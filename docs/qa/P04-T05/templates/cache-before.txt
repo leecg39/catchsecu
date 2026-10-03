@@ -1,0 +1,33 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/template-access-gate.test.ts (9 tests | 1 failed | 8 skipped) 2282ms
+   × 삭제한 템플릿의 생성 캐시는 내용·해시를 지우고 새/이전 형식의 재전송을 410으로 막는다 2273ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 삭제한 템플릿의 생성 캐시는 내용·해시를 지우고 새/이전 형식의 재전송을 410으로 막는다
+AssertionError: expected 201 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 201
+
+ ❯ tests/server/template-access-gate.test.ts:128:127
+    126|   expect((await templateDelete(req("/templates/" + row.id, f.editor.co…
+    127|   for (const retryKey of [key, legacyKey]) {
+    128|     expect((await templateCreate(req("/templates", f.editor.cookie, "P…
+       |                                                                                                                               ^
+    129|     const cache = await db.idempotencyRecord.findUniqueOrThrow({ where…
+    130|     expect(cache.responseCipher).toBeNull(); expect(cache.requestHash)…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 skipped (9)
+   Start at  23:25:11
+   Duration  4.29s (tests 55%, import 29%, transform 16%)
+

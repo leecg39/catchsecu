@@ -1,0 +1,377 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:563) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/campaigns.test.ts (55 tests) 39168ms
+   ✓ persistent campaign CRUD, privacy and delivery (25)
+     ✓ strict, idempotent drafts support search, versioned update, deletion and immutable history 333ms
+     ✓ CSV normalizes and deduplicates contacts, preserves invalid reasons and encrypts stored values 676ms
+     ✓ form selection uses explicit same-service consent IDs and exposes no full submission 565ms
+     ✓ exclusions require explicit confirmation and a repeated request creates one frozen outbox 637ms
+     ✓ two workers deliver one personalized local message with the verified From 561ms
+     ✓ schedule bounds and unavailable SMS transport are explicit 628ms
+     ✓ rescheduling moves the job and cancellation persists without creating a mail file 658ms
+     ✓ withdrawal committed before dispatch blocks the recorded consent 714ms
+     ✓ re-including a contact cannot silently replace the scheduled consent version 553ms
+     ✓ the actual requester, rather than the draft creator, must retain their service grant 2069ms
+     ✓ a disabled sender cannot send an already requested campaign 819ms
+     ✓ privacy erasure removes draft contacts, requested contacts and actual local mail bytes 593ms
+     ✓ retention cleanup includes unscheduled contact copies and campaign expiry 537ms
+     ✓ a known local storage failure can be retried without editing the original request 606ms
+     ✓ an interrupted local write recovers its existing receipt without changing file bytes 509ms
+     ✓ uncertain SMTP responses are never automatically resent or user-retried 583ms
+     ✓ cancellation during one real delivery keeps its receipt and prevents the next send 757ms
+     ✓ approved source destruction certifies the removal of every campaign contact copy 788ms
+     ✓ expiry cannot recopy an erased source and CSV formulas remain inert 489ms
+     ✓ database rejects missing events, cross-service copies, mutable receipts and duplicate attempts 465ms
+     ✓ cancelling an interrupted sending attempt preserves uncertainty instead of claiming it was unsent 501ms
+     ✓ a last-attempt worker exit is reconciled using its actual local receipt 412ms
+     ✓ 1000 targets remain fully pageable and maximum-sized scheduling is atomic 1946ms
+   ✓ message templates and HTML delivery (7)
+     ✓ template application copies an exact version; later edits and deletion cannot change scheduled mail 990ms
+     ✓ HTML sanitizer, escaped recipient values and plaintext fallback match actual delivered bytes 441ms
+   ✓ campaign attachment lifecycle (7)
+     ✓ real scanner, private download and actual local mail retain exact bytes and frozen metadata 839ms
+     ✓ unfinished or mismatched files block preview and scheduling, and upload owners are enforced 545ms
+     ✓ parallel reservations enforce five files, twenty MB, service scope and SMS restrictions 421ms
+     ✓ storage deletion failure blocks downloads and is retried; draft deletion removes the remaining originals 378ms
+     ✓ tampered stored bytes are rejected before any provider I/O 540ms
+     ✓ actual elapsed campaign expiry deletes encrypted attachment bytes 4738ms
+   ✓ SMTP adapter receives sanitized HTML and attachment buffers with path and URL access disabled 828ms
+   ✓ real local mail includes a bound unsubscribe link; GET is read-only and repeated anonymous POST is idempotent 547ms
+   ✓ forged, expired, unconfirmed and oversized unsubscribe requests cannot mutate data 430ms
+   ✓ RFC form posts work without cookies or Origin, and duplicate multipart posts keep one receipt 393ms
+   ✓ unsubscribe blocks new business mail, draft preview and a previously queued campaign at its final delivery check 702ms
+   ✓ signed relay receipts derive recipient scope from the sent job and preserve original acceptance and private audit fields 415ms
+   ✓ simultaneous duplicate events produce one effect and event ID reuse with another body conflicts 909ms
+   ✓ out-of-order delivery reports never override complaint or remove a permanent block 440ms
+   ✓ soft bounce threshold counts distinct sent jobs, not repeated events for one job 642ms
+   ✓ soft bounce policy excludes events outside seven days and jobs subsequently confirmed delivered 1443ms
+   ✓ unknown, unsent, impossibly dated jobs are rejected and raw SQL cannot forge scope or mutate feedback 495ms
+   ✓ suppression lists enforce tenant, service, role, exact address search and server pagination 768ms
+   ✓ erasing consent removes mail and contact copies while retaining minimum suppression and valid unsubscribe capability 514ms
+   ✓ the exact advertised one-click URL redirects only GET and accepts receiver POST without redirects 593ms
+stderr | tests/server/password-policy.test.ts > password policy, expiry and credential transactions > a session creation database failure rolls back password, history, timestamps, reset proofs and session revocation
+# SERVER_ERROR:  PrismaClientKnownRequestError: 
+Invalid `prisma.session.create()` invocation:
+
+
+Database error. Code: `P0001`. Message: `QA session creation failure`
+    at vn.handleRequestError (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:65:8643)
+    at vn.handleAndLogRequestError (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:65:7932)
+    at vn.request (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:65:7639)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at a (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:99:6935)
+    at Object.create (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@better-auth/prisma-adapter/dist/index.mjs:213:12)
+    at Object.create (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@better-auth/core/dist/db/adapter/factory.mjs:450:16)
+    at createWithHooks (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-auth/dist/db/with-hooks.mjs:26:66)
+    at Object.createSession (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-auth/dist/db/internal-adapter.mjs:308:16)
+    at file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-auth/dist/api/routes/update-user.mjs:176:22 {
+  code: 'P2039',
+  meta: {
+    modelName: 'Session',
+    driverAdapterError: DriverAdapterError: QA session creation failure
+        at PgTransaction.onError (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@prisma/adapter-pg/dist/index.mjs:666:11)
+        at PgTransaction.performIO (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@prisma/adapter-pg/dist/index.mjs:661:12)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at PgTransaction.queryRaw (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@prisma/adapter-pg/dist/index.mjs:595:30)
+        at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:70479
+        at e.run (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:69220)
+        at execute (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:57:815)
+        at yr.request (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:58:2425)
+        at Object.singleLoader (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:65:6920) {
+      cause: [Object]
+    }
+  },
+  clientVersion: '7.10.0'
+}
+
+ ✓ tests/server/password-policy.test.ts (22 tests) 23059ms
+   ✓ password policy, expiry and credential transactions (22)
+     ✓ policy CRUD validates limits, versions password rules separately and restores defaults 975ms
+     ✓ change rejects missing authentication, wrong origin, unknown fields and incorrect current password 329ms
+     ✓ default rejects current password and a failed reset leaves its proof and all sessions intact 796ms
+     ✓ successful change records one hash, clears all reset proofs and revokes other sessions even when false was sent 744ms
+     ✓ the credential trigger stores UTC even on a connection set to Korea time 341ms
+     ✓ disabling reuse permits the same password but still rotates its hash and sessions 782ms
+     ✓ the strongest minimum and reuse rules apply across active memberships, excluding suspended memberships and companies 467ms
+     ✓ last-ten reuse checks real history and retains exactly nine previous hashes 9809ms
+     ✓ direct auth API calls cannot bypass credential policy 381ms
+     ✓ concurrent change requests with the old session commit only once 549ms
+     ✓ concurrent reset proofs cannot overwrite a password after the first reset 557ms
+     ✓ a session creation database failure rolls back password, history, timestamps, reset proofs and session revocation 603ms
+     ✓ password attempts remain rate limited after transaction rollback 1222ms
+     ✓ expiry blocks company APIs and appears in context while recovery and policy status remain accessible 840ms
+     ✓ no rotation and credential-free accounts do not expire, and fresh passwords cannot be deferred 447ms
+     ✓ session deferral is idempotent in one session and the next login must change again 472ms
+     ✓ period deferral survives login until its deadline, policy revision or credential change 943ms
+     ✓ deferral rejects wrong origin, other company, stale policy, idle session and suspended membership 421ms
+     ✓ company switching applies each company's expiry while password rules remain account-wide 378ms
+     ✓ password reset racing a deferral never leaves a valid deferral of the old credential 644ms
+(node:1969) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/notifications.test.ts (25 tests) 17995ms
+   ✓ notification CRUD and transactional delivery (15)
+     ✓ shares the submission transaction, respects target and disabled filters, and never copies answers 1111ms
+     ✓ emits CSV completion from the actual importer once and preserves counts and target scope 552ms
+     ✓ disable, URL replacement and deletion cancel leased or queued sends before any effect 322ms
+     ✓ expired source data and archived services suppress queued notifications 320ms
+     ✓ failed local storage retries safely and manual retry has a bounded budget 10590ms
+   ✓ notification limits and failure boundaries (5)
+     ✓ persists an uncertain HTTP result, never auto-retries it and excludes provider response text 396ms
+(node:2375) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/subjects.test.ts (17 tests) 31409ms
+   ✓ explicit subject identity and real PostgreSQL access (17)
+     ✓ titles never infer identity; only paired required short text roles can publish 808ms
+     ✓ invalid name/email are rejected before writing; normalized identity deduplicates 459ms
+     ✓ same contact remains separate across services and companies; verified person can see all their fixed scopes 2605ms
+     ✓ mail token binds to request browser, GET never consumes it, POST can consume once even concurrently 395ms
+     ✓ expired and foreign links fail; only URL session matching its cookie reads; logout revokes 533ms
+     ✓ reads expose only consents/events, paginate, and cannot see another person's response 3358ms
+     ✓ correction rebinds one response, removes orphan contact and stale authentication scope 4046ms
+     ✓ approved destruction removes identity only after the last response and removes scopes 3556ms
+     ✓ retention expiry and inactive company/service immediately remove accessible records 5568ms
+     ✓ withdrawal cancel leaves consent intact; confirmation is atomic and idempotent 3518ms
+     ✓ another authenticated session cannot confirm a flow; stale correction blocks confirmation 988ms
+     ✓ administrator withdrawal suppresses scheduled and future business mail, transaction mail still works 363ms
+     ✓ database rejects cross-service bindings, scope extension after verification and invalid suppression 870ms
+     ✓ rate limits have no existence exception, old auth material is cleaned without erasing consent 566ms
+     ✓ worker drops an expired authentication mail before creating an outbox file 303ms
+     ✓ a read holds the current response stable until a concurrent correction finishes 1449ms
+(node:3300) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/form-crud-gate.test.ts (10 tests) 12253ms
+   ✓ 폼 복제는 질문·선택지·버전 ID를 독립 생성하고 재전송 및 원본 편집과 분리된다 1641ms
+   ✓ 게시본의 질문·선택지·본문은 DB에서 불변이고 편집·복제는 새 초안을 사용한다 1776ms
+   ✓ 게시 중지·재개는 현재 권한과 세션·만료·버전을 검사하고 실패 시 그대로 둔다 1240ms
+   ✓ 보관된 폼은 독립 초안으로 복제할 수 있고 최대 길이의 이름도 제한 내에서 생성한다 1032ms
+   ✓ 즐겨찾기도 권한 회수 후의 오래된 Context를 거부한다 961ms
+   ✓ 권한 회수 후의 오래된 Context는 폼 보관과 템플릿 삭제를 거부한다 1085ms
+   ✓ 로그아웃과 이메일 인증 취소 후에는 오래된 Context로 템플릿을 변경할 수 없다 1185ms
+   ✓ 복제 요청을 재전송할 때도 원본 서비스의 현재 권한을 검사한다 1005ms
+   ✓ 서비스 보관 후 템플릿 삭제를 거부하고 복원 후에는 버전을 검사한다 1111ms
+   ✓ 실제 변경이 없는 version-only 저장은 거부하고 즐겨찾기는 구성원별로 격리한다 1212ms
+(node:3580) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/policy-approvals.test.ts (15 tests) 8451ms
+   ✓ company policy and approval enforcement (15)
+     ✓ policy password checks are rate limited and cannot change the policy after repeated failures 681ms
+     ✓ invalid settings and enabling MFA before owner setup are rejected without writes 336ms
+     ✓ shortening session policy invalidates an existing idle session on the next protected request 508ms
+     ✓ approval requests enforce required evidence, service scope, tenant scope and idempotency 852ms
+     ✓ rejection permits a new request and approved publication binds immutable evidence and accepts a real response 706ms
+     ✓ editing a pending or approved draft invalidates the approval and preserves its review snapshot 510ms
+     ✓ approval policy changes supersede existing requests while unrelated session changes preserve approval 686ms
+     ✓ publication rechecks a reviewer's active role and service grant 338ms
+     ✓ cancellation and archive invalidate pending requests without deleting evidence 352ms
+     ✓ a concurrent edit and approval cannot approve the modified content 309ms
+     ✓ MFA requirement is applied on the next request and cannot be disabled while the policy requires it 435ms
+(node:3797) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/marketing.test.ts (23 tests) 13008ms
+   ✓ marketing preferences, lifecycle and dispatch with real PostgreSQL (23)
+     ✓ only a separate selected channel creates consent; general consent and old boolean never grant 935ms
+     ✓ one contact has independent channels, services and companies with no unauthorized reads 982ms
+     ✓ current grants and role are rechecked, sources require access to response data 341ms
+     ✓ manual evidence registration is idempotent; guessed fields, future dates and missing evidence fail 393ms
+     ✓ search is normalized exact match, pages are disjoint and CSV neutralizes formulas 343ms
+     ✓ exclusion is channel-specific with optimistic versions and append-only history 312ms
+     ✓ bulk withdrawal is atomic, handles repeated requests and refuses stale reconsented rows 913ms
+     ✓ new consent needs a newer timestamp and cannot remove channel exclusion or subject suppression 768ms
+     ✓ worker delivers only the consented current version and cancels queued mail after exclusion 553ms
+     ✓ future marketing mail stays queued and a withdrawal before due time cancels delivery 397ms
+     ✓ withdrawn marketing blocks business follow-up but authentication mail stays separate 396ms
+     ✓ source withdrawal updates all its channels; changing a contact cannot transfer consent 390ms
+     ✓ retention expiry and archived service deny delivery and never expose expired plaintext 707ms
+     ✓ deletion erases contact and evidence but preserves denial, history and original response 342ms
+     ✓ approved destruction erases marketing data before issuing a certificate 403ms
+     ✓ manual deletion and contact correction erase pending and delivered local copies 797ms
+     ✓ template instantiation maps all marketing contact fields to the new question IDs 398ms
+     ✓ database rejects unrecorded changes, cross-service bindings and deleted evidence restoration 521ms
+     ✓ a delivery lock serializes withdrawal; a committed withdrawal prevents the next callback 347ms
+     ✓ summary uses real service scoped state and audit trails contain no contacts or evidence text 326ms
+(node:4098) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/sharing.test.ts (20 tests) 9818ms
+   ✓ external sharing with PostgreSQL, local mail and private attachments (20)
+     ✓ creates one encrypted grant and one mail on retry; validates version and selected fields 659ms
+     ✓ role, tenant and current service grants protect all manager endpoints 579ms
+     ✓ local worker delivers a real authentication mail; cookie is HttpOnly and token never in JSON 455ms
+     ✓ a new challenge replaces the old one and expiry prevents verification 307ms
+     ✓ only selected fields are returned and new published versions remain outside the grant 639ms
+     ✓ updates, resend and revoke invalidate old cookies and invitation codes immediately 498ms
+     ✓ withdrawn, pending destruction and expired responses including legal hold are hidden 473ms
+     ✓ files require selected question, current answer, exact binding and fresh grant 551ms
+     ✓ DB foreign keys reject cross-version fields, cross-grant sessions and revived revoked grants 363ms
+     ✓ pagination, filters and audit events use server data without secret values 418ms
+     ✓ email lookup is normalized; archived services and missing file capability block access 559ms
+(node:4351) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/foundation.test.ts (43 tests) 9361ms
+   ✓ immutable forms and encrypted public submissions (15)
+     ✓ create and publish a validated immutable snapshot 392ms
+     ✓ copy has its own editable draft and idempotent publication; pause/resume gates public reads 307ms
+   ✓ membership permissions / invitations / ownership (8)
+     ✓ invite creation is idempotent, hides tokens, and rejects foreign services, members and unprivileged users 357ms
+     ✓ acceptance consumes one invitation concurrently, assigns only chosen services and changes the active company 486ms
+     ✓ database protects the last active owner and ownership transfer requires password, then changes authority immediately 335ms
+   ✓ service-scoped full-schema templates (6)
+     ✓ using a template copies all content/settings with new question identities and protects target service permissions 312ms
+   ✓ email verification / recovery / MFA (3)
+     ✓ unverified signup, verification mail and reset link roundtrip 471ms
+     ✓ MFA blocks pre-authenticated sessions, verifies TOTP and consumes a recovery code once 561ms
+(node:4571) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/senders.test.ts (26 tests) 9155ms
+   ✓ service scoped sender CRUD, verification and delivery (26)
+     ✓ real TXT queries and actual local code mail are both required, code is consumed once 322ms
+     ✓ address change and renewal revoke old challenges and require fresh proofs 329ms
+     ✓ only verified senders become the exclusive service/channel default 571ms
+     ✓ actual delivery uses verified From and queued use blocks sender deletion 869ms
+     ✓ a sender disabled before the due time cancels delivery without a local mail file 627ms
+     ✓ expired sender and another service cannot enqueue a branded message 599ms
+     ✓ server pagination is disjoint and verified filters exclude clock-expired rows 451ms
+     ✓ sender messages cannot be dispatched or downgraded through the legacy mail protocol 550ms
+(node:4800) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/destruction.test.ts (18 tests) 11514ms
+   ✓ approved destruction with real database and private storage (18)
+     ✓ request, approve, erase all originals and caches, produce one immutable verified certificate 1223ms
+     ✓ tenant, role and current service permission isolate request and certificate APIs 595ms
+     ✓ hold blocks approval and start, and releasing it permits the scheduled job 517ms
+     ✓ future schedule requires fresh approval after editing, supports cancellation, and rejects stale versions 628ms
+     ✓ expiry has an exact boundary, defaults to approval, hides all content and allows preservation 420ms
+     ✓ automatic expiry is policy-controlled and cancelled expiry does not starve newer candidates 732ms
+     ✓ policy change and revoked approver invalidate approval before destructive work 579ms
+     ✓ two workers and a recovered lease produce one certificate 629ms
+     ✓ filesystem failure preserves denial and originals until a retry succeeds 922ms
+     ✓ last-attempt crash reaches failure and explicit retry recovers 459ms
+     ✓ simultaneous approve/cancel never erases a cancelled request 441ms
+     ✓ after the barrier all writes and forged completion are rejected by API and DB 522ms
+     ✓ retention change needs policy, cannot exceed consent or revive expired data, and records the before value 564ms
+     ✓ requests reject cross-site origins, invalid schedules and company-mismatched references 392ms
+     ✓ attachment metadata uses permissions current at the locked read, even with an older context 326ms
+     ✓ request and certificate lists recheck service grants and roles after the context was read 354ms
+(node:5169) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/imports.test.ts (21 tests) 9168ms
+   ✓ CSV parser and real PostgreSQL import lifecycle (21)
+     ✓ validation creates zero responses, stages encrypted values and classifies duplicates 374ms
+     ✓ partial import erases original before writing and handles concurrent workers without duplicates 566ms
+     ✓ explicit identity columns survive scan, validation and worker import and normalize one subject 1195ms
+     ✓ roles, fresh service grants, tenant boundaries and origins protect every surface 413ms
+     ✓ stale config and catalog changes require revalidation 431ms
+     ✓ cancel and expiry remove staging payloads and private source bytes 439ms
+     ✓ import evidence and duplicate raw rows are removed by actual destruction 361ms
+     ✓ database rejects cross-service binding, unvalidated writes and modifying erased payloads 330ms
+     ✓ large input is committed in bounded batches with stable retry counts 1156ms
+     ✓ source providers must be active and in the same service; snapshot preserves the selected source 460ms
+(node:5392) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/files.test.ts (19 tests) 9328ms
+   ✓ private attachment storage with real PostgreSQL and ClamAV (19)
+     ✓ public file bytes are encrypted, scanned, attached once, and downloaded byte-for-byte with private headers 849ms
+     ✓ read access checks tenant, role, service, response and question together 564ms
+     ✓ question and publication proofs cannot be swapped and a proof cannot be consumed concurrently twice 548ms
+     ✓ cancellation removes stored bytes and metadata; expired uploads are recovered by the cleanup worker 332ms
+     ✓ privacy member replacement preserves old evidence and rejects cross-response files, legal holds, and attached deletion 612ms
+     ✓ retention expiry blocks file bytes while legal hold keeps authorized evidence accessible 339ms
+     ✓ the 10MB boundary succeeds and the database rejects tampered status, binding and immutable bytes 1235ms
+     ✓ a failed physical deletion stays inaccessible and cleanup retries after storage recovery 470ms
+     ✓ cancellation versus submission commits one outcome without an attachment pointing to deleted bytes 304ms
+     ✓ PDF, PNG, JPEG and UTF-8 CSV signatures are checked and downloaded without byte conversion 355ms
+(node:5623) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/form-documents.test.ts (15 tests) 8690ms
+   ✓ versioned form documents and consent receipt PDFs (15)
+     ✓ publishes frozen display and policy text without leaking internal scope identifiers 853ms
+     ✓ validates published same-service selections, kind, duplicate documents and retention limit 500ms
+     ✓ rejects missing, unknown and duplicate acknowledgments before creating any response 333ms
+     ✓ stores one encrypted immutable receipt for retry and parses its actual Korean PDF bytes 837ms
+     ✓ optional refusals never become granted documents and an all-refused response has no receipt 541ms
+     ✓ source edits, display changes and public-link revocation preserve published forms and receipt bytes 1000ms
+     ✓ approval freezes document display and saving refreshed settings requires approval again 419ms
+     ✓ current grants, tenant and retention control PDF access even with a previously loaded context 343ms
+     ✓ approved destruction removes encrypted evidence, PDF and events then blocks downloads 532ms
+     ✓ paginated options and templates enforce the same document boundaries 360ms
+     ✓ publication serializes with link revocation and never publishes an already-revoked selection 451ms
+ ✓ tests/server/account-closure.test.ts (8 tests) 7702ms
+   ✓ 프로필은 서버 저장 후 새 세션에서도 유지되며 계정/권한 필드 변경은 거부한다 1025ms
+   ✓ 회사 소속이 없어도 본인 활동만 조회·필터·페이지·CSV로 제공하며 원문·식별자는 제외한다 864ms
+   ✓ 기기 세션은 본인만 회수하고 해당 쿠키만 무효화한다 784ms
+   ✓ 소유권 인계 전 폐쇄는 API와 DB에서 거부하고 인계 후 계정만 폐쇄한다 1100ms
+   ✓ 폐쇄에는 이메일·현재 암호·버전·살아 있는 세션이 필요하고 실패하면 상태를 유지한다 766ms
+   ✓ 폐쇄는 모든 회사의 권한·세션·인증·초대와 암호 재설정 링크를 회수하며 사유는 암호화한다 1416ms
+   ✓ 전문가의 폐쇄는 배정·서비스 범위를 회수하고 감사 연결을 보존한다 891ms
+   ✓ 마지막 플랫폼 운영자의 폐쇄를 막고 동시 폐쇄 후에도 한 명을 유지한다 853ms
+(node:6054) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/documents.test.ts (21 tests) 5426ms
+   ✓ documents with real PostgreSQL, public links and service displays (21)
+     ✓ single link revocation, unpublish and archive do not erase versions 314ms
+     ✓ publish checks purposes, refusal, contacts, overseas recipients and archived references 324ms
+     ✓ service displays persist two independent kinds and fixed policy versions 334ms
+(node:6226) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/document-pdf.test.ts (10 tests) 4409ms
+   ✓ stored document PDF with real PostgreSQL (10)
+     ✓ produces actual PDF bytes and returns the identical file through authorized and public routes 843ms
+     ✓ older version stays byte-identical after revision and public revocation 473ms
+     ✓ requires current tenant, service grant and membership even for a cached PDF 329ms
+     ✓ multi-page Korean rendering is deterministic and includes safe attachment naming 566ms
+(node:6332) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/tenant-boundary.test.ts (2 tests) 4933ms
+   ✓ tenant boundary (2)
+     ✓ every protected route hides company A identifiers from company B 2857ms
+ ✓ tests/server/processing-catalog.test.ts (15 tests) 4217ms
+   ✓ processing catalog through actual PostgreSQL and API handlers (15)
+     ✓ creates, reads, updates both resources and keeps the original recipient snapshot 304ms
+     ✓ history remains paginated and a read cannot change it 371ms
+(node:6649) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/member-management-gate.test.ts (17 tests) 3424ms
+ ✓ tests/server/company-management.test.ts (14 tests) 2812ms
+ ✓ tests/server/audit-events.test.ts (5 tests) 4865ms
+   ✓ 회사 격리 감사 이벤트 조회 (5)
+     ✓ 인증·역할·서비스 범위와 안전 DTO 450ms
+     ✓ 5,000건 초과 내보내기는 일부만 내려주지 않는다 1737ms
+ ✓ tests/server/auth-session-gate.test.ts (7 tests) 2786ms
+ ✓ tests/server/subscriptions.test.ts (10 tests) 2613ms
+(node:7088) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/expert-assignments.test.ts (4 tests) 2249ms
+   ✓ 전문가 배정 PostgreSQL·API·회사 선택 (4)
+     ✓ 배정된 회사와 서비스만 조회하고 일반 구성원 관리로 승격할 수 없다 355ms
+     ✓ 두 번째 회사 선택, 범위 수정, 회수 직후 접근 차단 378ms
+(node:7177) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/support-tickets.test.ts (4 tests) 2413ms
+   ✓ tenant-scoped support requests (4)
+     ✓ validates creation, isolates authors and encrypts content 555ms
+(node:7252) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/access-requests.test.ts (3 tests) 1929ms
+   ✓ 서비스 접근 요청 PostgreSQL·HTTP 권한 흐름 (3)
+     ✓ 동일 서비스 중복 요청은 한 건으로 수렴하고 승인 후 실제 권한이 생긴다 310ms
+ ✓ tests/server/notices.test.ts (5 tests) 2049ms
+   ✓ notice publication (5)
+     ✓ publishes, searches, handles stale edits, unpublishes and archives consistently 419ms
+     ✓ scans, protects, downloads and deletes notice attachments with the notice lifecycle 337ms
+ ✓ tests/server/guides.test.ts (3 tests) 1748ms
+ ✓ tests/server/analytics.test.ts (5 tests) 1182ms
+ ✓ tests/server/auth-navigation.test.ts (13 tests) 909ms
+ ✓ tests/server/platform.test.ts (2 tests) 465ms
+   ✓ platform gate (2)
+     ✓ missing required environment names the field and not a planted secret 328ms
+ ✓ tests/server/ledger.test.ts (5 tests) 520ms
+ ✓ tests/server/message-content.test.ts (6 tests) 17ms
+
+ Test Files  34 passed (34)
+      Tests  488 passed (488)
+   Start at  19:27:05
+   Duration  300.87s (tests 91%, import 8%, transform 1%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P04-T01/full-test.json

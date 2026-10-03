@@ -1,0 +1,43 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:7316) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/imports.test.ts (21 tests | 1 failed) 10188ms
+   ❯ CSV parser and real PostgreSQL import lifecycle (21)
+     × expired worker leases recover and repeat processing never adds another response 170ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/imports.test.ts > CSV parser and real PostgreSQL import lifecycle > expired worker leases recover and repeat processing never adds another response
+PrismaClientKnownRequestError: 
+Invalid `tx.importJob.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/import-worker.ts:32:25
+
+  29 if (attempts >= 5) {
+  30   await tx.importJob.update({ where: { id: row.id }, data: { status: "failed", leaseOwner: null, leaseUntil: null, lastError: "LEASE_EXHAUSTED", version: { increment: 1 } } }); return null;
+  31 }
+→ 32 return tx.importJob.update(
+Database error. Code: `23514`. Message: `invalid import generation claim`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/src/runtime/getPrismaClient.ts:861:18
+ ❯ runOneImport src/server/import-worker.ts:56:15
+     54| }
+     55| export async function runOneImport(workerId: string, now = new Date(),…
+     56|   const job = await claimImport(workerId, now, scope);
+       |               ^
+     57|   if (!job) return false;
+     58|   try {
+ ❯ tests/server/imports.test.ts:189:53
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 20 passed (21)
+   Start at  04:44:36
+   Duration  11.82s (tests 87%, import 8%, transform 5%)
+

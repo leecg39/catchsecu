@@ -35,6 +35,37 @@ const auditSelect = { id: true, action: true, resource: true, resourceId: true,
 type AuditRow = Prisma.AuditEventGetPayload<{ select: typeof auditSelect }>;
 export const maxAuditExportRows = 5000;
 
+function ownAuditWhere(userId: string, input: AuditEventQuery): Prisma.AuditEventWhereInput {
+  if (input.scope !== "mine" || input.actorId || input.serviceId || input.searchField === "actor")
+    fail(422, "OWN_ACTIVITY_FILTER", "본인 활동은 처리내용·처리대상과 기간으로 조회해주세요.");
+  const prefixes = actionPrefixes[input.kind];
+  return { actorId: userId,
+    ...(prefixes.length ? { OR: prefixes.map(prefix => ({ action: { startsWith: prefix } })) } : {}),
+    ...(input.search ? { [input.searchField]: { contains: input.search, mode: "insensitive" } } : {}),
+    ...(input.from || input.to ? { createdAt: { ...(input.from ? { gte: new Date(input.from) } : {}), ...(input.to ? { lt: new Date(input.to) } : {}) } } : {}),
+  };
+}
+export async function listOwnAuditEvents(user: { id: string; name: string }, input: AuditEventQuery) {
+  const where = ownAuditWhere(user.id, input);
+  const [rows, total] = await db.$transaction([
+    db.auditEvent.findMany({ where, select: { id: true, createdAt: true, action: true, resource: true },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }], skip: (input.page - 1) * input.pageSize, take: input.pageSize }),
+    db.auditEvent.count({ where }),
+  ]);
+  return { items: rows.map(row => ({ ...row, resourceId: null, serviceId: null, serviceName: null, actorName: user.name })),
+    total, page: input.page, pageSize: input.pageSize };
+}
+export async function exportOwnAuditEvents(user: { id: string; name: string }, input: AuditEventQuery, requestId: string) {
+  const rows = await db.auditEvent.findMany({ where: ownAuditWhere(user.id, input), select: { id: true, createdAt: true, action: true, resource: true },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: maxAuditExportRows + 1 });
+  if (rows.length > maxAuditExportRows) fail(413, "AUDIT_EXPORT_LIMIT", "내보낼 기록이 5,000건을 넘습니다. 기간을 좁혀주세요.");
+  const csvRows = [["이벤트 ID", "처리일시", "처리자명", "처리내용", "처리대상"],
+    ...rows.map(row => [row.id, row.createdAt.toISOString(), user.name, row.action, row.resource])];
+  await db.auditEvent.create({ data: { actorId: user.id, requestId, action: "audit.exported", resource: "auditEvent",
+    detail: { scope: "mine", rowCount: rows.length, hasSearch: !!input.search, hasFrom: !!input.from, hasTo: !!input.to } } });
+  return "\uFEFF" + csvRows.map(row => row.map(safeCsvCell).join(",")).join("\r\n") + "\r\n";
+}
+
 async function auditWhere(ctx: Context, input: AuditEventQuery) {
   const companyWide = companyAuditRoles.has(ctx.member.role);
   if (input.scope === "company" && !ctx.capabilities.includes("audit.read"))

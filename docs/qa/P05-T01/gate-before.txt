@@ -1,0 +1,248 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/catalog-access-gate.test.ts (7 tests | 6 failed) 4745ms
+   × 로그아웃한 이전 Context는 목록·상세·이력·생성·수정·보관을 처리할 수 없다 1023ms
+   × 만료된 세션 Context는 수집 근거를 읽거나 생성하지 못한다 454ms
+   × 이메일 인증을 회수하면 이전 Context의 읽기와 쓰기를 거부한다 440ms
+   × 전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다 737ms
+   × 전문가 배정 상태를 회수하면 남아 있는 구성원/grant로 열람하지 못한다 911ms
+   × 전문가의 여분 grant로 배정하지 않은 서비스의 수집 근거를 읽을 수 없다 691ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 로그아웃한 이전 Context는 목록·상세·이력·생성·수정·보관을 처리할 수 없다
+AssertionError: promise resolved "{ items: [ { …(20) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "activePurposeCount": 0,
++       "contact": "test@catchsecu.test",
++       "countryCode": "KR",
++       "createdAt": 2026-10-03T11:17:10.647Z,
++       "id": "ac444078-556f-417f-aca3-0da368c2a27d",
++       "items": [
++         "이메일",
++       ],
++       "kind": "processor",
++       "name": "수탁자 238188f6-2cd4-4af2-b816-cd67b9ab0ac3",
++       "purpose": "합성 정보 전달",
++       "refusalNotice": "",
++       "retentionDays": 7,
++       "retentionMode": "days",
++       "retentionReason": "",
++       "serviceId": "33880c7b-cf7d-4e4a-9e86-3f0c60a99298",
++       "serviceName": "다른 서비스",
++       "status": "active",
++       "transferMethod": "",
++       "transferTiming": "",
++       "updatedAt": 2026-10-03T11:17:10.647Z,
++       "version": 1,
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/catalog-access-gate.test.ts:57:26
+     55|     () => db.$transaction(tx => createRecipient(tx, f.ctx, recipient(f…
+     56|     () => updateRecipient(f.ctx, f.row.id, { ...f.input, version: 1, p…
+     57|   ]) await expect(call()).rejects.toMatchObject({ status: 401 });
+       |                          ^
+     58|   expect(await db.recipient.count()).toBe(1); expect(await db.recipien…
+     59| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 만료된 세션 Context는 수집 근거를 읽거나 생성하지 못한다
+AssertionError: promise resolved "{ …(20) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "activePurposeCount": 0,
++   "contact": "test@catchsecu.test",
++   "countryCode": "KR",
++   "createdAt": 2026-10-03T11:17:11.134Z,
++   "id": "b15674eb-4c0d-4f67-9625-f6b5ae2ebbe5",
++   "items": [
++     "이메일",
++   ],
++   "kind": "processor",
++   "name": "수탁자 7d13b080-7b8a-44f7-9f82-61feb5915de9",
++   "purpose": "합성 정보 전달",
++   "refusalNotice": "",
++   "retentionDays": 7,
++   "retentionMode": "days",
++   "retentionReason": "",
++   "serviceId": "9681fa98-cd56-40e3-bf8c-5116613ceb0a",
++   "serviceName": "다른 서비스",
++   "status": "active",
++   "transferMethod": "",
++   "transferTiming": "",
++   "updatedAt": 2026-10-03T11:17:11.134Z,
++   "version": 1,
+  }
+
+ ❯ tests/server/catalog-access-gate.test.ts:62:59
+     60| test("만료된 세션 Context는 수집 근거를 읽거나 생성하지 못한다", async () => {
+     61|   const f = await fixture(); await db.session.update({ where: { id: f.…
+     62|   await expect(readCatalog(f.ctx, "recipients", f.row.id)).rejects.toM…
+       |                                                           ^
+     63|   await expect(db.$transaction(tx => createPurpose(tx, f.ctx, purpose(…
+     64| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 이메일 인증을 회수하면 이전 Context의 읽기와 쓰기를 거부한다
+AssertionError: promise resolved "{ items: [ { …(20) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "activePurposeCount": 0,
++       "contact": "test@catchsecu.test",
++       "countryCode": "KR",
++       "createdAt": 2026-10-03T11:17:11.567Z,
++       "id": "017fb5b7-c005-4d71-939c-feaec36c6dae",
++       "items": [
++         "이메일",
++       ],
++       "kind": "processor",
++       "name": "수탁자 075191a4-2f88-4784-8af5-1ba13fdd43e0",
++       "purpose": "합성 정보 전달",
++       "refusalNotice": "",
++       "retentionDays": 7,
++       "retentionMode": "days",
++       "retentionReason": "",
++       "serviceId": "8aa6d20f-d1ab-4e71-8813-c56c4d367919",
++       "serviceName": "다른 서비스",
++       "status": "active",
++       "transferMethod": "",
++       "transferTiming": "",
++       "updatedAt": 2026-10-03T11:17:11.567Z,
++       "version": 1,
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/catalog-access-gate.test.ts:67:73
+     65| test("이메일 인증을 회수하면 이전 Context의 읽기와 쓰기를 거부한다", async () => {
+     66|   const f = await fixture(); await db.user.update({ where: { id: f.use…
+     67|   await expect(listCatalog(f.ctx, "recipients", catalogQuery.parse({})…
+       |                                                                         ^
+     68|   await expect(updateRecipient(f.ctx, f.row.id, { ...f.input, version:…
+     69| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다
+PrismaClientKnownRequestError: 
+Invalid `db.expertAssignment.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/catalog-access-gate.test.ts:73:29
+
+  70 test("전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다", async () => {
+  71   const f = await fixture(), e = await expert(f);
+  72   expect((await listCatalog(e.ctx, "recipients", catalogQuery.parse({}))).total).toBe(1);
+→ 73   await db.expertAssignment.update(
+Database error. Code: `23514`. Message: `new row for relation "ExpertAssignment" violates check constraint "ExpertAssignment_state_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/catalog-access-gate.test.ts:73:3
+     71|   const f = await fixture(), e = await expert(f);
+     72|   expect((await listCatalog(e.ctx, "recipients", catalogQuery.parse({}…
+     73|   await db.expertAssignment.update({ where: { id: e.assignment.id }, d…
+       |   ^
+     74|   await expect(listCatalog(e.ctx, "recipients", catalogQuery.parse({})…
+     75|   await expect(readCatalog(e.ctx, "recipients", f.row.id)).rejects.toM…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 전문가 배정 상태를 회수하면 남아 있는 구성원/grant로 열람하지 못한다
+AssertionError: promise resolved "{ …(20) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "activePurposeCount": 0,
++   "contact": "test@catchsecu.test",
++   "countryCode": "KR",
++   "createdAt": 2026-10-03T11:17:12.987Z,
++   "id": "7459b2b8-bfbd-4d2d-83ba-44ae695a05ba",
++   "items": [
++     "이메일",
++   ],
++   "kind": "processor",
++   "name": "수탁자 57538aa1-13dd-4736-bf1a-175e764e59f4",
++   "purpose": "합성 정보 전달",
++   "refusalNotice": "",
++   "retentionDays": 7,
++   "retentionMode": "days",
++   "retentionReason": "",
++   "serviceId": "c56596b9-e214-44e6-a02e-e48c850d351d",
++   "serviceName": "다른 서비스",
++   "status": "active",
++   "transferMethod": "",
++   "transferTiming": "",
++   "updatedAt": 2026-10-03T11:17:12.987Z,
++   "version": 1,
+  }
+
+ ❯ tests/server/catalog-access-gate.test.ts:81:59
+     79|   const f = await fixture(), e = await expert(f);
+     80|   await db.expertAssignment.update({ where: { id: e.assignment.id }, d…
+     81|   await expect(readCatalog(e.ctx, "recipients", f.row.id)).rejects.toM…
+       |                                                           ^
+     82| });
+     83| test("전문가의 여분 grant로 배정하지 않은 서비스의 수집 근거를 읽을 수 없다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 전문가의 여분 grant로 배정하지 않은 서비스의 수집 근거를 읽을 수 없다
+AssertionError: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ tests/server/catalog-access-gate.test.ts:86:103
+     84|   const f = await fixture(), second = await db.$transaction(tx => crea…
+     85|   await db.serviceGrant.create({ data: { tenantId: f.company.id, membe…
+     86|   const listed = await listCatalog(e.ctx, "recipients", catalogQuery.p…
+       |                                                                                                       ^
+     87|   await expect(readCatalog(e.ctx, "recipients", second.id)).rejects.to…
+     88| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 1 passed (7)
+   Start at  20:17:08
+   Duration  6.15s (tests 79%, import 15%, transform 7%)
+

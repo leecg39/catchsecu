@@ -1,0 +1,20 @@
+(node:55329) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-async-export.ts:64
+    const q = { id: randomUUID(), type: "단문형 답변", label: "합성 값", required: true }, content = formContentSchema.parse({ body: "합성 비동기 검증", questions: [q], consentRequired: false, retentionDays: 30, maxResponses: 10 });
+                                                                                                                       ^
+
+ZodError: [
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "consentPurpose"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  }
+]
+    at <anonymous> (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-async-export.ts:64:112)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.19.0

@@ -1,0 +1,97 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:38524) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-list-deletion.test.ts (17 tests | 2 failed) 13181ms
+   × 다른 회사·조회 전용·보관 서비스의 삭제 조건과 실제 삭제를 일치시킨다 721ms
+   × 템플릿 사용으로 생성한 초안 삭제는 새 캐시와 이전 템플릿 캐시도 지운다 514ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 다른 회사·조회 전용·보관 서비스의 삭제 조건과 실제 삭제를 일치시킨다
+AssertionError: expected 409 to be 404 // Object.is equality
+
+- Expected
++ Received
+
+- 404
++ 409
+
+ ❯ tests/server/form-list-deletion.test.ts:144:115
+    142|   const f=await fixture(),foreign=await db.company.create({ data:{ nam…
+    143|   expect((await GET(req("/forms/"+f.form.id+"/deletion",outsider.cooki…
+    144|   expect((await DELETE(req("/forms/"+f.form.id+"/purge",outsider.cooki…
+       |                                                                                                                   ^
+    145|   await db.serviceGrant.update({ where:{ id:f.grant.id },data:{ capabi…
+    146|   const readOnly=await GET(req("/forms/"+f.form.id+"/deletion",f.edito…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 템플릿 사용으로 생성한 초안 삭제는 새 캐시와 이전 템플릿 캐시도 지운다
+PrismaClientValidationError: 
+Invalid `db.formTemplate.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/form-list-deletion.test.ts:153:58
+
+  150   const archived=await GET(req("/forms/"+f.form.id+"/deletion",f.editor.cookie)); expect(archived.status).toBe(200); expect((await archived.json()).canPurge).toBe(false); expect((await purge(f)).status).toBe(409);
+  151 });
+  152 test("템플릿 사용으로 생성한 초안 삭제는 새 캐시와 이전 템플릿 캐시도 지운다",async () => {
+→ 153   const f=await fixture(),template=await db.formTemplate.create({
+          data: {
+            tenantId: "a7643b68-915d-4207-a6ce-f7d77c92551d",
+            ~~~~~~~~
+            serviceId: "1e8fa088-1b7f-4466-a6d1-a15f1c02d126",
+            scope: "company",
+            title: "템플릿",
+            category: "시험",
+            content: {
+              body: "초안 본문",
+              questions: [
+                {
+                  id: "ac9ef1e0-853a-4e1d-b745-a12460c2bd07",
+                  type: "객관식 답변",
+                  label: "선택",
+                  required: true,
+                  options: [
+                    "첫째",
+                    "둘째"
+                  ]
+                }
+              ],
+              consentRequired: false,
+              consentPurpose: "",
+              retentionDays: 30,
+              maxResponses: 5
+            },
+        ?   id?: String,
+        ?   status?: String,
+        ?   version?: Int,
+        ?   createdAt?: DateTime,
+        ?   updatedAt?: DateTime,
+        ?   tenant?: CompanyCreateNestedOneWithoutTemplatesInput,
+        ?   service?: ServiceCreateNestedOneWithoutTemplatesInput
+          }
+        })
+
+Unknown argument `tenantId`. Did you mean `tenant`? Available options are marked with ?.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/form-list-deletion.test.ts:153:36
+    151| });
+    152| test("템플릿 사용으로 생성한 초안 삭제는 새 캐시와 이전 템플릿 캐시도 지운다",async () => {
+    153|   const f=await fixture(),template=await db.formTemplate.create({ data…
+       |                                    ^
+    154|   const key=randomUUID(),input={ version:1,serviceId:f.serviceId };
+    155|   const used=await templateUse(req("/templates/"+template.id+"/use",f.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 15 passed (17)
+   Start at  22:25:01
+   Duration  14.57s (tests 92%, import 5%, transform 3%)
+

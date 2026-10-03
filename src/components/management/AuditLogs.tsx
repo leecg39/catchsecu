@@ -57,7 +57,8 @@ export function AuditLogs({ path }: { path: string }) {
   if (applied.end) params.set("to", iso(applied.end, true));
   if (applied.serviceId) params.set("serviceId", applied.serviceId);
   if (applied.search.trim()) { params.set("search", applied.search.trim()); params.set("searchField", applied.searchField); }
-  const result = useResource<AuditEventList>("/audit-events?" + params.toString());
+  const auditPath = config.scope === "mine" ? "/me/audit-events" : "/audit-events";
+  const result = useResource<AuditEventList>(auditPath + "?" + params.toString());
   const companyWide = ["owner", "admin", "security", "auditor"].includes(context.data?.company?.role ?? "");
   const pages = Math.max(1, Math.ceil((result.data?.total ?? 0) / pageSize));
   function search() {
@@ -71,7 +72,7 @@ export function AuditLogs({ path }: { path: string }) {
     try {
       const exportParams = new URLSearchParams(params);
       exportParams.delete("page"); exportParams.delete("pageSize");
-      const response = await fetch("/api/v1/audit-events/export?" + exportParams.toString(),
+      const response = await fetch("/api/v1" + auditPath + "/export?" + exportParams.toString(),
         { credentials: "same-origin", cache: "no-store" });
       if (!response.ok) {
         const body = await response.json().catch(() => null);

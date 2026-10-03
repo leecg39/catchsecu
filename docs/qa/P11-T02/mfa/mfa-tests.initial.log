@@ -1,0 +1,55 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/mfa-policy.test.ts (21 tests | 21 skipped) 2404ms
+   ↓ company MFA policy and recovery exceptions (21)
+     ↓ reports actual enrollment counts without factor secrets, with search and page clamp
+     ↓ policy change is versioned and immediately requires unenrolled users to enroll
+     ↓ policy mutation requires current password, version, tenant and enrolled direct owner
+     ↓ create/read/update/delete are real, latest replay is current and deletion erases creation copies
+     ↓ an active exception opens access and a natural clock boundary closes it without cleanup
+     ↓ an owner exception also expires and cannot grant management authority
+     ↓ deleting an exception revokes existing password-only access on the next request
+     ↓ rejects unsafe expiration 2026-10-03T22:07:40.754Z
+     ↓ rejects unsafe expiration 2026-10-04T23:07:41.754Z
+     ↓ rejects foreign/enrolled targets and duplicate records
+     ↓ conflicting updates keep the current reason and original maximum lifetime
+     ↓ strict query ?search=x&search=y
+     ↓ strict query ?extra=x
+     ↓ strict query ?%5F%5Fproto%5F%5F=x
+     ↓ strict query ?page=0
+     ↓ viewer and foreign company cannot read exception details
+     ↓ cross-origin mutation cannot issue an exception
+     ↓ the final deadline check rolls back late audit and data after exception expiry
+     ↓ a stale context cannot use revoked exceptions in a service transaction
+     ↓ required MFA cannot be disabled, and the last enrolled owner cannot be demoted
+     ↓ native constraints reject tenant mismatch, unsafe lifetime, plaintext and unversioned updates
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/mfa-policy.test.ts [ tests/server/mfa-policy.test.ts ]
+AssertionError: expected 429 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 429
+
+ ❯ tests/server/mfa-policy.test.ts:34:146
+     32|  serviceId=(await db.service.create({data:{tenantId:a,name:"MFA 서비스",e…
+     33|  for(const role of roles){
+     34|   const email="mfa-"+role+"@example.test";expect((await auth.handler(r…
+       |                                                                                                                                                  ^
+     35|   const u=await db.user.update({where:{email},data:{emailVerified:true…
+     36|   members[role]=(await db.membership.create({data:{tenantId:role==="fo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  21 skipped (21)
+   Start at  07:07:40
+   Duration  3.90s (tests 64%, import 25%, transform 12%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P11-T02/mfa/mfa-tests.json

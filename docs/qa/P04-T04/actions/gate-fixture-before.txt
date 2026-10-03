@@ -1,0 +1,35 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:77276) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-list-deletion.test.ts (24 tests | 1 failed) 35442ms
+   × 보관 폼은 독립 복사/삭제 조건 조회를 허용하고 가져오기 양식은 변경 작업을 안내하지 않는다 1682ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 보관 폼은 독립 복사/삭제 조건 조회를 허용하고 가져오기 양식은 변경 작업을 안내하지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.form.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/form-list-deletion.test.ts:240:17
+
+  237 test("보관 폼은 독립 복사/삭제 조건 조회를 허용하고 가져오기 양식은 변경 작업을 안내하지 않는다",async () => {
+  238   const f=await fixture(); expect((await DELETE(req("/forms/"+f.form.id,f.editor.cookie,"DELETE",undefined,undefined,1))).status).toBe(204);
+  239   const archived=await (await GET(req("/forms/"+f.form.id,f.editor.cookie))).json(); expect(archived.actions).toMatchObject({ edit:false,copy:true,registerTemplate:false,archive:false,checkDeletion:true });
+→ 240   await db.form.update(
+Database error. Code: `23514`. Message: `immutable form origin`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/form-list-deletion.test.ts:240:3
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 23 passed (24)
+   Start at  22:51:10
+   Duration  38.22s (tests 94%, import 4%, transform 3%)
+

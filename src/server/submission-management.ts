@@ -12,7 +12,7 @@ import { contentDto } from "./forms";
 import { validateAnswers, type Answers } from "./answer-validation";
 import { submissionInput } from "@/contracts/domains";
 import { attachCorrectionFiles } from "./file-bindings";
-import { canReadFiles, fileInfo, lockFileContext, lockFileSubmission } from "./file-access";
+import { assertFileDeadlines, canReadFiles, fileInfo, lockFileContext, lockFileSubmission } from "./file-access";
 import { lockSubmission, requireSubmissionContent } from "./submission-access";
 import { submissionDataAvailable } from "@/contracts/destruction";
 import { createDestruction } from "./destruction";
@@ -25,7 +25,7 @@ export const actionInput = z.object({ version: z.number().int().positive(), reas
 export const noteInput = z.object({ text: z.string().trim().min(1).max(5000) }).strict();
 function answerValues(row: Awaited<ReturnType<typeof lockSubmission>>) {
   return Object.fromEntries(row.formVersion.questions.map(question => [question.stableKey,
-    row.status === "destroyed" ? "" : decrypt<string | string[]>(row.answers.find(answer => answer.questionId === question.id)!.valueCipher)]));
+    row.status === "destroyed" ? "" : decrypt<Answers[string]>(row.answers.find(answer => answer.questionId === question.id)!.valueCipher)]));
 }
 type CorrectionSnapshot = { answers: Answers; reason: string };
 async function recordChange(tx: Transaction, ctx: Context, id: string, reason: string, code: string, before: Answers, after: Answers) {
@@ -73,9 +73,9 @@ export async function correctSubmission(ctx: Context, id: string, input: z.infer
   if (row.legalHold) fail(409, "LEGAL_HOLD", "보존 조치 중에는 응답을 정정할 수 없습니다.");
   const evidence = row.importJobId ? await tx.importEvidence.findUnique({ where: { submissionId: id } }) : null;
   const fieldTypes = evidence ? decrypt<{ fieldTypes: string[] }>(evidence.payloadCipher).fieldTypes : [];
-  validateAnswers(row.formVersion.questions.map((q, i) => ({ ...q, validationKind: fieldTypes?.[i] })), input.answers, true);
   const before = answerValues(row);
-  const changedAnswers = Object.fromEntries(Object.entries(input.answers).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(before[key])));
+  const normalized = validateAnswers(row.formVersion.questions.map((q, i) => ({ ...q, validationKind: fieldTypes?.[i] })), input.answers, true, before);
+  const changedAnswers = Object.fromEntries(Object.entries(normalized).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(before[key])));
   if (!Object.keys(changedAnswers).length) fail(422, "NO_CHANGES", "변경된 답변이 없습니다.");
     const hasFileChanges = row.formVersion.questions.some(question => question.type === "파일 업로드" && question.stableKey in changedAnswers);
     if (hasFileChanges) {
@@ -91,7 +91,7 @@ export async function correctSubmission(ctx: Context, id: string, input: z.infer
       questions: row.formVersion.questions }, changedAnswers, requestId);
     for (const question of row.formVersion.questions) if (question.stableKey in changedAnswers) {
       await tx.answer.updateMany({ where: { tenantId: ctx.tenantId, submissionId: id, questionId: question.id },
-        data: { valueCipher: encrypt(input.answers[question.stableKey]) } });
+        data: { valueCipher: encrypt(changedAnswers[question.stableKey]) } });
     }
     const erasedMarketing = await tx.marketingPreference.findMany({ where: { sourceSubmissionId: id, status: "erased" }, select: { id: true } });
     if (erasedMarketing.length) await eraseMarketingJobs(tx, { marketingPreferenceId: { in: erasedMarketing.map(r => r.id) } });
@@ -105,6 +105,7 @@ export async function correctSubmission(ctx: Context, id: string, input: z.infer
 export async function changeSubmission(ctx: Context, id: string, action: "withdraw" | "destruction-request" | "hold", input: z.infer<typeof actionInput> & { hold?: boolean }, requestId: string) {
   return db.$transaction(async tx => {
     const row = await lockSubmission(tx, ctx, id, action === "withdraw" ? "submission.write" : "submission.destroy", true);
+    const deadlines = await lockFileContext(tx, ctx, row.formVersion.form.serviceId, [action === "withdraw" ? "submission.write" : "submission.destroy"], true);
     const current = row;
     if (current.version !== input.version) fail(409, "VERSION_CONFLICT", "응답이 변경되었습니다. 다시 불러와주세요.");
     if (["destroying", "destroyed"].includes(current.status)) fail(409, "DESTRUCTION_STARTED", "파기가 시작된 응답은 변경할 수 없습니다.");
@@ -122,6 +123,7 @@ export async function changeSubmission(ctx: Context, id: string, action: "withdr
       action === "hold" ? { legalHold: String(current.legalHold) } : { status: current.status },
       action === "hold" ? { legalHold: String(input.hold) } : { status });
     await audit(tx, ctx, requestId, "submission." + action, "submission", id, [action === "hold" ? "legalHold" : "status"], row.formVersion.form.serviceId);
+    assertFileDeadlines(deadlines);
     return { id, version: current.version + 1, status, legalHold: action === "hold" ? input.hold : current.legalHold, ...(destruction ? { destructionId: destruction.id } : {}) };
   });
 }

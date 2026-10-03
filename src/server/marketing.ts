@@ -1,4 +1,4 @@
-import { eraseMarketingJobs } from "./marketing-jobs";
+import { cleanupMarketingLocalCopies, eraseMarketingJobs } from "./marketing-jobs";
 import { z } from "zod";
 import { Prisma, type MarketingPreference } from "@/generated/prisma/client";
 import { marketingConfig, marketingCreate, marketingList, normalizeMarketingContact, normalizeMarketingName,
@@ -8,8 +8,10 @@ import type { Context } from "./context";
 import { decrypt, encrypt, tokenHash } from "./crypto";
 import { audit } from "./audit";
 import { fail, requireVersion } from "./http";
-import { lockFileContext } from "./file-access";
-import { documentScope } from "./documents";
+import { assertFileDeadlines, lockFileContext } from "./file-access";
+import { lockServiceActor } from "./service-actor";
+import { roleCan, type Capability } from "./permissions";
+import { idempotent } from "./idempotency";
 import { analyticsPeriod } from "./analytics-period";
 
 export function marketingContactHash(channel: MarketingChannel, contact: string) {
@@ -22,6 +24,23 @@ export async function lockMarketingContact(tx: Transaction, row: Pick<MarketingP
 const include = { sourceSubmission: { include: { formVersion: { include: { form: { include: { service: true } } } } } } };
 type Stored = Prisma.MarketingPreferenceGetPayload<{ include: typeof include }>;
 const sourceAvailable = (s: Stored["sourceSubmission"]) => ["submitted", "corrected", "withdrawn"].includes(s.status) && s.retentionUntil > new Date();
+async function marketingAccess(tx: Transaction, ctx: Context, serviceId: string, write = false, create = false) {
+  const deadlines = await lockFileContext(tx, ctx, serviceId, create ? ["marketing.write", "submission.read"] : [write ? "marketing.write" : "marketing.read"], !write && !create);
+  const member = await tx.membership.findUniqueOrThrow({ where: { id: ctx.member.id }, include: { grants: true } });
+  const service = await tx.service.findUniqueOrThrow({ where: { id: serviceId } });
+  const can = (capability: Capability) => service.status === "active" && roleCan(member.role, capability) &&
+    (["owner", "admin"].includes(member.role) || member.grants.some(g => g.serviceId === serviceId && g.capabilities.includes(capability)));
+  return { deadlines, canWrite: can("marketing.write"), canCreate: can("marketing.write") && can("submission.read") };
+}
+type MarketingAccess = Awaited<ReturnType<typeof marketingAccess>>;
+function redactExpired(row: MarketingRecord) {
+  if (new Date(row.retentionUntil) <= new Date()) {
+    row.available = false; row.eligible = false; row.name = null; row.contact = null;
+    if ("evidence" in row) row.evidence = null;
+    if (!row.denial) row.denial = "원본 응답 사용 종료";
+  }
+  return row;
+}
 export async function marketingDenial(tx: Transaction, row: Stored) {
   if (row.channel === "email" && await tx.emailSuppression.count({ where: { tenantId: row.tenantId, serviceId: row.serviceId, contactHash: row.contactHash } })) return "이메일 반송·신고·수신거부에 따른 발송 차단";
   if (row.status !== "granted") return row.status === "erased" ? "삭제된 동의" : "동의 철회";
@@ -29,18 +48,24 @@ export async function marketingDenial(tx: Transaction, row: Stored) {
   if (!sourceAvailable(row.sourceSubmission) || !["submitted", "corrected"].includes(row.sourceSubmission.status)) return "원본 응답 사용 종료";
   if (row.sourceSubmission.formVersion.form.service.status !== "active") return "보관된 서비스";
   if (row.channel === "email" && await tx.suppression.count({ where: { tenantId: row.tenantId, serviceId: row.serviceId, channel: "email", emailHash: row.contactHash } })) return "정보주체 철회에 따른 발송 차단";
+  if (!sourceAvailable(row.sourceSubmission)) return "원본 응답 사용 종료";
   return null;
 }
-async function dto(tx: Transaction, row: Stored, detail = false): Promise<MarketingRecord> {
+async function dto(tx: Transaction, row: Stored, access: MarketingAccess, detail = false): Promise<MarketingRecord> {
+  const denial = await marketingDenial(tx, row);
+  const pendingLocalCopies = await tx.job.count({ where: { tenantId: row.tenantId, marketingPreferenceId: row.id, payloadErasedAt: { not: null }, localCopyErasedAt: null } });
+  const events = detail ? (await tx.marketingEvent.findMany({ where: { preferenceId: row.id }, orderBy: { version: "desc" }, take: 100 }))
+    .map(e => ({ id: e.id, kind: e.kind, version: e.version, createdAt: e.createdAt.toISOString() })) : undefined;
   const available = sourceAvailable(row.sourceSubmission) && row.status !== "erased";
   const contact = available && row.contactCipher ? decrypt<{ name: string; contact: string }>(row.contactCipher) : null;
-  const denial = await marketingDenial(tx, row);
-  return { id: row.id, serviceId: row.serviceId, version: row.version, channel: row.channel as MarketingChannel, name: contact?.name ?? null, contact: contact?.contact ?? null,
+  return redactExpired({ id: row.id, serviceId: row.serviceId, version: row.version, channel: row.channel as MarketingChannel, name: contact?.name ?? null, contact: contact?.contact ?? null,
     status: row.status as MarketingRecord["status"], excluded: row.excluded, grantedAt: row.grantedAt.toISOString(), withdrawnAt: row.withdrawnAt?.toISOString() ?? null,
     sourceSubmissionId: row.sourceSubmissionId, sourceTitle: row.sourceSubmission.formVersion.title, sourceKind: row.sourceKind,
-    retentionUntil: row.sourceSubmission.retentionUntil.toISOString(), available, eligible: !denial, denial,
+    retentionUntil: row.sourceSubmission.retentionUntil.toISOString(), available, eligible: !denial, denial, pendingLocalCopies,
+    permissions: { canChangeExclusion: access.canWrite && row.status !== "erased", canWithdraw: access.canWrite && row.status === "granted",
+      canErase: access.canWrite && row.status !== "erased", canCleanup: access.canWrite && row.status === "erased" && pendingLocalCopies > 0 },
     ...(detail ? { evidence: available && row.evidenceCipher ? decrypt<NonNullable<MarketingRecord["evidence"]>>(row.evidenceCipher) : null,
-      events: (await tx.marketingEvent.findMany({ where: { preferenceId: row.id }, orderBy: { version: "desc" }, take: 100 })).map(e => ({ id: e.id, kind: e.kind, version: e.version, createdAt: e.createdAt.toISOString() })) } : {}) };
+      events } : {}) });
 }
 async function event(tx: Transaction, row: MarketingPreference, kind: string, actorId?: string) {
   await tx.marketingEvent.create({ data: { tenantId: row.tenantId, preferenceId: row.id, version: row.version, kind, actorId,
@@ -52,6 +77,7 @@ async function lockSources(tx: Transaction, ids: string[]) {
 function queryWhere(tenantId: string, q: z.infer<typeof marketingList>): Prisma.MarketingPreferenceWhereInput {
   const search: Prisma.MarketingPreferenceWhereInput[] = [];
   if (q.search) {
+    if (z.uuid().safeParse(q.search).success) search.push({ id: q.search });
     try { search.push({ nameHash: nameHash(q.search) }); } catch { /* An email may exceed the name limit. */ }
     for (const channel of ["email", "sms"] as const) try { search.push({ channel, contactHash: marketingContactHash(channel, q.search) }); } catch { /* Search only valid normalized identities. */ }
   }
@@ -60,40 +86,51 @@ function queryWhere(tenantId: string, q: z.infer<typeof marketingList>): Prisma.
 }
 export async function listMarketing(ctx: Context, q: z.infer<typeof marketingList>, requestId: string, exporting = false) {
   return db.$transaction(async tx => {
-    await lockFileContext(tx, ctx, q.serviceId, ["marketing.read"], true);
+    const access = await marketingAccess(tx, ctx, q.serviceId);
     const where = queryWhere(ctx.tenantId, q), total = await tx.marketingPreference.count({ where });
     if (exporting && total > 5000) fail(422, "EXPORT_LIMIT", "검색 조건을 좁혀 5,000개 이하로 내보내주세요.");
-    const ids = await tx.marketingPreference.findMany({ where, select: { id: true, sourceSubmissionId: true }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: exporting ? 5000 : q.pageSize, skip: exporting ? 0 : (q.page - 1) * q.pageSize });
+    const page = Math.min(q.page, Math.max(1, Math.ceil(total / q.pageSize)));
+    const orderBy = [{ [q.sort]: q.direction }, { id: "asc" as const }];
+    const ids = await tx.marketingPreference.findMany({ where, select: { id: true, sourceSubmissionId: true }, orderBy, take: exporting ? 5000 : q.pageSize, skip: exporting ? 0 : (page - 1) * q.pageSize });
     await lockSources(tx, ids.map(r => r.sourceSubmissionId));
     // A concurrent new consent can move an identity to another source. Omit it until the next refresh.
-    const rows = await tx.marketingPreference.findMany({ where: { AND: [where, { OR: ids.map(r => ({ id: r.id, sourceSubmissionId: r.sourceSubmissionId })) }] }, include, orderBy: [{ createdAt: "desc" }, { id: "asc" }] });
+    const locked = await tx.marketingPreference.findMany({ where: { AND: [where, { OR: ids.map(r => ({ id: r.id, sourceSubmissionId: r.sourceSubmissionId })) }] } });
+    for (const row of [...locked].sort((a, b) => (a.channel + a.contactHash).localeCompare(b.channel + b.contactHash))) await lockMarketingContact(tx, row);
+    const rows = await tx.marketingPreference.findMany({ where: { AND: [where, { OR: ids.map(r => ({ id: r.id, sourceSubmissionId: r.sourceSubmissionId })) }] }, include, orderBy });
     await audit(tx, ctx, requestId, exporting ? "marketing.exported" : "marketing.list_viewed", "marketing", undefined, [], q.serviceId);
-    return { items: await Promise.all(rows.map(r => dto(tx, r))), total, page: q.page, pageSize: q.pageSize };
+    const items = (await Promise.all(rows.map(r => dto(tx, r, access)))).map(redactExpired);
+    assertFileDeadlines(access.deadlines);
+    return { items, total, page, pageSize: q.pageSize, permissions: { canCreate: access.canCreate, canExport: true } };
   }, { timeout: 20000 });
 }
 async function locate(tx: Transaction, ctx: Context, id: string, write = false) {
   const initial = await tx.marketingPreference.findFirst({ where: { id, tenantId: ctx.tenantId } });
   if (!initial) fail(404, "NOT_FOUND", "수신동의를 찾을 수 없습니다.");
-  await lockFileContext(tx, ctx, initial.serviceId, [write ? "marketing.write" : "marketing.read"], !write);
+  const access = await marketingAccess(tx, ctx, initial.serviceId, write);
   await lockSources(tx, [initial.sourceSubmissionId]);
   await lockMarketingContact(tx, initial);
   const current = await tx.marketingPreference.findUniqueOrThrow({ where: { id }, include });
   if (current.sourceSubmissionId !== initial.sourceSubmissionId) fail(409, "VERSION_CONFLICT", "동의 출처가 변경되었습니다. 다시 불러와주세요.");
-  return current;
+  return { row: current, access };
 }
 export async function readMarketing(ctx: Context, id: string, requestId: string) {
-  return db.$transaction(async tx => { const row = await locate(tx, ctx, id); await audit(tx, ctx, requestId, "marketing.viewed", "marketing", id, [], row.serviceId); return dto(tx, row, true); });
+  return db.$transaction(async tx => { const { row, access } = await locate(tx, ctx, id); await audit(tx, ctx, requestId, "marketing.viewed", "marketing", id, [], row.serviceId);
+    const result = await dto(tx, row, access, true); assertFileDeadlines(access.deadlines); return redactExpired(result); });
 }
 export async function marketingSources(ctx: Context, serviceId: string, page: number, search: string, requestId: string) {
   return db.$transaction(async tx => {
-    await lockFileContext(tx, ctx, serviceId, ["marketing.write", "submission.read"]);
+    const access = await marketingAccess(tx, ctx, serviceId, true, true);
     const where = { tenantId: ctx.tenantId, formVersion: { form: { serviceId }, title: { contains: search, mode: "insensitive" as const } }, status: { in: ["submitted", "corrected"] }, retentionUntil: { gt: new Date() } };
+    const total = await tx.submission.count({ where });
+    page = Math.min(page, Math.max(1, Math.ceil(total / 20)));
     const picked = await tx.submission.findMany({ where, select: { id: true }, orderBy: [{ submittedAt: "desc" }, { id: "asc" }], skip: (page - 1) * 20, take: 20 });
     await lockSources(tx, picked.map(s => s.id));
     const rows = await tx.submission.findMany({ where: { ...where, id: { in: picked.map(s => s.id) } }, include: { formVersion: true, answers: { include: { question: true } } }, orderBy: [{ submittedAt: "desc" }, { id: "asc" }] });
     await audit(tx, ctx, requestId, "marketing.sources_viewed", "marketing", undefined, [], serviceId);
-    return { items: rows.map(r => ({ id: r.id, title: r.formVersion.title, createdAt: r.submittedAt, retentionUntil: r.retentionUntil,
-      questions: r.answers.filter(a => ["단문형 답변", "장문형 답변"].includes(a.question.type)).map(a => ({ id: a.question.stableKey, label: a.question.label, value: decrypt<string>(a.valueCipher) })) })), total: await tx.submission.count({ where }), page, pageSize: 20 };
+    const items = rows.filter(r => r.retentionUntil > new Date()).map(r => ({ id: r.id, title: r.formVersion.title, createdAt: r.submittedAt, retentionUntil: r.retentionUntil,
+      questions: r.answers.filter(a => ["단문형 답변", "장문형 답변"].includes(a.question.type)).map(a => ({ id: a.question.stableKey, label: a.question.label, value: decrypt<string>(a.valueCipher) })) }));
+    assertFileDeadlines(access.deadlines);
+    return { items, total, page, pageSize: 20 };
   });
 }
 type GrantInput = { tenantId: string; serviceId: string; submissionId: string; channel: MarketingChannel; nameQuestionId: string; contactQuestionId: string;
@@ -123,13 +160,41 @@ export async function grantMarketing(tx: Transaction, input: GrantInput) {
   const row = current ? await tx.marketingPreference.update({ where: { id: current.id }, data: { ...data, version: { increment: 1 } } })
     : await tx.marketingPreference.create({ data: { ...scope, ...data } });
   await event(tx, row, current ? "reconsented" : "granted", input.actorId);
+  if (source.retentionUntil <= new Date()) fail(409, "SOURCE_UNAVAILABLE", "원본 응답의 보유 기간이 끝났습니다.");
   return { id: row.id, version: row.version };
 }
 export async function createMarketing(tx: Transaction, ctx: Context, input: z.infer<typeof marketingCreate>, requestId: string) {
-  await lockFileContext(tx, ctx, input.serviceId, ["marketing.write", "submission.read"]);
+  const access = await marketingAccess(tx, ctx, input.serviceId, true, true);
   await lockSources(tx, [input.submissionId]);
   const result = await grantMarketing(tx, { ...input, tenantId: ctx.tenantId, sourceKind: "manual", actorId: ctx.user.id, grantedAt: new Date(input.grantedAt) });
-  await audit(tx, ctx, requestId, "marketing.granted", "marketing", result.id, ["consentEvidence"], input.serviceId); return result;
+  await audit(tx, ctx, requestId, "marketing.granted", "marketing", result.id, ["consentEvidence"], input.serviceId);
+  assertFileDeadlines(access.deadlines); return result;
+}
+export async function createMarketingRequest(ctx: Context, input: z.infer<typeof marketingCreate>, key: string | null, requestId: string) {
+  let deadlines: MarketingAccess["deadlines"] | undefined;
+  let retentionUntil: Date | undefined;
+  const validate = async (tx: Transaction) => {
+    const access = await marketingAccess(tx, ctx, input.serviceId, true, true); deadlines = access.deadlines;
+    await lockSources(tx, [input.submissionId]);
+    const source = await tx.submission.findFirst({ where: { id: input.submissionId, tenantId: ctx.tenantId, formVersion: { form: { serviceId: input.serviceId } } } });
+    if (!source || !["submitted", "corrected"].includes(source.status) || source.retentionUntil <= new Date())
+      fail(410, "SOURCE_UNAVAILABLE", "원본 응답의 사용 기간이 끝났습니다.");
+    retentionUntil = source.retentionUntil;
+  };
+  return idempotent("marketing:create:" + ctx.member.id, key, input, async tx => {
+    await validate(tx);
+    return { status: 201, body: await createMarketing(tx, ctx, input, requestId),
+      resource: { tenantId: ctx.tenantId, resourceType: "submission", resourceId: input.submissionId } };
+  }, validate, async (tx, cached) => {
+    const { row, access } = await locate(tx, ctx, cached.id, true); deadlines = access.deadlines;
+    if (row.status === "erased") fail(410, "MARKETING_ERASED", "이미 삭제된 동의 요청입니다.");
+    if (row.sourceSubmissionId !== input.submissionId) fail(409, "VERSION_CONFLICT", "동의 출처가 변경되었습니다. 현재 항목을 확인해주세요.");
+    retentionUntil = row.sourceSubmission.retentionUntil;
+    return { id: row.id, version: row.version };
+  }, async () => {
+    if (deadlines) assertFileDeadlines(deadlines);
+    if (!retentionUntil || retentionUntil <= new Date()) fail(410, "SOURCE_UNAVAILABLE", "원본 응답의 보유 기간이 끝났습니다.");
+  });
 }
 export async function collectMarketing(tx: Transaction, source: { id: string; tenantId: string }, serviceId: string, raw: unknown, channels: MarketingChannel[]) {
   if (!channels.length) return;
@@ -143,19 +208,20 @@ export async function collectMarketing(tx: Transaction, source: { id: string; te
 }
 export async function updateMarketing(ctx: Context, id: string, input: { version: number; excluded: boolean }, requestId: string) {
   return db.$transaction(async tx => {
-    const row = await locate(tx, ctx, id, true); requireVersion(input, row);
+    const { row, access } = await locate(tx, ctx, id, true); requireVersion(input, row);
     if (row.status === "erased") fail(409, "MARKETING_ERASED", "삭제된 항목은 변경할 수 없습니다.");
     if (row.excluded !== input.excluded) {
       const changed = await tx.marketingPreference.update({ where: { id }, data: { excluded: input.excluded, version: { increment: 1 } } });
       await event(tx, changed, input.excluded ? "excluded" : "included", ctx.user.id);
       await audit(tx, ctx, requestId, "marketing.exclusion_changed", "marketing", id, ["excluded"], row.serviceId);
     }
-    return dto(tx, await tx.marketingPreference.findUniqueOrThrow({ where: { id }, include }), true);
+    const result = await dto(tx, await tx.marketingPreference.findUniqueOrThrow({ where: { id }, include }), access, true);
+    assertFileDeadlines(access.deadlines); return redactExpired(result);
   });
 }
 export async function withdrawMarketing(ctx: Context, serviceId: string, inputs: { id: string; version: number }[], requestId: string, erase = false) {
-  return db.$transaction(async tx => {
-    await lockFileContext(tx, ctx, serviceId, ["marketing.write"]);
+  const result = await db.$transaction(async tx => {
+    const access = await marketingAccess(tx, ctx, serviceId, true);
     const originals = await tx.marketingPreference.findMany({ where: { tenantId: ctx.tenantId, serviceId, id: { in: inputs.map(i => i.id) } } });
     if (originals.length !== inputs.length) fail(404, "NOT_FOUND", "수신동의를 찾을 수 없습니다.");
     await lockSources(tx, originals.map(r => r.sourceSubmissionId));
@@ -168,14 +234,16 @@ export async function withdrawMarketing(ctx: Context, serviceId: string, inputs:
       if (row.status === status) { result.push({ id: row.id, version: row.version, status }); continue; }
       requireVersion(input, row);
       if (row.status === "erased") fail(409, "MARKETING_ERASED", "삭제된 동의입니다.");
-      if (erase) await eraseMarketingJobs(tx, { marketingPreferenceId: { in: [row.id] } });
+      if (erase) await eraseMarketingJobs(tx, { marketingPreferenceId: { in: [row.id] } }, { deferLocalRemoval: true });
       const changed = await tx.marketingPreference.update({ where: { id: row.id }, data: { status, version: { increment: 1 },
         ...(erase ? { contactCipher: null, evidenceCipher: null, nameHash: null } : { withdrawnAt: new Date() }) } });
       await event(tx, changed, status, ctx.user.id); await audit(tx, ctx, requestId, "marketing." + status, "marketing", row.id, ["status"], serviceId);
       result.push({ id: row.id, version: changed.version, status });
     }
+    assertFileDeadlines(access.deadlines);
     return { items: result };
   }, { timeout: 20000 });
+  return { ...result, ...(erase ? { cleanup: await cleanupMarketingLocalCopies({ tenantId: ctx.tenantId, preferenceIds: inputs.map(i => i.id) }) } : {}) };
 }
 export async function eraseMarketingSource(tx: Transaction, submissionId: string) {
   const rows = await tx.marketingPreference.findMany({ where: { sourceSubmissionId: submissionId, status: { not: "erased" } }, orderBy: [{ channel: "asc" }, { contactHash: "asc" }] });
@@ -190,7 +258,7 @@ export async function marketingSummary(ctx: Context, input: MarketingSummaryQuer
   return db.$transaction(async tx => {
     const [{ asOf }] = await tx.$queryRaw<{ asOf: Date }[]>`SELECT statement_timestamp() AS "asOf"`;
     const { from, to } = analyticsPeriod(input, asOf);
-    const scope = await documentScope(tx, ctx, "marketing.read");
+    const { scope, deadlines } = await lockServiceActor(tx, ctx, "marketing.read");
     if (input.serviceId && !await tx.service.count({ where: { AND: [scope, { id: input.serviceId, status: "active" }] } }))
       fail(404, "SERVICE_NOT_FOUND", "조회 가능한 서비스를 찾을 수 없습니다.");
     const services = await tx.service.findMany({ where: { AND: [scope, { ...(input.serviceId ? { id: input.serviceId } : {}), status: "active",
@@ -198,6 +266,7 @@ export async function marketingSummary(ctx: Context, input: MarketingSummaryQuer
     const period = { from: from.toISOString(), to: to.toISOString() };
     if (!services.length) {
       await audit(tx, ctx, requestId, "marketing.summary_viewed", "marketing", undefined, [], input.serviceId);
+      assertFileDeadlines(deadlines);
       return { asOf: asOf.toISOString(), period, items: [] };
     }
     const ids = services.map(service => service.id);
@@ -223,6 +292,7 @@ export async function marketingSummary(ctx: Context, input: MarketingSummaryQuer
     const countMap = new Map(counts.map(row => [row.serviceId, row]));
     const activityMap = new Map(activity.map(row => [row.serviceId, row]));
     await audit(tx, ctx, requestId, "marketing.summary_viewed", "marketing", undefined, [], input.serviceId);
+    assertFileDeadlines(deadlines);
     return { asOf: asOf.toISOString(), period, items: services.map(service => {
       const current = countMap.get(service.id), events = activityMap.get(service.id);
       return { id: service.id, name: service.name, granted: Number(current?.granted ?? 0),
@@ -234,7 +304,7 @@ export async function marketingSummary(ctx: Context, input: MarketingSummaryQuer
     }) };
   }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 15000 });
 }
-export async function withMarketingDelivery<T>(scope: { tenantId: string; serviceId: string; channel: MarketingChannel; contact: string }, operation: (tx: Transaction, row: MarketingPreference) => Promise<T>, expected?: { id: string; version: number }) {
+export async function withMarketingDelivery<T>(scope: { tenantId: string; serviceId: string; channel: MarketingChannel; contact: string }, operation: (tx: Transaction, row: MarketingPreference, assertCurrent: () => Promise<void>) => Promise<T>, expected?: { id: string; version: number }) {
   return db.$transaction(async tx => {
     await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${scope.tenantId} FOR SHARE`;
     await tx.$queryRaw`SELECT id FROM "Service" WHERE id=${scope.serviceId} AND "tenantId"=${scope.tenantId} FOR SHARE`;
@@ -245,6 +315,9 @@ export async function withMarketingDelivery<T>(scope: { tenantId: string; servic
     await lockSources(tx, [initial.sourceSubmissionId]); await lockMarketingContact(tx, key);
     const current = await tx.marketingPreference.findUniqueOrThrow({ where: { id: initial.id }, include });
     if (current.sourceSubmissionId !== initial.sourceSubmissionId || (expected && (current.id !== expected.id || current.version !== expected.version)) || await marketingDenial(tx, current)) return null;
-    return operation(tx, current);
+    const assertCurrent = async () => {
+      if (await marketingDenial(tx, current)) fail(409, "MARKETING_UNAVAILABLE", "현재 수신 동의로 발송할 수 없습니다.");
+    };
+    return operation(tx, current, assertCurrent);
   }, { timeout: 45000 });
 }

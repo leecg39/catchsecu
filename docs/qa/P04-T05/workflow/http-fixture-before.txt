@@ -1,0 +1,20 @@
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-form-module-flow.ts:82
+    const content = formContentSchema.parse({ body: "모듈 원본 본문", questions, consentRequired: true, consentPurpose: "합성 상담", retentionDays: 30, maxResponses: 5,
+                                      ^
+
+ZodError: [
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "documentConsents",
+      0,
+      "documentVersionId"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  }
+]
+    at <anonymous> (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-form-module-flow.ts:82:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.19.0

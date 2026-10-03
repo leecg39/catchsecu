@@ -1,0 +1,42 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/catalog-access-gate.test.ts (7 tests | 1 failed) 5463ms
+   × 전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다 757ms
+(node:69187) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:69526) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다
+PrismaClientKnownRequestError: 
+Invalid `db.expertAssignment.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/catalog-access-gate.test.ts:73:29
+
+  70 test("전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다", async () => {
+  71   const f = await fixture(), e = await expert(f);
+  72   expect((await listCatalog(e.ctx, "recipients", catalogQuery.parse({}))).total).toBe(1);
+→ 73   await db.expertAssignment.update(
+Database error. Code: `23514`. Message: `new row for relation "ExpertAssignment" violates check constraint "ExpertAssignment_state_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/catalog-access-gate.test.ts:73:3
+     71|   const f = await fixture(), e = await expert(f);
+     72|   expect((await listCatalog(e.ctx, "recipients", catalogQuery.parse({}…
+     73|   await db.expertAssignment.update({ where: { id: e.assignment.id }, d…
+       |   ^
+     74|   await expect(listCatalog(e.ctx, "recipients", catalogQuery.parse({})…
+     75|   await expect(readCatalog(e.ctx, "recipients", f.row.id)).rejects.toM…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 41 passed (42)
+   Start at  20:17:55
+   Duration  42.09s (tests 90%, import 8%, transform 2%)
+

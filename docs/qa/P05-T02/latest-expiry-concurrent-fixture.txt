@@ -1,0 +1,40 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:10905) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/document-access-gate.test.ts (12 tests | 1 failed | 11 skipped) 1791ms
+   × 이전 버전 링크가 유효해도 최신 버전만 만료되면 최신 내용으로 재게시할 수 있다 1788ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 이전 버전 링크가 유효해도 최신 버전만 만료되면 최신 내용으로 재게시할 수 있다
+AssertionError: expected { …(19) } to match object { latestNumber: 2, …(2) }
+(16 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "hasActivePublication": false,
++   "hasActivePublication": true,
+    "hasUnpublishedChanges": false,
+    "latestNumber": 2,
+  }
+
+ ❯ tests/server/document-access-gate.test.ts:179:47
+    177|   vi.useFakeTimers({ toFake: ["Date"] }); vi.setSystemTime(new Date(Da…
+    178|   expect((await publicDocument(f.published.url.split("/").pop()!)).sna…
+    179|   expect(await readDocument(f.ctx, f.row.id)).toMatchObject({ latestNu…
+       |                                               ^
+    180|   const reopened = await publishDocument(f.ctx, f.row.id, { version: e…
+    181|   expect(reopened.number).toBe(3);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 11 skipped (12)
+   Start at  20:48:44
+   Duration  3.34s (tests 56%, import 27%, transform 17%)
+

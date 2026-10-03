@@ -1,0 +1,118 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/question-rules.test.ts (6 tests | 5 failed) 3148ms
+   × 분기·행렬·선택 수 설정을 저장하고 공개 게시본에서 그대로 조회한다 751ms
+   × 숨긴 필수 질문은 생략할 수 있고 활성 분기의 누락·숨긴 답변 주입은 거부한다 485ms
+   × 행렬 답변은 행 ID·각 행 필수·선택지·단일/복수 타입·선택 수를 검사한다 485ms
+   × 폼·템플릿 복제는 조건 참조와 행 ID도 새 질문에 연결한다 522ms
+   × 분기 정정은 새 필수 답변을 검사하고 숨겨지는 현재 값을 비우며 암호화 이력을 남긴다 406ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/question-rules.test.ts > 분기·행렬·선택 수 설정을 저장하고 공개 게시본에서 그대로 조회한다
+AssertionError: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ add tests/server/question-rules.test.ts:40:27
+     38| async function add(f: Awaited<ReturnType<typeof fixture>>, value: unkn…
+     39|   const response = await createForm(req("/forms", "POST", f.cookie, { …
+     40|   expect(response.status).toBe(201); return response.json();
+       |                           ^
+     41| }
+     42| async function publish(f: Awaited<ReturnType<typeof fixture>>, id: str…
+ ❯ tests/server/question-rules.test.ts:55:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/server/question-rules.test.ts > 숨긴 필수 질문은 생략할 수 있고 활성 분기의 누락·숨긴 답변 주입은 거부한다
+AssertionError: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ add tests/server/question-rules.test.ts:40:27
+     38| async function add(f: Awaited<ReturnType<typeof fixture>>, value: unkn…
+     39|   const response = await createForm(req("/forms", "POST", f.cookie, { …
+     40|   expect(response.status).toBe(201); return response.json();
+       |                           ^
+     41| }
+     42| async function publish(f: Awaited<ReturnType<typeof fixture>>, id: str…
+ ❯ tests/server/question-rules.test.ts:78:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/server/question-rules.test.ts > 행렬 답변은 행 ID·각 행 필수·선택지·단일/복수 타입·선택 수를 검사한다
+AssertionError: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ add tests/server/question-rules.test.ts:40:27
+     38| async function add(f: Awaited<ReturnType<typeof fixture>>, value: unkn…
+     39|   const response = await createForm(req("/forms", "POST", f.cookie, { …
+     40|   expect(response.status).toBe(201); return response.json();
+       |                           ^
+     41| }
+     42| async function publish(f: Awaited<ReturnType<typeof fixture>>, id: str…
+ ❯ tests/server/question-rules.test.ts:88:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/server/question-rules.test.ts > 폼·템플릿 복제는 조건 참조와 행 ID도 새 질문에 연결한다
+AssertionError: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ add tests/server/question-rules.test.ts:40:27
+     38| async function add(f: Awaited<ReturnType<typeof fixture>>, value: unkn…
+     39|   const response = await createForm(req("/forms", "POST", f.cookie, { …
+     40|   expect(response.status).toBe(201); return response.json();
+       |                           ^
+     41| }
+     42| async function publish(f: Awaited<ReturnType<typeof fixture>>, id: str…
+ ❯ tests/server/question-rules.test.ts:98:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/server/question-rules.test.ts > 분기 정정은 새 필수 답변을 검사하고 숨겨지는 현재 값을 비우며 암호화 이력을 남긴다
+AssertionError: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ add tests/server/question-rules.test.ts:40:27
+     38| async function add(f: Awaited<ReturnType<typeof fixture>>, value: unkn…
+     39|   const response = await createForm(req("/forms", "POST", f.cookie, { …
+     40|   expect(response.status).toBe(201); return response.json();
+       |                           ^
+     41| }
+     42| async function publish(f: Awaited<ReturnType<typeof fixture>>, id: str…
+ ❯ tests/server/question-rules.test.ts:108:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 1 passed (6)
+   Start at  19:36:46
+   Duration  4.79s (tests 67%, import 19%, transform 13%)
+

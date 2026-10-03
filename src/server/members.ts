@@ -11,14 +11,15 @@ import { env } from "./env";
 import { assertQuota } from "./entitlements";
 
 export const assignableRole = z.enum(["admin", "editor", "viewer", "privacy", "sender", "billing", "security", "auditor"]);
-const servicesInput = z.array(z.uuid()).min(1).max(100).refine(value => new Set(value).size === value.length, "서비스가 중복되었습니다.");
-export const inviteInput = z.object({ email: z.string().trim().toLowerCase().pipe(z.email()), role: assignableRole, serviceIds: servicesInput }).strict();
-export const memberInput = z.object({ version: z.number().int().positive(), role: assignableRole.optional(), serviceIds: servicesInput.optional(), status: z.enum(["active", "suspended"]).optional() }).strict();
-const memberInclude = { user: { select: { id: true, name: true, email: true, department: true } }, grants: { include: { service: { select: { name: true } } } } };
+const servicesInput = z.array(z.uuid()).max(100).refine(value => new Set(value).size === value.length, "서비스가 중복되었습니다.");
+export const inviteInput = z.object({ email: z.string().trim().toLowerCase().pipe(z.email()), role: assignableRole, serviceIds: servicesInput.min(1) }).strict();
+export const memberInput = z.object({ version: z.number().int().positive(), role: assignableRole.optional(), serviceIds: servicesInput.optional(), status: z.enum(["active", "suspended"]).optional() })
+  .strict().refine(input => input.role !== undefined || input.serviceIds !== undefined || input.status !== undefined, "변경할 역할·서비스 범위·상태가 필요합니다.");
+const memberInclude = { user: { select: { id: true, name: true, email: true, department: true } }, grants: { include: { service: { select: { name: true, status: true } } } } };
 function memberDto(row: Awaited<ReturnType<typeof findMember>>) {
   return { id: row.id, version: row.version, role: row.role, status: row.status, accessKind: row.accessKind,
     createdAt: row.createdAt, user: row.user,
-    grants: row.grants.map(grant => ({ serviceId: grant.serviceId, serviceName: grant.service.name, capabilities: grant.capabilities })) };
+    grants: row.grants.map(grant => ({ serviceId: grant.serviceId, serviceName: grant.service.name, serviceStatus: grant.service.status, capabilities: grant.capabilities })) };
 }
 async function findMember(tenantId: string, id: string, tx: Transaction = db) {
   const row = await tx.membership.findFirst({ where: { id, tenantId }, include: memberInclude });
@@ -27,7 +28,8 @@ async function findMember(tenantId: string, id: string, tx: Transaction = db) {
 }
 async function manager(tx: Transaction, ctx: Context) {
   await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${ctx.tenantId} FOR UPDATE`;
-  const actor = await tx.membership.findFirst({ where: { id: ctx.member.id, tenantId: ctx.tenantId, status: "active", tenant: { status: "active" } } });
+  const actor = await tx.membership.findFirst({ where: { id: ctx.member.id, tenantId: ctx.tenantId, status: "active",
+    tenant: { status: "active" }, user: { status: "active", emailVerified: true } } });
   if (!actor || !roleCan(actor.role, "member.manage")) fail(403, "FORBIDDEN", "구성원 관리 권한이 없습니다.");
   return actor;
 }
@@ -35,8 +37,9 @@ function mayAssign(actorRole: Role, targetRole: Role) {
   if (targetRole === "owner" || (actorRole !== "owner" && !roleCapabilities(targetRole).every(capability => roleCan(actorRole, capability))))
     fail(403, "ROLE_ESCALATION", "현재 권한으로 이 역할을 부여하거나 변경할 수 없습니다.");
 }
-async function validateServices(tx: Transaction, tenantId: string, serviceIds: string[]) {
-  const count = await tx.service.count({ where: { id: { in: serviceIds }, tenantId, status: "active" } });
+async function validateServices(tx: Transaction, tenantId: string, serviceIds: string[], preservedArchivedIds: string[] = []) {
+  const count = await tx.service.count({ where: { id: { in: serviceIds }, tenantId,
+    OR: [{ status: "active" }, { status: "archived", id: { in: preservedArchivedIds } }] } });
   if (count !== serviceIds.length) fail(404, "SERVICE_NOT_FOUND", "선택한 서비스를 찾을 수 없습니다.");
 }
 async function replaceGrants(tx: Transaction, tenantId: string, memberId: string, serviceIds: string[], role: Role) {
@@ -65,12 +68,15 @@ export async function updateMember(ctx: Context, id: string, input: z.infer<type
     const role = input.role ?? member.role;
     mayAssign(actor.role, role);
     const serviceIds = input.serviceIds ?? member.grants.map(grant => grant.serviceId);
-    if (input.serviceIds) await validateServices(tx, ctx.tenantId, serviceIds);
-    if (input.status === "active" && member.status !== "active") await assertQuota(tx, ctx.tenantId, "members");
+    if (input.serviceIds) await validateServices(tx, ctx.tenantId, serviceIds, member.grants.map(grant => grant.serviceId));
+    if (input.status === "active" && member.status !== "active") await assertQuota(tx, ctx.tenantId, "members", true);
     const changed = await tx.membership.updateMany({ where: { id, tenantId: ctx.tenantId, version: input.version },
       data: { role, status: input.status, version: { increment: 1 } } });
     if (!changed.count) fail(409, "VERSION_CONFLICT", "구성원 정보가 변경되었습니다. 다시 불러와주세요.");
     if (input.serviceIds || input.role) await replaceGrants(tx, ctx.tenantId, id, serviceIds, role);
+    if ((input.serviceIds || input.role) && !["owner", "admin"].includes(role))
+      await tx.session.updateMany({ where: { userId: member.userId, activeCompanyId: ctx.tenantId, activeServiceId: { notIn: serviceIds } },
+        data: { activeServiceId: null } });
     if (input.status === "suspended") await tx.session.deleteMany({ where: { userId: member.userId, OR: [{ activeCompanyId: ctx.tenantId }, { activeCompanyId: null }] } });
     await audit(tx, ctx, requestId, "member.updated", "membership", id, Object.keys(input).filter(key => key !== "version"));
     return memberDto(await findMember(ctx.tenantId, id, tx));
@@ -153,7 +159,12 @@ export async function changeInvitation(ctx: Context, id: string, version: number
     mayAssign(actor.role, invitation.role);
     if (!["pending", "expired"].includes(invitation.status)) fail(409, "INVITATION_CLOSED", "이미 수락되었거나 취소된 초대입니다.");
     if (invitation.version !== version) fail(409, "VERSION_CONFLICT", "초대 정보가 변경되었습니다. 다시 불러와주세요.");
-    if (action === "resend") await validateServices(tx, ctx.tenantId, invitation.serviceIds);
+    if (action === "resend") {
+      await validateServices(tx, ctx.tenantId, invitation.serviceIds);
+      if (await tx.membership.findFirst({ where: { tenantId: ctx.tenantId, status: { in: ["active", "suspended"] }, user: { email: invitation.email } } }))
+        fail(409, "MEMBER_EXISTS", "이미 회사에 소속된 계정입니다.");
+      await assertQuota(tx, ctx.tenantId, "members", true, invitation.id);
+    }
     const token = opaqueToken();
     const updated = await tx.invitation.update({ where: { id }, data: { version: { increment: 1 },
       ...(action === "revoke" ? { status: "revoked" } : { status: "pending", invitedBy: actor.id, tokenHash: tokenHash(token), expiresAt: new Date(Date.now() + 7 * 86400000) }) } });
@@ -180,13 +191,18 @@ export async function acceptInvitation(actor: Actor, token: string, requestId: s
   await tx.$queryRawUnsafe('SELECT id FROM "Company" WHERE id=$1 FOR UPDATE', found.tenantId);
   // Re-read after the company lock: resend/revoke/another acceptance may have won.
   const row = await checkedInvitation(actor, token, tx);
+  const user = await tx.user.findUnique({ where: { id: actor.user.id } });
+  const session = await tx.session.findFirst({ where: { id: actor.session.id, userId: actor.user.id, expiresAt: { gt: new Date() } } });
+  if (!user || user.status !== "active" || !user.emailVerified || !session)
+    fail(401, "ACCOUNT_UNAVAILABLE", "계정 또는 세션을 사용할 수 없습니다. 다시 로그인해주세요.");
+  if (user.email.toLowerCase() !== row.email) fail(404, "INVITATION_NOT_FOUND", "이 계정으로 수락할 수 있는 초대가 없습니다.");
   const inviter = await tx.membership.findFirst({ where: { id: row.invitedBy, tenantId: row.tenantId, status: "active" } });
   if (!inviter || !roleCan(inviter.role, "member.manage")) fail(409, "INVITER_UNAVAILABLE", "초대한 담당자의 권한이 변경되었습니다. 다시 초대를 요청해주세요.");
   mayAssign(inviter.role, row.role);
   await validateServices(tx, row.tenantId, row.serviceIds);
   const existing = await tx.membership.findUnique({ where: { tenantId_userId: { tenantId: row.tenantId, userId: actor.user.id } } });
   if (existing && existing.status !== "revoked") fail(409, "MEMBER_EXISTS", "이미 회사에 소속된 계정입니다.");
-  await assertQuota(tx, row.tenantId, "members");
+  await assertQuota(tx, row.tenantId, "members", true, row.id);
   const member = existing
     ? await tx.membership.update({ where: { id: existing.id }, data: { role: row.role, status: "active",
       accessKind: "direct", expertAssignmentId: null, version: { increment: 1 } } })

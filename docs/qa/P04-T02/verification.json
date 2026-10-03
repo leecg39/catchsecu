@@ -1,0 +1,165 @@
+{
+  "checkedAt": "2026-10-03T12:54:03.002121+00:00",
+  "verificationResult": "passed",
+  "taskId": "P04-T02",
+  "taskStatus": "in_progress",
+  "taskAcceptanceComplete": false,
+  "officialCompletedTasks": 15,
+  "totalTasks": 72,
+  "runtime": {
+    "node": "24.19.0",
+    "next": "16.3.8",
+    "postgresql": "17",
+    "prisma": "7.10.0",
+    "buildId": "hTwIAcpcQuXxuAC8PwmZp",
+    "gitHead": "8cc95982059f02c977f419993f22825b919c3a74"
+  },
+  "tests": {
+    "files": 40,
+    "total": 548,
+    "passed": 548,
+    "failed": 0,
+    "pending": 0,
+    "newServerTests": 8,
+    "newClientStateTests": 13,
+    "newTotal": 21,
+    "relatedFiles": 6,
+    "relatedTests": 71,
+    "singleFixtureDatabaseRun": true,
+    "durationSeconds": 331.23
+  },
+  "checks": {
+    "typecheckExitCode": 0,
+    "lintExitCode": 0,
+    "buildExitCode": 0,
+    "gitDiffCheckExitCode": 0
+  },
+  "api": {
+    "prepare": 36,
+    "afterRestart": 9,
+    "total": 45,
+    "actualProductionServer": true,
+    "actualPostgreSQL": true,
+    "independentDatabaseMatches": true,
+    "networkFailureMechanism": "Successful response discarded before client state received it; not a real transport outage.",
+    "actualUiVerified": false
+  },
+  "restart": {
+    "beforePid": 88707,
+    "afterPid": 89354
+  },
+  "database": {
+    "formVersion": 9,
+    "storedVersions": 2,
+    "publishedVersions": 1,
+    "drafts": 1,
+    "questionRows": 4,
+    "stableQuestionIds": 2,
+    "documentBindings": 4,
+    "auditCount": 9,
+    "idempotencyKeysForForm": 8,
+    "publishedHashMatches": true,
+    "publishedBodyAndBundleFrozen": true,
+    "currentStateMatchesHttp": true,
+    "replayAddsNoWrite": true,
+    "creationReplay": {
+      "formVersion": 2,
+      "formsForMarker": 1,
+      "auditCount": 2,
+      "sameServicePreserved": true,
+      "extraInputPreserved": true
+    }
+  },
+  "migrations": {
+    "existing": 56,
+    "added": 0
+  },
+  "contract": {
+    "result": "passed",
+    "openapiPaths": 250,
+    "operations": 364,
+    "policies": 31,
+    "completedTasks": 15,
+    "implementation": {
+      "implemented": 312,
+      "planned": 52
+    },
+    "unmappedOperations": 0,
+    "missingPermissions": 0,
+    "missingInputSchemas": 0
+  },
+  "plan": {
+    "paths": 181,
+    "tasks": 72,
+    "dependencyCycles": 0
+  },
+  "regressions": {
+    "draftReplayAfterPublicationPermissionRevocation": true,
+    "legacyCachedDraftReplyRemovesToken": true,
+    "uncertainCreationKeepsServiceAndId": true,
+    "definiteCreationRejectionAllowsNewService": true,
+    "staleDeviceConflictPreservesLocalEdits": true,
+    "publishedBodyAndConsentBundleImmutable": true
+  },
+  "remainingGates": [
+    "P04-T01/P05-T01 prerequisite acceptance",
+    "Original normal editor flow comparison",
+    "Ego desktop/mobile navigation, reload, conflict recovery and exit warning scenarios"
+  ],
+  "evidenceScope": "This report records the source and runtime at this verification. Later changes need a new check. Before-token-redaction artifacts are historical.",
+  "syntheticSessionsClosed": true,
+  "userAdminAccountUntouched": true,
+  "sourceHashes": {
+    "src/server/forms.ts": "dce6000530fa79db23b91598cc8e95cfab57fcdb176004608479a10f05240db9",
+    "src/server/form-access.ts": "b3d1c29ab810eeab5a41dbd18492c516404300752a33d5122f446fd8be2b962b",
+    "src/server/service-access.ts": "7ba7731522de07ffef6959d7f5c1f5aa19b8594b04f9f57a7f990164a8236d77",
+    "src/server/idempotency.ts": "5e3e3167dec4430bdea0cf78a3535cefe4f76b5fc110afc52a87c842fbe8f0d3",
+    "src/server/context.ts": "c5f09eeeb57e9fcc1724d331a5ec9a3452d9f38dd7cc88a22c3f787778536691",
+    "src/app/api/v1/forms/[...segments]/route.ts": "0f0b2462ed212378660a15ae710b92820cd17c7531c8af9542c8197150cd03fc",
+    "src/app/api/v1/forms/route.ts": "58d1cf1419c1a8b82fb6f676910cd1b6339d6f3a1ed1a0509d529f64020ca665",
+    "src/lib/form-draft.ts": "40702887f440702fbccc1adbef7dfc69908aade1a6ed7bc1eed2b7e24b4f5bbc",
+    "src/lib/use-form-draft.ts": "8f5cd6bbbef16b0dae14c9ae78f389c66d20fed0c50aa9de9c9604afcb84dab6",
+    "src/components/forms/FormEditor.tsx": "f0b9f97de845d6aff0a76e78f8333760189bec296bcc9ea5c57b8a9d2df40a6f",
+    "src/components/forms/Workflow.tsx": "d07d3e9e68a2000fd14d22d5f5b244a86ec5962e3295772e382eae649afd101c",
+    "src/components/forms/ConsentDocuments.tsx": "1f8f3a27cfa8b1e1c201881a5f01bd5757603e64b81695782cb130498629c6aa",
+    "src/components/forms/index.tsx": "7e58ffaf3bf845cabfb02338cc61de8dcbc7b1fda95b6e1a86f04eb6f2b37d89",
+    "src/components/forms/DraftStatus.tsx": "7bab3b3f612dfb69d53ab216a5c8fbe959cf6873af9895804592a62dcb2b6753",
+    "src/components/forms/form-draft.css": "c06be9e852f936e4473fcdf117aecdd351f771c55a4f09a00a6285b21344a34d",
+    "tests/server/form-draft-save.test.ts": "672dac48aa2fc0fee218bea360d439c6e8db647f93d6977c56de4fda09f055b0",
+    "tests/server/form-draft-state.test.ts": "2b3f9f92d267dc1abab3cbee7bd73fed929b17432e0e3b93cd332fa5f3cd4778",
+    "scripts/qa-form-editor.ts": "d69796a1d1c88a12fe9f1f94ed0e84aca82306a56f606efc6414359f9d9aab57",
+    "scripts/generate-openapi.ts": "47306d579c21f8cd02430832bcc842523a5f6da0fbbddd33cf3d6ded916cd7a5",
+    "src/contracts/forms.ts": "8ededc363a8769bee39e75469b91137bb3c83e03ceb18b6ae5b2c04ac007fd6e",
+    "src/contracts/domains.ts": "c68b618ecf9a3af0f098febe6331120d12caed9991839c45e3df4d55d9df9ea5",
+    "src/contracts/questions.ts": "500344848d1e3545c3d840cee48246890fae105425df83569d9d71f2a2f3d073",
+    "prisma/schema.prisma": "5f7c7d2abdd6e0ed9d7d242f695d2807f9b33b1b78c8e440dc846693447bc72c",
+    "docs/planning/contracts/openapi.json": "3ea4aa60cf8de19191aafbebd45d048cb6d6f136c8f0618ccb8d5f3c346ddf0a",
+    "docs/planning/contracts/domain-policies.json": "04d42fb2c87a4e3172d734274b4f73fed9fbd7f1ec75cc31b4dc4fcc1e17da6e",
+    "docs/planning/contracts/operation-policy-matrix.csv": "949f4ee237c853c5ef25580e9d9f2ee9bd26c5b8b4461bf231bc68e783cf1e65",
+    "docs/planning/contracts/README.md": "7c44d1e62088ef5f96d6c71aa81959f913c2ee8b5c363581f0e2f832e8fe8828",
+    "docs/planning/02-api-contracts.md": "258011764a180493f396c76418671306ff86824e668b867e7d930b0e66762806",
+    "docs/planning/tasks.json": "a23cdb46e71d81ed0ce053c776d6cbd718ee82d95670a9e5a7938d5e5761d25f",
+    "TASKS.md": "6b2ef706fabc5a91de2c8e9aa80df2be075d13e95aea1c132e72e9a50ed7ae75",
+    "docs/IMPLEMENTATION-STATUS.md": "97442308a02a8739216de21b1b594c3cb78aa029e21d09601342c51017cf5cb2",
+    ".Codex/goals/progress.md": "50d1d4e6e42e483d57f3987faa31eecbea2cacd068873cbe3f8f70ffbaf8ab39",
+    ".Codex/goals/timeline.md": "c868d15251d8126f244b337a743c58817c065afbec5325beca014bb80c1ea818",
+    "docs/qa/P04-T02/README.md": "1e40b6490a85e5cb2c8319b401fde0e5882a5095168b3b8bd146fbb9f1e8fde3",
+    "docs/qa/P04-T02/PLAN.md": "f4e0d3e5b6f3e278b5097295782b8d729e4c97fd5090d6b31bb1a4a9ec3cede2",
+    "docs/qa/P04-T02/ui-checklist.md": "32e639d33ef715def80fad28116f0b82bee53cd05dad25e79f5c2f6eadcde061"
+  },
+  "artifactHashes": {
+    "full-test.json": "ade11b41105b43ccce3253b9fea800d2c4af7dd3c1b1281ade574ded00b7d352",
+    "full-test.txt": "3c89bd825deb0e16c3afc8f5fd108ca31120bb46c5a995850661e9d2fea620a1",
+    "token-before.txt": "be4470338fa27698f466555ccc1f307bd86c414d6c1ec37d7e2dc174ae8255d6",
+    "token-after.txt": "2c0b038752e47206a34145c6a10a07f600544347523a72249e4e9f30aed6d702",
+    "typecheck.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lint.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-final.txt": "f570b0da886860f478bcbbd5d33109951a9253ffe629e630548426ada9766355",
+    "http-prepare.json": "2cd0ed1911e7359759cd12d4cbda9079fbf14e7e49a29b265e27ef35bc24acdc",
+    "http-finish.json": "d170322c95af81034b6c3ed32fa837a55fd41d1b33a15d772ef7f6b1e3ae5cf5",
+    "restart.json": "7310995776f9c51a33a8cdced0e4d7ad5543e14ba51d52d62ada37d15b56b6f4",
+    "related-final.json": "f4a86c3c1781193049d700baaa9331d6594b0332155eae0885f6e499a084df80",
+    "contract-check.txt": "81f320771b1e933240ac8990bc93da7cb8469b7c6aef9683cb53458bba287889",
+    "plan-check.txt": "e4e22f665bec2c9f372b27fdf431a93bc7fc5c1a82b5adfdbbcff93385ab9c91"
+  }
+}

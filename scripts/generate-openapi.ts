@@ -1,3 +1,5 @@
+import { mfaPolicyChange,mfaExceptionCreate,mfaExceptionPatch,mfaExceptionDelete,mfaMemberQuery } from "../src/contracts/mfa-policy";
+import { ipRuleInput, ipRulePatch, ipRuleDelete, ipAccessChange, ipRuleQuery } from "../src/contracts/ip-access";
 import { integrationCreate, integrationPatch, integrationQuery, integrationToggle, integrationDeleteMany, notificationVersion, notificationHistoryQuery } from "../src/contracts/notifications";
 import { marketingCreate, marketingChange, marketingList, marketingVersions } from "../src/contracts/marketing";
 import { relayFeedback, suppressionQuery } from "../src/contracts/email-feedback";
@@ -7,10 +9,12 @@ import { documentPatch, documentAction, documentPublish, clauseInput, clausePatc
 import { importCreate, importPatch, importAction } from "../src/contracts/imports";
 import { policyPatch, policyReset, approvalRequestInput, approvalDecisionInput, approvalCancelInput, passwordDeferralInput, passwordChangeInput, passwordResetInput } from "../src/contracts/security";
 import { memberInput } from "../src/server/members";
-import { formPatch } from "../src/server/forms";
+import { accountClosureInput } from "../src/contracts/account-closure";
+import { formListQuery, formPatch } from "../src/server/forms";
 import { actionInput, correctionInput, noteInput } from "../src/server/submission-management";
-import { fixedUrlInput } from "../src/server/fixed-urls";
-import { templateInput, templatePatch } from "../src/server/templates";
+import { fixedUrlInput, fixedUrlPatch, fixedUrlQuery } from "../src/server/fixed-urls";
+import { approvalQuery } from "../src/server/approvals";
+import { templateInput, templatePatch, templateListQuery } from "../src/server/templates";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { noticeCreate, noticePatch } from "../src/contracts/notices";
 import { guideCreate, guidePatch } from "../src/contracts/guides";
@@ -25,11 +29,16 @@ import { messageTemplateCreate, messageTemplatePatch, messageTemplateVersion, me
 import { campaignCreate, campaignPatch, campaignTargets, campaignSchedule, campaignReschedule, campaignRetry, campaignVersion, campaignList, campaignSourceList, deliveryList } from "../src/contracts/campaigns";
 import { z } from "zod";
 import { companyInput, serviceInput, servicePatch, profilePatch } from "../src/server/schemas";
-import { formInput, documentInput, invitationInput, submissionInput, fileInput, securityInput } from "../src/contracts/domains";
+import { formContentSchema, formInput, documentInput, invitationInput, submissionInput, fileInput, securityInput } from "../src/contracts/domains";
+import { submissionListQuery, submissionFilters } from "../src/contracts/submissions";
+import { createExportInput, exportChangeInput, exportListQuery } from "../src/contracts/exports";
+import { submissionReceiptSchema } from "../src/contracts/public-forms";
 import { memberUploadInput, publicUploadInput } from "../src/contracts/files";
 import { destructionAction, destructionSchedule, destructionStatuses, retentionInput } from "../src/contracts/destruction";
 import { purposeInput, purposePatch, recipientInput, recipientPatch, catalogAction } from "../src/contracts/processing-catalog";
 import regionCodes from "../src/data/region-codes.json";
+import { rowSchema } from "../src/contracts/questions";
+import { verificationCreate, verificationPatch, verificationStateSchema } from "../src/contracts/verification";
 
 type Operation = Record<string, unknown>;
 type PathItem = { parameters?: Record<string, unknown>[] } & Record<string, unknown>;
@@ -56,7 +65,7 @@ schemas.LedgerOverview = { type: "object", additionalProperties: false,
     total: { type: "integer", minimum: 0 }, page: { type: "integer", minimum: 1 },
     pageSize: { type: "integer", minimum: 1 } } };
 const resources = [
-  { name: "Company", path: "/companies", schema: companyInput, scope: "tenant", permission: "company.manage", lifecycle: "closure", status: "partial" },
+  { name: "Company", path: "/companies", schema: companyInput, scope: "tenant", permission: "company.manage", lifecycle: "closure request", status: "implemented" },
   { name: "Service", path: "/services", schema: serviceInput, scope: "tenant", permission: "service.manage", lifecycle: "archive", status: "implemented" },
   { name: "Invitation", path: "/invitations", schema: invitationInput, scope: "tenant", permission: "member.manage", lifecycle: "revoke", status: "planned" },
   { name: "Form", path: "/forms", schema: formInput, scope: "service", permission: "form.write", lifecycle: "archive; purge only unreferenced draft", status: "planned" },
@@ -118,6 +127,13 @@ add("/me", "get", "self", "본인 프로필 안전 DTO", undefined, "implemented
 add("/me", "patch", "self", "프로필 수정", profilePatch, "implemented");
 add("/me/sessions", "get", "self", "본인 세션 목록: token 제외", undefined, "implemented");
 add("/me/sessions/{id}", "delete", "self", "본인 세션 회수", undefined, "implemented", "204");
+add("/me/closure", "get", "self", "계정 폐쇄 조건·소유 회사·운영 권한 인계 상태", undefined, "implemented");
+add("/me/closure", "post", "self + current password + ownership handoff", "계정 폐쇄·모든 세션/인증 정보/회사 권한 회수·불변 이력", accountClosureInput, "implemented");
+add("/me/audit-events", "get", "self", "회사 소속 없이 본인 활동의 안전 필드·기간·검색·페이지 조회", undefined, "implemented");
+add("/me/audit-events/export", "get", "self", "본인 활동 동일 필터 CSV·5,000건 상한·수식 방어", undefined, "implemented");
+for (const path of ["/me/audit-events", "/me/audit-events/export"]) (paths[path].get as Operation).parameters =
+  ((paths["/audit-events"].get as Operation).parameters as { name: string }[]).filter(parameter => !["scope", "serviceId", "actorId"].includes(parameter.name))
+    .map(parameter => parameter.name === "searchField" ? { ...parameter, schema: { type: "string", enum: ["action", "resource"] } } : parameter);
 add("/uploads/init", "post", "own service file.write OR submission.write + file.read; service grant", "암호화 비공개 파일 준비·회사 용량 예약", memberUploadInput, "implemented", "201");
 add("/public/forms/{token}/uploads", "post", "active publication + file question + rate limit", "일회성 업로드 권한 발급·회사 용량 예약", publicUploadInput, "implemented", "201");
 add("/uploads/{id}", "get", "uploader OR unconsumed X-Upload-Token", "업로드·검사 상태 확인", undefined, "implemented");
@@ -128,7 +144,7 @@ add("/files", "get", "submission.read + file.read + service grant", "submissionI
 add("/files/{id}", "get", "file.read + tenant/service/submission/question binding", "검사·만료·권한을 확인한 파일 메타데이터", undefined, "implemented");
 add("/files/{id}", "patch", "own unattached member upload + file.write", "첨부 전 파일 이름 변경·버전 검사", z.object({ name: fileInput.shape.name, version: z.number().int().positive() }).strict(), "implemented");
 add("/files/{id}", "delete", "own unattached member upload + If-Match", "제출 전 파일 삭제; 첨부된 증거는 개별 삭제 금지", undefined, "implemented", "204");
-add("/files/{id}/download", "get", "file.read + tenant/service/submission/question binding", "비공개 다운로드·감사; 제출 전 공개 업로드/검사 전/만료/삭제 상태 차단", undefined, "implemented");
+add("/files/{id}/download", "get", "file.read + current session/policy + tenant/service/submission/question binding", "비공개 다운로드·감사; 저장소 읽기 후 세션·보유 기한을 다시 확인하고 만료 응답은 감사와 함께 롤백", undefined, "implemented");
 for (const path of ["/uploads/init", "/public/forms/{token}/uploads"]) (paths[path].post as Operation).parameters = [
   { in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", minLength: 16, maxLength: 128 } }];
 for (const path of ["/uploads/{id}", "/uploads/{id}/content", "/uploads/{id}/complete"]) paths[path].parameters = [
@@ -136,7 +152,7 @@ for (const path of ["/uploads/{id}", "/uploads/{id}/content", "/uploads/{id}/com
 (paths["/uploads/{id}/content"].put as Operation).requestBody = { required: true, content: Object.fromEntries(
   ["application/pdf", "image/png", "image/jpeg", "text/plain", "text/csv"].map(mime => [mime, { schema: { type: "string", format: "binary", maxLength: 10485760 } }])) };
 for (const path of ["/files/{id}", "/files/{id}/download"]) (paths[path].get as Operation).parameters = ["submissionId", "questionId"].map(name =>
-  ({ in: "query", name, required: false, description: "응답 첨부파일은 두 값 모두 필수. questionId는 질문 stableKey이다.", schema: { type: "string", format: "uuid" } }));
+  ({ in: "query", name, required: false, description: "응답 첨부파일은 두 값 모두 필수. questionId는 질문 stableKey이다. 중복·알 수 없는 쿼리는 422.", schema: { type: "string", format: "uuid" } }));
 (paths["/files"].get as Operation).parameters = [{ in: "query", name: "submissionId", required: true, schema: { type: "string", format: "uuid" } }];
 for (const path of ["/uploads/{id}", "/files/{id}"]) (paths[path].delete as Operation).parameters = [
   { in: "header", name: "If-Match", required: true, schema: { type: "integer", minimum: 1 } }];
@@ -240,18 +256,113 @@ add("/me/password-policy", "post", "self + matching tenant and password revision
 const version = z.object({ version: z.number().int().positive() }).strict();
 for (const path of ["/services", "/services/{id}"]) (paths[path].get as Operation)["x-permission"] = "service.read";
 add("/services/{id}", "patch", "service.manage", "서비스 허용 필드 변경", servicePatch, "implemented");
+add("/services/{id}/verification", "get", "form.read + current service grant", "본인인증/전자서명 연동 설정·준비 상태·최근 20개 불변 설정 이력; 준비 완료와 sandbox 성공은 항상 false", undefined, "implemented");
+add("/services/{id}/verification", "post", "integration.manage + current service grant", "공급자 식별자·환경·대기/중지 설정 생성·삭제 후 새 세대로 재등록; 고객 입력으로 ready/인증 성공 설정 금지", verificationCreate, "implemented", "201");
+add("/services/{id}/verification", "patch", "integration.manage + current service grant", "version 비교·불변 설정 이력·이전 요청 취소·이전 생성 키 응답 tombstone", verificationPatch, "implemented");
+add("/services/{id}/verification", "delete", "integration.manage + current service grant", "If-Match 버전 확인 후 설정 삭제 상태·공급자 식별자 제거; 이력 보존·대기 요청 취소", undefined, "implemented", "204");
+(paths["/services/{id}/verification"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
+(paths["/services/{id}/verification"].delete as Operation).parameters = [{ in: "header", name: "If-Match", required: true, schema: { type: "string", pattern: "^[1-9][0-9]*$" } }];
+schemas.VerificationState = z.toJSONSchema(verificationStateSchema);
+for (const method of ["get", "post", "patch"]) (paths["/services/{id}/verification"][method] as Operation).responses = { ...errors,
+  [method === "post" ? "201" : "200"]: { description: "현재 서비스의 안전한 설정·준비 대기·권한·이력", content: { "application/json": { schema: { $ref: "#/components/schemas/VerificationState" } } } } };
+add("/companies", "get", "authenticated + active own membership", "소속 회사 검색·페이지 목록; 현재 역할에 따른 안전 DTO", undefined, "implemented");
+add("/companies", "post", "verified active account", "회사·소유자·기본 서비스·정책·무료 체험·현재 회사 선택 생성", companyInput, "implemented", "201");
+add("/companies/{id}", "get", "active current company membership", "현재 회사 기본 정보; 관리자에게만 사업자등록증·폐쇄 사유 공개", undefined, "implemented");
+add("/companies/{id}", "delete", "company.manage + owner", "폐쇄 요청 접수", version.extend({
+  confirmation: z.string().max(100), reason: z.string().trim().min(1).max(1000),
+}), "implemented", "204");
+add("/companies/{id}/closure", "post", "company.manage + owner", "회사 폐쇄 요청 취소", version.extend({ action: z.literal("cancel") }), "implemented", "204");
+add("/companies/{id}/business-file", "get", "company.manage", "사업자등록증 다운로드", undefined, "implemented");
+add("/companies/{id}/business-file", "post", "company.manage", "검사된 사업자등록증 첨부·교체", undefined, "implemented", "201");
+add("/companies/{id}/business-file", "delete", "company.manage", "사업자등록증 삭제", undefined, "implemented", "204");
+const matchVersion = { name: "If-Match", in: "header", required: true, schema: { type: "integer", minimum: 1 } };
+(paths["/companies/{id}/business-file"].get as Operation).parameters = [
+  { name: "fileId", in: "query", required: false, schema: { type: "string", format: "uuid" } },
+];
+(paths["/companies/{id}/business-file"].post as Operation).parameters = [
+  { name: "name", in: "query", required: true, schema: { type: "string", minLength: 1, maxLength: 200 } },
+  { name: "size", in: "query", required: true, schema: { type: "integer", minimum: 1, maximum: 10485760 } }, matchVersion,
+];
+(paths["/companies/{id}/business-file"].post as Operation).requestBody = {
+  required: true, content: Object.fromEntries(["application/pdf", "image/png", "image/jpeg"].map(mime => [mime, { schema: { type: "string", format: "binary" } }])),
+};
+(paths["/companies/{id}/business-file"].get as Operation).responses = { ...errors, "200": {
+  description: "원본 바이트 다운로드; attachment; private no-store",
+  content: { "application/octet-stream": { schema: { type: "string", format: "binary" } } },
+} };
+(paths["/companies/{id}/business-file"].delete as Operation).parameters = [matchVersion];
+(paths["/companies"].get as Operation).parameters = [
+  { name: "search", in: "query", schema: { type: "string", maxLength: 100 } },
+  ...["page", "pageSize"].map(name => ({ name, in: "query", schema: { type: "integer", minimum: 1, maximum: name === "page" ? 100000 : 100 } })),
+];
 for (const path of ["/forms", "/forms/{id}"]) add(path, "get", "form.read + service grant", "캐치폼 안전 DTO 또는 서버 목록", undefined, "implemented");
+const actionNames = ["preview", "responses", "edit", "copy", "registerTemplate", "publish", "share", "pause", "resume", "archive", "checkDeletion"];
+schemas.FormReadActions = { type: "object", additionalProperties: false, required: actionNames,
+  properties: Object.fromEntries(actionNames.map(name => [name, { type: "boolean" }])) };
+const formStatuses = ["draft", "pendingApproval", "published", "paused", "archived"];
+schemas.FormRead = { type: "object", additionalProperties: false,
+  required: ["id", "serviceId", "serviceName", "ownerName", "title", "status", "version", "sourceType", "createdAt", "updatedAt", "content", "consentBundle", "hasDraft", "published", "favorite", "publication", "actions"],
+  properties: { id: { type: "string", format: "uuid" }, serviceId: { type: "string", format: "uuid" }, serviceName: { type: "string" }, ownerName: { type: "string" },
+    title: { type: "string" }, status: { type: "string", enum: formStatuses }, version: { type: "integer", minimum: 1 }, sourceType: { type: "string", enum: ["form", "import"] },
+    createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" }, content: { anyOf: [z.toJSONSchema(formContentSchema), { type: "null" }] },
+    consentBundle: { type: ["object", "null"] }, draftNumber: { type: "integer", minimum: 1 }, hasDraft: { type: "boolean" }, published: { type: "boolean" }, favorite: { type: "boolean" },
+    actions: { $ref: "#/components/schemas/FormReadActions" }, publication: { anyOf: [{ type: "null" }, { type: "object", additionalProperties: false,
+      required: ["id", "responseCount", "maxResponses", "expiresAt"], properties: { id: { type: "string", format: "uuid" }, responseCount: { type: "integer", minimum: 0 }, maxResponses: { type: "integer", minimum: 1 },
+        expiresAt: { type: ["string", "null"], format: "date-time" }, token: { type: "string", pattern: "^[A-Za-z0-9_-]{43}$" } } }] } } };
+schemas.FormListPermissions = { type: "object", additionalProperties: false, required: ["canCreate", "canImport", "canViewImports"],
+  properties: Object.fromEntries(["canCreate", "canImport", "canViewImports"].map(name => [name, { type: "boolean" }])) };
+schemas.FormPage = { type: "object", additionalProperties: false, required: ["items", "total", "page", "pageSize", "permissions"],
+  properties: { items: { type: "array", items: { $ref: "#/components/schemas/FormRead" } }, total: { type: "integer", minimum: 0 }, page: { type: "integer", minimum: 1 }, pageSize: { type: "integer", minimum: 1, maximum: 100 },
+    permissions: { $ref: "#/components/schemas/FormListPermissions" } } };
+for (const [path, response] of [["/forms", "FormPage"], ["/forms/{id}", "FormRead"]] as const)
+  (paths[path].get as Operation).responses = { ...errors, "200": { description: "현재 서비스 권한·상태의 폼/작업 DTO", content: { "application/json": { schema: { $ref: "#/components/schemas/" + response } } } } };
+(paths["/forms"].get as Operation).parameters = Object.entries(z.toJSONSchema(formListQuery, { io: "input" }).properties!).map(([name, schema]) => ({ in: "query", name, schema }));
+(paths["/forms"].get as Operation)["x-query-additional-properties"] = false;
+(paths["/forms"].get as Operation).description = "현재 계정·세션·구성원·전문가·서비스 권한을 transaction에서 재검사합니다. 전문가는 배정된 활성 서비스만 조회합니다. 한국 날짜 기간·제목/생성자·상태·본인 즐겨찾기·정렬을 적용하고 범위 밖 page를 마지막 페이지로 보정합니다. 빈 목록은 page=1이며 공유 토큰을 포함하지 않습니다. actions는 현재 역할·서비스 grant·상태를 따르고 permissions는 선택 서비스의 생성/업로드 권한입니다. 작업 권한은 GET에서 계산하고 생성/저장 멱등 캐시에 포함하지 않습니다.";
+(paths["/forms/{id}"].get as Operation).description = "현재 조회 권한과 계정·세션을 재검사합니다. 공유 토큰은 현재 form.publish 권한이 있을 때만 반환합니다. 작업 actions는 현재 서비스 grant·보관/가져오기 양식·공개 링크 만료를 반영합니다. publish는 활성 서비스의 게시 grant와 초안 유무이며 실제 게시에서 승인·질문·문서·파일 공급자를 재검사합니다. 작성 grant 없이 게시 grant만 가진 구성원도 저장된 초안을 게시할 수 있습니다. checkDeletion은 삭제 조건을 조회할 권한이며 실제 삭제 가능 여부는 /deletion에서 다시 확인합니다.";
 add("/forms", "post", "form.write + service grant", "질문·선택지·초안 생성", formInput, "implemented", "201");
 add("/forms/{id}", "patch", "form.write + service grant", "초안 변경; 게시본 불변", formPatch, "implemented");
+add("/forms/{id}/draft", "patch", "form.write + current service grant", "자동저장 초안; version 충돌·게시본 불변·동일 키 재시도는 한 번만 저장", formPatch, "implemented");
+for (const path of ["/forms/{id}", "/forms/{id}/draft"]) (paths[path].patch as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: false,
+  schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" }, description: "자동저장은 매 저장의 키를 보냅니다. 동일 본문·키 재전송은 현재 권한 검사 후 기존 결과를 반환합니다." }];
+for (const path of ["/forms/{id}", "/forms/{id}/draft"]) {
+  const formUpdateSchema = (paths[path].patch as Operation).requestBody as { content: { "application/json": { schema: Record<string, unknown> } } };
+  formUpdateSchema.content["application/json"].schema.anyOf = ["title", "content"].map(name => ({ required: [name] }));
+  (paths[path].patch as Operation).description = "초안 저장 응답은 공유 토큰을 포함하지 않습니다. 기존 캐시를 재전송할 때도 토큰을 제거합니다. 공유 화면은 현재 form.publish 권한으로 GET /forms/{id}를 조회합니다.";
+}
 add("/forms/{id}", "delete", "form.write + service grant", "공개 종료와 보관", undefined, "implemented", "204");
+add("/forms/{id}/deletion", "get", "form.read + current service grant", "완전 삭제 조건·현재 version·참조 사유 확인", undefined, "implemented");
+schemas.FormDeletionState = { type: "object", additionalProperties: false, required: ["id", "version", "status", "canPurge", "canReadResponses", "reasons", "references"],
+  properties: { id: { type: "string", format: "uuid" }, version: { type: "integer", minimum: 1 }, status: { type: "string", enum: formStatuses }, canPurge: { type: "boolean" }, canReadResponses: { type: "boolean" },
+    reasons: { type: "array", items: { type: "object", additionalProperties: false, required: ["code", "message"], properties: { code: { type: "string" }, message: { type: "string" } } } },
+    references: { type: "object", additionalProperties: false, required: ["publications", "approvals", "submissions", "shares", "imports", "files"],
+      properties: Object.fromEntries(["publications", "approvals", "submissions", "shares", "imports", "files"].map(name => [name, { type: "integer", minimum: 0 }])) } } };
+(paths["/forms/{id}/deletion"].get as Operation).responses = { ...errors, "200": { description: "현재 삭제 조건·사유·응답 조회 권한", content: { "application/json": { schema: { $ref: "#/components/schemas/FormDeletionState" } } } } };
+add("/forms/{id}/purge", "delete", "form.write + current service grant + active service + If-Match", "미게시·미참조 초안의 영구 삭제; 게시·승인·응답 증거 참조 시 409; 요청 캐시 내용 제거·감사 유지", undefined, "implemented", "204");
+(paths["/forms/{id}/purge"].delete as Operation).parameters = [matchVersion];
+(paths["/forms/{id}/purge"].delete as Operation).description = "현재 권한·version·참조 상태를 폼 잠금 아래 다시 검사합니다. 질문·선택지·초안의 문서 연결·즐겨찾기·폼과 해당 생성/저장 캐시를 한 transaction에서 제거합니다. 게시 문서와 독립 복사본은 유지합니다. 삭제된 폼의 생성 키 재전송은 410입니다.";
 add("/forms/{id}/publish", "post", "form.publish + service grant", "검증된 초안 게시; 승인·본인인증·첨부 연동 미충족 시 차단", version.extend({ expiresAt: z.iso.datetime().optional() }), "implemented", "201");
 add("/forms/{id}/copy", "post", "form.write + service grant", "전체 폼 복사", z.object({ title: z.string().trim().min(1).max(200).optional() }).strict(), "implemented", "201");
 for (const action of ["pause", "resume"]) add("/forms/{id}/" + action, "post", "form.publish + service grant", "공개 " + action, version, "implemented");
 add("/forms/{id}/favorite", "put", "form.read + service grant", "본인 즐겨찾기 등록", undefined, "implemented");
 add("/forms/{id}/favorite", "delete", "form.read + service grant", "본인 즐겨찾기 해제", undefined, "implemented", "204");
 add("/forms/{id}/submissions", "get", "submission.read + service grant", "암호화 응답을 권한 범위에서 조회·감사; 보유 기한 종료 또는 파기 시작 뒤 원문 제외", undefined, "implemented");
-add("/public/forms/{token}", "get", "active publication", "유효한 게시본 조회", undefined, "implemented");
-add("/public/forms/{token}/submissions", "post", "active publication + rate limit", "한도·필수항목·동의 검증 후 원자 저장", submissionInput, "implemented", "201");
+add("/forms/{id}/submissions/export", "get", "submission.read + current tenant/service/user/session/expert grant", "동일 기간·상태·응답 ID 필터의 UTF-8 BOM CSV; 게시 버전·행렬 행별 열; 5,000건·1,000열·20MB 상한; 다운로드 감사", undefined, "implemented");
+for (const [path, query] of [["/forms/{id}/submissions", submissionListQuery], ["/forms/{id}/submissions/export", submissionFilters]] as const) {
+  const properties = z.toJSONSchema(query).properties!;
+  (paths[path].get as Operation).parameters = Object.entries(properties).map(([name, schema]) => ({ in: "query", name, schema }));
+  (paths[path].get as Operation)["x-query-additional-properties"] = false;
+}
+(paths["/forms/{id}/submissions/export"].get as Operation).responses = { ...errors, "200": { description: "attachment CSV; private no-store; masked unavailable content; safe file names with file.read",
+  headers: { "X-Export-Row-Count": { schema: { type: "integer", minimum: 0 } } }, content: { "text/csv": { schema: { type: "string" } } } } };
+add("/public/forms/{token}", "get", "current active company/service/publication grant", "현재 공개 상태를 잠금 후 재확인해 게시 당시 질문·동의만 제공; 응답 한도 도달은 closed 표시", undefined, "implemented");
+add("/public/forms/{token}/submissions", "post", "current active publication + idempotency + rate limit", "한도·필수항목·동의·파일 검증 후 원자 저장; 성공 재전송은 현재 공개 상태 재검사와 기존 응답만 반환", submissionInput, "implemented", "201");
+schemas.PublicSubmissionReceipt = z.toJSONSchema(submissionReceiptSchema);
+(paths["/public/forms/{token}/submissions"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true,
+  schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
+paths["/public/forms/{token}"].parameters = paths["/public/forms/{token}/submissions"].parameters = [{ in: "path", name: "token", required: true,
+  schema: { type: "string", pattern: "^[A-Za-z0-9_-]{43}$" } }];
+(paths["/public/forms/{token}/submissions"].post as Operation).responses = { ...errors, "201": { description: "접수 당시 ID·시각·상태; 같은 키의 정상 재시도는 같은 값", content: { "application/json": { schema: { $ref: "#/components/schemas/PublicSubmissionReceipt" } } } } };
 add("/submissions/{id}", "get", "submission.read + service grant", "응답·변경 이력·메모·동의 영수증; contentAvailable=false이면 원문·첨부 제외", undefined, "implemented");
 add("/submissions/{id}", "patch", "submission.write + service grant", "응답 정정; 암호화된 이전 값 보존", correctionInput, "implemented");
 for (const action of ["withdraw", "destruction-request", "hold"]) add("/submissions/{id}/" + action, "post",
@@ -263,20 +374,23 @@ add("/submissions/{id}/notes/{noteId}", "patch", "submission.write + service gra
 add("/submissions/{id}/notes/{noteId}", "delete", "submission.write + service grant", "메모 물리 삭제 및 감사", undefined, "implemented", "204");
 for (const path of ["/submissions/{id}/corrections", "/submissions/{id}/withdrawals", "/submissions/{id}/destruction"]) delete paths[path];
 add("/submissions/{id}/retention", "patch", "submission.destroy + current service grant + allowRetentionAdjustment", "만료 전 원래 동의 기한 이내로 보유 기한 변경; 보존 조치·진행 중 파기 거부", retentionInput, "implemented");
-add("/destruction-requests", "get", "submission.destroy + service grant", "파기 요청·승인·예약·실패·완료 이력; 회사와 서비스 범위 목록", undefined, "implemented");
+add("/destruction-requests", "get", "submission.destroy + current service grant/session/expert scope", "현재 작업 권한·검색·정렬·페이지 보정을 포함한 파기 요청 이력; 중복/미지원 쿼리 거부", undefined, "implemented");
 for (const action of ["approve", "reject", "cancel", "retry", "reschedule"]) add("/destruction-requests/{id}/" + action, "post",
   "submission.destroy + current service grant" + (["approve", "reject"].includes(action) ? " + active owner/admin" : ""),
   ({ approve: "보존 조치를 확인하고 파기 예약 승인; 실행 시 승인 권한 재검사", reject: "실행 전 파기 요청 반려",
     cancel: "실행 전 파기 예약 취소; 만료된 원문 열람은 계속 차단", retry: "실패한 파기 재시도 허용; 시작된 원문 접근은 계속 차단",
     reschedule: "보유 기한 이내의 일정 변경과 기존 승인 무효화" } as Record<string, string>)[action],
   action === "reschedule" ? destructionSchedule : destructionAction, "implemented");
-add("/destruction-certificates", "get", "audit.read + service grant", "원문 삭제가 완료된 파기 증명서 목록", undefined, "implemented");
+add("/destruction-certificates", "get", "audit.read + current service grant/session/expert scope", "원문 삭제가 완료된 증명서 검색·정렬·페이지 보정; 연결된 본인인증/전자서명 삭제 건수", undefined, "implemented");
 add("/destruction-certificates/{id}", "get", "audit.read + current service grant", "현재 DB·비공개 파일 파기 수량과 HMAC 무결성; 백업·WAL·외부 사본 제외", undefined, "implemented");
 add("/destruction-certificates/{id}/download", "get", "audit.read + current service grant", "파기 증명서 JSON 다운로드·열람 감사", undefined, "implemented");
 for (const path of ["/destruction-requests", "/destruction-certificates"]) (paths[path].get as Operation).parameters = [
   ...["serviceId", "submissionId"].map(name => ({ in: "query", name, schema: { type: "string", format: "uuid" } })),
-  { in: "query", name: "page", schema: { type: "integer", minimum: 1, default: 1 } },
+  { in: "query", name: "page", schema: { type: "integer", minimum: 1, maximum: 100000, default: 1 }, description: "마지막 유효 페이지로 보정" },
   { in: "query", name: "pageSize", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
+  { in: "query", name: "search", schema: { type: "string", maxLength: 100, default: "" }, description: "폼·서비스 이름 또는 요청/증명서·응답 ID" },
+  { in: "query", name: "sort", schema: { type: "string", enum: ["createdAt", "name", path === "/destruction-requests" ? "dueAt" : "completedAt"], default: "createdAt" }, description: "증명서 createdAt는 completedAt와 같은 의미" },
+  { in: "query", name: "direction", schema: { type: "string", enum: ["asc", "desc"], default: "desc" } },
   ...(path === "/destruction-requests" ? [{ in: "query", name: "status", schema: { type: "string", enum: destructionStatuses } }] : []),
 ];
 (paths["/destruction-certificates/{id}/download"].get as Operation).responses = { ...errors, "200": {
@@ -285,13 +399,17 @@ for (const path of ["/destruction-requests", "/destruction-certificates"]) (path
 add("/fixed-urls", "get", "form.read + service grant", "고정 URL 목록", undefined, "implemented");
 add("/fixed-urls", "post", "form.publish + service grant", "게시된 폼에 고정 URL 연결", fixedUrlInput, "implemented", "201");
 add("/fixed-urls/{id}", "get", "form.read + service grant", "고정 URL 조회", undefined, "implemented");
-add("/fixed-urls/{id}", "patch", "form.publish + service grant", "연결 대상·이름 변경", fixedUrlInput.omit({ slug: true }).partial().extend({ version: z.number().int().positive() }), "implemented");
+add("/fixed-urls/{id}", "patch", "form.publish + current source/target service grants", "연결 대상·이름 변경; 현재 권한·게시본을 잠금 안에서 검사", fixedUrlPatch, "implemented");
+const fixedUpdateSchema=(paths["/fixed-urls/{id}"].patch as Operation).requestBody as { content:{ "application/json":{ schema:Record<string,unknown> } } };
+fixedUpdateSchema.content["application/json"].schema.anyOf=["name","formId"].map(name => ({ required:[name] }));
 add("/fixed-urls/{id}", "delete", "form.publish + service grant", "고정 URL 회수", undefined, "implemented", "204");
 add("/public/urls/{slug}", "get", "active fixed URL", "유효한 공개 폼 연결", undefined, "implemented");
 
 add("/members", "get", "member.manage", "회사 구성원 검색·상태·페이지 목록", undefined, "implemented");
 add("/members/{id}", "get", "member.manage", "회사 구성원 상세", undefined, "implemented");
 add("/members/{id}", "patch", "member.manage + role ceiling", "역할·서비스 권한·정지 상태 변경", memberInput, "implemented");
+const memberUpdateSchema = (paths["/members/{id}"].patch as { requestBody: { content: { "application/json": { schema: Record<string, unknown> } } } }).requestBody.content["application/json"].schema;
+memberUpdateSchema.anyOf = ["role", "serviceIds", "status"].map(name => ({ required: [name] }));
 add("/members/{id}", "delete", "member.manage + role ceiling", "구성원 제외·권한/세션 회수; 기록 유지", undefined, "implemented", "204");
 add("/members/{id}/transfer", "post", "owner + current password", "소유권 이전; 마지막 소유자 DB 보호", version.extend({ password: z.string().min(1).max(128) }), "implemented");
 add("/invitations", "get", "member.manage", "초대 이력과 만료 상태", undefined, "implemented");
@@ -307,8 +425,32 @@ add("/templates", "get", "form.read + service grant", "공용·허용 서비스 
 add("/templates", "post", "form.write + service grant", "완전한 질문·동의·설정 템플릿 생성", templateInput, "implemented", "201");
 add("/templates/{id}", "get", "form.read + service grant", "템플릿 전체 내용 조회", undefined, "implemented");
 add("/templates/{id}", "patch", "form.write + service grant; public read-only", "템플릿 편집", templatePatch, "implemented");
+const templateUpdateSchema = (paths["/templates/{id}"].patch as Operation).requestBody as { content: { "application/json": { schema: Record<string, unknown> } } };
+templateUpdateSchema.content["application/json"].schema.anyOf = ["title", "category", "content"].map(name => ({ required: [name] }));
 add("/templates/{id}", "delete", "form.write + service grant; public read-only", "템플릿 물리 삭제; 기존 복제 폼 유지", undefined, "implemented", "204");
 add("/templates/{id}/use", "post", "form.write + target service grant", "전체 내용 복제와 새 질문 ID 생성", version.extend({ serviceId: z.uuid(), title: z.string().trim().min(1).max(200).optional() }), "implemented", "201");
+(paths["/templates"].post as Operation).description += "; 생성 캐시는 회사·템플릿에 연결; 삭제 후 기존 생성 키는410";
+(paths["/templates/{id}"].delete as Operation).description += "; 캐시 내용·요청 해시를 같은 transaction에서 삭제; 이전 형식은 회사 구성원 범위에서 검사; 독립 생성 폼은 유지";
+{
+  const querySchema = z.toJSONSchema(templateListQuery);
+  (paths["/templates"].get as Operation).parameters = Object.entries(querySchema.properties ?? {}).map(([name, schema]) => ({ in: "query", name, required: false, schema }));
+  schemas.TemplateReadActions = { type: "object", additionalProperties: false, required: ["preview", "use", "edit", "remove"], properties: Object.fromEntries(["preview", "use", "edit", "remove"].map(name => [name, { type: "boolean" }])) };
+  schemas.TemplatePermissions = { type: "object", additionalProperties: false, required: ["canCreate", "targets"], properties: {
+    canCreate: { type: "boolean" }, targets: { type: "array", items: { type: "object", additionalProperties: false, required: ["id", "name"], properties: { id: { type: "string", format: "uuid" }, name: { type: "string" } } } },
+  } };
+  schemas.TemplateRead = { type: "object", required: ["id", "serviceId", "serviceName", "scope", "title", "category", "content", "version", "createdAt", "updatedAt", "actions"], properties: {
+    id: { type: "string", format: "uuid" }, serviceId: { anyOf: [{ type: "string", format: "uuid" }, { type: "null" }] }, serviceName: { type: ["string", "null"] }, scope: { enum: ["company", "public"] },
+    title: { type: "string" }, category: { type: "string" }, content: z.toJSONSchema(formContentSchema), version: { type: "integer", minimum: 1 }, createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" }, actions: { $ref: "#/components/schemas/TemplateReadActions" },
+  } };
+  schemas.TemplatePage = { type: "object", required: ["items", "total", "page", "pageSize", "permissions"], properties: {
+    items: { type: "array", items: { $ref: "#/components/schemas/TemplateRead" } }, total: { type: "integer", minimum: 0 }, page: { type: "integer", minimum: 1 }, pageSize: { type: "integer", minimum: 1, maximum: 100 }, permissions: { $ref: "#/components/schemas/TemplatePermissions" },
+  } };
+  for (const [path, schema] of [["/templates", "TemplatePage"], ["/templates/{id}", "TemplateRead"]]) {
+    const operation = paths[path].get as Operation;
+    operation.description += "; 현재 역할·grant·세션·전문가 배정·서비스 상태 검사; 보관 서비스는 직접 구성원만 읽기; GET 작업 권한·활성 생성 대상; 생성/수정/사용 멱등 응답에 권한 캐시 없음";
+    (operation.responses as Record<string, unknown>)["200"] = { description: "현재 권한 검사 후 조회", content: { "application/json": { schema: { $ref: "#/components/schemas/" + schema } } } };
+  }
+}
 
 for (const path of ["/services/{id}", "/forms/{id}", "/fixed-urls/{id}", "/members/{id}", "/invitations/{id}", "/templates/{id}", "/submissions/{id}/notes/{noteId}"]) {
   (paths[path].delete as Operation).parameters = [{ in: "header", name: "If-Match", required: true, schema: { type: "string", pattern: "^[1-9][0-9]*$" } }];
@@ -329,6 +471,12 @@ add("/approvals/{id}", "get", "form.read + service grant", "요청·결정 내�
 add("/approvals/{id}", "delete", "requester or owner + form.write + service grant", "대기 중 요청 취소; 증거는 유지", approvalCancelInput, "implemented");
 add("/approvals/{id}/decision", "post", "configured approval role + form.approve + service grant", "변경되지 않은 검토본의 승인/반려; 동시 결정 하나만 허용", approvalDecisionInput, "implemented");
 (paths["/forms/{id}/approvals"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
+for (const [path,query] of [["/fixed-urls",fixedUrlQuery],["/approvals",approvalQuery]] as const) {
+  (paths[path].get as Operation).parameters=Object.entries(z.toJSONSchema(query).properties!).map(([name,schema]) => ({ in:"query",name,schema }));
+  (paths[path].get as Operation)["x-query-additional-properties"]=false;
+  (paths[path].get as Operation).description="현재 계정/세션/전문가/서비스 범위를 transaction 안에서 검사하며 범위를 벗어난 page는 마지막 페이지로 보정합니다.";
+}
+for (const path of ["/forms/{id}/publish","/forms/{id}/approvals","/fixed-urls"]) (paths[path].post as Operation).description="같은 키의 재전송에도 현재 계정·세션·전문가·서비스 권한과 서비스/폼 활성 상태를 검사한 뒤 기존 결과를 반환합니다.";
 
 for (const [path, title, input, patch] of [
   ["/processing-purposes", "수집 목적", purposeInput, purposePatch],
@@ -363,10 +511,10 @@ schemas.RecipientInput = z.toJSONSchema(recipientInput);
 for (const operation of [paths["/recipients"].post, paths["/recipients/{id}"].patch] as { requestBody: { content: { "application/json": { schema: { properties: { countryCode: object } } } } } }[])
   operation.requestBody.content["application/json"].schema.properties.countryCode = { type: "string", enum: regionCodes, description: "고정 Unicode CLDR regular 국가·지역 코드 257개" };
 
-add("/imports", "get", "import.read + current service grant", "회사·서비스별 업로드 목록·검색·페이지", undefined, "implemented");
+add("/imports", "get", "import.read + current service grant + final session deadline", "회사·서비스별 업로드 제목/ID 검색·상태·정렬·보정 페이지; 중복/미지원 쿼리 거절", undefined, "implemented");
 add("/imports", "post", "import.write + current service grant + Idempotency-Key", "CSV 작업·용량 예약·24시간 원본 업로드 생성", importCreate, "implemented", "201");
 add("/imports/options", "get", "import.read + current service grant", "동일 서비스의 사용 중인 수집 목적·원자료 제공자", undefined, "implemented");
-add("/imports/{id}", "get", "import.read + current service grant", "가져오기 진행·설정·계수; 만료 원문 제외", undefined, "implemented");
+add("/imports/{id}", "get", "import.read + current service grant + final session deadline", "현재 역할·서비스·작업 상태별 permissions, 진행·설정·계수; 만료 원문/파일명 제외", undefined, "implemented");
 add("/imports/{id}", "patch", "import.write + current service grant + version", "수집 근거·컬럼 설정 수정; 기존 검증 무효화", importPatch, "implemented");
 add("/imports/{id}", "delete", "import.write + current service grant + If-Match", "임시 자료 삭제 및 취소/보관; 반영된 응답 유지", undefined, "implemented");
 for (const [action, summary] of [["inspect", "안전 검사한 CSV의 헤더·행 수 확인"], ["validate", "행별 타입·동의·기한·중복 검증; 응답 생성 0"],
@@ -376,8 +524,18 @@ add("/imports/{id}/rows", "get", "import.read + current service grant; unexpired
 add("/imports/{id}/errors.csv", "get", "import.read + current service grant; unexpired staging", "실패행 CSV·수식 시작 문자 방어·다운로드 감사", undefined, "implemented");
 for (const path of ["/imports", "/imports/options"]) (paths[path].get as Operation).parameters = [
   { in: "query", name: "serviceId", required: true, schema: { type: "string", format: "uuid" } }];
+(paths["/imports"].get as Operation).parameters = [...((paths["/imports"].get as Operation).parameters as object[]),
+  ...["page", "pageSize"].map(name => ({ in: "query", name, schema: { type: "integer", minimum: 1, maximum: name === "page" ? 100000 : 100, default: name === "page" ? 1 : 20 } })),
+  { in: "query", name: "search", schema: { type: "string", maxLength: 100 } },
+  { in: "query", name: "sort", schema: { type: "string", enum: ["createdAt", "name"], default: "createdAt" } },
+  { in: "query", name: "direction", schema: { type: "string", enum: ["asc", "desc"], default: "desc" } },
+  { in: "query", name: "status", schema: { type: "string", enum: ["uploading", "draft", "validated", "committing", "retry", "failed", "completed", "partialFailed", "cancelled", "expired", "archived"] } }];
+(paths["/imports/{id}/rows"].get as Operation).parameters = [
+  { in: "query", name: "page", schema: { type: "integer", minimum: 1, maximum: 100000, default: 1 } },
+  { in: "query", name: "pageSize", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
+  { in: "query", name: "errorsOnly", schema: { type: "string", enum: ["true", "false"], default: "false" } }];
 (paths["/imports"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", minLength: 16, maxLength: 128 } }];
-(paths["/imports/{id}"].delete as Operation).parameters = [{ in: "header", name: "If-Match", required: true, schema: { type: "integer", minimum: 1 } }];
+(paths["/imports/{id}"].delete as Operation).parameters = [{ in: "header", name: "If-Match", required: true, schema: { type: "string", pattern: "^[1-9][0-9]*$", description: "현재 version의 안전한 정수 십진 표현" } }];
 (paths["/imports/{id}/errors.csv"].get as Operation).responses = { "200": { description: "UTF-8 BOM CSV attachment", content: { "text/csv": { schema: { type: "string" } } } } };
 schemas.ImportCreate = z.toJSONSchema(importCreate); schemas.ImportPatch = z.toJSONSchema(importPatch);
 
@@ -402,8 +560,8 @@ for (const [path, label, input, patch] of [["/documents", "문서", documentInpu
 add("/documents/options", "get", "document.read + current service grant", "사용 중인 수집 목적·제공/수탁자·문구·게시 처리방침 선택 목록", undefined, "implemented");
 (paths["/documents/options"].get as Operation).parameters = [{ in: "query", name: "serviceId", required: true, schema: { type: "string", format: "uuid" } }];
 add("/documents/{id}/preview", "get", "document.read + current service grant", "저장된 초안과 현재 기초 자료의 텍스트 미리보기·게시 검증", undefined, "implemented");
-add("/documents/{id}/versions", "get", "document.read + current service grant", "불변 게시 버전·비교용 본문·SHA-256·링크 목록; 공유 주소는 쓰기 권한에만 제공", undefined, "implemented");
-add("/documents/{id}/publish", "post", "document.write + current service grant", "본문·수집 자료 스냅샷과 공개 링크 생성; 과거 버전 유지", documentPublish, "implemented", "201");
+add("/documents/{id}/versions", "get", "document.read + current service grant", "불변 게시 버전·비교용 본문·SHA-256·링크 목록; 유효한 공유 주소는 쓰기 권한에만 제공", undefined, "implemented");
+add("/documents/{id}/publish", "post", "document.write + current service grant", "본문·수집 자료 스냅샷과 공개 링크 생성; 최신 게시 버전의 링크가 닫히면 동일 내용 재게시 허용·과거 버전 유지", documentPublish, "implemented", "201");
 add("/documents/{id}/unpublish", "post", "document.write + current service grant", "모든 공개 링크 회수; 서비스에 연결된 처리방침은 차단", documentAction, "implemented");
 add("/documents/{id}/revoke", "post", "document.write + current service grant", "지정한 게시 링크 회수", documentAction.extend({ publicationId: z.uuid() }), "implemented");
 add("/documents/{id}/apply-clause", "post", "document.write + current service grant", "동일 서비스·유형의 선택 버전 문구를 초안 본문에 복사", clauseApply, "implemented");
@@ -418,6 +576,22 @@ for (const path of ["/documents/{id}/versions/{number}/pdf", "/public/documents/
 add("/services/{id}/consent-display/{kind}", "get", "service.manage + current service grant", "collection/third_party 표시 설정·회사/서비스 공개명 조회", undefined, "implemented");
 add("/services/{id}/consent-display/{kind}", "patch", "service.manage + current service grant", "표시 문구·HTTPS 외부 주소 또는 동일 서비스 처리방침 게시 버전 저장; 최초 version=0", displayInput, "implemented");
 schemas.DocumentInput = z.toJSONSchema(documentInput); schemas.ClauseInput = z.toJSONSchema(clauseInput); schemas.ServiceConsentDisplayInput = z.toJSONSchema(displayInput);
+schemas.DocumentRecord = z.toJSONSchema(documentInput.extend({ id: z.uuid(), version: z.number().int().positive(), draftRevision: z.number().int().positive(),
+  status: z.enum(["draft", "published", "private", "archived"]), serviceName: z.string(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(),
+  latestNumber: z.number().int().nonnegative(), hasUnpublishedChanges: z.boolean(), hasActivePublication: z.boolean().describe("최신 게시 버전에 활성·미만료 공개 링크가 있는지 여부") }));
+const documentRef = { $ref: "#/components/schemas/DocumentRecord" };
+const documentReply = { description: "현재 초안과 유효 공개 링크 여부. 내부 토큰·암호문 제외.", content: { "application/json": { schema: documentRef } } };
+for (const [path, method, status] of [["/documents", "post", "201"], ["/documents/{id}", "get", "200"], ["/documents/{id}", "patch", "200"],
+  ["/documents/{id}/restore", "post", "200"], ["/documents/{id}/unpublish", "post", "200"], ["/documents/{id}/revoke", "post", "200"], ["/documents/{id}/apply-clause", "post", "200"]] as const)
+  (paths[path][method] as Operation).responses = { ...errors, [status]: documentReply };
+(paths["/documents"].get as Operation).responses = { ...errors, "200": { description: "현재 권한 범위의 문서 목록", content: { "application/json": { schema: {
+  type: "object", additionalProperties: false, required: ["items", "total", "page", "pageSize"], properties: { items: { type: "array", items: documentRef },
+    total: { type: "integer", minimum: 0 }, page: { type: "integer", minimum: 1 }, pageSize: { type: "integer", minimum: 1, maximum: 100 } },
+} } } } };
+(paths["/documents/{id}/publish"].post as Operation).responses = { ...errors, "201": { description: "새 불변 게시 버전과 공개 링크", content: { "application/json": { schema: {
+  type: "object", additionalProperties: false, required: ["document", "number", "publicationId", "url"], properties: { document: documentRef,
+    number: { type: "integer", minimum: 1 }, publicationId: { type: "string", format: "uuid" }, url: { type: "string", pattern: "^/document/view/[A-Za-z0-9_-]{43}$" } },
+} } } } };
 
 add("/forms/document-options", "get", "form.read + document.read + current service grant", "같은 서비스에서 공개 중인 동의서 게시 버전 검색·페이지 목록", undefined, "implemented");
 (paths["/forms/document-options"].get as Operation).parameters = [
@@ -428,26 +602,54 @@ add("/forms/document-options", "get", "form.read + document.read + current servi
 add("/submissions/{id}/receipts/{receiptId}/pdf", "get", "submission.read + current service grant + unexpired or held submission", "제출 당시 암호화해 보관한 동의 영수증 PDF; 파기 후 접근 차단", undefined, "implemented");
 (paths["/submissions/{id}/receipts/{receiptId}/pdf"].get as Operation).responses = { ...errors, "200": { description: "저장한 PDF 바이트. no-store, X-PDF-SHA256, X-Document-SHA256", content: { "application/pdf": { schema: { type: "string", format: "binary" } } } } };
 
-add("/share-grants", "get", "share.manage + submission.read + current service grant", "formId의 외부 공유 목록; 이메일 전체 일치 검색·상태 필터·페이지", undefined, "implemented");
-add("/share-grants", "post", "share.manage + submission.read (+ file.read for file fields)", "지정 게시 버전과 필드에 외부 열람자 초대; 멱등키·암호화 이메일·메일 작업", shareCreateInput, "implemented", "201");
-add("/share-grants/options", "get", "share.manage + submission.read + current service grant", "폼의 게시 버전·질문 선택 목록", undefined, "implemented");
+add("/share-grants", "get", "share.manage + submission.read + current session/service grant", "formId의 외부 공유 목록; 이메일 전체 일치 검색·상태·페이지 보정·현재 작업 권한; 중복/미지정 쿼리422", undefined, "implemented");
+add("/share-grants", "post", "share.manage + submission.read (+ file.read for file fields) + active form/service/current session", "지정 게시 버전/필드의 초대; 재전송도 현재 권한/기한 검사; 변경·재발송·회수 후 신규/이전 캐시 원문 제거", shareCreateInput, "implemented", "201");
+add("/share-grants/options", "get", "share.manage + submission.read + current session/service grant", "게시 버전·질문 선택 목록; 현재 초대/파일 권한과 선택 가능 여부", undefined, "implemented");
 add("/share-grants/{id}", "get", "share.manage + submission.read + current service grant", "외부 공유 안전 DTO", undefined, "implemented");
 add("/share-grants/{id}", "patch", "share.manage + submission.read + current service grant", "이메일·필드·기한 변경, 초대 코드 교체·세션 무효화·새 메일", shareUpdateInput, "implemented");
 add("/share-grants/{id}", "delete", "share.manage + submission.read + If-Match", "공유 회수; 현재 세션·인증코드·파일 접근 차단", undefined, "implemented");
-add("/share-grants/{id}/resend", "post", "share.manage + submission.read", "초대 재발송·이전 코드와 세션 무효화", shareVersionInput, "implemented");
+add("/share-grants/{id}/resend", "post", "share.manage + submission.read (+ file.read for file fields) + active form/service/current session", "초대 재발송·이전 코드와 세션/생성 캐시 무효화; 성공 감사 저장 후 실제 세션/공유 기한 검사", shareVersionInput, "implemented");
 add("/share-grants/{id}/events", "get", "share.manage + submission.read", "개인정보 값·코드 없는 열람 로그 페이지", undefined, "implemented");
 (paths["/share-grants"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", minLength: 16, maxLength: 128 } }];
 (paths["/share-grants/{id}"].delete as Operation).parameters = [{ in: "header", name: "If-Match", required: true, schema: { type: "integer", minimum: 1 } }];
 for (const path of ["/share-grants", "/share-grants/options"]) (paths[path].get as Operation).parameters = [{ in: "query", name: "formId", required: true, schema: { type: "string", format: "uuid" } }];
+const sharingPagination = [{ in: "query", name: "page", schema: { type: "integer", minimum: 1, maximum: 100000, default: 1 } },
+  { in: "query", name: "pageSize", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } }];
+(paths["/share-grants"].get as Operation).parameters = [...((paths["/share-grants"].get as Operation).parameters as unknown[]), ...sharingPagination,
+  { in: "query", name: "status", schema: { type: "string", enum: ["all", "active", "expired", "revoked"], default: "all" } },
+  { in: "query", name: "search", schema: { type: "string", maxLength: 254, default: "" } }];
+(paths["/share-grants/{id}/events"].get as Operation).parameters = sharingPagination;
+const sharedQuestionProperties = { id: { type: "string", format: "uuid" }, label: { type: "string" }, type: { type: "string" }, rows: z.toJSONSchema(rowSchema.array(), { target: "draft-7" }) };
+schemas.SharedQuestion = { type: "object", additionalProperties: false, required: ["id", "label", "type"], properties: sharedQuestionProperties };
+schemas.SharePermissions = { type: "object", additionalProperties: false, required: ["canCreate", "canSelectFiles", "reason"],
+  properties: { canCreate: { type: "boolean" }, canSelectFiles: { type: "boolean" }, reason: { type: ["string", "null"] } } };
+schemas.ShareActions = { type: "object", additionalProperties: false, required: ["edit", "resend", "revoke"],
+  properties: { edit: { type: "boolean" }, resend: { type: "boolean" }, revoke: { type: "boolean" } } };
+schemas.ShareRecord = { type: "object", additionalProperties: false, required: ["id", "formId", "formVersionId", "formTitle", "formNumber", "email", "questionIds", "questions", "expiresAt", "status", "version", "createdAt", "actions"],
+  properties: { id: { type: "string", format: "uuid" }, formId: { type: "string", format: "uuid" }, formVersionId: { type: "string", format: "uuid" },
+    formTitle: { type: "string" }, formNumber: { type: "integer", minimum: 1 }, email: { type: "string", format: "email" }, questionIds: { type: "array", uniqueItems: true, items: { type: "string", format: "uuid" } },
+    questions: { type: "array", items: { $ref: "#/components/schemas/SharedQuestion" } }, expiresAt: { type: "string", format: "date-time" }, createdAt: { type: "string", format: "date-time" },
+    status: { type: "string", enum: ["active", "expired", "revoked"] }, version: { type: "integer", minimum: 1 }, actions: { $ref: "#/components/schemas/ShareActions" } } };
+schemas.SharePage = { type: "object", additionalProperties: false, required: ["items", "total", "page", "pageSize", "permissions"], properties: {
+  items: { type: "array", items: { $ref: "#/components/schemas/ShareRecord" } }, total: { type: "integer", minimum: 0 }, page: { type: "integer", minimum: 1 }, pageSize: { type: "integer", minimum: 1, maximum: 100 }, permissions: { $ref: "#/components/schemas/SharePermissions" } } };
+schemas.ShareOptions = { type: "object", additionalProperties: false, required: ["formCode", "permissions", "versions"], properties: {
+  formCode: { type: "string", format: "uuid" }, permissions: { $ref: "#/components/schemas/SharePermissions" }, versions: { type: "array", items: { type: "object", additionalProperties: false,
+    required: ["id", "number", "title", "questions"], properties: { id: { type: "string", format: "uuid" }, number: { type: "integer", minimum: 1 }, title: { type: "string" },
+      questions: { type: "array", items: { type: "object", additionalProperties: false, required: ["id", "label", "type", "selectable"], properties: { ...sharedQuestionProperties, selectable: { type: "boolean" } } } } } } } } };
+for (const [path, method, status, schema] of [["/share-grants", "get", "200", "SharePage"], ["/share-grants", "post", "201", "ShareRecord"],
+  ["/share-grants/options", "get", "200", "ShareOptions"], ["/share-grants/{id}", "get", "200", "ShareRecord"], ["/share-grants/{id}", "patch", "200", "ShareRecord"],
+  ["/share-grants/{id}", "delete", "200", "ShareRecord"], ["/share-grants/{id}/resend", "post", "200", "ShareRecord"]])
+  (paths[path][method] as Operation).responses = { ...errors, [status]: { description: "현재 공유 상태/권한 DTO. private, no-store.", content: { "application/json": { schema: { $ref: "#/components/schemas/" + schema } } } } };
 add("/viewer/challenges", "post", "invitation code + form code + email + consent; rate limit", "이메일 인증 요청; 유효/무효 조합에 동일 응답, 브라우저 바인딩 쿠키 설정", challengeInput, "implemented", "202");
-add("/viewer/challenges/{challengeId}/verify", "post", "HttpOnly browser challenge cookie", "6자리 일회용 코드 검증; 5회 제한·10분 만료·30분 열람 세션", verificationInput, "implemented");
+add("/viewer/challenges/{challengeId}/verify", "post", "HttpOnly browser challenge cookie", "6자리 일회용 코드 검증; 5회 제한·10분 만료·30분 열람 세션; 성공 감사 저장 후 기한 종료 시422/인증 세션·감사 롤백", verificationInput, "implemented");
 add("/viewer/session", "get", "active viewer + fresh grant/scope/creator permission", "외부 열람 세션·기한·허용 필드", undefined, "implemented");
 add("/viewer/logout", "post", "viewer cookie", "열람 세션 회수·쿠키 만료", undefined, "implemented", "204");
 add("/viewer/submissions", "get", "active viewer + fresh grant/scope/creator permission", "허용 게시 버전·필드의 현재 응답; 철회·파기·만료는 제외", undefined, "implemented");
 add("/viewer/submissions/{id}", "get", "active viewer + fresh grant + bound version", "허용 필드만 포함한 응답; 메모·정정 이력·영수증 제외", undefined, "implemented");
+(paths["/viewer/submissions"].get as Operation).parameters = sharingPagination;
 add("/viewer/files", "get", "active viewer + selected file question + current answer", "공유 응답의 현재 첨부파일 목록", undefined, "implemented");
 add("/viewer/files/{id}", "get", "active viewer + exact submission/question/file binding", "허용된 현재 첨부파일 메타", undefined, "implemented");
-add("/viewer/files/{id}/download", "get", "active viewer + exact submission/question/file binding", "공유·응답·파일 잠금 아래 비공개 파일 원본 다운로드", undefined, "implemented");
+add("/viewer/files/{id}/download", "get", "active viewer + exact submission/question/file binding", "공유·응답·파일 잠금 아래 비공개 다운로드; 읽기 후 발급자·공유·열람 세션·응답 기한을 재검사", undefined, "implemented");
 for (const [path, item] of Object.entries(paths).filter(([path]) => path.startsWith("/viewer/"))) {
   for (const method of ["get", "post"]) if (item[method]) (item[method] as Operation).security = path === "/viewer/challenges" ? [] :
     path.includes("/verify") ? [{ viewerChallenge: [] }] : [{ viewerSession: [] }];
@@ -455,6 +657,11 @@ for (const [path, item] of Object.entries(paths).filter(([path]) => path.startsW
 for (const path of ["/viewer/files", "/viewer/files/{id}", "/viewer/files/{id}/download"]) (paths[path].get as Operation).parameters =
   (path === "/viewer/files" ? ["submissionId"] : ["submissionId", "questionId"]).map(name => ({ in: "query", name, required: true, schema: { type: "string", format: "uuid" } }));
 (paths["/viewer/files/{id}/download"].get as Operation).responses = { ...errors, "200": { description: "첨부파일 원본. attachment, private/no-store, nosniff, sandbox CSP", content: { "application/octet-stream": { schema: { type: "string", format: "binary" } } } } };
+for (const path of ["/files", "/viewer/files"]) (paths[path].get as Operation).parameters = [
+  ...((paths[path].get as Operation).parameters as unknown[]),
+  { in: "query", name: "page", schema: { type: "integer", minimum: 1, maximum: 100000, default: 1 } },
+  { in: "query", name: "pageSize", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
+];
 
 add("/subjects/access-requests", "post", "public + consent + rate limit", "이름·이메일 조회에 동일 202 응답; 10분 브라우저 연결 일회용 메일", subjectAccessInput, "implemented", "202");
 add("/subjects/sessions", "post", "subject browser cookie + one-use email token", "메일 링크 소비 후 30분 HttpOnly 세션, 비밀 없는 조회 ID 반환", subjectSessionInput, "implemented", "201");
@@ -472,6 +679,27 @@ for (const [path, item] of Object.entries(paths).filter(([path]) => path.startsW
     operation.security = path.endsWith("access-requests") ? [] : path.endsWith("sessions") ? [{ subjectBrowser: [] }] : [{ subjectSession: [] }];
     if (path.startsWith("/subjects/me")) operation.parameters = [{ in: "header", name: "X-Subject-Session", required: true, schema: { type: "string", format: "uuid" } }];
   }
+}
+const subjectSessionSchema = z.object({ id: z.uuid(), expiresAt: z.iso.datetime() }).strict();
+const subjectReceiptSchema = z.object({ id: z.uuid(), purpose: z.string(), grantedAt: z.iso.datetime(), retentionDays: z.number().int(), documentHash: z.string(), withdrawnAt: z.iso.datetime().nullable() }).strict();
+const subjectConsentSchema = z.object({ id: z.uuid(), version: z.number().int().positive(), company: z.string(), service: z.string(), title: z.string(),
+  status: z.enum(["submitted", "corrected", "withdrawn"]), submittedAt: z.iso.datetime(), retentionUntil: z.iso.datetime(), canWithdraw: z.boolean(), receipts: subjectReceiptSchema.array() }).strict();
+const subjectEventSchema = z.object({ id: z.uuid(), type: z.enum(["granted", "imported", "withdrawn"]), createdAt: z.iso.datetime(), submissionId: z.uuid(), title: z.string(), company: z.string(), service: z.string(), purpose: z.string() }).strict();
+const subjectWithdrawalSchema = z.object({ id: z.uuid(), sessionId: z.uuid(), title: z.string(), company: z.string(), service: z.string(), status: z.enum(["requested", "completed", "cancelled"]), createdAt: z.iso.datetime(), finishedAt: z.iso.datetime().nullable() }).strict();
+const subjectPagedSchema = (item: z.ZodType) => z.object({ items: item.array(), total: z.number().int().nonnegative(), page: z.number().int().positive(), pageSize: z.number().int().min(1).max(100) }).strict();
+for (const [name, schema] of Object.entries({ SubjectAccepted: z.object({ accepted: z.literal(true) }).strict(), SubjectSession: subjectSessionSchema,
+  SubjectConsent: subjectConsentSchema, SubjectEvent: subjectEventSchema, SubjectWithdrawal: subjectWithdrawalSchema,
+  SubjectConsentPage: subjectPagedSchema(subjectConsentSchema), SubjectEventPage: subjectPagedSchema(subjectEventSchema) })) schemas[name] = z.toJSONSchema(schema);
+for (const [path, method, code, name] of [
+  ["/subjects/access-requests", "post", "202", "SubjectAccepted"], ["/subjects/sessions", "post", "201", "SubjectSession"], ["/subjects/me", "get", "200", "SubjectSession"],
+  ["/subjects/me/consents", "get", "200", "SubjectConsentPage"], ["/subjects/me/events", "get", "200", "SubjectEventPage"],
+  ["/subjects/me/withdrawals", "post", "201", "SubjectWithdrawal"], ["/subjects/me/withdrawals/{id}", "get", "200", "SubjectWithdrawal"],
+  ["/subjects/me/withdrawals/{id}/confirm", "post", "200", "SubjectWithdrawal"], ["/subjects/me/withdrawals/{id}/cancel", "post", "200", "SubjectWithdrawal"],
+]) { const responses = (paths[path][method] as Operation).responses as Record<string, Record<string, unknown>>; responses[code].content = { "application/json": { schema: { $ref: "#/components/schemas/" + name } } }; }
+for (const path of ["/subjects/me/consents", "/subjects/me/events"]) {
+  const operation = paths[path].get as Operation;
+  operation.parameters = [...operation.parameters as unknown[], ...["page", "pageSize"].map(name => ({ in: "query", name, schema: { type: "integer", minimum: 1, maximum: name === "page" ? 100000 : 100, default: name === "page" ? 1 : 20 } }))];
+  operation["x-query-validation"] = "Only page/pageSize; duplicate/unknown keys return 422; clamp to last retained page";
 }
 
 add("/marketing/preferences", "get", "marketing.read + current service grant", "채널·상태·제외·정규화 완전일치 검색 및 서버 페이지", undefined, "implemented");
@@ -499,16 +727,28 @@ add("/analytics/dashboard", "get", "service.read + current service grants",
 schemas.MarketingCreate = z.toJSONSchema(marketingCreate); schemas.MarketingList = z.toJSONSchema(marketingList);
 for (const path of ["/marketing/preferences", "/marketing/preferences/export"]) (paths[path].get as Operation).parameters = Object.entries((schemas.MarketingList as { properties: Record<string, unknown> }).properties).map(([name, schema]) => ({ in: "query", name, required: name === "serviceId", schema }));
 (paths["/marketing/preferences/export"].get as Operation).responses = { ...errors, "200": { description: "UTF-8 BOM CSV", content: { "text/csv": { schema: { type: "string" } } } } };
+for (const path of Object.keys(paths).filter(path => path.startsWith("/marketing/"))) {
+  for (const method of ["get", "post", "patch", "delete"]) {
+    const operation = paths[path][method] as Operation | undefined;
+    if (!operation) continue;
+    operation["x-current-access"] = "회사·회원·서비스·현재 grant·계정·MFA·선택 회사·비밀번호·세션 기한을 잠금 후 재검사; 감사/캐시/DTO 처리 뒤 기한 검사";
+    operation["x-query-validation"] = "중복/미지원 쿼리 422; 변경/상세 쿼리 없음; 목록 정렬 createdAt/grantedAt, asc/desc; 마지막 페이지 보정";
+  }
+}
+(paths["/marketing/preferences"].get as Operation)["x-current-permissions"] = "목록 canCreate/canExport, 항목 canChangeExclusion/canWithdraw/canErase/canCleanup와 pendingLocalCopies";
+(paths["/marketing/preferences"].post as Operation)["x-idempotency-replay"] = "현재 버전 반환; 삭제/원본 기한 종료 410; 재동의 출처 변경 409; 캐시 저장 후 최종 기한 검사";
+(paths["/marketing/preferences/{id}"].delete as Operation)["x-copy-cleanup"] = "SQL 삭제 확정 후 파일 정리; 실패 시 localCopyErasedAt=null, cleanup.pending 반환; 반복 DELETE로 재시도, 중복 이력 없음";
 
 for (const [path, method, description] of [
-  ["/senders", "get", "서비스·채널·상태·이름/정확한 주소 검색·서버 페이지"],
-  ["/senders", "post", "발신자 등록·멱등키, 인증 대기"],
-  ["/senders/{id}", "get", "발신자·현재 인증·증빙·최근 100개 변경 이력"],
+  ["/senders", "get", "현재 권한·최종 세션 기한·엄격한 쿼리·서비스/채널/상태/검색·정렬과 마지막 페이지 보정"],
+  ["/senders", "post", "현재 권한의 등록·멱등키; 재실행은 최신 버전, 삭제 후 410; 캐시 저장 뒤 최종 기한"],
+  ["/senders/{id}", "get", "현재 권한·인증·작업 권한·사본 정리 대기·증빙·변경 이력; 만료 확인값과 읽기 전용 DNS 비밀 제외"],
   ["/senders/{id}", "patch", "이름·설명·주소 변경·version; 주소 변경 시 재인증"],
   ["/senders/{id}", "delete", "사용중 삭제 제한·주소와 증빙 원문 삭제·최소 이력 유지"],
   ["/senders/{id}/default", "post", "현재 인증된 발신자로 서비스/채널 대표 변경"],
   ["/senders/{id}/disable", "post", "사용 중지·기존 인증/대표 해제"],
   ["/senders/{id}/renew", "post", "새 인증 세대·이전 코드 및 예약 발송 차단"],
+  ["/senders/{id}/cleanup", "post", "현재 관리 권한·version·최종 기한 확인 후 확정된 인증 메일·증빙 사본 정리 재시도"],
   ["/senders/{id}/request-email", "post", "10분·5회·일회 이메일 인증번호 요청, 1분 재요청 제한"],
   ["/senders/{id}/confirm-email", "post", "인증번호 소비; 실패 횟수 커밋"],
   ["/senders/{id}/dns", "post", "서비스별 DNS TXT 확인값 발급"],
@@ -522,7 +762,7 @@ for (const [path, method, schema] of [
   ["/senders", "post", senderCreate], ["/senders/{id}", "patch", senderPatch], ["/senders/{id}", "delete", senderVersion],
   ["/senders/{id}/evidence", "post", senderEvidenceInput], ["/senders/{id}/evidence/{fileId}/attach", "post", senderVersion], ["/senders/{id}/evidence/{fileId}", "delete", senderVersion],
   ["/senders/{id}/confirm-email", "post", senderVersion.extend({ verificationId: z.uuid(), code: z.string().regex(/^\d{6}$/) }).strict()],
-  ...["default", "disable", "renew", "request-email", "dns", "check"].map(action => ["/senders/{id}/" + action, "post", senderVersion] as const),
+  ...["default", "disable", "renew", "request-email", "dns", "check", "cleanup"].map(action => ["/senders/{id}/" + action, "post", senderVersion] as const),
 ] as const) (paths[path][method] as Operation).requestBody = { required: true, content: { "application/json": { schema: z.toJSONSchema(schema) } } };
 for (const [path, description] of [
   ["/campaigns", "서비스·채널·검색·상태·보관·날짜·페이지별 캠페인"],
@@ -622,6 +862,11 @@ add("/access-requests", "post", "active member; experts excluded", "같은 회�
 add("/access-requests/{id}", "patch", "member.manage + active tenant", "본인 승인 금지·역할 상한·version 확인 후 결정", accessDecisionInput, "implemented");
 add("/access-requests/{id}", "delete", "requester + active tenant + If-Match", "본인 대기 요청 취소·이력 보존", undefined, "implemented", "204");
 add("/expert-assignments", "get", "own expert or platform-admin", "본인 또는 운영자 배정 목록", undefined, "implemented");
+(paths["/expert-assignments"].get as Operation).parameters = [
+  { in: "query", name: "scope", schema: { type: "string", enum: ["mine", "admin"], default: "mine" } },
+  { in: "query", name: "search", description: "mine도 전체 본인 배정에서 회사명을 검색한다.", schema: { type: "string", maxLength: 100 } },
+  ...["page", "pageSize"].map(name => ({ name, in: "query", schema: { type: "integer", minimum: 1, maximum: name === "page" ? 100000 : 100 } })),
+];
 add("/expert-assignments", "post", "platform-admin", "회사·서비스·전문가 이메일/만료 범위 배정", createExpertInput, "implemented", "201");
 add("/expert-assignments/{id}", "get", "own expert or platform-admin", "현재 배정·회수/만료 상태", undefined, "implemented");
 add("/expert-assignments/{id}", "patch", "platform-admin", "서비스 범위·기한·version 변경", updateExpertInput, "implemented");
@@ -666,7 +911,33 @@ for (const path of ["/notices/{id}/attachments/{attachmentId}", "/guides/{id}/fi
     { in: "header", name: "X-File-Sha256", required: true, schema: { type: "string", pattern: "^[0-9a-f]{64}$" } },
     { in: "header", name: "X-File-Name", required: true, schema: { type: "string", minLength: 1, maxLength: 1000 } },
   ];
+add("/security/ip-rules", "get", "security.read + direct membership", "현재 회사 IP 규칙·접근 제한·실제 현재 IP·정렬/페이지·변경 권한", undefined, "implemented");
+add("/security/ip-rules", "post", "direct owner", "IPv4·IPv6 CIDR 정규화·최대 100개·동일 요청의 현재 결과", ipRuleInput, "implemented", "201");
+add("/security/ip-rules/{id}", "get", "security.read + direct membership", "현재 회사의 IP 규칙 상세", undefined, "implemented");
+add("/security/ip-rules/{id}", "patch", "direct owner", "현재 version·접속 IP 유지·CIDR 중복 검사 후 변경", ipRulePatch, "implemented");
+add("/security/ip-rules/{id}", "delete", "direct owner", "현재 접속을 유지하면서 규칙·요청 원문 삭제", ipRuleDelete, "implemented", "204");
+add("/security/ip-rules/settings", "patch", "direct owner + current password", "실제 접속 IP를 허용할 때 제한 활성화; 현재 version과 비밀번호 확인", ipAccessChange, "implemented");
+(paths["/security/ip-rules"].get as Operation).parameters = Object.entries(z.toJSONSchema(ipRuleQuery).properties ?? {}).map(([name,schema]) => ({ in: "query", name, schema }));
+(paths["/security/ip-rules"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
+add("/security/mfa-policy", "get", "security.read + direct membership", "현재 회사 인증 강제·구성원 등록·기한이 있는 예외·검색/페이지", undefined, "implemented");
+add("/security/mfa-policy", "patch", "enrolled direct owner + current password", "현재 version의 회사 인증 강제를 변경", mfaPolicyChange, "implemented");
+add("/security/mfa-policy/exceptions", "post", "enrolled direct owner + current password", "다른 활성 구성원에 사유·최대 24시간 임시 예외; 현재 결과 재실행", mfaExceptionCreate, "implemented", "201");
+add("/security/mfa-policy/exceptions/{id}", "get", "security.read + direct membership", "현재 회사의 임시 예외와 만료 상태", undefined, "implemented");
+add("/security/mfa-policy/exceptions/{id}", "patch", "enrolled direct owner + current password", "현재 version으로 예외 변경; 최초 등록부터 24시간 상한", mfaExceptionPatch, "implemented");
+add("/security/mfa-policy/exceptions/{id}", "delete", "enrolled direct owner + current password", "예외와 생성 캐시 원문 삭제; 다음 요청 접근 차단", mfaExceptionDelete, "implemented", "204");
+add("/security/status", "get", "security.read + direct membership", "현재 정책·등록·허용 IP·복구 관리자에서 산출한 보안 확인과 개선 링크", undefined, "implemented");
+(paths["/security/mfa-policy"].get as Operation).parameters = Object.entries(z.toJSONSchema(mfaMemberQuery).properties ?? {}).map(([name,schema]) => ({ in: "query", name, schema }));
+(paths["/security/mfa-policy/exceptions"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
 type PolicyRule = { id: string; prefixes: string[] };
+add("/exports", "post", "submission.read + current service grant + requester", "검색 조건을 암호화한 비동기 CSV 작업 생성; 같은 키/입력 재전송; 진행 중 5개 상한", createExportInput, "implemented", "201");
+add("/exports", "get", "submission.read + current service grant + requester", "해당 폼의 본인 내보내기 안전 DTO·현재 작업 버튼·페이지 보정", undefined, "implemented");
+add("/exports/{id}", "get", "submission.read + current service grant + requester", "현재 작업의 상태·진행·만료·오류 코드; 암호문/검색어/요청 키 제외", undefined, "implemented");
+add("/exports/{id}", "delete", "submission.read + current service grant + requester", "version 확인 후 결과·검색 조건·해시 제거; 요청 키 tombstone으로 부활 차단", exportChangeInput, "implemented", "204");
+add("/exports/{id}/cancel", "post", "submission.read + current service grant + requester", "대기/처리 작업 취소·원문 제거; 오래된 worker 결과 차단", exportChangeInput, "implemented");
+add("/exports/{id}/download", "get", "submission.read + current service grant + requester", "현재 원천/권한/보유 기한과 CSV 해시 대조·성공 감사; 100,000건/1,000열/20MB 상한", undefined, "implemented");
+(paths["/exports"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{8,128}$" } }];
+(paths["/exports"].get as Operation).parameters = Object.entries(z.toJSONSchema(exportListQuery).properties ?? {}).map(([name, schema]) => ({ in: "query", name, required: name === "formId", schema }));
+(paths["/exports/{id}/download"].get as Operation).responses = { ...errors, "200": { description: "BOM/CRLF CSV; UTF-8; attachment/private no-store/nosniff", content: { "text/csv": { schema: { type: "string" } } } } };
 const policies = JSON.parse(await readFile("docs/planning/contracts/domain-policies.json", "utf8")) as { rules: PolicyRule[] };
 for (const [path, item] of Object.entries(paths)) {
   const matches = policies.rules.flatMap(policy => policy.prefixes

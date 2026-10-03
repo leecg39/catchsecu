@@ -1,0 +1,253 @@
+{
+  "checkedAt": "2026-10-03T18:43:54.672Z",
+  "result": "passed",
+  "database": "catchsecu_dev",
+  "checksumMatches": 61,
+  "existingMigrationChecksumsPreserved": 59,
+  "newMigrations": [
+    "20261004110000_verification_foundation",
+    "20261004111000_verification_receipt_kinds"
+  ],
+  "tables": 5,
+  "foreignKeys": 11,
+  "checks": 5,
+  "triggers": 5,
+  "constraints": [
+    {
+      "name": "VerificationAttempt_evidence_check",
+      "type": "c",
+      "table": "VerificationAttempt",
+      "definition": "CHECK (((version > 0) AND (kind = ANY (ARRAY['identity'::text, 'signature'::text])) AND (environment = ANY (ARRAY['sandbox'::text, 'production'::text])) AND (status = ANY (ARRAY['pending'::text, 'verified'::text, 'failed'::text, 'cancelled'::text, 'expired'::text, 'consumed'::text])) AND (\"browserNonceHash\" ~ '^[0-9a-f]{64}$'::text) AND (\"requestHash\" ~ '^[0-9a-f]{64}$'::text) AND (\"documentHash\" ~ '^[0-9a-f]{64}$'::text) AND ((\"providerRequestHash\" IS NULL) OR (\"providerRequestHash\" ~ '^[0-9a-f]{64}$'::text)) AND (\"expiresAt\" > \"createdAt\") AND ((status <> ALL (ARRAY['verified'::text, 'consumed'::text])) OR ((\"verifiedAt\" IS NOT NULL) AND (\"providerRequestHash\" IS NOT NULL) AND (\"providerRequestCipher\" IS NOT NULL)))))"
+    },
+    {
+      "name": "VerificationAttempt_pkey",
+      "type": "p",
+      "table": "VerificationAttempt",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "VerificationAttempt_tenantId_formId_formVersionId_fkey",
+      "type": "f",
+      "table": "VerificationAttempt",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formId\", \"formVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", \"formId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationAttempt_tenantId_formId_publicationId_formVers_fkey",
+      "type": "f",
+      "table": "VerificationAttempt",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formId\", \"publicationId\", \"formVersionId\") REFERENCES \"Publication\"(\"tenantId\", \"formId\", id, \"formVersionId\") ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationAttempt_tenantId_serviceId_fkey",
+      "type": "f",
+      "table": "VerificationAttempt",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationAttempt_tenantId_serviceId_formId_fkey",
+      "type": "f",
+      "table": "VerificationAttempt",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"formId\") REFERENCES \"Form\"(\"tenantId\", \"serviceId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationAttempt_tenantId_serviceId_integrationId_integ_fkey",
+      "type": "f",
+      "table": "VerificationAttempt",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"integrationId\", \"integrationVersion\") REFERENCES \"VerificationIntegrationRevision\"(\"tenantId\", \"serviceId\", \"integrationId\", version) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationEvent_evidence_check",
+      "type": "c",
+      "table": "VerificationEvent",
+      "definition": "CHECK (((\"providerEventHash\" ~ '^[0-9a-f]{64}$'::text) AND (\"bodyHash\" ~ '^[0-9a-f]{64}$'::text) AND (\"verificationStatus\" = ANY (ARRAY['verified'::text, 'rejected'::text, 'ignored'::text])) AND ((\"verificationStatus\" <> 'verified'::text) OR \"signatureValid\")))"
+    },
+    {
+      "name": "VerificationEvent_pkey",
+      "type": "p",
+      "table": "VerificationEvent",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "VerificationEvent_tenantId_serviceId_attemptId_fkey",
+      "type": "f",
+      "table": "VerificationEvent",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"attemptId\") REFERENCES \"VerificationAttempt\"(\"tenantId\", \"serviceId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationIntegration_configuration_check",
+      "type": "c",
+      "table": "VerificationIntegration",
+      "definition": "CHECK (((version > 0) AND (environment = ANY (ARRAY['sandbox'::text, 'production'::text])) AND (status = ANY (ARRAY['pending'::text, 'disabled'::text, 'deleted'::text])) AND ((\"identityProvider\" IS NULL) OR (\"identityProvider\" ~ '^[a-z][a-z0-9_-]{1,63}$'::text)) AND ((\"signatureProvider\" IS NULL) OR (\"signatureProvider\" ~ '^[a-z][a-z0-9_-]{1,63}$'::text)) AND\nCASE\n    WHEN (status = 'deleted'::text) THEN ((\"identityProvider\" IS NULL) AND (\"signatureProvider\" IS NULL))\n    ELSE ((\"identityProvider\" IS NOT NULL) OR (\"signatureProvider\" IS NOT NULL))\nEND))"
+    },
+    {
+      "name": "VerificationIntegration_pkey",
+      "type": "p",
+      "table": "VerificationIntegration",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "VerificationIntegration_tenantId_serviceId_fkey",
+      "type": "f",
+      "table": "VerificationIntegration",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationIntegrationRevision_configuration_check",
+      "type": "c",
+      "table": "VerificationIntegrationRevision",
+      "definition": "CHECK (((version > 0) AND (environment = ANY (ARRAY['sandbox'::text, 'production'::text])) AND (status = ANY (ARRAY['pending'::text, 'disabled'::text, 'deleted'::text]))))"
+    },
+    {
+      "name": "VerificationIntegrationRevision_pkey",
+      "type": "p",
+      "table": "VerificationIntegrationRevision",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "VerificationIntegrationRevision_tenantId_serviceId_integra_fkey",
+      "type": "f",
+      "table": "VerificationIntegrationRevision",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"integrationId\") REFERENCES \"VerificationIntegration\"(\"tenantId\", \"serviceId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationReceipt_evidence_check",
+      "type": "c",
+      "table": "VerificationReceipt",
+      "definition": "CHECK (((kind = ANY (ARRAY['identity'::text, 'signature'::text])) AND (environment = 'production'::text) AND (\"documentHash\" ~ '^[0-9a-f]{64}$'::text) AND (\"proofHash\" ~ '^[0-9a-f]{64}$'::text) AND (\"retentionUntil\" > \"verifiedAt\")))"
+    },
+    {
+      "name": "VerificationReceipt_pkey",
+      "type": "p",
+      "table": "VerificationReceipt",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "VerificationReceipt_tenantId_serviceId_attemptId_eventId_fkey",
+      "type": "f",
+      "table": "VerificationReceipt",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"attemptId\", \"eventId\") REFERENCES \"VerificationEvent\"(\"tenantId\", \"serviceId\", \"attemptId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationReceipt_tenantId_serviceId_attemptId_fkey",
+      "type": "f",
+      "table": "VerificationReceipt",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"attemptId\") REFERENCES \"VerificationAttempt\"(\"tenantId\", \"serviceId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "VerificationReceipt_tenantId_submissionId_formVersionId_fkey",
+      "type": "f",
+      "table": "VerificationReceipt",
+      "definition": "FOREIGN KEY (\"tenantId\", \"submissionId\", \"formVersionId\") REFERENCES \"Submission\"(\"tenantId\", id, \"formVersionId\") ON UPDATE CASCADE ON DELETE RESTRICT"
+    }
+  ],
+  "triggerDefinitions": [
+    {
+      "name": "verification_attempt_guard",
+      "table": "VerificationAttempt",
+      "definition": "CREATE TRIGGER verification_attempt_guard BEFORE INSERT OR UPDATE ON public.\"VerificationAttempt\" FOR EACH ROW EXECUTE FUNCTION verification_attempt_guard()"
+    },
+    {
+      "name": "verification_event_guard",
+      "table": "VerificationEvent",
+      "definition": "CREATE TRIGGER verification_event_guard BEFORE UPDATE ON public.\"VerificationEvent\" FOR EACH ROW EXECUTE FUNCTION verification_event_guard()"
+    },
+    {
+      "name": "verification_integration_scope_guard",
+      "table": "VerificationIntegration",
+      "definition": "CREATE TRIGGER verification_integration_scope_guard BEFORE UPDATE ON public.\"VerificationIntegration\" FOR EACH ROW EXECUTE FUNCTION verification_integration_scope_guard()"
+    },
+    {
+      "name": "verification_revision_guard",
+      "table": "VerificationIntegrationRevision",
+      "definition": "CREATE TRIGGER verification_revision_guard BEFORE INSERT OR DELETE OR UPDATE ON public.\"VerificationIntegrationRevision\" FOR EACH ROW EXECUTE FUNCTION verification_revision_guard()"
+    },
+    {
+      "name": "verification_receipt_guard",
+      "table": "VerificationReceipt",
+      "definition": "CREATE TRIGGER verification_receipt_guard BEFORE INSERT OR UPDATE ON public.\"VerificationReceipt\" FOR EACH ROW EXECUTE FUNCTION verification_receipt_guard()"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "Publication_tenantId_formId_id_formVersionId_key",
+      "definition": "CREATE UNIQUE INDEX \"Publication_tenantId_formId_id_formVersionId_key\" ON public.\"Publication\" USING btree (\"tenantId\", \"formId\", id, \"formVersionId\")"
+    },
+    {
+      "name": "VerificationAttempt_pkey",
+      "definition": "CREATE UNIQUE INDEX \"VerificationAttempt_pkey\" ON public.\"VerificationAttempt\" USING btree (id)"
+    },
+    {
+      "name": "VerificationAttempt_tenantId_serviceId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationAttempt_tenantId_serviceId_id_key\" ON public.\"VerificationAttempt\" USING btree (\"tenantId\", \"serviceId\", id)"
+    },
+    {
+      "name": "VerificationAttempt_tenantId_serviceId_status_expiresAt_idx",
+      "definition": "CREATE INDEX \"VerificationAttempt_tenantId_serviceId_status_expiresAt_idx\" ON public.\"VerificationAttempt\" USING btree (\"tenantId\", \"serviceId\", status, \"expiresAt\")"
+    },
+    {
+      "name": "VerificationEvent_attemptId_providerEventHash_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationEvent_attemptId_providerEventHash_key\" ON public.\"VerificationEvent\" USING btree (\"attemptId\", \"providerEventHash\")"
+    },
+    {
+      "name": "VerificationEvent_pkey",
+      "definition": "CREATE UNIQUE INDEX \"VerificationEvent_pkey\" ON public.\"VerificationEvent\" USING btree (id)"
+    },
+    {
+      "name": "VerificationEvent_tenantId_serviceId_attemptId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationEvent_tenantId_serviceId_attemptId_id_key\" ON public.\"VerificationEvent\" USING btree (\"tenantId\", \"serviceId\", \"attemptId\", id)"
+    },
+    {
+      "name": "VerificationIntegrationRevision_pkey",
+      "definition": "CREATE UNIQUE INDEX \"VerificationIntegrationRevision_pkey\" ON public.\"VerificationIntegrationRevision\" USING btree (id)"
+    },
+    {
+      "name": "VerificationIntegrationRevision_tenantId_serviceId_integrat_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationIntegrationRevision_tenantId_serviceId_integrat_key\" ON public.\"VerificationIntegrationRevision\" USING btree (\"tenantId\", \"serviceId\", \"integrationId\", version)"
+    },
+    {
+      "name": "VerificationIntegration_pkey",
+      "definition": "CREATE UNIQUE INDEX \"VerificationIntegration_pkey\" ON public.\"VerificationIntegration\" USING btree (id)"
+    },
+    {
+      "name": "VerificationIntegration_tenantId_serviceId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationIntegration_tenantId_serviceId_id_key\" ON public.\"VerificationIntegration\" USING btree (\"tenantId\", \"serviceId\", id)"
+    },
+    {
+      "name": "VerificationIntegration_tenantId_serviceId_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationIntegration_tenantId_serviceId_key\" ON public.\"VerificationIntegration\" USING btree (\"tenantId\", \"serviceId\")"
+    },
+    {
+      "name": "VerificationReceipt_attemptId_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationReceipt_attemptId_key\" ON public.\"VerificationReceipt\" USING btree (\"attemptId\")"
+    },
+    {
+      "name": "VerificationReceipt_pkey",
+      "definition": "CREATE UNIQUE INDEX \"VerificationReceipt_pkey\" ON public.\"VerificationReceipt\" USING btree (id)"
+    },
+    {
+      "name": "VerificationReceipt_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationReceipt_tenantId_id_key\" ON public.\"VerificationReceipt\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "name": "VerificationReceipt_tenantId_serviceId_attemptId_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationReceipt_tenantId_serviceId_attemptId_key\" ON public.\"VerificationReceipt\" USING btree (\"tenantId\", \"serviceId\", \"attemptId\")"
+    },
+    {
+      "name": "VerificationReceipt_tenantId_submissionId_kind_key",
+      "definition": "CREATE UNIQUE INDEX \"VerificationReceipt_tenantId_submissionId_kind_key\" ON public.\"VerificationReceipt\" USING btree (\"tenantId\", \"submissionId\", kind)"
+    }
+  ],
+  "rolledBackAttempts": [
+    {
+      "migration_name": "20261002143000_private_files"
+    },
+    {
+      "migration_name": "20261003050000_campaign_delivery_lifecycle"
+    },
+    {
+      "migration_name": "20261004110000_verification_foundation"
+    }
+  ],
+  "providerSandboxVerified": false,
+  "readOnly": true
+}

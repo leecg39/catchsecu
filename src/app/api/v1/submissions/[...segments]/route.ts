@@ -3,7 +3,7 @@ import { requireContext } from "@/server/context";
 import { body, fail, json, route } from "@/server/http";
 import { actionInput, changeSubmission, correctionInput, correctSubmission, createNote, getSubmission, mutateNote, noteInput } from "@/server/submission-management";
 import { idempotent } from "@/server/idempotency";
-import { changeRetention } from "@/server/destruction";
+import { changeRetention, destructionRequestQuery } from "@/server/destruction";
 import { retentionInput } from "@/contracts/destruction";
 import { lockSubmission } from "@/server/submission-access";
 function parts(request: Request) {
@@ -18,7 +18,10 @@ export const GET = route(async (request, requestId) => {
 });
 export const PATCH = route(async (request, requestId) => {
   const { id, action, noteId } = parts(request), ctx = await requireContext(request.headers, action === "retention" ? "submission.destroy" : "submission.write");
-  if (action === "retention" && !noteId) return json(await changeRetention(ctx, id, await body(request, retentionInput), requestId));
+  if (action === "retention" && !noteId) {
+    destructionRequestQuery(request, false, true);
+    return json(await changeRetention(ctx, id, await body(request, retentionInput), requestId));
+  }
   if (action === "notes" && noteId) return json(await mutateNote(ctx, id, noteId, await body(request, noteInput.extend({ version: z.number().int().positive() })), requestId));
   if (action) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   return json(await correctSubmission(ctx, id, await body(request, correctionInput), requestId));
@@ -36,6 +39,7 @@ export const POST = route(async (request, requestId) => {
   }
   if (!["withdraw", "destruction-request", "hold"].includes(action)) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   const ctx = await requireContext(request.headers, action === "withdraw" ? "submission.write" : "submission.destroy");
+  if (action !== "withdraw") destructionRequestQuery(request, false, true);
   const input = action === "hold" ? await body(request, actionInput.extend({ hold: z.boolean() })) : await body(request, actionInput);
   return json(await changeSubmission(ctx, id, action as "withdraw" | "destruction-request" | "hold", input, requestId));
 });

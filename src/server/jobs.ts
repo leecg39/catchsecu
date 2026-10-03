@@ -8,9 +8,12 @@ import { db, type Transaction } from "./db";
 import { decrypt, encrypt } from "./crypto";
 import { env } from "./env";
 import { contactEmailHash, isSuppressed, lockDelivery, type DeliveryScope } from "./suppression";
-import { requireVerifiedSender } from "./sender-access";
+import { lockSubjectScopes, retainedSubjectSubmission } from "./subject-scope";
+import { requireVerifiedSender, senderDenial } from "./sender-access";
+import { senderEnvironment } from "./sender-providers";
 import { HttpError } from "./http";
 import { CAMPAIGN_MAIL_JOB_TYPES } from "@/contracts/campaigns";
+import { roleCan, roleCapabilities } from "./permissions";
 
 const mailSchema = z.object({ to: z.email(), subject: z.string().max(200), text: z.string().max(100000) }).strict();
 type Mail = z.infer<typeof mailSchema>;
@@ -44,17 +47,20 @@ export async function enqueueServiceMail(mail: Mail, scope: { tenantId: string; 
 export async function enqueueMarketingMail(mail: Mail, scope: { tenantId: string; serviceId: string }, key: string = randomUUID(), dueAt = new Date(), sender?: { id: string; version: number }) {
   z.date().parse(dueAt);
   const parsed = mailSchema.parse(mail);
-  const result = await withMarketingDelivery({ ...scope, channel: "email", contact: parsed.to }, async (tx, row) => {
-    if (sender) await requireVerifiedSender(tx, { ...scope, ...sender, channel: "email" });
+  const result = await withMarketingDelivery({ ...scope, channel: "email", contact: parsed.to }, async (tx, row, assertCurrent) => {
+    const verifiedSender = sender ? await requireVerifiedSender(tx, { ...scope, ...sender, channel: "email" }) : undefined;
     const dedupeKey = "mail:marketing:" + scope.tenantId + ":" + scope.serviceId + ":" + key;
     const job = await tx.job.upsert({ where: { dedupeKey }, update: {}, create: { dedupeKey, dueAt, tenantId: scope.tenantId, type: sender ? SENDER_MAIL_JOB_TYPE : "mail", senderId: sender?.id, marketingPreferenceId: row.id, marketingSubmissionId: row.sourceSubmissionId,
       payloadCipher: encrypt({ ...parsed, ...(sender ? { sender } : {}), marketing: { tenantId: scope.tenantId, serviceId: scope.serviceId, id: row.id, version: row.version } }) } });
+    await assertCurrent();
+    if (verifiedSender && senderDenial(verifiedSender.row)) throw new Error("SENDER_UNAVAILABLE");
     return { id: job.id, suppressed: false };
   });
   return result ?? { id: null, suppressed: true };
 }
 export type ClaimedJob = { campaignDeliveryId: string | null; senderId: string | null; dedupeKey: string; tenantId: string | null; id: string; type: string; payloadCipher: string; attempts: number; maxAttempts: number };
-export async function claimJob(workerId: string): Promise<(ClaimedJob & { attemptId: string }) | undefined> {
+export type JobScope = { tenantId: string; jobId: string };
+export async function claimJob(workerId: string, scope?: JobScope): Promise<(ClaimedJob & { attemptId: string }) | undefined> {
   return db.$transaction(async tx => {
     const rows = await tx.$queryRaw<ClaimedJob[]>`
       UPDATE "Job" SET status = 'leased', "leaseOwner" = ${workerId},
@@ -64,6 +70,7 @@ export async function claimJob(workerId: string): Promise<(ClaimedJob & { attemp
         WHERE ((status IN ('queued', 'retry') AND "dueAt" <= now())
           OR (status = 'leased' AND "leaseUntil" < now()))
           AND attempts < "maxAttempts"
+          AND (${scope?.tenantId ?? null}::text IS NULL OR ("tenantId"=${scope?.tenantId ?? null} AND id=${scope?.jobId ?? null}))
         ORDER BY "dueAt", id FOR UPDATE SKIP LOCKED LIMIT 1
       )
       RETURNING id, type, "payloadCipher", attempts, "maxAttempts", "tenantId", "dedupeKey", "senderId", "campaignDeliveryId"`;
@@ -78,33 +85,76 @@ export async function claimJob(workerId: string): Promise<(ClaimedJob & { attemp
 async function finishAttempt(attemptId: string, outcome: string, errorCode?: string) {
   await db.$executeRaw`UPDATE "JobAttempt" SET outcome = ${outcome}, "errorCode" = ${errorCode ?? null}, "finishedAt" = now() WHERE id = ${attemptId} AND outcome = 'leased'`;
 }
-async function sendMail(job: ClaimedJob) {
+async function sendMail(job: ClaimedJob, workerId: string) {
   const parsed = scopedMailSchema.parse(decrypt(job.payloadCipher)), { deliveryScope, marketing, sender, ...mail } = parsed;
   if ((sender || job.dedupeKey.startsWith("mail:sender-verification:")) && job.type !== SENDER_MAIL_JOB_TYPE) throw new Error("SENDER_PROTOCOL_REQUIRED");
   if ((job.senderId ?? undefined) !== sender?.id || (sender && !marketing)) throw new Error("INVALID_SENDER_SCOPE");
   if (marketing) {
     if (job.tenantId !== marketing.tenantId || deliveryScope) throw new Error("INVALID_MARKETING_SCOPE");
-    return !!await withMarketingDelivery({ tenantId: marketing.tenantId, serviceId: marketing.serviceId, channel: "email", contact: mail.to }, async tx => {
+    return !!await withMarketingDelivery({ tenantId: marketing.tenantId, serviceId: marketing.serviceId, channel: "email", contact: mail.to }, async (tx, _row, assertCurrent) => {
       let from: { name: string; address: string } | undefined;
-      if (sender) try { const verified = await requireVerifiedSender(tx, { tenantId: marketing.tenantId, serviceId: marketing.serviceId, ...sender, channel: "email" }); from = { name: verified.row.label, address: verified.address }; }
+      let verifiedSender: Awaited<ReturnType<typeof requireVerifiedSender>> | undefined;
+      if (sender) try { verifiedSender = await requireVerifiedSender(tx, { tenantId: marketing.tenantId, serviceId: marketing.serviceId, ...sender, channel: "email" }); from = { name: verifiedSender.row.label, address: verifiedSender.address }; }
       catch (e) { if (e instanceof HttpError && e.code === "SENDER_UNAVAILABLE") return false; throw e; }
-      await deliverMail(job, mail, from); return true;
+      await tx.$queryRaw`SELECT id FROM "Job" WHERE id=${job.id} FOR UPDATE`;
+      const current = await tx.job.findFirst({ where: { id: job.id, tenantId: marketing.tenantId, status: "leased", leaseOwner: workerId, attempts: job.attempts, payloadErasedAt: null } });
+      if (!current?.leaseUntil || current.leaseUntil <= new Date()) return false;
+      const beforeDispatch = async () => {
+        await assertCurrent();
+        if (verifiedSender && senderDenial(verifiedSender.row)) throw new Error("SENDER_UNAVAILABLE");
+        if (current.leaseUntil! <= new Date()) throw new Error("LEASE_EXPIRED");
+      };
+      await deliverMail(job, mail, from, beforeDispatch); return true;
     }, marketing);
   }
   if (!deliveryScope) {
+    if (job.dedupeKey.startsWith("mail:invitation:")) {
+      const [, , id, rawVersion, ...rest] = job.dedupeKey.split(":");
+      const version = Number(rawVersion);
+      if (rest.length || !z.uuid().safeParse(id).success || !Number.isSafeInteger(version) || version < 1) return false;
+      const initial = await db.invitation.findUnique({ where: { id }, select: { tenantId: true } });
+      if (!initial || job.tenantId !== initial.tenantId) return false;
+      return db.$transaction(async tx => {
+        // The same company lock serializes delivery with resend, revoke and acceptance.
+        await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${initial.tenantId} FOR SHARE`;
+        const row = await tx.invitation.findUnique({ where: { id }, include: { tenant: { select: { status: true } } } });
+        if (!row || row.status !== "pending" || row.version !== version || row.expiresAt <= new Date() ||
+          row.tenant.status !== "active" || row.email !== mail.to || row.role === "owner") return false;
+        const inviter = await tx.membership.findFirst({ where: { id: row.invitedBy, tenantId: row.tenantId, status: "active",
+          user: { status: "active", emailVerified: true } } });
+        if (!inviter || !roleCan(inviter.role, "member.manage") || (inviter.role !== "owner" &&
+          !roleCapabilities(row.role).every(capability => roleCan(inviter.role, capability)))) return false;
+        if (!row.serviceIds.length || await tx.service.count({ where: { tenantId: row.tenantId, id: { in: row.serviceIds }, status: "active" } }) !== row.serviceIds.length) return false;
+        await deliverMail(job, mail); return true;
+      }, { timeout: 45000 });
+    }
     if (job.dedupeKey.startsWith("mail:sender-verification:")) return db.$transaction(async tx => {
-      const id = job.dedupeKey.slice("mail:sender-verification:".length), initial = await tx.senderVerification.findUnique({ where: { id } });
-      if (!initial) return false;
+      const id = job.dedupeKey.slice("mail:sender-verification:".length), initial = await tx.senderVerification.findUnique({ where: { id }, include: { sender: true } });
+      if (!initial || initial.tenantId !== job.tenantId || initial.method !== "email") return false;
+      await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${initial.tenantId} FOR SHARE`;
+      await tx.$queryRaw`SELECT id FROM "Service" WHERE id=${initial.sender.serviceId} FOR SHARE`;
       await tx.$queryRaw`SELECT id FROM "Sender" WHERE id=${initial.senderId} FOR SHARE`;
+      await tx.$queryRaw`SELECT id FROM "SenderVerification" WHERE id=${id} FOR SHARE`;
       const proof = await tx.senderVerification.findUnique({ where: { id }, include: { sender: { include: { service: { include: { tenant: true } } } } } });
-      if (!proof || proof.status !== "pending" || proof.expiresAt <= new Date() || proof.sender.status !== "pending" || proof.generation !== proof.sender.generation || proof.sender.service.status !== "active" || proof.sender.service.tenant.status !== "active") return false;
-      await deliverMail(job, mail); return true;
+      if (!proof || proof.status !== "pending" || !proof.tokenHash || proof.expiresAt <= new Date() || proof.sender.status !== "pending" || proof.generation !== proof.sender.generation || proof.sender.service.status !== "active" || proof.sender.service.tenant.status !== "active" || proof.environment !== senderEnvironment() || !proof.sender.addressCipher || decrypt<string>(proof.sender.addressCipher) !== mail.to) return false;
+      await tx.$queryRaw`SELECT id FROM "Job" WHERE id=${job.id} FOR UPDATE`;
+      const current = await tx.job.findFirst({ where: { id: job.id, tenantId: proof.tenantId, status: "leased", leaseOwner: workerId, attempts: job.attempts, payloadErasedAt: null } });
+      if (!current?.leaseUntil || current.leaseUntil <= new Date()) return false;
+      const beforeDispatch = async () => {
+        if (proof.expiresAt <= new Date()) throw new Error("VERIFICATION_EXPIRED");
+        if (current.leaseUntil! <= new Date()) throw new Error("LEASE_EXPIRED");
+        if (proof.environment !== senderEnvironment()) throw new Error("VERIFICATION_ENVIRONMENT");
+      };
+      await deliverMail(job, mail, undefined, beforeDispatch); return true;
     }, { timeout: 45000 });
     if (job.dedupeKey.startsWith("mail:subject-access:")) return db.$transaction(async tx => {
       const id = job.dedupeKey.slice("mail:subject-access:".length);
       await tx.$queryRaw`SELECT id FROM "SubjectAccessRequest" WHERE id=${id} FOR SHARE`;
       const request = await tx.subjectAccessRequest.findUnique({ where: { id } });
-      if (!request || request.expiresAt <= new Date()) return false;
+      if (!request || request.consumedAt || request.expiresAt <= new Date()) return false;
+      await lockSubjectScopes(tx, id);
+      const eligible = await tx.subjectAccessScope.count({ where: { requestId: id, subject: { submissions: { some: retainedSubjectSubmission() } } } });
+      if (request.expiresAt <= new Date() || !eligible) return false;
       await deliverMail(job, mail); return true;
     }, { timeout: 45000 });
     await deliverMail(job, mail); return true;
@@ -119,7 +169,7 @@ async function sendMail(job: ClaimedJob) {
   }, { timeout: 45000 });
 }
 export type MailAttachment = { filename: string; contentType: string; content: Buffer };
-export async function deliverMail(job: Pick<ClaimedJob, "id">, mail: Mail & { html?: string; attachments?: MailAttachment[]; headers?: { "List-Unsubscribe": string; "List-Unsubscribe-Post"?: string } }, sender?: { name: string; address: string }) {
+export async function deliverMail(job: Pick<ClaimedJob, "id">, mail: Mail & { html?: string; attachments?: MailAttachment[]; headers?: { "List-Unsubscribe": string; "List-Unsubscribe-Post"?: string } }, sender?: { name: string; address: string }, beforeDispatch?: () => Promise<void>) {
   if (env.MAIL_TRANSPORT === "local") {
     const dir = resolve(env.LOCAL_MAIL_DIR);
     await mkdir(dir, { recursive: true, mode: 0o700 });
@@ -129,6 +179,7 @@ export async function deliverMail(job: Pick<ClaimedJob, "id">, mail: Mail & { ht
       const file = await open(temp, "wx", 0o600);
       try { await file.writeFile(JSON.stringify({ id: job.id, ...mail, ...(mail.attachments ? { attachments: mail.attachments.map(a => ({ filename: a.filename, mime: a.contentType, size: a.content.length, sha256: createHash("sha256").update(a.content).digest("hex"), contentBase64: a.content.toString("base64") })) } : {}), from: sender ?? env.MAIL_FROM, deliveredAt: new Date().toISOString() }, null, 2)); await file.sync(); }
       finally { await file.close(); }
+      await beforeDispatch?.();
       await link(temp, resolve(dir, job.id + ".json"));
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
@@ -141,17 +192,20 @@ export async function deliverMail(job: Pick<ClaimedJob, "id">, mail: Mail & { ht
     auth: env.SMTP_USER ? { user: env.SMTP_USER, pass: env.SMTP_PASSWORD } : undefined,
     requireTLS: env.SMTP_SECURE !== "true", connectionTimeout: 10000, socketTimeout: 20000,
   });
+  await beforeDispatch?.();
   const response = await transport.sendMail({ ...mail, ...(mail.attachments ? { attachments: mail.attachments.map(a => ({ filename: a.filename, contentType: a.contentType, content: a.content, contentDisposition: "attachment" as const })) } : {}), disableFileAccess: true, disableUrlAccess: true, from: sender ?? env.MAIL_FROM, messageId: "<" + job.id + "@catchsecu.local>" });
   if (!response.accepted.some(address => address.toLowerCase() === mail.to.toLowerCase())) throw new Error("RECIPIENT_NOT_ACCEPTED");
   return "accepted" as const;
 }
-export async function runOneJob(workerId: string): Promise<boolean> {
+export async function runOneJob(workerId: string, scope?: JobScope): Promise<boolean> {
   // A worker dying on its last attempt must not leave a permanent leased row.
   await db.$executeRaw`UPDATE "JobAttempt" SET outcome = 'lease_exhausted', "errorCode" = 'LEASE_EXHAUSTED', "finishedAt" = now()
-    WHERE outcome = 'leased' AND "jobId" IN (SELECT id FROM "Job" WHERE status = 'leased' AND "leaseUntil" < now() AND attempts >= "maxAttempts")`;
+    WHERE outcome = 'leased' AND "jobId" IN (SELECT id FROM "Job" WHERE status = 'leased' AND "leaseUntil" < now() AND attempts >= "maxAttempts"
+      AND (${scope?.tenantId ?? null}::text IS NULL OR ("tenantId"=${scope?.tenantId ?? null} AND id=${scope?.jobId ?? null})))`;
   await db.$executeRaw`UPDATE "Job" SET status='dead', "leaseOwner"=NULL, "leaseUntil"=NULL, "lastError"='LEASE_EXHAUSTED'
-    WHERE status='leased' AND "leaseUntil" < now() AND attempts >= "maxAttempts"`;
-  const job = await claimJob(workerId);
+    WHERE status='leased' AND "leaseUntil" < now() AND attempts >= "maxAttempts"
+      AND (${scope?.tenantId ?? null}::text IS NULL OR ("tenantId"=${scope?.tenantId ?? null} AND id=${scope?.jobId ?? null}))`;
+  const job = await claimJob(workerId, scope);
   if (!job) return false;
   try {
     if (CAMPAIGN_MAIL_JOB_TYPES.includes(job.type)) {
@@ -162,13 +216,13 @@ export async function runOneJob(workerId: string): Promise<boolean> {
       return true;
     }
     if (job.type !== "mail" && job.type !== SENDER_MAIL_JOB_TYPE) throw new Error("UNSUPPORTED_JOB_TYPE");
-    const delivered = await sendMail(job);
-    const finished = await db.job.updateMany({ where: { id: job.id, status: "leased", leaseOwner: workerId },
+    const delivered = await sendMail(job, workerId);
+    const finished = await db.job.updateMany({ where: { id: job.id, status: "leased", leaseOwner: workerId, attempts: job.attempts, leaseUntil: { gt: new Date() }, payloadErasedAt: null },
       data: { status: delivered ? "done" : "cancelled", completedAt: new Date(), leaseOwner: null, leaseUntil: null, lastError: delivered ? null : "SUPPRESSED" } });
     if (finished.count) await finishAttempt(job.attemptId, delivered ? "delivered" : "suppressed", delivered ? undefined : "SUPPRESSED");
   } catch {
     // Provider errors may contain recipient addresses and credentials. Persist a safe code.
-    const finished = await db.job.updateMany({ where: { id: job.id, status: "leased", leaseOwner: workerId },
+    const finished = await db.job.updateMany({ where: { id: job.id, status: "leased", leaseOwner: workerId, attempts: job.attempts, leaseUntil: { gt: new Date() }, payloadErasedAt: null },
       data: { status: job.attempts >= job.maxAttempts ? "dead" : "retry",
         dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)),
         leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } });

@@ -1,0 +1,92 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:53143) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-list-deletion.test.ts (18 tests | 1 failed | 17 skipped) 1078ms
+   × 전문가의 배정 외 여분 grant와 실제 배정 만료는 상세·목록을 허용하지 않는다 1075ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 전문가의 배정 외 여분 grant와 실제 배정 만료는 상세·목록을 허용하지 않는다
+AssertionError: promise resolved "{ …(17) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "consentBundle": {
++     "display": {
++       "kind": "collection",
++       "name": "폼(목록 시험)",
++       "optionalText": "",
++       "policy": null,
++       "policyText": "",
++       "processorText": "",
++       "requiredText": "",
++       "schemaVersion": 1,
++       "startText": "",
++       "version": 0,
++     },
++     "documents": [],
++   },
++   "content": {
++     "body": "초안 본문",
++     "bold": false,
++     "consentPurpose": "",
++     "consentRequired": false,
++     "documentConsents": [],
++     "font": "14px",
++     "marketing": null,
++     "maxResponses": 5,
++     "questions": [
++       {
++         "id": "658e3b92-9a22-4931-8818-43d79740dbd0",
++         "label": "선택",
++         "options": [
++           "첫째",
++           "둘째",
++         ],
++         "required": true,
++         "type": "객관식 답변",
++       },
++     ],
++     "retentionDays": 30,
++     "showSubmitNotice": true,
++     "verify": false,
++   },
++   "createdAt": 2026-10-03T13:35:16.350Z,
++   "draftNumber": 1,
++   "favorite": false,
++   "hasDraft": true,
++   "id": "d0290aac-4f4a-45a2-b8a5-eab9e790de7e",
++   "ownerName": "목록 검증 editor",
++   "publication": null,
++   "published": false,
++   "serviceId": "a377247a-3330-48d0-8181-33c8f8028877",
++   "serviceName": "폼 서비스",
++   "sourceType": "form",
++   "status": "draft",
++   "title": "A 초안",
++   "updatedAt": 2026-10-03T13:35:16.350Z,
++   "version": 1,
+  }
+
+ ❯ tests/server/form-list-deletion.test.ts:182:40
+    180|   expect((await readForm(ctx,f.form.id)).id).toBe(f.form.id);
+    181|   await db.service.update({ where:{ id:f.serviceId },data:{ status:"ar…
+    182|   await expect(readForm(ctx,f.form.id)).rejects.toMatchObject({ status…
+       |                                        ^
+    183|   await expect(listForms(ctx,{ ...listQuery.parse({}),serviceId:f.serv…
+    184|   expect((await listForms(ctx,listQuery.parse({}))).total).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 skipped (18)
+   Start at  22:35:14
+   Duration  2.31s (tests 49%, import 29%, transform 22%)
+

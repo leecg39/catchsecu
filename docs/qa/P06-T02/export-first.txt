@@ -1,0 +1,55 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:46151) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/submission-export.test.ts (7 tests | 1 failed) 11880ms
+   × 다른 회사·조회 불가 역할·현재 권한 회수·로그아웃한 이전 Context는 CSV 원문을 읽지 못한다 1281ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/submission-export.test.ts > 다른 회사·조회 불가 역할·현재 권한 회수·로그아웃한 이전 Context는 CSV 원문을 읽지 못한다
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/submission-export.test.ts:125:38
+
+  122 expect((await download(req(path(f)))).status).toBe(401);
+  123 const other = await fixture(); expect((await download(req(path(f), "GET", other.cookie))).status).toBe(404);
+  124 const privacy = await account("개인정보 담당");
+→ 125 const member = await db.membership.create({
+        data: {
+          tenantId: "cdb98ecb-b7af-4c1f-87da-adbc853e45ae",
+          userId: "81c23fd5-b6ec-48be-8d75-bb443d3a931d",
+          role: "privacy",
+          grants: {
+            create: {
+              tenantId: "cdb98ecb-b7af-4c1f-87da-adbc853e45ae",
+              ~~~~~~~~
+              serviceId: "f897ccb1-8f8d-495f-9e41-7c592603a281",
+              capabilities: [
+                "submission.read"
+              ],
+      ?       id?: String,
+      ?       createdAt?: DateTime
+            }
+          }
+        }
+      })
+
+Unknown argument `tenantId`. Available options are marked with ?.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/submission-export.test.ts:125:18
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  20:00:50
+   Duration  13.68s (tests 88%, import 8%, transform 4%)
+

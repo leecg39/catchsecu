@@ -2,7 +2,9 @@ import { consentBundle, validateFormDocuments } from "./form-documents";
 import { preflightConsentReceipt } from "./consent-receipts";
 import { z } from "zod";
 import { db, type Transaction } from "./db";
-import { type Context, requireService, serviceScope } from "./context";
+import { type Context } from "./context";
+import { formScope, lockFormService } from "./form-access";
+import { lockPolicy } from "./security-policy";
 import { roleCan } from "./permissions";
 import { fail, listQuery } from "./http";
 import { audit } from "./audit";
@@ -47,44 +49,55 @@ export async function requestApproval(tx: Transaction, ctx: Context, id: string,
   return approvalDto(row, true);
 }
 export async function approvalForForm(ctx: Context, formId: string, page: number, pageSize: number) {
-  const form = await db.form.findFirst({ where: { id: formId, tenantId: ctx.tenantId }, include: formInclude });
-  if (!form) fail(404, "NOT_FOUND", "캐치폼을 찾을 수 없습니다.");
-  await requireService(ctx, form.serviceId, "form.read");
-  const policy = await db.securityPolicy.findUniqueOrThrow({ where: { tenantId: ctx.tenantId } });
-  const [items, total] = await db.$transaction([
-    db.approvalRequest.findMany({ where: { tenantId: ctx.tenantId, formId }, include: approvalInclude,
-      orderBy: [{ createdAt: "desc" }, { id: "asc" }], take: pageSize, skip: (page - 1) * pageSize }),
-    db.approvalRequest.count({ where: { tenantId: ctx.tenantId, formId } }),
-  ]);
-  return { items: items.map(row => ({ ...approvalDto(row, true), canCancel: row.requestedBy === ctx.member.id || ctx.member.role === "owner" })), total, page, pageSize,
+  return db.$transaction(async tx => {
+  const form=await readableForm(tx,ctx,formId),policy=await lockPolicy(tx,ctx.tenantId);
+  const member=await tx.membership.findUniqueOrThrow({ where:{ id:ctx.member.id },include:{ grants:true } });
+  const where={ tenantId:ctx.tenantId,formId },total=await tx.approvalRequest.count({ where });
+  page=Math.min(page,Math.max(1,Math.ceil(total/pageSize)));
+  const items=await tx.approvalRequest.findMany({ where,include:approvalInclude,orderBy:[{ createdAt:"desc" },{ id:"asc" }],take:pageSize,skip:(page-1)*pageSize });
+  return { items: items.map(row => ({ ...approvalDto(row, true), canCancel: row.requestedBy === member.id || member.role === "owner" })), total, page, pageSize,
     policy: { requireApproval: policy.requireApproval, referenceRequired: policy.approvalReferenceRequired,
       requestTemplate: policy.approvalRequestTemplate, approvalRevision: policy.approvalRevision },
-    canRequest: roleCan(ctx.member.role, "form.write") && (["owner", "admin"].includes(ctx.member.role)
-      || ctx.member.grants.some(grant => grant.serviceId === form.serviceId && grant.capabilities.includes("form.write"))),
-    canReview: policy.approvalRoles.includes(ctx.member.role) && roleCan(ctx.member.role, "form.approve")
-      && (["owner", "admin"].includes(ctx.member.role) || ctx.member.grants.some(grant => grant.serviceId === form.serviceId && grant.capabilities.includes("form.approve"))),
+    canRequest: roleCan(member.role, "form.write") && (["owner", "admin"].includes(member.role)
+      || member.grants.some(grant => grant.serviceId === form.serviceId && grant.capabilities.includes("form.write"))),
+    canReview: policy.approvalRoles.includes(member.role) && roleCan(member.role, "form.approve")
+      && (["owner", "admin"].includes(member.role) || member.grants.some(grant => grant.serviceId === form.serviceId && grant.capabilities.includes("form.approve"))),
   };
+  });
+}
+async function readableForm(tx: Transaction,ctx: Context,id: string) {
+  await formScope(tx,ctx,"form.read");
+  await tx.$queryRaw`SELECT id FROM "Form" WHERE id=${id} AND "tenantId"=${ctx.tenantId} FOR SHARE`;
+  const form=await tx.form.findFirst({ where:{ id,tenantId:ctx.tenantId },include:formInclude });
+  if (!form) fail(404,"NOT_FOUND","캐치폼을 찾을 수 없습니다.");
+  await lockFormService(tx,ctx,form.serviceId,"form.read",false);
+  return form;
 }
 export async function getApproval(ctx: Context, id: string) {
-  const row = await db.approvalRequest.findFirst({ where: { id, tenantId: ctx.tenantId }, include: approvalInclude });
+  return db.$transaction(async tx => {
+  await formScope(tx,ctx,"form.read");
+  const row = await tx.approvalRequest.findFirst({ where: { id, tenantId: ctx.tenantId }, include: approvalInclude });
   if (!row) fail(404, "NOT_FOUND", "승인 요청을 찾을 수 없습니다.");
-  await requireService(ctx, row.form.serviceId, "form.read");
-  return approvalDto(row, true);
+  await readableForm(tx,ctx,row.formId);
+  return approvalDto(await tx.approvalRequest.findUniqueOrThrow({ where:{ id },include:approvalInclude }),true);
+  });
 }
 export const approvalQuery = listQuery.extend({
   formId: z.uuid().optional(), serviceId: z.uuid().optional(), status: z.enum(["all", ...approvalStatuses]).default("all"),
 }).strict();
 export async function listApprovals(ctx: Context, query: z.infer<typeof approvalQuery>) {
-  if (query.serviceId) await requireService(ctx, query.serviceId, "form.read");
-  const services = await db.service.findMany({ where: serviceScope(ctx, "form.read"), select: { id: true } });
+  return db.$transaction(async tx => {
+  const scope=await formScope(tx,ctx,"form.read");
+  if (query.serviceId) await lockFormService(tx,ctx,query.serviceId,"form.read",false);
+  const services = await tx.service.findMany({ where:scope, select: { id: true } });
   const where: Prisma.ApprovalRequestWhereInput = { tenantId: ctx.tenantId, formId: query.formId,
     status: query.status === "all" ? undefined : query.status,
     form: { serviceId: query.serviceId ?? { in: services.map(service => service.id) }, title: { contains: query.search, mode: "insensitive" } } };
-  const [items, total] = await db.$transaction([
-    db.approvalRequest.findMany({ where, include: approvalInclude, orderBy: [query.sort === "name" ? { form: { title: query.direction } } : { createdAt: query.direction }, { id: "asc" }],
-      take: query.pageSize, skip: (query.page - 1) * query.pageSize }), db.approvalRequest.count({ where }),
-  ]);
-  return { items: items.map(row => approvalDto(row)), total, page: query.page, pageSize: query.pageSize };
+  const total=await tx.approvalRequest.count({ where }),page=Math.min(query.page,Math.max(1,Math.ceil(total/query.pageSize)));
+  const items=await tx.approvalRequest.findMany({ where, include: approvalInclude, orderBy: [query.sort === "name" ? { form: { title: query.direction } } : { createdAt: query.direction }, { id: "asc" }],
+    take: query.pageSize,skip:(page-1)*query.pageSize });
+  return { items: items.map(row => approvalDto(row)), total, page, pageSize: query.pageSize };
+  });
 }
 export async function decideApproval(ctx: Context, id: string, input: z.infer<typeof approvalDecisionInput> | { version: number; decision: "cancelled" }, requestId: string) {
   const initial = await db.approvalRequest.findFirst({ where: { id, tenantId: ctx.tenantId }, select: { formId: true } });

@@ -18,7 +18,7 @@ export function EmailSuppressions({ serviceId, canReadContacts }: { serviceId: s
         <label>차단 사유<select className="cs-input" aria-label="차단 사유" value={reason} onChange={e => { setReason(e.target.value); setPage(1); }}><option value="all">전체</option>{Object.entries(feedbackLabels).filter(([key]) => key !== "delivered").map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
         <ActionButton secondary>차단 검색</ActionButton><ActionButton secondary type="button" onClick={result.reload}>새로고침</ActionButton>
       </form>
-      <RemoteTable columns={["이름", "이메일", "차단 사유", "접수 시각"]} rows={(result.data?.items ?? []).map(item => ({ id: item.id, cells: [item.name ?? "—", item.contact ?? "원문 보관 종료", feedbackLabels[item.reason], new Date(item.createdAt).toLocaleString("ko-KR")] }))} total={result.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage} onPageSize={n => { setPageSize(n); setPage(1); }} loading={result.loading} error={result.error?.message} />
+      <RemoteTable columns={["이름", "이메일", "차단 사유", "접수 시각"]} rows={(result.data?.items ?? []).map(item => ({ id: item.id, cells: [item.name ?? "—", item.contact ?? "원문 보관 종료", feedbackLabels[item.reason], new Date(item.createdAt).toLocaleString("ko-KR")] }))} total={result.data?.total ?? 0} page={result.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={n => { setPageSize(n); setPage(1); }} loading={result.loading} error={result.error?.message} />
       <p className="campaign-note">차단은 새로운 동의 등록이나 뒤늦은 전달 결과로 자동 해제되지 않습니다. 원문을 삭제한 뒤에는 연락처를 표시하지 않고 재발송 방지 기록을 유지합니다.</p>
     </Panel>}</>;
 }

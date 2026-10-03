@@ -1,7 +1,7 @@
 {
   "component": "src/components/auth/AuthPages.tsx",
-  "typecheck": "npx tsc --noEmit 통과",
-  "browserQA": "메인 에이전트 담당; 아직 미실행",
+  "typecheck": "2026-10-03 npm run typecheck 통과",
+  "browserQA": "2026-10-03: docs/qa/P02-T04, P02-T05의 실제 로컬 production 브라우저·DB 검증",
   "routeCount": 33,
   "routes": [
     {
@@ -10,7 +10,8 @@
       "status": "로컬 로그인 화면; 실제 로그아웃 API 미구현",
       "source": null,
       "source_observation": "not captured",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/two-step-setting",
@@ -18,7 +19,8 @@
       "status": "원본 스냅샷 기반 UI 구현; 브라우저 시각 QA 대기",
       "source": "docs/research/public/_two-step-setting.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/identification/:result",
@@ -26,7 +28,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": null,
       "source_observation": "not captured",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/gwloginUser/login",
@@ -34,7 +37,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_gwloginUser_login.json",
       "source_observation": "dashboard redirect",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login",
@@ -42,7 +46,8 @@
       "status": "원본 스냅샷 기반 UI 구현; 브라우저 시각 QA 대기",
       "source": "docs/research/public/_login.json",
       "source_observation": "dashboard redirect",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/password-change-email",
@@ -50,7 +55,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_password-change-email.json",
       "source_observation": "dashboard redirect",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/passwordChange",
@@ -58,7 +64,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_passwordChange.json",
       "source_observation": "dashboard redirect",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/password-change-email/complete",
@@ -66,7 +73,8 @@
       "status": "원본 스냅샷 기반 UI 구현; 브라우저 시각 QA 대기",
       "source": "docs/research/public/_password-change-email_complete.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/password-change-rule",
@@ -74,7 +82,8 @@
       "status": "원본 스냅샷 기반 UI 구현; 브라우저 시각 QA 대기",
       "source": "docs/research/public/_password-change-rule.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/auth-code",
@@ -82,7 +91,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_auth-code.json",
       "source_observation": "dashboard redirect",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/signup",
@@ -90,7 +100,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_signup.json",
       "source_observation": "dashboard redirect",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/expire/code",
@@ -98,7 +109,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_expire_code.json",
       "source_observation": "dashboard redirect",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/two-step",
@@ -106,7 +118,8 @@
       "status": "원본 스냅샷 기반 UI 구현; 브라우저 시각 QA 대기",
       "source": "docs/research/public/_two-step.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/not-allow-ip",
@@ -114,7 +127,8 @@
       "status": "원본 스냅샷 기반 UI 구현; 브라우저 시각 QA 대기",
       "source": "docs/research/public/_not-allow-ip.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login-email",
@@ -122,7 +136,8 @@
       "status": "원본 스냅샷 기반 UI 구현; 브라우저 시각 QA 대기",
       "source": "docs/research/public/_login-email.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/login-otp",
@@ -130,7 +145,8 @@
       "status": "원본 스냅샷 기반 UI 구현; 브라우저 시각 QA 대기",
       "source": "docs/research/public/_login-otp.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "실제 DB 인증, 로컬 메일함, 비밀번호 변경·복구, TOTP·이메일 코드·복구코드; returnTo 검증",
+      "runtimeStatus": "DB 세션·Better Auth API·서버 오류/만료에 연결; 로컬 통합 검증"
     },
     {
       "route": "/login-failed",
@@ -138,7 +154,8 @@
       "status": "원본 스냅샷 기반 UI 구현; 브라우저 시각 QA 대기",
       "source": "docs/research/public/_login-failed.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login/oauth2",
@@ -146,7 +163,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_login_oauth2.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login/oauth2/verified",
@@ -154,7 +172,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_login_oauth2_verified.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login/gpki",
@@ -162,7 +181,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_login_gpki.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login/saeol",
@@ -170,7 +190,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_login_saeol.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/gpki/fail",
@@ -178,7 +199,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_gpki_fail.json",
       "source_observation": "dashboard redirect",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/gpki/email-register",
@@ -186,7 +208,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_gpki_email-register.json",
       "source_observation": "dashboard redirect",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/saeol/fail/:org",
@@ -194,7 +217,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": null,
       "source_observation": "not captured",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/link/oauth2",
@@ -202,7 +226,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_link_oauth2.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/link/oauth2/verified",
@@ -210,7 +235,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_link_oauth2_verified.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/oauth2/fail",
@@ -218,7 +244,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_oauth2_fail.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/oauth2/signup",
@@ -226,7 +253,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_oauth2_signup.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/oauth2/invite/signup",
@@ -234,7 +262,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_oauth2_invite_signup.json",
       "source_observation": "content extracted",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login/saml",
@@ -242,7 +271,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_login_saml.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login/saml/start",
@@ -250,7 +280,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_login_saml_start.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login/saml/verified",
@@ -258,7 +289,8 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_login_saml_verified.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     },
     {
       "route": "/login/saml/fail",
@@ -266,7 +298,12 @@
       "status": "데모 대체 UI; 원본 화면 미검증",
       "source": "docs/research/public/_login_saml_fail.json",
       "source_observation": "empty SSO callback",
-      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음"
+      "behavior": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음",
+      "runtimeStatus": "외부 인증 공급자·조직 인증은 별도 게이트에서 검증 필요"
     }
+  ],
+  "runtimeEvidence": [
+    "docs/qa/P02-T04/",
+    "docs/qa/P02-T05/"
   ]
 }

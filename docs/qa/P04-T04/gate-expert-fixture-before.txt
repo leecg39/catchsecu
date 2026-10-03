@@ -1,0 +1,40 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:40161) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-list-deletion.test.ts (18 tests | 1 failed) 15833ms
+   × 전문가의 배정 외 여분 grant와 실제 배정 만료는 상세·목록을 허용하지 않는다 616ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 전문가의 배정 외 여분 grant와 실제 배정 만료는 상세·목록을 허용하지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/form-list-deletion.test.ts:176:23
+
+  173 const f=await fixture(),second=await db.service.create({ data:{ tenantId:f.company.id,name:"배정 서비스",externalName:"배정 서비스" } });
+  174 const assignment=await db.expertAssignment.create({ data:{ tenantId:f.company.id,expertUserId:f.editor.user.id,assignedById:f.owner.user.id,expiresAt:new Date(Date.now()+86400000) } });
+  175 await db.expertAssignmentService.create({ data:{ tenantId:f.company.id,assignmentId:assignment.id,serviceId:second.id } });
+→ 176 await db.membership.update(
+Database error. Code: `23514`. Message: `new row for relation "Membership" violates check constraint "Membership_accessKind_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/form-list-deletion.test.ts:176:3
+    174|   const assignment=await db.expertAssignment.create({ data:{ tenantId:…
+    175|   await db.expertAssignmentService.create({ data:{ tenantId:f.company.…
+    176|   await db.membership.update({ where:{ id:f.editor.member.id },data:{ …
+       |   ^
+    177|   const ctx=await requireContext(req("/context",f.editor.cookie).heade…
+    178|   await expect(readForm(ctx,f.form.id)).rejects.toMatchObject({ status…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+   Start at  22:26:16
+   Duration  17.65s (tests 91%, import 5%, transform 4%)
+

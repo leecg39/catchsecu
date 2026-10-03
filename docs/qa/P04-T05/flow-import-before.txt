@@ -1,0 +1,25 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/form-module-flow.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-module-flow.test.ts [ tests/server/form-module-flow.test.ts ]
+Error: Cannot find package '@/app/api/v1/shares/route' imported from /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/form-module-flow.test.ts
+ ❯ tests/server/form-module-flow.test.ts:23:1
+     21| import { POST as uploadPost, PUT as uploadPut } from "@/app/api/v1/upl…
+     22| import { GET as fileRead } from "@/app/api/v1/files/[...segments]/rout…
+     23| import { POST as shareCreate } from "@/app/api/v1/shares/route";
+       | ^
+     24| import type { FormRecord } from "@/contracts/forms";
+     25| import type { FormConsentBundle } from "@/contracts/form-documents";
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  23:18:00
+   Duration  1.67s (worker 96%, environment 4%)
+

@@ -2,7 +2,7 @@ import { db } from "@/server/db";
 import { requireActor } from "@/server/context";
 import { body, fail, json, route } from "@/server/http";
 import { profilePatch } from "@/server/schemas";
-const select = { id: true, name: true, email: true, phone: true, department: true, locale: true, version: true, twoFactorEnabled: true, createdAt: true } as const;
+const select = { id: true, name: true, email: true, phone: true, department: true, jobTitle: true, locale: true, version: true, twoFactorEnabled: true, createdAt: true } as const;
 export const GET = route(async request => {
   const actor = await requireActor(request.headers);
   return json(await db.user.findUniqueOrThrow({ where: { id: actor.user.id }, select }));

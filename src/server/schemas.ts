@@ -17,11 +17,14 @@ export const companyInput = z.object({
   website: z.union([z.url().refine(url => ["https:", "http:"].includes(new URL(url).protocol)), z.literal("")]).optional(),
   businessNo: z.string().regex(/^(\d{3}-\d{2}-\d{5})?$/).optional(),
   billingEmail: z.union([z.email(), z.literal("")]).optional(),
+  billingContactName: z.string().trim().max(100).optional(),
+  billingContactPhone: z.string().trim().max(30).optional(),
 }).strict();
 export const profilePatch = z.object({
   version: versionSchema,
   name: z.string().trim().min(1).max(100),
   phone: z.string().trim().max(30).optional(),
   department: z.string().trim().max(100).optional(),
+  jobTitle: z.string().trim().max(100).optional(),
   locale: z.enum(["ko", "en", "ja"]).optional(),
 }).strict();

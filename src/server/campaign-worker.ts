@@ -7,7 +7,7 @@ import { decrypt, encrypt } from "./crypto";
 import { env } from "./env";
 import { HttpError } from "./http";
 import { withEmailPolicy } from "./email-policy";
-import { lockFileContext } from "./file-access";
+import { lockFileIssuer } from "./file-access";
 import { senderDenial } from "./sender-access";
 import { evaluateRecipient, lockCampaign, lockCampaignConsents, settleCampaign, changeCampaign } from "./campaign-common";
 import { readCampaignAttachments, markCampaignFilesForDeletion } from "./campaign-files";
@@ -22,7 +22,7 @@ async function lockedState(tx: Transaction, job: ClaimedJob, workerId: string, p
   const member = await tx.membership.findUnique({ where: { tenantId_userId: { tenantId: initial.tenantId, userId: initial.campaign.requesterId! } } });
   let reason: string | null = null;
   try {
-    await lockFileContext(tx, { tenantId: initial.tenantId, member: { id: member?.id ?? "" }, user: { id: initial.campaign.requesterId! } }, initial.serviceId, ["message.send", "marketing.read"]);
+    await lockFileIssuer(tx, { tenantId: initial.tenantId, member: { id: member?.id ?? "" }, user: { id: initial.campaign.requesterId! } }, initial.serviceId, ["message.send", "marketing.read"]);
   } catch (error) {
     if (!(error instanceof HttpError)) throw error;
     reason = ["COMPANY_UNAVAILABLE", "SERVICE_ARCHIVED", "NOT_FOUND"].includes(error.code) ? "SERVICE_UNAVAILABLE" : "PERMISSION_REVOKED";

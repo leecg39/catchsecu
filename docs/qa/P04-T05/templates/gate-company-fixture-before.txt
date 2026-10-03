@@ -1,0 +1,38 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/template-access-gate.test.ts (8 tests | 1 failed) 8164ms
+   × 회사·구성원 정지 이후 오래된 Context로 템플릿 목록을 읽지 못한다 614ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 회사·구성원 정지 이후 오래된 Context로 템플릿 목록을 읽지 못한다
+PrismaClientKnownRequestError: 
+Invalid `db.company.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/template-access-gate.test.ts:62:20
+
+  59 const f = await fixture(); await db.membership.update({ where: { id: f.member.id }, data: { status: "suspended" } });
+  60 await expect(listTemplates(f.ctx, query)).rejects.toMatchObject({ status: 403 });
+  61 await db.membership.update({ where: { id: f.member.id }, data: { status: "active" } });
+→ 62 await db.company.update(
+Database error. Code: `23514`. Message: `new row for relation "Company" violates check constraint "Company_status_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/template-access-gate.test.ts:62:3
+     60|   await expect(listTemplates(f.ctx, query)).rejects.toMatchObject({ st…
+     61|   await db.membership.update({ where: { id: f.member.id }, data: { sta…
+     62|   await db.company.update({ where: { id: f.company.id }, data: { statu…
+       |   ^
+     63|   await expect(listTemplates(f.ctx, query)).rejects.toMatchObject({ st…
+     64| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 passed (8)
+   Start at  23:14:07
+   Duration  9.81s (tests 85%, import 9%, transform 6%)
+

@@ -1,0 +1,22 @@
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 108ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 11.0s
+  Running TypeScript ...
+scripts/qa-file-access.ts(20,47): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(input: string | URL | Request, init?: RequestInit | undefined): Promise<Response>', gave the following error.
+    Argument of type '{ body: Buffer<ArrayBufferLike>; method: string; redirect: "manual"; headers: { "idempotency-key"?: `${string}-${string}-${string}-${string}-${string}` | undefined; "content-type"?: string | undefined; origin?: string | undefined; cookie: string; }; } | { ...; } | { ...; }' is not assignable to parameter of type 'RequestInit | undefined'.
+      Type '{ body: Buffer<ArrayBufferLike>; method: string; redirect: "manual"; headers: { "idempotency-key"?: `${string}-${string}-${string}-${string}-${string}` | undefined; "content-type"?: string | undefined; origin?: string | undefined; cookie: string; }; }' is not assignable to type 'RequestInit'.
+        Types of property 'body' are incompatible.
+          Type 'Buffer<ArrayBufferLike>' is not assignable to type 'BodyInit | null | undefined'.
+            Type 'Buffer<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
+  Overload 2 of 2, '(input: URL | RequestInfo, init?: RequestInit | undefined): Promise<Response>', gave the following error.
+    Argument of type '{ body: Buffer<ArrayBufferLike>; method: string; redirect: "manual"; headers: { "idempotency-key"?: `${string}-${string}-${string}-${string}-${string}` | undefined; "content-type"?: string | undefined; origin?: string | undefined; cookie: string; }; } | { ...; } | { ...; }' is not assignable to parameter of type 'RequestInit | undefined'.
+      Type '{ body: Buffer<ArrayBufferLike>; method: string; redirect: "manual"; headers: { "idempotency-key"?: `${string}-${string}-${string}-${string}-${string}` | undefined; "content-type"?: string | undefined; origin?: string | undefined; cookie: string; }; }' is not assignable to type 'RequestInit'.
+        Types of property 'body' are incompatible.
+          Type 'Buffer<ArrayBufferLike>' is not assignable to type 'BodyInit | null | undefined'.
+            Type 'Buffer<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
+Failed to type check.
+

@@ -1,0 +1,57 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:56154) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/marketing.test.ts (48 tests) 58856ms
+   ✓ 마케팅 최종 권한·만료·삭제·실행 경합 (25)
+     ✓ 중복·알 수 없는 쿼리와 변경 요청의 쿼리를 거절한다 654ms
+     ✓ 검색·정렬·페이지 보정과 현재 권한을 실제 결과로 확인한다 505ms
+     ✓ 생성 재실행은 현재 버전을 반환하며 삭제 후에는 410이다 438ms
+     ✓ 실제 Company 잠금 대기 뒤 세션 만료는 원문을 반환하지 않는다 2377ms
+     ✓ 실제 Submission 잠금 대기 뒤 세션 만료는 원문을 반환하지 않는다 2390ms
+     ✓ 실제 contact 잠금 대기 뒤 세션 만료는 원문을 반환하지 않는다 2371ms
+     ✓ 감사 저장 중 세션 만료는 marketing.list_viewed를 전체 롤백한다 2337ms
+     ✓ 감사 저장 중 세션 만료는 marketing.viewed를 전체 롤백한다 2254ms
+     ✓ 감사 저장 중 세션 만료는 marketing.sources_viewed를 전체 롤백한다 2246ms
+     ✓ 감사 저장 중 세션 만료는 marketing.granted를 전체 롤백한다 2272ms
+     ✓ 감사 저장 중 세션 만료는 marketing.exclusion_changed를 전체 롤백한다 2249ms
+     ✓ 감사 저장 중 세션 만료는 marketing.withdrawn를 전체 롤백한다 2292ms
+     ✓ 감사 저장 중 세션 만료는 marketing.erased를 전체 롤백한다 2424ms
+     ✓ 감사 저장 중 세션 만료는 marketing.summary_viewed를 전체 롤백한다 2399ms
+     ✓ 감사 저장 중 세션 만료는 email.suppressions_viewed를 전체 롤백한다 2395ms
+     ✓ 생성 캐시 저장 중 session 만료는 동의·이벤트·캐시를 남기지 않는다 2337ms
+     ✓ 생성 캐시 저장 중 retention 만료는 동의·이벤트·캐시를 남기지 않는다 2284ms
+     ✓ 읽기 감사 중 보유 기한이 끝나면 detail 원문을 반환하지 않는다 2257ms
+     ✓ 읽기 감사 중 보유 기한이 끝나면 csv 원문을 반환하지 않는다 2289ms
+     ✓ 읽기 감사 중 보유 기한이 끝나면 sources 원문을 반환하지 않는다 2250ms
+     ✓ 삭제 감사 중 세션 만료는 실제 로컬 사본을 보존한다 2355ms
+     ✓ 실제 파일 정리 실패를 보존하고 같은 삭제 요청으로 재시도한다 323ms
+     ✓ 같은 작업자 이름의 이전 시도는 새 임대를 덮어쓰지 않는다 (차단=false) 418ms
+     ✓ 같은 작업자 이름의 이전 시도는 새 임대를 덮어쓰지 않는다 (차단=true) 369ms
+     ✓ 로컬 파일 게시 직전에 다시 검사해 처리 중 만료된 동의를 차단한다 2284ms
+   ✓ marketing preferences, lifecycle and dispatch with real PostgreSQL (23)
+     ✓ only a separate selected channel creates consent; general consent and old boolean never grant 492ms
+     ✓ one contact has independent channels, services and companies with no unauthorized reads 742ms
+     ✓ manual evidence registration is idempotent; guessed fields, future dates and missing evidence fail 464ms
+     ✓ search is normalized exact match, pages are disjoint and CSV neutralizes formulas 453ms
+     ✓ bulk withdrawal is atomic, handles repeated requests and refuses stale reconsented rows 733ms
+     ✓ new consent needs a newer timestamp and cannot remove channel exclusion or subject suppression 595ms
+     ✓ worker delivers only the consented current version and cancels queued mail after exclusion 409ms
+     ✓ future marketing mail stays queued and a withdrawal before due time cancels delivery 336ms
+     ✓ withdrawn marketing blocks business follow-up but authentication mail stays separate 312ms
+     ✓ source withdrawal updates all its channels; changing a contact cannot transfer consent 388ms
+     ✓ retention expiry and archived service deny delivery and never expose expired plaintext 475ms
+     ✓ approved destruction erases marketing data before issuing a certificate 467ms
+     ✓ manual deletion and contact correction erase pending and delivered local copies 798ms
+     ✓ database rejects unrecorded changes, cross-service bindings and deleted evidence restoration 594ms
+     ✓ a delivery lock serializes withdrawal; a committed withdrawal prevents the next callback 302ms
+     ✓ summary uses real service scoped state and audit trails contain no contacts or evidence text 381ms
+     ✓ summary uses one period snapshot for consent and withdrawal history 312ms
+
+ Test Files  1 passed (1)
+      Tests  48 passed (48)
+   Start at  05:20:30
+   Duration  60.83s (tests 97%, import 2%, transform 1%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P07-T02/marketing-tests.json

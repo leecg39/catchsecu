@@ -2,7 +2,7 @@ import type { NotificationDelivery, NotificationEvent } from "@/generated/prisma
 import { notificationLabels, type NotificationProvider } from "@/contracts/notifications";
 import { submissionDataAvailable } from "@/contracts/destruction";
 import { db, type Transaction } from "./db";
-import { lockFileContext } from "./file-access";
+import { lockFileIssuer } from "./file-access";
 import { decrypt } from "./crypto";
 import { env } from "./env";
 import { HttpError } from "./http";
@@ -64,7 +64,7 @@ export async function processNotification(claimed: NotificationDelivery, workerI
     const initial = await tx.notificationIntegration.findUniqueOrThrow({ where: { id: claimed.integrationId } });
     const member = await tx.membership.findUniqueOrThrow({ where: { id: initial.creatorId } });
     let denied: string | null = null;
-    try { await lockFileContext(tx, { tenantId: initial.tenantId, member: { id: member.id }, user: { id: member.userId } }, initial.serviceId, ["integration.manage"]); }
+    try { await lockFileIssuer(tx, { tenantId: initial.tenantId, member: { id: member.id }, user: { id: member.userId } }, initial.serviceId, ["integration.manage"]); }
     catch (error) { if (error instanceof HttpError) denied = "PERMISSION_REVOKED"; else throw error; }
     const event = await tx.notificationEvent.findUniqueOrThrow({ where: { id: claimed.eventId } });
     if (!denied && !await lockSource(tx, event)) denied = "SOURCE_UNAVAILABLE";

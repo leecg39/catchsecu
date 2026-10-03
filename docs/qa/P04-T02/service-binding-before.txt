@@ -1,0 +1,30 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/form-draft-state.test.ts (13 tests | 1 failed | 11 skipped) 17ms
+   × 최초 생성 응답이 유실되면 서비스 선택을 고정한 채 입력만 이어 저장한다 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-draft-state.test.ts > 최초 생성 응답이 유실되면 서비스 선택을 고정한 채 입력만 이어 저장한다
+AssertionError: expected 'another-service' to be 'service' // Object.is equality
+
+Expected: "service"
+Received: "another-service"
+
+ ❯ tests/server/form-draft-state.test.ts:103:43
+    101|   const { s } = session(persist,null); s.edit({ ...value,title:"첫 생성" …
+    102|   s.edit({ ...s.getSnapshot().value,serviceId:"another-service",title:…
+    103|   expect(s.getSnapshot().value.serviceId).toBe(value.serviceId); await…
+       |                                           ^
+    104|   expect(persist.mock.calls[0]).toEqual(persist.mock.calls[1]); expect…
+    105|   expect(s.getSnapshot().record?.serviceId).toBe(value.serviceId); exp…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed | 11 skipped (13)
+   Start at  21:29:28
+   Duration  285ms (transform 55%, import 21%, tests 17%, worker 7%)
+

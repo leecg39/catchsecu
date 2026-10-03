@@ -1,0 +1,322 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/template-access-gate.test.ts (8 tests | 8 failed) 7130ms
+   × 목록은 오래된 Context의 회수된 조회 grant와 다른 서비스 양식을 노출하지 않는다 1494ms
+   × 이전 Context의 역할 회수·이메일 미인증·종료 세션은 공용 목록도 우회하지 못한다 686ms
+   × 회사·구성원 정지 이후 오래된 Context로 템플릿 목록을 읽지 못한다 728ms
+   × 템플릿 검색·회사/공용 범위와 마지막·빈 페이지를 실제 결과에 맞춰 보정한다 791ms
+   × 조회·작성 grant와 선택 서비스 상태를 GET 작업 및 생성 대상에 반영한다 669ms
+   × 전문가의 배정 외 grant·실제 배정 만료를 템플릿 목록에서도 차단한다 875ms
+   × 전문가의 보관 서비스 양식은 목록·상세에서 숨기고 직접 구성원의 읽기는 유지한다 877ms
+   × 목록 입력은 알 수 없는 키를 거부하고 이름 정렬을 처리한다 1005ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 목록은 오래된 Context의 회수된 조회 grant와 다른 서비스 양식을 노출하지 않는다
+AssertionError: expected [ …(2) ] to deeply equal [ Array(1) ]
+
+- Expected
++ Received
+
+  [
+    "0a688759-ce4e-4582-a6cf-c1a4820f7b42",
++   "7fbfe13c-35cc-4072-9406-2eaa7b7c2520",
+  ]
+
+ ❯ tests/server/template-access-gate.test.ts:44:89
+     42| test("목록은 오래된 Context의 회수된 조회 grant와 다른 서비스 양식을 노출하지 않는다", async () =>…
+     43|   const f = await fixture(); await db.serviceGrant.delete({ where: { i…
+     44|   const list = await listTemplates(f.ctx, query); expect(list.items.ma…
+       |                                                                                         ^
+     45|   await expect(listTemplates(f.ctx, { ...query, serviceId: f.firstId }…
+     46|   await expect(getTemplate(f.ctx, f.first.id)).rejects.toMatchObject({…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 이전 Context의 역할 회수·이메일 미인증·종료 세션은 공용 목록도 우회하지 못한다
+AssertionError: promise resolved "{ …(4) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "category": "공용",
++       "content": {
++         "body": "합성 템플릿 본문",
++         "consentPurpose": "",
++         "consentRequired": false,
++         "maxResponses": 5,
++         "questions": [
++           {
++             "id": "702cca99-2d35-4177-9cd8-240199ad282f",
++             "label": "합성 질문",
++             "required": true,
++             "type": "단문형 답변",
++           },
++         ],
++         "retentionDays": 30,
++       },
++       "createdAt": 2026-10-03T14:12:05.370Z,
++       "id": "b2bae345-38bf-42ed-8c60-69112801e5a2",
++       "scope": "public",
++       "serviceId": null,
++       "serviceName": null,
++       "title": "C 공용 양식",
++       "updatedAt": 2026-10-03T14:12:05.370Z,
++       "version": 1,
++     },
++     {
++       "category": "검증",
++       "content": {
++         "body": "합성 템플릿 본문",
++         "consentPurpose": "",
++         "consentRequired": false,
++         "maxResponses": 5,
++         "questions": [
++           {
++             "id": "702cca99-2d35-4177-9cd8-240199ad282f",
++             "label": "합성 질문",
++             "required": true,
++             "type": "단문형 답변",
++           },
++         ],
++         "retentionDays": 30,
++       },
++       "createdAt": 2026-10-03T14:12:05.359Z,
++       "id": "ad6f0d11-5582-4205-b170-e18b04bde1ed",
++       "scope": "company",
++       "serviceId": "5038606e-ce02-4e69-9280-6e47f20ebc48",
++       "serviceName": "다른 서비스",
++       "title": "A 회사 양식",
++       "updatedAt": 2026-10-03T14:12:05.359Z,
++       "version": 1,
++     },
++   ],
++   "page": 1,
++   "pageSize": 10,
++   "total": 2,
+  }
+
+ ❯ tests/server/template-access-gate.test.ts:50:44
+     48| test("이전 Context의 역할 회수·이메일 미인증·종료 세션은 공용 목록도 우회하지 못한다", async () => {
+     49|   const f = await fixture(); await db.membership.update({ where: { id:…
+     50|   await expect(listTemplates(f.ctx, query)).rejects.toMatchObject({ st…
+       |                                            ^
+     51|   await db.membership.update({ where: { id: f.member.id }, data: { rol…
+     52|   await db.user.update({ where: { id: f.editor.user.id }, data: { emai…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 회사·구성원 정지 이후 오래된 Context로 템플릿 목록을 읽지 못한다
+AssertionError: promise resolved "{ …(4) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "category": "공용",
++       "content": {
++         "body": "합성 템플릿 본문",
++         "consentPurpose": "",
++         "consentRequired": false,
++         "maxResponses": 5,
++         "questions": [
++           {
++             "id": "95ed473c-659f-4874-8df7-4f3cc01b2ad3",
++             "label": "합성 질문",
++             "required": true,
++             "type": "단문형 답변",
++           },
++         ],
++         "retentionDays": 30,
++       },
++       "createdAt": 2026-10-03T14:12:06.095Z,
++       "id": "b7afa629-42c8-4ef7-8237-9f5d9ae795fc",
++       "scope": "public",
++       "serviceId": null,
++       "serviceName": null,
++       "title": "C 공용 양식",
++       "updatedAt": 2026-10-03T14:12:06.095Z,
++       "version": 1,
++     },
++     {
++       "category": "검증",
++       "content": {
++         "body": "합성 템플릿 본문",
++         "consentPurpose": "",
++         "consentRequired": false,
++         "maxResponses": 5,
++         "questions": [
++           {
++             "id": "95ed473c-659f-4874-8df7-4f3cc01b2ad3",
++             "label": "합성 질문",
++             "required": true,
++             "type": "단문형 답변",
++           },
++         ],
++         "retentionDays": 30,
++       },
++       "createdAt": 2026-10-03T14:12:06.065Z,
++       "id": "bdae5555-961d-4ee0-a64c-42d1afe46932",
++       "scope": "company",
++       "serviceId": "472f18d6-9d81-4620-b226-2f3b61ebe013",
++       "serviceName": "다른 서비스",
++       "title": "A 회사 양식",
++       "updatedAt": 2026-10-03T14:12:06.065Z,
++       "version": 1,
++     },
++   ],
++   "page": 1,
++   "pageSize": 10,
++   "total": 2,
+  }
+
+ ❯ tests/server/template-access-gate.test.ts:60:44
+     58| test("회사·구성원 정지 이후 오래된 Context로 템플릿 목록을 읽지 못한다", async () => {
+     59|   const f = await fixture(); await db.membership.update({ where: { id:…
+     60|   await expect(listTemplates(f.ctx, query)).rejects.toMatchObject({ st…
+       |                                            ^
+     61|   await db.membership.update({ where: { id: f.member.id }, data: { sta…
+     62|   await db.company.update({ where: { id: f.company.id }, data: { statu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 템플릿 검색·회사/공용 범위와 마지막·빈 페이지를 실제 결과에 맞춰 보정한다
+AssertionError: expected 999 to be 3 // Object.is equality
+
+- Expected
++ Received
+
+- 3
++ 999
+
+ ❯ tests/server/template-access-gate.test.ts:67:105
+     65| test("템플릿 검색·회사/공용 범위와 마지막·빈 페이지를 실제 결과에 맞춰 보정한다", async () => {
+     66|   const f = await fixture();
+     67|   const last = await listTemplates(f.ownerCtx, { ...query, page: 999, …
+       |                                                                                                         ^
+     68|   const search = await listTemplates(f.ownerCtx, { ...query, page: 999…
+     69|   const empty = await listTemplates(f.ownerCtx, { ...query, page: 999,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 조회·작성 grant와 선택 서비스 상태를 GET 작업 및 생성 대상에 반영한다
+TypeError: Cannot read properties of undefined (reading 'canCreate')
+ ❯ tests/server/template-access-gate.test.ts:77:31
+     75|   await db.serviceGrant.create({ data: { tenantId: f.company.id, membe…
+     76|   const selected = await listTemplates(f.ctx, { ...query, serviceId: f…
+     77|   expect(selected.permissions.canCreate).toBe(false); expect(selected.…
+       |                               ^
+     78|   expect(selected.items.find(row => row.id === f.first.id)?.actions).t…
+     79|   expect((await getTemplate(f.ctx, f.second.id)).actions).toEqual({ pr…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 전문가의 배정 외 grant·실제 배정 만료를 템플릿 목록에서도 차단한다
+PrismaClientValidationError: 
+Invalid `db.expertAssignment.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/template-access-gate.test.ts:86:71
+
+  83   expect((await getTemplate(f.ctx, f.second.id)).actions).toEqual({ preview: true, use: false, edit: false, remove: false });
+  84 });
+  85 async function expert(f: Awaited<ReturnType<typeof fixture>>) {
+→ 86   const user = await person(), assignment = await db.expertAssignment.create({
+         data: {
+           tenantId: "be9bc1ef-7ec1-4392-8d74-5e13fadabb79",
+           expertUserId: "e7b9117a-42a5-454c-9d42-b36fa219113e",
+           assignedById: "0f134a55-7804-435e-a271-127addfb4371",
+           expiresAt: new Date("2026-10-04T14:12:08.432Z"),
+           services: {
+             create: {
+               tenantId: "be9bc1ef-7ec1-4392-8d74-5e13fadabb79",
+               ~~~~~~~~
+               serviceId: "ecce8ab4-2dfe-46e4-840d-b3cf5f762e27",
+       ?       id?: String
+             }
+           }
+         }
+       })
+
+Unknown argument `tenantId`. Available options are marked with ?.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ expert tests/server/template-access-gate.test.ts:86:45
+
+ ❯ tests/server/template-access-gate.test.ts:93:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 전문가의 보관 서비스 양식은 목록·상세에서 숨기고 직접 구성원의 읽기는 유지한다
+PrismaClientValidationError: 
+Invalid `db.expertAssignment.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/template-access-gate.test.ts:86:71
+
+  83   expect((await getTemplate(f.ctx, f.second.id)).actions).toEqual({ preview: true, use: false, edit: false, remove: false });
+  84 });
+  85 async function expert(f: Awaited<ReturnType<typeof fixture>>) {
+→ 86   const user = await person(), assignment = await db.expertAssignment.create({
+         data: {
+           tenantId: "c3a84c2a-e03f-417c-a500-e91ade232e6f",
+           expertUserId: "93011598-414c-4309-9f0b-439fa2cff53b",
+           assignedById: "7ecc2420-8506-479c-8927-26ce85f7ab46",
+           expiresAt: new Date("2026-10-04T14:12:09.318Z"),
+           services: {
+             create: {
+               tenantId: "c3a84c2a-e03f-417c-a500-e91ade232e6f",
+               ~~~~~~~~
+               serviceId: "8e495c0f-208a-4881-a77e-4f0c4380841c",
+       ?       id?: String
+             }
+           }
+         }
+       })
+
+Unknown argument `tenantId`. Available options are marked with ?.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ expert tests/server/template-access-gate.test.ts:86:45
+
+ ❯ tests/server/template-access-gate.test.ts:101:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  tests/server/template-access-gate.test.ts > 목록 입력은 알 수 없는 키를 거부하고 이름 정렬을 처리한다
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/template-access-gate.test.ts:109:87
+    107| test("목록 입력은 알 수 없는 키를 거부하고 이름 정렬을 처리한다", async () => {
+    108|   const f = await fixture();
+    109|   expect((await templateList(req("/templates?unknown=true", f.owner.co…
+       |                                                                                       ^
+    110|   const response = await templateList(req("/templates?sort=name&direct…
+    111|   expect((await response.json()).items.map((row: { title: string }) =>…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed (8)
+   Start at  23:12:01
+   Duration  8.84s (tests 82%, import 11%, transform 7%)
+

@@ -1,0 +1,83 @@
+{
+  "checkedAt": "2026-10-03T15:09:10.741698+00:00",
+  "files": 46,
+  "passed": 614,
+  "failed": 0,
+  "pending": 0,
+  "durationSeconds": 361.26,
+  "addedPostgreSQLTests": 6,
+  "relatedFiles": 4,
+  "relatedTests": 39,
+  "databaseLockBarriers": [
+    {
+      "test": "아홉 질문의 같은 version 저장 두 건이 실제 잠금 대기 후 한 번만 반영된다",
+      "waiting": 2,
+      "statuses": [
+        200,
+        409
+      ]
+    },
+    {
+      "test": "승인 요청과 초안 수정의 잠금 경합은 하나의 현재 내용만 승인 대상으로 만든다",
+      "waiting": 2,
+      "statuses": [
+        201,
+        409
+      ]
+    },
+    {
+      "test": "승인 결정과 새 수정의 잠금 경합에서 수정된 내용은 이전 승인을 사용할 수 없다",
+      "waiting": 2,
+      "statuses": [
+        409,
+        200
+      ]
+    },
+    {
+      "test": "서로 다른 승인 결정 두 건은 실제 잠금 대기 후 결정·감사를 한 번만 남긴다",
+      "waiting": 2,
+      "statuses": [
+        409,
+        200
+      ]
+    },
+    {
+      "test": "새 게시와 수정의 잠금 경합 후 최초 아홉 응답·첨부·영수증 PDF는 그대로 유지된다",
+      "waiting": 2,
+      "statuses": [
+        201,
+        409
+      ]
+    }
+  ],
+  "productionApiCases": 67,
+  "productionPrepareCases": 51,
+  "productionRestartCases": 16,
+  "productionLockBarriers": [
+    {
+      "label": "같은 version 두 저장",
+      "waiting": 2,
+      "statuses": [
+        409,
+        200
+      ]
+    },
+    {
+      "label": "게시와 같은 version 수정",
+      "waiting": 2,
+      "statuses": [
+        409,
+        200
+      ]
+    }
+  ],
+  "originalReceiptPdfByteIdentical": true,
+  "newReceiptContainsNewDocument": true,
+  "businessDatabaseMatchesAfterRestart": true,
+  "publicFileUploadExercised": true,
+  "globalProductionWorkerExecuted": false,
+  "testDatabaseDestructionWorkerExercised": true,
+  "actualUiVerified": false,
+  "externalDeliveryVerified": false,
+  "productionCodeChanged": false
+}

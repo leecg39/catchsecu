@@ -13,6 +13,7 @@ export type DestructionRecord = {
   legalHold: boolean; reason: string | null; decision: string | null; requesterId: string | null; approverId: string | null;
   approvedAt: string | null; startedAt: string | null; completedAt: string | null;
   attempts: number; nextAttemptAt: string | null; lastError: string | null; certificateId: string | null;
+  permissions: { canApprove: boolean; canReject: boolean; canCancel: boolean; canReschedule: boolean; canRetry: boolean };
 };
 export type CertificateRecord = {
   id: string; tenantId: string; serviceId: string; submissionId: string; requestId: string;

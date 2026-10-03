@@ -1,0 +1,218 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:8557) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/share-management-gate.test.ts (16 tests | 15 failed) 15757ms
+   × creation replay rechecks current file-capability 1108ms
+   × creation replay rechecks current form-archived 746ms
+   × creation replay rechecks current service-archived 607ms
+   × creation replay cannot return an active snapshot after grant expired 727ms
+   × creation replay cannot return an active snapshot after grant revoked 734ms
+   × recipient change clears both resource-bound and legacy creation cache ciphertext 584ms
+   × manager create rolls back successful audit and mail when session expires during audit INSERT 1366ms
+   × manager update rolls back successful audit and mail when session expires during audit INSERT 1450ms
+   × a share metadata read waits for the actual grant lock and rejects session expiry 2343ms
+   × verification does not commit an already expired challenge after authentication audit INSERT 1383ms
+   × verification does not commit an already expired grant after authentication audit INSERT 1530ms
+   × manager and viewer reject unknown or duplicate queries instead of silently discarding input 598ms
+   × share and viewer list pagination returns the current last page after stale high-page navigation 645ms
+   × server permissions expose archived read/revoke and disable invite/edit/resend 570ms
+   × file capability governs selectable fields and resend while permitting removal or revoke 568ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > creation replay rechecks current file-capability
+AssertionError: expected 201 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 201
+
+ ❯ tests/server/share-management-gate.test.ts:73:48
+     71|   } else if (kind === "form-archived") await db.form.update({ where: {…
+     72|   else await db.service.update({ where: { id: f.serviceId }, data: { s…
+     73|   expect((await create(f, key, input)).status).toBe(kind === "file-cap…
+       |                                                ^
+     74|   expect(await db.shareGrant.count()).toBe(1); expect(await db.job.cou…
+     75| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > creation replay rechecks current form-archived
+ FAIL  tests/server/share-management-gate.test.ts > creation replay rechecks current service-archived
+AssertionError: expected 201 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 201
+
+ ❯ tests/server/share-management-gate.test.ts:73:48
+     71|   } else if (kind === "form-archived") await db.form.update({ where: {…
+     72|   else await db.service.update({ where: { id: f.serviceId }, data: { s…
+     73|   expect((await create(f, key, input)).status).toBe(kind === "file-cap…
+       |                                                ^
+     74|   expect(await db.shareGrant.count()).toBe(1); expect(await db.job.cou…
+     75| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > creation replay cannot return an active snapshot after grant expired
+ FAIL  tests/server/share-management-gate.test.ts > creation replay cannot return an active snapshot after grant revoked
+AssertionError: expected 201 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 201
+
+ ❯ tests/server/share-management-gate.test.ts:80:41
+     78|   if (kind === "expired") await db.shareGrant.update({ where: { id: g.…
+     79|   else await ok(await shareDelete(req("/share-grants/" + g.id, "DELETE…
+     80|   expect((await create(f, key)).status).toBe(410); expect(await db.sha…
+       |                                         ^
+     81| });
+     82| test("recipient change clears both resource-bound and legacy creation …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > recipient change clears both resource-bound and legacy creation cache ciphertext
+AssertionError: expected 'v1.wLvMRj899X4wVyRr.vIE2oGRSK_CJA9vB5…' to be null
+
+- Expected:
+null
+
++ Received:
+"v1.wLvMRj899X4wVyRr.vIE2oGRSK_CJA9vB5uZskQ.Pk00b-VZ80UKJN_dO-P_lDNZKY-Mu198DJfu0-F8FCOBWwqS77IwITl2JphESnC1iKpkn9a-t-saoL6zNkHYVvs8XCWoLWAtSrDazPWqcBUVTlMIQgFq-AQ5mtQH3MXC8B-7jZgcGeQq3z4BLOl-ae5fYjdLJKAxIAoHM1hPkY4HOgW3jxIxgpPpFNWo7lNnQ4Tlh3UPUGOel3NPEls4oe6x424tmIbA_TWIPXETAR49le23ccp6npy4_hvpR1RkOWMK8Ay3y6xXx05fuHixnS8GXhaYev6lMMibrr9NEj6o1GCGIUcslZOeU6BbuTnZFVCTHcczlQaIEdwvJkG2Qw0GfcLa2ksmy9UGf8FChGxf_FbFp3wORPxDKsdx7Bvb6knUwJ_xcWF_8dU4ekFaQvUI7axkdK-RjQ9NBznRN5-TbotxsAB-g9vx2EYRrbY2avPUrYFmLWTZvtqJsKgNqO2TUykguGh_fPgV3Ttv6GuN1OAxTMWQ9mJux6abaU7QyVTohtdB7VVAPrY6H7W5lGySJVpfH0F3CfXpBtkdb4rsGJhGTqn7LbSIc9J-vGbsE9UqvTqrJVrvrkRvShWQZ5hZGHihxACJSQv0Z1E5ZIeE3qJalIH3Ku6lgWGlcOmp3EaXIj2c75WchGoKqAyPKHw5hdBlPNWuKMe3UXgJw9Y"
+
+ ❯ tests/server/share-management-gate.test.ts:88:111
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > manager create rolls back successful audit and mail when session expires during audit INSERT
+ FAIL  tests/server/share-management-gate.test.ts > manager update rolls back successful audit and mail when session expires during audit INSERT
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/share-management-gate.test.ts:97:58
+
+ ❯ delayedAudit tests/server/share-management-gate.test.ts:61:9
+ ❯ tests/server/share-management-gate.test.ts:94:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > a share metadata read waits for the actual grant lock and rejects session expiry
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/share-management-gate.test.ts:114:106
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > verification does not commit an already expired challenge after authentication audit INSERT
+ FAIL  tests/server/share-management-gate.test.ts > verification does not commit an already expired grant after authentication audit INSERT
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/share-management-gate.test.ts:125:29
+    123|     else await db.shareGrant.update({ where: { id: g.id }, data: { exp…
+    124|     const response = await viewerPost(req("/viewer/challenges/" + c.id…
+    125|     expect(response.status).toBe(422); expect(response.headers.getSetC…
+       |                             ^
+    126|   });
+    127|   expect(await db.viewerSession.count()).toBe(0); expect((await db.vie…
+ ❯ delayedAudit tests/server/share-management-gate.test.ts:61:9
+ ❯ tests/server/share-management-gate.test.ts:120:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > manager and viewer reject unknown or duplicate queries instead of silently discarding input
+AssertionError: /share-grants?formId=785d453f-7f5a-425f-8c2c-a1b3dd5e4951&unknown=x: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/share-management-gate.test.ts:137:94
+    135|     [shareGet, "/share-grants/options?formId=" + f.form.id + "&formId=…
+    136|     [shareGet, "/share-grants/" + g.id + "?unknown=x", f.cookie], [vie…
+    137|   ] as const) expect((await handler(req(path, "GET", undefined, creden…
+       |                                                                                              ^
+    138| });
+    139| test("share and viewer list pagination returns the current last page a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > share and viewer list pagination returns the current last page after stale high-page navigation
+AssertionError: expected 999 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 999
+
+ ❯ tests/server/share-management-gate.test.ts:142:21
+    140|   const f = await fixture(), g = await ok(await create(f), 201);
+    141|   const list = await ok(await shareList(req("/share-grants?formId=" + …
+    142|   expect(list.page).toBe(1); expect(list.items).toHaveLength(1);
+       |                     ^
+    143|   const events = await ok(await shareGet(req("/share-grants/" + g.id +…
+    144|   const c = await challenge(f, g), authenticated = await viewerPost(re…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > server permissions expose archived read/revoke and disable invite/edit/resend
+TypeError: Cannot read properties of undefined (reading 'canCreate')
+ ❯ tests/server/share-management-gate.test.ts:151:27
+    149|   await db.form.update({ where: { id: f.form.id }, data: { status: "ar…
+    150|   const data = await ok(await shareList(req("/share-grants?formId=" + …
+    151|   expect(data.permissions.canCreate).toBe(false); expect(data.items[0]…
+       |                           ^
+    152|   const options = await ok(await shareGet(req("/share-grants/options?f…
+    153|   await ok(await shareDelete(req("/share-grants/" + g.id, "DELETE", un…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > file capability governs selectable fields and resend while permitting removal or revoke
+TypeError: Cannot read properties of undefined (reading 'canSelectFiles')
+ ❯ tests/server/share-management-gate.test.ts:161:30
+    159|   await db.serviceGrant.create({ data: { tenantId: f.company.id, membe…
+    160|   const options = await ok(await shareGet(req("/share-grants/options?f…
+    161|   expect(options.permissions.canSelectFiles).toBe(false); expect(optio…
+       |                              ^
+    162|   const current = await ok(await shareGet(req("/share-grants/" + g.id,…
+    163|   expect((await shareAction(req("/share-grants/" + g.id + "/resend", "…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/15]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  15 failed | 1 passed (16)
+   Start at  02:18:01
+   Duration  17.36s (tests 92%, import 5%, transform 3%)
+

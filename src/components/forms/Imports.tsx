@@ -23,17 +23,19 @@ export function Imports({ path }: { path: string }) {
 function ImportList() {
   const app = useApplication(), [service, setService] = useState(""), [page, setPage] = useState(1), [size, setSize] = useState(20);
   const [query, setQuery] = useState(""), [search, setSearch] = useState("");
+  const [status, setStatus] = useState(""), [sort, setSort] = useState("createdAt"), [direction, setDirection] = useState("desc");
   const serviceId = service || app.data?.serviceId || "";
-  const result = useResource<Paged<ImportJobRecord>>(serviceId ? "/imports?" + new URLSearchParams({ serviceId, page: String(page), pageSize: String(size), search }) : null);
-  const lastPage = Math.max(1, Math.ceil((result.data?.total ?? 0) / size));
-  if (result.data && page > lastPage) setPage(lastPage);
+  const result = useResource<Paged<ImportJobRecord>>(serviceId ? "/imports?" + new URLSearchParams({ serviceId, page: String(page), pageSize: String(size), search, sort, direction, ...(status ? { status } : {}) }) : null);
   return <><PageHeading title="개인정보 업로드"><p>CSV 파일의 수집 근거와 보유 기한을 확인하고 응답으로 등록합니다.</p><Link className="cs-link" href="/form/manage">캐치폼 목록</Link></PageHeading>
     <div className="forms-filter"><label>서비스 <select aria-label="업로드 서비스" value={serviceId} onChange={e => { setService(e.target.value); setPage(1); }}>
       {app.data?.services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></label></div>
     {serviceId && app.data?.capabilities.includes("import.write") && <UploadStart key={serviceId} serviceId={serviceId} />}
     <Panel title="업로드 작업"><form className="forms-filter" onSubmit={e => { e.preventDefault(); setSearch(query); setPage(1); }}>
-      <input className="cs-input" aria-label="업로드 작업 검색" placeholder="작업 제목 검색" value={query} onChange={e => setQuery(e.target.value)} /><ActionButton>검색</ActionButton></form>
-      <RemoteTable columns={["제목", "상태", "전체 / 반영 / 오류 / 중복", "시작일", "임시 자료 만료", "작업"]} page={page} pageSize={size} total={result.data?.total ?? 0} loading={result.loading} error={result.error?.message}
+      <input className="cs-input" aria-label="업로드 작업 검색" placeholder="작업 제목 또는 ID 검색" value={query} onChange={e => setQuery(e.target.value)} /><ActionButton>검색</ActionButton>
+      <label>상태<select value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}><option value="">전체</option>{Object.entries(importStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+      <label>정렬<select value={sort} onChange={e => { setSort(e.target.value); setPage(1); }}><option value="createdAt">등록일</option><option value="name">제목</option></select></label>
+      <label>순서<select value={direction} onChange={e => { setDirection(e.target.value); setPage(1); }}><option value="desc">내림차순</option><option value="asc">오름차순</option></select></label></form>
+      <RemoteTable columns={["제목", "상태", "전체 / 반영 / 오류 / 중복", "시작일", "임시 자료 만료", "작업"]} page={result.data?.page ?? page} pageSize={size} total={result.data?.total ?? 0} loading={result.loading} error={result.error?.message}
         onPage={setPage} onPageSize={n => { setSize(n); setPage(1); }} rows={(result.data?.items ?? []).map(row => ({ id: row.id, cells: [
           <Link key="title" href={jobUrl(row.id, row.status === "uploading" ? "" : row.status === "draft" ? "/agreement" : "/recipient")}>{row.title}</Link>, importStatusLabels[row.status] ?? row.status,
           `${row.totalRows} / ${row.importedRows} / ${row.invalidRows} / ${row.skippedRows}`, date(row.createdAt), date(row.expiresAt),
@@ -55,10 +57,12 @@ function UploadStart({ serviceId }: { serviceId: string }) {
       if (pending.current?.fingerprint !== fingerprint) pending.current = { key: crypto.randomUUID(), fingerprint };
       const current = pending.current!;
       if (!current.row) current.row = await api<ImportJobRecord>("/imports", { method: "POST", body: fingerprint, headers: { "Idempotency-Key": current.key } });
+      const existing = await api<ImportJobRecord>("/imports/" + current.row.id);
+      if (existing.status !== "uploading") { router.push(jobUrl(existing.id, "/agreement")); return; }
       setProgress("파일을 업로드하고 있습니다.");
-      await api("/uploads/" + current.row.fileId + "/content", { method: "PUT", body: bytes, headers: { "Content-Type": "text/csv" } });
+      if (existing.fileStatus === "pending") await api("/uploads/" + current.row.fileId + "/content", { method: "PUT", body: bytes, headers: { "Content-Type": "text/csv" } });
       setProgress("악성코드 검사와 CSV 헤더 확인 중입니다.");
-      await api("/uploads/" + current.row.fileId + "/complete", { method: "POST" });
+      if (existing.fileStatus !== "ready") await api("/uploads/" + current.row.fileId + "/complete", { method: "POST" });
       const latest = await api<ImportJobRecord>("/imports/" + current.row.id);
       if (latest.status === "uploading") await api("/imports/" + latest.id + "/inspect", { method: "POST", body: JSON.stringify({ version: latest.version }) });
       router.push(jobUrl(latest.id, "/agreement"));
@@ -75,8 +79,8 @@ function UploadStart({ serviceId }: { serviceId: string }) {
 function ImportWorkspace({ id, path }: { id: string; path: string }) {
   const result = useResource<ImportJobRecord>("/imports/" + id), [override, setOverride] = useState<ImportJobRecord>();
   const row = override ?? result.data, app = useApplication(), router = useRouter();
-  const [sourceDirty, setSourceDirty] = useState(false);
-  const [error, setError] = useState(""), [busy, setBusy] = useState(false), [confirm, setConfirm] = useState<"commit" | "clean">();
+  const [dirtySource, setDirtySource] = useState<{ key: string; dirty: boolean }>();
+  const [error, setError] = useState(""), [busy, setBusy] = useState(false), [confirmation, setConfirmation] = useState<{ kind: "commit" | "clean"; key: string }>();
   const running = !!row && ["committing", "retry"].includes(row.status);
   useEffect(() => {
     if (!running) return;
@@ -86,7 +90,13 @@ function ImportWorkspace({ id, path }: { id: string; path: string }) {
   }, [id, running]);
   if (!row) return <Panel>{result.error ? <p role="alert">{result.error.message}</p> : <p role="status">업로드 작업을 불러오는 중입니다.</p>}</Panel>;
   const alive = new Date(row.expiresAt) > new Date() && !["cancelled", "archived", "expired"].includes(row.status);
-  const editable = alive && ["draft", "validated"].includes(row.status), canWrite = !!app.data?.capabilities.includes("import.write");
+  const editable = alive && row.permissions.canEdit;
+  const permissionKey = JSON.stringify(row.permissions);
+  const stateKey = row.id + ":" + row.version + permissionKey;
+  const sourceDirty = dirtySource?.key === stateKey && dirtySource.dirty;
+  const setSourceDirty = (dirty: boolean) => setDirtySource({ key: stateKey, dirty });
+  const confirm = confirmation?.key === stateKey ? confirmation.kind : undefined;
+  const setConfirm = (kind: "commit" | "clean" | undefined) => setConfirmation(kind ? { kind, key: stateKey } : undefined);
   async function action(kind: string) {
     if (!row || busy) return; setBusy(true); setError("");
     try {
@@ -106,24 +116,24 @@ function ImportWorkspace({ id, path }: { id: string; path: string }) {
       {row.lastError && <p role="alert">처리가 중단되었습니다. 권한·서비스·파일 상태를 확인한 뒤 다시 시도해주세요. ({row.lastError})</p>}
       {!alive && <p>임시 원문을 정리했습니다. 반영된 응답은 응답 관리에서 확인할 수 있습니다.</p>}
       {row.formId && app.data?.capabilities.includes("submission.read") && <Link className="cs-button" href={"/form/manage/applicant/" + row.formId}>반영된 응답 관리</Link>}
-      {canWrite && <div className="forms-actions">{row.status === "failed" && alive && <ActionButton disabled={busy} onClick={() => action("retry")}>반영 다시 시도</ActionButton>}
-        {alive && !running && <ActionButton secondary disabled={busy} onClick={() => setConfirm("clean")}>{row.formId ? "임시 자료 삭제 및 작업 보관" : "업로드 취소"}</ActionButton>}</div>}
+      <div className="forms-actions">{row.permissions.canRetry && <ActionButton disabled={busy} onClick={() => action("retry")}>반영 다시 시도</ActionButton>}
+        {row.permissions.canClean && <ActionButton secondary disabled={busy} onClick={() => setConfirm("clean")}>{row.formId ? "임시 자료 삭제 및 작업 보관" : "업로드 취소"}</ActionButton>}</div>
       {error && <p role="alert">{error}</p>}
     </Panel>
     {step === 1 && <Panel title="파일 확인"><p>{row.fileName} · {row.encoding} · {row.fileStatus === "ready" ? "안전 검사 완료" : row.fileStatus}</p>
       {row.headers.length > 0 && <><p>컬럼: {row.headers.join(" · ")}</p><Link className="cs-button" href={jobUrl(id, "/agreement")}>수집 근거 설정</Link></>}
       {row.status === "uploading" && <p>아직 파일 확인을 마치지 못했습니다. 원래 업로드 화면에서 재시도하거나 이 작업을 취소하고 새 파일을 등록해주세요.</p>}</Panel>}
-    {step === 2 && editable && canWrite && <MappingEditor key={row.id + ":" + row.version} row={row} onSaved={saved => { setSourceDirty(false); setOverride(saved); router.push(jobUrl(id, "/recipient")); }} />}
+    {step === 2 && editable && <MappingEditor key={row.id + ":" + row.version + permissionKey} row={row} onSaved={saved => { setSourceDirty(false); setOverride(saved); router.push(jobUrl(id, "/recipient")); }} />}
     {step === 2 && !editable && <Panel><p>수집 근거는 반영 시작 후 변경할 수 없습니다.</p><Link className="cs-link" href={jobUrl(id, "/recipient")}>검증 결과 확인</Link></Panel>}
     {step === 3 && alive && <>
-      {editable && canWrite && row.mapping && <SourceEditor key={"source:" + row.version} row={row} onDirty={setSourceDirty} onSaved={saved => { setSourceDirty(false); setOverride(saved); }} />}
+      {editable && row.mapping && <SourceEditor key={"source:" + row.version + permissionKey} row={row} onDirty={setSourceDirty} onSaved={saved => { setSourceDirty(false); setOverride(saved); }} />}
       {editable && !row.mapping && <Panel><Link className="cs-button" href={jobUrl(id, "/agreement")}>수집 근거와 컬럼을 먼저 설정해주세요</Link></Panel>}
-      {editable && canWrite && row.mapping && <Panel><div className="forms-actions"><ActionButton secondary disabled={busy || sourceDirty} onClick={() => action("validate")}>행 검증</ActionButton>
-        {row.status === "validated" && <ActionButton disabled={busy || sourceDirty || !row.validRows} onClick={() => setConfirm("commit")}>정상 {row.validRows}행 반영</ActionButton>}</div>
+      {row.permissions.canValidate && row.mapping && <Panel><div className="forms-actions"><ActionButton secondary disabled={busy || sourceDirty} onClick={() => action("validate")}>행 검증</ActionButton>
+        {row.permissions.canCommit && <ActionButton disabled={busy || sourceDirty} onClick={() => setConfirm("commit")}>정상 {row.validRows}행 반영</ActionButton>}</div>
         <p>검증 단계에서는 응답을 만들지 않습니다. 반영 전에 수집 근거와 실패 사유를 확인해주세요.</p></Panel>}
       {!["uploading", "draft"].includes(row.status) && <ImportRows key={"rows:" + row.version} row={row} />}
     </>}
-    {confirm && <Modal title={confirm === "commit" ? "정상 행 반영" : "임시 자료 정리"} onClose={() => { if (!busy) setConfirm(undefined); }}>
+    {confirm && (confirm === "commit" ? row.permissions.canCommit : row.permissions.canClean) && <Modal key={row.version + permissionKey} title={confirm === "commit" ? "정상 행 반영" : "임시 자료 정리"} onClose={() => { if (!busy) setConfirm(undefined); }}>
       <p>{confirm === "commit" ? `정상 ${row.validRows}행을 응답으로 등록합니다. 오류·중복 ${row.invalidRows + row.skippedRows}행은 반영하지 않습니다. 원본 파일은 반영 전에 삭제합니다.` : "원본과 남은 임시 행을 삭제하고 이 작업을 정리합니다. 이미 등록된 응답의 파기는 응답 관리에서 요청할 수 있습니다."}</p>
       {error && <p role="alert">{error}</p>}<ActionButton disabled={busy} onClick={() => action(confirm)}>확인하고 {confirm === "commit" ? "반영" : "정리"}</ActionButton></Modal>}
   </>;
@@ -191,7 +201,7 @@ function ImportRows({ row }: { row: ImportJobRecord }) {
   return <Panel title="행별 검증 결과"><div className="forms-between"><label><input type="checkbox" checked={errorsOnly} onChange={e => { setErrorsOnly(e.target.checked); setPage(1); }} /> 오류·중복만 보기</label>
     <a className="cs-link" href={"/api/v1/imports/" + row.id + "/errors.csv"} download>실패행 CSV 다운로드</a></div>
     <p className="import-help">반영된 행의 임시 원문은 삭제됩니다. 중복 행은 연결된 응답이 파기되면 함께 제거됩니다.</p>
-    <RemoteTable columns={["CSV 행 / 줄", "처리 상태", "검증 사유", ...row.headers]} page={page} pageSize={size} total={result.data?.total ?? 0} loading={result.loading} error={result.error?.message}
+    <RemoteTable columns={["CSV 행 / 줄", "처리 상태", "검증 사유", ...row.headers]} page={result.data?.page ?? page} pageSize={size} total={result.data?.total ?? 0} loading={result.loading} error={result.error?.message}
       onPage={setPage} onPageSize={n => { setSize(n); setPage(1); }} rows={(result.data?.items ?? []).map(r => ({ id: String(r.rowNo), cells: [
         `${r.rowNo} / ${r.lineNo}`, ({ valid: "정상", error: "오류", duplicate: "중복", imported: "반영 완료" } as Record<string, string>)[r.status], r.errors.map(e => e.field + ": " + e.message).join(" / ") || "—",
         ...row.headers.map((_, i) => r.values ? (r.values[i] ?? "") : "원문 삭제됨"),

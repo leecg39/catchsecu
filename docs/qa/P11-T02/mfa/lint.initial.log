@@ -1,0 +1,93 @@
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/management/MfaPolicy.tsx
+  47:116  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/management/MfaPolicy.tsx:47:116
+  45 |  return <Modal title={name+" 임시 예외 "+(row?"수정":"등록")} onClose={()=>{if(!busy)onClose();}}><form onSubmit={e=>{e.preventDefault();void save(String(new FormData(e.currentTarget).get("password")));}}>
+  46 |  {error&&<p role="alert">{error}</p>}{row&&<p>최종 기한: {new Date(new Date(row.createdAt).getTime()+86400000).toLocaleString("ko-KR")}</p>}
+> 47 |  <label>예외 사유<textarea className="cs-input" required minLength={5} maxLength={500} value={reason} disabled={busy||!!pending.current} onChange={e=>setReason(e.target.value)}/></label>
+     |                                                                                                                    ^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  48 |  <label>현재부터 허용 시간<input className="cs-input" type="number" min="0.1" max="24" step="0.1" required value={hours} disabled={busy||!!pending.current} onChange={e=>setHours(e.target.value)}/></label>
+  49 |  <label>현재 비밀번호<input className="cs-input" name="password" type="password" required autoComplete="current-password"/></label>
+  50 |  {pending.current&&<p>같은 입력으로 처리 결과를 다시 확인합니다.</p>}<div className="mg-flex">{row&&<ActionButton secondary type="button" disabled={busy} onClick={()=>void latest()}>최신 예외 불러오기</ActionButton>}<ActionButton type="submit" disabled={busy}>{pending.current?"같은 요청 재확인":"저장"}</ActionButton></div>                                                                                                                               react-hooks/refs
+  47:117  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/management/MfaPolicy.tsx:47:117
+  45 |  return <Modal title={name+" 임시 예외 "+(row?"수정":"등록")} onClose={()=>{if(!busy)onClose();}}><form onSubmit={e=>{e.preventDefault();void save(String(new FormData(e.currentTarget).get("password")));}}>
+  46 |  {error&&<p role="alert">{error}</p>}{row&&<p>최종 기한: {new Date(new Date(row.createdAt).getTime()+86400000).toLocaleString("ko-KR")}</p>}
+> 47 |  <label>예외 사유<textarea className="cs-input" required minLength={5} maxLength={500} value={reason} disabled={busy||!!pending.current} onChange={e=>setReason(e.target.value)}/></label>
+     |                                                                                                                     ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  48 |  <label>현재부터 허용 시간<input className="cs-input" type="number" min="0.1" max="24" step="0.1" required value={hours} disabled={busy||!!pending.current} onChange={e=>setHours(e.target.value)}/></label>
+  49 |  <label>현재 비밀번호<input className="cs-input" name="password" type="password" required autoComplete="current-password"/></label>
+  50 |  {pending.current&&<p>같은 입력으로 처리 결과를 다시 확인합니다.</p>}<div className="mg-flex">{row&&<ActionButton secondary type="button" disabled={busy} onClick={()=>void latest()}>최신 예외 불러오기</ActionButton>}<ActionButton type="submit" disabled={busy}>{pending.current?"같은 요청 재확인":"저장"}</ActionButton></div>
+
+To initialize a ref only once, check that the ref is null with the pattern `if (ref.current == null) { ref.current = ... }`  react-hooks/refs
+  48:131  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/management/MfaPolicy.tsx:48:131
+  46 |  {error&&<p role="alert">{error}</p>}{row&&<p>최종 기한: {new Date(new Date(row.createdAt).getTime()+86400000).toLocaleString("ko-KR")}</p>}
+  47 |  <label>예외 사유<textarea className="cs-input" required minLength={5} maxLength={500} value={reason} disabled={busy||!!pending.current} onChange={e=>setReason(e.target.value)}/></label>
+> 48 |  <label>현재부터 허용 시간<input className="cs-input" type="number" min="0.1" max="24" step="0.1" required value={hours} disabled={busy||!!pending.current} onChange={e=>setHours(e.target.value)}/></label>
+     |                                                                                                                                   ^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  49 |  <label>현재 비밀번호<input className="cs-input" name="password" type="password" required autoComplete="current-password"/></label>
+  50 |  {pending.current&&<p>같은 입력으로 처리 결과를 다시 확인합니다.</p>}<div className="mg-flex">{row&&<ActionButton secondary type="button" disabled={busy} onClick={()=>void latest()}>최신 예외 불러오기</ActionButton>}<ActionButton type="submit" disabled={busy}>{pending.current?"같은 요청 재확인":"저장"}</ActionButton></div>
+  51 |  </form></Modal>;                                                                                                                                                                                                                                                                                                    react-hooks/refs
+  48:132  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/management/MfaPolicy.tsx:48:132
+  46 |  {error&&<p role="alert">{error}</p>}{row&&<p>최종 기한: {new Date(new Date(row.createdAt).getTime()+86400000).toLocaleString("ko-KR")}</p>}
+  47 |  <label>예외 사유<textarea className="cs-input" required minLength={5} maxLength={500} value={reason} disabled={busy||!!pending.current} onChange={e=>setReason(e.target.value)}/></label>
+> 48 |  <label>현재부터 허용 시간<input className="cs-input" type="number" min="0.1" max="24" step="0.1" required value={hours} disabled={busy||!!pending.current} onChange={e=>setHours(e.target.value)}/></label>
+     |                                                                                                                                    ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  49 |  <label>현재 비밀번호<input className="cs-input" name="password" type="password" required autoComplete="current-password"/></label>
+  50 |  {pending.current&&<p>같은 입력으로 처리 결과를 다시 확인합니다.</p>}<div className="mg-flex">{row&&<ActionButton secondary type="button" disabled={busy} onClick={()=>void latest()}>최신 예외 불러오기</ActionButton>}<ActionButton type="submit" disabled={busy}>{pending.current?"같은 요청 재확인":"저장"}</ActionButton></div>
+  51 |  </form></Modal>;
+
+To initialize a ref only once, check that the ref is null with the pattern `if (ref.current == null) { ref.current = ... }`                                                                                                                                                                       react-hooks/refs
+  50:3    error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/management/MfaPolicy.tsx:50:3
+  48 |  <label>현재부터 허용 시간<input className="cs-input" type="number" min="0.1" max="24" step="0.1" required value={hours} disabled={busy||!!pending.current} onChange={e=>setHours(e.target.value)}/></label>
+  49 |  <label>현재 비밀번호<input className="cs-input" name="password" type="password" required autoComplete="current-password"/></label>
+> 50 |  {pending.current&&<p>같은 입력으로 처리 결과를 다시 확인합니다.</p>}<div className="mg-flex">{row&&<ActionButton secondary type="button" disabled={busy} onClick={()=>void latest()}>최신 예외 불러오기</ActionButton>}<ActionButton type="submit" disabled={busy}>{pending.current?"같은 요청 재확인":"저장"}</ActionButton></div>
+     |   ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  51 |  </form></Modal>;
+  52 | }
+  53 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/refs
+  50:3    error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/management/MfaPolicy.tsx:50:3
+  48 |  <label>현재부터 허용 시간<input className="cs-input" type="number" min="0.1" max="24" step="0.1" required value={hours} disabled={busy||!!pending.current} onChange={e=>setHours(e.target.value)}/></label>
+  49 |  <label>현재 비밀번호<input className="cs-input" name="password" type="password" required autoComplete="current-password"/></label>
+> 50 |  {pending.current&&<p>같은 입력으로 처리 결과를 다시 확인합니다.</p>}<div className="mg-flex">{row&&<ActionButton secondary type="button" disabled={busy} onClick={()=>void latest()}>최신 예외 불러오기</ActionButton>}<ActionButton type="submit" disabled={busy}>{pending.current?"같은 요청 재확인":"저장"}</ActionButton></div>
+     |   ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  51 |  </form></Modal>;
+  52 | }
+  53 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/refs
+  50:236  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/management/MfaPolicy.tsx:50:236
+  48 |  <label>현재부터 허용 시간<input className="cs-input" type="number" min="0.1" max="24" step="0.1" required value={hours} disabled={busy||!!pending.current} onChange={e=>setHours(e.target.value)}/></label>
+  49 |  <label>현재 비밀번호<input className="cs-input" name="password" type="password" required autoComplete="current-password"/></label>
+> 50 |  {pending.current&&<p>같은 입력으로 처리 결과를 다시 확인합니다.</p>}<div className="mg-flex">{row&&<ActionButton secondary type="button" disabled={busy} onClick={()=>void latest()}>최신 예외 불러오기</ActionButton>}<ActionButton type="submit" disabled={busy}>{pending.current?"같은 요청 재확인":"저장"}</ActionButton></div>
+     |                                                                                                                                                                                                                                            ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  51 |  </form></Modal>;
+  52 | }
+  53 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react-hooks/refs
+
+✖ 7 problems (7 errors, 0 warnings)
+

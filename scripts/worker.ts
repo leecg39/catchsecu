@@ -7,6 +7,7 @@ import { db } from "../src/server/db";
 import { runOneJob } from "../src/server/jobs";
 import { cleanupExpiredFiles } from "../src/server/files";
 import { cleanupNoticeAttachments } from "../src/server/notice-attachments";
+import { cleanupBusinessFiles } from "../src/server/company-management";
 import { enqueueExpiredSubmissions, runOneDestruction } from "../src/server/destruction-worker";
 import { expireIdempotencyResponses } from "../src/server/idempotency";
 
@@ -15,6 +16,7 @@ import { cleanupExpiredImports, runOneImport } from "../src/server/import-worker
 import { cleanupSubjectAccess } from "../src/server/subjects";
 import { expireTrials } from "../src/server/subscription-worker";
 import { expireExpertAssignments } from "../src/server/expert-assignments";
+import { cleanupExpiredExports, runOneExport } from "../src/server/exports";
 
 const workerId = randomUUID();
 let stopped = false;
@@ -30,10 +32,13 @@ async function main() {
       await cleanupCampaigns();
       await cleanupSubjectAccess();
       await cleanupExpiredImports();
+      await cleanupExpiredExports();
       const cleanup = await cleanupExpiredFiles();
       if (cleanup.deleted || cleanup.retry) console.info("임시 파일 정리", cleanup);
       const noticeCleanup = await cleanupNoticeAttachments();
       if (noticeCleanup.deleted || noticeCleanup.retry) console.info("공지 첨부 정리", noticeCleanup);
+      const businessCleanup = await cleanupBusinessFiles();
+      if (businessCleanup.deleted || businessCleanup.retry) console.info("사업자등록증 정리", businessCleanup);
       const expired = await expireIdempotencyResponses();
       const expiredTrials = await expireTrials();
       const expiredExperts = await expireExpertAssignments();
@@ -44,7 +49,8 @@ async function main() {
     const destroyed = await runOneDestruction(workerId);
     const imported = await runOneImport(workerId);
     const notified = await runOneNotification(workerId);
-    const worked = (await runOneJob(workerId)) || destroyed || imported || notified;
+    const exported = await runOneExport(workerId);
+    const worked = (await runOneJob(workerId)) || destroyed || imported || notified || exported;
     if (process.argv.includes("--once") || (!worked && process.argv.includes("--drain"))) break;
     if (!worked) await new Promise(resolve => setTimeout(resolve, 1000));
   }

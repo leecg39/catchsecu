@@ -1,5 +1,13 @@
 # 데이터 모델·수명주기 설계안
 
+## P06-T06 공통 모델 구현 (2026-10-04, 진행 중)
+
+서비스별 `VerificationIntegration`과 불변 `VerificationIntegrationRevision`, 게시 버전/브라우저 nonce/요청·문서 HMAC을 고정한 `VerificationAttempt`, 중복 공급자 이벤트 해시를 막는 `VerificationEvent`, 검증 사실과 제출을 연결하는 `VerificationReceipt`를 추가했다. 회사/서비스/폼/게시 버전은 복합 FK로 연결한다. 설정 이력과 이벤트 본문 해시는 수정할 수 없고, 설정 변경은 이전 세대의 미소비 요청과 생성 키 응답을 무효화한다.
+
+운영 제출에는 production 증거만 연결할 수 있다. 같은 접수에 본인인증/전자서명 영수증을 각각 하나씩 연결할 수 있으며, 같은 종류의 중복 연결과 다른 문서/공급자/게시 버전/검증 이벤트 연결을 DB에서 거부한다. 이 제약의 합성 DB 시험은 실제 공급자 서명 검증이나 sandbox 성공의 증거가 아니다.
+
+현재 고객 설정은 `pending`/`disabled`만 허용하며 삭제는 `deleted` 상태·새 세대로 기록한다. 실제 공급자 어댑터, raw callback 서명 검증, 공개 challenge·제출 영수증 소비와 인증 원문/임시 파일의 만료·파기 연결은 아직 구현 전이다. 설정 등록이나 모델 추가로 verify 폼 게시·접수 차단을 해제하지 않는다. 전체 작업 계획과 수용 조건은 [P06-T06 계획](../qa/P06-T06/PLAN.md)을 유지한다.
+
 아래는 독립 백엔드의 설계 모델이며 원본 DB 스키마를 추출한 결과가 아니다. 구현된 모델의 정확한 필드·제약·삭제 규칙은 [P00-T03 계약 기준선](contracts/README.md), [Prisma schema](../../prisma/schema.prisma), migration SQL을 따른다. 아직 없는 모델은 아래 제안 상태를 유지한다.
 
 ## 공통 기준
@@ -16,7 +24,7 @@
 
 | 영역 | 모델과 핵심 필드 | 관계·제약·삭제 규칙 |
 |---|---|---|
-| 계정 | User(emailNormalized, passwordHash, name, status, verifiedAt); CredentialHistory(hash, changedAt) | email 유일; 탈퇴는 Membership/자산 인계 후 상태 변경; 자격증명 재사용 규칙 검증 |
+| 계정 | User(emailNormalized, passwordHash, name, department, jobTitle, phone, locale, status, verifiedAt); CredentialHistory(hash, changedAt); AccountClosure(userId, requestedAt, completedAt, reasonCipher) | email 유일; 직책은 선택 입력·100자 상한; 탈퇴는 Membership/자산 인계 후 closed 상태 변경·세션/인증 회수; 폐쇄 기록 불변·사유 암호화; 자격증명 재사용 규칙 검증 |
 | 세션 | Session(userId, tokenHash, expiresAt, idleExpiresAt, revokedAt, ipHash, device); AuthChallenge(purpose, recipientHash, tokenHash, attempts, expiresAt, consumedAt) | 일회용 challenge의 원자적 소비; 로그아웃/암호 변경 후 세션 무효화 |
 | 2FA | MfaFactor(userId,type,secretCipher,status); RecoveryCode(hash,usedAt) | 사용자·종류 유일; 활성화 전 challenge 확인; 복구코드 한 번만 사용 |
 | 외부 인증 | IdentityProvider(tenantId,type,issuer,clientId,secretRef,metadata,enabled); ExternalIdentity(providerId,subject,userId); AuthAttempt(stateHash,nonce,returnTo,status) | provider+subject 유일; 임의 이메일 일치만으로 계정 자동 연결 금지; returnTo 허용목록 |
@@ -26,10 +34,10 @@
 | 서비스 | Service(name,externalName,description,type,status); ServiceConsentDisplay(kind,mode,externalUrl,documentVersionId); Subprocessor(name,country,purpose,items,retention) | tenant 내 이름/slug 정책; 폐쇄된 서비스로 폼 게시/발송 금지; 재위탁 공지 이력 연결 |
 | 정책 | CompanySecurityPolicy(passwordRules,sessionMinutes,approvalRules,destructionRules,revision); IpRule(cidr,description,enabled); PolicyChange(actorId,before,after) | 정책 변경 이후 로그인/게시/세션에 실제 적용; IP 설정 잠금 방지; 마지막 인증수단 제거 차단 |
 | 양식 | Form(serviceId,title,description,status,currentDraftVersionId,publishedVersionId,ownerId); FormVersion(formId,number,schema,consentVersionId,settings,publishedAt) | form+number 유일; draft만 편집 가능; 참조된 published version 불변 |
-| 질문 | Question(formVersionId,stableKey,type,label,required,order,validation,branchRule); QuestionOption(questionId,value,label,order) | version+stableKey 유일; 선택지 중복/분기 순환/필수 누락 검사; JSON schema에도 타입 검증 |
+| 질문 | Question(formVersionId,stableKey,type,label,required,order,subjectRole,condition,matrixRows,selectionLimits); QuestionOption(questionId,value,label,order) | 9개 유형; version+stableKey 유일; 조건은 앞선 선택형 질문의 유효한 답변만 참조; 행 ID 유일·행/선택 수 상한; 게시 시 DB 재검증·게시본 불변; 복제 시 질문·행 ID 및 조건 참조 독립 |
 | 템플릿·즐겨찾기 | FormTemplate(tenantId,serviceId,title,category,content,version,status); FormFavorite(memberId,formId) | 공용(tenantId/serviceId 모두 NULL)과 서비스 템플릿 분리; 회사+서비스 FK와 서비스 권한 검사; 복제 시 새 폼·질문 ID; favorite 복합 유일 |
 | 게시·공유 | Publication(formVersionId,tokenHash,expiresAt,maxResponses,count,status); FixedUrl(slug,currentPublicationId,status); ApprovalRequest(formVersionId,status,reviewerId,reason) | 공개 토큰 원문 DB 저장 금지; 게시 승인 완료 전 token 비활성; 응답 한도 원자적 증가 |
-| 응답 | Submission(formVersionId,publicationId,subjectId,status,submittedAt,retentionUntil,legalHold); Answer(submissionId,questionId,valueCipher,valueType) | question이 해당 formVersion 소속인지 복합 검증; 중복 제출키 유일; 수정은 Correction 이벤트 |
+| 응답 | Submission(formVersionId,publicationId,subjectId,status,submittedAt,retentionUntil,legalHold); Answer(submissionId,questionId,valueCipher,valueType) | 같은 게시 버전 질문만 허용; 문자열·선택 배열·행 ID별 구조화한 행렬 답변을 검증 후 암호화; 표시된 필수 질문만 검사·숨겨진 원문 주입 거부; 정정 시 숨겨진 현재 값을 비우고 암호화된 변경 이력 보존; 중복 제출키 유일 |
 | 정보주체·동의 | DataSubject(contactHash,contactCipher); ConsentReceipt(submissionId,documentVersionId,purpose,channel,grantedAt); ConsentEvent(receiptId,type,at,evidence); Correction(requestId,field,beforeHash,afterCipher) | 동의 당시 내용/버전 고정; 철회 새 이벤트; 동의 증거와 현재 상태 분리 |
 | 마케팅 | MarketingPreference(subjectId,serviceId,channel,status,changedAt); Suppression(contactHash,channel,reason,sourceEventId) | tenant+subject+service+channel 유일; 발송 직전 suppression 재검사; 체크박스 변경 이력 보존 |
 | 수집 목적·문서 | ProcessingPurpose(name,itemCategories,lawfulBasis,retentionRule); Recipient(name,country,purpose,items,transferMethod); Document(type,title,status); DocumentVersion(number,structuredBody,renderedContent,publishedAt) | 문서 타입 P/C/OC 정확한 의미는 P00 증거로 확정; 미확정 문서 공개 금지; 참조 버전 삭제 금지 |
@@ -50,6 +58,8 @@
 | 작업·수신 이벤트 | OutboxEvent(type,payloadRef,status); Job(type,dueAt,leaseUntil,attempts); ProviderEvent(provider,eventId,signatureStatus,processedAt); IdempotencyRecord(scope,key,requestHash,response) | eventId/key 복합 유일; worker lease·재시도·dead-letter·재처리; 트랜잭션 커밋과 outbox 생성 동시 수행 |
 
 ## 핵심 상태 전이
+
+응답 CSV 즉시 다운로드는 기존 Submission·Answer·게시 질문/행 정의·FileObject·AuditEvent를 사용한다. 비동기는 ExportJob(요청자/회사/서비스/폼·HMAC 키/입력·암호화 조건/layout·상태/version·진행/기한/lease), ExportChunk(100건 단위 암호화 CSV), ExportSource(원천 응답/순서/HMAC)를 사용한다. 같은 렌더러로 게시 버전·행렬 행 열과 현재 보유/파일 권한을 적용한다. 결과는 최대 24시간 또는 더 빠른 응답 보유 기한까지다. 정정/파기·권한/정책 변경의 DB trigger, 취소/삭제/실패/만료는 결과·조건·hash를 제거하고 요청 키 tombstone을 남긴다. 원문 CSV 디스크 파일은 보관하지 않는다. [구현 범위와 증거](../qa/P06-T02/exports/README.md)를 적용한다.
 
 - Form: draft → pendingApproval → published → paused → archived. 수정은 새 draft/version; 응답 보존 여부에 따라 purge 제한.
 - Submission: submitted → corrected/withdrawn → pendingDestruction → destroying → destroyed. legalHold가 있으면 파기 시작을 막는다. 시작 전 취소·반려는 이전 상태로 돌아가며, destroying 이후 원복을 허용하지 않는다.
@@ -221,3 +231,25 @@ DocumentPdf(migration 20)는 DocumentVersion당 한 개의 서버 생성 PDF 바
 - migration 49. ExpertAssignment는 회사·기존 활성 계정·운영자·만료일·회수 상태·version을 가진다. 한 회사/계정에 하나의 배정 행을 두고 만료/회수 후 재배정 시 version을 올린다. ExpertAssignmentService는 회사/서비스 복합 FK로 명시적 범위를 저장한다.
 - 전문가 Membership은 accessKind=expert, viewer 역할, ExpertAssignment와 동일한 회사/사용자 복합 FK를 가진다. DB CHECK로 다른 역할과 직접 구성원/전문가 연결 혼용을 거부한다. 기존 일반 구성원은 expert 배정으로 변환하지 않는다.
 - 회사 선택과 매 API 요청에서 현재 배정 상태·만료를 확인한다. ServiceGrant와 ExpertAssignmentService를 교집합으로 검사하므로 다른 경로에서 grant가 추가돼도 범위 밖 서비스에 접근할 수 없다. 회수/만료는 구성원 상태·grant·세션 회사 선택을 정리한다. 원본의 배정 상태 화면은 미관찰이어서 viewer 범위는 독립 구현 정책이다. [부분 검증](../qa/P03-T02/README.md).
+
+
+## P07-T03 연결된 인증 원문 파기 (2026-10-04)
+
+VerificationReceipt는 본인인증·전자서명 증거를 정확한 Submission에 연결한다. migration 62는 파기 중/완료/기한 종료 응답과 원래 동의 기한을 넘는 영수증 연결을 거절한다. 연결된 영수증 삭제는 Submission.destroying과 현재 실행 중인 파기 lease가 필요하다. AFTER DELETE 트리거가 연결 이벤트·인증 시도와 providerRequestCipher를 삭제한다. 증명서는 연결 영수증이 없어야 생성되며 verificationReceipts/verificationEvents/verificationAttempts 건수를 기록한다. 아직 응답에 연결되지 않은 시도의 만료와 실제 공급자 검증은 P06-T06에 남는다.
+
+DestructionRequest.attempts는 leaseOwner와 별도로 실행 세대를 구분한다. 갱신·완료·실패 처리는 현재 세대와 만료되지 않은 lease를 요구한다. 목록·작업은 현재 권한과 최종 기한을 다시 검사한다. [P07-T03 검증](../qa/P07-T03/README.md).
+
+## P07-T01 실행 번호와 CSV 보관 기한 보완 (2026-10-04)
+
+`ImportJob.leaseGeneration`은 최초 0이며 작업을 맡을 때마다 1씩 증가한다. 재시도 횟수 초기화와 별도로 유지한다. 현재 실행 번호·작업자·임대 기한이 일치할 때만 처리 결과를 저장한다. 새 DB 트리거는 유효한 임대 없는 응답/행 반영, 실행 번호 건너뛰기와 임의 임대 연장을 거절한다. 기한을 줄여 안전하게 실행을 회수할 수 있다.
+
+임시 원문/파일명은 보관 기한이 지난 뒤 조회하지 않는다. 반영 직전 원본 파일을 실제 삭제하며, 실패한 경우 삭제된 원본을 복원하지 않고 남은 검증 행에서 재개한다. [현재 검증](../qa/P07-T01/README.md).
+
+
+## P07-T02 로컬 발송 사본 정리
+
+Job.localCopyErasedAt과 payloadErasedAt 인덱스, 확정된 원문 삭제 뒤 물리 사본 정리 상태를 추가했다. 정리 실패는 빈 timestamp로 남아 재시도한다. native CHECK와 불변 timestamp, 연결 사본 정리 전 증명서 차단 trigger를 64번째 migration에 추가했다. 이전 63개 SQL을 보존했다.
+
+## 회사 2FA 임시 예외 (2026-10-04)
+
+MfaException은 tenantId/memberId로 회사 구성원에 연결하고 createdById도 같은 회사의 구성원을 참조한다. 사유는 암호화하며 최초 생성부터 24시간 상한·불변 scope·증가 version을 DB에서 검사한다. 마지막 인증 owner의 Membership/User 변경도 보호한다. SecurityPolicy.requireMfa를 기존 개인 2FA와 함께 집행한다.

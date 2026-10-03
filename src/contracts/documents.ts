@@ -39,7 +39,7 @@ export type DisplayKind = "collection" | "third_party";
 export type DisplayRecord = DisplayInput & { serviceId: string; kind: DisplayKind; policyUrl: string | null; companyName: string; serviceName: string };
 export const emptyDisplay = (): DisplayInput => ({ version: 0, nameMode: "service_company", startText: "", processorText: "", policyText: "", requiredText: "", optionalText: "", policyMode: "none", externalUrl: "", publicationId: null });
 export type DocumentRecord = DocumentInput & { id: string; version: number; draftRevision: number; status: keyof typeof documentStates;
-  serviceName: string; createdAt: string; updatedAt: string; latestNumber: number; hasUnpublishedChanges: boolean };
+  serviceName: string; createdAt: string; updatedAt: string; latestNumber: number; hasUnpublishedChanges: boolean; hasActivePublication: boolean };
 export type ClauseRecord = ClauseInput & { id: string; version: number; status: "active" | "archived"; createdAt: string; updatedAt: string };
 export type PublicPurpose = { name: string; purpose: string; lawfulBasis: string; basisReference: string; items: z.infer<typeof catalogItem>[]; retentionMode: string; retentionDays: number | null; retentionReason: string };
 export type PublicRecipient = { name: string; kind: string; countryCode: string; purpose: string; items: string[]; retentionMode: string; retentionDays: number | null; retentionReason: string; contact: string; transferMethod: string; transferTiming: string; refusalNotice: string };

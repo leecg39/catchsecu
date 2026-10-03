@@ -1,0 +1,63 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/form-draft-state.test.ts (11 tests | 1 failed) 26ms
+   × 최초 생성 중 추가 입력은 첫 ID를 사용해 변경하고 두 번째 폼을 만들지 않는다 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-draft-state.test.ts > 최초 생성 중 추가 입력은 첫 ID를 사용해 변경하고 두 번째 폼을 만들지 않는다
+AssertionError: expected { serviceId: 'service', …(14) } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "content": {
+    "body": "원본",
+    "consentPurpose": "",
+    "consentRequired": false,
+    "maxResponses": 50,
+    "questions": [
+      {
+        "id": "question",
+        "label": "이름",
+        "required": true,
+        "type": "단문형 답변",
+      },
+    ],
+    "retentionDays": 30,
+  },
+  "createdAt": "2026-10-03T00:00:00Z",
+  "draftNumber": 1,
+  "favorite": false,
+  "hasDraft": true,
+  "id": "form",
+  "ownerName": "소유자",
+  "publication": null,
+  "published": false,
+  "serviceId": "service",
+  "serviceName": "서비스",
+  "status": "draft",
+  "title": "초안",
+  "updatedAt": "2026-10-03T00:00:00Z",
+  "version": 1,
+}
+
+ ❯ tests/server/form-draft-state.test.ts:71:36
+     69|   const { s } = session(persist, undefined); s.edit({ ...value,title:"…
+     70|   s.edit({ ...value,title:"추가 입력" }); a.resolve(record({ ...value,titl…
+     71|   expect(persist.mock.calls[0][0]).toBeUndefined(); expect(persist.moc…
+       |                                    ^
+     72| });
+     73| test("편집기를 떠나면 예약된 자동저장을 취소한다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  21:15:06
+   Duration  243ms (transform 52%, tests 29%, import 14%, worker 5%)
+

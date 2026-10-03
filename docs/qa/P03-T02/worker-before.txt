@@ -1,0 +1,36 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/member-management-gate.test.ts (16 tests | 1 failed | 15 skipped) 1827ms
+   × worker는 전달 전에 만료된 초대 링크를 확인하고 메일을 남기지 않는다 223ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/member-management-gate.test.ts > worker는 전달 전에 만료된 초대 링크를 확인하고 메일을 남기지 않는다
+AssertionError: expected { campaignDeliveryId: null, …(19) } to match object { status: 'cancelled' }
+(19 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "status": "cancelled",
++   "status": "done",
+  }
+
+ ❯ tests/server/member-management-gate.test.ts:214:62
+    212|   await db.invitation.update({ where: { id: pending.id }, data: { expi…
+    213|   expect(await runOneJob("member-gate-worker")).toBe(true);
+    214|   expect(await db.job.findUnique({ where: { id: job.id } })).toMatchOb…
+       |                                                              ^
+    215|   await expect(access(resolve(env.LOCAL_MAIL_DIR, job.id + ".json"))).…
+    216| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 15 skipped (16)
+   Start at  18:39:19
+   Duration  3.42s (tests 57%, import 28%, transform 16%)
+

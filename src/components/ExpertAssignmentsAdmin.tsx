@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { api, errorText, useResource } from "@/lib/api";
 import type { ExpertAssignmentList, ExpertAssignmentRecord, ExpertOptions } from "@/contracts/expert-assignments";
@@ -11,16 +11,17 @@ function localDate(value: string) {
   const date = new Date(value);
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
-function AssignmentEditor({ initial, done, close }: { initial?: ExpertAssignmentRecord; done: () => void; close: () => void }) {
+function AssignmentEditor({ initial, done, close, onBusy }: { initial?: ExpertAssignmentRecord; done: () => void; close: () => void; onBusy: (busy: boolean) => void }) {
   const [companySearch, setCompanySearch] = useState(initial?.companyName ?? "");
   const [companyId, setCompanyId] = useState(initial?.companyId ?? "");
   const [email, setEmail] = useState(initial?.expertEmail ?? "");
   const [selected, setSelected] = useState(initial?.services.filter(service => service.status === "active").map(service => service.id) ?? []);
   const [expiry, setExpiry] = useState(initial?.expiresAt ? localDate(initial.expiresAt) : "");
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const lock = useRef(false);
   const options = useResource<ExpertOptions>("/expert-assignments/options?search=" + encodeURIComponent(companySearch) + (companyId ? "&companyId=" + companyId : ""));
   async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setError("");
+    event.preventDefault(); if (lock.current) return; lock.current = true; setBusy(true); onBusy(true); setError("");
     try {
       if (!companyId || !selected.length) throw new Error("회사와 서비스를 한 개 이상 선택해주세요.");
       const expiresAt = new Date(expiry).toISOString();
@@ -30,23 +31,23 @@ function AssignmentEditor({ initial, done, close }: { initial?: ExpertAssignment
         companyId, expertEmail: email.trim(), serviceIds: selected, expiresAt,
       }) });
       done();
-    } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
+    } catch (cause) { setError(errorText(cause)); } finally { lock.current = false; setBusy(false); onBusy(false); }
   }
   return <form className="member-fields" onSubmit={submit}>
     {initial ? <p><strong>{initial.companyName}</strong> · {initial.expertName} ({initial.expertEmail})</p> : <>
-      <label>회사 검색<input className="cs-input" value={companySearch} maxLength={100} onChange={event => setCompanySearch(event.target.value)} /></label>
-      <label>배정 회사<select className="cs-input" required value={companyId} onChange={event => { setCompanyId(event.target.value); setSelected([]); }}>
+      <label>회사 검색<input className="cs-input" disabled={busy} value={companySearch} maxLength={100} onChange={event => setCompanySearch(event.target.value)} /></label>
+      <label>배정 회사<select className="cs-input" disabled={busy} required value={companyId} onChange={event => { setCompanyId(event.target.value); setSelected([]); }}>
         <option value="">회사 선택</option>{options.data?.companies.map(company => <option value={company.id} key={company.id}>{company.name}</option>)}
       </select></label>
-      <label>전문가 계정 이메일<input className="cs-input" type="email" required value={email} maxLength={254} onChange={event => setEmail(event.target.value)} /></label>
+      <label>전문가 계정 이메일<input className="cs-input" disabled={busy} type="email" required value={email} maxLength={254} onChange={event => setEmail(event.target.value)} /></label>
     </>}
     {options.error && <p role="alert">{options.error.message} <button type="button" className="cs-link" onClick={options.reload}>다시 시도</button></p>}
     <fieldset><legend>조회 가능한 서비스</legend>{options.data?.services.map(service => <label className="member-check" key={service.id}>
-      <input type="checkbox" checked={selected.includes(service.id)} onChange={event => setSelected(event.target.checked
+      <input type="checkbox" disabled={busy} checked={selected.includes(service.id)} onChange={event => setSelected(event.target.checked
         ? [...selected, service.id] : selected.filter(id => id !== service.id))} />{service.name}</label>)}
       {companyId && !options.loading && !options.data?.services.length && <p>활성 서비스가 없습니다.</p>}
     </fieldset>
-    <label>배정 만료일<input className="cs-input" type="datetime-local" required value={expiry} onChange={event => setExpiry(event.target.value)} /></label>
+    <label>배정 만료일<input className="cs-input" disabled={busy} type="datetime-local" required value={expiry} onChange={event => setExpiry(event.target.value)} /></label>
     <p className="cs-muted">전문가에게 선택한 서비스의 조회자 권한을 부여합니다. 만료일이 지나거나 회수하면 접근이 차단됩니다.</p>
     {error && <p role="alert" className="auth-error">{error}</p>}
     <div className="mg-flex"><ActionButton disabled={busy || options.loading}>{busy ? "저장 중…" : initial?.status === "active" ? "배정 변경" : "배정 저장"}</ActionButton>
@@ -58,14 +59,15 @@ export function ExpertAssignmentsAdmin() {
   const [editor, setEditor] = useState<ExpertAssignmentRecord | "new">();
   const [revoke, setRevoke] = useState<ExpertAssignmentRecord>();
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [notice, setNotice] = useState("");
+  const [editorBusy, setEditorBusy] = useState(false), lock = useRef(false);
   const list = useResource<ExpertAssignmentList>("/expert-assignments?scope=admin&page=" + page + "&pageSize=" + pageSize + "&search=" + encodeURIComponent(search));
   async function confirmRevoke() {
-    if (!revoke) return;
+    if (!revoke || lock.current) return; lock.current = true;
     setError(""); setBusy(true);
     try {
       await api("/expert-assignments/" + revoke.id, { method: "DELETE", headers: { "If-Match": String(revoke.version) } });
       setRevoke(undefined); setNotice("전문가 배정을 회수했습니다."); list.reload();
-    } catch (cause) { setError(errorText(cause)); list.reload(); } finally { setBusy(false); }
+    } catch (cause) { setError(errorText(cause)); list.reload(); } finally { lock.current = false; setBusy(false); }
   }
   return <main className="expert-admin-page"><PageHeading title="전문가 배정 관리"><Link className="cs-button secondary" href="/dashboard">대시보드</Link>
     <ActionButton onClick={() => { setEditor("new"); setError(""); }}>새 배정</ActionButton></PageHeading>
@@ -85,8 +87,8 @@ export function ExpertAssignmentsAdmin() {
         ] }))} total={list.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage}
         onPageSize={size => { setPageSize(size); setPage(1); }} loading={list.loading} error={list.error?.message} />
     </Panel>
-    {editor && <Modal title={editor === "new" ? "전문가 배정" : "전문가 배정 변경"} onClose={() => setEditor(undefined)}>
-      <AssignmentEditor initial={editor === "new" ? undefined : editor} close={() => setEditor(undefined)}
+    {editor && <Modal title={editor === "new" ? "전문가 배정" : "전문가 배정 변경"} onClose={() => { if (!editorBusy) setEditor(undefined); }}>
+      <AssignmentEditor initial={editor === "new" ? undefined : editor} close={() => setEditor(undefined)} onBusy={setEditorBusy}
         done={() => { setNotice("전문가 배정을 저장했습니다."); setEditor(undefined); list.reload(); }} /></Modal>}
     {revoke && <Modal title="전문가 배정 회수" onClose={() => { if (!busy) setRevoke(undefined); }}>
       <p>{revoke.expertName} 님의 {revoke.companyName} 접근을 즉시 차단합니다.</p>

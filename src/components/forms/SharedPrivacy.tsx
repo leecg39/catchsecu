@@ -1,4 +1,5 @@
 "use client";
+import { formatAnswer } from "@/contracts/questions";
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -48,6 +49,7 @@ function Verification({ path }: { path: string }) {
 function Viewer() {
   const router = useRouter(), [page, setPage] = useState(1), [error, setError] = useState(""), [busy, setBusy] = useState(false);
   const resource = useResource<SharedPage>(`/viewer/submissions?page=${page}&pageSize=20`);
+  const currentPage = resource.data?.page ?? page;
   const { reload } = resource;
   useEffect(() => {
     const refresh = () => reload(), timer = window.setInterval(refresh, 15000);
@@ -66,10 +68,10 @@ function Viewer() {
         <h3>{new Date(row.submittedAt).toLocaleString("ko-KR")}</h3><dl>{resource.data!.viewer.questions.map(q => <div key={q.id}><dt>{q.label}</dt><dd>{q.type === "파일 업로드" ? (() => {
           const file = row.attachments.find(f => f.questionId === q.id);
           return file ? <a className="cs-link" href={sharedFileDownloadUrl(file.id, row.id, q.id)}>{file.name} 다운로드</a> : "첨부파일 없음";
-        })() : Array.isArray(row.values[q.id]) ? (row.values[q.id] as string[]).join(", ") : row.values[q.id] || "-"}</dd></div>)}</dl>
+        })() : formatAnswer(row.values[q.id], q.rows)}</dd></div>)}</dl>
         {!!row.attachments.length && <Link className="cs-link" href={`/file-view/${row.id}/shared`}>공유 첨부파일 보기</Link>}
       </article>)}</div> : <p>현재 열람할 수 있는 응답이 없습니다.</p>}
-      <div className="cs-pagination"><button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>이전</button><span>{page} / {Math.max(1, Math.ceil(resource.data.total / 20))}</span><button disabled={page * 20 >= resource.data.total} onClick={() => setPage(p => p + 1)}>다음</button></div>
+      <div className="cs-pagination"><button disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>이전</button><span>{currentPage} / {Math.max(1, Math.ceil(resource.data.total / 20))}</span><button disabled={currentPage * 20 >= resource.data.total} onClick={() => setPage(currentPage + 1)}>다음</button></div>
     </>}
   </Panel></div>;
 }

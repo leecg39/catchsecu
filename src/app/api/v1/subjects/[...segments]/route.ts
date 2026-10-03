@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { subjectAccessInput, subjectSessionInput, subjectWithdrawalInput } from "@/contracts/subjects";
-import { body, fail, json, listQuery, rateLimit, route } from "@/server/http";
+import { subjectAccessInput, subjectSessionInput, subjectWithdrawalInput, subjectEmptyQuery, subjectPageQuery } from "@/contracts/subjects";
+import { body, fail, json, rateLimit, route } from "@/server/http";
+import { subjectQuery } from "@/server/subject-query";
 import { tokenHash } from "@/server/crypto";
 import { SUBJECT_COOKIE, SUBJECT_BROWSER_COOKIE, subjectCookie, setSubjectCookie, requestSubjectAccess, createSubjectSession,
   withSubject, logoutSubject, subjectConsents, subjectEvents, requestWithdrawal, subjectWithdrawal } from "@/server/subjects";
@@ -14,6 +15,7 @@ async function authenticated<T>(request: Request, operation: Parameters<typeof w
 }
 export const POST = route(async (request, requestId) => {
   const segments = parts(request), [first, second, id, action] = segments;
+  subjectQuery(request, subjectEmptyQuery);
   if (first === "access-requests" && segments.length === 1) {
     const input = await body(request, subjectAccessInput);
     await rateLimit("subject:access:global", 120);
@@ -28,7 +30,7 @@ export const POST = route(async (request, requestId) => {
     await rateLimit("subject:verify:" + tokenHash(input.token), 10, 600);
     const result = await createSubjectSession(input.token, subjectCookie(request, SUBJECT_BROWSER_COOKIE));
     const response = json({ id: result.id, expiresAt: result.expiresAt }, 201);
-    setSubjectCookie(response, SUBJECT_COOKIE, result.token, 1800, request);
+    setSubjectCookie(response, SUBJECT_COOKIE, result.token, (Date.parse(result.expiresAt) - Date.now()) / 1000, request);
     return response;
   }
   if (first === "logout" && segments.length === 1) {
@@ -49,11 +51,12 @@ export const GET = route(async (request, requestId) => {
   const segments = parts(request), [first, second, id] = segments;
   if (first !== "me") fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   return authenticated(request, async (tx, session) => {
-    if (segments.length === 1) return json({ id: session.id, expiresAt: session.expiresAt });
-    const { page, pageSize } = listQuery.parse(Object.fromEntries(new URL(request.url).searchParams));
-    if (second === "consents" && segments.length === 2) return json(await subjectConsents(tx, session, page, pageSize, requestId));
-    if (second === "events" && segments.length === 2) return json(await subjectEvents(tx, session, page, pageSize, requestId));
-    if (second === "withdrawals" && segments.length === 3) return json(await subjectWithdrawal(tx, session, z.uuid().parse(id), "read", requestId));
+    if (segments.length === 1) { subjectQuery(request, subjectEmptyQuery); return json({ id: session.id, expiresAt: session.expiresAt }); }
+    if (["consents", "events"].includes(second) && segments.length === 2) {
+      const { page, pageSize } = subjectQuery(request, subjectPageQuery);
+      return json(await (second === "consents" ? subjectConsents : subjectEvents)(tx, session, page, pageSize, requestId));
+    }
+    if (second === "withdrawals" && segments.length === 3) { subjectQuery(request, subjectEmptyQuery); return json(await subjectWithdrawal(tx, session, z.uuid().parse(id), "read", requestId)); }
     fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   });
 });

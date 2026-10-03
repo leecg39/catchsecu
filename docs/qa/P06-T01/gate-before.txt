@@ -1,0 +1,96 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:7222) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/public-submission-gate.test.ts (10 tests | 7 failed) 9592ms
+   × 동시 제출은 한도를 넘지 않고 마지막 성공의 같은 키 재시도는 같은 영수증만 반환한다 1373ms
+   × 접수 성공 재전송이 대기하는 동안 실제 폼 중지 API가 끝나면 캐시 성공을 반환하지 않는다 713ms
+   × 대기 중 service 종료를 재검사하고 성공 응답·자료를 추가하지 않는다 597ms
+   × 대기 중 company 종료를 재검사하고 성공 응답·자료를 추가하지 않는다 606ms
+   × 대기 중 expiry 종료를 재검사하고 성공 응답·자료를 추가하지 않는다 704ms
+   × 대기 중 publication 종료를 재검사하고 성공 응답·자료를 추가하지 않는다 625ms
+   × 공개 조회는 회사 중지 transaction을 기다린 뒤 새 상태를 확인한다 3060ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/public-submission-gate.test.ts > 동시 제출은 한도를 넘지 않고 마지막 성공의 같은 키 재시도는 같은 영수증만 반환한다
+AssertionError: expected 3 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ tests/server/public-submission-gate.test.ts:74:58
+     72| test("동시 제출은 한도를 넘지 않고 마지막 성공의 같은 키 재시도는 같은 영수증만 반환한다", async () => {
+     73|   const f = await fixture(2), key = randomUUID(), responses = await Pr…
+     74|   expect(responses.filter(r => r.status === 409).length).toBe(2); expe…
+       |                                                          ^
+     75|   const first = await responses[0].json(); expect(await responses[1].j…
+     76|   expect(await (await send(f, key)).json()).toEqual(first);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/server/public-submission-gate.test.ts > 접수 성공 재전송이 대기하는 동안 실제 폼 중지 API가 끝나면 캐시 성공을 반환하지 않는다
+AssertionError: expected 201 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 201
+
+ ❯ blockedReplay tests/server/public-submission-gate.test.ts:60:29
+     58|     await change(); await client.query("COMMIT"); const response = awa…
+     59|     barriers.push({ test: expect.getState().currentTestName, waiting, …
+     60|     expect(response.status).toBe(410); expect(await db.submission.coun…
+       |                             ^
+     61|     expect(await db.consentReceipt.count({ where: { submissionId: rece…
+     62|     expect((await db.publication.findUniqueOrThrow({ where: { id: f.pu…
+ ❯ tests/server/public-submission-gate.test.ts:83:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/server/public-submission-gate.test.ts > 대기 중 service 종료를 재검사하고 성공 응답·자료를 추가하지 않는다
+ FAIL  tests/server/public-submission-gate.test.ts > 대기 중 company 종료를 재검사하고 성공 응답·자료를 추가하지 않는다
+ FAIL  tests/server/public-submission-gate.test.ts > 대기 중 expiry 종료를 재검사하고 성공 응답·자료를 추가하지 않는다
+ FAIL  tests/server/public-submission-gate.test.ts > 대기 중 publication 종료를 재검사하고 성공 응답·자료를 추가하지 않는다
+AssertionError: expected 201 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 201
+
+ ❯ blockedReplay tests/server/public-submission-gate.test.ts:60:29
+     58|     await change(); await client.query("COMMIT"); const response = awa…
+     59|     barriers.push({ test: expect.getState().currentTestName, waiting, …
+     60|     expect(response.status).toBe(410); expect(await db.submission.coun…
+       |                             ^
+     61|     expect(await db.consentReceipt.count({ where: { submissionId: rece…
+     62|     expect((await db.publication.findUniqueOrThrow({ where: { id: f.pu…
+ ❯ tests/server/public-submission-gate.test.ts:87:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/server/public-submission-gate.test.ts > 공개 조회는 회사 중지 transaction을 기다린 뒤 새 상태를 확인한다
+AssertionError: expected 0 to be greater than 0
+ ❯ tests/server/public-submission-gate.test.ts:99:115
+     97|     const pending = publicRead(req("/public/forms/" + f.publication.to…
+     98|     await client.query("COMMIT"); const response = await pending;
+     99|     barriers.push({ test: expect.getState().currentTestName, waiting, …
+       |                                                                                                                   ^
+    100|   } finally { await client.query("ROLLBACK").catch(() => undefined); a…
+    101| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 3 passed (10)
+   Start at  01:06:12
+   Duration  10.81s (tests 90%, import 6%, transform 4%)
+

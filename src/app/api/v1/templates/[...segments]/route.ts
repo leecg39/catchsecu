@@ -3,6 +3,7 @@ import { requireContext } from "@/server/context";
 import { body, fail, json, route } from "@/server/http";
 import { idempotent } from "@/server/idempotency";
 import { deleteTemplate, getTemplate, templatePatch, updateTemplate, useTemplate } from "@/server/templates";
+import { lockFormService } from "@/server/form-access";
 function parts(request: Request) {
   const [rawId, action, ...rest] = new URL(request.url).pathname.split("/").slice(4);
   if (rest.length) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
@@ -26,6 +27,12 @@ export const POST = route(async (request, requestId) => {
   const ctx = await requireContext(request.headers, "form.write");
   const input = await body(request, z.object({ version: z.number().int().positive(), serviceId: z.uuid(), title: z.string().trim().min(1).max(200).optional() }).strict());
   const result = await idempotent("template:use:" + ctx.member.id + ":" + id, request.headers.get("idempotency-key"), input,
-    async tx => ({ status: 201, body: await useTemplate(ctx, id, input, requestId, tx) }));
+    async tx => {
+      const form = await useTemplate(ctx, id, input, requestId, tx);
+      return { status: 201, body: form, resource: { tenantId: ctx.tenantId, resourceType: "form", resourceId: form.id } };
+    }, async tx => {
+      await getTemplate(ctx, id, false, tx);
+      await lockFormService(tx, ctx, input.serviceId, "form.write");
+    });
   return json(result.body, result.status);
 });

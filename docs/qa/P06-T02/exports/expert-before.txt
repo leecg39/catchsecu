@@ -1,0 +1,40 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:67384) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/async-export.test.ts (14 tests | 1 failed | 13 skipped) 1765ms
+   × 전문가의 보관 서비스 요청을 거부하고 결과 기한도 배정 종료일을 넘지 않는다 1762ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/async-export.test.ts > 전문가의 보관 서비스 요청을 거부하고 결과 기한도 배정 종료일을 넘지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/async-export.test.ts:233:38
+
+  230 const f = await fixture(); await response(f); const actor = await account("내보내기 전문가"), deadline = new Date(Date.now() + 1800000);
+  231 const assignment = await db.expertAssignment.create({ data: { tenantId: f.company.id, expertUserId: actor.user.id, assignedById: f.user.id, expiresAt: deadline } });
+  232 await db.expertAssignmentService.create({ data: { tenantId: f.company.id, assignmentId: assignment.id, serviceId: f.serviceId } });
+→ 233 const member = await db.membership.create(
+Database error. Code: `23514`. Message: `new row for relation "Membership" violates check constraint "Membership_accessKind_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/async-export.test.ts:233:18
+    231|   const assignment = await db.expertAssignment.create({ data: { tenant…
+    232|   await db.expertAssignmentService.create({ data: { tenantId: f.compan…
+    233|   const member = await db.membership.create({ data: { tenantId: f.comp…
+       |                  ^
+    234|   await db.serviceGrant.create({ data: { tenantId: f.company.id, membe…
+    235|   expect((await selectContext(req("/context", "POST", actor.cookie, { …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 skipped (14)
+   Start at  00:42:30
+   Duration  3.69s (tests 51%, import 27%, transform 21%)
+

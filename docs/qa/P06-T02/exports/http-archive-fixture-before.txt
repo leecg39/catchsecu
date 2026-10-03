@@ -1,0 +1,22 @@
+(node:58448) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: archive independent VALIDATION_ERROR
+
+422 !== 204
+
+    at request (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-async-export.ts:23:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-async-export.ts:77:101) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 422,
+  expected: 204,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

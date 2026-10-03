@@ -1,0 +1,78 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:42240) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-draft-save.test.ts (7 tests | 3 failed) 4479ms
+   × 같은 키의 동시 초안 저장은 한 번의 version 증가와 감사만 만든다 1080ms
+   × 성공 응답을 잃어버린 저장은 같은 키/내용으로 복구하고 후속 변경과 분리된다 598ms
+   × 같은 저장 키에 다른 내용은 키 불일치로 거부하고 원문을 유지한다 577ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-draft-save.test.ts > 같은 키의 동시 초안 저장은 한 번의 version 증가와 감사만 만든다
+AssertionError: expected [ 409, 200 ] to deeply equal [ 200, 200 ]
+
+- Expected
++ Received
+
+  [
+-   200,
++   409,
+    200,
+  ]
+
+ ❯ tests/server/form-draft-save.test.ts:42:40
+     40|   const f = await setup(), key = randomUUID(), value = { version: f.fo…
+     41|   const responses = await Promise.all([0, 1].map(() => PATCH(req("/for…
+     42|   expect(responses.map(x => x.status)).toEqual([200, 200]);
+       |                                        ^
+     43|   const [a,b] = await Promise.all(responses.map(x => x.json())); expec…
+     44|   expect(await db.auditEvent.count({ where: { resourceId: f.form.id, a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/server/form-draft-save.test.ts > 성공 응답을 잃어버린 저장은 같은 키/내용으로 복구하고 후속 변경과 분리된다
+AssertionError: expected 409 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 409
+
+ ❯ tests/server/form-draft-save.test.ts:49:112
+     47|   const f = await setup(), key = randomUUID(), value = { version: 1, c…
+     48|   expect((await PATCH(req("/forms/" + f.form.id, "PATCH", f.cookie, va…
+     49|   const replay = await PATCH(req("/forms/" + f.form.id, "PATCH", f.coo…
+       |                                                                                                                ^
+     50|   const saved = await replay.json(); expect(saved.version).toBe(2);
+     51|   expect((await PATCH(req("/forms/" + f.form.id, "PATCH", f.cookie, { …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/server/form-draft-save.test.ts > 같은 저장 키에 다른 내용은 키 불일치로 거부하고 원문을 유지한다
+AssertionError: expected 200 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 200
+
+ ❯ tests/server/form-draft-save.test.ts:59:25
+     57|   expect((await PATCH(req("/forms/" + f.form.id, "PATCH", f.cookie, { …
+     58|   const result = await PATCH(req("/forms/" + f.form.id, "PATCH", f.coo…
+     59|   expect(result.status).toBe(409); expect((await result.json()).error.…
+       |                         ^
+     60|   expect((await db.form.findUniqueOrThrow({ where: { id: f.form.id } }…
+     61| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 4 passed (7)
+   Start at  21:12:26
+   Duration  5.80s (tests 79%, import 13%, transform 8%)
+

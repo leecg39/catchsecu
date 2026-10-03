@@ -1,0 +1,235 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:7727) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/share-management-gate.test.ts (16 tests | 15 failed) 15757ms
+   × creation replay rechecks current file-capability 1229ms
+   × creation replay rechecks current form-archived 720ms
+   × creation replay rechecks current service-archived 735ms
+   × creation replay cannot return an active snapshot after grant expired 656ms
+   × creation replay cannot return an active snapshot after grant revoked 675ms
+   × recipient change clears both resource-bound and legacy creation cache ciphertext 688ms
+   × manager create rolls back successful audit and mail when session expires during audit INSERT 1650ms
+   × manager update rolls back successful audit and mail when session expires during audit INSERT 1496ms
+   × a share metadata read waits for the actual grant lock and rejects session expiry 2363ms
+   × verification does not commit an already expired challenge after authentication audit INSERT 1398ms
+   × verification does not commit an already expired grant after authentication audit INSERT 1431ms
+   × manager and viewer reject unknown or duplicate queries instead of silently discarding input 534ms
+   × share and viewer list pagination returns the current last page after stale high-page navigation 499ms
+   × server permissions expose archived read/revoke and disable invite/edit/resend 478ms
+   × file capability governs selectable fields and resend while permitting removal or revoke 576ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > creation replay rechecks current file-capability
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/share-management-gate.test.ts:68:25
+
+  65 test.each(["file-capability", "form-archived", "service-archived"])("creation replay rechecks current %s", async kind => {
+  66   const f = await fixture(), key = randomUUID(), input = { ...f.input, questionIds: [f.file] }, g = await ok(await create(f, key, input), 201);
+  67   if (kind === "file-capability") {
+→ 68     await db.membership.update(
+Database error. Code: `23514`. Message: `LAST_OWNER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/share-management-gate.test.ts:68:5
+     66|   const f = await fixture(), key = randomUUID(), input = { ...f.input,…
+     67|   if (kind === "file-capability") {
+     68|     await db.membership.update({ where: { id: f.ctx.member.id }, data:…
+       |     ^
+     69|     await db.serviceGrant.create({ data: { tenantId: f.company.id, mem…
+     70|   } else if (kind === "form-archived") await db.form.update({ where: {…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > creation replay rechecks current form-archived
+ FAIL  tests/server/share-management-gate.test.ts > creation replay rechecks current service-archived
+AssertionError: expected 201 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 201
+
+ ❯ tests/server/share-management-gate.test.ts:72:48
+     70|   } else if (kind === "form-archived") await db.form.update({ where: {…
+     71|   else await db.service.update({ where: { id: f.serviceId }, data: { s…
+     72|   expect((await create(f, key, input)).status).toBe(kind === "file-cap…
+       |                                                ^
+     73|   expect(await db.shareGrant.count()).toBe(1); expect(await db.job.cou…
+     74| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > creation replay cannot return an active snapshot after grant expired
+ FAIL  tests/server/share-management-gate.test.ts > creation replay cannot return an active snapshot after grant revoked
+AssertionError: expected 201 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 201
+
+ ❯ tests/server/share-management-gate.test.ts:79:41
+     77|   if (kind === "expired") await db.shareGrant.update({ where: { id: g.…
+     78|   else await ok(await shareDelete(req("/share-grants/" + g.id, "DELETE…
+     79|   expect((await create(f, key)).status).toBe(410); expect(await db.sha…
+       |                                         ^
+     80| });
+     81| test("recipient change clears both resource-bound and legacy creation …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > recipient change clears both resource-bound and legacy creation cache ciphertext
+AssertionError: expected 'v1.FU9d7BElfpk5VyIe.AlL_6qKO_7xMj0gHR…' to be null
+
+- Expected:
+null
+
++ Received:
+"v1.FU9d7BElfpk5VyIe.AlL_6qKO_7xMj0gHRLE_7Q.QnZgKD4l_Or6meZriSfVg4_XbxfgqioSMXz_znf7bNEfOQzeKe477Ki8YUKyLa_n9kATkMOWRkcyPMl066CTBjepOmwjSlorSpVSdfZCZqa-iekxKvzK1cSWb8OulH-faitv_7m-AhWj5aZ58o23jG7V8RE6EF5ootjRAUJNcBHbr7sQkk8fe35HuuORu4p4Wx9XGg-lr_SkYVm3L7SFpem3MzH61Lo0xjpiLPE-ApGwZ_EvN-W6LVgZnjKTOTJrTyGHxhTVFHEEuaErfP5TEKFEhDKNtM_BEXXtDpoP6dJWQ65Vnu8R-j8FPEJGWrbeLD2q2vZGb_Ev87Ee7VB9s44dzUkJrynmneyVNRCPPtiu0m6b4axBsuyb_viZ2yJmrWiYADK6f6-dqjW-JozriyBbmYvZo427EijowYiNh6UtXTq12rxzTIQwMx3HywSLDKCBf0uGQmaNnDIyWPtG7UePzmcfecjeia8wxy62bGTQey4bPzrjO7w_6hW2sW0S8xDXTHJ-WLV5fQOfMVQ1M9RjxFL8ueSdGRqzpi-HtEeP-Fpkj5mYxbmKIabMDAAm1SsVtFrlkwZZJNI6MKdIv-J4KI5lgg5czhevyhjXQBxy50SZ1Mh0z7ADTR36va7NmLFRNOSRy493QlF7igVzQWqL683FrxWhAxD1SLFl7AE"
+
+ ❯ tests/server/share-management-gate.test.ts:87:111
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > manager create rolls back successful audit and mail when session expires during audit INSERT
+ FAIL  tests/server/share-management-gate.test.ts > manager update rolls back successful audit and mail when session expires during audit INSERT
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/share-management-gate.test.ts:96:58
+
+ ❯ delayedAudit tests/server/share-management-gate.test.ts:60:9
+ ❯ tests/server/share-management-gate.test.ts:93:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > a share metadata read waits for the actual grant lock and rejects session expiry
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/share-management-gate.test.ts:113:106
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > verification does not commit an already expired challenge after authentication audit INSERT
+ FAIL  tests/server/share-management-gate.test.ts > verification does not commit an already expired grant after authentication audit INSERT
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/share-management-gate.test.ts:124:29
+    122|     else await db.shareGrant.update({ where: { id: g.id }, data: { exp…
+    123|     const response = await viewerPost(req("/viewer/challenges/" + c.id…
+    124|     expect(response.status).toBe(422); expect(response.headers.getSetC…
+       |                             ^
+    125|   });
+    126|   expect(await db.viewerSession.count()).toBe(0); expect((await db.vie…
+ ❯ delayedAudit tests/server/share-management-gate.test.ts:60:9
+ ❯ tests/server/share-management-gate.test.ts:119:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > manager and viewer reject unknown or duplicate queries instead of silently discarding input
+AssertionError: /share-grants?formId=7b9eabc0-5d0b-4a75-a313-915d3b0e68fb&unknown=x: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/share-management-gate.test.ts:136:94
+    134|     [shareGet, "/share-grants/options?formId=" + f.form.id + "&formId=…
+    135|     [shareGet, "/share-grants/" + g.id + "?unknown=x", f.cookie], [vie…
+    136|   ] as const) expect((await handler(req(path, "GET", undefined, creden…
+       |                                                                                              ^
+    137| });
+    138| test("share and viewer list pagination returns the current last page a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > share and viewer list pagination returns the current last page after stale high-page navigation
+AssertionError: expected 999 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 999
+
+ ❯ tests/server/share-management-gate.test.ts:141:21
+    139|   const f = await fixture(), g = await ok(await create(f), 201);
+    140|   const list = await ok(await shareList(req("/share-grants?formId=" + …
+    141|   expect(list.page).toBe(1); expect(list.items).toHaveLength(1);
+       |                     ^
+    142|   const events = await ok(await shareGet(req("/share-grants/" + g.id +…
+    143|   const c = await challenge(f, g), authenticated = await viewerPost(re…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > server permissions expose archived read/revoke and disable invite/edit/resend
+TypeError: Cannot read properties of undefined (reading 'canCreate')
+ ❯ tests/server/share-management-gate.test.ts:150:27
+    148|   await db.form.update({ where: { id: f.form.id }, data: { status: "ar…
+    149|   const data = await ok(await shareList(req("/share-grants?formId=" + …
+    150|   expect(data.permissions.canCreate).toBe(false); expect(data.items[0]…
+       |                           ^
+    151|   const options = await ok(await shareGet(req("/share-grants/options?f…
+    152|   await ok(await shareDelete(req("/share-grants/" + g.id, "DELETE", un…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/15]⎯
+
+ FAIL  tests/server/share-management-gate.test.ts > file capability governs selectable fields and resend while permitting removal or revoke
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/share-management-gate.test.ts:157:23
+
+  154 });
+  155 test("file capability governs selectable fields and resend while permitting removal or revoke", async () => {
+  156   const f = await fixture(), g = await ok(await create(f, randomUUID(), { ...f.input, questionIds: [f.file] }), 201);
+→ 157   await db.membership.update(
+Database error. Code: `23514`. Message: `LAST_OWNER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/share-management-gate.test.ts:157:3
+    155| test("file capability governs selectable fields and resend while permi…
+    156|   const f = await fixture(), g = await ok(await create(f, randomUUID()…
+    157|   await db.membership.update({ where: { id: f.ctx.member.id }, data: {…
+       |   ^
+    158|   await db.serviceGrant.create({ data: { tenantId: f.company.id, membe…
+    159|   const options = await ok(await shareGet(req("/share-grants/options?f…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/15]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  15 failed | 1 passed (16)
+   Start at  02:17:22
+   Duration  17.20s (tests 92%, import 5%, transform 3%)
+

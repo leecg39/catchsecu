@@ -3,7 +3,7 @@ import { db, type Transaction } from "./db";
 import { decrypt, opaqueToken, tokenHash } from "./crypto";
 import { fail, HttpError } from "./http";
 import { enqueueMail } from "./jobs";
-import { lockFileContext, fileInfo } from "./file-access";
+import { lockFileIssuer, fileInfo } from "./file-access";
 import { findShare, grantQuestions, type Grant } from "./sharing";
 import { privateFiles } from "./file-storage";
 import { validateFileBytes } from "./file-validation";
@@ -27,7 +27,7 @@ export function viewerAudit(tx: Transaction, row: Grant, requestId: string, acti
 async function activeGrant(tx: Transaction, id: string, write = false) {
   const initial = await findShare(tx, id);
   if (!initial) fail(401, "VIEWER_SESSION_EXPIRED", "다시 이메일 인증을 완료해주세요.");
-  await lockFileContext(tx, { tenantId: initial.tenantId, member: { id: initial.createdBy }, user: { id: initial.creator.userId } },
+  const issuer = await lockFileIssuer(tx, { tenantId: initial.tenantId, member: { id: initial.createdBy }, user: { id: initial.creator.userId } },
     initial.serviceId, ["share.manage", "submission.read", ...(initial.fields.some(f => f.question.type === "파일 업로드") ? ["file.read" as const] : [])]);
   await tx.$queryRaw`SELECT id FROM "Form" WHERE id=${initial.formId} FOR SHARE`;
   if (write) await tx.$queryRaw`SELECT id FROM "ShareGrant" WHERE id=${id} FOR UPDATE`;
@@ -36,8 +36,10 @@ async function activeGrant(tx: Transaction, id: string, write = false) {
   if (row.revokedAt || row.expiresAt <= new Date() || (form.status === "archived" && form.sourceType !== "import") || !row.fields.length)
     fail(401, "VIEWER_SESSION_EXPIRED", "공유 권한이 만료되었거나 회수되었습니다. 담당자에게 문의해주세요.");
   // Fields may have changed while waiting for the grant lock. Re-evaluate file capability.
-  if (row.fields.some(f => f.question.type === "파일 업로드")) await lockFileContext(tx,
+  if (row.fields.some(f => f.question.type === "파일 업로드")) await lockFileIssuer(tx,
     { tenantId: row.tenantId, member: { id: row.createdBy }, user: { id: row.creator.userId } }, row.serviceId, ["file.read"]);
+  if (issuer.member.accessKind === "expert" && issuer.member.expertAssignment!.expiresAt <= new Date()) fail(401, "VIEWER_SESSION_EXPIRED", "공유 발급자의 배정 기한이 종료되었습니다.");
+  if (row.expiresAt <= new Date()) fail(401, "VIEWER_SESSION_EXPIRED", "공유 권한이 만료되었습니다.");
   return row;
 }
 export async function startViewerChallenge(input: z.infer<typeof challengeInput>, requestId: string) {
@@ -78,13 +80,16 @@ export async function verifyViewerChallenge(id: string, code: string, client: st
     await tx.viewerChallenge.update({ where: { id }, data: { consumedAt: now } });
     const session = await tx.viewerSession.create({ data: { tenantId: row.tenantId, grantId: row.id, grantVersion: row.version, challengeId: id, tokenHash: tokenHash(token), expiresAt } });
     await viewerAudit(tx, row, requestId, "share.authenticated", { sessionId: session.id });
+    try { await activeGrant(tx, row.id); } catch (error) { if (error instanceof HttpError) fail(422, "VIEWER_CODE_INVALID", "인증 요청이 종료되었습니다. 다시 이메일 인증을 요청해주세요."); throw error; }
+    if (challenge.expiresAt <= new Date() || expiresAt <= new Date()) fail(422, "VIEWER_CODE_INVALID", "인증 요청이 종료되었습니다. 다시 이메일 인증을 요청해주세요.");
     return { token, expiresAt: expiresAt.toISOString() };
   });
   // Throw outside the transaction so failed-attempt counters persist.
   if (!result) fail(422, "VIEWER_CODE_INVALID", "인증코드가 올바르지 않거나 사용할 수 없습니다. 다시 이메일 인증을 요청해주세요.");
   return result;
 }
-export async function withViewer<T>(token: string | null, operation: (tx: Transaction, grant: Grant, session: { id: string; expiresAt: Date }) => Promise<T>) {
+type ViewerReadSession = { id: string; expiresAt: Date; setResponseDeadline: (date: Date) => void };
+export async function withViewer<T>(token: string | null, operation: (tx: Transaction, grant: Grant, session: ViewerReadSession) => Promise<T>) {
   if (!token) fail(401, "VIEWER_AUTH_REQUIRED", "외부 열람자 이메일 인증이 필요합니다.");
   return db.$transaction(async tx => {
     const initial = await tx.viewerSession.findUnique({ where: { tokenHash: tokenHash(token) } });
@@ -98,7 +103,17 @@ export async function withViewer<T>(token: string | null, operation: (tx: Transa
     const session = await tx.viewerSession.findUniqueOrThrow({ where: { id: initial.id } });
     if (session.revokedAt || session.expiresAt <= new Date() || session.grantVersion !== grant.version)
       fail(401, "VIEWER_SESSION_EXPIRED", "공유 권한이 변경되었거나 인증이 만료되었습니다. 다시 인증해주세요.");
-    return operation(tx, grant, session);
+    let responseDeadline: Date | undefined;
+    const result = await operation(tx, grant, { id: session.id, expiresAt: session.expiresAt,
+      setResponseDeadline: date => { if (!responseDeadline || date < responseDeadline) responseDeadline = date; } });
+    try { await activeGrant(tx, grant.id); } catch (error) {
+      if (error instanceof HttpError) fail(401, "VIEWER_SESSION_EXPIRED", "공유 권한을 사용할 수 없습니다. 담당자에게 문의해주세요.");
+      throw error;
+    }
+    if (responseDeadline && responseDeadline <= new Date()) fail(410, "SHARED_RESPONSE_UNAVAILABLE", "더 이상 열람할 수 없는 응답입니다.");
+    if (grant.expiresAt <= new Date()) fail(401, "VIEWER_SESSION_EXPIRED", "공유 권한이 만료되었습니다.");
+    if (session.expiresAt <= new Date()) fail(401, "VIEWER_SESSION_EXPIRED", "열람 인증이 만료되었습니다. 다시 인증해주세요.");
+    return result;
   }, { timeout: 15000 });
 }
 export function viewerInfo(grant: Grant, session: { expiresAt: Date }): ViewerInfo {
@@ -116,18 +131,19 @@ export async function logoutViewer(token: string | null, requestId: string) {
     if (changed.count) await viewerAudit(tx, (await findShare(tx, session.grantId))!, requestId, "share.logged_out", { sessionId: session.id });
   });
 }
-async function sharedSubmission(tx: Transaction, grant: Grant, id: string): Promise<SharedSubmission> {
+async function sharedSubmission(tx: Transaction, grant: Grant, id: string, setResponseDeadline: (date: Date) => void): Promise<SharedSubmission> {
   await tx.$queryRaw`SELECT id FROM "Submission" WHERE id=${id} AND "tenantId"=${grant.tenantId} AND "formVersionId"=${grant.formVersionId} FOR SHARE`;
   const row = await tx.submission.findFirst({ where: { id, tenantId: grant.tenantId, formVersionId: grant.formVersionId },
     include: { answers: { where: { questionId: { in: grant.fields.map(f => f.questionId) } } } } });
   if (!row) fail(404, "NOT_FOUND", "공유된 응답을 찾을 수 없습니다.");
   if (!["submitted", "corrected"].includes(row.status) || row.retentionUntil <= new Date())
     fail(410, "SHARED_RESPONSE_UNAVAILABLE", "더 이상 열람할 수 없는 응답입니다.");
+  setResponseDeadline(row.retentionUntil);
   const values: SharedSubmission["values"] = {}, fileIds: string[] = [];
   for (const field of grant.fields) {
     const answer = row.answers.find(a => a.questionId === field.questionId);
     if (answer) {
-      values[field.question.stableKey] = decrypt<string | string[]>(answer.valueCipher);
+      values[field.question.stableKey] = decrypt<SharedSubmission["values"][string]>(answer.valueCipher);
       if (field.question.type === "파일 업로드" && typeof values[field.question.stableKey] === "string" && values[field.question.stableKey]) fileIds.push(values[field.question.stableKey] as string);
     }
   }
@@ -142,41 +158,45 @@ async function sharedSubmission(tx: Transaction, grant: Grant, id: string): Prom
 export async function listSharedSubmissions(token: string | null, page: number, pageSize: number, requestId: string) {
   return withViewer(token, async (tx, grant, session) => {
     const now = new Date(), where = { tenantId: grant.tenantId, formVersionId: grant.formVersionId, status: { in: ["submitted", "corrected"] }, retentionUntil: { gt: now } };
+    const total = await tx.submission.count({ where }); page = Math.min(page, Math.max(1, Math.ceil(total / pageSize)));
     const rows = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM "Submission"
       WHERE "tenantId"=${grant.tenantId} AND "formVersionId"=${grant.formVersionId}
         AND status IN ('submitted','corrected') AND "retentionUntil">${now}
       ORDER BY "submittedAt" DESC, id ASC LIMIT ${pageSize} OFFSET ${(page-1)*pageSize} FOR SHARE`;
     const items: SharedSubmission[] = [];
-    for (const row of rows) items.push(await sharedSubmission(tx, grant, row.id));
+    for (const row of rows) items.push(await sharedSubmission(tx, grant, row.id, session.setResponseDeadline));
     await viewerAudit(tx, grant, requestId, "share.responses_viewed", { sessionId: session.id });
-    return { items, total: await tx.submission.count({ where }), page, pageSize, viewer: viewerInfo(grant, session) };
+    return { items, total, page, pageSize, viewer: viewerInfo(grant, session) };
   });
 }
 export async function getSharedSubmission(token: string | null, id: string, requestId: string) {
   return withViewer(token, async (tx, grant, session) => {
-    const result = await sharedSubmission(tx, grant, id);
+    const result = await sharedSubmission(tx, grant, id, session.setResponseDeadline);
     await viewerAudit(tx, grant, requestId, "share.response_viewed", { sessionId: session.id, submissionId: id });
     return result;
   });
 }
 export async function sharedFiles(token: string | null, submissionId: string, query: { page: number; pageSize: number }, requestId: string) {
   return withViewer(token, async (tx, grant, session) => {
-    const row = await sharedSubmission(tx, grant, submissionId);
+    const row = await sharedSubmission(tx, grant, submissionId, session.setResponseDeadline);
     await viewerAudit(tx, grant, requestId, "share.files_viewed", { sessionId: session.id, submissionId });
     return { items: row.attachments.slice((query.page - 1) * query.pageSize, query.page * query.pageSize), total: row.attachments.length, ...query };
   });
 }
 export async function sharedFile(token: string | null, submissionId: string, questionId: string, fileId: string, download: boolean, requestId: string) {
   return withViewer(token, async (tx, grant, session) => {
-    const row = await sharedSubmission(tx, grant, submissionId);
+    const row = await sharedSubmission(tx, grant, submissionId, session.setResponseDeadline);
     if (!row.attachments.some(file => file.id === fileId && file.questionId === questionId)) fail(404, "NOT_FOUND", "공유된 첨부파일을 찾을 수 없습니다.");
     await tx.$queryRaw`SELECT id FROM "FileObject" WHERE id=${fileId} FOR SHARE`;
     const file = await tx.fileObject.findUniqueOrThrow({ where: { id: fileId }, include: { question: { select: { stableKey: true } } } });
     if (file.status !== "attached" || file.scanStatus !== "clean" || (file.expiresAt && file.expiresAt <= new Date())) fail(410, "SHARED_FILE_UNAVAILABLE", "더 이상 열람할 수 없는 파일입니다.");
+    await sharedSubmission(tx, grant, submissionId, session.setResponseDeadline);
     await viewerAudit(tx, grant, requestId, download ? "share.file_downloaded" : "share.file_viewed", { sessionId: session.id, submissionId, fileId });
     if (!download) return fileInfo(file);
     const bytes = await privateFiles.read(file.storageKey), name = decrypt<string>(file.nameCipher!);
     validateFileBytes(bytes, { ...file, name });
+    await sharedSubmission(tx, grant, submissionId, session.setResponseDeadline);
+    if (file.expiresAt && file.expiresAt <= new Date()) fail(410, "SHARED_FILE_UNAVAILABLE", "더 이상 열람할 수 없는 파일입니다.");
     const encoded = encodeURIComponent(name).replace(/[!'()*]/g, ch => "%" + ch.charCodeAt(0).toString(16).toUpperCase());
     return new Response(new Uint8Array(bytes), { headers: { "Content-Type": file.mime, "Content-Length": String(bytes.length),
       "Content-Disposition": "attachment; filename=\"attachment\"; filename*=UTF-8''" + encoded,

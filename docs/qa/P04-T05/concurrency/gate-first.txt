@@ -1,0 +1,85 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:85737) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-module-concurrency.test.ts (6 tests | 5 failed) 17903ms
+   × 아홉 질문의 같은 version 저장 두 건이 실제 잠금 대기 후 한 번만 반영된다 3307ms
+   × 승인 요청과 초안 수정의 잠금 경합은 하나의 현재 내용만 승인 대상으로 만든다 2978ms
+   × 승인 결정과 새 수정의 잠금 경합에서 수정된 내용은 이전 승인을 사용할 수 없다 2953ms
+   × 서로 다른 승인 결정 두 건은 실제 잠금 대기 후 결정·감사를 한 번만 남긴다 2904ms
+   × 새 게시와 수정의 잠금 경합 후 최초 아홉 응답·첨부·영수증 PDF는 그대로 유지된다 3641ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 아홉 질문의 같은 version 저장 두 건이 실제 잠금 대기 후 한 번만 반영된다
+AssertionError: expected 0 to be greater than or equal to 2
+ ❯ competingFormRequests tests/server/form-module-concurrency.test.ts:87:84
+     85|       await new Promise(done => setTimeout(done, 25));
+     86|     }
+     87|     await client.query("COMMIT"); const responses = await pending; exp…
+       |                                                                                    ^
+     88|   } finally { await client.query("ROLLBACK").catch(() => undefined); a…
+     89| }
+ ❯ tests/server/form-module-concurrency.test.ts:118:42
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 승인 요청과 초안 수정의 잠금 경합은 하나의 현재 내용만 승인 대상으로 만든다
+AssertionError: expected 0 to be greater than or equal to 2
+ ❯ competingFormRequests tests/server/form-module-concurrency.test.ts:87:84
+     85|       await new Promise(done => setTimeout(done, 25));
+     86|     }
+     87|     await client.query("COMMIT"); const responses = await pending; exp…
+       |                                                                                    ^
+     88|   } finally { await client.query("ROLLBACK").catch(() => undefined); a…
+     89| }
+ ❯ tests/server/form-module-concurrency.test.ts:124:49
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 승인 결정과 새 수정의 잠금 경합에서 수정된 내용은 이전 승인을 사용할 수 없다
+AssertionError: expected 0 to be greater than or equal to 2
+ ❯ competingFormRequests tests/server/form-module-concurrency.test.ts:87:84
+     85|       await new Promise(done => setTimeout(done, 25));
+     86|     }
+     87|     await client.query("COMMIT"); const responses = await pending; exp…
+       |                                                                                    ^
+     88|   } finally { await client.query("ROLLBACK").catch(() => undefined); a…
+     89| }
+ ❯ tests/server/form-module-concurrency.test.ts:137:28
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 서로 다른 승인 결정 두 건은 실제 잠금 대기 후 결정·감사를 한 번만 남긴다
+AssertionError: expected 0 to be greater than or equal to 2
+ ❯ competingFormRequests tests/server/form-module-concurrency.test.ts:87:84
+     85|       await new Promise(done => setTimeout(done, 25));
+     86|     }
+     87|     await client.query("COMMIT"); const responses = await pending; exp…
+       |                                                                                    ^
+     88|   } finally { await client.query("ROLLBACK").catch(() => undefined); a…
+     89| }
+ ❯ tests/server/form-module-concurrency.test.ts:147:74
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 새 게시와 수정의 잠금 경합 후 최초 아홉 응답·첨부·영수증 PDF는 그대로 유지된다
+AssertionError: expected 0 to be greater than or equal to 2
+ ❯ competingFormRequests tests/server/form-module-concurrency.test.ts:87:84
+     85|       await new Promise(done => setTimeout(done, 25));
+     86|     }
+     87|     await client.query("COMMIT"); const responses = await pending; exp…
+       |                                                                                    ^
+     88|   } finally { await client.query("ROLLBACK").catch(() => undefined); a…
+     89| }
+ ❯ tests/server/form-module-concurrency.test.ts:156:29
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 1 passed (6)
+   Start at  23:56:48
+   Duration  19.31s (tests 93%, import 4%, transform 3%)
+

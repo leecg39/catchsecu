@@ -10,6 +10,7 @@ import { enqueueMail } from "./jobs";
 import { env } from "./env";
 import { fail } from "./http";
 import { suppressSubmission } from "./suppression";
+import { lockSubjectScopes, retainedSubjectSubmission as retained } from "./subject-scope";
 export const SUBJECT_COOKIE = "cs_subject", SUBJECT_BROWSER_COOKIE = "cs_subject_browser";
 const secret = /^[A-Za-z0-9_-]{43}$/;
 export function subjectCookie(request: Request, name = SUBJECT_COOKIE) {
@@ -19,9 +20,17 @@ export function subjectCookie(request: Request, name = SUBJECT_COOKIE) {
 export function setSubjectCookie(response: Response, name: string, value: string, seconds: number, request: Request) {
   response.headers.append("Set-Cookie", `${name}=${value}; Path=/api/v1/subjects; HttpOnly; SameSite=Strict; Max-Age=${Math.max(0, Math.floor(seconds))}${new URL(request.url).protocol === "https:" ? "; Secure" : ""}`);
 }
-const retained = (): Prisma.SubmissionWhereInput => ({ status: { in: ["submitted", "corrected", "withdrawn"] }, retentionUntil: { gt: new Date() }, receipts: { some: {} },
-  formVersion: { form: { service: { status: "active", tenant: { status: "active" } } } } });
 function scoped(session: SubjectSession): Prisma.SubmissionWhereInput { return { ...retained(), subject: { accessScopes: { some: { requestId: session.requestId } } } }; }
+const responseRetention = new WeakMap<SubjectSession, number>();
+function assertSubjectDeadline(session: SubjectSession) {
+  const now = Date.now();
+  if (session.revokedAt || session.expiresAt.getTime() <= now) fail(401, "SUBJECT_SESSION_EXPIRED", "조회 시간이 만료되었습니다. 다시 이메일 인증을 완료해주세요.");
+  if ((responseRetention.get(session) ?? Infinity) <= now) fail(404, "SUBJECT_RECORD_NOT_FOUND", "조회할 수 있는 동의 이력이 없습니다. 목록을 다시 불러와주세요.");
+}
+function retainResponse(session: SubjectSession, rows: { retentionUntil: Date }[]) {
+  for (const row of rows) responseRetention.set(session, Math.min(responseRetention.get(session) ?? Infinity, row.retentionUntil.getTime()));
+  assertSubjectDeadline(session);
+}
 function audit(tx: Transaction, requestId: string, tenantId: string, serviceId: string, action: string, resourceId: string, sessionId?: string) {
   return tx.auditEvent.create({ data: { tenantId, serviceId, requestId, action, resource: "subject", resourceId, detail: sessionId ? { sessionId } : {} } });
 }
@@ -51,11 +60,15 @@ export async function createSubjectSession(token: string, browser: string | null
     if (!initial) fail(422, "SUBJECT_LINK_INVALID", "인증 링크가 만료되었거나 이미 사용되었습니다. 다시 조회를 요청해주세요.");
     await tx.$queryRaw`SELECT id FROM "SubjectAccessRequest" WHERE id=${initial.id} FOR UPDATE`;
     const access = await tx.subjectAccessRequest.findUniqueOrThrow({ where: { id: initial.id } });
+    await lockSubjectScopes(tx, access.id);
     if (access.consumedAt || access.expiresAt <= new Date() || access.browserHash !== tokenHash(browser) ||
       !await tx.subjectAccessScope.count({ where: { requestId: access.id, subject: { submissions: { some: retained() } } } }))
       fail(422, "SUBJECT_LINK_INVALID", "인증 링크가 만료되었거나 사용할 수 없습니다. 조회를 요청한 브라우저에서 다시 요청해주세요.");
     await tx.subjectAccessRequest.update({ where: { id: access.id }, data: { consumedAt: new Date() } });
     const value = opaqueToken(), session = await tx.subjectSession.create({ data: { requestId: access.id, tokenHash: tokenHash(value), expiresAt: new Date(Date.now() + 1800000) } });
+    const eligible = await tx.subjectAccessScope.count({ where: { requestId: access.id, subject: { submissions: { some: retained() } } } });
+    if (access.expiresAt <= new Date() || session.expiresAt <= new Date() || !eligible)
+      fail(422, "SUBJECT_LINK_INVALID", "인증 요청이 종료되었습니다. 다시 조회를 요청해주세요.");
     return { token: value, id: session.id, expiresAt: session.expiresAt.toISOString() };
   });
 }
@@ -66,12 +79,12 @@ export async function withSubject<T>(token: string | null, id: string, operation
     if (!initial || initial.id !== id) fail(401, "SUBJECT_AUTH_REQUIRED", "현재 인증에 해당하는 조회 링크를 이용해주세요.");
     await tx.$queryRaw`SELECT id FROM "SubjectSession" WHERE id=${id} FOR SHARE`;
     const session = await tx.subjectSession.findUniqueOrThrow({ where: { id } });
-    if (session.revokedAt || session.expiresAt <= new Date()) fail(401, "SUBJECT_SESSION_EXPIRED", "조회 시간이 만료되었습니다. 다시 이메일 인증을 완료해주세요.");
-    const scopes = await tx.subjectAccessScope.findMany({ where: { requestId: session.requestId }, include: { subject: { select: { serviceId: true } } } });
-    const companies = [...new Set(scopes.map(s => s.tenantId))].sort(), services = [...new Set(scopes.map(s => s.subject.serviceId))].sort();
-    if (companies.length) await tx.$queryRaw`SELECT id FROM "Company" WHERE id IN (${Prisma.join(companies)}) ORDER BY id FOR SHARE`;
-    if (services.length) await tx.$queryRaw`SELECT id FROM "Service" WHERE id IN (${Prisma.join(services)}) ORDER BY id FOR SHARE`;
-    return operation(tx, session);
+    assertSubjectDeadline(session);
+    await lockSubjectScopes(tx, session.requestId);
+    assertSubjectDeadline(session);
+    const result = await operation(tx, session);
+    assertSubjectDeadline(session);
+    return result;
   }, { timeout: 15000 });
 }
 export async function logoutSubject(token: string | null) {
@@ -90,21 +103,33 @@ function consentDto(row: Prisma.SubmissionGetPayload<{ include: typeof consentIn
       documentHash: r.documentHash, withdrawnAt: r.events[0]?.createdAt.toISOString() ?? null })) };
 }
 export async function subjectConsents(tx: Transaction, session: SubjectSession, page: number, pageSize: number, requestId: string): Promise<SubjectPage<SubjectConsent>> {
-  const where = scoped(session), selected = await tx.submission.findMany({ where, orderBy: [{ submittedAt: "desc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize, select: { id: true } });
+  const total = await tx.submission.count({ where: scoped(session) });
+  page = Math.min(page, Math.max(1, Math.ceil(total / pageSize)));
+  const selected = await tx.submission.findMany({ where: scoped(session), orderBy: [{ submittedAt: "desc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize, select: { id: true } });
   await lockRows(tx, selected.map(s => s.id));
   const rows = await tx.submission.findMany({ where: { ...scoped(session), id: { in: selected.map(s => s.id) } }, include: consentInclude, orderBy: [{ submittedAt: "desc" }, { id: "asc" }] });
+  retainResponse(session, rows);
   for (const row of rows) await audit(tx, requestId, row.tenantId, row.formVersion.form.serviceId, "subject.consents_viewed", row.id, session.id);
-  return { items: rows.map(consentDto), total: await tx.submission.count({ where: scoped(session) }), page, pageSize };
+  const currentTotal = await tx.submission.count({ where: scoped(session) });
+  assertSubjectDeadline(session);
+  if (page > Math.max(1, Math.ceil(currentTotal / pageSize))) return subjectConsents(tx, session, Math.max(1, Math.ceil(currentTotal / pageSize)), pageSize, requestId);
+  return { items: rows.map(consentDto), total: currentTotal, page, pageSize };
 }
 export async function subjectEvents(tx: Transaction, session: SubjectSession, page: number, pageSize: number, requestId: string): Promise<SubjectPage<SubjectEvent>> {
   const where = () => ({ type: { in: ["granted", "imported", "withdrawn"] }, receipt: { submission: scoped(session) } });
+  const total = await tx.consentEvent.count({ where: where() });
+  page = Math.min(page, Math.max(1, Math.ceil(total / pageSize)));
   const rows = await tx.consentEvent.findMany({ where: where(), select: { id: true, receipt: { select: { submissionId: true } } }, orderBy: [{ createdAt: "desc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize });
   await lockRows(tx, [...new Set(rows.map(r => r.receipt.submissionId))]);
   const events = await tx.consentEvent.findMany({ where: { ...where(), id: { in: rows.map(r => r.id) } }, include: { receipt: { include: { submission: { include: consentInclude } } } }, orderBy: [{ createdAt: "desc" }, { id: "asc" }] });
+  retainResponse(session, events.map(e => e.receipt.submission));
   for (const event of events) { const sub = event.receipt.submission; await audit(tx, requestId, sub.tenantId, sub.formVersion.form.serviceId, "subject.events_viewed", sub.id, session.id); }
+  const currentTotal = await tx.consentEvent.count({ where: where() });
+  assertSubjectDeadline(session);
+  if (page > Math.max(1, Math.ceil(currentTotal / pageSize))) return subjectEvents(tx, session, Math.max(1, Math.ceil(currentTotal / pageSize)), pageSize, requestId);
   return { items: events.map(e => ({ id: e.id, type: e.type, createdAt: e.createdAt.toISOString(), submissionId: e.receipt.submissionId, title: e.receipt.submission.formVersion.title,
     company: e.receipt.submission.formVersion.form.service.tenant.publicName, service: e.receipt.submission.formVersion.form.service.externalName, purpose: e.receipt.purpose })),
-    total: await tx.consentEvent.count({ where: where() }), page, pageSize };
+    total: currentTotal, page, pageSize };
 }
 async function ownSubmission(tx: Transaction, session: SubjectSession, id: string, write: boolean) {
   // Do not lock a foreign record on an attacker-controlled UUID.
@@ -112,6 +137,7 @@ async function ownSubmission(tx: Transaction, session: SubjectSession, id: strin
   await lockRows(tx, [id], write);
   const row = await tx.submission.findFirst({ where: { ...scoped(session), id }, include: consentInclude });
   if (!row) fail(404, "SUBJECT_RECORD_NOT_FOUND", "조회할 수 있는 동의 이력이 없습니다.");
+  retainResponse(session, [row]);
   return row;
 }
 export async function requestWithdrawal(tx: Transaction, session: SubjectSession, input: z.infer<typeof subjectWithdrawalInput>, requestId: string) {

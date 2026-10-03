@@ -32,6 +32,7 @@ export const marketingList = z.object({
   serviceId: z.uuid(), page: z.coerce.number().int().min(1).max(100000).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20),
   search: z.string().trim().max(254).default(""), channel: marketingChannel.optional(),
   status: z.enum(["granted", "withdrawn", "erased"]).optional(), excluded: z.enum(["true", "false"]).optional(),
+  sort: z.enum(["createdAt", "grantedAt"]).default("createdAt"), direction: z.enum(["asc", "desc"]).default("desc"),
 }).strict();
 export const marketingSummaryQuery = z.object({
   search: z.string().trim().max(100).default(""), serviceId: z.uuid().optional(),
@@ -45,7 +46,10 @@ export type MarketingRecord = {
   sourceSubmissionId: string; sourceTitle: string; sourceKind: string; retentionUntil: string; available: boolean; eligible: boolean; denial: string | null;
   evidence?: { purpose: string; reference: string; grantedAt: string; sourceKind: string } | null;
   events?: { id: string; kind: string; version: number; createdAt: string }[];
+  permissions: { canChangeExclusion: boolean; canWithdraw: boolean; canErase: boolean; canCleanup: boolean };
+  pendingLocalCopies: number;
 };
+export type MarketingPage = { items: MarketingRecord[]; total: number; page: number; pageSize: number; permissions: { canCreate: boolean; canExport: boolean } };
 export type MarketingSource = { id: string; title: string; createdAt: string; retentionUntil: string; questions: { id: string; label: string; value: string }[] };
 export type MarketingSummary = {
   asOf: string; period: { from: string; to: string };

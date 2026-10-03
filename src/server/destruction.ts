@@ -1,25 +1,28 @@
 import { z } from "zod";
-import type { Prisma, DestructionCertificate } from "@/generated/prisma/client";
+import type { Prisma, DestructionCertificate, Role } from "@/generated/prisma/client";
 import { destructionStatuses, type destructionAction, type destructionSchedule, type retentionInput } from "@/contracts/destruction";
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
-import { roleCan } from "./permissions";
+import { lockDestructionActor } from "./destruction-access";
 import { lockSubmission } from "./submission-access";
-import { lockFileContext } from "./file-access";
+import { assertFileDeadlines, lockFileContext } from "./file-access";
 import { audit } from "./audit";
 import { decrypt, encrypt, tokenHash } from "./crypto";
 import { fail, listQuery } from "./http";
 
 export const activeDestruction = ["pending", "scheduled", "running", "retry", "failed"];
 const includeRequest = { submission: { include: { formVersion: { include: { form: true } } } }, certificate: { select: { id: true } } };
-export function requestDto(row: Prisma.DestructionRequestGetPayload<{ include: typeof includeRequest }>) {
+export function requestDto(row: Prisma.DestructionRequestGetPayload<{ include: typeof includeRequest }>, role: Role) {
+  const pending = !row.startedAt && ["pending", "scheduled"].includes(row.status), manager = ["owner", "admin"].includes(role);
   return { id: row.id, tenantId: row.tenantId, serviceId: row.serviceId, submissionId: row.submissionId,
     formId: row.submission.formVersion.formId, formTitle: row.submission.formVersion.title,
     source: row.source, status: row.status, dueAt: row.dueAt, version: row.version, createdAt: row.createdAt,
     legalHold: row.submission.legalHold, requesterId: row.requesterId, approverId: row.approverId,
     reason: row.reasonCipher ? decrypt<string>(row.reasonCipher) : null, decision: row.decisionCipher ? decrypt<string>(row.decisionCipher) : null,
     approvedAt: row.approvedAt, startedAt: row.startedAt, completedAt: row.completedAt,
-    attempts: row.attempts, nextAttemptAt: row.nextAttemptAt, lastError: row.lastError, certificateId: row.certificate?.id ?? null };
+    attempts: row.attempts, nextAttemptAt: row.nextAttemptAt, lastError: row.lastError, certificateId: row.certificate?.id ?? null,
+    permissions: { canApprove: manager && pending && row.status === "pending" && !row.submission.legalHold,
+      canReject: manager && pending, canCancel: pending, canReschedule: pending, canRetry: row.status === "failed" } };
 }
 export function certificateDigest(row: Pick<DestructionCertificate, "id" | "tenantId" | "serviceId" | "submissionId" | "requestId" | "scope" | "method" | "counts" | "version" | "completedAt">) {
   const counts = row.counts as Record<string, number>;
@@ -28,35 +31,47 @@ export function certificateDigest(row: Pick<DestructionCertificate, "id" | "tena
 }
 export function certificateDto(row: DestructionCertificate) { return { ...row, integrityVerified: certificateDigest(row) === row.digest }; }
 export const destructionQuery = listQuery.extend({
+  sort: z.enum(["createdAt", "name", "dueAt", "completedAt"]).default("createdAt"),
   serviceId: z.uuid().optional(), submissionId: z.uuid().optional(), status: z.enum(destructionStatuses).optional(),
-});
+}).strict();
+export function destructionRequestQuery(request: Request, certificates = false, empty = false) {
+  const input: Record<string, string> = {};
+  for (const [key, value] of new URL(request.url).searchParams) {
+    if (Object.hasOwn(input, key)) fail(422, "VALIDATION_ERROR", "같은 조회 항목을 반복할 수 없습니다.");
+    input[key] = value;
+  }
+  if (empty) z.object({}).strict().parse(input);
+  const query = destructionQuery.parse(input);
+  if ((certificates && (query.status || query.sort === "dueAt")) || (!certificates && query.sort === "completedAt"))
+    fail(422, "VALIDATION_ERROR", "이 목록에서 지원하지 않는 조회 조건입니다.");
+  return query;
+}
 export async function listDestructions(ctx: Context, query: z.infer<typeof destructionQuery>, certificates = false) {
+  if ((certificates && (query.status || query.sort === "dueAt")) || (!certificates && query.sort === "completedAt"))
+    fail(422, "VALIDATION_ERROR", "이 목록에서 지원하지 않는 조회 조건입니다.");
   return db.$transaction(async tx => {
-    // Membership and grant mutations take the company lock before writing.
-    await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${ctx.tenantId} FOR SHARE`;
-    const company = await tx.company.findUnique({ where: { id: ctx.tenantId } });
-    if (!company || company.status !== "active") fail(403, "COMPANY_UNAVAILABLE", "사용할 수 없는 회사입니다.");
-    await tx.$queryRaw`SELECT id FROM "Membership" WHERE id=${ctx.member.id} AND "tenantId"=${ctx.tenantId} FOR SHARE`;
-    const member = await tx.membership.findFirst({ where: { id: ctx.member.id, tenantId: ctx.tenantId, userId: ctx.user.id,
-      status: "active", user: { status: "active" } }, include: { grants: true } });
     const capability = certificates ? "audit.read" : "submission.destroy";
-    if (!member || !roleCan(member.role, capability)) fail(403, "FORBIDDEN", "이 작업을 수행할 권한이 없습니다.");
-    const service = { tenantId: ctx.tenantId, ...(["owner", "admin"].includes(member.role) ? {} :
-      { id: { in: member.grants.filter(grant => grant.capabilities.includes(capability)).map(grant => grant.serviceId) } }) };
-    const where = { tenantId: ctx.tenantId, service, ...(query.serviceId ? { serviceId: query.serviceId } : {}),
-      ...(query.submissionId ? { submissionId: query.submissionId } : {}) };
+    const { member, deadlines, scope } = await lockDestructionActor(tx, ctx, capability);
+    const where = { tenantId: ctx.tenantId, service: scope, ...(query.serviceId ? { serviceId: query.serviceId } : {}),
+      ...(query.submissionId ? { submissionId: query.submissionId } : {}), ...(query.search ? { OR: [
+        { id: { contains: query.search, mode: "insensitive" as const } }, { submissionId: { contains: query.search, mode: "insensitive" as const } },
+        { service: { name: { contains: query.search, mode: "insensitive" as const } } },
+        { submission: { formVersion: { title: { contains: query.search, mode: "insensitive" as const } } } },
+      ] } : {}) };
     if (certificates) {
+      const total = await tx.destructionCertificate.count({ where }), page = Math.min(query.page, Math.max(1, Math.ceil(total / query.pageSize)));
       const items = await tx.destructionCertificate.findMany({ where, include: { service: { select: { name: true } } },
-        orderBy: [{ completedAt: "desc" }, { id: "asc" }], skip: (query.page - 1) * query.pageSize, take: query.pageSize });
-      const total = await tx.destructionCertificate.count({ where });
-      return { items: items.map(row => ({ ...certificateDto(row), serviceName: row.service.name, service: undefined })), total, page: query.page, pageSize: query.pageSize };
+        orderBy: [query.sort === "name" ? { service: { name: query.direction } } : { completedAt: query.direction }, { id: "asc" }], skip: (page - 1) * query.pageSize, take: query.pageSize });
+      const result = { items: items.map(row => ({ ...certificateDto(row), serviceName: row.service.name, service: undefined })), total, page, pageSize: query.pageSize };
+      assertFileDeadlines(deadlines); return result;
     }
     const filter = { ...where, ...(query.status ? { status: query.status } : {}) };
+    const total = await tx.destructionRequest.count({ where: filter }), page = Math.min(query.page, Math.max(1, Math.ceil(total / query.pageSize)));
     const items = await tx.destructionRequest.findMany({ where: filter, include: includeRequest,
-      orderBy: [{ createdAt: "desc" }, { id: "asc" }], skip: (query.page - 1) * query.pageSize, take: query.pageSize });
-    const total = await tx.destructionRequest.count({ where: filter });
-    return { items: items.map(requestDto), total, page: query.page, pageSize: query.pageSize };
-  });
+      orderBy: [query.sort === "name" ? { submission: { formVersion: { title: query.direction } } } : { [query.sort]: query.direction }, { id: "asc" }], skip: (page - 1) * query.pageSize, take: query.pageSize });
+    const result = { items: items.map(row => requestDto(row, member.role)), total, page, pageSize: query.pageSize };
+    assertFileDeadlines(deadlines); return result;
+  }, { timeout: 15000, isolationLevel: "RepeatableRead" });
 }
 export async function createDestruction(tx: Transaction, ctx: Context, row: { id: string; status: string; legalHold: boolean; retentionUntil: Date },
   serviceId: string, reason: string, dueAt = new Date()) {
@@ -77,6 +92,7 @@ export async function decideDestruction(ctx: Context, id: string, action: "appro
     const first = await tx.destructionRequest.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!first) fail(404, "NOT_FOUND", "파기 요청을 찾을 수 없습니다.");
     const submission = await lockSubmission(tx, ctx, first.submissionId, "submission.destroy", true);
+    const deadlines = await lockFileContext(tx, ctx, first.serviceId, ["submission.destroy"], true);
     await tx.$queryRaw`SELECT id FROM "DestructionRequest" WHERE id=${id} FOR UPDATE`;
     const row = await tx.destructionRequest.findUniqueOrThrow({ where: { id } });
     if (row.version !== input.version) fail(409, "VERSION_CONFLICT", "파기 요청이 변경되었습니다. 다시 불러와주세요.");
@@ -107,12 +123,14 @@ export async function decideDestruction(ctx: Context, id: string, action: "appro
       }
     }
     await audit(tx, ctx, requestId, "destruction." + action, "destructionRequest", id, ["status"], row.serviceId);
-    return requestDto(await tx.destructionRequest.findUniqueOrThrow({ where: { id }, include: includeRequest }));
+    const result = requestDto(await tx.destructionRequest.findUniqueOrThrow({ where: { id }, include: includeRequest }), member.role);
+    assertFileDeadlines(deadlines); return result;
   }, { timeout: 15000 });
 }
 export async function changeRetention(ctx: Context, id: string, input: z.infer<typeof retentionInput>, requestId: string) {
   return db.$transaction(async tx => {
     const row = await lockSubmission(tx, ctx, id, "submission.destroy", true);
+    const deadlines = await lockFileContext(tx, ctx, row.formVersion.form.serviceId, ["submission.destroy"], true);
     const policy = await tx.securityPolicy.findUniqueOrThrow({ where: { tenantId: ctx.tenantId } });
     if (!policy.allowRetentionAdjustment) fail(403, "RETENTION_ADJUSTMENT_DISABLED", "회사의 파기일자 변경 정책이 꺼져 있습니다.");
     if (row.version !== input.version) fail(409, "VERSION_CONFLICT", "응답이 변경되었습니다.");
@@ -129,15 +147,19 @@ export async function changeRetention(ctx: Context, id: string, input: z.infer<t
       beforeCipher: encrypt({ answers: { retentionUntil: row.retentionUntil.toISOString() }, reason: input.reason }),
       afterCipher: encrypt({ retentionUntil: date.toISOString() }) } });
     await audit(tx, ctx, requestId, "submission.retention_changed", "submission", id, ["retentionUntil"], row.formVersion.form.serviceId);
+    assertFileDeadlines(deadlines);
+    if (row.retentionUntil <= new Date() || date <= new Date()) fail(422, "RETENTION_BOUNDARY", "보유 기한이 끝난 응답의 일정을 변경할 수 없습니다.");
     return { id, version: row.version + 1, retentionUntil: date };
-  });
+  }, { timeout: 15000 });
 }
 export async function readCertificate(ctx: Context, id: string, requestId: string) {
   return db.$transaction(async tx => {
     const row = await tx.destructionCertificate.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!row) fail(404, "NOT_FOUND", "파기 증명서를 찾을 수 없습니다.");
-    await lockFileContext(tx, ctx, row.serviceId, ["audit.read"], true);
+    const deadlines = await lockFileContext(tx, ctx, row.serviceId, ["audit.read"], true);
+    const result = certificateDto(row);
+    if (!result.integrityVerified) fail(409, "CERTIFICATE_INTEGRITY", "증명서 무결성을 확인하지 못했습니다.");
     await audit(tx, ctx, requestId, "destruction.certificate_viewed", "destructionCertificate", id, [], row.serviceId);
-    return certificateDto(row);
-  });
+    assertFileDeadlines(deadlines); return result;
+  }, { timeout: 15000 });
 }

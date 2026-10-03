@@ -7,8 +7,10 @@ function canonical(value: unknown): string {
   return JSON.stringify(value);
 }
 export async function idempotent<T>(scope: string, key: string | null, payload: unknown,
-  operation: (tx: Transaction) => Promise<{ status: number; body: T; resource?: { tenantId?: string; resourceType: "submission" | "file" | "support-ticket" | "notice" | "guide"; resourceId: string } }>,
-  validateReplay?: (tx: Transaction) => Promise<unknown>): Promise<{ status: number; body: T }> {
+  operation: (tx: Transaction) => Promise<{ status: number; body: T; resource?: { tenantId?: string; resourceType: "mfa-exception" | "ip-rule" | "submission" | "file" | "support-ticket" | "notice" | "guide" | "form" | "template" | "shareGrant" | "verificationIntegration"; resourceId: string } }>,
+  validateReplay?: (tx: Transaction) => Promise<unknown>,
+  replayBody?: (tx: Transaction, cached: T) => Promise<T>,
+  finalCheck?: (tx: Transaction) => Promise<unknown>): Promise<{ status: number; body: T }> {
   if (!key || !/^[a-zA-Z0-9_-]{16,128}$/.test(key)) fail(400, "IDEMPOTENCY_REQUIRED", "유효한 Idempotency-Key가 필요합니다.");
   const requestHash = tokenHash(canonical(payload));
   return db.$transaction(async tx => {
@@ -19,6 +21,21 @@ export async function idempotent<T>(scope: string, key: string | null, payload: 
       if (saved.invalidatedAt || !saved.responseCipher || saved.expiresAt <= new Date())
         fail(410, "IDEMPOTENCY_EXPIRED", "이 요청의 보관 기간이 끝났습니다. 최신 처리 결과를 확인해주세요.");
       await validateReplay?.(tx);
+      const legacyForm = !saved.resourceType && /^(form:(create|copy):|template:use:)/.test(scope)
+        ? decrypt<{ id?: string }>(saved.responseCipher).id : undefined;
+      const formId = saved.resourceType === "form" ? saved.resourceId : legacyForm;
+      if (formId) {
+        await tx.$queryRaw`SELECT id FROM "Form" WHERE id=${formId} FOR SHARE`;
+        const form = await tx.form.findFirst({ where: { id: formId, ...(saved.tenantId ? { tenantId: saved.tenantId } : {}) } });
+        if (!form) fail(410, "IDEMPOTENCY_EXPIRED", "이미 완전 삭제된 캐치폼 요청입니다.");
+      }
+      const legacyTemplate = !saved.resourceType && scope.startsWith("template:create:") ? decrypt<{ id?: string }>(saved.responseCipher).id : undefined;
+      const templateId = saved.resourceType === "template" ? saved.resourceId : legacyTemplate;
+      if (templateId) {
+        await tx.$queryRaw`SELECT id FROM "FormTemplate" WHERE id=${templateId} FOR SHARE`;
+        const template = await tx.formTemplate.findFirst({ where: { id: templateId, ...(saved.tenantId ? { tenantId: saved.tenantId } : {}) } });
+        if (!template || template.status !== "active") fail(410, "IDEMPOTENCY_EXPIRED", "이미 삭제된 템플릿 요청입니다.");
+      }
       let submissionId = saved.resourceType === "submission" ? saved.resourceId : null;
       if (saved.resourceType === "file" && saved.resourceId) {
         const file = await tx.fileObject.findUnique({ where: { id: saved.resourceId } });
@@ -53,11 +70,15 @@ export async function idempotent<T>(scope: string, key: string | null, payload: 
           fail(410, "IDEMPOTENCY_EXPIRED", "이 업로드 요청의 사용 기간이 끝났습니다.");
       }
       if (saved.requestHash !== requestHash) fail(409, "IDEMPOTENCY_MISMATCH", "같은 요청 키에 다른 내용이 사용되었습니다.");
-      return { status: saved.statusCode, body: decrypt<T>(saved.responseCipher) };
+      const cached = decrypt<T>(saved.responseCipher);
+      const body = replayBody ? await replayBody(tx, cached) : cached;
+      await finalCheck?.(tx);
+      return { status: saved.statusCode, body };
     }
     const result = await operation(tx);
     await tx.idempotencyRecord.create({ data: { scope, key, requestHash, statusCode: result.status,
       responseCipher: encrypt(result.body), expiresAt: new Date(Date.now() + 86400000), ...result.resource } });
+    await finalCheck?.(tx);
     return { status: result.status, body: result.body };
   }, { timeout: 15000 });
 }

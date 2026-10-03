@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { api, errorText, useResource } from "@/lib/api";
-import { marketingEventLabel, marketingStatus, type MarketingRecord, type MarketingSource, type MarketingSummary } from "@/contracts/marketing";
+import { marketingEventLabel, marketingStatus, type MarketingPage, type MarketingRecord, type MarketingSource, type MarketingSummary } from "@/contracts/marketing";
 import type { Paged } from "@/contracts/forms";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel, DataTable } from "../shared";
@@ -19,24 +19,31 @@ export function Marketing() {
   if (!app.data) return <Panel><p role="status">회사 정보를 불러오는 중입니다.</p></Panel>;
   if (!app.data.capabilities.includes("marketing.read")) return <Panel><p role="alert">마케팅 수신동의를 조회할 권한이 없습니다.</p></Panel>;
   if (!app.data.serviceId) return <Panel><p>서비스를 선택해주세요.</p></Panel>;
-  return <MarketingList key={app.data.serviceId} serviceId={app.data.serviceId} canWrite={app.data.capabilities.includes("marketing.write")} />;
+  return <MarketingList key={app.data.serviceId} serviceId={app.data.serviceId} />;
 }
-function MarketingList({ serviceId, canWrite }: { serviceId: string; canWrite: boolean }) {
+function MarketingList({ serviceId }: { serviceId: string }) {
   const [query, setQuery] = useState(""), [search, setSearch] = useState(""), [channel, setChannel] = useState(""), [status, setStatus] = useState(""), [excluded, setExcluded] = useState("");
-  const [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20), [selected, setSelected] = useState<MarketingRecord[]>([]);
+  const [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20), [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [sort, setSort] = useState("createdAt"), [direction, setDirection] = useState("desc");
   const [create, setCreate] = useState(false), [detail, setDetail] = useState<string>(), [confirm, setConfirm] = useState<{ rows: MarketingRecord[]; erase: boolean }>();
   const [error, setError] = useState(""), [message, setMessage] = useState(""), [busy, setBusy] = useState(false);
-  const params = new URLSearchParams({ serviceId, page: String(page), pageSize: String(pageSize), search });
+  const params = new URLSearchParams({ serviceId, page: String(page), pageSize: String(pageSize), search, sort, direction });
   if (channel) params.set("channel", channel); if (status) params.set("status", status); if (excluded) params.set("excluded", excluded);
-  const list = useResource<Paged<MarketingRecord>>("/marketing/preferences?" + params);
-  const reload = () => { setSelected([]); list.reload(); };
-  const changed = () => { setPage(1); setSelected([]); };
+  const list = useResource<MarketingPage>("/marketing/preferences?" + params);
+  const selected = (list.data?.items ?? []).filter(row => selectedIds.includes(row.id) && row.permissions.canWithdraw);
+  const reload = () => { setSelectedIds([]); list.reload(); };
+  const changed = () => { setPage(1); setSelectedIds([]); setConfirm(undefined); };
   async function perform() {
     if (!confirm || busy) return; setBusy(true); setError("");
     try {
-      if (confirm.erase) await api("/marketing/preferences/" + confirm.rows[0].id, { method: "DELETE", body: JSON.stringify({ serviceId, version: confirm.rows[0].version }) });
-      else await api("/marketing/preferences/withdrawals", { method: "POST", body: JSON.stringify({ serviceId, items: confirm.rows.map(r => ({ id: r.id, version: r.version })) }) });
-      setMessage(confirm.erase ? "마케팅 연락처와 동의 근거 원문을 삭제했습니다." : "선택한 채널의 수신동의를 철회했습니다."); setConfirm(undefined); setDetail(undefined); reload();
+      const current = await Promise.all(confirm.rows.map(row => api<MarketingRecord>("/marketing/preferences/" + row.id)));
+      if (current.some((row, index) => row.version !== confirm.rows[index].version ||
+        !(confirm.erase ? row.permissions.canErase || row.permissions.canCleanup : row.permissions.canWithdraw))) {
+        setConfirm(undefined); reload(); throw new Error("항목이나 권한이 변경되었습니다. 현재 목록을 확인하고 다시 선택해주세요.");
+      }
+      const result = confirm.erase ? await api<{ cleanup: { pending: number } }>("/marketing/preferences/" + current[0].id, { method: "DELETE", body: JSON.stringify({ serviceId, version: current[0].version }) })
+        : await api("/marketing/preferences/withdrawals", { method: "POST", body: JSON.stringify({ serviceId, items: current.map(r => ({ id: r.id, version: r.version })) }) });
+      setMessage(confirm.erase ? ((result as { cleanup: { pending: number } }).cleanup.pending > 0 ? "연락처와 근거 원문을 삭제했습니다. 남은 발송 사본은 상세에서 정리를 재시도할 수 있습니다." : "마케팅 연락처와 동의 근거 원문, 로컬 발송 사본을 삭제했습니다.") : "선택한 채널의 수신동의를 철회했습니다."); setConfirm(undefined); setDetail(undefined); reload();
     } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
   }
   async function download() {
@@ -48,51 +55,57 @@ function MarketingList({ serviceId, canWrite }: { serviceId: string; canWrite: b
     } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
   }
   return <div className="marketing-page"><PageHeading title="광고성 정보 수신동의 관리"><p>폼과 개인정보 업로드에서 받은 채널별 동의를 확인하고 관리합니다.</p></PageHeading>
-    <Panel><div className="marketing-toolbar"><h2>수신동의 목록</h2><div className="cs-row"><Link href="/marketing-detail" className="cs-link">서비스별 현황</Link><ActionButton secondary disabled={busy || !!list.error || list.loading} onClick={download}>CSV 내보내기</ActionButton>{canWrite && <ActionButton onClick={() => setCreate(true)}>동의 근거 등록</ActionButton>}</div></div>
+    <Panel><div className="marketing-toolbar"><h2>수신동의 목록</h2><div className="cs-row"><Link href="/marketing-detail" className="cs-link">서비스별 현황</Link><ActionButton secondary disabled={busy || !!list.error || list.loading || !list.data?.permissions.canExport} onClick={download}>CSV 내보내기</ActionButton>{list.data?.permissions.canCreate && <ActionButton onClick={() => setCreate(true)}>동의 근거 등록</ActionButton>}</div></div>
       <form className="marketing-filters" onSubmit={e => { e.preventDefault(); setSearch(query); changed(); }}>
         <input className="cs-input" aria-label="이름 또는 연락처 검색" placeholder="이름·이메일·전화번호 완전일치" value={query} onChange={e => setQuery(e.target.value)} maxLength={254} />
         <select className="cs-input" aria-label="마케팅 채널" value={channel} onChange={e => { setChannel(e.target.value); changed(); }}><option value="">전체 채널</option><option value="email">이메일</option><option value="sms">문자</option></select>
         <select className="cs-input" aria-label="동의 상태" value={status} onChange={e => { setStatus(e.target.value); changed(); }}><option value="">전체 상태</option>{Object.entries(marketingStatus).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
         <select className="cs-input" aria-label="발송 제외 필터" value={excluded} onChange={e => { setExcluded(e.target.value); changed(); }}><option value="">발송 제외 전체</option><option value="true">발송 제외</option><option value="false">제외하지 않음</option></select><ActionButton secondary>검색</ActionButton>
+        <select className="cs-input" aria-label="동의 정렬 기준" value={sort} onChange={e => { setSort(e.target.value); changed(); }}><option value="createdAt">등록 시각</option><option value="grantedAt">동의 시각</option></select>
+        <select className="cs-input" aria-label="동의 정렬 방향" value={direction} onChange={e => { setDirection(e.target.value); changed(); }}><option value="desc">최근순</option><option value="asc">오래된순</option></select>
       </form>
-      <div className="marketing-toolbar"><p>이메일과 문자의 동의는 각각 한 건으로 표시됩니다.</p><div className="cs-row"><ActionButton secondary onClick={reload}>새로고침</ActionButton>{canWrite && <ActionButton secondary disabled={!selected.length || busy} onClick={() => { setError(""); setConfirm({ rows: selected, erase: false }); }}>선택동의철회 ({selected.length})</ActionButton>}</div></div>
+      <div className="marketing-toolbar"><p>이메일과 문자의 동의는 각각 한 건으로 표시됩니다.</p><div className="cs-row"><ActionButton secondary onClick={reload}>새로고침</ActionButton><ActionButton secondary disabled={!selected.length || busy || list.loading} onClick={() => { setError(""); setConfirm({ rows: selected, erase: false }); }}>선택동의철회 ({selected.length})</ActionButton></div></div>
       <RemoteTable columns={["선택", "이름", "채널", "연락처", "수집 출처", "동의일", "발송 제외", "상태 · 철회일", "관리"]}
-        rows={(list.data?.items ?? []).map(row => ({ id: row.id, cells: [<input key="select" type="checkbox" aria-label={`${row.name ?? "삭제된 항목"} ${row.channel} 선택`} disabled={!canWrite || row.status !== "granted"} checked={selected.some(s => s.id === row.id)} onChange={e => setSelected(v => e.target.checked ? [...v, row] : v.filter(s => s.id !== row.id))} />,
+        rows={(list.data?.items ?? []).map(row => ({ id: row.id, cells: [<input key="select" type="checkbox" aria-label={`${row.name ?? "삭제된 항목"} ${row.channel} 선택`} disabled={busy || !row.permissions.canWithdraw} checked={selected.some(s => s.id === row.id)} onChange={e => setSelectedIds(v => e.target.checked ? [...v, row.id] : v.filter(id => id !== row.id))} />,
           row.name ?? "원문 없음", row.channel === "email" ? "이메일" : "문자", row.contact ?? "—", row.sourceTitle, time(row.grantedAt), row.excluded ? "제외" : "—",
           <span key="state">{marketingStatus[row.status]}<small className="marketing-subtext">{time(row.withdrawnAt)}</small>{row.denial && <small className="marketing-subtext">{row.denial}</small>}</span>,
-          <button key="detail" className="cs-link" onClick={() => setDetail(row.id)}>상세</button>] }))} total={list.data?.total ?? 0} page={page} pageSize={pageSize} onPage={p => { setPage(p); setSelected([]); }} onPageSize={n => { setPageSize(n); changed(); }} loading={list.loading} error={list.error?.message} />
+          <button key="detail" className="cs-link" onClick={() => setDetail(row.id)}>상세</button>] }))} total={list.data?.total ?? 0} page={list.data?.page ?? page} pageSize={pageSize} onPage={p => { setPage(p); setSelectedIds([]); setConfirm(undefined); }} onPageSize={n => { setPageSize(n); changed(); }} loading={list.loading} error={list.error?.message} />
       {error && !confirm && <p role="alert">{error}</p>}<p role="status">{message}</p>
     </Panel>
-    {create && <MarketingCreate serviceId={serviceId} onClose={() => setCreate(false)} onCreated={id => { setCreate(false); reload(); setDetail(id); setMessage("명시한 근거로 수신동의를 등록했습니다."); }} />}
-    {detail && !confirm && <MarketingDetail id={detail} canWrite={canWrite} onClose={() => setDetail(undefined)} onChanged={reload} onAction={(row, erase) => { setError(""); setConfirm({ rows: [row], erase }); }} />}
+    {create && list.data?.permissions.canCreate && <MarketingCreate serviceId={serviceId} onClose={() => setCreate(false)} onCreated={id => { setCreate(false); reload(); setDetail(id); setMessage("명시한 근거로 수신동의를 등록했습니다."); }} />}
+    {detail && !confirm && <MarketingDetail id={detail} onClose={() => setDetail(undefined)} onChanged={reload} onAction={(row, erase) => { setError(""); setConfirm({ rows: [row], erase }); }} />}
     {confirm && <Modal title={confirm.erase ? "마케팅 개인정보 삭제" : "마케팅 수신동의 철회"} onClose={() => { if (!busy) setConfirm(undefined); }}>
       <p>{confirm.erase ? "마케팅 목록의 연락처와 근거 원문을 삭제합니다. 발송 거부 기록과 변경 이력은 남습니다. 원본 응답의 파기는 응답 관리에서 진행하세요." : `${confirm.rows.length}개 채널의 수신동의를 철회합니다. 해당 채널의 예약 발송도 전달 전에 차단됩니다.`}</p>
       {error && <p role="alert">{error}</p>}<div className="marketing-actions"><ActionButton secondary disabled={busy} onClick={() => setConfirm(undefined)}>취소</ActionButton><ActionButton disabled={busy} onClick={perform}>{busy ? "처리 중…" : confirm.erase ? "개인정보 삭제" : "철회 확인"}</ActionButton></div>
     </Modal>}
   </div>;
 }
-function MarketingDetail({ id, canWrite, onClose, onChanged, onAction }: { id: string; canWrite: boolean; onClose: () => void; onChanged: () => void; onAction: (row: MarketingRecord, erase: boolean) => void }) {
+function MarketingDetail({ id, onClose, onChanged, onAction }: { id: string; onClose: () => void; onChanged: () => void; onAction: (row: MarketingRecord, erase: boolean) => void }) {
   const result = useResource<MarketingRecord>("/marketing/preferences/" + id), [busy, setBusy] = useState(false), [error, setError] = useState("");
   const r = result.data;
   async function toggle() { if (!r || busy) return; setBusy(true); setError(""); try { await api("/marketing/preferences/" + id, { method: "PATCH", body: JSON.stringify({ version: r.version, excluded: !r.excluded }) }); result.reload(); onChanged(); } catch (e) { setError(errorText(e)); } finally { setBusy(false); } }
   return <Modal title="수신동의 상세" onClose={onClose}>{result.loading ? <p role="status">불러오는 중입니다.</p> : result.error ? <p role="alert">{result.error.message}</p> : r && <div className="cs-stack">
     <dl className="marketing-detail"><dt>이름</dt><dd>{r.name ?? "원문 없음"}</dd><dt>{r.channel === "email" ? "이메일" : "전화번호"}</dt><dd>{r.contact ?? "원문 없음"}</dd><dt>상태</dt><dd>{marketingStatus[r.status]} · {r.eligible ? "발송 가능" : r.denial}</dd><dt>수집 출처</dt><dd>{r.sourceTitle}</dd><dt>동의일</dt><dd>{time(r.grantedAt)}</dd><dt>보유 기한</dt><dd>{time(r.retentionUntil)}</dd><dt>마케팅 목적</dt><dd>{r.evidence?.purpose ?? "원문 없음"}</dd><dt>증빙 참조</dt><dd>{r.evidence?.reference ?? "원문 없음"}</dd><dt>버전</dt><dd>{r.version}</dd></dl>
-    {canWrite && r.status !== "erased" && <div className="marketing-actions"><ActionButton secondary disabled={busy} onClick={toggle}>{r.excluded ? "발송 제외 해제" : "이 채널 발송 제외"}</ActionButton><ActionButton secondary disabled={busy || r.status !== "granted"} onClick={() => onAction(r, false)}>동의 철회</ActionButton><ActionButton secondary disabled={busy} onClick={() => onAction(r, true)}>개인정보 삭제</ActionButton></div>}
+    <div className="marketing-actions">{r.permissions.canChangeExclusion && <ActionButton secondary disabled={busy} onClick={toggle}>{r.excluded ? "발송 제외 해제" : "이 채널 발송 제외"}</ActionButton>}{r.permissions.canWithdraw && <ActionButton secondary disabled={busy} onClick={() => onAction(r, false)}>동의 철회</ActionButton>}{r.permissions.canErase && <ActionButton secondary disabled={busy} onClick={() => onAction(r, true)}>개인정보 삭제</ActionButton>}</div>
+    {r.pendingLocalCopies > 0 && <p role="status">정리 대기 중인 로컬 발송 사본 {r.pendingLocalCopies}건</p>}
+    {r.permissions.canCleanup && <ActionButton secondary disabled={busy} onClick={() => onAction(r, true)}>남은 발송 사본 정리 재시도</ActionButton>}
     {error && <p role="alert">{error}</p>}<h3>변경 이력 (최근 100건)</h3><ol className="marketing-events">{r.events?.map(e => <li key={e.id}>{marketingEventLabel[e.kind] ?? e.kind}<small>v{e.version} · {time(e.createdAt)}</small></li>)}</ol>
   </div>}</Modal>;
 }
 function MarketingCreate({ serviceId, onClose, onCreated }: { serviceId: string; onClose: () => void; onCreated: (id: string) => void }) {
-  const [page, setPage] = useState(1), [query, setQuery] = useState(""), [search, setSearch] = useState(""), [source, setSource] = useState<MarketingSource>();
+  const [page, setPage] = useState(1), [query, setQuery] = useState(""), [search, setSearch] = useState(""), [sourceId, setSourceId] = useState<string>();
   const [channel, setChannel] = useState("email"), [nameId, setNameId] = useState(""), [contactId, setContactId] = useState("");
   const [busy, setBusy] = useState(false), [error, setError] = useState(""); const pending = useRef<{ body: string; key: string } | null>(null);
   const sources = useResource<Paged<MarketingSource>>("/marketing/sources?" + new URLSearchParams({ serviceId, page: String(page), search }));
+  const source = sources.data?.items.find(row => row.id === sourceId && new Date(row.retentionUntil) > new Date());
+  const currentPage = sources.data?.page ?? page;
   return <Modal title="기존 응답의 마케팅 동의 근거 등록" onClose={() => { if (!busy) onClose(); }}><div className="cs-stack">
     <p>별도로 받은 채널별 수신동의의 근거를 등록하세요. 원본 응답에 있는 이름과 연락처를 직접 선택합니다.</p>
     <form className="cs-row" onSubmit={e => { e.preventDefault(); setSearch(query); setPage(1); }}><input className="cs-input" aria-label="동의 출처 검색" placeholder="캐치폼·업로드 제목" value={query} onChange={e => setQuery(e.target.value)} /><ActionButton secondary>출처 검색</ActionButton></form>
     {sources.error && <p role="alert">{sources.error.message}</p>}
-    <label className="cs-label">원본 응답<select className="cs-input" aria-label="동의 출처 응답" value={source?.id ?? ""} onChange={e => { setSource(sources.data?.items.find(s => s.id === e.target.value)); setNameId(""); setContactId(""); }}><option value="">응답을 선택하세요</option>{sources.data?.items.map(s => <option key={s.id} value={s.id}>{s.title} · {time(s.createdAt)} · {s.id.slice(0, 8)}</option>)}</select></label>
-    <div className="marketing-actions"><ActionButton secondary disabled={page === 1 || sources.loading} onClick={() => { setPage(p => p - 1); setSource(undefined); }}>이전 출처</ActionButton><span>{page} / {Math.max(1, Math.ceil((sources.data?.total ?? 0) / 20))}</span><ActionButton secondary disabled={page * 20 >= (sources.data?.total ?? 0) || sources.loading} onClick={() => { setPage(p => p + 1); setSource(undefined); }}>다음 출처</ActionButton></div>
-    {source && <form className="cs-stack" onSubmit={async e => { e.preventDefault(); if (busy) return; const f = new FormData(e.currentTarget); setBusy(true); setError("");
+    <label className="cs-label">원본 응답<select className="cs-input" aria-label="동의 출처 응답" value={source?.id ?? ""} onChange={e => { setSourceId(e.target.value); setNameId(""); setContactId(""); }}><option value="">응답을 선택하세요</option>{sources.data?.items.map(s => <option key={s.id} value={s.id}>{s.title} · {time(s.createdAt)} · {s.id.slice(0, 8)}</option>)}</select></label>
+    <div className="marketing-actions"><ActionButton secondary disabled={currentPage === 1 || sources.loading} onClick={() => { setPage(currentPage - 1); setSourceId(undefined); }}>이전 출처</ActionButton><span>{currentPage} / {Math.max(1, Math.ceil((sources.data?.total ?? 0) / 20))}</span><ActionButton secondary disabled={currentPage * 20 >= (sources.data?.total ?? 0) || sources.loading} onClick={() => { setPage(currentPage + 1); setSourceId(undefined); }}>다음 출처</ActionButton></div>
+    {source && <form key={source.id + source.retentionUntil} className="cs-stack" onSubmit={async e => { e.preventDefault(); if (busy) return; const f = new FormData(e.currentTarget); setBusy(true); setError("");
       try { const body = JSON.stringify({ serviceId, submissionId: source.id, channel, nameQuestionId: nameId, contactQuestionId: contactId, grantedAt: new Date(String(f.get("grantedAt"))).toISOString(), purpose: f.get("purpose"), reference: f.get("reference"), attested: f.get("attested") === "on" });
         if (pending.current?.body !== body) pending.current = { body, key: crypto.randomUUID() };
         const r = await api<{ id: string }>("/marketing/preferences", { method: "POST", body, headers: { "Idempotency-Key": pending.current.key } }); onCreated(r.id);

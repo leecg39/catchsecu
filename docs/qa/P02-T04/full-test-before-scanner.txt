@@ -1,0 +1,230 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:67964) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/campaigns.test.ts (55 tests | 8 failed) 28486ms
+   ❯ campaign attachment lifecycle (7)
+     × real scanner, private download and actual local mail retain exact bytes and frozen metadata 327ms
+     × unfinished or mismatched files block preview and scheduling, and upload owners are enforced 280ms
+     × actual EICAR rejection and unavailable scanner never create sendable attachments 42ms
+     × parallel reservations enforce five files, twenty MB, service scope and SMS restrictions 39ms
+     × storage deletion failure blocks downloads and is retried; draft deletion removes the remaining originals 36ms
+     × tampered stored bytes are rejected before any provider I/O 246ms
+     × actual elapsed campaign expiry deletes encrypted attachment bytes 54ms
+   × SMTP adapter receives sanitized HTML and attachment buffers with path and URL access disabled 456ms
+(node:69171) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:69389) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/notifications.test.ts (25 tests | 1 failed) 17087ms
+   ❯ notification CRUD and transactional delivery (15)
+     × emits CSV completion from the actual importer once and preserves counts and target scope 88ms
+(node:69814) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:70518) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:70841) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sharing.test.ts (20 tests | 1 failed) 10507ms
+   ❯ external sharing with PostgreSQL, local mail and private attachments (20)
+     × creates one encrypted grant and one mail on retry; validates version and selected fields 456ms
+(node:71104) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:71311) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:71541) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:71800) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:72023) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:72243) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:72469) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:72615) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:72749) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:73337) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:73398) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:73633) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/campaigns.test.ts > campaign attachment lifecycle > real scanner, private download and actual local mail retain exact bytes and frozen metadata
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"32816ddf-87bc-4e3c-a434-c4fe79a16489"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/campaigns.test.ts:58:169
+
+ ❯ attachFile tests/server/campaigns.test.ts:453:16
+ ❯ tests/server/campaigns.test.ts:461:58
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/server/campaigns.test.ts > campaign attachment lifecycle > unfinished or mismatched files block preview and scheduling, and upload owners are enforced
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"e5060b55-7c8c-432b-a001-8d6a55af1218"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/campaigns.test.ts:58:169
+
+ ❯ tests/server/campaigns.test.ts:479:99
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/server/campaigns.test.ts > campaign attachment lifecycle > actual EICAR rejection and unavailable scanner never create sendable attachments
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"e4a9dcb0-7746-4a2d-83e2-9acd07f658cc"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/campaigns.test.ts:58:169
+
+ ❯ tests/server/campaigns.test.ts:489:132
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/server/campaigns.test.ts > campaign attachment lifecycle > parallel reservations enforce five files, twenty MB, service scope and SMS restrictions
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"9b302344-8288-4d9a-9bd6-1a821c3d01ba"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/campaigns.test.ts:58:169
+
+ ❯ tests/server/campaigns.test.ts:497:59
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/server/campaigns.test.ts > campaign attachment lifecycle > storage deletion failure blocks downloads and is retried; draft deletion removes the remaining originals
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"8a6af150-8f4d-46e0-a0b5-87f362180ced"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/campaigns.test.ts:58:169
+
+ ❯ attachFile tests/server/campaigns.test.ts:453:16
+ ❯ tests/server/campaigns.test.ts:507:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/server/campaigns.test.ts > campaign attachment lifecycle > tampered stored bytes are rejected before any provider I/O
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"3566f92c-227f-49ce-8315-5e194671b145"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/campaigns.test.ts:58:169
+
+ ❯ attachFile tests/server/campaigns.test.ts:453:16
+ ❯ tests/server/campaigns.test.ts:516:58
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  tests/server/campaigns.test.ts > campaign attachment lifecycle > actual elapsed campaign expiry deletes encrypted attachment bytes
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"ee7a3be0-0d03-419d-8357-7ec802d8f82f"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/campaigns.test.ts:58:169
+
+ ❯ attachFile tests/server/campaigns.test.ts:453:16
+ ❯ tests/server/campaigns.test.ts:524:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  tests/server/campaigns.test.ts > SMTP adapter receives sanitized HTML and attachment buffers with path and URL access disabled
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"3b9907e9-025d-44ff-84ce-1de742574329"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/campaigns.test.ts:58:169
+
+ ❯ attachFile tests/server/campaigns.test.ts:453:16
+ ❯ tests/server/campaigns.test.ts:536:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯
+
+ FAIL  tests/server/notifications.test.ts > notification CRUD and transactional delivery > emits CSV completion from the actual importer once and preserves counts and target scope
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"f22b479d-e2bf-4ce8-93ad-0be024207f8d"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/notifications.test.ts:42:169
+
+ ❯ startImport tests/server/notifications.test.ts:65:13
+ ❯ tests/server/notifications.test.ts:157:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > creates one encrypted grant and one mail on retry; validates version and selected fields
+AssertionError: {"error":{"code":"FILE_SCANNER_UNAVAILABLE","message":"파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.","requestId":"dada8363-dc89-479b-b835-791f92e46a3f"}}: expected 503 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 503
+
+ ❯ ok tests/server/sharing.test.ts:36:104
+     34| }
+     35| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     36|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     37| }
+     38| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ fixture tests/server/sharing.test.ts:61:15
+ ❯ tests/server/sharing.test.ts:101:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯
+
+
+ Test Files  3 failed | 27 passed (30)
+      Tests  10 failed | 429 passed (439)
+   Start at  17:48:10
+   Duration  259.13s (tests 89%, import 10%, transform 1%)
+

@@ -81,10 +81,11 @@ function DocumentEditor({ row, type, reload }: { row?: DocumentRecord; type: Doc
   return <div className="documents-page"><PageHeading title={row ? row.title : documentTypes[type] + " 생성"}><Link href={listPath(value.type)}>목록으로</Link></PageHeading>
     {row && <div className="documents-toolbar"><strong>{documentStates[row.status]} · {row.latestNumber ? `게시 v${row.latestNumber}` : "미게시"}</strong>{row.hasUnpublishedChanges && row.latestNumber > 0 && <span>저장된 초안에 미게시 변경이 있습니다.</span>}
       {canWrite && (row.status === "archived" ? <ActionButton onClick={() => setAction("restore")}>초안으로 복원</ActionButton> : <>
-        <ActionButton disabled={dirty || busy || !!preview.data?.publishErrors.length || (row.status === "published" && !row.hasUnpublishedChanges)} onClick={() => setAction("publish")}>게시하기</ActionButton>
+        <ActionButton disabled={dirty || busy || !!preview.data?.publishErrors.length || (row.status === "published" && row.hasActivePublication && !row.hasUnpublishedChanges)} onClick={() => setAction("publish")}>게시하기</ActionButton>
         {row.status === "published" && <ActionButton secondary disabled={dirty || busy} onClick={() => setAction("unpublish")}>비공개로 전환</ActionButton>}
         <ActionButton secondary disabled={dirty || busy} onClick={() => setAction("archive")}>문서 보관</ActionButton></>)}
     </div>}
+    {row?.status === "published" && !row.hasActivePublication && <p role="status">최신 게시본의 공개 링크가 종료되었습니다. 같은 내용으로도 다시 게시할 수 있습니다.</p>}
     {error && !action && <p role="alert" className="documents-error">{error}</p>}
     <div className="documents-grid"><Panel title="문서 초안"><form className="documents-fields" onSubmit={save}>
       <fieldset disabled={!editable || busy}><label>서비스<select className="cs-input" aria-label="문서 서비스" disabled={!!row} value={serviceId} onChange={event => { patch({ serviceId: event.target.value, purposeIds: [], recipientIds: [] }); setTemplateId(""); }}>{app.data?.services.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>

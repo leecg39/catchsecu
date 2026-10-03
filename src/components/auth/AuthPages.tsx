@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
+import { IpDeniedCompanies } from "./LiveAuth";
 import { useSearchParams } from "next/navigation";
 import { authPath } from "@/lib/return-to";
 import { InvitationAccept } from "./InvitationAccept";
 import { useEffect, useState, type ReactNode } from "react";
-import {LoginForm, SignupOrResetForm, PasswordForm, VerificationForm, MfaForm, LogoutForm} from "./LiveAuth";
+import {LoginForm, SignupOrResetForm, PasswordForm, VerificationForm, MfaForm, LogoutForm, AuthCallbackError} from "./LiveAuth";
 import "./auth.css";
 
 const A = "/assets/img/catchsecu/";
@@ -23,7 +24,7 @@ function Login() {
  const returnTo = useSearchParams().get("returnTo");
  return <Frame login><Card><LoginForm/><div className="auth-signup">아직 계정이 없으신가요? <Link href={authPath("/signup", returnTo)}>회원가입</Link></div><div className="auth-divider"><span/>or<span/></div><Link className="auth-social" href="/login/oauth2"><img src={A+"google-logo.svg"} width={32} height={32} alt=""/>구글 계정 로그인</Link><Link className="auth-social" href="/login/saml"><img src={A+"ms-logo.svg"} width={32} height={32} alt=""/>MS 계정 로그인</Link></Card><section className="auth-lookup"><Link href="/infoOwner/find">캐치폼 동의 이력을 조회하고 싶어요<span>›</span></Link><hr/><Link href="/shared-privacy/verify">공유받은 외부 개인정보를 조회하고 싶어요<span>›</span></Link></section><Testimonials/></Frame>;
 }
-function Message({ title, description, action = "로그인으로 돌아가기", href = "/login" }: { title: string; description?: string; action?: string; href?: string }) { return <Frame><Card><h1>{title}</h1>{description && <p className="auth-description">{description}</p>}<Link className="auth-primary auth-block" href={href}>{action}</Link></Card></Frame>; }
+function Message({ title, description, action = "로그인으로 돌아가기", href = "/login" }: { title: string; description?: string; action?: string; href?: string }) { const returnTo = useSearchParams().get("returnTo"); return <Frame><Card><h1>{title}</h1>{description && <p className="auth-description">{description}</p>}<AuthCallbackError /><Link className="auth-primary auth-block" href={authPath(href, returnTo)}>{action}</Link></Card></Frame>; }
 function Verification({email=false}:{email?:boolean}){return <Frame><Card><h1>{email?'이메일 인증':'OTP 인증'}</h1><VerificationForm email={email}/></Card></Frame>}
 function TwoStep(){return <Frame><Card><h1>2단계 인증 설정</h1><MfaForm/></Card></Frame>}
 function ChangePassword(){return <Frame><Card><h1>비밀번호 변경</h1><PasswordForm/></Card></Frame>}
@@ -39,7 +40,7 @@ export function AuthPages({ path }: { path: string }) {
  if (path === "/password-change-email/complete") return <Message title="이메일을 확인해주세요." description="가입된 이메일이면 비밀번호 재설정 메일 전송을 요청했습니다." />;
  if (path === "/password-change-email") return <RecoverOrSignup />;
  if (path === "/signup" || path.startsWith("/oauth2/") && path.includes("signup")) return <RecoverOrSignup signup />;
- if (path === "/not-allow-ip") return <Message title="허용되지 않은 IP 접근 제한" description="보안 담당자가 사전에 등록한 IP주소로만 로그인할 수 있습니다. 사무실과 같은 허용된 장소에서 접속하세요." action="확인" />;
+ if (path === "/not-allow-ip") return <Frame><Card><h1>허용되지 않은 IP 접근 제한</h1><p className="auth-description">회사에서 허용한 IP 주소에서 접속해주세요. 다른 소속 회사의 접근 권한이 있다면 회사를 변경할 수 있습니다.</p><IpDeniedCompanies/></Card></Frame>;
  if (path.includes("fail")) return <Message title="로그인에 실패했습니다. 다시 시도해 주세요." />;
  if (path.startsWith("/expire")) return <Message title="인증 시간이 만료되었습니다." description="로그인 화면에서 다시 시작해주세요." />;
  return <Message title="외부 인증이 필요합니다." description="이 인증 공급자는 아직 연결되지 않았습니다. 이메일 계정으로 로그인할 수 있습니다." />;

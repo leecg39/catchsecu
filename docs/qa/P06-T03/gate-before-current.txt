@@ -1,0 +1,373 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:45662) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/file-access-gate.test.ts (17 tests | 17 failed) 21110ms
+   × 로그아웃한 Context로 파일·목록·업로드 조회·변경·생성 재전송을 처리하지 않는다 1635ms
+   × 현재 expired 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 857ms
+   × 현재 email 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 965ms
+   × 현재 idle 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 977ms
+   × 현재 mfa 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 809ms
+   × 현재 password 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 803ms
+   × 현재 company 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 987ms
+   × 진행 중인 Session 회수 변경이 커밋될 때까지 파일 읽기가 기다린 뒤 거부된다 2380ms
+   × 진행 중인 User 회수 변경이 커밋될 때까지 파일 읽기가 기다린 뒤 거부된다 2309ms
+   × 파일 행 잠금 대기 중 session 실제 기한이 지나면 바이트를 보내지 않는다 1266ms
+   × 파일 행 잠금 대기 중 retention 실제 기한이 지나면 바이트를 보내지 않는다 1299ms
+   × 실제 저장소 읽기 중 private-session 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다 1166ms
+   × 실제 저장소 읽기 중 shared-session 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다 1238ms
+   × 실제 저장소 읽기 중 shared-grant 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다 1293ms
+   × 실제 저장소 읽기 중 shared-retention 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다 1329ms
+   × 응답·질문·파일의 정확한 조합과 중복 없는 쿼리만 개인·공유 경로에 허용한다 919ms
+   × 공유 발급자의 이메일 인증 회수도 이미 인증한 열람자의 파일을 차단한다 874ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 17 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 로그아웃한 Context로 파일·목록·업로드 조회·변경·생성 재전송을 처리하지 않는다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "expiresAt": null,
++   "id": "68b5f5e8-c044-4bb6-ace2-84c027bf6470",
++   "mime": "text/plain",
++   "name": "합성 증빙.txt",
++   "questionId": "41f59475-843d-43be-9383-084c1482a5dd",
++   "scanStatus": "clean",
++   "size": 80,
++   "status": "attached",
++   "submissionId": "4a10f1c3-acda-4fa5-9979-02f56250840f",
++   "version": 4,
+  }
+
+ ❯ tests/server/file-access-gate.test.ts:100:49
+     98|     () => cancelUpload({ ctx: f.ctx }, upload.id, upload.version, rand…
+     99|   const audits = await db.auditEvent.count();
+    100|   for (const call of calls) await expect(call()).rejects.toMatchObject…
+       |                                                 ^
+    101|   expect(await db.auditEvent.count()).toBe(audits); expect(await db.fi…
+    102|   expect((await db.fileObject.findUniqueOrThrow({ where: { id: upload.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 현재 expired 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "expiresAt": null,
++   "id": "e1855ad1-b92a-4486-ad8c-75680418d22f",
++   "mime": "text/plain",
++   "name": "합성 증빙.txt",
++   "questionId": "cc94ac33-a44b-436b-9aad-2533d95d0e1b",
++   "scanStatus": "clean",
++   "size": 80,
++   "status": "attached",
++   "submissionId": "1c4a4006-2002-40e2-ad9e-e7d5fed377de",
++   "version": 4,
+  }
+
+ ❯ tests/server/file-access-gate.test.ts:117:72
+    115|   }
+    116|   const status = ["expired", "email", "idle"].includes(kind) ? 401 : 4…
+    117|   await expect(fileMetadata(f.ctx, f.file.id, f.binding, randomUUID())…
+       |                                                                        ^
+    118|   await expect(downloadFile(f.ctx, f.file.id, f.binding, randomUUID())…
+    119|   expect(await db.auditEvent.count()).toBe(audits);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 현재 email 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "expiresAt": null,
++   "id": "8cfc14d8-b920-458b-9872-eb956b65f6fe",
++   "mime": "text/plain",
++   "name": "합성 증빙.txt",
++   "questionId": "bf1d295e-5095-4729-849c-d04e05ca79b4",
++   "scanStatus": "clean",
++   "size": 80,
++   "status": "attached",
++   "submissionId": "0a47de2e-a392-4e3c-b0de-d2fb225fcb67",
++   "version": 4,
+  }
+
+ ❯ tests/server/file-access-gate.test.ts:117:72
+    115|   }
+    116|   const status = ["expired", "email", "idle"].includes(kind) ? 401 : 4…
+    117|   await expect(fileMetadata(f.ctx, f.file.id, f.binding, randomUUID())…
+       |                                                                        ^
+    118|   await expect(downloadFile(f.ctx, f.file.id, f.binding, randomUUID())…
+    119|   expect(await db.auditEvent.count()).toBe(audits);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 현재 idle 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "expiresAt": null,
++   "id": "29258de8-080d-4ab4-a226-d93533d19426",
++   "mime": "text/plain",
++   "name": "합성 증빙.txt",
++   "questionId": "d75dc210-95df-44f3-a069-d51d5faf6fa5",
++   "scanStatus": "clean",
++   "size": 80,
++   "status": "attached",
++   "submissionId": "6180b3e0-2644-4c34-a2b2-97f5584021b6",
++   "version": 4,
+  }
+
+ ❯ tests/server/file-access-gate.test.ts:117:72
+    115|   }
+    116|   const status = ["expired", "email", "idle"].includes(kind) ? 401 : 4…
+    117|   await expect(fileMetadata(f.ctx, f.file.id, f.binding, randomUUID())…
+       |                                                                        ^
+    118|   await expect(downloadFile(f.ctx, f.file.id, f.binding, randomUUID())…
+    119|   expect(await db.auditEvent.count()).toBe(audits);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 현재 mfa 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "expiresAt": null,
++   "id": "cbb00ad8-3431-47f9-8bf1-4b7743001334",
++   "mime": "text/plain",
++   "name": "합성 증빙.txt",
++   "questionId": "0640a01e-5706-49bf-9637-1ba5c97c2bf9",
++   "scanStatus": "clean",
++   "size": 80,
++   "status": "attached",
++   "submissionId": "874afe26-3ce8-4d5d-b1ea-f88e103a59fd",
++   "version": 4,
+  }
+
+ ❯ tests/server/file-access-gate.test.ts:117:72
+    115|   }
+    116|   const status = ["expired", "email", "idle"].includes(kind) ? 401 : 4…
+    117|   await expect(fileMetadata(f.ctx, f.file.id, f.binding, randomUUID())…
+       |                                                                        ^
+    118|   await expect(downloadFile(f.ctx, f.file.id, f.binding, randomUUID())…
+    119|   expect(await db.auditEvent.count()).toBe(audits);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 현재 password 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "expiresAt": null,
++   "id": "8a822cc3-c184-4870-90b4-b3f3b88abd90",
++   "mime": "text/plain",
++   "name": "합성 증빙.txt",
++   "questionId": "c11b23b8-3fc0-4db3-9404-9a9d8cc2f54c",
++   "scanStatus": "clean",
++   "size": 80,
++   "status": "attached",
++   "submissionId": "05851401-94a5-4b10-b534-27f5b2eab7fb",
++   "version": 4,
+  }
+
+ ❯ tests/server/file-access-gate.test.ts:117:72
+    115|   }
+    116|   const status = ["expired", "email", "idle"].includes(kind) ? 401 : 4…
+    117|   await expect(fileMetadata(f.ctx, f.file.id, f.binding, randomUUID())…
+       |                                                                        ^
+    118|   await expect(downloadFile(f.ctx, f.file.id, f.binding, randomUUID())…
+    119|   expect(await db.auditEvent.count()).toBe(audits);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 현재 company 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "expiresAt": null,
++   "id": "c716c070-33d1-4747-b058-5e3ef677fbb7",
++   "mime": "text/plain",
++   "name": "합성 증빙.txt",
++   "questionId": "3244f93b-7c01-4bd0-b696-ebeae491b7a7",
++   "scanStatus": "clean",
++   "size": 80,
++   "status": "attached",
++   "submissionId": "714d4540-4d81-4714-95d2-7f63d9b43d99",
++   "version": 4,
+  }
+
+ ❯ tests/server/file-access-gate.test.ts:117:72
+    115|   }
+    116|   const status = ["expired", "email", "idle"].includes(kind) ? 401 : 4…
+    117|   await expect(fileMetadata(f.ctx, f.file.id, f.binding, randomUUID())…
+       |                                                                        ^
+    118|   await expect(downloadFile(f.ctx, f.file.id, f.binding, randomUUID())…
+    119|   expect(await db.auditEvent.count()).toBe(audits);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 진행 중인 Session 회수 변경이 커밋될 때까지 파일 읽기가 기다린 뒤 거부된다
+ FAIL  tests/server/file-access-gate.test.ts > 진행 중인 User 회수 변경이 커밋될 때까지 파일 읽기가 기다린 뒤 거부된다
+AssertionError: expected 0 to be greater than 0
+ ❯ tests/server/file-access-gate.test.ts:131:21
+    129|     await client.query("COMMIT"); const response = await pending;
+    130|     barriers.push({ name: table, waiting, status: response.status });
+    131|     expect(waiting).toBeGreaterThan(0); expect(response.status).toBe(4…
+       |                     ^
+    132|     expect(await db.auditEvent.count({ where: { resourceId: f.file.id,…
+    133|   } finally { await client.query("ROLLBACK").catch(() => undefined); a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 파일 행 잠금 대기 중 session 실제 기한이 지나면 바이트를 보내지 않는다
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/file-access-gate.test.ts:146:65
+    144|     await pause(Math.max(0, expiresAt.getTime() - Date.now() + 50)); a…
+    145|     barriers.push({ name: "file-wait-" + kind, waiting, status: respon…
+    146|     expect(waiting).toBeGreaterThan(0); expect(response.status).toBe(k…
+       |                                                                 ^
+    147|     expect(await db.auditEvent.count({ where: { resourceId: f.file.id,…
+    148|   } finally { await client.query("ROLLBACK").catch(() => undefined); a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 파일 행 잠금 대기 중 retention 실제 기한이 지나면 바이트를 보내지 않는다
+AssertionError: expected 200 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 200
+
+ ❯ tests/server/file-access-gate.test.ts:146:65
+    144|     await pause(Math.max(0, expiresAt.getTime() - Date.now() + 50)); a…
+    145|     barriers.push({ name: "file-wait-" + kind, waiting, status: respon…
+    146|     expect(waiting).toBeGreaterThan(0); expect(response.status).toBe(k…
+       |                                                                 ^
+    147|     expect(await db.auditEvent.count({ where: { resourceId: f.file.id,…
+    148|   } finally { await client.query("ROLLBACK").catch(() => undefined); a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 실제 저장소 읽기 중 private-session 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다
+ FAIL  tests/server/file-access-gate.test.ts > 실제 저장소 읽기 중 shared-session 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다
+ FAIL  tests/server/file-access-gate.test.ts > 실제 저장소 읽기 중 shared-grant 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/file-access-gate.test.ts:165:61
+    163|   });
+    164|   const response = kind === "private-session" ? await directDownload(f…
+    165|   expect(readRealBytes).toBe(true); expect(response.status).toBe(kind …
+       |                                                             ^
+    166|   expect(await db.auditEvent.count()).toBe(audits);
+    167| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 실제 저장소 읽기 중 shared-retention 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다
+AssertionError: expected 200 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 200
+
+ ❯ tests/server/file-access-gate.test.ts:165:61
+    163|   });
+    164|   const response = kind === "private-session" ? await directDownload(f…
+    165|   expect(readRealBytes).toBe(true); expect(response.status).toBe(kind …
+       |                                                             ^
+    166|   expect(await db.auditEvent.count()).toBe(audits);
+    167| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 응답·질문·파일의 정확한 조합과 중복 없는 쿼리만 개인·공유 경로에 허용한다
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/file-access-gate.test.ts:178:192
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/17]⎯
+
+ FAIL  tests/server/file-access-gate.test.ts > 공유 발급자의 이메일 인증 회수도 이미 인증한 열람자의 파일을 차단한다
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/file-access-gate.test.ts:186:99
+    184|   expect((await viewerGet(req(filePath(f, "/viewer/files"), "GET", und…
+    185|   await db.user.update({ where: { id: f.user.id }, data: { emailVerifi…
+    186|   expect((await viewerGet(req(filePath(f, "/viewer/files"), "GET", und…
+       |                                                                                                   ^
+    187| });
+    188|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/17]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  17 failed (17)
+   Start at  01:32:27
+   Duration  22.46s (tests 94%, import 3%, transform 3%)
+

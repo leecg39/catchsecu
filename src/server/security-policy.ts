@@ -6,6 +6,8 @@ import type { Context } from "./context";
 import { fail, rateLimit } from "./http";
 import { auth } from "./auth";
 import { audit } from "./audit";
+import { lockServiceActor } from "./service-actor";
+import { assertFileDeadlines } from "./file-access";
 
 export function policyDto(policy: SecurityPolicy, ctx: Context) {
   return { tenantId: ctx.tenantId, minPassword: policy.minPassword, passwordMonths: policy.passwordMonths,
@@ -38,8 +40,8 @@ export async function updatePolicy(ctx: Context, version: number, settings: z.in
   return db.$transaction(async tx => {
     // Use the same company lock as member removal and ownership transfer.
     await tx.$queryRaw`SELECT id FROM "Company" WHERE id = ${ctx.tenantId} FOR UPDATE`;
-    const member = await tx.membership.findFirst({ where: { id: ctx.member.id, tenantId: ctx.tenantId, role: "owner", status: "active" } });
-    if (!member) fail(403, "FORBIDDEN", "최상위 관리자 권한이 필요합니다.");
+    const actor = await lockServiceActor(tx, ctx, "security.write");
+    if (actor.member.role !== "owner" || actor.member.accessKind !== "direct") fail(403, "FORBIDDEN", "최상위 관리자 권한이 필요합니다.");
     await tx.$queryRaw`SELECT "tenantId" FROM "SecurityPolicy" WHERE "tenantId" = ${ctx.tenantId} FOR UPDATE`;
     const current = await tx.securityPolicy.findUniqueOrThrow({ where: { tenantId: ctx.tenantId } });
     if (current.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 정책을 불러와주세요.");
@@ -61,6 +63,7 @@ export async function updatePolicy(ctx: Context, version: number, settings: z.in
     const saved = await tx.securityPolicy.update({ where: { tenantId: ctx.tenantId },
       data: { ...settings, version: { increment: 1 }, passwordRevision: { increment: passwordChanged ? 1 : 0 }, approvalRevision: { increment: approvalChanged ? 1 : 0 } } });
     await audit(tx, ctx, requestId, reset ? "policy.reset" : "policy.updated", "securityPolicy", ctx.tenantId, Object.keys(settings));
+    assertFileDeadlines(actor.deadlines);
     return policyDto(saved, ctx);
   }, { timeout: 15000 });
 }

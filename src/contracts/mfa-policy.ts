@@ -1,0 +1,10 @@
+import { z } from "zod";
+const scope = { tenantId: z.uuid() };
+const reason = z.string().trim().min(5).max(500).refine(v => !/[\u0000-\u001f\u007f]/.test(v), "제어 문자는 사용할 수 없습니다.");
+export const mfaPolicyChange = z.object({ ...scope, version: z.number().int().positive(), required: z.boolean(), password: z.string().min(1).max(128) }).strict();
+export const mfaExceptionCreate = z.object({ ...scope, memberId: z.uuid(), reason, expiresAt: z.iso.datetime(), password: z.string().min(1).max(128) }).strict();
+export const mfaExceptionPatch = mfaExceptionCreate.omit({ memberId: true }).extend({ version: z.number().int().positive() });
+export const mfaExceptionDelete = z.object({ ...scope, version: z.number().int().positive(), password: z.string().min(1).max(128) }).strict();
+export const mfaMemberQuery = z.object({ search: z.string().trim().max(100).default(""), status: z.enum(["all","enabled","required","exception"]).default("all"), page: z.coerce.number().int().min(1).max(100000).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20) }).strict();
+export type MfaExceptionRecord = { id: string; tenantId: string; memberId: string; reason: string; expiresAt: string; createdAt: string; version: number; active: boolean };
+export type MfaPolicyPage = { policy: { tenantId: string; required: boolean; version: number; canManage: boolean; actorEnrolled: boolean }; items: { id: string; name: string; email: string; role: string; enrolled: boolean; exception: MfaExceptionRecord|null }[]; total: number; page: number; pageSize: number; summary: { members: number; enrolled: number; exceptions: number; missing: number } };

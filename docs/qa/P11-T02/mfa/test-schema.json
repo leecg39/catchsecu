@@ -1,0 +1,52 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-03T22:16:21.326Z",
+  "database": "catchsecu_test",
+  "checksumMatches": 67,
+  "priorMigrationChecksumsPreserved": 65,
+  "constraints": [
+    {
+      "name": "MfaException_lifetime",
+      "definition": "CHECK (((\"expiresAt\" > \"createdAt\") AND (\"expiresAt\" <= (\"createdAt\" + '24:00:00'::interval))))"
+    },
+    {
+      "name": "MfaException_other_owner",
+      "definition": "CHECK ((\"memberId\" <> \"createdById\"))"
+    },
+    {
+      "name": "MfaException_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "MfaException_reason_encrypted",
+      "definition": "CHECK ((\"reasonCipher\" ~~ 'v1.%'::text))"
+    },
+    {
+      "name": "MfaException_tenantId_createdById_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"createdById\") REFERENCES \"Membership\"(\"tenantId\", id) ON DELETE RESTRICT"
+    },
+    {
+      "name": "MfaException_tenantId_memberId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"memberId\") REFERENCES \"Membership\"(\"tenantId\", id) ON DELETE CASCADE"
+    },
+    {
+      "name": "MfaException_version_check",
+      "definition": "CHECK ((version > 0))"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "Membership_mfa_owner_guard",
+      "definition": "CREATE TRIGGER \"Membership_mfa_owner_guard\" BEFORE DELETE OR UPDATE ON public.\"Membership\" FOR EACH ROW EXECUTE FUNCTION protect_last_mfa_owner()"
+    },
+    {
+      "name": "MfaException_guard",
+      "definition": "CREATE TRIGGER \"MfaException_guard\" BEFORE INSERT OR UPDATE ON public.\"MfaException\" FOR EACH ROW EXECUTE FUNCTION guard_mfa_exception()"
+    },
+    {
+      "name": "User_mfa_owner_guard",
+      "definition": "CREATE TRIGGER \"User_mfa_owner_guard\" BEFORE UPDATE ON public.\"User\" FOR EACH ROW EXECUTE FUNCTION protect_last_mfa_owner_account()"
+    }
+  ],
+  "readOnly": true
+}

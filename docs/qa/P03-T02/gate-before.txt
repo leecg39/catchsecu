@@ -1,0 +1,175 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:26112) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/member-management-gate.test.ts (10 tests | 7 failed) 2474ms
+   × 만료 초대 재발송은 다른 대기 초대의 좌석 예약을 침범하지 않는다 261ms
+   × 정지 구성원 복구는 대기 초대를 포함한 좌석 한도를 지킨다 87ms
+   × 신규 전문가 배정도 대기 초대의 좌석 예약을 지킨다 96ms
+   × 서비스 범위를 모두 회수하면 기존 세션의 직접 URL과 목록도 즉시 차단된다 128ms
+   × 회사 잠금 전에 얻은 권한도 실제 계정 정지 후 구성원 변경에 사용할 수 없다 46ms
+   × 초대 수락 트랜잭션도 로그인 후 정지된 계정을 재검사한다 62ms
+   × 전문가 본인 회사 검색은 서버에서 전체 배정과 페이지에 적용된다 103ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/member-management-gate.test.ts > 만료 초대 재발송은 다른 대기 초대의 좌석 예약을 침범하지 않는다
+AssertionError: expected 200 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 200
+
+ ❯ tests/server/member-management-gate.test.ts:74:27
+     72|   await invitation(tenant);
+     73|   const response = await invitationAction(req("/invitations/" + expire…
+     74|   expect(response.status).toBe(409); expect((await response.json()).er…
+       |                           ^
+     75|   expect(await db.invitation.findUnique({ where: { id: expired.id } })…
+     76|   expect(await db.job.count({ where: { dedupeKey: { startsWith: "mail:…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/server/member-management-gate.test.ts > 정지 구성원 복구는 대기 초대를 포함한 좌석 한도를 지킨다
+AssertionError: expected 200 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 200
+
+ ❯ tests/server/member-management-gate.test.ts:88:25
+     86|   await invitation(tenant);
+     87|   const result = await memberPatch(req("/members/" + row.id, "PATCH", …
+     88|   expect(result.status).toBe(409); expect((await result.json()).error.…
+       |                         ^
+     89|   expect(await db.membership.findUnique({ where: { id: row.id } })).to…
+     90| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/server/member-management-gate.test.ts > 신규 전문가 배정도 대기 초대의 좌석 예약을 지킨다
+AssertionError: expected 201 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 201
+
+ ❯ tests/server/member-management-gate.test.ts:101:25
+     99|   const result = await assignExpert(req("/expert-assignments", "POST",…
+    100|     serviceIds: [tenant.serviceId], expiresAt: new Date(Date.now() + 8…
+    101|   expect(result.status).toBe(409); expect((await result.json()).error.…
+       |                         ^
+    102|   expect(await db.expertAssignment.count({ where: { tenantId: tenant.i…
+    103| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/server/member-management-gate.test.ts > 서비스 범위를 모두 회수하면 기존 세션의 직접 URL과 목록도 즉시 차단된다
+AssertionError: expected 422 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 422
+
+ ❯ tests/server/member-management-gate.test.ts:111:113
+    109|   expect((await selectContext(req("/context", "POST", member, { servic…
+    110|   expect((await serviceDetail(req("/services/" + tenant.serviceId, "GE…
+    111|   expect((await memberPatch(req("/members/" + row.id, "PATCH", owner, …
+       |                                                                                                                 ^
+    112|   expect((await serviceDetail(req("/services/" + tenant.serviceId, "GE…
+    113|   expect((await (await services(req("/services", "GET", member))).json…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/server/member-management-gate.test.ts > 회사 잠금 전에 얻은 권한도 실제 계정 정지 후 구성원 변경에 사용할 수 없다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "accessKind": "direct",
++   "createdAt": 2026-10-03T09:31:35.845Z,
++   "grants": [],
++   "id": "cab98254-f8f6-466f-b93a-1001d4144066",
++   "role": "editor",
++   "status": "active",
++   "user": {
++     "department": null,
++     "email": "gate-member-3bbc636f-5cbe-490e-9b0f-9a62a6ca7aaa@members.test.local",
++     "id": "e09b7745-b885-4e2a-8885-c6b75fdaf9b5",
++     "name": "gate-member",
++   },
++   "version": 2,
+  }
+
+ ❯ tests/server/member-management-gate.test.ts:125:92
+    123|   await db.user.update({ where: { id: owner.id }, data: { status: "sus…
+    124|   try {
+    125|     await expect(updateMember(stale, row.id, { version: 1, role: "edit…
+       |                                                                                            ^
+    126|     expect(await db.membership.findUnique({ where: { id: row.id } })).…
+    127|   } finally { await db.user.update({ where: { id: owner.id }, data: { …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/server/member-management-gate.test.ts > 초대 수락 트랜잭션도 로그인 후 정지된 계정을 재검사한다
+AssertionError: promise resolved "{ …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "companyId": "9dfb9e19-8cb5-457a-ac19-d842ea0cab9b",
++   "companyName": "수락 계정 재검사",
++   "memberId": "5eb9ba8b-2782-4102-85a7-6f45f4f4b12d",
+  }
+
+ ❯ tests/server/member-management-gate.test.ts:134:90
+    132|   await db.user.update({ where: { id: expert.id }, data: { status: "su…
+    133|   try {
+    134|     await expect(db.$transaction(tx => acceptInvitation(stale, token, …
+       |                                                                                          ^
+    135|     expect(await db.membership.count({ where: { tenantId: tenant.id, u…
+    136|     expect(await db.invitation.findUnique({ where: { id: pending.id } …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/server/member-management-gate.test.ts > 전문가 본인 회사 검색은 서버에서 전체 배정과 페이지에 적용된다
+AssertionError: expected 3 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 3
+
+ ❯ tests/server/member-management-gate.test.ts:144:26
+    142|     { companyId: tenant.id, expertEmail: expert.email, serviceIds: [te…
+    143|   const filtered = await (await assignments(req("/expert-assignments?s…
+    144|   expect(filtered.total).toBe(1); expect(filtered.items[0].companyId).…
+       |                          ^
+    145|   const page1 = await (await assignments(req("/expert-assignments?scop…
+    146|   const page2 = await (await assignments(req("/expert-assignments?scop…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 3 passed (10)
+   Start at  18:31:32
+   Duration  3.94s (tests 67%, import 22%, transform 12%)
+

@@ -8,7 +8,7 @@ import { decrypt, tokenHash } from "./crypto";
 import { env } from "./env";
 import { fail, rateLimit } from "./http";
 import { lockDelivery, contactEmailHash } from "./suppression";
-import { lockFileContext } from "./file-access";
+import { assertFileDeadlines, lockFileContext } from "./file-access";
 import { audit } from "./audit";
 import { unsubscribeJobId, UNSUBSCRIBE_LIFETIME_MS } from "./email-policy";
 
@@ -111,18 +111,21 @@ export async function feedbackSummary(tx: Transaction, deliveryId: string): Prom
 }
 export async function listEmailSuppressions(ctx: Context, input: z.infer<typeof suppressionQuery>, requestId: string) {
   return db.$transaction(async tx => {
-    await lockFileContext(tx, ctx, input.serviceId, ["message.read", "marketing.read"], true);
+    const deadlines = await lockFileContext(tx, ctx, input.serviceId, ["message.read", "marketing.read"], true);
     let hash: string | undefined;
     if (input.search) { try { hash = contactEmailHash(input.search); } catch { hash = "no-match"; } }
     const where = { tenantId: ctx.tenantId, serviceId: input.serviceId, ...(hash ? { contactHash: hash } : {}), ...(input.reason === "all" ? {} : { reason: input.reason }) };
-    const total = await tx.emailSuppression.count({ where }), rows = await tx.emailSuppression.findMany({ where, orderBy: [{ createdAt: "desc" }, { id: "asc" }], skip: (input.page - 1) * input.pageSize, take: input.pageSize });
+    const total = await tx.emailSuppression.count({ where }), page = Math.min(input.page, Math.max(1, Math.ceil(total / input.pageSize)));
+    const rows = await tx.emailSuppression.findMany({ where, orderBy: [{ createdAt: "desc" }, { id: "asc" }], skip: (page - 1) * input.pageSize, take: input.pageSize });
     const initial = await tx.marketingPreference.findMany({ where: { tenantId: ctx.tenantId, serviceId: input.serviceId, channel: "email", contactHash: { in: rows.map(r => r.contactHash) } } });
     for (const id of [...new Set(initial.map(p => p.sourceSubmissionId))].sort()) await tx.$queryRaw`SELECT id FROM "Submission" WHERE id=${id} FOR SHARE`;
+    for (const contactHash of [...new Set(rows.map(r => r.contactHash))].sort()) await lockDelivery(tx, { tenantId: ctx.tenantId, serviceId: input.serviceId, emailHash: contactHash });
     const preferences = await tx.marketingPreference.findMany({ where: { OR: initial.map(p => ({ id: p.id, sourceSubmissionId: p.sourceSubmissionId })), status: { not: "erased" } }, include: { sourceSubmission: true } });
+    await audit(tx, ctx, requestId, "email.suppressions_viewed", "email_suppression", undefined, [], input.serviceId);
     const items: SuppressionRecord[] = rows.map(r => { const p = preferences.find(p => p.contactHash === r.contactHash), available = p && ["submitted", "corrected", "withdrawn"].includes(p.sourceSubmission.status) && p.sourceSubmission.retentionUntil > new Date();
       const contact = available && p.contactCipher ? decrypt<{ name: string; contact: string }>(p.contactCipher) : null;
       return { id: r.id, contact: contact?.contact ?? null, name: contact?.name ?? null, reason: r.reason as SuppressionRecord["reason"], createdAt: r.createdAt.toISOString() }; });
-    await audit(tx, ctx, requestId, "email.suppressions_viewed", "email_suppression", undefined, [], input.serviceId);
-    return { items, total, page: input.page, pageSize: input.pageSize, relayConfigured: !!env.EMAIL_FEEDBACK_SECRET, providerVerified: false };
+    assertFileDeadlines(deadlines);
+    return { items, total, page, pageSize: input.pageSize, relayConfigured: !!env.EMAIL_FEEDBACK_SECRET, providerVerified: false };
   });
 }

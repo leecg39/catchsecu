@@ -1,0 +1,35 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:81971) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-draft-save.test.ts (8 tests | 1 failed | 7 skipped) 1568ms
+   × 게시 권한 회수 후 이전 초안 저장 캐시에서 게시 토큰을 받을 수 없다 1562ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-draft-save.test.ts > 게시 권한 회수 후 이전 초안 저장 캐시에서 게시 토큰을 받을 수 없다
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/server/form-draft-save.test.ts:106:54
+    104|   const current = await GET(req("/forms/"+f.form.id,"GET",f.cookie)); …
+    105|   const replay = await PATCH(req("/forms/"+f.form.id+"/draft","PATCH",…
+    106|   expect(!!(await replay.json()).publication?.token).toBe(false);
+       |                                                      ^
+    107|   expect(await db.auditEvent.count({ where:{ resourceId:f.form.id,acti…
+    108| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 skipped (8)
+   Start at  21:42:34
+   Duration  3.68s (tests 44%, import 32%, transform 23%)
+

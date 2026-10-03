@@ -1,0 +1,158 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:92072) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-crud-gate.test.ts (6 tests | 5 failed) 6364ms
+   × 폼 복제는 질문·선택지·버전 ID를 독립 생성하고 재전송 및 원본 편집과 분리된다 1397ms
+   × 권한 회수 후의 오래된 Context는 폼 보관과 템플릿 삭제를 거부한다 972ms
+   × 로그아웃과 이메일 인증 취소 후에는 오래된 Context로 템플릿을 변경할 수 없다 1031ms
+   × 서비스 보관 후 템플릿 삭제를 거부하고 복원 후에는 버전을 검사한다 1019ms
+   × 실제 변경이 없는 version-only 저장은 거부하고 즐겨찾기는 구성원별로 격리한다 962ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-crud-gate.test.ts > 폼 복제는 질문·선택지·버전 ID를 독립 생성하고 재전송 및 원본 편집과 분리된다
+AssertionError: expected [ …(3) ] to not include '76c57a27-a07d-460c-a42e-bcd3d5c8c652'
+ ❯ tests/server/form-crud-gate.test.ts:64:77
+     62|   expect(copies[0].id).toBe(copies[1].id); expect(copies[0].id).not.to…
+     63|   const sourceIds = original.content.questions.map((question: { id: st…
+     64|   for (const question of copies[0].content.questions) expect(sourceIds…
+       |                                                                             ^
+     65|   const stored = await db.formVersion.findMany({ where: { formId: { in…
+     66|   expect(new Set(stored.flatMap(version => version.questions.map(quest…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/server/form-crud-gate.test.ts > 권한 회수 후의 오래된 Context는 폼 보관과 템플릿 삭제를 거부한다
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+undefined
+
+ ❯ tests/server/form-crud-gate.test.ts:77:59
+     75|   const f = await setup(), form = await addForm(f), template = await a…
+     76|   await db.serviceGrant.deleteMany({ where: { memberId: f.editor.membe…
+     77|   await expect(archiveForm(ctx, form.id, 1, randomUUID())).rejects.toM…
+       |                                                           ^
+     78|   await expect(deleteTemplate(ctx, template.id, 1, randomUUID())).reje…
+     79|   expect((await db.form.findUniqueOrThrow({ where: { id: form.id } }))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/server/form-crud-gate.test.ts > 로그아웃과 이메일 인증 취소 후에는 오래된 Context로 템플릿을 변경할 수 없다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "category": "신청",
++   "content": {
++     "body": "신청서",
++     "bold": false,
++     "consentPurpose": "",
++     "consentRequired": false,
++     "font": "16px",
++     "maxResponses": 50,
++     "questions": [
++       {
++         "id": "86d67891-4f6f-409f-97c0-c16e9f4a3960",
++         "label": "이름",
++         "required": true,
++         "subjectRole": "name",
++         "type": "단문형 답변",
++       },
++       {
++         "id": "2283edee-dcd5-4893-b756-c866deeb965a",
++         "label": "이메일",
++         "required": true,
++         "subjectRole": "email",
++         "type": "단문형 답변",
++       },
++       {
++         "id": "ced097c9-1100-40ab-aeaa-53375d15cbba",
++         "label": "참여 방식",
++         "options": [
++           "온라인",
++           "현장",
++         ],
++         "required": true,
++         "type": "객관식 답변",
++       },
++     ],
++     "retentionDays": 30,
++     "showSubmitNotice": true,
++     "verify": false,
++   },
++   "createdAt": 2026-10-03T10:21:16.429Z,
++   "id": "b22127a2-fd73-468b-add9-1810eaf54d0b",
++   "scope": "company",
++   "serviceId": "2ca5def6-04e5-4996-b309-04b80ccfc019",
++   "serviceName": "폼 서비스",
++   "title": "삭제된 세션",
++   "updatedAt": 2026-10-03T10:21:16.465Z,
++   "version": 2,
+  }
+
+ ❯ tests/server/form-crud-gate.test.ts:86:96
+     84|   const f = await setup(), template = await addTemplate(f), ctx = awai…
+     85|   await db.session.delete({ where: { id: ctx.session.id } });
+     86|   await expect(updateTemplate(ctx, template.id, { version: 1, title: "…
+       |                                                                                                ^
+     87|   expect((await db.formTemplate.findUniqueOrThrow({ where: { id: templ…
+     88|   const ownerCtx = await requireContext(req("/context", "GET", f.owner…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/server/form-crud-gate.test.ts > 서비스 보관 후 템플릿 삭제를 거부하고 복원 후에는 버전을 검사한다
+AssertionError: expected 204 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 204
+
+ ❯ tests/server/form-crud-gate.test.ts:104:133
+    102|   const f = await setup(), template = await addTemplate(f);
+    103|   await db.service.update({ where: { id: f.serviceId }, data: { status…
+    104|   expect((await templateDelete(req("/templates/" + template.id, "DELET…
+       |                                                                                                                                     ^
+    105|   expect(await db.formTemplate.count({ where: { id: template.id } })).…
+    106|   await db.service.update({ where: { id: f.serviceId }, data: { status…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/server/form-crud-gate.test.ts > 실제 변경이 없는 version-only 저장은 거부하고 즐겨찾기는 구성원별로 격리한다
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/form-crud-gate.test.ts:114:104
+    112| test("실제 변경이 없는 version-only 저장은 거부하고 즐겨찾기는 구성원별로 격리한다", async () => {
+    113|   const f = await setup(), form = await addForm(f), template = await a…
+    114|   expect((await formPatch(req("/forms/" + form.id, "PATCH", f.editor.c…
+       |                                                                                                        ^
+    115|   expect((await templatePatch(req("/templates/" + template.id, "PATCH"…
+    116|   expect((await favorite(req("/forms/" + form.id + "/favorite", "PUT",…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 1 passed (6)
+   Start at  19:21:11
+   Duration  7.95s (tests 82%, import 11%, transform 7%)
+

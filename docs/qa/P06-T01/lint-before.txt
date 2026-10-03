@@ -1,0 +1,65 @@
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx
+  75:60  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx:75:60
+  73 |   return <form className="cs-stack" onSubmit={submit}><h1>{data.title}</h1>
+  74 |     <p className="public-form-body" style={{ fontSize: content.font, fontWeight: content.bold ? 700 : 400 }}>{content.body}</p>
+> 75 |     <fieldset className="public-response-fields" disabled={busy || session.current.hasPending}>{content.questions.filter(question => visible.has(question.id)).map(question =>
+     |                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  76 |       <fieldset className="public-question" key={question.id}><legend>{question.label} {question.required && <em>*</em>}</legend>
+  77 |         <QuestionInput question={question} value={values[question.id]} onChange={value => change(question.id, value)}
+  78 |           onFileChange={() => { if (!busy && !session.current!.hasPending) uploadCache.current.delete(question.id); }} />  react-hooks/refs
+  92:6   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx:92:6
+  90 |     {uploadStatus && <p role="status">{uploadStatus}</p>}
+  91 |     {error && <p role="alert">{error}</p>}
+> 92 |     {session.current.hasPending && !busy && <p role="status">접수 여부를 확인할 수 없습니다. 입력 내용과 첨부를 유지하고 같은 요청으로 결과를 다시 확인해주세요.</p>}
+     |      ^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  93 |     <ActionButton disabled={busy}>{busy ? "제출 중…" : session.current.hasPending ? "같은 요청으로 결과 확인" : "제출하기"}</ActionButton>
+  94 |   </form>;
+  95 | }                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react-hooks/refs
+  92:6   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx:92:6
+  90 |     {uploadStatus && <p role="status">{uploadStatus}</p>}
+  91 |     {error && <p role="alert">{error}</p>}
+> 92 |     {session.current.hasPending && !busy && <p role="status">접수 여부를 확인할 수 없습니다. 입력 내용과 첨부를 유지하고 같은 요청으로 결과를 다시 확인해주세요.</p>}
+     |      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  93 |     <ActionButton disabled={busy}>{busy ? "제출 중…" : session.current.hasPending ? "같은 요청으로 결과 확인" : "제출하기"}</ActionButton>
+  94 |   </form>;
+  95 | }                                                                                                                                                                                                                                                                                                                                                                                                                                                             react-hooks/refs
+  92:6   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx:92:6
+  90 |     {uploadStatus && <p role="status">{uploadStatus}</p>}
+  91 |     {error && <p role="alert">{error}</p>}
+> 92 |     {session.current.hasPending && !busy && <p role="status">접수 여부를 확인할 수 없습니다. 입력 내용과 첨부를 유지하고 같은 요청으로 결과를 다시 확인해주세요.</p>}
+     |      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  93 |     <ActionButton disabled={busy}>{busy ? "제출 중…" : session.current.hasPending ? "같은 요청으로 결과 확인" : "제출하기"}</ActionButton>
+  94 |   </form>;
+  95 | }                                                                                                                                                                                                                                                                                                                                                                           react-hooks/refs
+  93:53  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx:93:53
+  91 |     {error && <p role="alert">{error}</p>}
+  92 |     {session.current.hasPending && !busy && <p role="status">접수 여부를 확인할 수 없습니다. 입력 내용과 첨부를 유지하고 같은 요청으로 결과를 다시 확인해주세요.</p>}
+> 93 |     <ActionButton disabled={busy}>{busy ? "제출 중…" : session.current.hasPending ? "같은 요청으로 결과 확인" : "제출하기"}</ActionButton>
+     |                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  94 |   </form>;
+  95 | }
+  96 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/refs
+
+✖ 5 problems (5 errors, 0 warnings)
+

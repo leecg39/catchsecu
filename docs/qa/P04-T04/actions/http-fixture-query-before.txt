@@ -1,0 +1,87 @@
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46
+  throw new PrismaClientValidationError(messageWithContext, { clientVersion })
+        ^
+
+PrismaClientValidationError: 
+Invalid `db.company.findFirst()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-form-actions.ts:71:36
+
+  68 let checkpoint: Checkpoint;
+  69 if (phase === "prepare") {
+  70   // Resume the empty fixture created by this script before an input failure. Do not reset rate limits.
+→ 71   const empty = await db.company.findFirst({
+         where: {
+           name: {
+             startsWith: "P04 작업 권한 검증 "
+           },
+           status: "active",
+           forms: {
+           ~~~~~
+             none: {}
+           },
+           invitations: {
+             none: {}
+           },
+           memberships: {
+             some: {
+               userId: "85579ea7-044a-444d-ac3d-56310e250459",
+               role: "owner",
+               status: "active"
+             },
+             every: {
+               userId: "85579ea7-044a-444d-ac3d-56310e250459"
+             }
+           },
+       ?   AND?: CompanyWhereInput | CompanyWhereInput[],
+       ?   OR?: CompanyWhereInput[],
+       ?   NOT?: CompanyWhereInput | CompanyWhereInput[],
+       ?   id?: StringFilter | String,
+       ?   publicName?: StringFilter | String,
+       ?   address?: StringFilter | String,
+       ?   phone?: StringFilter | String,
+       ?   website?: StringFilter | String,
+       ?   businessNo?: StringFilter | String,
+       ?   billingEmail?: StringFilter | String,
+       ?   billingContactName?: StringFilter | String,
+       ?   billingContactPhone?: StringFilter | String,
+       ?   closureRequestedAt?: DateTimeNullableFilter | DateTime | Null,
+       ?   closureReasonCipher?: StringNullableFilter | String | Null,
+       ?   closureRequestedById?: StringNullableFilter | String | Null,
+       ?   version?: IntFilter | Int,
+       ?   createdAt?: DateTimeFilter | DateTime,
+       ?   updatedAt?: DateTimeFilter | DateTime,
+       ?   businessFiles?: CompanyBusinessFileListRelationFilter,
+       ?   services?: ServiceListRelationFilter,
+       ?   sessions?: SessionListRelationFilter,
+       ?   policy?: SecurityPolicyNullableScalarRelationFilter | SecurityPolicyWhereInput | Null,
+       ?   ipRules?: IpRuleListRelationFilter,
+       ?   auditEvents?: AuditEventListRelationFilter,
+       ?   files?: FileObjectListRelationFilter,
+       ?   jobs?: JobListRelationFilter,
+       ?   templates?: FormTemplateListRelationFilter,
+       ?   destructions?: DestructionRequestListRelationFilter,
+       ?   certificates?: DestructionCertificateListRelationFilter,
+       ?   subscriptions?: BillingSubscriptionListRelationFilter,
+       ?   creditAccounts?: CreditAccountListRelationFilter,
+       ?   ledgerTransactions?: LedgerTransactionListRelationFilter,
+       ?   supportTickets?: SupportTicketListRelationFilter,
+       ?   accessRequests?: AccessRequestListRelationFilter,
+       ?   expertAssignments?: ExpertAssignmentListRelationFilter
+         },
+         orderBy: {
+           createdAt: "desc"
+         }
+       })
+
+Unknown argument `forms`. Did you mean `files`? Available options are marked with ?.
+    at throwValidationException (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9)
+    at vn.handleRequestError (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7)
+    at vn.handleAndLogRequestError (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12)
+    at vn.request (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async a (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24)
+    at async <anonymous> (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-form-actions.ts:71:19) {
+  clientVersion: '7.10.0'
+}
+
+Node.js v24.19.0

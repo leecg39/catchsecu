@@ -1,3 +1,6 @@
+import { trustedClientIp } from "./client-ip";
+import { assertCompanyIp } from "./ip-enforcement";
+import { mfaState } from "./mfa-enforcement";
 import { passwordState } from "./password-policy";
 import { auth } from "./auth";
 import { APIError } from "better-auth/api";
@@ -32,12 +35,15 @@ export async function requireContext(headers: Headers, capability?: Capability, 
     orderBy: { createdAt: "asc" },
   });
   if (!member) fail(403, "COMPANY_REQUIRED", "소속된 회사가 없습니다. 회사를 등록하거나 초대를 수락해주세요.");
+  const clientIp = trustedClientIp(headers);
+  await assertCompanyIp(member.tenantId, clientIp);
   const policy = member.tenant.policy;
   if (policy && Date.now() - new Date(actor.session.updatedAt).getTime() > policy.sessionMinutes * 60000) {
     await db.session.deleteMany({ where: { id: actor.session.id } });
     fail(401, "SESSION_EXPIRED", "세션이 만료되었습니다. 다시 로그인해주세요.");
   }
-  if (policy?.requireMfa && !actor.user.twoFactorEnabled && !allowMfaSetup) fail(403, "MFA_REQUIRED", "2단계 인증 설정이 필요합니다.");
+  const mfa = await mfaState(member.tenantId, member.id, actor.user.twoFactorEnabled, !!policy?.requireMfa);
+  if (mfa.required && !allowMfaSetup) fail(403, "MFA_REQUIRED", "2단계 인증 설정이 필요합니다.");
   if (policy && !allowPasswordSetup && (await passwordState(actor.user, actor.session, member)).required)
     fail(403, "PASSWORD_CHANGE_REQUIRED", "회사 정책에 따라 비밀번호를 변경해주세요.");
   if (Date.now() - new Date(actor.session.updatedAt).getTime() > 60000) {
@@ -45,7 +51,7 @@ export async function requireContext(headers: Headers, capability?: Capability, 
   }
   if (capability && !roleCan(member.role, capability)) fail(403, "FORBIDDEN", "이 작업을 수행할 권한이 없습니다.");
   await rateLimit("member:" + member.id, 300);
-  return { ...actor, member, tenantId: member.tenantId, capabilities: roleCapabilities(member.role) };
+  return { ...actor, clientIp, member, tenantId: member.tenantId, capabilities: roleCapabilities(member.role) };
 }
 export type Context = Awaited<ReturnType<typeof requireContext>>;
 export async function requireService(ctx: Context, serviceId: string, capability: Capability = "service.read") {
@@ -92,5 +98,5 @@ export async function contextDto(headers: Headers) {
     select: { id: true, name: true, externalName: true }, orderBy: [{ name: "asc" }, { id: "asc" }] });
   return { ...base, company: { id: ctx.tenantId, name: ctx.member.tenant.name, role: ctx.member.role },
     services, serviceId: services.find(item => item.id === actor.session.activeServiceId)?.id ?? services[0]?.id ?? null,
-    capabilities: ctx.capabilities, requirePasswordChange: (await passwordState(ctx.user, ctx.session, ctx.member)).required, requireMfa: !!ctx.member.tenant.policy?.requireMfa && !actor.user.twoFactorEnabled };
+    capabilities: ctx.capabilities, requirePasswordChange: (await passwordState(ctx.user, ctx.session, ctx.member)).required, requireMfa: (await mfaState(ctx.tenantId, ctx.member.id, actor.user.twoFactorEnabled, !!ctx.member.tenant.policy?.requireMfa)).required };
 }

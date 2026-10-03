@@ -1,0 +1,195 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:17789) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/mfa-policy.test.ts (21 tests | 10 failed) 4556ms
+   ❯ company MFA policy and recovery exceptions (21)
+     ✓ reports actual enrollment counts without factor secrets, with search and page clamp 160ms
+     ✓ policy change is versioned and immediately requires unenrolled users to enroll 443ms
+     ✓ policy mutation requires current password, version, tenant and enrolled direct owner 792ms
+     × create/read/update/delete are real, latest replay is current and deletion erases creation copies 20ms
+     × an active exception opens access and a natural clock boundary closes it without cleanup 10ms
+     × an owner exception also expires and cannot grant management authority 9ms
+     × deleting an exception revokes existing password-only access on the next request 195ms
+     × rejects unsafe expiration 2026-10-03T22:08:41.629Z 6ms
+     × rejects unsafe expiration 2026-10-04T23:08:42.630Z 5ms
+     × rejects foreign/enrolled targets and duplicate records 5ms
+     × conflicting updates keep the current reason and original maximum lifetime 17ms
+     ✓ strict query ?search=x&search=y 15ms
+     ✓ strict query ?extra=x 19ms
+     ✓ strict query ?%5F%5Fproto%5F%5F=x 15ms
+     ✓ strict query ?page=0 15ms
+     ✓ viewer and foreign company cannot read exception details 22ms
+     ✓ cross-origin mutation cannot issue an exception 5ms
+     × the final deadline check rolls back late audit and data after exception expiry 5ms
+     × a stale context cannot use revoked exceptions in a service transaction 140ms
+     ✓ required MFA cannot be disabled, and the last enrolled owner cannot be demoted 149ms
+     ✓ native constraints reject tenant mismatch, unsafe lifetime, plaintext and unversioned updates 28ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > create/read/update/delete are real, latest replay is current and deletion erases creation copies
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ tests/server/mfa-policy.test.ts:78:55
+     76|  });
+     77|  test("create/read/update/delete are real, latest replay is current an…
+     78|   const {r,key,input}=await create();expect(r.status).toBe(201);const …
+       |                                                       ^
+     79|   expect(decrypt((await db.mfaException.findUniqueOrThrow({where:{id:r…
+     80|   expect((await GET(req("/security/mfa-policy/exceptions/"+row.id))).s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > an active exception opens access and a natural clock boundary closes it without cleanup
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ tests/server/mfa-policy.test.ts:91:45
+     89|  });
+     90|  test("an active exception opens access and a natural clock boundary c…
+     91|   const x=await create();expect(x.r.status).toBe(201);const row=await …
+       |                                             ^
+     92|   expect((await services(req("/services","GET",undefined,"admin"))).st…
+     93|   const created=await db.mfaException.findUniqueOrThrow({where:{id:row…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > an owner exception also expires and cannot grant management authority
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ tests/server/mfa-policy.test.ts:99:61
+     97|  });
+     98|  test("an owner exception also expires and cannot grant management aut…
+     99|   const x=await create(members.recovery);expect(x.r.status).toBe(201);…
+       |                                                             ^
+    100|   expect((await services(req("/services","GET",undefined,"recovery")))…
+    101|   expect((await POST(req("/security/mfa-policy/exceptions","POST",{...…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > deleting an exception revokes existing password-only access on the next request
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/server/mfa-policy.test.ts:108:77
+    106|  test("deleting an exception revokes existing password-only access on …
+    107|   const x=await create();const row=await x.r.json();expect((await togg…
+    108|   expect((await services(req("/services","GET",undefined,"admin"))).st…
+       |                                                                             ^
+    109|   expect((await DELETE(req("/security/mfa-policy/exceptions/"+row.id,"…
+    110|   expect((await services(req("/services","GET",undefined,"admin"))).st…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > rejects unsafe expiration 2026-10-03T22:08:41.629Z
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > rejects unsafe expiration 2026-10-04T23:08:42.630Z
+AssertionError: expected 404 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 404
+
+ ❯ tests/server/mfa-policy.test.ts:112:193
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > rejects foreign/enrolled targets and duplicate records
+AssertionError: expected 404 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 404
+
+ ❯ tests/server/mfa-policy.test.ts:114:109
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > conflicting updates keep the current reason and original maximum lifetime
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/server/mfa-policy.test.ts:119:93
+    117|  test("conflicting updates keep the current reason and original maximu…
+    118|   const x=await create();const row=await x.r.json(),data={tenantId:a,v…
+    119|   expect((await PATCH(req("/security/mfa-policy/exceptions/"+row.id,"P…
+       |                                                                                             ^
+    120|   expect((await PATCH(req("/security/mfa-policy/exceptions/"+row.id,"P…
+    121|   expect((await PATCH(req("/security/mfa-policy/exceptions/"+row.id,"P…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > the final deadline check rolls back late audit and data after exception expiry
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ tests/server/mfa-policy.test.ts:135:98
+    133|  });
+    134|  test("the final deadline check rolls back late audit and data after e…
+    135|   const x=await create(members.admin,new Date(Date.now()+1000).toISOSt…
+       |                                                                                                  ^
+    136|   const ctx=await requireContext(req("/context","GET",undefined,"admin…
+    137|   await expect(db.$transaction(async tx=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯
+
+ FAIL  tests/server/mfa-policy.test.ts > company MFA policy and recovery exceptions > a stale context cannot use revoked exceptions in a service transaction
+Error: 2단계 인증 설정이 필요합니다.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ requireContext src/server/context.ts:46:39
+ ❯ tests/server/mfa-policy.test.ts:146:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  10 failed | 11 passed (21)
+   Start at  07:08:41
+   Duration  5.63s (tests 82%, import 11%, transform 7%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P11-T02/mfa/mfa-tests.json

@@ -195,11 +195,12 @@
       "P02-T03"
     ],
     "acceptance": "가입→메일검증→로그인→2FA→보호페이지→로그아웃 E2E; invalid callback 실패",
-    "status": "planned",
+    "status": "completed",
     "partialEvidence": [
       "docs/qa/password-policy/"
     ],
-    "updatedAt": "2026-10-02T11:31:38.288443+00:00"
+    "updatedAt": "2026-10-03T09:08:02.023721+00:00",
+    "evidence": "docs/qa/P02-T04/"
   },
   {
     "id": "P02-T05",
@@ -211,7 +212,9 @@
       "P02-T04"
     ],
     "acceptance": "A/B회사 동시 브라우저 격리; 모든 보호 API 미인증 차단; session fixation/로그아웃 재사용 차단",
-    "status": "planned"
+    "status": "completed",
+    "updatedAt": "2026-10-03T09:08:02.024299+00:00",
+    "evidence": "docs/qa/P02-T05/"
   },
   {
     "id": "P03-T01",
@@ -224,7 +227,9 @@
       "P01-T03"
     ],
     "acceptance": "생성→검색→편집→재로그인→보관; 참조 중 서비스 삭제409; 타회사 파일 거부",
-    "status": "planned"
+    "status": "completed",
+    "updatedAt": "2026-10-03T09:22:32.041416+00:00",
+    "evidence": "docs/qa/P03-T01/"
   },
   {
     "id": "P03-T02",
@@ -237,7 +242,7 @@
       "P01-T04"
     ],
     "acceptance": "다른 이메일 초대수락 거부; 마지막 owner 제거 차단; 권한 회수 직후 API 차단",
-    "status": "planned"
+    "status": "in_progress"
   },
   {
     "id": "P03-T03",
@@ -249,7 +254,9 @@
       "P03-T02"
     ],
     "acceptance": "재시작 후 프로필 유지; owner 인계 전 탈퇴 실패; 탈퇴 후 세션 및 토큰 거부",
-    "status": "planned"
+    "status": "in_progress",
+    "updatedAt": "2026-10-03T10:29:34.622155+00:00",
+    "evidence": "docs/qa/P03-T03/"
   },
   {
     "id": "P03-T04",
@@ -292,11 +299,12 @@
       "P03-T01"
     ],
     "acceptance": "다양한 질문·선택지·분기·필수 검증; 게시버전 직접수정 거부; 복제 ID 독립",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/marketing/"
     ],
-    "updatedAt": "2026-10-02T18:16:37.641717+00:00"
+    "updatedAt": "2026-10-03T10:54:44.882516+00:00",
+    "evidence": "docs/qa/P04-T01/"
   },
   {
     "id": "P04-T02",
@@ -309,11 +317,12 @@
       "P05-T01"
     ],
     "acceptance": "앞뒤 이동·새로고침·다른 기기 복원; 동시에 수정하면409·재로드 안내; 제목만 복제하는 템플릿 제거",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
-      "docs/qa/marketing/"
+      "docs/qa/marketing/",
+      "docs/qa/P04-T02/"
     ],
-    "updatedAt": "2026-10-02T18:16:37.641717+00:00"
+    "updatedAt": "2026-10-03T12:53:16.714502+00:00"
   },
   {
     "id": "P04-T03",
@@ -326,7 +335,11 @@
       "P11-T01"
     ],
     "acceptance": "승인전 공개 불가; 고정URL 변경과 구버전응답 보존; 만료/회수/한도 경합 검사",
-    "status": "planned"
+    "status": "in_progress",
+    "updatedAt": "2026-10-03T13:08:05.456383+00:00",
+    "partialEvidence": [
+      "docs/qa/P04-T03/"
+    ]
   },
   {
     "id": "P04-T04",
@@ -338,7 +351,11 @@
       "P04-T03"
     ],
     "acceptance": "신규/편집 혼동0; 2페이지 검색·빈페이지 범위보정; 참조중 삭제 불가 안내",
-    "status": "planned"
+    "status": "in_progress",
+    "artifacts": [
+      "docs/qa/P04-T04/",
+      "docs/qa/P04-T04/actions/"
+    ]
   },
   {
     "id": "P04-T05",
@@ -351,7 +368,14 @@
       "P06-T02"
     ],
     "acceptance": "모든 질문 유형/분기·서비스권한·동시수정·재시작 E2E; localStorage 도메인 의존0",
-    "status": "planned"
+    "status": "in_progress",
+    "artifacts": [
+      "docs/qa/P04-T05/PLAN.md",
+      "docs/qa/P04-T05/",
+      "docs/qa/P04-T05/templates/",
+      "docs/qa/P04-T05/workflow/",
+      "docs/qa/P04-T05/concurrency/"
+    ]
   },
   {
     "id": "P05-T01",
@@ -363,12 +387,13 @@
       "P03-T01"
     ],
     "acceptance": "국가/항목/목적 필수 규칙·기간 타입·중복·타회사 참조 검사; UI별 저장 복원",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/processing-catalog/",
-      "docs/qa/documents/"
+      "docs/qa/documents/",
+      "docs/qa/P05-T01/"
     ],
-    "updatedAt": "2026-10-02T15:09:37.682463+00:00"
+    "updatedAt": "2026-10-03T11:25:40.178054+00:00"
   },
   {
     "id": "P05-T02",
@@ -380,11 +405,13 @@
       "P05-T01"
     ],
     "acceptance": "초안 CRUD; 이전동의 문구 고정; 게시 버전 비교·잘못된 HTML 무해화",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
-      "docs/qa/documents/"
+      "docs/qa/documents/",
+      "docs/qa/form-documents/",
+      "docs/qa/P05-T02/"
     ],
-    "updatedAt": "2026-10-02T15:09:37.682463+00:00"
+    "updatedAt": "2026-10-03T12:06:50.502680+00:00"
   },
   {
     "id": "P05-T03",
@@ -428,13 +455,19 @@
       "P05-T02"
     ],
     "acceptance": "필드변조·타버전 질문·미동의·마감·중복 요청 거부; 동시 제출 한도 초과0",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/form-documents/",
       "docs/qa/subjects/",
       "docs/qa/marketing/"
     ],
-    "updatedAt": "2026-10-02T18:16:37.641717+00:00"
+    "updatedAt": "2026-10-03T16:19:15.747386+00:00",
+    "evidence": "docs/qa/P06-T01/",
+    "artifacts": [
+      "docs/qa/P06-T01/",
+      "tests/server/public-submission-gate.test.ts",
+      "tests/server/public-submission-state.test.ts"
+    ]
   },
   {
     "id": "P06-T02",
@@ -447,7 +480,7 @@
       "P02-T03"
     ],
     "acceptance": "새 브라우저 관리자에 응답 표시; 정정 원본 이력 보존; 역할별 필드 접근 차이",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/form-documents/",
       "docs/qa/subjects/",
@@ -455,7 +488,12 @@
       "docs/qa/campaigns/",
       "docs/qa/notifications/"
     ],
-    "updatedAt": "2026-10-02T21:36:15.640544+00:00"
+    "updatedAt": "2026-10-03T15:55:39.972667+00:00",
+    "evidence": "docs/qa/P06-T02/",
+    "artifacts": [
+      "docs/qa/P06-T02/exports/PLAN.md",
+      "docs/qa/P06-T02/exports/"
+    ]
   },
   {
     "id": "P06-T03",
@@ -468,12 +506,17 @@
       "P01-T03"
     ],
     "acceptance": "실제 파일 byte/hash 동일; 다른 questionId/customerId/fileId 조합 거부; 만료 URL 차단",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/files/",
       "docs/qa/sharing/"
     ],
-    "updatedAt": "2026-10-02T16:43:54.213813+00:00"
+    "updatedAt": "2026-10-03T17:10:58.153256+00:00",
+    "evidence": "docs/qa/P06-T03/",
+    "artifacts": [
+      "docs/qa/P06-T03/PLAN.md",
+      "docs/qa/P06-T03/"
+    ]
   },
   {
     "id": "P06-T04",
@@ -486,11 +529,16 @@
       "P09-T02"
     ],
     "acceptance": "초대받은 사람만 지정 필드 조회; 권한회수 즉시 세션 무효; 공유 파일 우회 차단",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/sharing/"
     ],
-    "updatedAt": "2026-10-02T16:43:54.213813+00:00"
+    "updatedAt": "2026-10-03T17:38:55.043342+00:00",
+    "evidence": "docs/qa/P06-T04/",
+    "artifacts": [
+      "docs/qa/P06-T04/PLAN.md",
+      "docs/qa/P06-T04/"
+    ]
   },
   {
     "id": "P06-T05",
@@ -503,11 +551,12 @@
       "P02-T02"
     ],
     "acceptance": "계정 존재 추측 불가 공통응답; 다른 사람 토큰 거부; 철회가 다음 발송 suppression에 반영",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/subjects/"
     ],
-    "updatedAt": "2026-10-02T17:30:29.848975+00:00"
+    "updatedAt": "2026-10-03T17:53:36.983025+00:00",
+    "evidence": "docs/qa/P06-T05/"
   },
   {
     "id": "P06-T06",
@@ -520,7 +569,7 @@
       "P01-T04"
     ],
     "acceptance": "서명위조·중복callback 거부; 실제 sandbox 검증 없으면 완료 체크 금지",
-    "status": "planned"
+    "status": "in_progress"
   },
   {
     "id": "P06-T07",
@@ -550,13 +599,14 @@
       "P01-T04"
     ],
     "acceptance": "인코딩·큰파일·빈행·중복·부분실패·재실행 중복0; 원본파일 보존정책; CSV 수식 무해화",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/imports/",
       "docs/qa/subjects/",
-      "docs/qa/marketing/"
+      "docs/qa/marketing/",
+      "docs/qa/P07-T01/"
     ],
-    "updatedAt": "2026-10-02T18:16:37.641717+00:00"
+    "updatedAt": "2026-10-03T19:50:03.774786+00:00"
   },
   {
     "id": "P07-T02",
@@ -568,13 +618,14 @@
       "P06-T05"
     ],
     "acceptance": "다른 서비스 동의 섞이지 않음; 대량철회 멱등; 발송 직전 거부 목록 확인",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/subjects/",
       "docs/qa/marketing/",
       "docs/qa/email-feedback/"
     ],
-    "updatedAt": "2026-10-02T21:02:05.782288+00:00"
+    "updatedAt": "2026-10-03T20:20:06.473944+00:00",
+    "evidence": "docs/qa/P07-T02/"
   },
   {
     "id": "P07-T03",
@@ -588,13 +639,14 @@
       "P11-T01"
     ],
     "acceptance": "가상시계 만료; legalHold 우선; 파일삭제 실패 재처리; 원문 제거 후 최소증거만 잔존",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/destruction/",
       "docs/qa/subjects/",
-      "docs/qa/marketing/"
+      "docs/qa/marketing/",
+      "docs/qa/P07-T03/"
     ],
-    "updatedAt": "2026-10-02T18:16:37.641717+00:00"
+    "updatedAt": "2026-10-03T19:34:15.852171+00:00"
   },
   {
     "id": "P07-T04",
@@ -621,11 +673,12 @@
       "P01-T03"
     ],
     "acceptance": "인증대기 발신 불가; 만료 재확인; 사용중 삭제 규칙; 재시작 후 목록 유지",
-    "status": "planned",
+    "status": "in_progress",
     "partialEvidence": [
       "docs/qa/senders/"
     ],
-    "updatedAt": "2026-10-02T19:00:18.962Z"
+    "updatedAt": "2026-10-03T20:58:27.537598+00:00",
+    "evidence": "docs/qa/P08-T01/"
   },
   {
     "id": "P08-T02",
@@ -870,7 +923,12 @@
       "P11-T01"
     ],
     "acceptance": "프록시 신뢰경계·IPv4/IPv6·IP우회·마지막 복구수단·owner 예외 만료 검사",
-    "status": "planned"
+    "status": "in_progress",
+    "evidence": "docs/qa/P11-T02/",
+    "updatedAt": "2026-10-03T22:17:52.162911+00:00",
+    "partialEvidence": [
+      "docs/qa/P11-T02/mfa/"
+    ]
   },
   {
     "id": "P11-T03",

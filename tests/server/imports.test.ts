@@ -1,4 +1,9 @@
 import { randomUUID } from "node:crypto";
+import { Client } from "pg";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { requireContext } from "@/server/context";
+import { listImports as listImportService, importQuery, getImport as getImportService } from "@/server/imports";
 import { beforeAll, beforeEach, afterAll, describe, test, expect, vi } from "vitest";
 import { db } from "@/server/db";
 import { requestSubjectAccess, createSubjectSession, subjectConsents, subjectEvents, withSubject } from "@/server/subjects";
@@ -55,7 +60,12 @@ beforeAll(async () => {
   await signup("owner", "owner"); await signup("editor", "editor"); await signup("viewer", "viewer"); await signup("privacy", "privacy"); await signup("foreign", "owner", foreign);
 });
 beforeEach(async () => { await db.apiRateLimit.deleteMany(); await db.rateLimit.deleteMany(); });
-afterAll(async () => { await db.$disconnect(); });
+const barriers: object[] = [];
+afterAll(async () => {
+  const folder = resolve("docs/qa/P07-T01"); await mkdir(folder, { recursive: true });
+  await writeFile(resolve(folder, "lock-barriers.json"), JSON.stringify({ isolatedDatabase: true, providerVerified: false, barriers }, null, 2) + "\n");
+  await db.$disconnect();
+});
 
 import { parseImportCsv, validateImportRows, safeCsvCell } from "@/server/import-csv";
 import { claimImport, runOneImport, cleanupExpiredImports } from "@/server/import-worker";
@@ -91,6 +101,26 @@ async function validated(csv=sample,who="owner",input=purpose(),custom?:Partial<
 }
 async function start(row:ImportJobRecord,who="owner") {return ok<ImportJobRecord>(await actImport(req('/imports/'+row.id+'/commit','POST',who,{version:row.version})),202)}
 async function readJob(id:string){return ok<ImportJobRecord>(await getImport(req('/imports/'+id)))}
+const scopeFor = (jobId: string) => ({ tenantId: tenant, jobId });
+async function withAuditDelay(action: string, operation: () => Promise<void>) {
+  await db.$executeRawUnsafe("CREATE FUNCTION qa_import_delay() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='" + action + "' THEN PERFORM pg_sleep(2); END IF; RETURN NEW; END $$");
+  await db.$executeRawUnsafe('CREATE TRIGGER qa_import_delay BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION qa_import_delay()');
+  try { await operation(); } finally {
+    await db.$executeRawUnsafe('DROP TRIGGER qa_import_delay ON "AuditEvent"'); await db.$executeRawUnsafe('DROP FUNCTION qa_import_delay()');
+  }
+}
+async function ownerSession() {
+  const ctx = await requireContext(req('/').headers);
+  return db.session.findUniqueOrThrow({ where: { id: ctx.session.id } });
+}
+async function nativeReject(sql: string, values: unknown[]) {
+  const client = new Client({ connectionString: env.DATABASE_URL }); await client.connect();
+  try {
+    await client.query('BEGIN'); let error: { code?: string } | undefined;
+    try { await client.query(sql, values); } catch (cause) { error = cause as typeof error; }
+    expect(error?.code).toBe('23514');
+  } finally { await client.query('ROLLBACK'); await client.end(); }
+}
 
 describe('CSV parser and real PostgreSQL import lifecycle',()=>{
  test('BOM, quoted commas, embedded newline, blank rows and EUC-KR are parsed',()=>{
@@ -186,7 +216,9 @@ describe('CSV parser and real PostgreSQL import lifecycle',()=>{
  });
  test('expired worker leases recover and repeat processing never adds another response',async()=>{
   const {row}=await validated();await start(row);const claimed=await claimImport('crashed');expect(claimed?.id).toBe(row.id);
-  expect(await claimImport('too-early')).toBeNull();await runOneImport('recovered',new Date(Date.now()+180000));
+  expect(await claimImport('too-early')).toBeNull();
+  await db.importJob.update({where:{id:row.id},data:{leaseUntil:new Date(Date.now()-1),version:{increment:1}}});
+  await runOneImport('recovered');
   expect((await readJob(row.id)).importedRows).toBe(1);await runOneImport('again');expect(await db.submission.count({where:{importJobId:row.id}})).toBe(1);
  });
  test('roles, fresh service grants, tenant boundaries and origins protect every surface',async()=>{
@@ -284,6 +316,151 @@ describe('CSV parser and real PostgreSQL import lifecycle',()=>{
   expect(()=>parseImportCsv(Buffer.from(Array.from({length:101},(_,i)=>'h'+i).join(',')+'\nx'),'utf-8')).toThrow();
   expect(()=>validateImportRows(read('01012345678,2,2020-01-01,\n'),{...m,fields:m.fields.map((f,i)=>i===1?{...f,column:0}:f)},snap)).toThrow();
   expect(()=>validateImportRows(read('01012345678,2,2020-01-01,\n'),{...m,fields:m.fields.map((f,i)=>i===0?{...f,column:null}:f)},snap)).toThrow();
+ });
+
+ test('목록 검색·정렬·상태와 보정 페이지가 실제 결과에 적용된다',async()=>{
+  const row=await upload(), result=await ok<{items:ImportJobRecord[];page:number;total:number}>(await listImports(req('/imports?serviceId='+service+'&search='+row.id+'&page=999&sort=name&direction=asc')));
+  expect(result).toMatchObject({page:1,total:1});expect(result.items[0].id).toBe(row.id);
+  const preview=await validated();const rows=await ok<ImportPreview>(await getImport(req('/imports/'+preview.row.id+'/rows?page=999&pageSize=1&errorsOnly=true')));
+  expect(rows).toMatchObject({page:2,total:2});expect(rows.items[0].status).toBe('duplicate');
+ });
+ test('중복·알 수 없는 검색 조건과 비표준 If-Match를 거절한다',async()=>{
+  const {row}=await validated();
+  for(const suffix of ['&status=anything','&serviceId='+service,'&unknown=x','&sort=title'])expect((await listImports(req('/imports?serviceId='+service+suffix))).status).toBe(422);
+  for(const suffix of ['/rows?search=x','/rows?page=1&page=2','/errors.csv?errorsOnly=false','?version=1'])expect((await getImport(req('/imports/'+row.id+suffix))).status).toBe(422);
+  for(const version of ['1e0','01','1.0','+1','9007199254740992'])expect((await deleteImport(req('/imports/'+row.id,'DELETE','owner',undefined,{'if-match':version}))).status).toBe(422);
+  expect((await actImport(req('/imports/'+row.id+'/validate?extra=1','POST','owner',{version:row.version}))).status).toBe(422);
+  expect((await getImport(req('/imports/options?serviceId='+service+'&extra=x'))).status).toBe(422);
+ });
+ test('화면 권한은 현재 역할·서비스 상태·작업 상태로 계산된다',async()=>{
+  const {row}=await validated(sample,'editor');expect(row.permissions).toMatchObject({canEdit:true,canValidate:true,canCommit:true,canRetry:false,canClean:true});
+  const member=await db.membership.findUniqueOrThrow({where:{id:members.editor}});
+  try{
+   await db.membership.update({where:{id:member.id},data:{role:'viewer'}});
+   expect((await getImport(req('/imports/'+row.id,'GET','editor'))).status).toBe(403);
+   await db.membership.update({where:{id:member.id},data:{role:'editor'}});
+   await db.service.update({where:{id:service},data:{status:'archived',version:{increment:1}}});
+   const archived=await readJob(row.id);expect(Object.values(archived.permissions).every(value=>!value)).toBe(true);
+  }finally{await db.membership.update({where:{id:member.id},data:{role:member.role}});await db.service.update({where:{id:service},data:{status:'active',version:{increment:1}}})}
+ });
+ test('생성 재실행은 갱신된 작업을 반환하고 취소 후 원문을 반환하지 않는다',async()=>{
+  const bytes=Buffer.from(sample), key=randomUUID(), input={serviceId:service,title:'현재 상태 재실행',name:'수집.csv',mime:'text/csv',size:bytes.length,sha256:sha256(bytes),encoding:'utf-8'};
+  const row=await ok<ImportJobRecord>(await newImport(req('/imports','POST','owner',input,{'idempotency-key':key})),201);
+  await ok(await uploadPut(new Request(origin+'/api/v1/uploads/'+row.fileId+'/content',{method:'PUT',body:new Uint8Array(bytes),headers:{origin,cookie:cookies.owner,'content-type':'text/csv'}})));
+  await ok(await uploadPost(req('/uploads/'+row.fileId+'/complete','POST')));
+  const draft=await ok<ImportJobRecord>(await actImport(req('/imports/'+row.id+'/inspect','POST','owner',{version:row.version})));
+  const replay=await ok<ImportJobRecord>(await newImport(req('/imports','POST','owner',input,{'idempotency-key':key})),201);
+  expect(replay).toMatchObject({id:row.id,status:'draft',version:draft.version});expect(replay.headers).toHaveLength(4);
+  await ok(await deleteImport(req('/imports/'+row.id,'DELETE','owner',undefined,{'if-match':String(draft.version)})));
+  expect((await newImport(req('/imports','POST','owner',input,{'idempotency-key':key}))).status).toBe(410);
+  expect(await db.importJob.count({where:{fileId:row.fileId}})).toBe(1);
+ });
+ test.each(['Company','ImportJob'] as const)('실제 %s 잠금 대기 중 세션 만료가 성공을 반환하지 않는다',async table=>{
+  const {row}=await validated(),ctx=await requireContext(req('/').headers),session=await ownerSession(),client=new Client({connectionString:env.DATABASE_URL});await client.connect();
+  let promise:Promise<unknown>|undefined;
+  try{
+   await db.session.update({where:{id:session.id},data:{expiresAt:new Date(Date.now()+2000)}});
+   await client.query('BEGIN');await client.query('SELECT id FROM "'+table+'" WHERE id=$1 FOR UPDATE',[table==='Company'?tenant:row.id]);
+   promise=table==='Company'?listImportService(ctx,importQuery.parse({serviceId:service}),randomUUID()):getImportService(ctx,row.id,randomUUID());const caught=promise.catch(error=>error);
+   let waiters=0;for(let i=0;i<60;i++){await client.query('SELECT pg_stat_clear_snapshot()');waiters=(await client.query("SELECT count(*)::int AS n FROM pg_stat_activity WHERE datname=current_database() AND pid<>pg_backend_pid() AND wait_event_type='Lock' AND query LIKE $1",['%FROM "'+table+'"%'])).rows[0].n;if(waiters)break;await new Promise(resolve=>setTimeout(resolve,20))}
+   expect(waiters).toBeGreaterThan(0);await new Promise(resolve=>setTimeout(resolve,2100));await client.query('ROLLBACK');expect(await caught).toMatchObject({status:401,code:'SESSION_EXPIRED'});
+   barriers.push({table,actualWaitObserved:true,expiredSessionDenied:true});
+  }finally{await client.query('ROLLBACK');await promise?.catch(()=>undefined);await client.end();await db.session.update({where:{id:session.id},data:{expiresAt:session.expiresAt,updatedAt:session.updatedAt}})}
+ });
+ test.each(['viewed','list_viewed','previewed','errors_downloaded','configured','validated','commit_requested','cleaned'] as const)('감사 저장 중 세션 만료는 import.%s 처리와 감사 기록을 롤백한다',async action=>{
+  const {row,p}=await validated(),session=await ownerSession();
+  const count=await db.auditEvent.count({where:{resourceId:row.id,action:'import.'+action}}),listCount=await db.auditEvent.count({where:{serviceId:service,action:'import.list_viewed'}});
+  await withAuditDelay('import.'+action,async()=>{
+   try{
+    await db.session.update({where:{id:session.id},data:{expiresAt:new Date(Date.now()+1500)}});
+    let response:Response;
+    if(action==='list_viewed')response=await listImports(req('/imports?serviceId='+service));
+    else if(action==='viewed')response=await getImport(req('/imports/'+row.id));
+    else if(action==='previewed')response=await getImport(req('/imports/'+row.id+'/rows'));
+    else if(action==='errors_downloaded')response=await getImport(req('/imports/'+row.id+'/errors.csv'));
+    else if(action==='configured')response=await patchImport(req('/imports/'+row.id,'PATCH','owner',{version:row.version,mapping:mapping(p)}));
+    else if(action==='cleaned')response=await deleteImport(req('/imports/'+row.id,'DELETE','owner',undefined,{'if-match':String(row.version)}));
+    else response=await actImport(req('/imports/'+row.id+'/'+(action==='commit_requested'?'commit':'validate'),'POST','owner',{version:row.version}));
+    expect(response.status).toBe(401);expect((await response.json()).error.code).toBe('SESSION_EXPIRED');
+    expect(await db.importJob.findUniqueOrThrow({where:{id:row.id}})).toMatchObject({status:'validated',version:row.version});
+    expect(await db.auditEvent.count({where:{resourceId:row.id,action:'import.'+action}})).toBe(count);
+    expect(await db.auditEvent.count({where:{serviceId:service,action:'import.list_viewed'}})).toBe(listCount);
+    barriers.push({action:'import.'+action,actualAuditDelay:true,rolledBack:true});
+   }finally{await db.session.update({where:{id:session.id},data:{expiresAt:session.expiresAt,updatedAt:session.updatedAt}})}
+  });
+ });
+ test('생성 캐시 저장 중 세션 만료가 파일·작업·예약·감사를 모두 롤백한다',async()=>{
+  const session=await ownerSession(),key=randomUUID(),bytes=Buffer.from(sample),beforeJobs=await db.importJob.count(),beforeFiles=await db.fileObject.count();
+  await db.$executeRawUnsafe("CREATE FUNCTION qa_import_cache_delay() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.scope LIKE 'import:create:%' THEN PERFORM pg_sleep(2); END IF; RETURN NEW; END $$");
+  await db.$executeRawUnsafe('CREATE TRIGGER qa_import_cache_delay BEFORE INSERT ON "IdempotencyRecord" FOR EACH ROW EXECUTE FUNCTION qa_import_cache_delay()');
+  try{
+   await db.session.update({where:{id:session.id},data:{expiresAt:new Date(Date.now()+1500)}});
+   const response=await newImport(req('/imports','POST','owner',{serviceId:service,title:'만료 생성',name:'수집.csv',mime:'text/csv',size:bytes.length,sha256:sha256(bytes),encoding:'utf-8'},{'idempotency-key':key}));expect(response.status).toBe(401);
+   expect(await db.importJob.count()).toBe(beforeJobs);expect(await db.fileObject.count()).toBe(beforeFiles);expect(await db.idempotencyRecord.count({where:{key}})).toBe(0);
+   barriers.push({action:'idempotency.insert',actualAuditDelay:true,rolledBack:true});
+  }finally{await db.$executeRawUnsafe('DROP TRIGGER qa_import_cache_delay ON "IdempotencyRecord"');await db.$executeRawUnsafe('DROP FUNCTION qa_import_cache_delay()');await db.session.update({where:{id:session.id},data:{expiresAt:session.expiresAt,updatedAt:session.updatedAt}})}
+ });
+ test.each([false,true])('같은 작업자 이름의 오래된 실행은 새 실행을 덮어쓰지 않는다 (실패=%s)',async fail=>{
+  const {row}=await validated();await start(row);const client=new Client({connectionString:env.DATABASE_URL});await client.connect();let old:Promise<boolean>|undefined,newer:Promise<boolean>|undefined;
+  const user=await db.user.findUniqueOrThrow({where:{email:'owner@imports.local.test'}});
+  try{
+   await client.query('BEGIN');await client.query('SELECT id FROM "Company" WHERE id=$1 FOR UPDATE',[tenant]);
+   old=runOneImport('same-worker',new Date(),scopeFor(row.id));
+   let first;for(let i=0;i<100;i++){first=await db.importJob.findUniqueOrThrow({where:{id:row.id}});if(first.leaseOwner)break;await new Promise(resolve=>setTimeout(resolve,20))}expect(first?.leaseOwner).toBe('same-worker');
+   await db.importJob.update({where:{id:row.id},data:{leaseUntil:new Date(Date.now()-1),version:{increment:1}}});
+   newer=runOneImport('same-worker',new Date(),scopeFor(row.id));
+   let second;for(let i=0;i<100;i++){second=await db.importJob.findUniqueOrThrow({where:{id:row.id}});if(second.leaseGeneration>first!.leaseGeneration)break;await new Promise(resolve=>setTimeout(resolve,20))}expect(second!.leaseGeneration).toBe(first!.leaseGeneration+1);
+   if(fail)await db.user.update({where:{id:user.id},data:{emailVerified:false}});
+   await client.query('ROLLBACK');await Promise.all([old,newer]);
+   const final=await db.importJob.findUniqueOrThrow({where:{id:row.id}});expect(final.leaseGeneration).toBe(second!.leaseGeneration);
+   expect(final.status).toBe(fail?'failed':'partialFailed');expect(final.importedRows).toBe(fail?0:1);
+   expect(await db.submission.count({where:{importJobId:row.id}})).toBe(fail?0:1);
+   expect(await db.auditEvent.count({where:{resourceId:row.id,action:'import.failed_attempt'}})).toBe(fail?1:0);
+   barriers.push({sameWorkerName:true,oldGeneration:first!.leaseGeneration,newGeneration:second!.leaseGeneration,failure:fail,newExecutionPreserved:true});
+  }finally{await client.query('ROLLBACK');await Promise.allSettled([old,newer]);await client.end();await db.user.update({where:{id:user.id},data:{emailVerified:user.emailVerified}})}
+ });
+ test('반영 범위가 다른 회사·작업을 선택하지 않고 DB가 임대 없는 반영을 거절한다',async()=>{
+  const {row}=await validated();await start(row);
+  expect(await runOneImport('wrong-company',new Date(),{tenantId:foreign,jobId:row.id})).toBe(false);
+  expect(await runOneImport('wrong-job',new Date(),scopeFor(randomUUID()))).toBe(false);
+  await nativeReject('UPDATE "ImportJob" SET "leaseOwner"=$2,"leaseUntil"=clock_timestamp()+interval \'1 minute\',version=version+1 WHERE id=$1',[row.id,'unfenced']);
+  await nativeReject('UPDATE "ImportJob" SET "leaseGeneration"="leaseGeneration"+2,"leaseOwner"=$2,"leaseUntil"=clock_timestamp()+interval \'1 minute\',version=version+1 WHERE id=$1',[row.id,'skipped']);
+  const valid=await db.importRow.findFirstOrThrow({where:{jobId:row.id,status:'valid'}});
+  await nativeReject('UPDATE "ImportRow" SET status=\'error\',errors=\'[]\'::jsonb WHERE id=$1',[valid.id]);
+  await runOneImport('correct-scope',new Date(),scopeFor(row.id));expect((await readJob(row.id)).importedRows).toBe(1);
+ });
+ test('완료 감사 중 실제 임대가 만료되면 응답·증거·완료 알림은 롤백되고 회수 후 한 번 반영된다',async()=>{
+  const {row}=await validated();await start(row);const client=new Client({connectionString:env.DATABASE_URL});await client.connect();let promise:Promise<boolean>|undefined;
+  await withAuditDelay('import.completed',async()=>{
+   try{
+    await client.query('BEGIN');await client.query('SELECT id FROM "Company" WHERE id=$1 FOR UPDATE',[tenant]);
+    promise=runOneImport('lease-short',new Date(),scopeFor(row.id));
+    let claimed;for(let i=0;i<100;i++){claimed=await db.importJob.findUniqueOrThrow({where:{id:row.id}});if(claimed.leaseOwner)break;await new Promise(resolve=>setTimeout(resolve,20))}expect(claimed?.leaseOwner).toBe('lease-short');
+    await db.importJob.update({where:{id:row.id},data:{leaseUntil:new Date(Date.now()+1500),version:{increment:1}}});await client.query('ROLLBACK');await promise;
+    const failed=await db.importJob.findUniqueOrThrow({where:{id:row.id}});expect(failed).toMatchObject({status:'committing',importedRows:0,formVersionId:null});
+    expect(await db.submission.count({where:{importJobId:row.id}})).toBe(0);expect(await db.importEvidence.count({where:{jobId:row.id}})).toBe(0);
+    expect(await db.auditEvent.count({where:{resourceId:row.id,action:'import.completed'}})).toBe(0);
+    expect((await db.fileObject.findUniqueOrThrow({where:{id:row.fileId}})).status).toBe('deleted');
+    barriers.push({completionAuditDelay:true,actualLeaseExpired:true,originalDeleted:true,submissionsRolledBack:true});
+   }finally{await client.query('ROLLBACK');await promise?.catch(()=>undefined);await client.end()}
+  });
+  await runOneImport('lease-recovered',new Date(),scopeFor(row.id));expect((await readJob(row.id)).importedRows).toBe(1);expect(await db.submission.count({where:{importJobId:row.id}})).toBe(1);
+ });
+ test('미리보기 감사 중 실제 보관 기한이 끝나면 임시 원문과 감사 성공을 반환하지 않는다',async()=>{
+  const fixture=await validated(),original=await db.importJob.findUniqueOrThrow({where:{id:fixture.row.id}}),source=await db.fileObject.findUniqueOrThrow({where:{id:fixture.row.fileId}});
+  const expiresAt=new Date(Date.now()+1500);
+  const file=await db.fileObject.create({data:{tenantId:tenant,serviceId:service,ownerId:original.creatorId,ownerKind:'import',mime:'text/csv',encoding:'utf-8',storageKey:randomUUID(),nameCipher:source.nameCipher,size:source.size,sha256:source.sha256,expiresAt}});
+  const job=await db.importJob.create({data:{tenantId:tenant,serviceId:service,creatorId:original.creatorId,fileId:file.id,title:'짧은 실제 보관 기한',expiresAt}});
+  await db.importJob.update({where:{id:job.id},data:{status:'draft',headersCipher:original.headersCipher,totalRows:1,version:{increment:1}}});
+  const first=await db.importRow.findFirstOrThrow({where:{jobId:original.id,status:'valid'}});
+  await db.importRow.create({data:{tenantId:tenant,jobId:job.id,rowNo:first.rowNo,lineNo:first.lineNo,status:first.status,payloadCipher:first.payloadCipher,digest:first.digest,errors:[]}});
+  await withAuditDelay('import.previewed',async()=>{
+   const response=await getImport(req('/imports/'+job.id+'/rows'));expect(response.status).toBe(410);expect(await db.auditEvent.count({where:{resourceId:job.id,action:'import.previewed'}})).toBe(0);
+  });
+  const detail=await readJob(job.id);expect(detail.headers).toEqual([]);expect(detail.mapping).toBeNull();expect(detail.fileName).toBe('원본 삭제됨');
+  expect(await cleanupExpiredImports(new Date(),scopeFor(job.id))).toEqual({cleaned:1});
+  expect(await db.importRow.count({where:{jobId:job.id,payloadCipher:{not:null}}})).toBe(0);
+  barriers.push({actualStagingExpiry:true,previewDenied:true,metadataRedacted:true,scopedCleanup:true});
  });
 
 });

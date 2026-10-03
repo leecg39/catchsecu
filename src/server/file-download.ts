@@ -1,6 +1,6 @@
 import type { Context } from "./context";
 import { db, type Transaction } from "./db";
-import { fileInfo, lockFileContext, lockFileSubmission } from "./file-access";
+import { assertFileDeadlines, fileInfo, lockFileContext, lockFileSubmission } from "./file-access";
 import { fail } from "./http";
 import { privateFiles } from "./file-storage";
 import { validateFileBytes } from "./file-validation";
@@ -18,7 +18,8 @@ export async function readFile<T>(ctx: Context, id: string, binding: Binding, re
     if (!initial || (initial.submissionId ? binding.submissionId !== initial.submissionId || binding.questionId !== initial.question?.stableKey : binding.submissionId || binding.questionId) || (initial.senderId ? binding.senderId !== initial.senderId : binding.senderId) || (initial.campaignId ? binding.campaignId !== initial.campaignId : binding.campaignId))
       fail(404, "NOT_FOUND", "응답과 질문에 연결된 파일을 찾을 수 없습니다.");
     if (initial.ownerKind === "public" && !initial.submissionId) fail(409, "FILE_NOT_AVAILABLE", "응답 제출이 완료된 파일만 열람할 수 있습니다.");
-    await lockFileContext(tx, ctx, initial.serviceId, initial.campaignId ? ["message.read"] : initial.senderId ? ["sender.manage"] : initial.submissionId ? ["submission.read", "file.read"] : [initial.ownerId === ctx.user.id ? "file.write" : "file.read"]);
+    const required = initial.campaignId ? ["message.read" as const] : initial.senderId ? ["sender.manage" as const] : initial.submissionId ? ["submission.read" as const, "file.read" as const] : [initial.ownerId === ctx.user.id ? "file.write" as const : "file.read" as const];
+    await lockFileContext(tx, ctx, initial.serviceId, required);
     if (initial.campaignId) await lockCampaignForFile(tx, initial);
     if (initial.senderId) await lockSenderForFile(tx, initial);
     if (initial.submissionId) await lockFileSubmission(tx, ctx.tenantId, initial.submissionId);
@@ -29,6 +30,10 @@ export async function readFile<T>(ctx: Context, id: string, binding: Binding, re
     if (file.expiresAt && file.expiresAt <= new Date()) fail(410, "FILE_EXPIRED", "파일 보유 기한이 만료되었습니다.");
     const result = await operation(tx, file);
     await audit(tx, ctx, requestId, "file.viewed", "file", id, [], file.serviceId);
+    const deadlines = await lockFileContext(tx, ctx, file.serviceId, required);
+    if (file.submissionId) await lockFileSubmission(tx, ctx.tenantId, file.submissionId);
+    if (file.expiresAt && file.expiresAt <= new Date()) fail(410, "FILE_EXPIRED", "파일 보유 기한이 만료되었습니다.");
+    assertFileDeadlines(deadlines);
     return result;
   }, { timeout: 15000 });
 }
@@ -60,6 +65,9 @@ export async function listSubmissionFiles(ctx: Context, submissionId: string, pa
       orderBy: [{ createdAt: "asc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize });
     const total = await tx.fileObject.count({ where });
     await audit(tx, ctx, requestId, "file.list_viewed", "submission", submissionId, [], initial.formVersion.form.serviceId);
+    const deadlines = await lockFileContext(tx, ctx, initial.formVersion.form.serviceId, ["submission.read", "file.read"]);
+    await lockFileSubmission(tx, ctx.tenantId, submissionId);
+    assertFileDeadlines(deadlines);
     return { items: items.map(fileInfo), total, page, pageSize };
   });
 }

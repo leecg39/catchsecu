@@ -57,7 +57,8 @@ async function replaceScope(tx: Transaction, row: { id: string; tenantId: string
 }
 export async function listExpertAssignments(actor: Actor, input: { scope: "mine" | "admin"; page: number; pageSize: number; search: string }) {
   if (input.scope === "admin" && !actor.user.platformAdmin) fail(403, "PLATFORM_ADMIN_REQUIRED", "전문가 배정 관리 권한이 없습니다.");
-  const where: Prisma.ExpertAssignmentWhereInput = input.scope === "mine" ? { expertUserId: actor.user.id }
+  const where: Prisma.ExpertAssignmentWhereInput = input.scope === "mine" ? { expertUserId: actor.user.id,
+    tenant: { name: { contains: input.search, mode: "insensitive" } } }
     : { OR: [{ tenant: { name: { contains: input.search, mode: "insensitive" } } },
       { expertUser: { email: { contains: input.search, mode: "insensitive" } } }] };
   const [items, total] = await db.$transaction([
@@ -99,7 +100,7 @@ export async function createExpertAssignment(actor: Actor, input: z.infer<typeof
       fail(409, "ASSIGNMENT_EXISTS", "이미 활성 전문가 배정이 있습니다. 기존 배정을 수정해주세요.");
     if (existing && (!existingMember || existingMember.expertAssignmentId !== existing.id))
       fail(409, "ASSIGNMENT_INCONSISTENT", "전문가 구성원 연결을 확인해주세요.");
-    if (!existingMember || existingMember.status !== "active") await assertQuota(tx, input.companyId, "members");
+    if (!existingMember || existingMember.status !== "active") await assertQuota(tx, input.companyId, "members", true);
     const assignment = existing
       ? await tx.expertAssignment.update({ where: { id: existing.id }, data: { status: "active", revokedAt: null,
         expiresAt: expiry, assignedById: actor.user.id, version: { increment: 1 } } })

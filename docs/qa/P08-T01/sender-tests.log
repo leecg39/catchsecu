@@ -1,0 +1,49 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:23146) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/senders.test.ts (52 tests) 62933ms
+   ✓ 발신자 현재 권한·최종 기한·사본 정리 (26)
+     ✓ 현재 정렬·페이지와 읽기 전용 권한을 반환하고 DNS 비밀을 제한한다 370ms
+     ✓ list 감사 처리 중 세션 만료는 전체 롤백한다 2103ms
+     ✓ detail 감사 처리 중 세션 만료는 전체 롤백한다 2094ms
+     ✓ create 감사 처리 중 세션 만료는 전체 롤백한다 2071ms
+     ✓ edit 감사 처리 중 세션 만료는 전체 롤백한다 2112ms
+     ✓ disable 감사 처리 중 세션 만료는 전체 롤백한다 2099ms
+     ✓ renew 감사 처리 중 세션 만료는 전체 롤백한다 2139ms
+     ✓ email 감사 처리 중 세션 만료는 전체 롤백한다 2097ms
+     ✓ dns 감사 처리 중 세션 만료는 전체 롤백한다 2115ms
+     ✓ cleanup 감사 처리 중 세션 만료는 전체 롤백한다 2096ms
+     ✓ evidence 감사 처리 중 세션 만료는 전체 롤백한다 2095ms
+     ✓ Company 실제 잠금 대기 뒤 세션 만료를 거절한다 4108ms
+     ✓ Sender 실제 잠금 대기 뒤 세션 만료를 거절한다 4093ms
+     ✓ 캐시 저장 중 만료된 생성 요청은 발신자·캐시·감사를 남기지 않는다 2062ms
+     ✓ DNS 상세 감사 중 만료된 확인값은 반환하지 않는다 2175ms
+     ✓ 코드 확인 감사 중 만료되면 소비와 메일 사본 삭제를 롤백한다 2601ms
+     ✓ 삭제 감사 중 세션 만료는 인증 원문과 실제 메일 파일을 보존한다 2447ms
+     ✓ 실제 파일 장애는 확정된 무효화와 대기 상태를 남기고 명시적 정리로 재시도한다 347ms
+     ✓ 대표 설정 감사 중 인증이 만료되면 대표 변경을 롤백한다 2473ms
+     ✓ DNS 확인 감사 중 확인값이 만료되면 성공 증거를 저장하지 않는다 2150ms
+     ✓ 증빙 캐시 저장 중 업로드 기한 종료는 파일과 캐시를 롤백한다 2095ms
+     ✓ 증빙 정리 실패 후 삭제한 발신자의 같은 DELETE로 재시도한다 324ms
+     ✓ 만료 DNS 원문은 정리 처리기에서 제거하고 인증 상태를 위조하지 않는다 1638ms
+     ✓ 확인 메일은 마지막 Job 잠금 대기 중 인증 기한이 끝나면 파일을 게시하지 않는다 4106ms
+   ✓ service scoped sender CRUD, verification and delivery (26)
+     ✓ real TXT queries and actual local code mail are both required, code is consumed once 317ms
+     ✓ address change and renewal revoke old challenges and require fresh proofs 415ms
+     ✓ only verified senders become the exclusive service/channel default 640ms
+     ✓ local email verification cannot authorize live SMTP after transport changes 308ms
+     ✓ evidence uses actual scanning, encrypted bytes, bound download and actual removal 384ms
+     ✓ actual delivery uses verified From and queued use blocks sender deletion 1024ms
+     ✓ a sender disabled before the due time cancels delivery without a local mail file 655ms
+     ✓ expired sender and another service cannot enqueue a branded message 761ms
+     ✓ server pagination is disjoint and verified filters exclude clock-expired rows 849ms
+     ✓ sender messages cannot be dispatched or downgraded through the legacy mail protocol 588ms
+
+ Test Files  1 passed (1)
+      Tests  52 passed (52)
+   Start at  06:10:12
+   Duration  64.41s (tests 98%, import 1%, transform 1%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P08-T01/sender-tests.json

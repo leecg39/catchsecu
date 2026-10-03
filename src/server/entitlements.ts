@@ -3,7 +3,7 @@ import { fail } from "./http";
 
 type Resource = "services" | "members" | "subjects" | "forms";
 /** Serialize resource creation for one company before checking the persisted allowance. */
-export async function assertQuota(tx: Transaction, tenantId: string, resource: Resource, reserveInvitation = false) {
+export async function assertQuota(tx: Transaction, tenantId: string, resource: Resource, reserveInvitation = false, excludedInvitationId?: string) {
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${"entitlement:" + tenantId}, 0))`;
   const subscriptions = await tx.billingSubscription.findMany({ where: { tenantId }, include: { planVersion: true } });
   // Old test fixtures use direct Company inserts. Production creation and the backfill always attach a trial.
@@ -19,6 +19,8 @@ export async function assertQuota(tx: Transaction, tenantId: string, resource: R
     : resource === "members" ? await tx.membership.count({ where: { tenantId, status: "active" } })
     : resource === "subjects" ? await tx.dataSubject.count({ where: { tenantId } })
     : await tx.form.count({ where: { tenantId, status: { not: "deleted" }, sourceType: "form" } });
-  const pending = resource === "members" && reserveInvitation ? await tx.invitation.count({ where: { tenantId, status: "pending", expiresAt: { gt: now } } }) : 0;
+  const pending = resource === "members" && reserveInvitation ? await tx.invitation.count({ where: {
+    tenantId, status: "pending", expiresAt: { gt: now }, ...(excludedInvitationId ? { id: { not: excludedInvitationId } } : {}),
+  } }) : 0;
   if (count + pending >= limit) fail(409, "QUOTA_EXCEEDED", "현재 구독의 이용 한도에 도달했습니다.");
 }

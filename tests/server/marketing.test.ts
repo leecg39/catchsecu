@@ -1,16 +1,18 @@
 import { randomUUID } from "node:crypto";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, mkdir, writeFile, rename, rmdir } from "node:fs/promises";
+import { Client } from "pg";
 import { resolve } from "node:path";
 import { beforeAll, beforeEach, afterAll, describe, expect, test } from "vitest";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
 import { auth } from "@/server/auth";
+import { requireContext } from "@/server/context";
 import { roleCapabilities } from "@/server/permissions";
 import type { Role } from "@/generated/prisma/client";
 import { decrypt } from "@/server/crypto";
-import { cleanupMarketingJobs } from "@/server/marketing-jobs";
-import { marketingContactHash, withMarketingDelivery } from "@/server/marketing";
-import { enqueueMarketingMail, enqueueMail, enqueueServiceMail, runOneJob } from "@/server/jobs";
+import { cleanupMarketingJobs, cleanupMarketingLocalCopies } from "@/server/marketing-jobs";
+import { marketingContactHash, withMarketingDelivery, readMarketing } from "@/server/marketing";
+import { enqueueMarketingMail, enqueueMail, enqueueServiceMail, runOneJob, deliverMail } from "@/server/jobs";
 import { runOneDestruction } from "@/server/destruction-worker";
 import type { FormRecord, FormContent, Paged } from "@/contracts/forms";
 import type { MarketingRecord, MarketingSource, MarketingSummary } from "@/contracts/marketing";
@@ -22,6 +24,10 @@ import { POST as formAction, PATCH as formEdit } from "@/app/api/v1/forms/[...se
 import { POST as publicPost } from "@/app/api/v1/public/forms/[...segments]/route";
 import { POST as subAction, PATCH as subEdit } from "@/app/api/v1/submissions/[...segments]/route";
 import { POST as destructionAction } from "@/app/api/v1/destruction-requests/[...segments]/route";
+import { GET as suppressionGet } from "@/app/api/v1/email-suppressions/route";
+import { NextRequest } from "next/server";
+import { unstable_doesMiddlewareMatch } from "next/experimental/testing/server";
+import { proxy, config as proxyConfig } from "@/proxy";
 const database = new URL(env.DATABASE_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test database required.");
 const origin = env.BETTER_AUTH_URL, tenant = randomUUID(), foreign = randomUUID(), service = randomUUID(), second = randomUUID(), other = randomUUID();
@@ -48,7 +54,24 @@ beforeAll(async () => {
   await signup("foreign", foreign, "owner");
 });
 beforeEach(async () => { await db.apiRateLimit.deleteMany(); await db.rateLimit.deleteMany(); });
-afterAll(async () => { await db.$disconnect(); });
+const barriers: object[] = [];
+afterAll(async () => {
+  await mkdir(resolve("docs/qa/P07-T02"), { recursive: true });
+  await writeFile(resolve("docs/qa/P07-T02/lock-barriers.json"), JSON.stringify({ isolatedDatabase: true, providerVerified: false, barriers }, null, 2) + "\n");
+  await db.$disconnect();
+});
+async function ownerSession() {
+  const user = await db.user.findUniqueOrThrow({ where: { email: "owner@marketing.local.test" } });
+  return db.session.findFirstOrThrow({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
+}
+async function auditDelay(action: string, operation: () => Promise<void>) {
+  await db.$executeRawUnsafe("CREATE FUNCTION qa_marketing_delay() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='" + action + "' THEN PERFORM pg_sleep(2); END IF; RETURN NEW; END $$");
+  await db.$executeRawUnsafe('CREATE TRIGGER qa_marketing_delay BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION qa_marketing_delay()');
+  try { await operation(); } finally {
+    await db.$executeRawUnsafe('DROP TRIGGER qa_marketing_delay ON "AuditEvent"');
+    await db.$executeRawUnsafe('DROP FUNCTION qa_marketing_delay()');
+  }
+}
 async function fixture(configured = true, serviceId = service, who = "owner") {
   const name = randomUUID(), email = randomUUID(), phone = randomUUID(), note = randomUUID();
   const content: FormContent = { body: "합성 검증", consentPurpose: "서비스 신청", consentRequired: true, retentionDays: 30, maxResponses: 100,
@@ -73,6 +96,200 @@ async function drain(id: string) {
 const mail = (f: Fixture) => ({ to: f.contact.email, subject: "합성 마케팅 발송", text: "선택 동의한 소식" });
 const scope = (f: Fixture, channel: "email" | "sms" = "email") => ({ tenantId: f.who === "foreign" ? foreign : tenant, serviceId: f.serviceId, channel, contact: channel === "email" ? f.contact.email : f.contact.phone });
 const manual = (f: Fixture, subId: string) => ({ serviceId: f.serviceId, submissionId: subId, channel: "email", nameQuestionId: f.name, contactQuestionId: f.email, grantedAt: new Date(Date.now() - 1000).toISOString(), purpose: "별도 마케팅 목적", reference: "합성 수신동의 기록 01", attested: true });
+describe("마케팅 최종 권한·만료·삭제·실행 경합", () => {
+  test("원래 URL의 예약 키를 거절하고 Proxy는 대상 API에만 적용한다", async () => {
+    for (const path of ["/api/v1/marketing/preferences", "/api/v1/marketing/preferences/export", "/api/v1/email-suppressions", "/api/v1/senders", "/api/v1/senders/a/evidence"]) {
+      expect(unstable_doesMiddlewareMatch({ config: proxyConfig, nextConfig: { skipProxyUrlNormalize: true }, url: path })).toBe(true);
+      const denied = proxy(new NextRequest(origin + path + "?%5F%5Fproto%5F%5F=x"));
+      expect(denied.status).toBe(422); expect(denied.headers.get("cache-control")).toBe("private, no-store");
+      expect((await denied.json()).error.code).toBe("INVALID_QUERY");
+      expect(proxy(new NextRequest(origin + path + "?serviceId=" + service)).headers.get("x-middleware-next")).toBe("1");
+    }
+    for (const path of ["/api/v1/health", "/api/v1/me", "/api/v1/imports", "/api/v1/subjects/me", "/login", "/_next/static/a.js"])
+      expect(unstable_doesMiddlewareMatch({ config: proxyConfig, nextConfig: { skipProxyUrlNormalize: true }, url: path })).toBe(false);
+  });
+  test("중복·알 수 없는 쿼리와 변경 요청의 쿼리를 거절한다", async () => {
+    const f = await fixture(), sub = await submit(f), p = await stored(sub.id);
+    for (const suffix of ["&serviceId=" + service, "&sort=name", "&extra=x", "&direction=sideways", "&__proto__=x", "&__proto__=x&__proto__=y", "&constructor=x", "&prototype=x"])
+      expect((await GET(req("/marketing/preferences?serviceId=" + service + suffix))).status).toBe(422);
+    expect((await GET(req("/marketing/preferences/" + p.id + "?page=1"))).status).toBe(422);
+    expect((await PATCH(req("/marketing/preferences/" + p.id + "?extra=x", "PATCH", "owner", { version: p.version, excluded: true }))).status).toBe(422);
+    expect((await withdraw([{ id: p.id, version: p.version }, { id: p.id, version: p.version }])).status).toBe(422);
+    expect((await suppressionGet(req("/email-suppressions?serviceId=" + service + "&serviceId=" + service))).status).toBe(422);
+  });
+  test("검색·정렬·페이지 보정과 현재 권한을 실제 결과로 확인한다", async () => {
+    const f = await fixture(), sub = await submit(f), p = await stored(sub.id);
+    const result = await ok<{ items: MarketingRecord[]; total: number; page: number; permissions: { canCreate: boolean } }>(await list({ search: p.id, page: "999", sort: "grantedAt", direction: "asc" }));
+    expect(result).toMatchObject({ total: 1, page: 1, permissions: { canCreate: true } });
+    expect(result.items[0].permissions).toEqual({ canChangeExclusion: true, canWithdraw: true, canErase: true, canCleanup: false });
+    const viewer = await ok<{ items: MarketingRecord[]; permissions: { canCreate: boolean } }>(await list({ search: p.id }, "sender"));
+    expect(viewer.permissions.canCreate).toBe(false); expect(Object.values(viewer.items[0].permissions).every(value => !value)).toBe(true);
+    try {
+      await db.service.update({ where: { id: service }, data: { status: "archived", version: { increment: 1 } } });
+      expect(Object.values((await ok<MarketingRecord>(await record(p.id))).permissions).every(value => !value)).toBe(true);
+    } finally { await db.service.update({ where: { id: service }, data: { status: "active", version: { increment: 1 } } }); }
+  });
+  test("생성 재실행은 현재 버전을 반환하며 삭제 후에는 410이다", async () => {
+    const f = await fixture(false), sub = await submit(f, []), key = randomUUID(), input = manual(f, sub.id);
+    const create = () => POST(req("/marketing/preferences", "POST", "owner", input, { "idempotency-key": key }));
+    const p = await ok<{ id: string; version: number }>(await create(), 201);
+    const changed = await ok<MarketingRecord>(await PATCH(req("/marketing/preferences/" + p.id, "PATCH", "owner", { version: p.version, excluded: true })));
+    expect(await ok(await create(), 201)).toEqual({ id: p.id, version: changed.version });
+    await ok(await DELETE(req("/marketing/preferences/" + p.id, "DELETE", "owner", { serviceId: service, version: changed.version })));
+    expect((await create()).status).toBe(410);
+  });
+  test.each(["Company", "Submission", "contact"] as const)("실제 %s 잠금 대기 뒤 세션 만료는 원문을 반환하지 않는다", async table => {
+    const f = await fixture(), sub = await submit(f), p = await stored(sub.id), ctx = await requireContext(req("/").headers), session = await ownerSession();
+    const client = new Client({ connectionString: env.DATABASE_URL }); await client.connect();
+    let pending: Promise<unknown> | undefined;
+    try {
+      await client.query("BEGIN");
+      if (table === "contact") await client.query("SELECT marketing_delivery_lock($1,$2,$3,$4)", [tenant, service, p.channel, p.contactHash]);
+      else await client.query('SELECT id FROM "' + table + '" WHERE id=$1 FOR UPDATE', [table === "Company" ? tenant : sub.id]);
+      await db.session.update({ where: { id: session.id }, data: { expiresAt: new Date(Date.now() + 1500) } });
+      pending = readMarketing(ctx, p.id, randomUUID()).then(value => value, error => ({ status: error.status, code: error.code }));
+      let waiting = 0;
+      for (let i = 0; i < 100; i++) {
+        const rows = await client.query("SELECT count(*)::int AS count FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND pid<>pg_backend_pid()");
+        waiting = rows.rows[0].count; if (waiting) break;
+        await new Promise(resolve => setTimeout(resolve, 20));
+      }
+      expect(waiting).toBeGreaterThan(0);
+      await new Promise(resolve => setTimeout(resolve, 2100)); await client.query("ROLLBACK");
+      expect(await pending).toMatchObject({ status: 401, code: "SESSION_EXPIRED" });
+      barriers.push({ table, actualWaitObserved: true, expiredSessionDenied: true });
+    } finally {
+      await client.query("ROLLBACK"); await pending; await client.end();
+      await db.session.update({ where: { id: session.id }, data: { expiresAt: session.expiresAt, updatedAt: session.updatedAt } });
+    }
+  });
+  test.each(["marketing.list_viewed", "marketing.viewed", "marketing.sources_viewed", "marketing.granted", "marketing.exclusion_changed", "marketing.withdrawn", "marketing.erased", "marketing.summary_viewed", "email.suppressions_viewed"])("감사 저장 중 세션 만료는 %s를 전체 롤백한다", async action => {
+    const f = await fixture(action !== "marketing.granted"), sub = await submit(f, action === "marketing.granted" ? [] : ["email"]), session = await ownerSession();
+    const p = action === "marketing.granted" ? undefined : await stored(sub.id);
+    const beforeAudit = await db.auditEvent.count({ where: { action } }), beforePrefs = await db.marketingPreference.count(), beforeEvents = await db.marketingEvent.count();
+    await auditDelay(action, async () => {
+      try {
+        await db.session.update({ where: { id: session.id }, data: { expiresAt: new Date(Date.now() + 1500) } });
+        let response: Response;
+        if (action === "marketing.list_viewed") response = await list();
+        else if (action === "marketing.viewed") response = await record(p!.id);
+        else if (action === "marketing.sources_viewed") response = await GET(req("/marketing/sources?serviceId=" + service));
+        else if (action === "marketing.granted") response = await POST(req("/marketing/preferences", "POST", "owner", manual(f, sub.id), { "idempotency-key": randomUUID() }));
+        else if (action === "marketing.exclusion_changed") response = await PATCH(req("/marketing/preferences/" + p!.id, "PATCH", "owner", { version: p!.version, excluded: true }));
+        else if (action === "marketing.withdrawn") response = await withdraw([p!]);
+        else if (action === "marketing.erased") response = await DELETE(req("/marketing/preferences/" + p!.id, "DELETE", "owner", { serviceId: service, version: p!.version }));
+        else if (action === "marketing.summary_viewed") response = await GET(req("/marketing/summary?serviceId=" + service));
+        else response = await suppressionGet(req("/email-suppressions?serviceId=" + service));
+        expect(response.status).toBe(401); expect((await response.json()).error.code).toBe("SESSION_EXPIRED");
+        if (p) expect(await db.marketingPreference.findUniqueOrThrow({ where: { id: p.id } })).toMatchObject({ status: "granted", excluded: false, version: p.version });
+        expect(await db.marketingPreference.count()).toBe(beforePrefs); expect(await db.marketingEvent.count()).toBe(beforeEvents);
+        expect(await db.auditEvent.count({ where: { action } })).toBe(beforeAudit);
+        barriers.push({ action, actualAuditDelay: true, rolledBack: true });
+      } finally { await db.session.update({ where: { id: session.id }, data: { expiresAt: session.expiresAt, updatedAt: session.updatedAt } }); }
+    });
+  });
+  test.each(["session", "retention"] as const)("생성 캐시 저장 중 %s 만료는 동의·이벤트·캐시를 남기지 않는다", async clock => {
+    const f = await fixture(false), sub = await submit(f, []), input = manual(f, sub.id), key = randomUUID(), session = await ownerSession();
+    const before = await db.marketingPreference.count();
+    await db.$executeRawUnsafe("CREATE FUNCTION qa_marketing_cache_delay() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.scope LIKE 'marketing:create:%' THEN PERFORM pg_sleep(2); END IF; RETURN NEW; END $$");
+    await db.$executeRawUnsafe('CREATE TRIGGER qa_marketing_cache_delay BEFORE INSERT ON "IdempotencyRecord" FOR EACH ROW EXECUTE FUNCTION qa_marketing_cache_delay()');
+    try {
+      if (clock === "session") await db.session.update({ where: { id: session.id }, data: { expiresAt: new Date(Date.now() + 1500) } });
+      else await db.submission.update({ where: { id: sub.id }, data: { retentionUntil: new Date(Date.now() + 1500) } });
+      const response = await POST(req("/marketing/preferences", "POST", "owner", input, { "idempotency-key": key }));
+      expect(response.status).toBe(clock === "session" ? 401 : 410);
+      expect(await db.marketingPreference.count()).toBe(before); expect(await db.idempotencyRecord.count({ where: { key } })).toBe(0);
+      barriers.push({ action: "idempotency.insert", clock, actualDelay: true, rolledBack: true });
+    } finally {
+      await db.$executeRawUnsafe('DROP TRIGGER qa_marketing_cache_delay ON "IdempotencyRecord"');
+      await db.$executeRawUnsafe('DROP FUNCTION qa_marketing_cache_delay()');
+      await db.session.update({ where: { id: session.id }, data: { expiresAt: session.expiresAt, updatedAt: session.updatedAt } });
+    }
+  });
+  test.each(["detail", "csv", "sources"] as const)("읽기 감사 중 보유 기한이 끝나면 %s 원문을 반환하지 않는다", async kind => {
+    const f = await fixture(), sub = await submit(f), p = await stored(sub.id);
+    const action = kind === "detail" ? "marketing.viewed" : kind === "csv" ? "marketing.exported" : "marketing.sources_viewed";
+    await auditDelay(action, async () => {
+      await db.submission.update({ where: { id: sub.id }, data: { retentionUntil: new Date(Date.now() + 1500) } });
+      const response = kind === "detail" ? await record(p.id) : kind === "csv" ? await GET(req("/marketing/preferences/export?serviceId=" + service + "&search=" + p.id)) : await GET(req("/marketing/sources?serviceId=" + service + "&search=" + f.form.title));
+      expect(response.status).toBe(200);
+      const text = await response.text(); expect(text).not.toContain(f.contact.email); expect(text).not.toContain(f.contact.phone); expect(text).not.toContain(f.contact.name);
+      if (kind === "detail") expect(JSON.parse(text)).toMatchObject({ available: false, eligible: false, name: null, contact: null, evidence: null });
+      if (kind === "sources") expect(JSON.parse(text).items).toHaveLength(0);
+      barriers.push({ kind, actualRetentionExpired: true, noPlaintextReturned: true });
+    });
+  });
+  test("삭제 감사 중 세션 만료는 실제 로컬 사본을 보존한다", async () => {
+    const f = await fixture(), sub = await submit(f, ["email"]), p = await stored(sub.id);
+    const job = await enqueueMarketingMail(mail(f), scope(f)); expect(job.id).toBeTruthy();
+    await runOneJob("own-copy-rollback", { tenantId: tenant, jobId: job.id! });
+    const path = resolve(env.LOCAL_MAIL_DIR, job.id! + ".json"), original = await readFile(path);
+    const session = await ownerSession();
+    await auditDelay("marketing.erased", async () => {
+      try {
+        await db.session.update({ where: { id: session.id }, data: { expiresAt: new Date(Date.now() + 1500) } });
+        expect((await DELETE(req("/marketing/preferences/" + p.id, "DELETE", "owner", { serviceId: service, version: p.version }))).status).toBe(401);
+        expect(await readFile(path)).toEqual(original);
+        expect(await db.job.findUniqueOrThrow({ where: { id: job.id! } })).toMatchObject({ payloadErasedAt: null, localCopyErasedAt: null, status: "done" });
+        barriers.push({ eraseRollback: true, localBytesPreserved: true });
+      } finally { await db.session.update({ where: { id: session.id }, data: { expiresAt: session.expiresAt, updatedAt: session.updatedAt } }); }
+    });
+  });
+  test("실제 파일 정리 실패를 보존하고 같은 삭제 요청으로 재시도한다", async () => {
+    const f = await fixture(), sub = await submit(f, ["email"]), p = await stored(sub.id), job = await enqueueMarketingMail(mail(f), scope(f));
+    await runOneJob("own-copy-retry", { tenantId: tenant, jobId: job.id! });
+    const path = resolve(env.LOCAL_MAIL_DIR, job.id! + ".json"), saved = path + ".qa-backup";
+    await rename(path, saved); await mkdir(path);
+    try {
+      const response = await ok<{ cleanup: { pending: number } }>(await DELETE(req("/marketing/preferences/" + p.id, "DELETE", "owner", { serviceId: service, version: p.version })));
+      expect(response.cleanup.pending).toBe(1);
+      const pending = await ok<MarketingRecord>(await record(p.id)); expect(pending).toMatchObject({ status: "erased", pendingLocalCopies: 1, permissions: { canCleanup: true } });
+      expect(await db.job.findUniqueOrThrow({ where: { id: job.id! } })).toMatchObject({ payloadErasedAt: expect.any(Date), localCopyErasedAt: null });
+      expect(await cleanupMarketingLocalCopies({ tenantId: foreign, jobIds: [job.id!] })).toEqual({ pending: 0, cleaned: 0 });
+    } finally { await rmdir(path); await rename(saved, path); }
+    const eventCount = await db.marketingEvent.count({ where: { preferenceId: p.id } });
+    const replay = await ok<{ cleanup: { pending: number } }>(await DELETE(req("/marketing/preferences/" + p.id, "DELETE", "owner", { serviceId: service, version: p.version })));
+    expect(replay.cleanup.pending).toBe(0); await expect(access(path)).rejects.toThrow();
+    expect(await db.marketingEvent.count({ where: { preferenceId: p.id } })).toBe(eventCount);
+    await expect(db.job.update({ where: { id: job.id! }, data: { localCopyErasedAt: null } })).rejects.toThrow();
+    barriers.push({ actualFilesystemFailure: true, committedErasure: true, retryCleaned: true, duplicateEvents: 0, nativeTimestampImmutable: true });
+  });
+  test.each([false, true])("같은 작업자 이름의 이전 시도는 새 임대를 덮어쓰지 않는다 (차단=%s)", async blocked => {
+    const f = await fixture(), sub = await submit(f, ["email"]), job = await enqueueMarketingMail(mail(f), scope(f)), scoped = { tenantId: tenant, jobId: job.id! };
+    expect(await runOneJob("wrong-tenant", { ...scoped, tenantId: foreign })).toBe(false);
+    const client = new Client({ connectionString: env.DATABASE_URL }); await client.connect();
+    let first: Promise<boolean> | undefined, secondRun: Promise<boolean> | undefined;
+    try {
+      await client.query("BEGIN"); await client.query('SELECT id FROM "Company" WHERE id=$1 FOR UPDATE', [tenant]);
+      first = runOneJob("same-marketing-worker", scoped);
+      let old;
+      for (let i = 0; i < 100; i++) { old = await db.job.findUniqueOrThrow({ where: { id: job.id! } }); if (old.leaseOwner) break; await new Promise(resolve => setTimeout(resolve, 20)); }
+      expect(old?.attempts).toBe(1);
+      await db.job.update({ where: { id: job.id! }, data: { leaseUntil: new Date(Date.now() - 1) } });
+      secondRun = runOneJob("same-marketing-worker", scoped);
+      let next;
+      for (let i = 0; i < 100; i++) { next = await db.job.findUniqueOrThrow({ where: { id: job.id! } }); if (next.attempts === 2) break; await new Promise(resolve => setTimeout(resolve, 20)); }
+      expect(next?.attempts).toBe(2);
+      if (blocked) await client.query('UPDATE "Submission" SET "retentionUntil"=(clock_timestamp() AT TIME ZONE \'UTC\')-interval \'1 second\' WHERE id=$1', [sub.id]);
+      await client.query(blocked ? "COMMIT" : "ROLLBACK");
+      await Promise.all([first, secondRun]);
+      const final = await db.job.findUniqueOrThrow({ where: { id: job.id! } });
+      expect(final.attempts).toBe(2); expect(final.status).toBe(blocked ? "cancelled" : "done");
+      const attempts = await db.jobAttempt.findMany({ where: { jobId: job.id! }, orderBy: { attempt: "asc" } });
+      expect(attempts.map(row => row.outcome)).toEqual(["expired", blocked ? "suppressed" : "delivered"]);
+      barriers.push({ sameWorkerName: true, oldAttempt: 1, newAttempt: 2, blocked, newExecutionPreserved: true });
+    } finally { await client.query("ROLLBACK"); await Promise.allSettled([first, secondRun]); await client.end(); }
+  });
+  test("로컬 파일 게시 직전에 다시 검사해 처리 중 만료된 동의를 차단한다", async () => {
+    const f = await fixture(), sub = await submit(f, ["email"]), id = randomUUID();
+    await db.submission.update({ where: { id: sub.id }, data: { retentionUntil: new Date(Date.now() + 1500) } });
+    await expect(withMarketingDelivery(scope(f), async (tx, _row, assertCurrent) => deliverMail({ id }, mail(f), undefined, async () => {
+      await tx.$executeRaw`SELECT pg_sleep(2)`; await assertCurrent();
+    }))).rejects.toThrow();
+    await expect(access(resolve(env.LOCAL_MAIL_DIR, id + ".json"))).rejects.toThrow();
+    barriers.push({ beforeLocalPublish: true, actualRetentionExpired: true, delivered: false });
+  });
+});
 describe("marketing preferences, lifecycle and dispatch with real PostgreSQL", () => {
   test("only a separate selected channel creates consent; general consent and old boolean never grant", async () => {
     const f = await fixture(); const no = await submit(f, []); expect(await db.marketingPreference.count({ where: { sourceSubmissionId: no.id } })).toBe(0);

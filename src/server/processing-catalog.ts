@@ -3,7 +3,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { normalizedCatalogName, type PurposeInput, type RecipientInput } from "@/contracts/processing-catalog";
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
-import { roleCan } from "./permissions";
+import { currentServiceScope } from "./service-access";
 import { audit } from "./audit";
 import { fail, listQuery } from "./http";
 
@@ -28,16 +28,7 @@ function purposeDto(row: PurposeRow) {
     createdAt: row.createdAt, updatedAt: row.updatedAt };
 }
 async function identity(tx: Transaction, ctx: Context, write: boolean) {
-  await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${ctx.tenantId} FOR SHARE`;
-  const company = await tx.company.findUnique({ where: { id: ctx.tenantId } });
-  if (!company || company.status !== "active") fail(403, "COMPANY_UNAVAILABLE", "사용할 수 없는 회사입니다.");
-  await tx.$queryRaw`SELECT id FROM "Membership" WHERE id=${ctx.member.id} AND "tenantId"=${ctx.tenantId} FOR SHARE`;
-  const member = await tx.membership.findFirst({ where: { id: ctx.member.id, tenantId: ctx.tenantId, userId: ctx.user.id,
-    status: "active", user: { status: "active" } }, include: { grants: true } });
-  const capability = write ? "document.write" : "document.read";
-  if (!member || !roleCan(member.role, capability)) fail(403, "FORBIDDEN", "수집 근거 자료를 처리할 권한이 없습니다.");
-  return { tenantId: ctx.tenantId, ...(["owner", "admin"].includes(member.role) ? {} :
-    { id: { in: member.grants.filter(grant => grant.capabilities.includes(capability)).map(grant => grant.serviceId) } }) };
+  return currentServiceScope(tx, ctx, write ? "document.write" : "document.read");
 }
 export async function lockCatalogService(tx: Transaction, ctx: Context, serviceId: string, write: boolean) {
   const scope = await identity(tx, ctx, write);

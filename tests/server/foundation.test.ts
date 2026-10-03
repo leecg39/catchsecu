@@ -378,7 +378,10 @@ describe("immutable forms and encrypted public submissions", () => {
     expect((await submissionAction(request(path, "POST", viewerCookie, payload, { "idempotency-key": randomUUID() }))).status).toBe(403);
     expect((await correctSubmissionRoute(request(path + "/" + note.id, "PATCH", foreignCookie, { version: 1, text: "금지" }))).status).toBe(404);
     const token = decrypt<string>((await db.publication.findFirstOrThrow({ where: { formId: copiedId, status: "active" } })).tokenCipher);
-    const extra = await submitPublicForm(request("/public/forms/" + token + "/submissions", "POST", "", { answers, consent: true }, { "idempotency-key": randomUUID() }));
+    const copiedSchema = await (await readPublicForm(request("/public/forms/" + token))).json();
+    const copiedAnswers = Object.fromEntries(copiedSchema.content.questions.map((question: { id: string; label: string }) =>
+      [question.id, answers[content.questions.find(original => original.label === question.label)!.id]]));
+    const extra = await submitPublicForm(request("/public/forms/" + token + "/submissions", "POST", "", { answers: copiedAnswers, consent: true }, { "idempotency-key": randomUUID() }));
     expect(extra.status).toBe(201); const extraId = (await extra.json()).id;
     expect((await correctSubmissionRoute(request("/submissions/" + extraId + "/notes/" + note.id, "PATCH", ownerCookie, { version: 1, text: "다른 응답" }))).status).toBe(404);
     expect((await correctSubmissionRoute(request(path + "/" + note.id, "PATCH", ownerCookie, { version: 1, text: "변경 메모" }))).status).toBe(200);

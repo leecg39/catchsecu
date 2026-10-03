@@ -1,0 +1,33 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/member-management-gate.test.ts (17 tests | 1 failed | 16 skipped) 1686ms
+   × 보관된 서비스의 기존 권한은 편집할 수 있지만 회수 후 새로 부여할 수 없다 189ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/member-management-gate.test.ts > 보관된 서비스의 기존 권한은 편집할 수 있지만 회수 후 새로 부여할 수 없다
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/server/member-management-gate.test.ts:223:145
+    221|     grants: { create: { serviceId: tenant.serviceId, capabilities: [..…
+    222|   expect((await archiveService(req("/services/" + tenant.serviceId, "D…
+    223|   expect((await memberPatch(req("/members/" + row.id, "PATCH", owner, …
+       |                                                                                                                                                 ^
+    224|   expect((await memberPatch(req("/members/" + row.id, "PATCH", owner, …
+    225|   expect((await memberPatch(req("/members/" + row.id, "PATCH", owner, …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 skipped (17)
+   Start at  18:52:27
+   Duration  3.16s (tests 57%, import 27%, transform 16%)
+

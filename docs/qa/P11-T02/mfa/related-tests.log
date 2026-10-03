@@ -1,0 +1,96 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:21495) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/file-access-gate.test.ts (22 tests) 23643ms
+   ✓ 로그아웃한 Context로 파일·목록·업로드 조회·변경·생성 재전송을 처리하지 않는다 1539ms
+   ✓ 현재 expired 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 746ms
+   ✓ 현재 email 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 717ms
+   ✓ 현재 idle 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 873ms
+   ✓ 현재 mfa 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 679ms
+   ✓ 현재 password 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 712ms
+   ✓ 현재 company 상태로 바뀐 Context는 파일 메타데이터와 바이트를 읽지 않는다 860ms
+   ✓ 진행 중인 Session 회수 변경이 커밋될 때까지 파일 읽기가 기다린 뒤 거부된다 815ms
+   ✓ 진행 중인 User 회수 변경이 커밋될 때까지 파일 읽기가 기다린 뒤 거부된다 900ms
+   ✓ 파일 행 잠금 대기 중 session 실제 기한이 지나면 바이트를 보내지 않는다 1725ms
+   ✓ 파일 행 잠금 대기 중 retention 실제 기한이 지나면 바이트를 보내지 않는다 1058ms
+   ✓ 실제 저장소 읽기 중 private-session 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다 1126ms
+   ✓ 실제 저장소 읽기 중 shared-session 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다 1244ms
+   ✓ 실제 저장소 읽기 중 shared-grant 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다 1249ms
+   ✓ 실제 저장소 읽기 중 shared-retention 기한이 지나면 감사 기록과 파일 응답을 모두 취소한다 1284ms
+   ✓ 응답·질문·파일의 정확한 조합과 중복 없는 쿼리만 개인·공유 경로에 허용한다 941ms
+   ✓ 공유 발급자의 이메일 인증 회수도 이미 인증한 열람자의 파일을 차단한다 751ms
+   ✓ 파일 저장 중 member-session 기한이 지나면 업로드 DB 변경과 감사 기록을 롤백한다 1053ms
+   ✓ 파일 저장 중 public-upload 기한이 지나면 업로드 DB 변경과 감사 기록을 롤백한다 1046ms
+   ✓ 메타데이터 감사 저장이 지연되어 세션 기한이 지나도 파일 이름을 반환하지 않는다 1098ms
+   ✓ 공유 single 감사 INSERT가 실제로 지연되어 보유 기한이 지나면 파일 이름을 반환하지 않는다 1640ms
+   ✓ 공유 list 감사 INSERT가 실제로 지연되어 보유 기한이 지나면 파일 이름을 반환하지 않는다 1580ms
+(node:22178) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/policy-approvals.test.ts (15 tests) 8232ms
+   ✓ company policy and approval enforcement (15)
+     ✓ policy password checks are rate limited and cannot change the policy after repeated failures 580ms
+     ✓ shortening session policy invalidates an existing idle session on the next protected request 510ms
+     ✓ approval requests enforce required evidence, service scope, tenant scope and idempotency 795ms
+     ✓ rejection permits a new request and approved publication binds immutable evidence and accepts a real response 729ms
+     ✓ editing a pending or approved draft invalidates the approval and preserves its review snapshot 672ms
+     ✓ approval policy changes supersede existing requests while unrelated session changes preserve approval 677ms
+     ✓ publication rechecks a reviewer's active role and service grant 311ms
+     ✓ cancellation and archive invalidate pending requests without deleting evidence 421ms
+     ✓ a concurrent edit and approval cannot approve the modified content 313ms
+     ✓ MFA requirement is applied on the next request and cannot be disabled while the policy requires it 513ms
+(node:22472) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/ip-access.test.ts (32 tests) 23096ms
+   ✓ IP network and trusted transport (20)
+     ✓ normalizes 192.0.2.7/24 327ms
+     ✓ normalizes 2001:0DB8:0000:1::abcd/64 332ms
+     ✓ normalizes ::ffff:192.0.2.7/120 363ms
+     ✓ normalizes 0.0.0.0/0 436ms
+     ✓ rejects malformed 192.168.001.1 779ms
+     ✓ rejects malformed fe80::1%eth0 496ms
+     ✓ rejects malformed 192.0.2.1/33 338ms
+     ✓ native TCP peer 127.0.0.1 overwrites the attacker's original and raw headers 429ms
+   ✓ PostgreSQL IP CRUD and enforcement (12)
+     ✓ owner CRUD normalizes ranges, preserves current replay and erases deleted request copies 1620ms
+     ✓ admin and security read; only current direct owner can mutate 764ms
+     ✓ foreign tenant IDs and stale versions cannot change rows 840ms
+     ✓ strict queries, validation, duplicate canonical networks and page clamping 730ms
+     ✓ policy activation requires a trusted matching IP and current password 3456ms
+     ✓ editing, disabling and deleting the owner's last allowed network rolls back 1173ms
+     ✓ denied target-company selection does not mutate the current session 1500ms
+     ✓ login chooses an allowed company and refuses when every company is blocked 883ms
+     ✓ a stale authorized context is checked again inside a service transaction 492ms
+     ✓ simultaneous owner changes preserve one current allowed network 879ms
+     ✓ database rejects malformed CIDR, stale versions, tenant moves and an empty active policy 607ms
+(node:23093) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/mfa-policy.test.ts (24 tests) 14525ms
+   ✓ company MFA policy and recovery exceptions (24)
+     ✓ policy change is versioned and immediately requires unenrolled users to enroll 882ms
+     ✓ policy mutation requires current password, version, tenant and enrolled direct owner 887ms
+     ✓ create/read/update/delete are real, latest replay is current and deletion erases creation copies 754ms
+     ✓ an active exception opens access and a natural clock boundary closes it without cleanup 552ms
+     ✓ an owner exception also expires and cannot grant management authority 601ms
+     ✓ deleting an exception revokes existing password-only access on the next request 590ms
+     ✓ rejects foreign/enrolled targets and duplicate records 1179ms
+     ✓ conflicting updates keep the current reason and original maximum lifetime 1067ms
+     ✓ strict query ?%5F%5Fproto%5F%5F=x 390ms
+     ✓ viewer and foreign company cannot read exception details 401ms
+     ✓ the final deadline check rolls back late audit and data after exception expiry 1898ms
+     ✓ a stale context cannot use revoked exceptions in a service transaction 428ms
+     ✓ security results reflect live policy and enrollment with working improvement links 307ms
+     ✓ an actual recovery code completes login once and reuse fails 330ms
+ ✓ tests/server/auth-session-gate.test.ts (7 tests) 4739ms
+   ✓ authentication integration gate (7)
+     ✓ company A and B requests remain isolated while running concurrently 391ms
+     ✓ company selection is scoped to one session of a user with two memberships 355ms
+     ✓ GET sign-out does not mutate a session; POST sign-out prevents replay and leaves another device active 331ms
+
+ Test Files  5 passed (5)
+      Tests  100 passed (100)
+   Start at  07:10:42
+   Duration  80.96s (tests 93%, import 6%, transform 1%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P11-T02/mfa/related-tests.json

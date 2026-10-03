@@ -34,6 +34,7 @@ export const importStatusLabels: Record<string, string> = { uploading: "파일 �
 export type ImportJobRecord = { id: string; title: string; serviceId: string; fileId: string; status: string; version: number;
   totalRows: number; validRows: number; invalidRows: number; skippedRows: number; importedRows: number;
   headers: string[]; mapping: ImportMapping | null; expiresAt: string; createdAt: string; lastError: string | null;
-  formId: string | null; fileStatus: string; fileName: string; encoding: string; };
+  formId: string | null; fileStatus: string; fileName: string; encoding: string;
+  permissions: { canEdit: boolean; canInspect: boolean; canValidate: boolean; canCommit: boolean; canRetry: boolean; canClean: boolean }; };
 export type ImportPreview = { items: { rowNo: number; lineNo: number; status: string; values: string[] | null; errors: ImportRowError[] }[]; total: number; page: number; pageSize: number };
 export type ImportOptions = { purposes: ImportSnapshot["purpose"][]; recipients: NonNullable<ImportSnapshot["recipient"]>[] };

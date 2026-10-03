@@ -14,9 +14,10 @@ function RequestsReview() {
   const [status, setStatus] = useState("pending"), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20);
   const [selection, setSelection] = useState<{ item: AccessRequestRecord; decision: "approve" | "reject" }>();
   const [note, setNote] = useState(""), [error, setError] = useState(""), [notice, setNotice] = useState(""), [busy, setBusy] = useState(false);
+  const lock = useRef(false);
   const requests = useResource<AccessRequestList>("/access-requests?scope=review&status=" + status + "&page=" + page + "&pageSize=" + pageSize);
   async function decide(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); if (!selection) return;
+    event.preventDefault(); if (!selection || lock.current) return; lock.current = true;
     setError(""); setNotice(""); setBusy(true);
     try {
       await api("/access-requests/" + selection.item.id, { method: "PATCH", body: JSON.stringify({
@@ -24,7 +25,7 @@ function RequestsReview() {
       }) });
       setNotice(selection.decision === "approve" ? "서비스 권한을 부여했습니다." : "접근 요청을 거절했습니다.");
       setSelection(undefined); setNote(""); requests.reload();
-    } catch (cause) { setError(errorText(cause)); requests.reload(); } finally { setBusy(false); }
+    } catch (cause) { setError(errorText(cause)); requests.reload(); } finally { lock.current = false; setBusy(false); }
   }
   return <><Panel title="서비스 접근 요청">
     <p className="cs-muted">승인하면 해당 구성원의 현재 역할 권한으로 요청한 서비스 접근이 부여됩니다.</p>
@@ -55,35 +56,43 @@ function RequestsReview() {
   </>;
 }
 
-function MemberFields({ member, done }: { member?: MemberRecord; done: () => void }) {
+function MemberFields({ member, done, onBusy }: { member?: MemberRecord; done: () => void; onBusy: (busy: boolean) => void }) {
   const app = useApplication(), [role, setRole] = useState<MemberRole>(member?.role ?? "viewer");
   const [serviceIds, setServiceIds] = useState(member?.grants.map(grant => grant.serviceId) ?? (app.data?.serviceId ? [app.data.serviceId] : []));
   const [status, setStatus] = useState(member?.status ?? "active"), [error, setError] = useState(""), [busy, setBusy] = useState(false);
   const key = useRef<string | null>(null);
+  const lock = useRef(false);
+  const services = [
+    ...(app.data?.services ?? []).map(service => ({ id: service.id, name: service.name, archived: false })),
+    ...(member?.grants.filter(grant => !app.data?.services.some(service => service.id === grant.serviceId)) ?? [])
+      .map(grant => ({ id: grant.serviceId, name: grant.serviceName, archived: grant.serviceStatus === "archived" })),
+  ];
   async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setError(""); setBusy(true);
+    event.preventDefault(); if (lock.current) return; lock.current = true; setError(""); setBusy(true); onBusy(true);
     const fields = new FormData(event.currentTarget);
     try {
-      if (!serviceIds.length) throw new Error("서비스를 한 개 이상 선택해주세요.");
+      if (!member && !serviceIds.length) throw new Error("서비스를 한 개 이상 선택해주세요.");
       if (!key.current) key.current = crypto.randomUUID();
       await api(member ? "/members/" + member.id : "/invitations", { method: member ? "PATCH" : "POST",
         headers: { "Idempotency-Key": key.current }, body: JSON.stringify({ role, serviceIds, ...(member ? { version: member.version, status } : { email: String(fields.get("email")).trim() }) }) });
       done();
-    } catch (error) { setError(errorText(error)); } finally { setBusy(false); }
+    } catch (error) { setError(errorText(error)); } finally { lock.current = false; setBusy(false); onBusy(false); }
   }
   return <form className="member-fields" onSubmit={submit}>
     {member ? <p><strong>{member.user.name}</strong><br />{member.user.email}</p> :
-      <label>초대할 이메일<input name="email" onChange={() => { key.current = null; }} type="email" className="cs-input" required autoComplete="off" maxLength={254} /></label>}
-    <label>역할<select className="cs-input" value={role} onChange={event => { setRole(event.target.value as MemberRole); key.current = null; }}>
+      <label>초대할 이메일<input name="email" disabled={busy} onChange={() => { key.current = null; }} type="email" className="cs-input" required autoComplete="off" maxLength={254} /></label>}
+    <label>역할<select className="cs-input" disabled={busy} value={role} onChange={event => { setRole(event.target.value as MemberRole); key.current = null; }}>
       {(Object.keys(roleLabels) as MemberRole[]).filter(value => value !== "owner" && (app.data?.company?.role === "owner" || value !== "billing"))
         .map(value => <option key={value} value={value}>{roleLabels[value]}</option>)}</select></label>
-    {member && <label>상태<select className="cs-input" value={status} onChange={event => setStatus(event.target.value)}><option value="active">활성</option><option value="suspended">정지</option></select></label>}
-    <fieldset><legend>사용할 서비스</legend>{app.data?.services.map(service => <label className="member-check" key={service.id}>
-      <input type="checkbox" checked={serviceIds.includes(service.id)} onChange={event => { setServiceIds(event.target.checked ? [...serviceIds, service.id] : serviceIds.filter(id => id !== service.id)); key.current = null; }} />{service.name}</label>)}
-      {!app.data?.services.length && <p>서비스 관리에서 서비스를 먼저 생성해주세요.</p>}</fieldset>
+    {member && <label>상태<select className="cs-input" disabled={busy} value={status} onChange={event => setStatus(event.target.value)}><option value="active">활성</option><option value="suspended">정지</option></select></label>}
+    <fieldset><legend>사용할 서비스</legend>{services.map(service => <label className="member-check" key={service.id}>
+      <input type="checkbox" disabled={busy || (service.archived && !serviceIds.includes(service.id))} checked={serviceIds.includes(service.id)} onChange={event => { setServiceIds(event.target.checked ? [...serviceIds, service.id] : serviceIds.filter(id => id !== service.id)); key.current = null; }} />{service.name}{service.archived ? " (보관됨)" : ""}</label>)}
+      {!services.length && <p>{member ? "현재 선택할 수 있는 활성 서비스가 없습니다." : "서비스 관리에서 서비스를 먼저 생성해주세요."}</p>}</fieldset>
+    {services.some(service => service.archived) && <p className="cs-muted">보관된 서비스의 기존 권한은 유지하거나 회수할 수 있습니다. 다시 부여하려면 서비스를 먼저 복원해주세요.</p>}
     {role === "admin" && <p className="cs-muted">관리자는 새로 생성되는 서비스를 포함해 모든 서비스를 관리합니다. 선택한 서비스는 기본 접근 정보로 저장됩니다.</p>}
+    {member && role !== "admin" && !serviceIds.length && <p className="cs-muted">회사 구성원 상태는 유지하고 모든 서비스 접근 권한을 회수합니다.</p>}
     {error && <p role="alert" className="auth-error">{error}</p>}
-    <ActionButton disabled={busy || !app.data?.services.length}>{busy ? "처리 중…" : member ? "변경 저장" : "초대 보내기"}</ActionButton>
+    <ActionButton disabled={busy || (!member && !app.data?.services.length)}>{busy ? "처리 중…" : member ? "변경 저장" : "초대 보내기"}</ActionButton>
   </form>;
 }
 export function LiveMembers({ authority = false }: { authority?: boolean }) {
@@ -93,15 +102,16 @@ export function LiveMembers({ authority = false }: { authority?: boolean }) {
   const [editor, setEditor] = useState<MemberRecord | "invite">(), [action, setAction] = useState<{ kind: "remove" | "transfer"; member: MemberRecord }>();
   const [invitationAction, setInvitationAction] = useState<{ kind: "resend" | "revoke"; invitation: InvitationRecord }>();
   const [error, setError] = useState(""), [notice, setNotice] = useState(""), [busy, setBusy] = useState(false);
+  const [editorBusy, setEditorBusy] = useState(false), lock = useRef(false);
   const suffix = "?page=" + page + "&pageSize=" + pageSize + "&status=" + status + "&search=" + encodeURIComponent(query);
   const members = useResource<Paged<MemberRecord>>(canManage && tab === "members" ? "/members" + suffix : null);
   const invitations = useResource<Paged<InvitationRecord>>(canManage && tab === "invitations" ? "/invitations" + suffix : null);
   function resetTab(value: "members" | "invitations") { setTab(value); setPage(1); setStatus("all"); setSearch(""); setQuery(""); setError(""); }
   function refresh() { members.reload(); invitations.reload(); app.reload(); }
   async function execute(operation: () => Promise<void>, message: string) {
-    setError(""); setNotice(""); setBusy(true);
+    if (lock.current) return; lock.current = true; setError(""); setNotice(""); setBusy(true);
     try { await operation(); setAction(undefined); setInvitationAction(undefined); refresh(); setNotice(message); }
-    catch (error) { setError(errorText(error)); } finally { setBusy(false); }
+    catch (error) { setError(errorText(error)); } finally { lock.current = false; setBusy(false); }
   }
   if (!app.data) return <p role="status">구성원 권한을 확인하는 중입니다.</p>;
   if (!canManage) return <Panel><p role="alert">구성원 관리 권한이 없습니다.</p></Panel>;
@@ -128,8 +138,8 @@ export function LiveMembers({ authority = false }: { authority?: boolean }) {
             <button className="cs-link" onClick={() => { setError(""); setInvitationAction({ kind: "resend", invitation }); }}>재발송</button>
             <button className="cs-link" onClick={() => { setError(""); setInvitationAction({ kind: "revoke", invitation }); }}>초대 취소</button></>}</div>] }))}
           total={invitations.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={invitations.loading} error={invitations.error?.message} />}
-    </Panel><RequestsReview/>{editor && <Modal title={editor === "invite" ? "구성원 초대" : "구성원 권한 수정"} onClose={() => setEditor(undefined)}>
-      <MemberFields member={editor === "invite" ? undefined : editor} done={() => { setNotice(editor === "invite" ? "초대 메일 전송을 요청했습니다." : "구성원 정보를 저장했습니다."); setEditor(undefined); refresh(); }} /></Modal>}
+    </Panel><RequestsReview/>{editor && <Modal title={editor === "invite" ? "구성원 초대" : "구성원 권한 수정"} onClose={() => { if (!editorBusy) setEditor(undefined); }}>
+      <MemberFields member={editor === "invite" ? undefined : editor} onBusy={setEditorBusy} done={() => { setNotice(editor === "invite" ? "초대 메일 전송을 요청했습니다." : "구성원 정보를 저장했습니다."); setEditor(undefined); refresh(); }} /></Modal>}
     {action && <Modal title={action.kind === "remove" ? "구성원 제외" : "소유권 이전"} onClose={() => { if (!busy) setAction(undefined); }}>
       <form className="member-fields" onSubmit={event => { event.preventDefault(); const password = String(new FormData(event.currentTarget).get("password") ?? "");
         void execute(async () => { await api("/members/" + action.member.id + (action.kind === "transfer" ? "/transfer" : ""), {

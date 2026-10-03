@@ -16,6 +16,7 @@ export function FixedUrls() {
   const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), search, status });
   if (app.data?.serviceId) params.set("serviceId", app.data.serviceId);
   const result = useResource<Paged<FixedUrl>>(app.data ? "/fixed-urls?" + params : null);
+  const shownPage=result.data?.page ?? page;
   return <><PageHeading title="고정URL 관리"><p>주소를 유지하면서 연결된 캐치폼을 변경할 수 있습니다. 같은 폼을 다시 게시하면 새 게시본으로 자동 연결됩니다.</p>
     {canWrite && <ActionButton onClick={() => setEdit("new")}>고정URL 생성</ActionButton>}</PageHeading>
     <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); setSearch(query); setPage(1); }}>
@@ -23,10 +24,10 @@ export function FixedUrls() {
       <select aria-label="고정URL 상태" value={status} onChange={event => { setStatus(event.target.value); setPage(1); }}><option value="active">사용 중</option><option value="revoked">사용 종료</option></select><ActionButton secondary>검색</ActionButton></form>
       {error && <p role="alert">{error}</p>}
       <RemoteTable columns={["#", "URL 명", "URL", "연결된 캐치폼", "생성일", "관리"]} rows={(result.data?.items ?? []).map((row, index) => ({
-        id: row.id, cells: [(page - 1) * pageSize + index + 1, row.name, <Link key="url" href={row.url} target="_blank" rel="noopener noreferrer">{row.url}</Link>,
+        id: row.id, cells: [(shownPage - 1) * pageSize + index + 1, row.name, <Link key="url" href={row.url} target="_blank" rel="noopener noreferrer">{row.url}</Link>,
           row.formTitle, new Date(row.createdAt).toLocaleDateString("ko-KR"), canWrite && row.status === "active" ?
             <div className="forms-row-actions" key="actions"><button onClick={() => setEdit(row)}>수정</button><button onClick={() => setRemove(row)}>사용 종료</button></div> : "종료"],
-      }))} page={page} pageSize={pageSize} total={result.data?.total ?? 0} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={result.loading} error={result.error?.message} />
+      }))} page={shownPage} pageSize={pageSize} total={result.data?.total ?? 0} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={result.loading} error={result.error?.message} />
     </Panel>
     {edit && <Modal title={edit === "new" ? "고정URL 생성" : "고정URL 수정"} onClose={() => setEdit(undefined)}><FixedUrlEditor initial={edit === "new" ? undefined : edit}
       onSaved={() => { setEdit(undefined); result.reload(); }} /></Modal>}

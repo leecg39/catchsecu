@@ -1,0 +1,31 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:98401) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/document-access-gate.test.ts (11 tests | 1 failed | 10 skipped) 1378ms
+   × 모든 링크가 만료되면 동일한 내용의 새 게시본을 만들고 옛 링크의 만료를 유지한다 1375ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 모든 링크가 만료되면 동일한 내용의 새 게시본을 만들고 옛 링크의 만료를 유지한다
+Error: 이미 게시한 내용입니다. 기존 링크를 사용하거나 새 초안을 저장해주세요.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ src/server/documents.ts:139:92
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/src/runtime/getPrismaClient.ts:861:18
+ ❯ tests/server/document-access-gate.test.ts:163:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 skipped (11)
+   Start at  20:39:36
+   Duration  2.72s (tests 54%, import 31%, transform 16%)
+

@@ -1,0 +1,22 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:19351) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/mfa-policy.test.ts (21 tests) 7360ms
+   ✓ company MFA policy and recovery exceptions (21)
+     ✓ policy mutation requires current password, version, tenant and enrolled direct owner 659ms
+     ✓ create/read/update/delete are real, latest replay is current and deletion erases creation copies 488ms
+     ✓ an active exception opens access and a natural clock boundary closes it without cleanup 352ms
+     ✓ an owner exception also expires and cannot grant management authority 302ms
+     ✓ rejects foreign/enrolled targets and duplicate records 392ms
+     ✓ conflicting updates keep the current reason and original maximum lifetime 363ms
+     ✓ the final deadline check rolls back late audit and data after exception expiry 1417ms
+     ✓ a stale context cannot use revoked exceptions in a service transaction 316ms
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  07:09:34
+   Duration  8.26s (tests 90%, import 6%, transform 4%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P11-T02/mfa/mfa-tests.json

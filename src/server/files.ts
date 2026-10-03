@@ -18,7 +18,8 @@ export async function reserveQuota(tx: Transaction, tenantId: string, bytes: num
   // All reservations for one tenant are serialized, including public uploads.
   await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${tenantId} FOR UPDATE`;
   const result = await tx.fileObject.aggregate({ where: { tenantId, status: { not: "deleted" } }, _sum: { size: true } });
-  if ((result._sum.size ?? 0) + bytes > env.FILE_TENANT_QUOTA_BYTES) fail(409, "FILE_QUOTA_EXCEEDED", "회사의 파일 저장 한도에 도달했습니다.");
+  const business = await tx.companyBusinessFile.aggregate({ where: { tenantId, status: { not: "deleted" } }, _sum: { size: true } });
+  if ((result._sum.size ?? 0) + (business._sum.size ?? 0) + bytes > env.FILE_TENANT_QUOTA_BYTES) fail(409, "FILE_QUOTA_EXCEEDED", "회사의 파일 저장 한도에 도달했습니다.");
 }
 async function fileAudit(tx: Transaction, file: FileObject, requestId: string, action: string, ctx?: Context) {
   await tx.auditEvent.create({ data: { tenantId: file.tenantId, actorId: ctx?.user.id, serviceId: file.serviceId,

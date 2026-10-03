@@ -1,13 +1,14 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api, useResource, errorText } from "@/lib/api";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
 type Service = { id: string; name: string; externalName: string; description: string; type: string; status: string; version: number; createdAt: string };
-type Company = { id: string; name: string; publicName: string; address: string; phone: string; website: string; businessNo: string; billingEmail: string; version: number };
-type Profile = { id: string; name: string; email: string; phone: string; department: string; locale: string; version: number; twoFactorEnabled: boolean };
+type Company = { id: string; name: string; publicName: string; address: string; phone: string; website: string; businessNo: string; billingEmail: string; billingContactName: string; billingContactPhone: string; version: number;
+  closureRequestedAt: string | null; closureReason?: string | null; businessFile?: { id: string; name: string; size: number } | null };
+type Profile = { id: string; name: string; email: string; phone: string; department: string; jobTitle: string | null; locale: string; version: number; twoFactorEnabled: boolean };
 function ErrorNote({ error }: { error?: string }) { return error ? <p className="auth-error" role="alert">{error}</p> : null; }
 export function LiveServices() {
   const app = useApplication(), canManage = app.data?.capabilities.includes("service.manage");
@@ -21,10 +22,10 @@ export function LiveServices() {
       <select className="cs-input" aria-label="서비스 상태" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}><option value="active">운영 중</option><option value="archived">보관</option><option value="all">전체</option></select><ActionButton secondary>검색</ActionButton></form>
       <ErrorNote error={result.error?.message || error} />{result.loading ? <p role="status">서비스를 불러오는 중입니다.</p> :
       <><div className="cs-table-wrap"><table className="cs-table"><thead><tr>{["서비스 명", "외부 공개 서비스 명", "유형", "소개", "상태", "관리"].map(label => <th key={label}>{label}</th>)}</tr></thead><tbody>
-        {result.data?.items.map(service => <tr key={service.id}><td>{service.name}</td><td>{service.externalName}</td><td>{service.type}</td><td>{service.description || "-"}</td><td>{service.status === "active" ? "운영 중" : "보관"}</td><td>{canManage && <div className="mg-flex"><Link className="cs-link" href={"/set/service/modification?id=" + service.id}>수정</Link>{service.status === "active" && <><Link href={"/set/service/consent?serviceId=" + service.id}>동의서 표시</Link><button onClick={() => setArchive(service)}>보관</button></>}</div>}</td></tr>)}
+        {result.data?.items.map(service => <tr key={service.id}><td>{service.name}</td><td>{service.externalName}</td><td>{service.type}</td><td>{service.description || "-"}</td><td>{service.status === "active" ? "운영 중" : "보관"}</td><td>{canManage && <div className="mg-flex"><Link className="cs-link" href={"/set/service/modification?id=" + service.id}>수정</Link>{service.status === "active" ? <><Link href={"/set/service/consent?serviceId=" + service.id}>동의서 표시</Link><button onClick={() => setArchive(service)}>보관</button></> : <button disabled={busy} onClick={async () => { setBusy(true); setError(""); try { await api("/services/" + service.id, { method: "PATCH", body: JSON.stringify({ version: service.version, status: "active" }) }); result.reload(); app.reload(); } catch (error) { setError(errorText(error)); } finally { setBusy(false); } }}>복원</button>}</div>}</td></tr>)}
         {!result.error && !result.data?.items.length && <tr><td colSpan={6}>등록된 서비스가 없습니다.</td></tr>}</tbody></table></div>
         <div className="cs-pagination"><span>총 {result.data?.total ?? 0}개</span><div><button disabled={page === 1} onClick={() => setPage(page - 1)}>이전</button><span>{page} 페이지</span><button disabled={page * 20 >= (result.data?.total ?? 0)} onClick={() => setPage(page + 1)}>다음</button></div></div></>}
-    </Panel>{archive && <Modal title="서비스 보관" onClose={() => { if (!busy) setArchive(undefined); }}><p>“{archive.name}” 서비스를 보관하시겠습니까? 연결된 기록은 유지됩니다.</p>
+    </Panel>{archive && <Modal title="서비스 보관" onClose={() => { if (!busy) setArchive(undefined); }}><p>“{archive.name}” 서비스를 보관하시겠습니까? 연결된 업무 데이터가 있는 서비스는 보관할 수 없습니다.</p><ErrorNote error={error} />
       <ActionButton disabled={busy} onClick={async () => { setBusy(true); setError(""); try {
         await api("/services/" + archive.id, { method: "DELETE", headers: { "If-Match": String(archive.version) } });
         setArchive(undefined); result.reload(); app.reload();
@@ -53,41 +54,68 @@ export function LiveServiceEditor() {
   return <div className="mg-narrow"><PageHeading title={id ? "서비스 정보 수정" : "서비스 생성"} /><Panel>
     <ErrorNote error={result.error?.message} />{result.loading ? <p>불러오는 중…</p> : !result.error && <ServiceForm key={id ?? "new"} initial={result.data} />}</Panel></div>;
 }
-const companyFields = [["name", "회사명"], ["publicName", "외부 공개 회사명"], ["address", "주소"], ["phone", "연락처"], ["website", "홈페이지"], ["businessNo", "사업자등록번호"], ["billingEmail", "세금계산서 이메일"]] as const;
+const companyFields = [["name", "회사명"], ["publicName", "외부 공개 회사명"], ["address", "주소"], ["phone", "연락처"], ["website", "홈페이지"], ["businessNo", "사업자등록번호"], ["billingEmail", "세금계산서 이메일"], ["billingContactName", "세금계산서 담당자"], ["billingContactPhone", "담당자 연락처"]] as const;
 function CompanyForm({ initial, onboarding = false }: { initial?: Company; onboarding?: boolean }) {
-  const [data, setData] = useState(initial ?? { name: "", publicName: "", address: "", phone: "", website: "", businessNo: "", billingEmail: "" });
+  const [data, setData] = useState(initial ?? { name: "", publicName: "", address: "", phone: "", website: "", businessNo: "", billingEmail: "", billingContactName: "", billingContactPhone: "" });
   const [error, setError] = useState(""), [busy, setBusy] = useState(false), router = useRouter(), app = useApplication();
   return <form className="mg-fields" onSubmit={async event => {
     event.preventDefault(); setBusy(true); setError("");
     try {
       const payload = Object.fromEntries(companyFields.map(([key]) => [key, data[key]]));
       await api("/companies" + (initial ? "/" + initial.id : ""), { method: initial ? "PATCH" : "POST", body: JSON.stringify({ ...payload, ...(initial ? { version: initial.version } : {}) }) });
-      app.reload(); router.push(onboarding ? "/dashboard" : "/set/company"); router.refresh();
+      app.reload(); router.push("/set/company"); router.refresh();
     } catch (error) { setError(errorText(error)); } finally { setBusy(false); }
   }}>{companyFields.map(([key, label]) => <label key={key}><span>{label}</span><input className="cs-input" value={data[key]} type={key === "billingEmail" ? "email" : key === "website" ? "url" : "text"} required={key === "name" || key === "publicName"} onChange={event => setData({ ...data, [key]: event.target.value })} /></label>)}
-    <ErrorNote error={error} /><ActionButton disabled={busy}>{busy ? "저장 중…" : onboarding ? "회사 등록" : "저장"}</ActionButton></form>;
+    {onboarding && <p>사업자등록증은 회사 등록 후 회사 기본 정보에서 첨부할 수 있습니다.</p>}<ErrorNote error={error} /><ActionButton disabled={busy}>{busy ? "저장 중…" : onboarding ? "회사 등록" : "저장"}</ActionButton></form>;
+}
+function CompanyBusinessFile({ company, reload }: { company: Company; reload: () => void }) {
+  const [error, setError] = useState(""), [busy, setBusy] = useState(false), [remove, setRemove] = useState(false);
+  return <Panel title="사업자등록증"><ErrorNote error={error} />{company.businessFile ? <div className="mg-flex"><a className="cs-link" href={"/api/v1/companies/" + company.id + "/business-file?fileId=" + company.businessFile.id}>{company.businessFile.name}</a><span>{Math.ceil(company.businessFile.size / 1024)} KB</span><ActionButton secondary disabled={busy} onClick={() => setRemove(true)}>첨부 삭제</ActionButton></div> : <p>첨부된 사업자등록증이 없습니다.</p>}
+    <label className="mg-fields"><span>{busy ? "처리 중…" : company.businessFile ? "사업자등록증 교체" : "사업자등록증 첨부"}</span><input aria-label="사업자등록증 첨부" type="file" accept=".pdf,.png,.jpg,.jpeg" disabled={busy} onChange={async event => {
+      const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (!file) return;
+      setBusy(true); setError("");
+      try {
+        if (file.size < 1 || file.size > 10 * 1024 * 1024) throw new Error("파일은 1바이트 이상, 10MB 이하로 첨부해주세요.");
+        await api("/companies/" + company.id + "/business-file?" + new URLSearchParams({ name: file.name, size: String(file.size) }), { method: "POST", headers: { "Content-Type": file.type || "application/octet-stream", "If-Match": String(company.version) }, body: file });
+        reload();
+      } catch (error) { setError(errorText(error)); } finally { setBusy(false); }
+    }} /></label><small>PDF, PNG, JPG · 최대 10MB · 안전성 검사 후 저장됩니다.</small>
+    {remove && <Modal title="사업자등록증 삭제" onClose={() => { if (!busy) setRemove(false); }}><p>첨부된 사업자등록증을 삭제하시겠습니까?</p><ErrorNote error={error} /><ActionButton disabled={busy} onClick={async () => { setBusy(true); setError(""); try { await api("/companies/" + company.id + "/business-file", { method: "DELETE", headers: { "If-Match": String(company.version) } }); setRemove(false); reload(); } catch (error) { setError(errorText(error)); reload(); } finally { setBusy(false); } }}>삭제</ActionButton></Modal>}
+  </Panel>;
+}
+function CompanyClosure({ company, reload }: { company: Company; reload: () => void }) {
+  const app = useApplication(), owner = app.data?.company?.role === "owner";
+  const [open, setOpen] = useState(false), [confirmation, setConfirmation] = useState(""), [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false), [error, setError] = useState("");
+  return <Panel title="회사 폐쇄 요청"><ErrorNote error={error} />{company.closureRequestedAt ? <><p>폐쇄 요청 접수: {new Date(company.closureRequestedAt).toLocaleString("ko-KR")}</p><p>{company.closureReason}</p><p>청구·자산·보존 자료 확인을 거쳐 폐쇄가 진행됩니다.</p>{owner && <ActionButton secondary disabled={busy} onClick={async () => { setBusy(true); setError(""); try { await api("/companies/" + company.id + "/closure", { method: "POST", body: JSON.stringify({ version: company.version, action: "cancel" }) }); reload(); } catch (error) { setError(errorText(error)); } finally { setBusy(false); } }}>폐쇄 요청 취소</ActionButton>}</> : <><p>회사 소유자가 폐쇄를 요청할 수 있습니다. 접수 후 청구·자산·보존 자료를 확인합니다.</p>{owner && <ActionButton secondary onClick={() => setOpen(true)}>폐쇄 요청</ActionButton>}</>}
+    {open && <Modal title="회사 폐쇄 요청" onClose={() => { if (!busy) setOpen(false); }}><form className="mg-fields" onSubmit={async event => { event.preventDefault(); setBusy(true); setError(""); try { await api("/companies/" + company.id, { method: "DELETE", body: JSON.stringify({ version: company.version, confirmation, reason }) }); setOpen(false); reload(); } catch (error) { setError(errorText(error)); } finally { setBusy(false); } }}><p>“{company.name}” 회사의 폐쇄를 요청합니다.</p><label><span>회사명 확인</span><input className="cs-input" value={confirmation} required maxLength={100} onChange={event => setConfirmation(event.target.value)} /></label><label><span>폐쇄 사유</span><textarea className="cs-input" value={reason} required maxLength={1000} onChange={event => setReason(event.target.value)} /></label><ErrorNote error={error} /><ActionButton disabled={busy}>{busy ? "접수 중…" : "요청 접수"}</ActionButton></form></Modal>}
+  </Panel>;
 }
 export function LiveCompany({ edit = false }: { edit?: boolean }) {
   const app = useApplication(), result = useResource<Company>(app.data?.company ? "/companies/" + app.data.company.id : null);
   return <div className="mg-narrow"><PageHeading title={edit ? "회사 정보 수정" : "회사 기본 정보"}>{!edit && app.data?.capabilities.includes("company.manage") && <Link className="cs-button" href="/set/company/edit">수정</Link>}</PageHeading><Panel>
-    <ErrorNote error={result.error?.message} />{!result.data ? <p>회사 정보를 불러오는 중입니다.</p> : edit ? <CompanyForm initial={result.data} /> :
-      <div className="mg-info-grid">{companyFields.map(([key, label]) => <label key={key}><span>{label}</span><strong>{result.data?.[key] || "-"}</strong></label>)}</div>}</Panel></div>;
+    <ErrorNote error={result.error?.message} />{result.loading ? <p>회사 정보를 불러오는 중입니다.</p> : result.data && (edit ? <CompanyForm key={result.data.id} initial={result.data} /> :
+      <div className="mg-info-grid">{companyFields.map(([key, label]) => <label key={key}><span>{label}</span><strong>{result.data?.[key] || "-"}</strong></label>)}</div>)}</Panel>{!edit && result.data && app.data?.capabilities.includes("company.manage") && <><CompanyBusinessFile company={result.data} reload={result.reload} /><CompanyClosure company={result.data} reload={result.reload} /></>}</div>;
 }
 export function CompanyOnboarding() {
   const app = useApplication();
-  return <div className="mg-narrow"><PageHeading title="회사 등록" /><Panel>{app.data?.company ? <><p>현재 회사: {app.data.company.name}</p><Link className="cs-button" href="/dashboard">대시보드로 이동</Link></> : <CompanyForm onboarding />}</Panel></div>;
+  return <div className="mg-narrow"><PageHeading title="회사 등록" /><Panel>{app.data?.company && <p>현재 회사: {app.data.company.name}. 새 회사를 등록하면 새 회사로 전환됩니다.</p>}<CompanyForm onboarding /></Panel></div>;
 }
 function ProfileForm({ initial }: { initial: Profile }) {
   const [data, setData] = useState(initial), [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  const lock = useRef(false);
   const app = useApplication(), router = useRouter();
   return <form className="mg-fields" onSubmit={async event => {
-    event.preventDefault(); setBusy(true); setError("");
+    event.preventDefault(); if (lock.current) return; lock.current = true; setBusy(true); setError("");
     try {
-      await api("/me", { method: "PATCH", body: JSON.stringify({ version: initial.version, name: data.name, department: data.department ?? "", phone: data.phone ?? "", locale: data.locale }) });
+      await api("/me", { method: "PATCH", body: JSON.stringify({ version: initial.version, name: data.name, department: data.department ?? "", jobTitle: data.jobTitle ?? "", phone: data.phone ?? "", locale: data.locale }) });
       app.reload(); router.push("/my-page/info");
-    } catch (error) { setError(errorText(error)); } finally { setBusy(false); }
-  }}>{([["name", "이름"], ["department", "부서명"], ["phone", "연락처"]] as const).map(([key, label]) => <label key={key}><span>{label}</span><input className="cs-input" required={key === "name"} value={data[key] ?? ""} onChange={event => setData({ ...data, [key]: event.target.value })} /></label>)}
-    <label><span>이메일</span><input className="cs-input" disabled value={data.email} /></label><ErrorNote error={error} /><ActionButton disabled={busy}>{busy ? "저장 중…" : "저장"}</ActionButton></form>;
+    } catch (error) { setError(errorText(error)); } finally { lock.current = false; setBusy(false); }
+  }}><label><span>회사명</span><input className="cs-input" disabled value={app.data?.company?.name ?? "소속 회사 없음"} /></label>
+    {([["name", "이름"], ["department", "부서명"], ["jobTitle", "직책"], ["phone", "연락처"]] as const).map(([key, label]) => <label key={key}><span>{label}</span><input className="cs-input" disabled={busy} maxLength={key === "phone" ? 30 : 100} required={key === "name"} value={data[key] ?? ""} onChange={event => setData({ ...data, [key]: event.target.value })} /></label>)}
+    <label><span>이메일</span><input className="cs-input" disabled value={data.email} /></label>
+    <label><span>언어</span><select className="cs-input" disabled={busy} value={data.locale} onChange={event => setData({ ...data, locale: event.target.value })}><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option></select></label>
+    <ErrorNote error={error} /><div className="mg-flex"><Link className="cs-link" href="/my-page/delete">회원탈퇴</Link><ActionButton disabled={busy}>{busy ? "저장 중…" : "저장"}</ActionButton></div></form>;
 }
 function Sessions() {
   const result = useResource<{ items: { id: string; current: boolean; userAgent: string | null; updatedAt: string }[] }>("/me/sessions");
@@ -96,9 +124,11 @@ function Sessions() {
     {!session.current && <ActionButton secondary disabled={!!busy} onClick={async () => { setBusy(session.id); setError(""); try { await api("/me/sessions/" + session.id, { method: "DELETE" }); result.reload(); } catch (error) { setError(errorText(error)); } finally { setBusy(""); } }}>로그인 해제</ActionButton>}</div>)}</Panel>;
 }
 export function LiveProfile({ edit = false }: { edit?: boolean }) {
+  const app = useApplication();
   const result = useResource<Profile>("/me");
-  return <div className="mg-narrow"><PageHeading title={edit ? "프로필 편집" : "프로필"}>{!edit && <Link className="cs-button" href="/my-page/info/edit">편집</Link>}</PageHeading><Panel>
-    <ErrorNote error={result.error?.message} />{!result.data ? <p>프로필을 불러오는 중입니다.</p> : edit ? <ProfileForm initial={result.data} /> : <div className="mg-info-grid">
-      {([["name", "이름"], ["email", "이메일"], ["department", "부서명"], ["phone", "연락처"]] as const).map(([key, label]) => <label key={key}><span>{label}</span><strong>{result.data?.[key] || "-"}</strong></label>)}</div>}</Panel>
+  return <div className="mg-narrow"><PageHeading title={edit ? "프로필 편집" : "프로필"}>{!edit && <div className="mg-flex"><Link className="cs-button secondary" href="/my-page/activity-log">나의 활동 로그</Link><Link className="cs-button secondary" href="/my-page/info-activity-log">개인정보 활동 검토 이력</Link><Link className="cs-button" href="/my-page/info/edit">편집</Link></div>}</PageHeading><Panel>
+    <ErrorNote error={result.error?.message} />{!result.data ? <p>프로필을 불러오는 중입니다.</p> : edit ? <ProfileForm key={result.data.version} initial={result.data} /> : <div className="mg-info-grid">
+      <label><span>회사명</span><strong>{app.data?.company?.name ?? "소속 회사 없음"}</strong></label>
+      {([["name", "이름"], ["email", "이메일"], ["department", "부서명"], ["jobTitle", "직책"], ["phone", "연락처"]] as const).map(([key, label]) => <label key={key}><span>{label}</span><strong>{result.data?.[key] || "-"}</strong></label>)}</div>}</Panel>
     {!edit && <><Panel title="로그인 보안"><div className="mg-flex"><Link className="cs-button secondary" href="/password-change-rule">비밀번호 변경</Link><Link className="cs-button secondary" href="/two-step-setting">2단계 인증 {result.data?.twoFactorEnabled ? "관리" : "등록"}</Link></div></Panel><Sessions /></>}</div>;
 }

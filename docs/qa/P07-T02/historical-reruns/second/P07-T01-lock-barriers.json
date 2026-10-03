@@ -1,0 +1,87 @@
+{
+  "isolatedDatabase": true,
+  "providerVerified": false,
+  "barriers": [
+    {
+      "table": "Company",
+      "actualWaitObserved": true,
+      "expiredSessionDenied": true
+    },
+    {
+      "table": "ImportJob",
+      "actualWaitObserved": true,
+      "expiredSessionDenied": true
+    },
+    {
+      "action": "import.viewed",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "import.list_viewed",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "import.previewed",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "import.errors_downloaded",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "import.configured",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "import.validated",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "import.commit_requested",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "import.cleaned",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "idempotency.insert",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "sameWorkerName": true,
+      "oldGeneration": 1,
+      "newGeneration": 2,
+      "failure": false,
+      "newExecutionPreserved": true
+    },
+    {
+      "sameWorkerName": true,
+      "oldGeneration": 1,
+      "newGeneration": 2,
+      "failure": true,
+      "newExecutionPreserved": true
+    },
+    {
+      "completionAuditDelay": true,
+      "actualLeaseExpired": true,
+      "originalDeleted": true,
+      "submissionsRolledBack": true
+    },
+    {
+      "actualStagingExpiry": true,
+      "previewDenied": true,
+      "metadataRedacted": true,
+      "scopedCleanup": true
+    }
+  ]
+}

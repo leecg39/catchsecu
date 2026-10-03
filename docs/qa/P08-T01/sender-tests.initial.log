@@ -1,0 +1,79 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:17011) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/senders.test.ts (46 tests | 2 failed) 47862ms
+   ❯ 발신자 현재 권한·최종 기한·사본 정리 (20)
+     ✓ 중복·미지원·예약 쿼리와 상세/변경 쿼리를 거절한다 364ms
+     ✓ 현재 정렬·페이지와 읽기 전용 권한을 반환하고 DNS 비밀을 제한한다 718ms
+     ✓ 생성 재실행은 현재 버전과 삭제 410을 반환한다 143ms
+     ✓ list 감사 처리 중 세션 만료는 전체 롤백한다 2093ms
+     ✓ detail 감사 처리 중 세션 만료는 전체 롤백한다 2077ms
+     ✓ create 감사 처리 중 세션 만료는 전체 롤백한다 2108ms
+     ✓ edit 감사 처리 중 세션 만료는 전체 롤백한다 2099ms
+     ✓ disable 감사 처리 중 세션 만료는 전체 롤백한다 2094ms
+     ✓ renew 감사 처리 중 세션 만료는 전체 롤백한다 2091ms
+     ✓ email 감사 처리 중 세션 만료는 전체 롤백한다 2103ms
+     ✓ dns 감사 처리 중 세션 만료는 전체 롤백한다 2117ms
+     ✓ cleanup 감사 처리 중 세션 만료는 전체 롤백한다 2069ms
+     ✓ evidence 감사 처리 중 세션 만료는 전체 롤백한다 2111ms
+     × Company 실제 잠금 대기 뒤 세션 만료를 거절한다 2399ms
+     × Sender 실제 잠금 대기 뒤 세션 만료를 거절한다 2372ms
+     ✓ 캐시 저장 중 만료된 생성 요청은 발신자·캐시·감사를 남기지 않는다 2046ms
+     ✓ DNS 상세 감사 중 만료된 확인값은 반환하지 않는다 2205ms
+     ✓ 코드 확인 감사 중 만료되면 소비와 메일 사본 삭제를 롤백한다 2171ms
+     ✓ 삭제 감사 중 세션 만료는 인증 원문과 실제 메일 파일을 보존한다 2155ms
+     ✓ 실제 파일 장애는 확정된 무효화와 대기 상태를 남기고 명시적 정리로 재시도한다 235ms
+   ✓ service scoped sender CRUD, verification and delivery (26)
+     ✓ registration is persistent, normalized, idempotent, searchable and versioned 167ms
+     ✓ unknown actors, roles and cross-company/service access are rejected 207ms
+     ✓ invalid addresses, consumer domains, forged activation and foreign origin fail 62ms
+     ✓ real TXT queries and actual local code mail are both required, code is consumed once 397ms
+     ✓ five wrong codes are committed and never become a valid proof 248ms
+     ✓ expired code fails and cleanup erases queued/local authentication copies 155ms
+     ✓ address change and renewal revoke old challenges and require fresh proofs 443ms
+     ✓ only verified senders become the exclusive service/channel default 648ms
+     ✓ provider absence and foreign company configuration cannot activate a phone 99ms
+     ✓ provider activation requires the exact phone, active status and future expiry 241ms
+     ✓ provider failures and privilege withdrawal during I/O keep the sender unverified 98ms
+     ✓ local email verification cannot authorize live SMTP after transport changes 197ms
+     ✓ evidence uses actual scanning, encrypted bytes, bound download and actual removal 372ms
+     ✓ deleting a sender removes attached evidence and cannot revive its tombstone 235ms
+     ✓ storage deletion failure is explicit and the worker retries the real object 291ms
+     ✓ database rejects missing history, unverified defaults and unverified jobs 73ms
+     ✓ actual delivery uses verified From and queued use blocks sender deletion 669ms
+     ✓ a sender disabled before the due time cancels delivery without a local mail file 575ms
+     ✓ expired sender and another service cannot enqueue a branded message 878ms
+     ✓ audit and verification output omit address plaintext, code hashes and provider secrets 238ms
+     ✓ phone evidence cannot silently move to a different number 246ms
+     ✓ verification evidence is immutable after consumption 267ms
+     ✓ server pagination is disjoint and verified filters exclude clock-expired rows 783ms
+     ✓ renewal cancels an undelivered authentication mail and clears its secret 131ms
+     ✓ a pending local challenge requires renewal after changing to SMTP 236ms
+     ✓ sender messages cannot be dispatched or downgraded through the legacy mail protocol 621ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/senders.test.ts > 발신자 현재 권한·최종 기한·사본 정리 > Company 실제 잠금 대기 뒤 세션 만료를 거절한다
+ FAIL  tests/server/senders.test.ts > 발신자 현재 권한·최종 기한·사본 정리 > Sender 실제 잠금 대기 뒤 세션 만료를 거절한다
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/server/senders.test.ts:178:24
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 44 passed (46)
+   Start at  06:05:15
+   Duration  50.73s (tests 95%, import 3%, transform 3%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P08-T01/sender-tests.initial.json

@@ -1,0 +1,207 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/catalog-access-gate.test.ts (7 tests | 6 failed) 4579ms
+   × 로그아웃한 이전 Context는 목록·상세·이력·생성·수정·보관을 처리할 수 없다 907ms
+   × 만료된 세션 Context는 수집 근거를 읽거나 생성하지 못한다 569ms
+   × 이메일 인증을 회수하면 이전 Context의 읽기와 쓰기를 거부한다 447ms
+   × 전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다 659ms
+   × 전문가 배정 상태를 회수하면 남아 있는 구성원/grant로 열람하지 못한다 668ms
+   × 전문가의 여분 grant로 배정하지 않은 서비스의 수집 근거를 읽을 수 없다 786ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 로그아웃한 이전 Context는 목록·상세·이력·생성·수정·보관을 처리할 수 없다
+AssertionError: promise resolved "{ items: [ { …(20) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "activePurposeCount": 0,
++       "contact": "test@catchsecu.test",
++       "countryCode": "KR",
++       "createdAt": 2026-10-03T11:15:36.289Z,
++       "id": "4061fc35-890f-4a94-8874-d197bee30e0b",
++       "items": [
++         "이메일",
++       ],
++       "kind": "processor",
++       "name": "수탁자 d8486c3a-34c9-440b-b7ef-d929a7086888",
++       "purpose": "합성 정보 전달",
++       "refusalNotice": "",
++       "retentionDays": 7,
++       "retentionMode": "days",
++       "retentionReason": "",
++       "serviceId": "8692e2dc-4d3a-4dd1-a581-cc0ba0bd8448",
++       "serviceName": "다른 서비스",
++       "status": "active",
++       "transferMethod": "",
++       "transferTiming": "",
++       "updatedAt": 2026-10-03T11:15:36.289Z,
++       "version": 1,
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/catalog-access-gate.test.ts:55:26
+     53|     () => db.$transaction(tx => createRecipient(tx, f.ctx, recipient(f…
+     54|     () => updateRecipient(f.ctx, f.row.id, { ...f.input, version: 1, p…
+     55|   ]) await expect(call()).rejects.toMatchObject({ status: 401 });
+       |                          ^
+     56|   expect(await db.recipient.count()).toBe(1); expect(await db.recipien…
+     57| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 만료된 세션 Context는 수집 근거를 읽거나 생성하지 못한다
+AssertionError: promise resolved "{ …(20) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "activePurposeCount": 0,
++   "contact": "test@catchsecu.test",
++   "countryCode": "KR",
++   "createdAt": 2026-10-03T11:15:36.890Z,
++   "id": "c087456c-cf51-44b0-afff-0d3e9103bc05",
++   "items": [
++     "이메일",
++   ],
++   "kind": "processor",
++   "name": "수탁자 7a010940-1ba8-42c1-bda8-54b191b65ec8",
++   "purpose": "합성 정보 전달",
++   "refusalNotice": "",
++   "retentionDays": 7,
++   "retentionMode": "days",
++   "retentionReason": "",
++   "serviceId": "c3aa583d-055b-4657-aec5-ae8685ec0dad",
++   "serviceName": "다른 서비스",
++   "status": "active",
++   "transferMethod": "",
++   "transferTiming": "",
++   "updatedAt": 2026-10-03T11:15:36.890Z,
++   "version": 1,
+  }
+
+ ❯ tests/server/catalog-access-gate.test.ts:60:59
+     58| test("만료된 세션 Context는 수집 근거를 읽거나 생성하지 못한다", async () => {
+     59|   const f = await fixture(); await db.session.update({ where: { id: f.…
+     60|   await expect(readCatalog(f.ctx, "recipients", f.row.id)).rejects.toM…
+       |                                                           ^
+     61|   await expect(db.$transaction(tx => createPurpose(tx, f.ctx, purpose(…
+     62| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 이메일 인증을 회수하면 이전 Context의 읽기와 쓰기를 거부한다
+AssertionError: promise resolved "{ items: [ { …(20) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "activePurposeCount": 0,
++       "contact": "test@catchsecu.test",
++       "countryCode": "KR",
++       "createdAt": 2026-10-03T11:15:37.343Z,
++       "id": "584ae916-5491-4ff1-85eb-98e1d0303502",
++       "items": [
++         "이메일",
++       ],
++       "kind": "processor",
++       "name": "수탁자 a352e856-fe7f-4afe-8fe2-a8e1921fb67d",
++       "purpose": "합성 정보 전달",
++       "refusalNotice": "",
++       "retentionDays": 7,
++       "retentionMode": "days",
++       "retentionReason": "",
++       "serviceId": "e3295354-b4be-497c-b994-e62951947029",
++       "serviceName": "다른 서비스",
++       "status": "active",
++       "transferMethod": "",
++       "transferTiming": "",
++       "updatedAt": 2026-10-03T11:15:37.343Z,
++       "version": 1,
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/catalog-access-gate.test.ts:65:73
+     63| test("이메일 인증을 회수하면 이전 Context의 읽기와 쓰기를 거부한다", async () => {
+     64|   const f = await fixture(); await db.user.update({ where: { id: f.use…
+     65|   await expect(listCatalog(f.ctx, "recipients", catalogQuery.parse({})…
+       |                                                                         ^
+     66|   await expect(updateRecipient(f.ctx, f.row.id, { ...f.input, version:…
+     67| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다
+Error: 소속된 회사가 없습니다. 회사를 등록하거나 초대를 수락해주세요.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ requireContext src/server/context.ts:34:16
+ ❯ expert tests/server/catalog-access-gate.test.ts:43:15
+ ❯ tests/server/catalog-access-gate.test.ts:69:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 전문가 배정 상태를 회수하면 남아 있는 구성원/grant로 열람하지 못한다
+Error: 소속된 회사가 없습니다. 회사를 등록하거나 초대를 수락해주세요.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ requireContext src/server/context.ts:34:16
+ ❯ expert tests/server/catalog-access-gate.test.ts:43:15
+ ❯ tests/server/catalog-access-gate.test.ts:77:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 전문가의 여분 grant로 배정하지 않은 서비스의 수집 근거를 읽을 수 없다
+Error: 소속된 회사가 없습니다. 회사를 등록하거나 초대를 수락해주세요.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ requireContext src/server/context.ts:34:16
+ ❯ expert tests/server/catalog-access-gate.test.ts:43:15
+ ❯ tests/server/catalog-access-gate.test.ts:82:137
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 1 passed (7)
+   Start at  20:15:34
+   Duration  5.79s (tests 81%, import 13%, transform 7%)
+

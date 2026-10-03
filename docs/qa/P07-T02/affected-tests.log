@@ -1,0 +1,111 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:99084) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/marketing.test.ts (49 tests) 65042ms
+   ✓ 마케팅 최종 권한·만료·삭제·실행 경합 (26)
+     ✓ 중복·알 수 없는 쿼리와 변경 요청의 쿼리를 거절한다 1157ms
+     ✓ 검색·정렬·페이지 보정과 현재 권한을 실제 결과로 확인한다 415ms
+     ✓ 생성 재실행은 현재 버전을 반환하며 삭제 후에는 410이다 473ms
+     ✓ 실제 Company 잠금 대기 뒤 세션 만료는 원문을 반환하지 않는다 2389ms
+     ✓ 실제 Submission 잠금 대기 뒤 세션 만료는 원문을 반환하지 않는다 2401ms
+     ✓ 실제 contact 잠금 대기 뒤 세션 만료는 원문을 반환하지 않는다 2457ms
+     ✓ 감사 저장 중 세션 만료는 marketing.list_viewed를 전체 롤백한다 2577ms
+     ✓ 감사 저장 중 세션 만료는 marketing.viewed를 전체 롤백한다 2644ms
+     ✓ 감사 저장 중 세션 만료는 marketing.sources_viewed를 전체 롤백한다 2515ms
+     ✓ 감사 저장 중 세션 만료는 marketing.granted를 전체 롤백한다 2403ms
+     ✓ 감사 저장 중 세션 만료는 marketing.exclusion_changed를 전체 롤백한다 2798ms
+     ✓ 감사 저장 중 세션 만료는 marketing.withdrawn를 전체 롤백한다 3048ms
+     ✓ 감사 저장 중 세션 만료는 marketing.erased를 전체 롤백한다 2393ms
+     ✓ 감사 저장 중 세션 만료는 marketing.summary_viewed를 전체 롤백한다 2412ms
+     ✓ 감사 저장 중 세션 만료는 email.suppressions_viewed를 전체 롤백한다 2357ms
+     ✓ 생성 캐시 저장 중 session 만료는 동의·이벤트·캐시를 남기지 않는다 2306ms
+     ✓ 생성 캐시 저장 중 retention 만료는 동의·이벤트·캐시를 남기지 않는다 2403ms
+     ✓ 읽기 감사 중 보유 기한이 끝나면 detail 원문을 반환하지 않는다 2359ms
+     ✓ 읽기 감사 중 보유 기한이 끝나면 csv 원문을 반환하지 않는다 2401ms
+     ✓ 읽기 감사 중 보유 기한이 끝나면 sources 원문을 반환하지 않는다 2355ms
+     ✓ 삭제 감사 중 세션 만료는 실제 로컬 사본을 보존한다 2354ms
+     ✓ 실제 파일 정리 실패를 보존하고 같은 삭제 요청으로 재시도한다 682ms
+     ✓ 같은 작업자 이름의 이전 시도는 새 임대를 덮어쓰지 않는다 (차단=false) 510ms
+     ✓ 같은 작업자 이름의 이전 시도는 새 임대를 덮어쓰지 않는다 (차단=true) 434ms
+     ✓ 로컬 파일 게시 직전에 다시 검사해 처리 중 만료된 동의를 차단한다 2237ms
+   ✓ marketing preferences, lifecycle and dispatch with real PostgreSQL (23)
+     ✓ only a separate selected channel creates consent; general consent and old boolean never grant 561ms
+     ✓ one contact has independent channels, services and companies with no unauthorized reads 890ms
+     ✓ current grants and role are rechecked, sources require access to response data 314ms
+     ✓ manual evidence registration is idempotent; guessed fields, future dates and missing evidence fail 655ms
+     ✓ search is normalized exact match, pages are disjoint and CSV neutralizes formulas 606ms
+     ✓ exclusion is channel-specific with optimistic versions and append-only history 399ms
+     ✓ bulk withdrawal is atomic, handles repeated requests and refuses stale reconsented rows 819ms
+     ✓ new consent needs a newer timestamp and cannot remove channel exclusion or subject suppression 716ms
+     ✓ worker delivers only the consented current version and cancels queued mail after exclusion 533ms
+     ✓ source withdrawal updates all its channels; changing a contact cannot transfer consent 349ms
+     ✓ retention expiry and archived service deny delivery and never expose expired plaintext 495ms
+     ✓ approved destruction erases marketing data before issuing a certificate 611ms
+     ✓ manual deletion and contact correction erase pending and delivered local copies 926ms
+     ✓ pending destruction only suspends sending; cancellation preserves original consent 332ms
+     ✓ database rejects unrecorded changes, cross-service bindings and deleted evidence restoration 519ms
+     ✓ a delivery lock serializes withdrawal; a committed withdrawal prevents the next callback 449ms
+     ✓ summary uses real service scoped state and audit trails contain no contacts or evidence text 356ms
+     ✓ summary uses one period snapshot for consent and withdrawal history 335ms
+(node:824) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/campaigns.test.ts (55 tests) 48923ms
+   ✓ persistent campaign CRUD, privacy and delivery (25)
+     ✓ strict, idempotent drafts support search, versioned update, deletion and immutable history 645ms
+     ✓ CSV normalizes and deduplicates contacts, preserves invalid reasons and encrypts stored values 1166ms
+     ✓ form selection uses explicit same-service consent IDs and exposes no full submission 725ms
+     ✓ exclusions require explicit confirmation and a repeated request creates one frozen outbox 1158ms
+     ✓ two workers deliver one personalized local message with the verified From 1109ms
+     ✓ schedule bounds and unavailable SMS transport are explicit 982ms
+     ✓ rescheduling moves the job and cancellation persists without creating a mail file 865ms
+     ✓ withdrawal committed before dispatch blocks the recorded consent 775ms
+     ✓ re-including a contact cannot silently replace the scheduled consent version 1126ms
+     ✓ the actual requester, rather than the draft creator, must retain their service grant 783ms
+     ✓ a disabled sender cannot send an already requested campaign 1103ms
+     ✓ privacy erasure removes draft contacts, requested contacts and actual local mail bytes 1010ms
+     ✓ retention cleanup includes unscheduled contact copies and campaign expiry 1091ms
+     ✓ a known local storage failure can be retried without editing the original request 945ms
+     ✓ an interrupted local write recovers its existing receipt without changing file bytes 731ms
+     ✓ uncertain SMTP responses are never automatically resent or user-retried 1397ms
+     ✓ cancellation during one real delivery keeps its receipt and prevents the next send 1139ms
+     ✓ approved source destruction certifies the removal of every campaign contact copy 1792ms
+     ✓ expiry cannot recopy an erased source and CSV formulas remain inert 738ms
+     ✓ database rejects missing events, cross-service copies, mutable receipts and duplicate attempts 712ms
+     ✓ cancelling an interrupted sending attempt preserves uncertainty instead of claiming it was unsent 1073ms
+     ✓ a last-attempt worker exit is reconciled using its actual local receipt 661ms
+     ✓ 1000 targets remain fully pageable and maximum-sized scheduling is atomic 1981ms
+     ✓ SMS form selection uses real same-service consent but cannot fabricate provider delivery or pricing 389ms
+   ✓ message templates and HTML delivery (7)
+     ✓ template application copies an exact version; later edits and deletion cannot change scheduled mail 672ms
+     ✓ HTML sanitizer, escaped recipient values and plaintext fallback match actual delivered bytes 854ms
+     ✓ SMS and template state rules reject unsupported HTML and archived application 337ms
+   ✓ campaign attachment lifecycle (7)
+     ✓ real scanner, private download and actual local mail retain exact bytes and frozen metadata 1027ms
+     ✓ unfinished or mismatched files block preview and scheduling, and upload owners are enforced 608ms
+     ✓ parallel reservations enforce five files, twenty MB, service scope and SMS restrictions 592ms
+     ✓ storage deletion failure blocks downloads and is retried; draft deletion removes the remaining originals 444ms
+     ✓ tampered stored bytes are rejected before any provider I/O 631ms
+     ✓ actual elapsed campaign expiry deletes encrypted attachment bytes 4744ms
+   ✓ SMTP adapter receives sanitized HTML and attachment buffers with path and URL access disabled 1100ms
+   ✓ real local mail includes a bound unsubscribe link; GET is read-only and repeated anonymous POST is idempotent 577ms
+   ✓ forged, expired, unconfirmed and oversized unsubscribe requests cannot mutate data 443ms
+   ✓ RFC form posts work without cookies or Origin, and duplicate multipart posts keep one receipt 548ms
+   ✓ unsubscribe blocks new business mail, draft preview and a previously queued campaign at its final delivery check 935ms
+   ✓ signed relay receipts derive recipient scope from the sent job and preserve original acceptance and private audit fields 527ms
+   ✓ simultaneous duplicate events produce one effect and event ID reuse with another body conflicts 944ms
+   ✓ out-of-order delivery reports never override complaint or remove a permanent block 808ms
+   ✓ soft bounce threshold counts distinct sent jobs, not repeated events for one job 976ms
+   ✓ soft bounce policy excludes events outside seven days and jobs subsequently confirmed delivered 1359ms
+   ✓ unknown, unsent, impossibly dated jobs are rejected and raw SQL cannot forge scope or mutate feedback 651ms
+   ✓ suppression lists enforce tenant, service, role, exact address search and server pagination 660ms
+   ✓ erasing consent removes mail and contact copies while retaining minimum suppression and valid unsubscribe capability 547ms
+   ✓ the exact advertised one-click URL redirects only GET and accepts receiver POST without redirects 406ms
+
+ Test Files  2 passed (2)
+      Tests  104 passed (104)
+   Start at  05:52:01
+   Duration  119.43s (tests 96%, import 3%, transform 2%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P07-T02/affected-tests.json

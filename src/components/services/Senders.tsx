@@ -1,8 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import { api, errorText, useResource } from "@/lib/api";
-import type { Paged } from "@/contracts/forms";
-import { senderEventLabels, senderStatuses, type SenderRecord } from "@/contracts/senders";
+import { senderEventLabels, senderStatuses, type SenderPage, type SenderRecord } from "@/contracts/senders";
 import type { FileInfo } from "@/contracts/files";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
@@ -15,21 +14,23 @@ export function SenderManagement({ email = false }: { email?: boolean }) {
   if (!app.data) return <Panel><p role="status">회사 정보를 불러오는 중입니다.</p></Panel>;
   if (!app.data.capabilities.includes("sender.read")) return <Panel><p role="alert">발신자를 조회할 권한이 없습니다.</p></Panel>;
   if (!app.data.serviceId) return <Panel><p>서비스를 선택해주세요.</p></Panel>;
-  return <SenderList key={app.data.serviceId + String(email)} serviceId={app.data.serviceId} email={email} canWrite={app.data.capabilities.includes("sender.manage")} />;
+  return <SenderList key={app.data.serviceId + String(email)} serviceId={app.data.serviceId} email={email} />;
 }
-function SenderList({ serviceId, email, canWrite }: { serviceId: string; email: boolean; canWrite: boolean }) {
+function SenderList({ serviceId, email }: { serviceId: string; email: boolean }) {
   const [search, setSearch] = useState(""), [query, setQuery] = useState(""), [status, setStatus] = useState("all"), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20);
-  const [create, setCreate] = useState(false), [detail, setDetail] = useState<string>();
-  const list = useResource<Paged<SenderRecord>>("/senders?" + new URLSearchParams({ serviceId, channel: email ? "email" : "sms", search, status, page: String(page), pageSize: String(pageSize) }));
+  const [create, setCreate] = useState(false), [detail, setDetail] = useState<string>(), [sort, setSort] = useState("createdAt"), [direction, setDirection] = useState("desc");
+  const list = useResource<SenderPage>("/senders?" + new URLSearchParams({ serviceId, channel: email ? "email" : "sms", search, status, page: String(page), pageSize: String(pageSize), sort, direction }));
+  const canWrite = !!list.data?.permissions.canCreate;
   return <div className="senders-page"><PageHeading title={email ? "발신 주소 관리" : "발신번호 관리"}><p>{email ? "조직에서 소유한 이메일 주소를 등록하고 확인합니다." : "등록한 발신번호와 공급자의 인증 상태를 관리합니다."}</p></PageHeading>
     <Panel><div className="sender-toolbar"><h2>{email ? "발신 주소 목록" : "발신번호 목록"}</h2>{canWrite && <ActionButton onClick={() => setCreate(true)}>{email ? "발신 주소 등록" : "발신번호 등록"}</ActionButton>}</div>
       <form className="sender-filters" onSubmit={e => { e.preventDefault(); setSearch(query); setPage(1); }}><input className="cs-input" aria-label="발신자 검색" placeholder="이름 또는 정확한 주소·번호" value={query} onChange={e => setQuery(e.target.value)} maxLength={254} />
-        <select className="cs-input" aria-label="발신자 상태" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}><option value="all">현재 목록 전체</option>{Object.entries(senderStatuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><ActionButton secondary>검색</ActionButton><ActionButton secondary type="button" onClick={list.reload}>새로고침</ActionButton></form>
-      <RemoteTable columns={["대표", "발신자 이름", email ? "발신자 주소" : "발신번호", "설명", "인증 상태", "발송 준비", "등록 담당자", "등록일", "관리"]} rows={(list.data?.items ?? []).map(r => ({ id: r.id, cells: [r.isDefault ? "대표" : "—", r.label || "삭제된 발신자", r.address ?? "원문 없음", r.description || "—", <span key="state">{senderStatuses[r.status]}{r.environment === "local" && <small>로컬 검증</small>}<small>{r.expiresAt ? "만료 " + when(r.expiresAt) : ""}</small></span>, r.eligible ? r.environment === "local" ? "로컬 메일" : "준비됨" : r.denial, r.creator, when(r.createdAt), <button key="detail" className="cs-link" onClick={() => setDetail(r.id)}>관리</button>] }))} total={list.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage} onPageSize={n => { setPageSize(n); setPage(1); }} loading={list.loading} error={list.error?.message} />
+        <select className="cs-input" aria-label="발신자 상태" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}><option value="all">현재 목록 전체</option>{Object.entries(senderStatuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
+        <select className="cs-input" aria-label="발신자 정렬" value={sort + ":" + direction} onChange={e => { const [s, d] = e.target.value.split(":"); setSort(s); setDirection(d); setPage(1); }}><option value="createdAt:desc">최근 등록순</option><option value="createdAt:asc">등록 오래된순</option><option value="label:asc">이름순</option><option value="label:desc">이름 역순</option></select><ActionButton secondary>검색</ActionButton><ActionButton secondary type="button" onClick={list.reload}>새로고침</ActionButton></form>
+      <RemoteTable columns={["대표", "발신자 이름", email ? "발신자 주소" : "발신번호", "설명", "인증 상태", "발송 준비", "등록 담당자", "등록일", "관리"]} rows={(list.data?.items ?? []).map(r => ({ id: r.id, cells: [r.isDefault ? "대표" : "—", r.label || "삭제된 발신자", r.address ?? "원문 없음", r.description || "—", <span key="state">{senderStatuses[r.status]}{r.environment === "local" && <small>로컬 검증</small>}<small>{r.expiresAt ? "만료 " + when(r.expiresAt) : ""}</small></span>, r.eligible ? r.environment === "local" ? "로컬 메일" : "준비됨" : r.denial, r.creator, when(r.createdAt), <button key="detail" className="cs-link" onClick={() => setDetail(r.id)}>관리</button>] }))} total={list.data?.total ?? 0} page={list.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={n => { setPageSize(n); setPage(1); }} loading={list.loading} error={list.error?.message} />
     </Panel>
     <Panel title={email ? "발신 주소 확인 방법" : "발신번호 확인 방법"}><p>{email ? "이메일 인증번호와 도메인의 DNS TXT 값을 모두 확인해야 합니다. 주소를 변경하거나 재인증을 시작하면 기존 인증은 해제됩니다." : "문자 공급자에 등록된 번호의 활성 상태와 만료일을 확인합니다. 심사에 필요한 증빙을 보관하고 교체할 수 있습니다. 증빙 첨부만으로 발신번호 인증이 완료되지는 않습니다."}</p></Panel>
-    {create && <SenderCreate serviceId={serviceId} email={email} onClose={() => setCreate(false)} onCreated={id => { setCreate(false); list.reload(); setDetail(id); }} />}
-    {detail && <SenderDetail id={detail} canWrite={canWrite} onClose={() => setDetail(undefined)} onChanged={list.reload} />}
+    {create && canWrite && <SenderCreate serviceId={serviceId} email={email} onClose={() => setCreate(false)} onCreated={id => { setCreate(false); list.reload(); setDetail(id); }} />}
+    {detail && <SenderDetail id={detail} onClose={() => setDetail(undefined)} onChanged={list.reload} />}
   </div>;
 }
 function SenderCreate({ serviceId, email, onClose, onCreated }: { serviceId: string; email: boolean; onClose: () => void; onCreated: (id: string) => void }) {
@@ -43,14 +44,20 @@ function SenderCreate({ serviceId, email, onClose, onCreated }: { serviceId: str
 function SenderFields({ email, record }: { email: boolean; record?: SenderRecord }) {
   return <><label>발신자 이름<input className="cs-input" aria-label="발신자 이름" name="label" defaultValue={record?.label} maxLength={100} required /></label><label>{email ? "발신자 주소" : "발신번호"}<input className="cs-input" aria-label={email ? "발신자 주소" : "발신번호"} type={email ? "email" : "tel"} name="address" defaultValue={record?.address ?? ""} maxLength={254} required /></label><label>설명<input className="cs-input" aria-label="발신자 설명" name="description" defaultValue={record?.description} maxLength={1000} /></label></>;
 }
-function SenderDetail({ id, canWrite, onClose, onChanged }: { id: string; canWrite: boolean; onClose: () => void; onChanged: () => void }) {
+function SenderDetail({ id, onClose, onChanged }: { id: string; onClose: () => void; onChanged: () => void }) {
   const resource = useResource<SenderRecord>("/senders/" + id), r = resource.data;
+  const canWrite = !!r?.permissions.canEdit;
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [message, setMessage] = useState("");
   const [confirm, setConfirm] = useState<"disable" | "renew" | "delete">();
   const changed = () => { resource.reload(); onChanged(); };
   async function action(path: string, extra: object = {}, method = "POST") {
     if (!r || busy) return; setBusy(true); setError(""); setMessage("");
-    try { const response = await api<{ verified?: boolean; cleanupPending?: boolean }>("/senders/" + id + (path ? "/" + path : ""), { method, body: JSON.stringify({ version: r.version, ...extra }) });
+    try {
+      const current = await api<SenderRecord>("/senders/" + id);
+      const allowed = path === "cleanup" ? current.permissions.canCleanup : path === "default" ? current.permissions.canSetDefault : path === "disable" ? current.permissions.canDisable : path === "renew" ? current.permissions.canRenew : path ? current.permissions.canVerify : method === "DELETE" ? current.permissions.canDelete || current.permissions.canCleanup : current.permissions.canEdit;
+      if (!allowed) { changed(); throw new Error("현재 이 작업을 수행할 권한이나 상태가 아닙니다."); }
+      if (current.version !== r.version) { changed(); throw new Error("발신자 정보가 변경되었습니다. 다시 불러온 내용을 확인해주세요."); }
+      const response = await api<{ verified?: boolean; cleanupPending?: boolean }>("/senders/" + id + (path ? "/" + path : ""), { method, body: JSON.stringify({ version: current.version, ...extra }) });
       setConfirm(undefined); setMessage(response.cleanupPending ? "삭제 요청을 저장했습니다. 파일 정리를 다시 처리 중입니다." : response.verified === false ? "아직 확인되지 않았습니다. 등록 내용과 공급자 상태를 확인해주세요." : "처리했습니다."); changed();
     } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
   }
@@ -68,6 +75,7 @@ function SenderDetail({ id, canWrite, onClose, onChanged }: { id: string; canWri
     </> : <><p>문자 공급자 계정에 등록한 번호의 인증 상태를 확인합니다.</p><ActionButton secondary disabled={busy} onClick={() => action("check")}>공급자 인증 확인</ActionButton></>}</section>}
     {canWrite && r.status !== "deleted" && <div className="sender-actions">{r.eligible && !r.isDefault && <ActionButton secondary disabled={busy} onClick={() => action("default")}>대표로 설정</ActionButton>}<ActionButton secondary disabled={busy} onClick={() => { setError(""); setConfirm("renew"); }}>재인증 시작</ActionButton>{r.status !== "disabled" && <ActionButton secondary disabled={busy} onClick={() => { setError(""); setConfirm("disable"); }}>사용 중지</ActionButton>}<ActionButton secondary disabled={busy} onClick={() => { setError(""); setConfirm("delete"); }}>발신자 삭제</ActionButton></div>}
     {r.channel === "sms" && r.status !== "deleted" && <SenderEvidence record={r} canWrite={canWrite} onChanged={changed} />}
+    {r.cleanupPending && <section className="sender-fields"><p>원문은 사용할 수 없으며 사본 정리가 남아 있습니다.</p>{r.permissions.canCleanup && <ActionButton secondary disabled={busy} onClick={() => action("cleanup")}>사본 정리 다시 시도</ActionButton>}</section>}
     {error && <p role="alert">{error}</p>}<p role="status">{message}</p><h3>변경 이력 (최근 100건)</h3><ol className="sender-history">{r.events?.map(e => <li key={e.version}>{senderEventLabels[e.kind] ?? e.kind}<small>v{e.version} · {when(e.createdAt)}</small></li>)}</ol>
   </div>}</Modal>;
 }

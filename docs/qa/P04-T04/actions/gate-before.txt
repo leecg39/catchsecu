@@ -1,0 +1,162 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:75195) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-list-deletion.test.ts (24 tests | 6 failed | 18 skipped) 6424ms
+   × 조회 전용 서비스의 목록·상세 작업과 생성/업로드 메뉴는 현재 권한으로 계산한다 1186ms
+   × 이전 Context의 작성/게시 권한 회수는 작업 DTO와 실제 API에 동시에 반영한다 883ms
+   × 서비스별 생성/업로드 권한과 보관 상태를 목록 메타데이터에 반영한다 828ms
+   × 응답 링크는 현재 역할·서비스 submission.read 권한이 모두 있을 때만 안내한다 1563ms
+   × 공개 중/중단/만료 상태와 보관 서비스의 작업은 실행 가능한 상태를 따른다 1257ms
+   × 보관 폼은 독립 복사/삭제 조건 조회를 허용하고 가져오기 양식은 변경 작업을 안내하지 않는다 701ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 조회 전용 서비스의 목록·상세 작업과 생성/업로드 메뉴는 현재 권한으로 계산한다
+AssertionError: expected undefined to match object { preview: true, …(9) }
+
+- Expected:
+{
+  "archive": false,
+  "checkDeletion": false,
+  "copy": false,
+  "edit": false,
+  "pause": false,
+  "preview": true,
+  "registerTemplate": false,
+  "responses": false,
+  "resume": false,
+  "share": false,
+}
+
++ Received:
+undefined
+
+ ❯ tests/server/form-list-deletion.test.ts:194:23
+    192|   const f=await fixture(); await db.serviceGrant.update({ where:{ id:f…
+    193|   const row=await (await GET(req("/forms/"+f.form.id,f.editor.cookie))…
+    194|   expect(row.actions).toMatchObject({ preview:true,responses:false,edi…
+       |                       ^
+    195|   const page=await (await list(req("/forms?serviceId="+f.serviceId,f.e…
+    196|   expect(page.items[0].actions).toEqual(row.actions); expect(page.perm…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 이전 Context의 작성/게시 권한 회수는 작업 DTO와 실제 API에 동시에 반영한다
+AssertionError: expected undefined to match object { edit: true, copy: true, …(4) }
+
+- Expected:
+{
+  "checkDeletion": true,
+  "copy": true,
+  "edit": true,
+  "pause": true,
+  "resume": false,
+  "share": true,
+}
+
++ Received:
+undefined
+
+ ❯ tests/server/form-list-deletion.test.ts:201:109
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 서비스별 생성/업로드 권한과 보관 상태를 목록 메타데이터에 반영한다
+AssertionError: expected undefined to deeply equal { canCreate: false, …(2) }
+
+- Expected:
+{
+  "canCreate": false,
+  "canImport": false,
+  "canViewImports": false,
+}
+
++ Received:
+undefined
+
+ ❯ tests/server/form-list-deletion.test.ts:211:48
+    209|   await db.serviceGrant.create({ data:{ tenantId:f.company.id,memberId…
+    210|   const get=async (serviceId?:string) => (await list(req("/forms"+(ser…
+    211|   expect((await get(f.serviceId)).permissions).toEqual({ canCreate:fal…
+       |                                                ^
+    212|   expect((await get(second.id)).permissions).toEqual({ canCreate:true,…
+    213|   await db.service.update({ where:{ id:second.id },data:{ status:"arch…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 응답 링크는 현재 역할·서비스 submission.read 권한이 모두 있을 때만 안내한다
+AssertionError: expected undefined to match object { responses: true, edit: false, …(2) }
+
+- Expected:
+{
+  "copy": false,
+  "edit": false,
+  "responses": true,
+  "share": false,
+}
+
++ Received:
+undefined
+
+ ❯ tests/server/form-list-deletion.test.ts:219:101
+    217|   const f=await fixture(); await db.membership.update({ where:{ id:f.e…
+    218|   await db.serviceGrant.update({ where:{ id:f.grant.id },data:{ capabi…
+    219|   const row=await (await GET(req("/forms/"+f.form.id,f.editor.cookie))…
+       |                                                                                                     ^
+    220|   expect((await GET(req("/forms/"+f.form.id+"/submissions",f.editor.co…
+    221|   expect((await (await GET(req("/forms/"+f.form.id+"/deletion",f.edito…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 공개 중/중단/만료 상태와 보관 서비스의 작업은 실행 가능한 상태를 따른다
+AssertionError: expected undefined to match object { pause: false, resume: true, …(1) }
+
+- Expected:
+{
+  "pause": false,
+  "resume": true,
+  "share": true,
+}
+
++ Received:
+undefined
+
+ ❯ tests/server/form-list-deletion.test.ts:230:107
+    228|   const f=await fixture(),publication=await publish(f);
+    229|   expect((await action(req("/forms/"+f.form.id+"/pause",f.editor.cooki…
+    230|   const paused=await (await GET(req("/forms/"+f.form.id,f.editor.cooki…
+       |                                                                                                           ^
+    231|   await db.publication.update({ where:{ id:publication.id },data:{ exp…
+    232|   const expired=await (await GET(req("/forms/"+f.form.id,f.editor.cook…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 보관 폼은 독립 복사/삭제 조건 조회를 허용하고 가져오기 양식은 변경 작업을 안내하지 않는다
+AssertionError: expected undefined to match object { edit: false, copy: true, …(3) }
+
+- Expected:
+{
+  "archive": false,
+  "checkDeletion": true,
+  "copy": true,
+  "edit": false,
+  "registerTemplate": false,
+}
+
++ Received:
+undefined
+
+ ❯ tests/server/form-list-deletion.test.ts:239:111
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 18 skipped (24)
+   Start at  22:49:58
+   Duration  8.37s (tests 78%, import 13%, transform 9%)
+

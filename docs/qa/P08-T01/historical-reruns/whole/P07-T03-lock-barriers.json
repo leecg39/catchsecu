@@ -1,0 +1,92 @@
+{
+  "checkedAt": "2026-10-03T21:18:16.511Z",
+  "barriers": [
+    {
+      "table": "Company",
+      "actualWaitObserved": true,
+      "waiters": 1,
+      "afterWaitStatus": 401
+    },
+    {
+      "table": "DestructionRequest",
+      "actualWaitObserved": true,
+      "waiters": 1,
+      "afterWaitStatus": 401
+    },
+    {
+      "table": "AuditEvent",
+      "action": "hold",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "table": "AuditEvent",
+      "action": "destruction-request",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "table": "AuditEvent",
+      "action": "approve",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "table": "AuditEvent",
+      "action": "retention",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "table": "AuditEvent",
+      "action": "certificate",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "kind": "sameWorkerLeaseGeneration",
+      "mode": "succeed",
+      "staleAttempt": 1,
+      "currentAttempt": 2,
+      "staleCompletionOrRetryRejected": true
+    },
+    {
+      "kind": "sameWorkerLeaseGeneration",
+      "mode": "fail",
+      "staleAttempt": 1,
+      "currentAttempt": 2,
+      "staleCompletionOrRetryRejected": true
+    },
+    {
+      "kind": "expertViewerRole",
+      "forgedGrantCannotElevateRole": true,
+      "requestAndCertificateDenied": true,
+      "holdUnchanged": true
+    },
+    {
+      "kind": "retentionBoundary",
+      "actualAuditDelaySeconds": 2,
+      "elapsedRetentionUpdateRolledBack": true
+    },
+    {
+      "kind": "completionAuditLeaseExpiry",
+      "actualDelaySeconds": 2,
+      "certificateAndErasureRolledBack": true
+    },
+    {
+      "kind": "syntheticVerificationErasure",
+      "receipts": 2,
+      "events": 4,
+      "encryptedAttempts": 2,
+      "remainingLinkedOriginals": 0,
+      "lateBindingRejected": true,
+      "providerProtocolVerified": false
+    }
+  ],
+  "providerProtocolVerified": false
+}

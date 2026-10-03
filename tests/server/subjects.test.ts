@@ -149,7 +149,11 @@ describe("explicit subject identity and real PostgreSQL access", () => {
     expect((await subjectPost(req("/subjects/sessions", "POST", "anonymous", { token }))).status).toBe(422);
     const results = await Promise.all([0, 1].map(() => subjectPost(req("/subjects/sessions", "POST", request.cookie, { token }))));
     expect(results.map(r => r.status).sort()).toEqual([201, 422]);
-    const response = results.find(r => r.status === 201)!; expect(response.headers.get("set-cookie")).toMatch(/HttpOnly; SameSite=Strict; Max-Age=1800/);
+    const response = results.find(r => r.status === 201)!, setCookie = response.headers.get("set-cookie")!;
+    expect(setCookie).toMatch(/HttpOnly; SameSite=Strict; Max-Age=\d+/);
+    const maxAge = Number(/Max-Age=(\d+)/.exec(setCookie)![1]), current = await db.subjectSession.findUniqueOrThrow({ where: { requestId: request.access!.id } });
+    expect(maxAge).toBeGreaterThan(0); expect(maxAge).toBeLessThanOrEqual(1800);
+    expect(maxAge).toBeLessThanOrEqual(Math.ceil((current.expiresAt.getTime() - Date.now()) / 1000));
     expect((await db.subjectSession.count({ where: { requestId: request.access!.id } }))).toBe(1);
   });
   test("expired and foreign links fail; only URL session matching its cookie reads; logout revokes", async () => {

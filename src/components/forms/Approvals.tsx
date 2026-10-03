@@ -1,4 +1,5 @@
 "use client";
+import { QuestionSummary } from "./QuestionSummary";
 import { ConsentDisplay, ConsentDocuments } from "./ConsentDocuments";
 import type { FormConsentBundle } from "@/contracts/form-documents";
 import { useRef, useState } from "react";
@@ -35,7 +36,7 @@ export function ApprovalPanel({ form, dirty, onChanged }: { form: FormRecord; di
   if (!result.data) return <Panel><p role="status">게시 승인 상태를 불러오는 중입니다.</p></Panel>;
   const data = result.data, active = data.items.some(item => item.status === "pending" || item.status === "approved");
   return <Panel title="캐치폼 사용 승인"><p>{data.policy.requireApproval ? "회사 정책에 따라 현재 초안의 승인이 필요합니다." : "현재 회사 정책에서는 바로 게시할 수 있습니다."}</p>
-    {data.policy.requireApproval && data.canRequest && form.hasDraft && !active && page === 1 && form.status !== "archived" &&
+    {data.policy.requireApproval && data.canRequest && form.hasDraft && !active && data.page === 1 && form.status !== "archived" &&
       <form className="approval-request" key={data.policy.approvalRevision} onSubmit={event => {
         event.preventDefault(); const values = new FormData(event.currentTarget);
         void mutate("/forms/" + form.id + "/approvals", "POST", { version: form.version, message: String(values.get("message")), reference: String(values.get("reference")) }, true);
@@ -60,14 +61,14 @@ export function ApprovalPanel({ form, dirty, onChanged }: { form: FormRecord; di
     </article>)}
     {data.total === 0 && <p className="mg-muted">승인 요청 내역이 없습니다.</p>}
     {data.total > 0 && <div className="cs-pagination"><span>총 {data.total}개</span><select aria-label="승인 내역 페이지당 행 수" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>{[10, 20, 50].map(size => <option key={size}>{size}</option>)}</select>
-      <button aria-label="이전 승인 내역" disabled={page <= 1} onClick={() => setPage(page - 1)}>이전</button><span>{page}</span>
-      <button aria-label="다음 승인 내역" disabled={page * pageSize >= data.total} onClick={() => setPage(page + 1)}>다음</button></div>}
+      <button aria-label="이전 승인 내역" disabled={data.page <= 1} onClick={() => setPage(data.page - 1)}>이전</button><span>{data.page}</span>
+      <button aria-label="다음 승인 내역" disabled={data.page * pageSize >= data.total} onClick={() => setPage(data.page + 1)}>다음</button></div>}
   </Panel>;
 }
 function ApprovalSnapshot({ snapshot }: { snapshot: Approval["snapshot"] }) {
   return <section className="approval-snapshot"><h3>{snapshot.title}</h3><p className="approval-text">{snapshot.content.body}</p>
     <ol>{snapshot.content.questions.map(question => <li key={question.id}><strong>{question.label}</strong> ({question.type}{question.required ? " · 필수" : ""})
-      {!!question.options?.length && <ul>{question.options.map(value => <li key={value}>{value}</li>)}</ul>}</li>)}</ol>
+      {!!question.options?.length && <ul>{question.options.map(value => <li key={value}>{value}</li>)}</ul>}<QuestionSummary question={question} questions={snapshot.content.questions} /></li>)}</ol>
     <dl><dt>개인정보 동의</dt><dd>{snapshot.content.consentRequired ? "필수" : "선택"}</dd><dt>수집·이용 목적</dt><dd>{snapshot.content.consentPurpose || "-"}</dd>
       <dt>보유·이용 기간</dt><dd>{snapshot.content.retentionDays}일</dd><dt>최대 응답 수</dt><dd>{snapshot.content.maxResponses}개</dd>
       <dt>본인인증</dt><dd>{snapshot.content.verify ? "사용" : "사용 안 함"}</dd></dl><ConsentDisplay display={snapshot.consentBundle?.display} /><ConsentDocuments bundle={snapshot.consentBundle} /></section>;
@@ -83,5 +84,5 @@ export function ApprovalLog() {
       <option value="all">모든 상태</option>{approvalStatuses.map(value => <option key={value} value={value}>{approvalStatusLabels[value]}</option>)}</select><ActionButton>검색</ActionButton>
   </form><RemoteTable columns={["캐치폼", "서비스", "요청자", "승인 담당자", "상태", "요청일"]} rows={(result.data?.items ?? []).map(row => ({ id: row.id,
     cells: [<Link key="form" className="cs-link" href={"/form/ai/setting?formId=" + row.formId}>{row.title}</Link>, row.serviceName, row.requesterName, row.reviewerName || "-", approvalStatusLabels[row.status], new Date(row.createdAt).toLocaleString("ko-KR")] }))}
-    total={result.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={result.loading} error={result.error?.message} /></Panel></>;
+    total={result.data?.total ?? 0} page={result.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={result.loading} error={result.error?.message} /></Panel></>;
 }

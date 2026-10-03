@@ -1,0 +1,256 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:42263) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:43134) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+stderr | tests/server/async-export.test.ts > 같은 생성 키의 동시 요청·현재 DTO·실제 CSV가 즉시 다운로드와 일치한다
+{"requestId":"0712316f-65af-459b-ab32-13c867c636cd","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/async-export.test.ts > 정정 API는 처리한 CSV 원문을 같은 transaction에서 회수하고 새 작업은 새 값만 제공한다
+{"requestId":"0d64c4c4-0282-484f-941e-c4991b2422aa","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/async-export.test.ts > 정정 API는 처리한 CSV 원문을 같은 transaction에서 회수하고 새 작업은 새 값만 제공한다
+{"requestId":"a8d41025-5dae-4187-8ca6-98e9193c1696","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/async-export.test.ts > 파일 권한을 포함한 실제 첨부 내보내기와 grant 회수는 이름과 암호화 결과를 제거한다
+{"requestId":"4c8628c8-b37d-4f7e-94e0-0c3ae4a24a4d","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/async-export.test.ts > 취소·삭제의 version 경합과 이전 worker claim은 결과를 되살리지 않는다
+{"requestId":"dafabe99-bc29-467d-b5f2-fe6f70769f32","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/async-export.test.ts > 동시 claim 한 건과 만료 lease 회수 이후 옛 worker는 현재 worker를 덮어쓰지 않는다
+{"requestId":"c527e24c-fd56-424f-9c90-cebbe2d7b2f1","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/async-export.test.ts > 자료 보유 기한을 결과 만료에 반영하고 실제 경과 뒤 암호화 조각을 제거한다
+{"requestId":"fa021704-29d9-437f-8770-6addc806367d","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/async-export.test.ts > 미인증·타 회사·현재 역할 회수와 잘못된 필터는 결과를 노출하지 않는다
+{"requestId":"e915c1d3-4bac-4dcb-a8c5-14dc9daf3166","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/async-export.test.ts > 다운로드는 실제 응답 잠금 대기 후 파기 상태 변경을 재검사해 원문을 제공하지 않는다
+{"requestId":"b69e41ce-8ab8-4e0b-bbfc-c7eec7f971a7","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+ ❯ tests/server/async-export.test.ts (10 tests | 10 failed) 10621ms
+   × 같은 생성 키의 동시 요청·현재 DTO·실제 CSV가 즉시 다운로드와 일치한다 1307ms
+   × 정정 API는 처리한 CSV 원문을 같은 transaction에서 회수하고 새 작업은 새 값만 제공한다 1261ms
+   × 파일 권한을 포함한 실제 첨부 내보내기와 grant 회수는 이름과 암호화 결과를 제거한다 1969ms
+   × 취소·삭제의 version 경합과 이전 worker claim은 결과를 되살리지 않는다 1274ms
+   × 동시 claim 한 건과 만료 lease 회수 이후 옛 worker는 현재 worker를 덮어쓰지 않는다 904ms
+   × 5,001건은 100건씩 처리하고 즉시 CSV 한도를 넘어서도 실제 DB 행을 제공한다 728ms
+   × 100,001건은 부분 원문·성공 감사 없이 상한 오류로 종료한다 1016ms
+   × 자료 보유 기한을 결과 만료에 반영하고 실제 경과 뒤 암호화 조각을 제거한다 808ms
+   × 미인증·타 회사·현재 역할 회수와 잘못된 필터는 결과를 노출하지 않는다 626ms
+   × 다운로드는 실제 응답 잠금 대기 후 파기 상태 변경을 재검사해 원문을 제공하지 않는다 726ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/async-export.test.ts > 같은 생성 키의 동시 요청·현재 DTO·실제 CSV가 즉시 다운로드와 일치한다
+AssertionError: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ create tests/server/async-export.test.ts:68:72
+     66| async function create(f: Fixture, key = randomUUID(), filters = {}) {
+     67|   const request = req("/exports", "POST", f.cookie, { formId: f.id, fi…
+     68|   const result = await createExportApi(request); expect(result.status)…
+       |                                                                        ^
+     69| }
+     70| async function finish(id: string, max = 1100) {
+ ❯ tests/server/async-export.test.ts:96:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/server/async-export.test.ts > 정정 API는 처리한 CSV 원문을 같은 transaction에서 회수하고 새 작업은 새 값만 제공한다
+AssertionError: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ create tests/server/async-export.test.ts:68:72
+     66| async function create(f: Fixture, key = randomUUID(), filters = {}) {
+     67|   const request = req("/exports", "POST", f.cookie, { formId: f.id, fi…
+     68|   const result = await createExportApi(request); expect(result.status)…
+       |                                                                        ^
+     69| }
+     70| async function finish(id: string, max = 1100) {
+ ❯ tests/server/async-export.test.ts:110:69
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/server/async-export.test.ts > 파일 권한을 포함한 실제 첨부 내보내기와 grant 회수는 이름과 암호화 결과를 제거한다
+AssertionError: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ create tests/server/async-export.test.ts:68:72
+     66| async function create(f: Fixture, key = randomUUID(), filters = {}) {
+     67|   const request = req("/exports", "POST", f.cookie, { formId: f.id, fi…
+     68|   const result = await createExportApi(request); expect(result.status)…
+       |                                                                        ^
+     69| }
+     70| async function finish(id: string, max = 1100) {
+ ❯ tests/server/async-export.test.ts:125:55
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/server/async-export.test.ts > 취소·삭제의 version 경합과 이전 worker claim은 결과를 되살리지 않는다
+AssertionError: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ create tests/server/async-export.test.ts:68:72
+     66| async function create(f: Fixture, key = randomUUID(), filters = {}) {
+     67|   const request = req("/exports", "POST", f.cookie, { formId: f.id, fi…
+     68|   const result = await createExportApi(request); expect(result.status)…
+       |                                                                        ^
+     69| }
+     70| async function finish(id: string, max = 1100) {
+ ❯ tests/server/async-export.test.ts:135:59
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/server/async-export.test.ts > 동시 claim 한 건과 만료 lease 회수 이후 옛 worker는 현재 worker를 덮어쓰지 않는다
+AssertionError: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ create tests/server/async-export.test.ts:68:72
+     66| async function create(f: Fixture, key = randomUUID(), filters = {}) {
+     67|   const request = req("/exports", "POST", f.cookie, { formId: f.id, fi…
+     68|   const result = await createExportApi(request); expect(result.status)…
+       |                                                                        ^
+     69| }
+     70| async function finish(id: string, max = 1100) {
+ ❯ tests/server/async-export.test.ts:146:59
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/server/async-export.test.ts > 5,001건은 100건씩 처리하고 즉시 CSV 한도를 넘어서도 실제 DB 행을 제공한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRaw()` invocation:
+
+
+Raw query failed. Code: `23514`. Message: `new row for relation "Submission" violates check constraint "Submission_source_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ bulk tests/server/async-export.test.ts:90:3
+     88| async function bulk(f: Fixture, count: number) {
+     89|   const version = await db.formVersion.findFirstOrThrow({ where: { for…
+     90|   await db.$executeRaw`INSERT INTO "Submission" (id,"tenantId","formVe…
+       |   ^
+     91|     SELECT gen_random_uuid()::text,${f.company.id},${version.id},now()…
+     92| }
+ ❯ tests/server/async-export.test.ts:154:30
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  tests/server/async-export.test.ts > 100,001건은 부분 원문·성공 감사 없이 상한 오류로 종료한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRaw()` invocation:
+
+
+Raw query failed. Code: `23514`. Message: `new row for relation "Submission" violates check constraint "Submission_source_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ bulk tests/server/async-export.test.ts:90:3
+     88| async function bulk(f: Fixture, count: number) {
+     89|   const version = await db.formVersion.findFirstOrThrow({ where: { for…
+     90|   await db.$executeRaw`INSERT INTO "Submission" (id,"tenantId","formVe…
+       |   ^
+     91|     SELECT gen_random_uuid()::text,${f.company.id},${version.id},now()…
+     92| }
+ ❯ tests/server/async-export.test.ts:162:30
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  tests/server/async-export.test.ts > 자료 보유 기한을 결과 만료에 반영하고 실제 경과 뒤 암호화 조각을 제거한다
+AssertionError: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ create tests/server/async-export.test.ts:68:72
+     66| async function create(f: Fixture, key = randomUUID(), filters = {}) {
+     67|   const request = req("/exports", "POST", f.cookie, { formId: f.id, fi…
+     68|   const result = await createExportApi(request); expect(result.status)…
+       |                                                                        ^
+     69| }
+     70| async function finish(id: string, max = 1100) {
+ ❯ tests/server/async-export.test.ts:169:96
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯
+
+ FAIL  tests/server/async-export.test.ts > 미인증·타 회사·현재 역할 회수와 잘못된 필터는 결과를 노출하지 않는다
+AssertionError: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ create tests/server/async-export.test.ts:68:72
+     66| async function create(f: Fixture, key = randomUUID(), filters = {}) {
+     67|   const request = req("/exports", "POST", f.cookie, { formId: f.id, fi…
+     68|   const result = await createExportApi(request); expect(result.status)…
+       |                                                                        ^
+     69| }
+     70| async function finish(id: string, max = 1100) {
+ ❯ tests/server/async-export.test.ts:176:59
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯
+
+ FAIL  tests/server/async-export.test.ts > 다운로드는 실제 응답 잠금 대기 후 파기 상태 변경을 재검사해 원문을 제공하지 않는다
+AssertionError: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ create tests/server/async-export.test.ts:68:72
+     66| async function create(f: Fixture, key = randomUUID(), filters = {}) {
+     67|   const request = req("/exports", "POST", f.cookie, { formId: f.id, fi…
+     68|   const result = await createExportApi(request); expect(result.status)…
+       |                                                                        ^
+     69| }
+     70| async function finish(id: string, max = 1100) {
+ ❯ tests/server/async-export.test.ts:185:69
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  10 failed | 10 passed (20)
+   Start at  00:26:06
+   Duration  33.05s (tests 93%, import 5%, transform 2%)
+

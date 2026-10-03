@@ -1,7 +1,14 @@
+import { trustedClientIp } from "@/server/client-ip";
 import { db } from "@/server/db";
 import { requireActor } from "@/server/context";
-import { body, json, rateLimit, route } from "@/server/http";
+import { body, json, listQuery, rateLimit, route } from "@/server/http";
 import { companyInput } from "@/server/schemas";
+import { companyDto, listCompanies } from "@/server/company-management";
+export const GET = route(async request => {
+  const actor = await requireActor(request.headers);
+  const query = listQuery.pick({ page: true, pageSize: true, search: true }).parse(Object.fromEntries(new URL(request.url).searchParams));
+  return json(await listCompanies(actor.user.id, query, trustedClientIp(request.headers), actor.session.id));
+});
 export const POST = route(async (request, requestId) => {
   const actor = await requireActor(request.headers);
   await rateLimit("company:create:" + actor.user.id, 5, 3600);
@@ -23,5 +30,5 @@ export const POST = route(async (request, requestId) => {
       resource: "company", resourceId: created.id, requestId, detail: {} } });
     return created;
   });
-  return json(company, 201);
+  return json(companyDto(company, true), 201);
 });

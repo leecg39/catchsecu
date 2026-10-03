@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  skipProxyUrlNormalize: true,
   async headers() {
     return ["/infoOwner/:path*", "/email/unsubscribe/:path*", "/api/v1/email-unsubscribe/:path*"].map(source => ({ source, headers: [
       { key: "Referrer-Policy", value: "no-referrer" },

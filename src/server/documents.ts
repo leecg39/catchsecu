@@ -6,6 +6,7 @@ import { basisLabels, itemKinds, recipientKinds } from "@/contracts/processing-c
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
 import { roleCan, type Capability } from "./permissions";
+import { currentServiceScope } from "./service-access";
 import { audit } from "./audit";
 import { decrypt, encrypt, opaqueToken, tokenHash } from "./crypto";
 import { fail, listQuery, requireVersion } from "./http";
@@ -14,20 +15,16 @@ export const documentQuery = listQuery.omit({ sort: true, direction: true }).ext
 export const clauseQuery = documentQuery.omit({ status: true }).extend({ status: z.enum(["active", "archived", "all"]).default("active") });
 const include = { service: { include: { tenant: { select: { publicName: true } } } },
   purposes: { orderBy: { purposeId: "asc" as const }, include: { purpose: { include: { recipients: { include: { recipient: true } } } } } },
-  recipients: { orderBy: { recipientId: "asc" as const }, include: { recipient: true } }, versions: { orderBy: { number: "desc" as const }, take: 1 } };
+  recipients: { orderBy: { recipientId: "asc" as const }, include: { recipient: true } }, versions: { orderBy: { number: "desc" as const }, take: 1 },
+  publications: { where: { status: "active" }, select: { documentVersionId: true, expiresAt: true } } };
 type StoredDocument = Prisma.DocumentGetPayload<{ include: typeof include }>;
 const iso = (value: Date) => value.toISOString();
 const publicUrl = (cipher: string) => "/document/view/" + decrypt<string>(cipher);
-
-export async function documentScope(tx: Transaction, ctx: Context, capability: Capability) {
-  await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${ctx.tenantId} FOR SHARE`;
-  await tx.$queryRaw`SELECT id FROM "Membership" WHERE id=${ctx.member.id} AND "tenantId"=${ctx.tenantId} FOR SHARE`;
-  await tx.$queryRaw`SELECT id FROM "ServiceGrant" WHERE "memberId"=${ctx.member.id} AND "tenantId"=${ctx.tenantId} FOR SHARE`;
-  const member = await tx.membership.findFirst({ where: { id: ctx.member.id, tenantId: ctx.tenantId, userId: ctx.user.id,
-    status: "active", tenant: { status: "active" }, user: { status: "active" } }, include: { grants: true } });
-  if (!member || !roleCan(member.role, capability)) fail(403, "FORBIDDEN", "이 문서 작업을 수행할 권한이 없습니다.");
-  return { tenantId: ctx.tenantId, ...(["owner", "admin"].includes(member.role) ? {} : { id: { in: member.grants.filter(item => item.capabilities.includes(capability)).map(item => item.serviceId) } }) };
+function hasLatestPublication(row: StoredDocument) {
+  return row.publications.some(link => link.documentVersionId === row.versions[0]?.id && (!link.expiresAt || link.expiresAt > new Date()));
 }
+
+export const documentScope = currentServiceScope;
 export async function lockDocumentService(tx: Transaction, ctx: Context, serviceId: string, capability: Capability) {
   const scope = await documentScope(tx, ctx, capability);
   if (capability === "document.read") await tx.$queryRaw`SELECT id FROM "Service" WHERE id=${serviceId} AND "tenantId"=${ctx.tenantId} FOR SHARE`;
@@ -47,7 +44,8 @@ function dto(row: StoredDocument) {
     refusalNotice: row.refusalNotice, rightsContact: row.rightsContact, effectiveDate: row.effectiveDate,
     purposeIds: row.purposes.map(item => item.purposeId), recipientIds: row.recipients.map(item => item.recipientId),
     status: row.status, version: row.version, draftRevision: row.draftRevision, createdAt: iso(row.createdAt), updatedAt: iso(row.updatedAt),
-    latestNumber: row.versions[0]?.number ?? 0, hasUnpublishedChanges: !row.versions[0] || row.versions[0].contentHash !== preview(row).contentHash };
+    latestNumber: row.versions[0]?.number ?? 0, hasUnpublishedChanges: !row.versions[0] || row.versions[0].contentHash !== preview(row).contentHash,
+    hasActivePublication: hasLatestPublication(row) };
 }
 function editable(row: { version: number; status: string }, version: number) {
   requireVersion({ version }, row); if (row.status === "archived") fail(409, "DOCUMENT_ARCHIVED", "문서를 복원한 뒤 변경해주세요.");
@@ -143,7 +141,8 @@ export async function publishDocument(ctx: Context, id: string, input: { version
     if (result.publishErrors.length) fail(422, "DOCUMENT_INCOMPLETE", result.publishErrors.join(" "));
     const expiresAt = input.expiresAt ? new Date(input.expiresAt) : null;
     if (expiresAt && (expiresAt.getTime() <= Date.now() + 60000 || expiresAt.getTime() > Date.now() + 3650 * 86400000)) fail(422, "INVALID_EXPIRY", "공개 기한은 1분 이후부터 10년 이내로 지정해주세요.");
-    if (row.status === "published" && row.versions[0]?.contentHash === result.contentHash) fail(409, "NO_DOCUMENT_CHANGES", "이미 게시한 내용입니다. 기존 링크를 사용하거나 새 초안을 저장해주세요.");
+    if (row.status === "published" && row.versions[0]?.contentHash === result.contentHash && hasLatestPublication(row))
+      fail(409, "NO_DOCUMENT_CHANGES", "이미 게시한 내용입니다. 기존 링크를 사용하거나 새 초안을 저장해주세요.");
     const published = await tx.documentVersion.create({ data: { tenantId: row.tenantId, serviceId: row.serviceId, documentId: id,
       number: (row.versions[0]?.number ?? 0) + 1, draftRevision: row.draftRevision, snapshot: result.snapshot as unknown as Prisma.InputJsonValue,
       contentHash: result.contentHash, renderedText: result.renderedText } });
@@ -195,7 +194,7 @@ export async function documentHistory(ctx: Context, id: string, query: z.infer<t
     return { items: versions.map(version => ({ id: version.id, number: version.number, draftRevision: version.draftRevision, snapshot: version.snapshot, renderedText: version.renderedText, contentHash: version.contentHash, createdAt: iso(version.createdAt),
       publications: version.publications.map(link => ({ id: link.id, status: link.status === "active" && link.expiresAt && link.expiresAt <= new Date() ? "expired" : link.status,
         createdAt: iso(link.createdAt), expiresAt: link.expiresAt ? iso(link.expiresAt) : null, revokedAt: link.revokedAt ? iso(link.revokedAt) : null,
-        ...(canShare && link.status === "active" ? { url: publicUrl(link.tokenCipher) } : {}), displayCount: link._count.displays })) })), total: await tx.documentVersion.count({ where: { documentId: id } }), page: query.page, pageSize: query.pageSize };
+        ...(canShare && link.status === "active" && (!link.expiresAt || link.expiresAt > new Date()) ? { url: publicUrl(link.tokenCipher) } : {}), displayCount: link._count.displays })) })), total: await tx.documentVersion.count({ where: { documentId: id } }), page: query.page, pageSize: query.pageSize };
   });
 }
 export async function lockPublicDocument(tx: Transaction, token: string) {

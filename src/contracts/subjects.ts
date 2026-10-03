@@ -16,6 +16,8 @@ export function checkSubjectQuestions(questions: SubjectQuestion[], publishing =
 export const subjectAccessInput = z.object({ name: subjectName, email: subjectEmail, consent: z.literal(true) }).strict();
 export const subjectSessionInput = z.object({ token: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict();
 export const subjectWithdrawalInput = z.object({ submissionId: z.uuid(), version: z.number().int().positive() }).strict();
+export const subjectEmptyQuery = z.object({}).strict();
+export const subjectPageQuery = z.object({ page: z.coerce.number().int().min(1).max(100000).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20) }).strict();
 export type SubjectSessionInfo = { id: string; expiresAt: string };
 export type SubjectConsent = { id: string; version: number; company: string; service: string; title: string; status: string;
   submittedAt: string; retentionUntil: string; canWithdraw: boolean;

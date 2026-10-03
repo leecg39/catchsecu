@@ -10,8 +10,10 @@ import { Modal, ActionButton } from "../shared";
 import { FILE_ACCEPT, type FileInfo } from "@/contracts/files";
 import { fileDownloadUrl, uploadFile, type UploadCache } from "@/lib/file-upload";
 import { SubmissionDestruction } from "../management/destruction";
+import { QuestionInput } from "./QuestionInput";
+import { emptyAnswer, formatAnswer, visibleQuestionIds, type AnswerValue, type Answers } from "@/contracts/questions";
 
-type Values = Record<string, string | string[]>;
+type Values = Answers;
 type Detail = {
   id: string; formId: string; title: string; version: number; status: string; createdAt: string; retentionUntil: string; legalHold: boolean;
   originalRetentionUntil: string; contentAvailable: boolean;
@@ -24,7 +26,6 @@ type Detail = {
   receipts: { id: string; purpose: string; retentionDays: number; grantedAt: string; documentHash: string; pdfHash: string | null; pdfAvailable: boolean; evidence: ConsentEvidence | null; events: { type: string; reason: string; createdAt: string }[] }[];
 };
 const statuses: Record<string, string> = { submitted: "제출 완료", corrected: "정정", withdrawn: "철회", pendingDestruction: "파기 요청", destroying: "파기 처리 중", destroyed: "파기 완료" };
-const show = (value: string | string[] | undefined) => Array.isArray(value) ? value.join(", ") : value || "-";
 export function SubmissionDetail({ id, onClose, onChanged }: { id: string; onClose: () => void; onChanged: () => void }) {
   const result = useResource<Detail>("/submissions/" + id);
   return <Modal title="응답 상세" onClose={onClose}>
@@ -40,11 +41,21 @@ function DetailView({ row, reload }: { row: Detail; reload: () => void }) {
   const [noteText, setNoteText] = useState(""), [editingNote, setEditingNote] = useState<Detail["notes"][number]>(), [deleteNote, setDeleteNote] = useState("");
   const pendingNote = useRef<{ payload: string; key: string } | null>(null);
   const uploads = useRef<UploadCache>(new Map()), [files, setFiles] = useState<Record<string, File>>({}), [uploadStatus, setUploadStatus] = useState("");
-  function answerView(questionId: string, value: string | string[] | undefined) {
+  const visible = visibleQuestionIds(row.questions, values);
+  function change(id: string, value: AnswerValue) {
+    const next = { ...values, [id]: value }, shown = visibleQuestionIds(row.questions, next);
+    const nextFiles = { ...files };
+    for (const question of row.questions) if (!shown.has(question.id)) {
+      next[question.id] = emptyAnswer(question.type); delete nextFiles[question.id]; uploads.current.delete(question.id);
+    }
+    setValues(next); setFiles(nextFiles);
+  }
+  function answerView(questionId: string, value: AnswerValue | undefined) {
     if (questionId === "status" && typeof value === "string") return statuses[value] ?? value;
     if (questionId === "legalHold" && typeof value === "string") return value === "true" ? "보존 조치" : "해제";
     if (questionId === "retentionUntil" && typeof value === "string") return new Date(value).toLocaleString("ko-KR");
-    if (row.questions.find(question => question.id === questionId)?.type !== "파일 업로드" || !value) return show(value);
+    const question = row.questions.find(question => question.id === questionId);
+    if (question?.type !== "파일 업로드" || !value) return formatAnswer(value, question?.rows);
     const file = row.attachments.find(item => item.id === value);
     return file ? <a className="cs-link" href={fileDownloadUrl(file.id, row.id, questionId)}>{file.name} · 다운로드</a> : "열람할 수 없는 첨부파일";
   }
@@ -84,7 +95,7 @@ function DetailView({ row, reload }: { row: Detail; reload: () => void }) {
       <h3>{{ edit: "응답 정정", withdraw: "동의 철회", hold: row.legalHold ? "보존 조치 해제" : "보존 조치", "destruction-request": "파기 요청", retention: "보유 기한 변경" }[mode]}</h3>
       {mode === "retention" && <label className="cs-label">변경할 보유 기한<input className="cs-input" aria-label="변경할 보유 기한" type="datetime-local" required value={retention} onChange={event => setRetention(event.target.value)} />
         <span>회사 정책이 허용한 경우, 동의받은 원래 기한 {new Date(row.originalRetentionUntil).toLocaleString("ko-KR")} 이내로 변경합니다.</span></label>}
-      {mode === "edit" && row.questions.map(question => <fieldset className="cs-label forms-correction-field" key={question.id}><legend>{question.label}</legend>
+      {mode === "edit" && row.questions.filter(question => visible.has(question.id)).map(question => <fieldset disabled={busy} className="cs-label forms-correction-field" key={question.id}><legend>{question.label}</legend>
         {question.type === "파일 업로드" ? <div><p>{answerView(question.id, values[question.id])}</p>
           <input className="cs-input" type="file" accept={FILE_ACCEPT} aria-label={question.label} required={question.required && !values[question.id]}
             disabled={busy || row.legalHold || !app.data?.capabilities.includes("file.read")} onChange={event => {
@@ -93,12 +104,7 @@ function DetailView({ row, reload }: { row: Detail; reload: () => void }) {
             }} /><p className="cs-muted">새 파일을 선택하면 검사 후 첨부파일을 교체합니다. 이전 파일은 정정 이력에 보관됩니다.</p>
           {!question.required && <label><input type="checkbox" disabled={busy || row.legalHold} checked={!values[question.id] && !files[question.id]}
             onChange={event => { setValues({ ...values, [question.id]: event.target.checked ? "" : row.values[question.id] }); const next = { ...files }; delete next[question.id]; setFiles(next); }} />첨부파일 비우기</label>}
-        </div> : question.type === "체크박스" ? <div className="public-options">{question.options?.map(option => <label key={option}><input type="checkbox" checked={Array.isArray(values[question.id]) && values[question.id].includes(option)}
-          onChange={event => { const current = Array.isArray(values[question.id]) ? values[question.id] as string[] : []; setValues({ ...values, [question.id]: event.target.checked ? [...current, option] : current.filter(value => value !== option) }); }} />{option}</label>)}</div> :
-          ["객관식 답변", "드롭다운"].includes(question.type) ? <select aria-label={question.label} className="cs-input" value={String(values[question.id] ?? "")} required={question.required} onChange={event => setValues({ ...values, [question.id]: event.target.value })}>
-            <option value="">선택해주세요</option>{question.options?.map(option => <option key={option}>{option}</option>)}</select> :
-          <input aria-label={question.label} className="cs-input" required={question.required} type={question.type === "날짜" ? "date" : "text"} maxLength={question.type === "단문형 답변" ? 1000 : 20000}
-            value={String(values[question.id] ?? "")} onChange={event => setValues({ ...values, [question.id]: event.target.value })} />}</fieldset>)}
+        </div> : <QuestionInput question={question} value={values[question.id]} onChange={value => change(question.id, value)} />}</fieldset>)}
       {mode === "destruction-request" && <p>파기 요청을 등록합니다. 실제 파기 완료 상태는 처리 결과에 따라 별도로 표시됩니다.</p>}
       <label className="cs-label">변경 사유<textarea aria-label="변경 사유" className="cs-input" required maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} /></label>
       <div className="forms-actions"><ActionButton disabled={busy}>확인</ActionButton><ActionButton secondary type="button" disabled={busy} onClick={() => setMode(undefined)}>취소</ActionButton></div>

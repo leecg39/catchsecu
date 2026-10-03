@@ -1,11 +1,14 @@
 import { z } from "zod";
-import { challengeIdInput, challengeInput, verificationInput } from "@/contracts/sharing";
-import { body, fail, json, listQuery, rateLimit, route } from "@/server/http";
+import { challengeIdInput, challengeInput, sharingEmptyQuery, sharingPageQuery, verificationInput } from "@/contracts/sharing";
+import { body, fail, json, rateLimit, route } from "@/server/http";
 import { tokenHash } from "@/server/crypto";
 import { CHALLENGE_COOKIE, VIEWER_COOKIE, getSharedSubmission, listSharedSubmissions, logoutViewer, setViewerCookie,
   sharedFile, sharedFiles, startViewerChallenge, verifyViewerChallenge, viewerCookie, viewerInfo, withViewer } from "@/server/viewer";
+import { fileBindingQuery, fileListQuery } from "@/server/file-query";
+import { sharingQuery } from "@/server/share-query";
 function parts(request: Request) { return new URL(request.url).pathname.split("/").slice(4); }
 export const POST = route(async (request, requestId) => {
+  sharingQuery(new URL(request.url), sharingEmptyQuery);
   const segments = parts(request), [first, id, action] = segments;
   if (first === "challenges" && segments.length === 1) {
     const input = await body(request, challengeInput);
@@ -33,13 +36,17 @@ export const POST = route(async (request, requestId) => {
 export const GET = route(async (request, requestId) => {
   const segments = parts(request), [first, id, action] = segments, token = viewerCookie(request);
   if (token) await rateLimit("viewer:read:" + tokenHash(token), 120);
-  const params = Object.fromEntries(new URL(request.url).searchParams), { page, pageSize } = listQuery.parse(params);
-  if (first === "session" && segments.length === 1) return json(await withViewer(token, async (_tx, grant, session) => viewerInfo(grant, session)));
-  if (first === "submissions" && segments.length === 1) return json(await listSharedSubmissions(token, page, pageSize, requestId));
-  if (first === "submissions" && segments.length === 2) return json(await getSharedSubmission(token, z.uuid().parse(id), requestId));
-  if (first === "files" && segments.length === 1) return json(await sharedFiles(token, z.uuid().parse(params.submissionId), { page, pageSize }, requestId));
+  const url = new URL(request.url);
+  if (first === "session" && segments.length === 1) { sharingQuery(url, sharingEmptyQuery); return json(await withViewer(token, async (_tx, grant, session) => viewerInfo(grant, session))); }
+  if (first === "submissions" && segments.length === 1) { const { page, pageSize } = sharingQuery(url, sharingPageQuery); return json(await listSharedSubmissions(token, page, pageSize, requestId)); }
+  if (first === "submissions" && segments.length === 2) { sharingQuery(url, sharingEmptyQuery); return json(await getSharedSubmission(token, z.uuid().parse(id), requestId)); }
+  if (first === "files" && segments.length === 1) {
+    const { submissionId, ...query } = fileListQuery(new URL(request.url));
+    return json(await sharedFiles(token, submissionId, query, requestId));
+  }
   if (first === "files" && (segments.length === 2 || (segments.length === 3 && action === "download"))) {
-    const result = await sharedFile(token, z.uuid().parse(params.submissionId), z.uuid().parse(params.questionId), z.uuid().parse(id), action === "download", requestId);
+    const query = fileBindingQuery(new URL(request.url), true);
+    const result = await sharedFile(token, query.submissionId!, query.questionId!, z.uuid().parse(id), action === "download", requestId);
     return result instanceof Response ? result : json(result);
   }
   fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");

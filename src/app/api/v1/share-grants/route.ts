@@ -1,18 +1,16 @@
-import { z } from "zod";
-import { shareCreateInput } from "@/contracts/sharing";
+import { shareCreateInput, shareListQuery, sharingEmptyQuery } from "@/contracts/sharing";
 import { requireContext } from "@/server/context";
-import { body, json, listQuery, rateLimit, route } from "@/server/http";
-import { createShare, listShares, lockShareForm } from "@/server/sharing";
-import { idempotent } from "@/server/idempotency";
+import { body, json, rateLimit, route } from "@/server/http";
+import { createShareRequest, listShares } from "@/server/sharing";
+import { sharingQuery } from "@/server/share-query";
 export const GET = route(async request => {
-  const ctx = await requireContext(request.headers, "share.manage"), params = Object.fromEntries(new URL(request.url).searchParams);
-  const query = listQuery.extend({ status: z.enum(["all", "active", "expired", "revoked"]).optional() }).parse(params);
-  return json(await listShares(ctx, z.uuid().parse(params.formId), query));
+  const ctx = await requireContext(request.headers, "share.manage"), { formId, ...query } = sharingQuery(new URL(request.url), shareListQuery);
+  return json(await listShares(ctx, formId, query));
 });
 export const POST = route(async (request, requestId) => {
   const ctx = await requireContext(request.headers, "share.manage"), input = await body(request, shareCreateInput);
+  sharingQuery(new URL(request.url), sharingEmptyQuery);
   await rateLimit("share:manage:" + ctx.member.id, 20);
-  const result = await idempotent("share:create:" + ctx.tenantId + ":" + ctx.member.id, request.headers.get("idempotency-key"), input,
-    async tx => ({ status: 201, body: await createShare(ctx, input, requestId, tx) }), tx => lockShareForm(tx, ctx, input.formId));
+  const result = await createShareRequest(ctx, input, request.headers.get("idempotency-key"), requestId);
   return json(result.body, result.status);
 });

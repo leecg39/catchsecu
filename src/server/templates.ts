@@ -1,16 +1,22 @@
-import { documentScope } from "./documents";
+import { formScope, lockFormService } from "./form-access";
+import { cloneFormContent } from "@/contracts/form-copy";
 import { validateDocumentSelections } from "./form-documents";
 import { z } from "zod";
 import { db, type Transaction } from "./db";
-import { type Context, requireService, serviceScope } from "./context";
+import { type Context } from "./context";
 import { audit } from "./audit";
-import { fail } from "./http";
+import { fail, listQuery } from "./http";
+import { roleCan } from "./permissions";
+import type { TemplateActions, TemplatePermissions } from "@/contracts/forms";
+import { invalidateTemplateCache } from "./template-cache";
 import { formContentSchema, validateFormForPublish } from "@/contracts/domains";
 import { createForm, formDto } from "./forms";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const templateInput = z.object({ serviceId: z.uuid(), title: z.string().trim().min(1).max(200), category: z.string().trim().min(1).max(80), content: formContentSchema }).strict();
-export const templatePatch = templateInput.omit({ serviceId: true }).partial().extend({ version: z.number().int().positive() }).strict();
+export const templatePatch = templateInput.omit({ serviceId: true }).partial().extend({ version: z.number().int().positive() }).strict()
+  .refine(input => input.title !== undefined || input.category !== undefined || input.content !== undefined, "변경할 제목·분류 또는 내용을 입력해주세요.");
+export const templateListQuery = listQuery.extend({ scope: z.enum(["all", "company", "public"]).default("all"), serviceId: z.uuid().optional() }).strict();
 const include = { service: { select: { name: true } } };
 function dto(row: Prisma.FormTemplateGetPayload<{ include: typeof include }>) {
   return { id: row.id, serviceId: row.serviceId, serviceName: row.service?.name ?? null, scope: row.tenantId ? "company" : "public",
@@ -20,35 +26,57 @@ function validContent(content: z.infer<typeof formContentSchema>) {
   try { validateFormForPublish(content); }
   catch (error) { fail(422, "INVALID_TEMPLATE", error instanceof Error ? error.message : "템플릿 내용을 확인해주세요."); }
 }
-export async function getTemplate(ctx: Context, id: string, write = false, tx: Transaction = db) {
+async function readPermissions(tx: Transaction, ctx: Context, selectedServiceId?: string): Promise<TemplatePermissions> {
+  const member = await tx.membership.findUniqueOrThrow({ where: { id: ctx.member.id } });
+  const targets = roleCan(member.role, "form.write") ? await tx.service.findMany({
+    where: { ...await formScope(tx, ctx, "form.write"), status: "active" }, select: { id: true, name: true }, orderBy: [{ name: "asc" }, { id: "asc" }],
+  }) : [];
+  return { canCreate: targets.some(service => !selectedServiceId || service.id === selectedServiceId), targets };
+}
+function readDto(row: Prisma.FormTemplateGetPayload<{ include: typeof include }>, permissions: TemplatePermissions) {
+  const writable = !!row.tenantId && permissions.targets.some(service => service.id === row.serviceId);
+  return { ...dto(row), actions: { preview: true, use: permissions.targets.length > 0, edit: writable, remove: writable } };
+}
+async function locateTemplate(tx: Transaction, ctx: Context, id: string, write: boolean): Promise<ReturnType<typeof dto> & { actions?: TemplateActions }> {
+  await formScope(tx, ctx, write ? "form.write" : "form.read");
+  if (write) await tx.$queryRaw`SELECT id FROM "FormTemplate" WHERE id=${id} AND ("tenantId"=${ctx.tenantId} OR "tenantId" IS NULL) FOR UPDATE`;
+  else await tx.$queryRaw`SELECT id FROM "FormTemplate" WHERE id=${id} AND ("tenantId"=${ctx.tenantId} OR "tenantId" IS NULL) FOR SHARE`;
   const row = await tx.formTemplate.findFirst({ where: { id, OR: [{ tenantId: ctx.tenantId }, { tenantId: null }] }, include });
   if (!row || row.status !== "active") fail(404, "NOT_FOUND", "템플릿을 찾을 수 없습니다.");
   if (!row.tenantId) {
     if (write) fail(403, "PUBLIC_TEMPLATE_READ_ONLY", "공용 템플릿은 서비스 템플릿으로 복제한 뒤 수정해주세요.");
   } else {
     if (!row.serviceId) fail(409, "TEMPLATE_SERVICE_REQUIRED", "템플릿의 서비스 정보가 없습니다.");
-    await requireService(ctx, row.serviceId, write ? "form.write" : "form.read");
+    const service = await lockFormService(tx, ctx, row.serviceId, write ? "form.write" : "form.read", write);
+    const member = await tx.membership.findUniqueOrThrow({ where: { id: ctx.member.id }, select: { accessKind: true } });
+    if (member.accessKind === "expert" && service.status !== "active") fail(404, "NOT_FOUND", "활성 서비스를 찾을 수 없습니다.");
   }
-  return dto(row);
+  return write ? dto(row) : readDto(row, await readPermissions(tx, ctx));
 }
-export async function listTemplates(ctx: Context, query: { page: number; pageSize: number; search: string; scope: "all" | "company" | "public"; serviceId?: string }) {
-  if (query.serviceId) await requireService(ctx, query.serviceId, "form.read");
-  const allowed = serviceScope(ctx, "form.read");
-  const company = { tenantId: ctx.tenantId, ...(query.serviceId ? { serviceId: query.serviceId } : allowed.id ? { serviceId: allowed.id } : {}) };
-  const where = { status: "active", OR: query.scope === "public" ? [{ tenantId: null }] : query.scope === "company" ? [company] : [{ tenantId: null }, company],
-    AND: [{ OR: [{ title: { contains: query.search, mode: "insensitive" as const } }, { category: { contains: query.search, mode: "insensitive" as const } }] }] };
-  const [items, total] = await db.$transaction([
-    db.formTemplate.findMany({ where, include, skip: (query.page - 1) * query.pageSize, take: query.pageSize, orderBy: [{ updatedAt: "desc" }, { id: "desc" }] }),
-    db.formTemplate.count({ where }),
-  ]);
-  return { items: items.map(dto), total, page: query.page, pageSize: query.pageSize };
+export async function getTemplate(ctx: Context, id: string, write = false, tx?: Transaction) {
+  return tx ? locateTemplate(tx, ctx, id, write) : db.$transaction(client => locateTemplate(client, ctx, id, write));
+}
+export async function listTemplates(ctx: Context, query: { page: number; pageSize: number; search: string; scope: "all" | "company" | "public"; serviceId?: string; sort?: "createdAt" | "name"; direction?: "asc" | "desc" }) {
+  return db.$transaction(async tx => {
+    const allowed = await formScope(tx, ctx, "form.read");
+    const member = await tx.membership.findUniqueOrThrow({ where: { id: ctx.member.id }, select: { accessKind: true } });
+    if (query.serviceId) {
+      const service = await lockFormService(tx, ctx, query.serviceId, "form.read", false);
+      if (member.accessKind === "expert" && service.status !== "active") fail(404, "NOT_FOUND", "활성 서비스를 찾을 수 없습니다.");
+    }
+    const services = await tx.service.findMany({ where: { ...allowed, ...(member.accessKind === "expert" ? { status: "active" } : {}) }, select: { id: true } });
+    const permissions = await readPermissions(tx, ctx, query.serviceId);
+    const company = { tenantId: ctx.tenantId, serviceId: query.serviceId ?? { in: services.map(service => service.id) } };
+    const where = { status: "active", OR: query.scope === "public" ? [{ tenantId: null }] : query.scope === "company" ? [company] : [{ tenantId: null }, company],
+      AND: [{ OR: [{ title: { contains: query.search, mode: "insensitive" as const } }, { category: { contains: query.search, mode: "insensitive" as const } }] }] };
+    const total = await tx.formTemplate.count({ where }), page = Math.min(query.page, Math.max(1, Math.ceil(total / query.pageSize)));
+    const items = await tx.formTemplate.findMany({ where, include, skip: (page - 1) * query.pageSize, take: query.pageSize,
+      orderBy: [{ [query.sort === "name" ? "title" : "createdAt"]: query.direction ?? "desc" }, { id: "asc" }] });
+    return { items: items.map(row => readDto(row, permissions)), total, page, pageSize: query.pageSize, permissions };
+  });
 }
 export async function createTemplate(ctx: Context, input: z.infer<typeof templateInput>, requestId: string, tx: Transaction) {
-  const scope = await documentScope(tx, ctx, "form.write");
-  await tx.$queryRaw`SELECT id FROM "Service" WHERE id=${input.serviceId} FOR SHARE`;
-  const service = await tx.service.findFirst({ where: { AND: [scope, { id: input.serviceId }] } });
-  if (!service) fail(403, "SERVICE_FORBIDDEN", "해당 서비스에 대한 권한이 없습니다.");
-  if (service.status !== "active") fail(409, "SERVICE_ARCHIVED", "보관된 서비스에는 템플릿을 등록할 수 없습니다.");
+  await lockFormService(tx, ctx, input.serviceId, "form.write");
   validContent(input.content);
   await validateDocumentSelections(tx, ctx, input.serviceId, input.content.documentConsents ?? [], input.content.retentionDays);
   const row = await tx.formTemplate.create({ data: { tenantId: ctx.tenantId, ...input, content: input.content as Prisma.InputJsonValue }, include });
@@ -56,12 +84,10 @@ export async function createTemplate(ctx: Context, input: z.infer<typeof templat
   return dto(row);
 }
 export async function updateTemplate(ctx: Context, id: string, input: z.infer<typeof templatePatch>, requestId: string) {
-  const current = await getTemplate(ctx, id, true);
   if (input.content) validContent(input.content);
   return db.$transaction(async tx => {
-    const scope = await documentScope(tx, ctx, "form.write");
-    await tx.$queryRaw`SELECT id FROM "Service" WHERE id=${current.serviceId} FOR SHARE`;
-    if (!await tx.service.findFirst({ where: { AND: [scope, { id: current.serviceId!, status: "active" }] } })) fail(403, "SERVICE_FORBIDDEN", "이 서비스의 템플릿을 변경할 수 없습니다.");
+    const current = await locateTemplate(tx, ctx, id, true);
+    if (current.version !== input.version) fail(409, "VERSION_CONFLICT", "템플릿이 변경되었습니다. 다시 불러와주세요.");
     const content = input.content ?? current.content;
     await validateDocumentSelections(tx, ctx, current.serviceId!, content.documentConsents ?? [], content.retentionDays);
     const changed = await tx.formTemplate.updateMany({ where: { id, tenantId: ctx.tenantId, version: input.version },
@@ -72,10 +98,11 @@ export async function updateTemplate(ctx: Context, id: string, input: z.infer<ty
   });
 }
 export async function deleteTemplate(ctx: Context, id: string, version: number, requestId: string) {
-  const current = await getTemplate(ctx, id, true);
   await db.$transaction(async tx => {
+    const current = await locateTemplate(tx, ctx, id, true);
     const removed = await tx.formTemplate.deleteMany({ where: { id, tenantId: ctx.tenantId, version } });
     if (!removed.count) fail(409, "VERSION_CONFLICT", "템플릿이 변경되었거나 이미 삭제되었습니다.");
+    await invalidateTemplateCache(tx, ctx.tenantId, id);
     await audit(tx, ctx, requestId, "template.deleted", "template", id, [], current.serviceId ?? undefined);
   });
 }
@@ -83,12 +110,7 @@ export async function useTemplate(ctx: Context, id: string, input: { version: nu
   const template = await getTemplate(ctx, id, false, tx);
   if (template.version !== input.version) fail(409, "VERSION_CONFLICT", "템플릿이 변경되었습니다. 최신 내용을 확인해주세요.");
   // Snapshot the full schema and allocate new question identities for the independent form.
-  const ids = new Map(template.content.questions.map(question => [question.id, crypto.randomUUID()]));
-  const original = template.content.marketing;
-  const content = { ...template.content, questions: template.content.questions.map(question => ({ ...question, id: ids.get(question.id)! })),
-    ...(original ? { marketing: { ...original, nameQuestionId: ids.get(original.nameQuestionId)!,
-      ...(original.emailQuestionId ? { emailQuestionId: ids.get(original.emailQuestionId)! } : {}),
-      ...(original.smsQuestionId ? { smsQuestionId: ids.get(original.smsQuestionId)! } : {}) } } : {}) };
+  const content = cloneFormContent(template.content);
   const form = await createForm(ctx, { serviceId: input.serviceId, title: input.title ?? template.title, content }, requestId, tx);
   await audit(tx, ctx, requestId, "template.used", "template", id, [], input.serviceId);
   return formDto(form, ctx);

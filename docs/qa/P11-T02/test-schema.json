@@ -1,0 +1,64 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-03T21:58:35.366Z",
+  "database": "catchsecu_test",
+  "checksumMatches": 65,
+  "priorChecksumsPreserved": 64,
+  "constraints": [
+    {
+      "name": "IpAccessPolicy_pkey",
+      "type": "p",
+      "table": "IpAccessPolicy",
+      "definition": "PRIMARY KEY (\"tenantId\")"
+    },
+    {
+      "name": "IpAccessPolicy_tenantId_fkey",
+      "type": "f",
+      "table": "IpAccessPolicy",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "IpAccessPolicy_version_check",
+      "type": "c",
+      "table": "IpAccessPolicy",
+      "definition": "CHECK ((version > 0))"
+    },
+    {
+      "name": "IpRule_cidr_canonical",
+      "type": "c",
+      "table": "IpRule",
+      "definition": "CHECK ((cidr = ((cidr)::cidr)::text))"
+    },
+    {
+      "name": "IpRule_pkey",
+      "type": "p",
+      "table": "IpRule",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "IpRule_tenantId_fkey",
+      "type": "f",
+      "table": "IpRule",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "IpRule_version_positive",
+      "type": "c",
+      "table": "IpRule",
+      "definition": "CHECK ((version > 0))"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "IpAccessPolicy_guard",
+      "table": "IpAccessPolicy",
+      "definition": "CREATE TRIGGER \"IpAccessPolicy_guard\" BEFORE INSERT OR UPDATE ON public.\"IpAccessPolicy\" FOR EACH ROW EXECUTE FUNCTION guard_ip_access_policy()"
+    },
+    {
+      "name": "IpRule_guard",
+      "table": "IpRule",
+      "definition": "CREATE TRIGGER \"IpRule_guard\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"IpRule\" FOR EACH ROW EXECUTE FUNCTION guard_ip_rule()"
+    }
+  ],
+  "readOnly": true
+}

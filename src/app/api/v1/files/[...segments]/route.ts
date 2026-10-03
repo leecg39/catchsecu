@@ -4,10 +4,11 @@ import { requireContext } from "@/server/context";
 import { body, fail, json, route } from "@/server/http";
 import { downloadFile, fileMetadata } from "@/server/file-download";
 import { cancelUpload, renameFile } from "@/server/files";
+import { fileBindingQuery } from "@/server/file-query";
 function parts(request: Request) {
   const url = new URL(request.url), [id, action, ...rest] = url.pathname.split("/").slice(4);
   if (rest.length || (action && action !== "download")) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
-  const binding = z.object({ submissionId: z.uuid().optional(), questionId: z.uuid().optional() }).parse(Object.fromEntries(url.searchParams));
+  const binding = fileBindingQuery(url);
   return { id: z.uuid().parse(id), action, binding };
 }
 export const GET = route(async (request, requestId) => {

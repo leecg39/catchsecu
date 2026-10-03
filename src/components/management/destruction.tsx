@@ -9,10 +9,9 @@ import { RemoteTable } from "../RemoteTable";
 type Page<T> = { items: T[]; total: number; page: number; pageSize: number };
 const time = (value: string | null) => value ? new Date(value).toLocaleString("ko-KR") : "-";
 const localDate = (value: string) => { const date = new Date(value); return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16); };
-const countLabels: Record<string, string> = { campaignRecipients: "캠페인 수신자 연락처", marketingJobs: "마케팅 발송 원문·로컬 파일", marketingPreferences: "마케팅 연락처·동의 근거", subjectBindings: "정보주체 연결", dataSubjects: "정보주체 연락처", importEvidence: "CSV 수집 근거", importRows: "CSV 임시 행", answers: "답변", notes: "담당자 메모", correctionPayloads: "정정 원문", corrections: "정정 기록", consentEvents: "동의 변경 기록", receipts: "동의 영수증", files: "첨부 저장 기록" };
+const countLabels: Record<string, string> = { verificationReceipts: "본인인증·전자서명 영수증", verificationEvents: "인증 확인 이벤트", verificationAttempts: "암호화 인증 요청", campaignRecipients: "캠페인 수신자 연락처", marketingJobs: "마케팅 발송 원문·로컬 파일", marketingPreferences: "마케팅 연락처·동의 근거", subjectBindings: "정보주체 연결", dataSubjects: "정보주체 연락처", importEvidence: "CSV 수집 근거", importRows: "CSV 임시 행", answers: "답변", notes: "담당자 메모", correctionPayloads: "정정 원문", corrections: "정정 기록", consentEvents: "동의 변경 기록", receipts: "동의 영수증", files: "첨부 저장 기록" };
 
 function DestructionActions({ row, reload }: { row: DestructionRecord; reload: () => void }) {
-  const app = useApplication(), manager = ["owner", "admin"].includes(app.data?.company?.role ?? "");
   const [action, setAction] = useState(""), [reason, setReason] = useState(""), [date, setDate] = useState(localDate(row.dueAt));
   const [error, setError] = useState(""), [busy, setBusy] = useState(false);
   async function submit(event: FormEvent) {
@@ -21,7 +20,6 @@ function DestructionActions({ row, reload }: { row: DestructionRecord; reload: (
       version: row.version, reason, ...(action === "reschedule" ? { dueAt: new Date(date).toISOString() } : {}),
     }) }); setAction(""); reload(); } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
   }
-  const pending = !row.startedAt && ["pending", "scheduled"].includes(row.status);
   return <div className="cs-stack"><p><strong>{destructionLabels[row.status]}</strong> · 예정 {time(row.dueAt)} {row.legalHold && "· 보존 조치 중"}</p>
     {row.reason && <p>요청 사유: {row.reason}</p>}{row.decision && <p>처리 사유: {row.decision}</p>}
     {row.startedAt && <p>시작 {time(row.startedAt)} · 처리 시도 {row.attempts}회</p>}
@@ -34,30 +32,44 @@ function DestructionActions({ row, reload }: { row: DestructionRecord; reload: (
       {action === "reschedule" && <label className="cs-label">파기 예정 시각<input className="cs-input" type="datetime-local" aria-label="파기 예정 시각" required value={date} onChange={event => setDate(event.target.value)} /><span>일정 변경 후 관리자 승인을 다시 받습니다.</span></label>}
       <label className="cs-label">처리 사유<textarea className="cs-input" aria-label="파기 처리 사유" required maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} /></label>
       <div className="forms-actions"><ActionButton disabled={busy}>처리 확인</ActionButton><ActionButton secondary type="button" disabled={busy} onClick={() => setAction("")}>닫기</ActionButton></div>
-    </form> : <div className="forms-actions">{pending && <>
-      {manager && row.status === "pending" && <ActionButton disabled={row.legalHold} onClick={() => setAction("approve")}>파기 승인</ActionButton>}
-      {manager && <ActionButton secondary onClick={() => setAction("reject")}>반려</ActionButton>}
-      <ActionButton secondary onClick={() => setAction("reschedule")}>일정 변경</ActionButton>
-      <ActionButton secondary onClick={() => setAction("cancel")}>예약 취소</ActionButton></>}
-      {row.status === "failed" && <ActionButton onClick={() => setAction("retry")}>파기 재처리</ActionButton>}
+    </form> : <div className="forms-actions">
+      {row.permissions.canApprove && <ActionButton onClick={() => setAction("approve")}>파기 승인</ActionButton>}
+      {row.permissions.canReject && <ActionButton secondary onClick={() => setAction("reject")}>반려</ActionButton>}
+      {row.permissions.canReschedule && <ActionButton secondary onClick={() => setAction("reschedule")}>일정 변경</ActionButton>}
+      {row.permissions.canCancel && <ActionButton secondary onClick={() => setAction("cancel")}>예약 취소</ActionButton>}
+      {row.permissions.canRetry && <ActionButton onClick={() => setAction("retry")}>파기 재처리</ActionButton>}
     </div>}{error && <p role="alert">{error}</p>}</div>;
 }
 export function SubmissionDestruction({ id, changed }: { id: string; changed: () => void }) {
   const result = useResource<Page<DestructionRecord>>("/destruction-requests?submissionId=" + id + "&pageSize=10");
   return <section><h3>파기 처리</h3><ActionButton secondary onClick={() => { result.reload(); changed(); }}>처리 상태 새로고침</ActionButton>
     {result.error ? <p role="alert">{result.error.message}</p> : result.data?.items.map(row =>
-      <article className="forms-note" key={row.id + ":" + row.version}><DestructionActions row={row} reload={() => { result.reload(); changed(); }} /></article>)}
+      <article className="forms-note" key={row.id + ":" + row.version + ":" + JSON.stringify(row.permissions)}><DestructionActions row={row} reload={() => { result.reload(); changed(); }} /></article>)}
     {result.data?.total === 0 && <p>등록된 파기 요청이 없습니다.</p>}
   </section>;
+}
+function CertificateDetail({ id }: { id: string }) {
+  const result = useResource<CertificateRecord>("/destruction-certificates/" + id), row = result.data;
+  if (result.error) return <p role="alert">{result.error.message}</p>;
+  if (result.loading || !row) return <p role="status">증명서를 확인하고 있습니다.</p>;
+  return <div className="cs-stack"><p>증명서 번호: {row.id}</p><p>응답 ID: {row.submissionId}</p><p>파기 완료: {time(row.completedAt)}</p>
+    <dl className="forms-response-values">{Object.entries(row.counts).map(([key, value]) => <div key={key}><dt>{countLabels[key] ?? key}</dt><dd>{value}개</dd></div>)}</dl>
+    <p>DB에서 응답·연결된 인증 원문을 삭제하고 암호화 파일 객체를 저장소에서 제거했습니다. 관련 중복 요청의 응답 캐시도 제거했습니다.</p>
+    <p>원문이 없는 감사 기록과 재실행 방지 표식은 남습니다. 백업·복구 로그·이미 내려받은 외부 사본은 이 증명서의 대상이 아닙니다.</p>
+    <p>무결성: {row.integrityVerified ? "확인됨" : "확인 실패"}</p>
+    {row.integrityVerified && <a className="cs-button" href={"/api/v1/destruction-certificates/" + row.id + "/download"}>증명서 JSON 다운로드</a>}
+  </div>;
 }
 export function DestructionPages({ certificates = false }: { certificates?: boolean }) {
   const app = useApplication(), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20);
   const [status, setStatus] = useState(""), [service, setService] = useState(""), [selected, setSelected] = useState<DestructionRecord | CertificateRecord>();
+  const [search, setSearch] = useState(""), [sort, setSort] = useState(certificates ? "completedAt" : "createdAt"), [direction, setDirection] = useState("desc");
   const [submissionId] = useState(() => typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("submissionId") ?? "");
-  const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+  const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), search, sort, direction });
   if (status && !certificates) params.set("status", status); if (service) params.set("serviceId", service); if (submissionId) params.set("submissionId", submissionId);
   const result = useResource<Page<DestructionRecord | CertificateRecord>>("/destruction-" + (certificates ? "certificates" : "requests") + "?" + params);
   const reload = result.reload;
+  const selection = selected && "status" in selected ? result.data?.items.find(item => item.id === selected.id) : selected;
   const processing = result.data?.items.some(item => "status" in item && ["scheduled", "running", "retry"].includes(item.status));
   useEffect(() => { if (!processing) return; const timer = setInterval(() => { if (!document.hidden) reload(); }, 5000); return () => clearInterval(timer); }, [processing, reload]);
   return <><PageHeading title={certificates ? "개인정보 파기 증명서" : "개인정보 파기 일정"}><ActionButton secondary onClick={reload}>새로고침</ActionButton></PageHeading>
@@ -67,23 +79,22 @@ export function DestructionPages({ certificates = false }: { certificates?: bool
       <option value="">권한이 있는 모든 서비스</option>{app.data?.services.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select>
       {!certificates && <select className="cs-input" aria-label="파기 상태" value={status} onChange={event => { setStatus(event.target.value); setPage(1); }}><option value="">모든 상태</option>
         {destructionStatuses.map(value => <option key={value} value={value}>{destructionLabels[value]}</option>)}</select>}
+      <input className="cs-input" aria-label="파기 목록 검색" placeholder="폼·서비스·응답 ID 검색" maxLength={100} value={search} onChange={event => { setSearch(event.target.value); setPage(1); }} />
+      <select className="cs-input" aria-label="파기 목록 정렬" value={sort} onChange={event => { setSort(event.target.value); setPage(1); }}>
+        <option value="createdAt">등록일</option><option value="name">{certificates ? "서비스 이름" : "폼 이름"}</option>
+        <option value={certificates ? "completedAt" : "dueAt"}>{certificates ? "파기 완료일" : "파기 예정일"}</option></select>
+      <select className="cs-input" aria-label="파기 정렬 방향" value={direction} onChange={event => { setDirection(event.target.value); setPage(1); }}><option value="desc">내림차순</option><option value="asc">오름차순</option></select>
       <Link className="cs-link" href={certificates ? "/log/destruction-schedule" : "/log/destruction_certificate"}>{certificates ? "파기 일정" : "파기 증명서"}</Link>
     </div></div>
     <RemoteTable columns={certificates ? ["증명서 번호", "응답 ID", "파기 완료일", "무결성", "보기"] : ["폼", "응답 ID", "예정 시각", "상태", "처리"]}
       rows={(result.data?.items ?? []).map(item => ({ id: item.id, cells: "status" in item
         ? [item.formTitle, item.submissionId, time(item.dueAt), destructionLabels[item.status] + (item.legalHold ? " · 보존 조치" : ""), <button className="cs-link" key="open" onClick={() => setSelected(item)}>상세</button>]
         : [item.id, item.submissionId, time(item.completedAt), item.integrityVerified ? "확인" : "확인 실패", <button className="cs-link" key="open" onClick={() => setSelected(item)}>증명서 보기</button>] }))}
-      total={result.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }}
+      total={result.data?.total ?? 0} page={result.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }}
       loading={result.loading} error={result.error?.message} />
-    </Panel>{selected && <Modal title={"status" in selected ? "파기 요청 상세" : "파기 증명서"} onClose={() => setSelected(undefined)}>
-      {"status" in selected ? <><p>응답 ID: {selected.submissionId}</p><DestructionActions key={selected.id + ":" + selected.version} row={selected}
+    </Panel>{selection && <Modal title={"status" in selection ? "파기 요청 상세" : "파기 증명서"} onClose={() => setSelected(undefined)}>
+      {"status" in selection ? <><p>응답 ID: {selection.submissionId}</p><DestructionActions key={selection.id + ":" + selection.version + ":" + JSON.stringify(selection.permissions)} row={selection}
         reload={() => { setSelected(undefined); reload(); }} /></> :
-        <div className="cs-stack"><p>증명서 번호: {selected.id}</p><p>응답 ID: {selected.submissionId}</p><p>파기 완료: {time(selected.completedAt)}</p>
-          <dl className="forms-response-values">{Object.entries(selected.counts).map(([key, value]) => <div key={key}><dt>{countLabels[key] ?? key}</dt><dd>{value}개</dd></div>)}</dl>
-          <p>DB에서 원문 행을 삭제하고 암호화 파일 객체를 저장소에서 제거했습니다. 관련 중복 요청의 응답 캐시도 제거했습니다.</p>
-          <p>원문이 없는 감사 기록과 재실행 방지 표식은 남습니다. 백업·복구 로그·이미 내려받은 외부 사본은 이 증명서의 대상이 아닙니다.</p>
-          <p>무결성: {selected.integrityVerified ? "확인됨" : "확인 실패"}</p>
-          <a className="cs-button" href={"/api/v1/destruction-certificates/" + selected.id + "/download"}>증명서 JSON 다운로드</a>
-        </div>}</Modal>}
+        <CertificateDetail key={selection.id} id={selection.id} />}</Modal>}
   </>;
 }

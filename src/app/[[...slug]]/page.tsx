@@ -25,6 +25,7 @@ export default async function Page({params,searchParams}:{params:Promise<{slug?:
   const memberSupport=/^\/my-page\/support(?:\/(?:new|[0-9a-f-]{36}))?$/.test(path);
   const systemExpert=path==='/admin/expert-assignments';
   const auditLog=/^\/log\/(?:service|info-monitoring|ad-monitoring|customer|member|authority|external-viewer|access-history|mail)$/.test(path);
+  const selfPage=['/my-page/info','/my-page/info/edit','/my-page/delete','/my-page/activity-log'].includes(path);
   const known=systemNotices||systemGuides||systemSupport||systemExpert||memberSupport||/^\/document\/view\/[A-Za-z0-9_-]{43}$/.test(path)||routes.some(r=>new RegExp('^'+r.path.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/:[^/]+/g,'[^/]+')+'/?$').test(path));
   if(!known)notFound();
   if(!isPublicPath(path)) {
@@ -32,7 +33,7 @@ export default async function Page({params,searchParams}:{params:Promise<{slug?:
       const requestHeaders=await headers();
       const actor=await requireActor(requestHeaders);
       if((systemNotices||systemGuides||systemSupport||systemExpert) && !actor.user.platformAdmin)redirect('/access-not-allow?reason=admin');
-      if(!systemNotices&&!systemGuides&&!systemSupport&&!systemExpert&&!['/company-info','/access-not-allow','/expert/select-company'].includes(path)){
+      if(!systemNotices&&!systemGuides&&!systemSupport&&!systemExpert&&!selfPage&&!['/company-info','/access-not-allow','/expert/select-company'].includes(path)){
         const ctx=await requireContext(requestHeaders,auditLog?'audit.read':undefined);
         if(['/', '/dashboard', '/IE'].includes(path) && !['owner','admin'].includes(ctx.member.role) &&
           !(await db.service.count({where:{...serviceScope(ctx),status:'active'}})))
@@ -47,7 +48,8 @@ export default async function Page({params,searchParams}:{params:Promise<{slug?:
           if(await db.expertAssignment.count({where:{expertUserId:expert.user.id}}))redirect('/expert/select-company');
           redirect('/company-info');
         }
-        if(error.code==='MFA_REQUIRED')redirect('/two-step-setting');
+        if(['IP_NOT_ALLOWED','IP_ADDRESS_UNAVAILABLE'].includes(error.code))redirect('/not-allow-ip');
+        if(error.code==='MFA_REQUIRED')redirect('/two-step-setting?returnTo='+encodeURIComponent(returnTo));
         if(error.code==='PASSWORD_CHANGE_REQUIRED')redirect('/password-change-rule?returnTo='+encodeURIComponent(returnTo));
         if(error.status===403)redirect('/access-not-allow?reason='+accessDenialFromCode(error.code));
       }

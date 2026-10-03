@@ -1,0 +1,438 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:87291) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/document-access-gate.test.ts (10 tests | 9 failed) 8424ms
+   × 로그아웃한 Context로 문서·문구·미리보기·이력·PDF·표시 설정·동의 선택을 읽거나 변경할 수 없다 959ms
+   × 만료된 세션으로 문서와 문구를 처리하지 못한다 497ms
+   × 이메일 인증이 회수된 Context의 초안 생성과 이력을 거부한다 547ms
+   × 실제 시간이 지나 만료된 전문가 배정은 문서·문구·PDF·폼 동의 선택을 열 수 없다 856ms
+   × 전문가 배정을 회수하면 남은 membership과 grant로 문서 이력을 열 수 없다 718ms
+   × 배정하지 않은 서비스의 여분 grant는 문서·문구·폼 문서 선택·PDF 범위를 넓히지 않는다 763ms
+   × 완료한 생성 요청의 재전송도 로그아웃한 Context를 거부한다 617ms
+   × 동시 세션 회수의 DB 잠금을 기다린 뒤 이전 Context의 문서 열람을 거부한다 2516ms
+   × 만료된 게시 링크 이력은 expired를 표시하고 공유 URL을 제공하지 않는다 492ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 로그아웃한 Context로 문서·문구·미리보기·이력·PDF·표시 설정·동의 선택을 읽거나 변경할 수 없다
+AssertionError: promise resolved "{ items: [ { …(18) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "body": "당시 동의 문구",
++       "createdAt": "2026-10-03T11:31:33.540Z",
++       "draftRevision": 1,
++       "effectiveDate": "2026-10-03",
++       "hasUnpublishedChanges": false,
++       "id": "b52ae337-4f1e-47f6-a544-9bcb2cb04258",
++       "latestNumber": 1,
++       "purposeIds": [
++         "82267ba8-87f3-44c8-9a2d-78f25bc3fee2",
++       ],
++       "recipientIds": [],
++       "refusalNotice": "거부할 수 있습니다.",
++       "rightsContact": "QA 문의",
++       "serviceId": "cb058822-7e95-49b4-859b-fee580565c2e",
++       "serviceName": "다른 서비스",
++       "status": "published",
++       "title": "합성 동의서 8654c07a-42df-42dd-bfb6-1a5acbea03cc",
++       "type": "consent",
++       "updatedAt": "2026-10-03T11:31:33.576Z",
++       "version": 2,
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/document-access-gate.test.ts:78:49
+     76|     () => updateDisplay(f.ctx, f.serviceId, "collection", emptyDisplay…
+     77|   ];
+     78|   for (const call of calls) await expect(call()).rejects.toMatchObject…
+       |                                                 ^
+     79|   expect(await db.document.count()).toBe(1); expect(await db.documentV…
+     80| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 만료된 세션으로 문서와 문구를 처리하지 못한다
+AssertionError: promise resolved "{ …(18) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": "당시 동의 문구",
++   "createdAt": "2026-10-03T11:31:34.070Z",
++   "draftRevision": 1,
++   "effectiveDate": "2026-10-03",
++   "hasUnpublishedChanges": false,
++   "id": "8010b25b-b3bc-42af-8567-296bcfc1168b",
++   "latestNumber": 1,
++   "purposeIds": [
++     "4c4a00fb-cb03-4809-8b60-281d63af1afa",
++   ],
++   "recipientIds": [],
++   "refusalNotice": "거부할 수 있습니다.",
++   "rightsContact": "QA 문의",
++   "serviceId": "e20f7be6-4501-4d5f-8107-9fdadfbc79ac",
++   "serviceName": "다른 서비스",
++   "status": "published",
++   "title": "합성 동의서 46678cd6-4bef-46a2-8971-5491058f3626",
++   "type": "consent",
++   "updatedAt": "2026-10-03T11:31:34.096Z",
++   "version": 2,
+  }
+
+ ❯ tests/server/document-access-gate.test.ts:83:46
+     81| test("만료된 세션으로 문서와 문구를 처리하지 못한다", async () => {
+     82|   const f = await fixture(); await db.session.update({ where: { id: f.…
+     83|   await expect(readDocument(f.ctx, f.row.id)).rejects.toMatchObject({ …
+       |                                              ^
+     84|   await expect(updateClause(f.ctx, f.clause.id, { ...f.clauseInput, bo…
+     85| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 이메일 인증이 회수된 Context의 초안 생성과 이력을 거부한다
+AssertionError: promise resolved "{ items: [ { …(8) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "contentHash": "7758d95c3483838d51a352a8dfe29d77256c3c599979405fde9f7184528be62e",
++       "createdAt": "2026-10-03T11:31:34.629Z",
++       "draftRevision": 1,
++       "id": "3b809fae-e294-42d9-91a0-a6f33aa06b96",
++       "number": 1,
++       "publications": [
++         {
++           "createdAt": "2026-10-03T11:31:34.630Z",
++           "displayCount": 0,
++           "expiresAt": null,
++           "id": "d27d5fb6-732f-4d66-bcc1-500a2efe58e0",
++           "revokedAt": null,
++           "status": "active",
++           "url": "/document/view/mSm72XQaSIjO6-PhIg7ZNvJ_OBOPPRrQKBwQ_C-mO9I",
++         },
++       ],
++       "renderedText": "합성 동의서 e738b39c-cdcb-42d6-ad42-7c04cdac7711
++ 개인정보 수집·이용 동의서
++ 문서 검사 · 다른
++ 시행일: 2026-10-03
++ 당시 동의 문구
++
++ 처리 목적: 문서 목적 06daebde-3d25-4c57-bc5a-f8e388a7f63d
++ 합성 상담 처리
++ 수집 근거: 정보주체 동의
++ 항목: 이름 (일반 개인정보, 필수)
++ 보유 기간: 30일
++
++ 동의 거부 안내
++ 거부할 수 있습니다.
++
++ 권리 행사·문의
++ QA 문의",
++       "snapshot": {
++         "body": "당시 동의 문구",
++         "companyName": "문서 검사",
++         "effectiveDate": "2026-10-03",
++         "purposes": [
++           {
++             "basisReference": "",
++             "items": [
++               {
++                 "kind": "general",
++                 "name": "이름",
++                 "required": true,
++               },
++             ],
++             "lawfulBasis": "consent",
++             "name": "문서 목적 06daebde-3d25-4c57-bc5a-f8e388a7f63d",
++             "purpose": "합성 상담 처리",
++             "retentionDays": 30,
++             "retentionMode": "days",
++             "retentionReason": "",
++           },
++         ],
++         "recipients": [],
++         "refusalNotice": "거부할 수 있습니다.",
++         "rightsContact": "QA 문의",
++         "schemaVersion": 1,
++         "serviceName": "다른",
++         "title": "합성 동의서 e738b39c-cdcb-42d6-ad42-7c04cdac7711",
++         "type": "consent",
++       },
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/document-access-gate.test.ts:88:70
+     86| test("이메일 인증이 회수된 Context의 초안 생성과 이력을 거부한다", async () => {
+     87|   const f = await fixture(); await db.user.update({ where: { id: f.use…
+     88|   await expect(documentHistory(f.ctx, f.row.id, listQuery.parse({}))).…
+       |                                                                      ^
+     89|   await expect(db.$transaction(tx => createDocument(tx, f.ctx, f.input…
+     90| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 실제 시간이 지나 만료된 전문가 배정은 문서·문구·PDF·폼 동의 선택을 열 수 없다
+AssertionError: promise resolved "{ …(18) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": "당시 동의 문구",
++   "createdAt": "2026-10-03T11:31:35.035Z",
++   "draftRevision": 1,
++   "effectiveDate": "2026-10-03",
++   "hasUnpublishedChanges": false,
++   "id": "f36f8dfe-3561-4db8-bcac-2a025ca66d76",
++   "latestNumber": 1,
++   "purposeIds": [
++     "f1ad6be0-97c1-4c7b-a98b-82081e0bd10e",
++   ],
++   "recipientIds": [],
++   "refusalNotice": "거부할 수 있습니다.",
++   "rightsContact": "QA 문의",
++   "serviceId": "b9fc2e0b-630f-4a35-95ec-e9cb6cc3570c",
++   "serviceName": "다른 서비스",
++   "status": "published",
++   "title": "합성 동의서 8df24df6-15cd-4cbc-957d-76457d19e0b6",
++   "type": "consent",
++   "updatedAt": "2026-10-03T11:31:35.045Z",
++   "version": 2,
+  }
+
+ ❯ tests/server/document-access-gate.test.ts:98:112
+     96|   expect((await db.expertAssignment.findUniqueOrThrow({ where: { id: e…
+     97|   for (const call of [() => readDocument(e.ctx, f.row.id), () => readC…
+     98|     () => formDocumentOptions(e.ctx, f.serviceId, { page: 1, pageSize:…
+       |                                                                                                                ^
+     99|   expect(await db.documentPdf.count()).toBe(0);
+    100| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 전문가 배정을 회수하면 남은 membership과 grant로 문서 이력을 열 수 없다
+AssertionError: promise resolved "{ items: [ { …(8) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "contentHash": "69ee76dc3aba4c261fc08bee99341eee3e4705ac172b006e145dac1b76380839",
++       "createdAt": "2026-10-03T11:31:35.989Z",
++       "draftRevision": 1,
++       "id": "4dd72033-ab33-4e90-9b80-ee83da813fe8",
++       "number": 1,
++       "publications": [
++         {
++           "createdAt": "2026-10-03T11:31:35.990Z",
++           "displayCount": 0,
++           "expiresAt": null,
++           "id": "6ed7bcce-f755-4721-9cff-e13b6c8115a8",
++           "revokedAt": null,
++           "status": "active",
++         },
++       ],
++       "renderedText": "합성 동의서 fdbcf72c-3ffb-4c9b-8587-006e968a42b3
++ 개인정보 수집·이용 동의서
++ 문서 검사 · 다른
++ 시행일: 2026-10-03
++ 당시 동의 문구
++
++ 처리 목적: 문서 목적 71716a35-ca2d-4557-812e-c24a74185173
++ 합성 상담 처리
++ 수집 근거: 정보주체 동의
++ 항목: 이름 (일반 개인정보, 필수)
++ 보유 기간: 30일
++
++ 동의 거부 안내
++ 거부할 수 있습니다.
++
++ 권리 행사·문의
++ QA 문의",
++       "snapshot": {
++         "body": "당시 동의 문구",
++         "companyName": "문서 검사",
++         "effectiveDate": "2026-10-03",
++         "purposes": [
++           {
++             "basisReference": "",
++             "items": [
++               {
++                 "kind": "general",
++                 "name": "이름",
++                 "required": true,
++               },
++             ],
++             "lawfulBasis": "consent",
++             "name": "문서 목적 71716a35-ca2d-4557-812e-c24a74185173",
++             "purpose": "합성 상담 처리",
++             "retentionDays": 30,
++             "retentionMode": "days",
++             "retentionReason": "",
++           },
++         ],
++         "recipients": [],
++         "refusalNotice": "거부할 수 있습니다.",
++         "rightsContact": "QA 문의",
++         "schemaVersion": 1,
++         "serviceName": "다른",
++         "title": "합성 동의서 fdbcf72c-3ffb-4c9b-8587-006e968a42b3",
++         "type": "consent",
++       },
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/document-access-gate.test.ts:104:70
+    102|   const f = await fixture(), e = await expert(f);
+    103|   await db.expertAssignment.update({ where: { id: e.assignment.id }, d…
+    104|   await expect(documentHistory(e.ctx, f.row.id, listQuery.parse({}))).…
+       |                                                                      ^
+    105| });
+    106| test("배정하지 않은 서비스의 여분 grant는 문서·문구·폼 문서 선택·PDF 범위를 넓히지 않는다", async () …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 배정하지 않은 서비스의 여분 grant는 문서·문구·폼 문서 선택·PDF 범위를 넓히지 않는다
+AssertionError: expected [ …(2) ] to deeply equal [ Array(1) ]
+
+- Expected
++ Received
+
+  [
++   "3305d228-3491-47ec-9c3c-47b4e65e2081",
+    "93794564-d30b-4e59-9a40-2af48a753950",
+  ]
+
+ ❯ tests/server/document-access-gate.test.ts:109:90
+    107|   const f = await fixture(), other = await f.ready(f.secondId), e = aw…
+    108|   await db.serviceGrant.create({ data: { tenantId: f.company.id, membe…
+    109|   expect((await listDocuments(e.ctx, documentQuery.parse({}))).items.m…
+       |                                                                                          ^
+    110|   expect((await listClauses(e.ctx, clauseQuery.parse({}))).items.map(r…
+    111|   for (const call of [() => readDocument(e.ctx, other.row.id), () => d…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 완료한 생성 요청의 재전송도 로그아웃한 Context를 거부한다
+AssertionError: promise resolved "{ status: 201, body: { …(18) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "body": "당시 동의 문구",
++     "createdAt": "2026-10-03T11:31:37.605Z",
++     "draftRevision": 1,
++     "effectiveDate": "2026-10-03",
++     "hasUnpublishedChanges": true,
++     "id": "5ed6848f-08ec-42d1-9856-d49ac0c29170",
++     "latestNumber": 0,
++     "purposeIds": [
++       "04a1c8d8-8b9e-448f-ba41-7386c8c251d0",
++     ],
++     "recipientIds": [],
++     "refusalNotice": "거부할 수 있습니다.",
++     "rightsContact": "QA 문의",
++     "serviceId": "bbb54f9a-9beb-4f4e-a003-1684c27573ad",
++     "serviceName": "다른 서비스",
++     "status": "draft",
++     "title": "중복 요청 초안",
++     "type": "consent",
++     "updatedAt": "2026-10-03T11:31:37.605Z",
++     "version": 1,
++   },
++   "status": 201,
+  }
+
+ ❯ tests/server/document-access-gate.test.ts:119:25
+    117|     tx => lockDocumentService(tx, f.ctx, f.serviceId, "document.write"…
+    118|   await replay(); await db.session.delete({ where: { id: f.ctx.session…
+    119|   await expect(replay()).rejects.toMatchObject({ status: 401 }); expec…
+       |                         ^
+    120| });
+    121| test("동시 세션 회수의 DB 잠금을 기다린 뒤 이전 Context의 문서 열람을 거부한다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 동시 세션 회수의 DB 잠금을 기다린 뒤 이전 Context의 문서 열람을 거부한다
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/server/document-access-gate.test.ts:138:21
+    136|       waiting = rows[0].waiting; if (!waiting) await new Promise(resol…
+    137|     }
+    138|     expect(waiting).toBe(true);
+       |                     ^
+    139|   } finally { release(); await writer; }
+    140|   expect(await reading).toBe(401);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  tests/server/document-access-gate.test.ts > 만료된 게시 링크 이력은 expired를 표시하고 공유 URL을 제공하지 않는다
+AssertionError: expected { …(7) } to not have property "url"
+
+- Expected:
+undefined
+
++ Received:
+"/document/view/JcOxXpR0nTtXTTOh39ZcpcU5FwjeXUO-sYi9GN34oPQ"
+
+ ❯ tests/server/document-access-gate.test.ts:154:57
+    152|   const history = await documentHistory(f.ctx, f.row.id, listQuery.par…
+    153|   const link = history.items.flatMap(row => row.publications).find(row…
+    154|   expect(link.status).toBe("expired"); expect(link).not.toHaveProperty…
+       |                                                         ^
+    155|   await expect(publicDocument(published.url.split("/").pop()!)).reject…
+    156| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 1 passed (10)
+   Start at  20:31:31
+   Duration  9.81s (tests 87%, import 8%, transform 5%)
+

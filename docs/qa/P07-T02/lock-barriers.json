@@ -1,0 +1,123 @@
+{
+  "isolatedDatabase": true,
+  "providerVerified": false,
+  "barriers": [
+    {
+      "table": "Company",
+      "actualWaitObserved": true,
+      "expiredSessionDenied": true
+    },
+    {
+      "table": "Submission",
+      "actualWaitObserved": true,
+      "expiredSessionDenied": true
+    },
+    {
+      "table": "contact",
+      "actualWaitObserved": true,
+      "expiredSessionDenied": true
+    },
+    {
+      "action": "marketing.list_viewed",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "marketing.viewed",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "marketing.sources_viewed",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "marketing.granted",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "marketing.exclusion_changed",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "marketing.withdrawn",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "marketing.erased",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "marketing.summary_viewed",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "email.suppressions_viewed",
+      "actualAuditDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "idempotency.insert",
+      "clock": "session",
+      "actualDelay": true,
+      "rolledBack": true
+    },
+    {
+      "action": "idempotency.insert",
+      "clock": "retention",
+      "actualDelay": true,
+      "rolledBack": true
+    },
+    {
+      "kind": "detail",
+      "actualRetentionExpired": true,
+      "noPlaintextReturned": true
+    },
+    {
+      "kind": "csv",
+      "actualRetentionExpired": true,
+      "noPlaintextReturned": true
+    },
+    {
+      "kind": "sources",
+      "actualRetentionExpired": true,
+      "noPlaintextReturned": true
+    },
+    {
+      "eraseRollback": true,
+      "localBytesPreserved": true
+    },
+    {
+      "actualFilesystemFailure": true,
+      "committedErasure": true,
+      "retryCleaned": true,
+      "duplicateEvents": 0,
+      "nativeTimestampImmutable": true
+    },
+    {
+      "sameWorkerName": true,
+      "oldAttempt": 1,
+      "newAttempt": 2,
+      "blocked": false,
+      "newExecutionPreserved": true
+    },
+    {
+      "sameWorkerName": true,
+      "oldAttempt": 1,
+      "newAttempt": 2,
+      "blocked": true,
+      "newExecutionPreserved": true
+    },
+    {
+      "beforeLocalPublish": true,
+      "actualRetentionExpired": true,
+      "delivered": false
+    }
+  ]
+}

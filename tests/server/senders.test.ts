@@ -1,5 +1,6 @@
 import { createHash, createHmac, randomUUID } from "node:crypto";
-import { readFile, access } from "node:fs/promises";
+import { readFile, access, mkdir, rename, rmdir, writeFile } from "node:fs/promises";
+import { Client } from "pg";
 import { resolve } from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import type { Role } from "@/generated/prisma/client";
@@ -52,7 +53,12 @@ beforeAll(async () => {
 });
 beforeEach(async () => { await db.apiRateLimit.deleteMany(); await db.rateLimit.deleteMany(); });
 afterEach(() => { vi.restoreAllMocks(); vi.useRealTimers(); env.MAIL_TRANSPORT = original.mail; env.SOLAPI_TENANT_ID = original.solapiTenant; env.SOLAPI_API_KEY = original.key; env.SOLAPI_API_SECRET = original.secret; });
-afterAll(async () => { await dns.close(); env.SENDER_DNS_SERVER = original.dns; await db.$disconnect(); });
+const barriers: object[] = [];
+afterAll(async () => {
+  await mkdir(resolve("docs/qa/P08-T01"), { recursive: true });
+  await writeFile(resolve("docs/qa/P08-T01/lock-barriers.json"), JSON.stringify({ isolatedDatabase: true, providerVerified: false, barriers }, null, 2) + "\n");
+  await dns.close(); env.SENDER_DNS_SERVER = original.dns; await db.$disconnect();
+});
 async function create(channel: "email" | "sms" = "email", serviceId = service, who = "owner", address = channel === "email" ? "sender@" + randomUUID() + ".test" : "010" + String(Math.floor(Math.random() * 100000000)).padStart(8, "0")) {
   const out = await ok<{ id: string }>(await POST(req("/senders", "POST", who, { serviceId, channel, address, label: "합성 발신자", description: "테스트" }, { "idempotency-key": randomUUID() })), 201);
   return read(out.id, who);
@@ -96,6 +102,228 @@ async function recipient() {
   const token = pub.token;
   await ok(await publicPost(req("/public/forms/" + token + "/submissions", "POST", "anonymous", { answers: { [name]: "합성 수신자", [email]: contact }, consent: true, marketingChannels: ["email"] }, { "idempotency-key": randomUUID() })), 201); return contact;
 }
+async function ownerSession() {
+  const user = await db.user.findUniqueOrThrow({ where: { email: "owner@senders.local.test" } });
+  return db.session.findFirstOrThrow({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
+}
+async function auditDelay(action: string, operation: () => Promise<void>) {
+  await db.$executeRawUnsafe("CREATE FUNCTION qa_sender_delay() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='" + action + "' THEN PERFORM pg_sleep(2); END IF; RETURN NEW; END $$");
+  await db.$executeRawUnsafe('CREATE TRIGGER qa_sender_delay BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION qa_sender_delay()');
+  try { await operation(); } finally { await db.$executeRawUnsafe('DROP TRIGGER qa_sender_delay ON "AuditEvent"'); await db.$executeRawUnsafe('DROP FUNCTION qa_sender_delay()'); }
+}
+async function shortProof(row: SenderRecord, method: "email" | "dns", operation: () => Promise<void>, milliseconds = 1500) {
+  await db.$executeRawUnsafe("CREATE FUNCTION qa_sender_proof_time() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.\"senderId\"='" + row.id + "' AND NEW.method='" + method + "' THEN NEW.\"expiresAt\":=(clock_timestamp() AT TIME ZONE 'UTC')+interval '" + milliseconds + " milliseconds'; END IF; RETURN NEW; END $$");
+  await db.$executeRawUnsafe('CREATE TRIGGER qa_sender_proof_time BEFORE INSERT ON "SenderVerification" FOR EACH ROW EXECUTE FUNCTION qa_sender_proof_time()');
+  try { await operation(); } finally { await db.$executeRawUnsafe('DROP TRIGGER qa_sender_proof_time ON "SenderVerification"'); await db.$executeRawUnsafe('DROP FUNCTION qa_sender_proof_time()'); }
+}
+describe("발신자 현재 권한·최종 기한·사본 정리", () => {
+  test("중복·미지원·예약 쿼리와 상세/변경 쿼리를 거절한다", async () => {
+    const row = await create();
+    for (const suffix of ["&serviceId=" + service, "&extra=x", "&sort=address", "&direction=sideways", "&__proto__=x", "&constructor=x"])
+      expect((await GET(req("/senders?serviceId=" + service + "&channel=email" + suffix))).status).toBe(422);
+    expect((await GET(req("/senders/" + row.id + "?page=1"))).status).toBe(422);
+    expect((await PATCH(req("/senders/" + row.id + "?extra=x", "PATCH", "owner", { version: row.version, address: row.address, label: row.label, description: "" }))).status).toBe(422);
+    expect((await POST(req("/senders/" + row.id + "/renew?extra=x", "POST", "owner", { version: row.version }))).status).toBe(422);
+    expect((await DELETE(req("/senders/" + row.id + "?extra=x", "DELETE", "owner", { version: row.version }))).status).toBe(422);
+  });
+  test("현재 정렬·페이지와 읽기 전용 권한을 반환하고 DNS 비밀을 제한한다", async () => {
+    const label = "sort-" + randomUUID(); let a = await create(), b = await create();
+    for (const [row, tail] of [[a, "B"], [b, "A"]] as const) await ok(await PATCH(req("/senders/" + row.id, "PATCH", "owner", { version: row.version, address: row.address, label: label + tail, description: "" })));
+    a = await act(await read(a.id), "dns", {}, 201); b = await read(b.id);
+    const page = await ok<{ items: SenderRecord[]; page: number; permissions: { canCreate: boolean } }>(await GET(req("/senders?" + new URLSearchParams({ serviceId: service, channel: "email", search: label, sort: "label", direction: "asc", page: "999", pageSize: "1" }))));
+    expect(page.page).toBe(2); expect(page.items.map(r => r.id)).toEqual([a.id]); expect(page.permissions.canCreate).toBe(true);
+    const grant = await db.serviceGrant.findFirstOrThrow({ where: { memberId: members.sender, serviceId: service } });
+    await db.serviceGrant.update({ where: { id: grant.id }, data: { capabilities: ["service.read", "sender.read"] } });
+    try {
+      const readonly = await read(a.id, "sender"); expect(Object.values(readonly.permissions).every(v => !v)).toBe(true); expect(readonly.verifications![0].recordValue).toBeUndefined();
+      const listing = await ok<{ permissions: { canCreate: boolean } }>(await GET(req("/senders?serviceId=" + service + "&channel=email", "GET", "sender"))); expect(listing.permissions.canCreate).toBe(false);
+      expect((await POST(req("/senders/" + a.id + "/renew", "POST", "sender", { version: a.version }))).status).toBe(403);
+    } finally { await db.serviceGrant.update({ where: { id: grant.id }, data: { capabilities: [...roleCapabilities("sender")] } }); }
+    expect(b.id).not.toBe(a.id);
+  });
+  test("생성 재실행은 현재 버전과 삭제 410을 반환한다", async () => {
+    const input = { serviceId: service, channel: "email", address: "replay@" + randomUUID() + ".test", label: "재실행", description: "" }, key = randomUUID();
+    const created = await ok<{ id: string; version: number }>(await POST(req("/senders", "POST", "owner", input, { "idempotency-key": key })), 201);
+    await ok(await PATCH(req("/senders/" + created.id, "PATCH", "owner", { ...input, serviceId: undefined, channel: undefined, version: created.version, label: "수정" })));
+    const replay = await ok<{ id: string; version: number }>(await POST(req("/senders", "POST", "owner", input, { "idempotency-key": key })), 201); expect(replay).toEqual({ id: created.id, version: 2 });
+    await ok(await DELETE(req("/senders/" + created.id, "DELETE", "owner", { version: 2 })));
+    expect((await POST(req("/senders", "POST", "owner", input, { "idempotency-key": key }))).status).toBe(410);
+  });
+  test.each(["list", "detail", "create", "edit", "disable", "renew", "email", "dns", "cleanup", "evidence"] as const)("%s 감사 처리 중 세션 만료는 전체 롤백한다", async kind => {
+    const row = await create(kind === "evidence" ? "sms" : "email"), session = await ownerSession();
+    const before = JSON.stringify(await db.sender.findUniqueOrThrow({ where: { id: row.id } }));
+    const count = await db.sender.count(), events = await db.senderEvent.count({ where: { senderId: row.id } });
+    const actions = { list: "list_viewed", detail: "viewed", create: "created", edit: "updated", disable: "disabled", renew: "renewed", email: "email_requested", dns: "dns_requested", cleanup: "cleanup_requested", evidence: "evidence_initialized" };
+    const input = { serviceId: service, channel: "email", address: "audit@" + randomUUID() + ".test", label: "합성 감사", description: "" };
+    await auditDelay("sender." + actions[kind], async () => {
+      try {
+        await db.session.update({ where: { id: session.id }, data: { expiresAt: new Date(Date.now() + 1500) } });
+        const response = kind === "list" ? await GET(req("/senders?serviceId=" + service + "&channel=email")) : kind === "detail" ? await GET(req("/senders/" + row.id)) : kind === "create" ? await POST(req("/senders", "POST", "owner", input, { "idempotency-key": randomUUID() })) : kind === "edit" ? await PATCH(req("/senders/" + row.id, "PATCH", "owner", { version: row.version, address: row.address, label: "변경", description: "" })) : kind === "evidence" ? await POST(req("/senders/" + row.id + "/evidence", "POST", "owner", { version: row.version, name: "합성.png", mime: "image/png", size: png.length, sha256: createHash("sha256").update(png).digest("hex") }, { "idempotency-key": randomUUID() })) : await POST(req("/senders/" + row.id + "/" + (kind === "email" ? "request-email" : kind), "POST", "owner", { version: row.version }));
+        expect(response.status).toBe(401); expect((await response.json()).error.code).toBe("SESSION_EXPIRED");
+        expect(JSON.stringify(await db.sender.findUniqueOrThrow({ where: { id: row.id } }))).toBe(before);
+        expect(await db.sender.count()).toBe(count); expect(await db.senderEvent.count({ where: { senderId: row.id } })).toBe(events);
+        barriers.push({ audit: actions[kind], sessionExpired: true, transactionRolledBack: true });
+      } finally { await db.session.update({ where: { id: session.id }, data: { expiresAt: session.expiresAt, updatedAt: session.updatedAt } }); }
+    });
+  });
+  test.each(["Company", "Sender"] as const)("%s 실제 잠금 대기 뒤 세션 만료를 거절한다", async table => {
+    const row = await create(), session = await ownerSession(), client = new Client({ connectionString: env.DATABASE_URL }); await client.connect();
+    let operation: Promise<Response> | undefined;
+    try {
+      await client.query("BEGIN"); await client.query('SELECT id FROM "' + table + '" WHERE id=$1 FOR UPDATE', [table === "Company" ? tenant : row.id]);
+      const expiresAt = new Date(Date.now() + 4000); await db.session.update({ where: { id: session.id }, data: { expiresAt } });
+      operation = GET(req("/senders/" + row.id));
+      let observed = false;
+      for (let i = 0; i < 100; i++) { await client.query("SELECT pg_stat_clear_snapshot()"); const waiting = await client.query("SELECT count(*)::int AS n FROM pg_stat_activity WHERE pid<>pg_backend_pid() AND wait_event_type='Lock' AND query LIKE $1", ['%FROM "' + table + '"%FOR SHARE%']); if (waiting.rows[0].n) { observed = true; break; } await new Promise(r => setTimeout(r, 20)); }
+      expect(observed).toBe(true); await new Promise(r => setTimeout(r, Math.max(1, expiresAt.getTime() - Date.now() + 20)));
+      await client.query("COMMIT"); expect((await operation).status).toBe(401);
+      barriers.push({ table, actualWaitObserved: true, expiredSessionDenied: true });
+    } finally { await client.query("ROLLBACK"); await operation; await client.end(); await db.session.update({ where: { id: session.id }, data: { expiresAt: session.expiresAt, updatedAt: session.updatedAt } }); }
+  });
+  test("캐시 저장 중 만료된 생성 요청은 발신자·캐시·감사를 남기지 않는다", async () => {
+    const session = await ownerSession(), key = randomUUID(), before = await db.sender.count();
+    await db.$executeRawUnsafe("CREATE FUNCTION qa_sender_cache_delay() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.scope LIKE 'sender:create:%' THEN PERFORM pg_sleep(2); END IF; RETURN NEW; END $$");
+    await db.$executeRawUnsafe('CREATE TRIGGER qa_sender_cache_delay BEFORE INSERT ON "IdempotencyRecord" FOR EACH ROW EXECUTE FUNCTION qa_sender_cache_delay()');
+    try {
+      await db.session.update({ where: { id: session.id }, data: { expiresAt: new Date(Date.now() + 1500) } });
+      const response = await POST(req("/senders", "POST", "owner", { serviceId: service, channel: "email", address: "cache@" + randomUUID() + ".test", label: "합성" }, { "idempotency-key": key }));
+      expect(response.status).toBe(401); expect(await db.sender.count()).toBe(before); expect(await db.idempotencyRecord.count({ where: { key } })).toBe(0);
+      barriers.push({ cacheInsertExpired: true, senderAndCacheRolledBack: true });
+    } finally { await db.$executeRawUnsafe('DROP TRIGGER qa_sender_cache_delay ON "IdempotencyRecord"'); await db.$executeRawUnsafe('DROP FUNCTION qa_sender_cache_delay()'); await db.session.update({ where: { id: session.id }, data: { expiresAt: session.expiresAt, updatedAt: session.updatedAt } }); }
+  });
+  test("DNS 상세 감사 중 만료된 확인값은 반환하지 않는다", async () => {
+    const row = await create();
+    await shortProof(row, "dns", async () => {
+      const started = await act(row, "dns", {}, 201), value = started.verifications![0].recordValue;
+      expect(value).toBeTruthy();
+      await auditDelay("sender.viewed", async () => {
+        const response = await GET(req("/senders/" + row.id)); expect(response.status).toBe(200);
+        const text = await response.text(); expect(text).not.toContain(value!); expect(JSON.parse(text).verifications[0]).toMatchObject({ status: "expired" });
+      });
+      barriers.push({ dnsExpiredDuringAudit: true, secretOmitted: true });
+    });
+  });
+  test("코드 확인 감사 중 만료되면 소비와 메일 사본 삭제를 롤백한다", async () => {
+    const row = await create();
+    await shortProof(row, "email", async () => {
+      const sent = await emailCode(row), path = resolve(env.LOCAL_MAIL_DIR, sent.jobId + ".json"), bytes = await readFile(path);
+      await auditDelay("sender.email_confirmed", async () => {
+        expect((await POST(req("/senders/" + row.id + "/confirm-email", "POST", "owner", { version: sent.row.version, verificationId: sent.id, code: sent.code }))).status).toBe(422);
+        expect((await db.senderVerification.findUniqueOrThrow({ where: { id: sent.id } })).status).toBe("pending"); expect(await readFile(path)).toEqual(bytes);
+        expect((await db.job.findUniqueOrThrow({ where: { id: sent.jobId } })).payloadErasedAt).toBeNull();
+      });
+      barriers.push({ codeExpiredDuringAudit: true, proofAndActualCopyRolledBack: true });
+    });
+  });
+  test("삭제 감사 중 세션 만료는 인증 원문과 실제 메일 파일을 보존한다", async () => {
+    const sent = await emailCode(await create()), session = await ownerSession(), path = resolve(env.LOCAL_MAIL_DIR, sent.jobId + ".json"), bytes = await readFile(path);
+    await auditDelay("sender.deleted", async () => {
+      try {
+        await db.session.update({ where: { id: session.id }, data: { expiresAt: new Date(Date.now() + 1500) } });
+        expect((await DELETE(req("/senders/" + sent.row.id, "DELETE", "owner", { version: sent.row.version }))).status).toBe(401);
+        expect(await readFile(path)).toEqual(bytes); expect((await db.job.findUniqueOrThrow({ where: { id: sent.jobId } })).payloadErasedAt).toBeNull();
+        expect((await db.senderVerification.findUniqueOrThrow({ where: { id: sent.id } })).tokenHash).not.toBeNull();
+      } finally { await db.session.update({ where: { id: session.id }, data: { expiresAt: session.expiresAt, updatedAt: session.updatedAt } }); }
+    });
+    barriers.push({ deletionRollback: true, originalCodeAndFilePreserved: true });
+  });
+  test("실제 파일 장애는 확정된 무효화와 대기 상태를 남기고 명시적 정리로 재시도한다", async () => {
+    const sent = await emailCode(await create()), path = resolve(env.LOCAL_MAIL_DIR, sent.jobId + ".json"), backup = path + ".qa-backup";
+    await rename(path, backup); await mkdir(path);
+    try {
+      const result = await ok<{ cleanupPending: boolean }>(await POST(req("/senders/" + sent.row.id + "/renew", "POST", "owner", { version: sent.row.version }))); expect(result.cleanupPending).toBe(true);
+      const current = await read(sent.row.id); expect(current.cleanupPending).toBe(true); expect(current.permissions.canCleanup).toBe(true);
+      expect(await db.job.findUniqueOrThrow({ where: { id: sent.jobId } })).toMatchObject({ payloadErasedAt: expect.any(Date), localCopyErasedAt: null });
+    } finally { await rmdir(path); await rename(backup, path); }
+    const current = await read(sent.row.id), events = await db.senderEvent.count({ where: { senderId: current.id } });
+    const result = await ok<{ cleanupPending: boolean }>(await POST(req("/senders/" + current.id + "/cleanup", "POST", "owner", { version: current.version }))); expect(result.cleanupPending).toBe(false);
+    await expect(access(path)).rejects.toThrow(); expect((await read(current.id)).status).toBe("pending"); expect(await db.senderEvent.count({ where: { senderId: current.id } })).toBe(events);
+    barriers.push({ actualFilesystemFailure: true, committedInvalidation: true, cleanupRetriedWithoutDeletion: true });
+  });
+  test("대표 설정 감사 중 인증이 만료되면 대표 변경을 롤백한다", async () => {
+    const row = await verifyEmail();
+    const current = await db.$transaction(async tx => {
+      const saved = await tx.sender.update({ where: { id: row.id }, data: { expiresAt: new Date(Date.now() + 1500), version: { increment: 1 } } });
+      await tx.senderEvent.create({ data: { tenantId: tenant, senderId: row.id, version: saved.version, kind: "updated" } }); return saved;
+    });
+    await auditDelay("sender.default_changed", async () => {
+      expect((await POST(req("/senders/" + row.id + "/default", "POST", "owner", { version: current.version }))).status).toBe(409);
+      expect(await db.sender.findUniqueOrThrow({ where: { id: row.id } })).toMatchObject({ version: current.version, isDefault: false });
+    });
+    barriers.push({ defaultExpiredDuringAudit: true, defaultRolledBack: true });
+  });
+  test("DNS 확인 감사 중 확인값이 만료되면 성공 증거를 저장하지 않는다", async () => {
+    const row = await create();
+    await shortProof(row, "dns", async () => {
+      const current = await act(row, "dns", {}, 201), proof = current.verifications![0]; records.set(proof.recordName!, proof.recordValue!);
+      await auditDelay("sender.dns_checked", async () => {
+        expect((await POST(req("/senders/" + row.id + "/check", "POST", "owner", { version: current.version }))).status).toBe(409);
+        expect((await db.senderVerification.findUniqueOrThrow({ where: { id: proof.id } })).status).toBe("pending");
+        expect((await db.sender.findUniqueOrThrow({ where: { id: row.id } })).version).toBe(current.version);
+      });
+      barriers.push({ dnsCheckExpiredDuringAudit: true, successProofRolledBack: true });
+    });
+  });
+  test("증빙 캐시 저장 중 업로드 기한 종료는 파일과 캐시를 롤백한다", async () => {
+    const row = await create("sms"), key = randomUUID(), before = await db.fileObject.count();
+    await db.$executeRawUnsafe("CREATE FUNCTION qa_sender_upload_time() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.\"ownerKind\"='sender' THEN NEW.\"expiresAt\":=(clock_timestamp() AT TIME ZONE 'UTC')+interval '1500 milliseconds'; END IF; RETURN NEW; END $$");
+    await db.$executeRawUnsafe('CREATE TRIGGER qa_sender_upload_time BEFORE INSERT ON "FileObject" FOR EACH ROW EXECUTE FUNCTION qa_sender_upload_time()');
+    await db.$executeRawUnsafe("CREATE FUNCTION qa_sender_upload_cache() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.scope LIKE 'sender:evidence:%' THEN PERFORM pg_sleep(2); END IF; RETURN NEW; END $$");
+    await db.$executeRawUnsafe('CREATE TRIGGER qa_sender_upload_cache BEFORE INSERT ON "IdempotencyRecord" FOR EACH ROW EXECUTE FUNCTION qa_sender_upload_cache()');
+    try {
+      const response = await POST(req("/senders/" + row.id + "/evidence", "POST", "owner", { version: row.version, name: "합성.png", mime: "image/png", size: png.length, sha256: createHash("sha256").update(png).digest("hex") }, { "idempotency-key": key }));
+      expect(response.status).toBe(410); expect(await db.fileObject.count()).toBe(before); expect(await db.idempotencyRecord.count({ where: { key } })).toBe(0);
+      barriers.push({ uploadExpiredDuringCache: true, fileAndCacheRolledBack: true });
+    } finally {
+      await db.$executeRawUnsafe('DROP TRIGGER qa_sender_upload_cache ON "IdempotencyRecord"'); await db.$executeRawUnsafe('DROP FUNCTION qa_sender_upload_cache()');
+      await db.$executeRawUnsafe('DROP TRIGGER qa_sender_upload_time ON "FileObject"'); await db.$executeRawUnsafe('DROP FUNCTION qa_sender_upload_time()');
+    }
+  });
+  test("증빙 정리 실패 후 삭제한 발신자의 같은 DELETE로 재시도한다", async () => {
+    const { row, file } = await evidence(await create("sms"));
+    const failure = vi.spyOn(privateFiles, "remove").mockRejectedValueOnce(new Error("synthetic storage failure"));
+    const result = await ok<{ cleanupPending: boolean; version: number }>(await DELETE(req("/senders/" + row.id, "DELETE", "owner", { version: row.version })));
+    expect(result.cleanupPending).toBe(true); failure.mockRestore();
+    const current = await read(row.id); expect(current.status).toBe("deleted"); expect(current.permissions.canCleanup).toBe(true);
+    const events = await db.senderEvent.count({ where: { senderId: row.id } });
+    expect((await ok<{ cleanupPending: boolean }>(await DELETE(req("/senders/" + row.id, "DELETE", "owner", { version: current.version })))).cleanupPending).toBe(false);
+    expect(await db.senderEvent.count({ where: { senderId: row.id } })).toBe(events); await expect(privateFiles.read(file.storageKey)).rejects.toThrow();
+    barriers.push({ evidenceRemovalFailed: true, deletedSenderRetryCleaned: true, duplicateEvents: 0 });
+  });
+  test("만료 DNS 원문은 정리 처리기에서 제거하고 인증 상태를 위조하지 않는다", async () => {
+    const row = await create();
+    await shortProof(row, "dns", async () => {
+      const current = await act(row, "dns", {}, 201), proof = current.verifications![0];
+      await new Promise(r => setTimeout(r, Math.max(1, new Date(proof.expiresAt).getTime() - Date.now() + 20)));
+      await cleanupSenderVerificationMail();
+      expect(await db.senderVerification.findUniqueOrThrow({ where: { id: proof.id } })).toMatchObject({ status: "failed", tokenHash: null, valueCipher: null });
+      expect((await read(row.id)).status).toBe("pending");
+      barriers.push({ expiredDnsPlaintextErased: true, senderStillPending: true });
+    });
+  });
+  test("확인 메일은 마지막 Job 잠금 대기 중 인증 기한이 끝나면 파일을 게시하지 않는다", async () => {
+    const row = await create();
+    await shortProof(row, "email", async () => {
+      const challenge = await ok<{ id: string }>(await POST(req("/senders/" + row.id + "/request-email", "POST", "owner", { version: row.version })), 202);
+      const proof = await db.senderVerification.findUniqueOrThrow({ where: { id: challenge.id } }), job = await db.job.findUniqueOrThrow({ where: { dedupeKey: "mail:sender-verification:" + proof.id } });
+      const senderLock = new Client({ connectionString: env.DATABASE_URL }), jobLock = new Client({ connectionString: env.DATABASE_URL });
+      await senderLock.connect(); await jobLock.connect(); let processing: Promise<boolean> | undefined;
+      try {
+        await senderLock.query("BEGIN"); await senderLock.query('SELECT id FROM "Sender" WHERE id=$1 FOR UPDATE', [row.id]);
+        processing = runOneJob("p08-final-proof", { tenantId: tenant, jobId: job.id });
+        let leased = false;
+        for (let i = 0; i < 100; i++) { if ((await db.job.findUniqueOrThrow({ where: { id: job.id } })).status === "leased") { leased = true; break; } await new Promise(r => setTimeout(r, 20)); }
+        expect(leased).toBe(true); await jobLock.query("BEGIN"); await jobLock.query('SELECT id FROM "Job" WHERE id=$1 FOR UPDATE', [job.id]);
+        await senderLock.query("COMMIT"); let observed = false;
+        for (let i = 0; i < 100; i++) { const waiting = await senderLock.query("SELECT count(*)::int AS n FROM pg_stat_activity WHERE wait_event_type='Lock' AND query LIKE '%SELECT id FROM \"Job\"%FOR UPDATE%'"); if (waiting.rows[0].n) { observed = true; break; } await new Promise(r => setTimeout(r, 20)); }
+        expect(observed).toBe(true); await new Promise(r => setTimeout(r, Math.max(1, proof.expiresAt.getTime() - Date.now() + 20)));
+        await jobLock.query("COMMIT"); expect(await processing).toBe(true);
+        expect((await db.job.findUniqueOrThrow({ where: { id: job.id } })).status).toBe("retry"); await expect(access(resolve(env.LOCAL_MAIL_DIR, job.id + ".json"))).rejects.toThrow();
+        barriers.push({ actualFinalJobWait: true, proofExpiredBeforePublication: true, localFileAbsent: true });
+      } finally { await senderLock.query("ROLLBACK"); await jobLock.query("ROLLBACK"); await processing; await senderLock.end(); await jobLock.end(); }
+    }, 4000);
+  });
+});
 describe("service scoped sender CRUD, verification and delivery", () => {
   test("registration is persistent, normalized, idempotent, searchable and versioned", async () => {
     const input = { serviceId: service, channel: "email", address: " SALES@normalized-sender.test ", label: "고유 검색 이름", description: "등록" }, key = randomUUID();
@@ -248,12 +476,22 @@ describe("service scoped sender CRUD, verification and delivery", () => {
     const filtered = (status: string) => GET(req("/senders?" + new URLSearchParams({ serviceId: service, channel: "email", search: verified.address!, status })));
     expect((await ok<Paged<SenderRecord>>(await filtered("verified"))).items.map(r => r.id)).toEqual([verified.id]);
     const ctx = await requireContext(req("/senders").headers, "sender.read");
-    // Expire the sender clock without consuming the unrelated 90-day-old login session.
-    const expiredList = (status: string) => listSenders(ctx, senderList.parse({ serviceId: service, channel: "email", search: verified.address!, status }), randomUUID());
     vi.useFakeTimers({ toFake: ["Date"] }); vi.setSystemTime(Date.now() + 91 * 86400000);
-    expect((await expiredList("verified")).total).toBe(0);
-    const expired = await expiredList("expired");
-    expect(expired.items.map(r => [r.id, r.status])).toEqual([[verified.id, "expired"]]);
+    const query = (status: string) => senderList.parse({ serviceId: service, channel: "email", search: verified.address!, status });
+    await expect(listSenders(ctx, query("verified"), randomUUID())).rejects.toMatchObject({ status: 401 });
+    // This sender expiry fixture uses the supported no-rotation policy and a real fresh login.
+    // The old session still expires; password rotation is covered independently by its own suite.
+    const policy = await db.securityPolicy.findUniqueOrThrow({ where: { tenantId: tenant } });
+    try {
+      await db.securityPolicy.update({ where: { tenantId: tenant }, data: { passwordMonths: 0 } });
+      const name = "current-" + randomUUID(); await signUp(name, tenant, "owner");
+      const current = await requireContext(req("/senders", "GET", name).headers, "sender.read");
+      expect((await listSenders(current, query("verified"), randomUUID())).total).toBe(0);
+      const expired = await listSenders(current, query("expired"), randomUUID());
+      expect(expired.items.map(r => [r.id, r.status])).toEqual([[verified.id, "expired"]]);
+    } finally {
+      vi.useRealTimers(); await db.securityPolicy.update({ where: { tenantId: tenant }, data: { passwordMonths: policy.passwordMonths } });
+    }
   });
   test("renewal cancels an undelivered authentication mail and clears its secret", async()=>{
     let r=await create();const out=await ok<{id:string}>(await POST(req("/senders/"+r.id+"/request-email","POST","owner",{version:r.version})),202);r=await read(r.id);

@@ -1,0 +1,35 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:54755) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-list-deletion.test.ts (18 tests | 1 failed | 17 skipped) 1039ms
+   × 전문가의 배정 외 여분 grant와 실제 배정 만료는 상세·목록을 허용하지 않는다 1036ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-list-deletion.test.ts > 전문가의 배정 외 여분 grant와 실제 배정 만료는 상세·목록을 허용하지 않는다
+AssertionError: expected 200 to be 404 // Object.is equality
+
+- Expected
++ Received
+
+- 404
++ 200
+
+ ❯ tests/server/form-list-deletion.test.ts:185:90
+    183|   await expect(listForms(ctx,{ ...listQuery.parse({}),serviceId:f.serv…
+    184|   expect((await listForms(ctx,listQuery.parse({}))).total).toBe(0);
+    185|   expect((await PUT(req("/forms/"+f.form.id+"/favorite",f.editor.cooki…
+       |                                                                                          ^
+    186|   await db.service.update({ where:{ id:f.serviceId },data:{ status:"ac…
+    187|   await db.expertAssignment.update({ where:{ id:assignment.id },data:{…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 skipped (18)
+   Start at  22:36:23
+   Duration  2.31s (tests 47%, import 29%, transform 23%)
+

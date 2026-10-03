@@ -1,0 +1,40 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+stdout | tests/server/catalog-access-gate.test.ts > 전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다
+EXPERT_FIXTURE {
+  sameUser: true,
+  companySelected: null,
+  status: 'active',
+  assignmentStatus: 'active',
+  expiresAt: '2026-10-04T11:16:42.467Z',
+  now: '2026-10-03T11:16:42.485Z',
+  assignmentIdMatches: true
+}
+
+ ❯ tests/server/catalog-access-gate.test.ts (7 tests | 1 failed | 6 skipped) 984ms
+   × 전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다 980ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/catalog-access-gate.test.ts > 전문가 배정이 만료되면 기존 Context로 목록·상세·이력을 읽을 수 없다
+Error: 소속된 회사가 없습니다. 회사를 등록하거나 초대를 수락해주세요.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ requireContext src/server/context.ts:34:16
+ ❯ expert tests/server/catalog-access-gate.test.ts:45:15
+ ❯ tests/server/catalog-access-gate.test.ts:71:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 skipped (7)
+   Start at  20:16:40
+   Duration  2.00s (tests 52%, import 32%, transform 16%)
+

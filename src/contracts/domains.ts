@@ -1,16 +1,10 @@
 import { marketingConfig, marketingChannel, validateMarketingConfig } from "./marketing";
 import { z } from "zod";
-import { checkSubjectQuestions, subjectRole } from "./subjects";
+import { checkSubjectQuestions } from "./subjects";
+import { questionSchema, answersSchema, validateQuestionDefinitions } from "./questions";
 import { formDocumentSelections } from "./form-documents";
 
-export const questionSchema = z.object({
-  id: z.uuid(),
-  type: z.enum(["단문형 답변", "장문형 답변", "객관식 답변", "체크박스", "드롭다운", "날짜", "파일 업로드"]),
-  label: z.string().trim().min(1).max(3000),
-  required: z.boolean(),
-  subjectRole: subjectRole.optional(),
-  options: z.array(z.string().trim().min(1).max(500)).max(100).optional(),
-}).strict();
+export { questionSchema } from "./questions";
 export const formContentSchema = z.object({
   body: z.string().max(20000),
   questions: z.array(questionSchema).min(1).max(100),
@@ -29,7 +23,7 @@ export const formInput = z.object({
   serviceId: z.uuid(), title: z.string().trim().min(1).max(200), content: formContentSchema,
 }).strict();
 export const submissionInput = z.object({
-  answers: z.record(z.uuid(), z.union([z.string().max(20000), z.array(z.string().max(1000)).max(100)])),
+  answers: answersSchema,
   marketingChannels: z.array(marketingChannel).max(2).refine(v => new Set(v).size === v.length).optional(),
   consent: z.boolean(), marketingConsent: z.boolean().optional(),
   documentConsents: z.array(z.uuid()).max(10).refine(value => new Set(value).size === value.length, "동의 항목이 중복되었습니다.").optional(),
@@ -60,6 +54,7 @@ export const securityInput = z.object({
 export function validateFormForPublish(content: z.infer<typeof formContentSchema>) {
   checkSubjectQuestions(content.questions, true);
   validateMarketingConfig(content.marketing, content.questions);
+  validateQuestionDefinitions(content.questions, true, content.marketing ? [content.marketing.nameQuestionId, content.marketing.emailQuestionId, content.marketing.smsQuestionId].filter((id): id is string => !!id) : []);
   const ids = new Set<string>();
   for (const question of content.questions) {
     if (ids.has(question.id)) throw new Error("질문 ID가 중복되었습니다.");

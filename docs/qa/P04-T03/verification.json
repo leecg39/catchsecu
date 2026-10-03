@@ -1,0 +1,167 @@
+{
+  "checkedAt": "2026-10-03T13:12:03.830775+00:00",
+  "verificationResult": "passed",
+  "taskId": "P04-T03",
+  "taskStatus": "in_progress",
+  "taskAcceptanceComplete": false,
+  "officialCompletedTasks": 15,
+  "totalTasks": 72,
+  "runtime": {
+    "node": "24.19.0",
+    "next": "16.3.8",
+    "postgresql": "17",
+    "prisma": "7.10.0",
+    "buildId": "lRWVSwGwzK8HJjt3IAYT6",
+    "gitHead": "8cc95982059f02c977f419993f22825b919c3a74"
+  },
+  "tests": {
+    "files": 41,
+    "total": 565,
+    "passed": 565,
+    "failed": 0,
+    "pending": 0,
+    "newServerTests": 17,
+    "relatedFiles": 4,
+    "relatedTests": 50,
+    "durationSeconds": 346.89,
+    "singleFixtureDatabaseRun": true
+  },
+  "checks": {
+    "typecheckExitCode": 0,
+    "lintExitCode": 0,
+    "buildExitCode": 0,
+    "gitDiffCheckExitCode": 0
+  },
+  "api": {
+    "prepare": 78,
+    "afterRestart": 13,
+    "total": 91,
+    "actualProductionServer": true,
+    "actualPostgreSQL": true,
+    "actualUiVerified": false,
+    "realClockExpiry": true,
+    "crossCompanyAndAnonymousChecks": true
+  },
+  "database": {
+    "formVersions": [
+      3,
+      5,
+      8
+    ],
+    "formCount": 3,
+    "storedVersions": 4,
+    "publications": 4,
+    "approvalEvidence": 5,
+    "fixedUrls": 3,
+    "oldSubmissions": 1,
+    "independentQuestionRows": 4,
+    "auditCount": 28,
+    "originalResponseCipherMatches": true,
+    "approvalSnapshotsMatch": true,
+    "publicationHashesMatch": true,
+    "retargetAndRestartMatch": true,
+    "replayAddsNoWrite": true
+  },
+  "restart": {
+    "beforePid": 15510,
+    "afterPid": 18210
+  },
+  "migrations": {
+    "existing": 56,
+    "added": 0
+  },
+  "contract": {
+    "result": "passed",
+    "openapiPaths": 250,
+    "operations": 364,
+    "policies": 31,
+    "completedTasks": 15,
+    "implementation": {
+      "implemented": 312,
+      "planned": 52
+    },
+    "unmappedOperations": 0,
+    "missingPermissions": 0,
+    "missingInputSchemas": 0
+  },
+  "plan": {
+    "paths": 181,
+    "tasks": 72,
+    "dependencyCycles": 0
+  },
+  "regressions": {
+    "publishReplayAfterGrantRevocation": true,
+    "approvalReplayAfterGrantRevocation": true,
+    "fixedCreateReplayAfterGrantRevocation": true,
+    "staleContextSessionEmailAndExpertChecks": true,
+    "sourceAndTargetServiceCapabilities": true,
+    "versionOnlyPatchRejected": true,
+    "republishAndFixedEditRace": true,
+    "serverPageNormalization": true,
+    "oldResponseCipherAndVersionImmutable": true,
+    "concurrentLastSubmissionSlot": true
+  },
+  "remainingGates": [
+    "P04-T02/P11-T01 prerequisite acceptance",
+    "Original normal approval/fixed URL flow comparison",
+    "Ego desktop/mobile approval, fixed URL and error/navigation scenarios"
+  ],
+  "evidenceScope": "Source hashes record this verification. Before-original-response-proof API reports and the earlier P04-T02/548-test report are historical. The final QA script strengthened original response evidence after the build; production files did not change, and the final script passed type/lint and actual API checks.",
+  "syntheticSessionsClosed": true,
+  "userAdminAccountUntouched": true,
+  "sourceHashes": {
+    "src/server/approvals.ts": "03b9655de46254bb2024d3a234bcc15f28c008f5a87dad107a539e638442d2a9",
+    "src/server/fixed-urls.ts": "0173058fb0be5562203b56a776bd802639c1e1b74f1cdc5761fbb0afa1bcd093",
+    "src/server/forms.ts": "dce6000530fa79db23b91598cc8e95cfab57fcdb176004608479a10f05240db9",
+    "src/server/form-access.ts": "b3d1c29ab810eeab5a41dbd18492c516404300752a33d5122f446fd8be2b962b",
+    "src/server/service-access.ts": "7ba7731522de07ffef6959d7f5c1f5aa19b8594b04f9f57a7f990164a8236d77",
+    "src/server/context.ts": "c5f09eeeb57e9fcc1724d331a5ec9a3452d9f38dd7cc88a22c3f787778536691",
+    "src/server/idempotency.ts": "5e3e3167dec4430bdea0cf78a3535cefe4f76b5fc110afc52a87c842fbe8f0d3",
+    "src/server/security-policy.ts": "1487a30e602cb546d02c3f0fc34a8cbb16dd64728bbd2bfef405df4a80ca0609",
+    "src/server/submissions.ts": "acbe5fdb666aae1fe6d77e9dda2688f8d34d1a27fe95555349f1d2a3648c67f9",
+    "src/contracts/security.ts": "3b3e462b8a34c19892d2c593bcd11712dcacff66dbcdeb7fc1dddd1b5bdbd5d5",
+    "src/contracts/forms.ts": "8ededc363a8769bee39e75469b91137bb3c83e03ceb18b6ae5b2c04ac007fd6e",
+    "src/contracts/domains.ts": "c68b618ecf9a3af0f098febe6331120d12caed9991839c45e3df4d55d9df9ea5",
+    "src/app/api/v1/forms/[...segments]/route.ts": "93f953231cea8690b4c45be97fe6b6e46ca693da04a880dff9920da1d495f6b4",
+    "src/app/api/v1/fixed-urls/route.ts": "736069bb81e0c8127c1f14375f1f03a6c074bf7c552064a098f23b88da39f0c6",
+    "src/app/api/v1/fixed-urls/[id]/route.ts": "fc828e0c7e098db82368a5f29f88e2bb36911960dd2e3c6abbc747706aca890f",
+    "src/app/api/v1/approvals/route.ts": "84e2a19403aa4f0e7dff3b99be37c74e8a6af07c3e2de7cee68a3b922a15a4d4",
+    "src/app/api/v1/approvals/[...segments]/route.ts": "41b5e9a6c811296e84f2f7ac78422589da0538d1736518710de92bdffb27cf27",
+    "src/app/api/v1/public/urls/[slug]/route.ts": "b30e6e5e7bec8ae8dc007c9afaf512e599f674447086e6da8ab5fb4fc2e62842",
+    "src/components/forms/FixedUrls.tsx": "10bdcb688b828b933a0968f9a965b68432e64a1c023635babf3aec8434c897e1",
+    "src/components/forms/Approvals.tsx": "e7ab7388dc1a28350c71345c43057c7a3ca34941b9fde2bfdfd6296ccb7a5ba3",
+    "tests/server/publication-access-gate.test.ts": "4474c0554378b74949abaab84df298ccdbb6dd61413a5ff78f1e01e2b8af3e85",
+    "scripts/qa-publication-gate.ts": "f7173070e9e671ba56f7f3dd0b7e4bd234dc8c61e558fb129d0d2386687a03f3",
+    "scripts/generate-openapi.ts": "563fa8aa245859cf0376819b1ba895032fc2af6935512e92dc3b9d3dc37ea655",
+    "prisma/schema.prisma": "5f7c7d2abdd6e0ed9d7d242f695d2807f9b33b1b78c8e440dc846693447bc72c",
+    "docs/planning/02-api-contracts.md": "9c8e28a40d979c3bf8f6c6615ec782b5cd31f4d9e7752fe835fb0ec0ad215d9b",
+    "docs/planning/contracts/openapi.json": "9e4f632d3572a8ba0f9d329089c157ee9aaf73c7c36c524798427361b8e593cf",
+    "docs/planning/contracts/domain-policies.json": "d601afed8ecd02f3af6069b9cad958c9a73ddfdb68acf62a71efa4675478e40b",
+    "docs/planning/contracts/operation-policy-matrix.csv": "bbe8596d4676f0b3c89ea37aecd608a32d81b4b19dd9dfed7468c5086f0aeac9",
+    "docs/planning/tasks.json": "49e567dc3a9f9c7aa642578e5500a17e1a83d5e0e82346c13e5652f9690dd927",
+    "TASKS.md": "8ec16ae628c759a77614b6614a0d7d123960510318414520bb043b7080930c1b",
+    "docs/IMPLEMENTATION-STATUS.md": "7304aa1b25ac4d2db0d46d515887e662a53272b0bd996ecb911f15c8e46ce806",
+    ".Codex/goals/progress.md": "bed52448bc2c2331d99f19ec324b05729cf9be1aec3731f6887d476408213936",
+    ".Codex/goals/timeline.md": "7c65658201f3f950560b45b4d7aeae2129d9f3e1b272239685ab41e1c827b240",
+    "docs/qa/P04-T03/README.md": "cdb1f2d66a6a54caf26f060791b5b28ec2eec5201884c0ce25d0b46756b5b563",
+    "docs/qa/P04-T03/PLAN.md": "e50e44e555435dde0e1fa1f6e69c1d6427d5b2e2fb400eb6ff1627cd1f5d5fa3",
+    "docs/qa/P04-T03/ui-checklist.md": "987164ee7ec0fd9643a030e679cbd3e5ae18976bdb54abdd7a43fb16f33d7030",
+    "docs/qa/P04-T02/README.md": "b1a09c1517ac800b9b4648f777dda904ae7d8ef18d878cc68769ae5515e5dbf8"
+  },
+  "artifactHashes": {
+    "full-test.json": "1b1cbada2e0c1bb939f84f52a4b0f22eb2ab42c1dd13b0639ca535fe3f40ab65",
+    "full-test.txt": "019ae0f9af10806a3a6a5837ad522be60b94d56574b1d061ebf480a9701b28fa",
+    "gate-before.txt": "1510e2fb75848e9d9a8c014db4e3568bad2ae5f65a775934ff22b84a14c5c4cd",
+    "gate-fixture-before.txt": "324b2d636eee570cdf8283fcead9dd5a8b4f4fd9fe8743de47ca6268dd283751",
+    "gate-after.txt": "88d2c57a3fb05008118cc889cc105680e99d939d9e38ea3920a28de9821d77c9",
+    "typecheck.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lint.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.txt": "ab1c52ce158cbdd3e87b2b1bbdbcc7c9c2e211ca11a59cc45bb5ba3c7c336d6c",
+    "http-prepare.json": "b27b81ed6bbbf4e5f56f55d63b5362043466b869f57ac9184a4fd5a76f88956e",
+    "http-finish.json": "039356b070b04d4ba9b721ce41067caebcf6b3fb59e62a937d0d15d05ae70363",
+    "restart.json": "7acfbb586a00a59c551379a32c73283b18b955f446fb7799d974ac937677ba1a",
+    "related-final.json": "442254f1bec901f9f53693ea5c84a88826229102263816808ab582e397e42b56",
+    "contract-check.txt": "81f320771b1e933240ac8990bc93da7cb8469b7c6aef9683cb53458bba287889",
+    "plan-check.txt": "4d7ce4e48669ac65bc3ca06e0b1f6df9321179e99116fe6c8136b01769984821"
+  }
+}

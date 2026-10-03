@@ -6,7 +6,7 @@
 
 1. [Prisma 모델](../../../prisma/schema.prisma)과 [순서 있는 SQL migration](../../../prisma/migrations/)이 구현된 엔티티의 DDL 기준이다. 아직 구현하지 않은 엔티티의 설계 초안은 [데이터 모델 문서](../01-data-models.md)의 표에 있다. 모델과 migration이 다르면 migration의 실제 DB 제약과 해당 Task의 QA로 확인한다.
 2. [OpenAPI 3.1](openapi.json)은 API 경로·method·권한·입력 JSON Schema·HTTP 상태를 기록한다. [API 계약 설명](../02-api-contracts.md)은 도메인 규칙과 UI 상태를 기록한다.
-3. [354개 작업별 정책 표](operation-policy-matrix.csv)는 각 method+경로의 역할/권한, 회사·서비스/토큰 범위, 유효성, 안전 DTO, 삭제 정책, 금지 동작을 [30개 도메인 정책](domain-policies.json)에서 상속해 고정한다. [검사 스크립트](../../../scripts/verify-contracts.py)는 미매핑 경로·권한·입력 스키마를 실패 처리한다.
+3. [376개 작업별 정책 표](operation-policy-matrix.csv)는 각 method+경로의 역할/권한, 회사·서비스/토큰 범위, 유효성, 안전 DTO, 삭제 정책, 금지 동작을 [33개 도메인 정책](domain-policies.json)에서 상속해 고정한다. [검사 스크립트](../../../scripts/verify-contracts.py)는 미매핑 경로·권한·입력 스키마를 실패 처리한다. 현재 257개 API 경로의 구현 작업은 324개, 계획 작업은 52개다. P06-T06의 4개 설정 API는 공급자 challenge/callback/서명·제출 흐름의 완료 판정이 아니다.
 4. [181개 화면 표](../03-route-matrix.csv)는 각 화면의 소유 Task, 모델·API, 역할, 정상/오류/권한 상태, 고유 E2E ID를 연결한다. 화면 표의 과거 제안 경로와 실제 Route Handler가 다른 경우에는 구현 Task의 QA와 OpenAPI의 현재 경로를 우선한다.
 
 ## ERD와 DDL 결정
@@ -27,6 +27,11 @@ erDiagram
   Submission ||--o{ Answer : contains
   Submission ||--o{ ConsentReceipt : records
   Submission ||--o{ DestructionRequest : schedules
+  Membership ||--o{ ExportJob : requests
+  Form ||--o{ ExportJob : exports
+  ExportJob ||--o{ ExportChunk : stores
+  ExportJob ||--o{ ExportSource : references
+  Submission ||--o{ ExportSource : supplies
   Service ||--o{ Document : has
   Document ||--o{ DocumentVersion : versions
   DocumentVersion ||--o{ DocumentPublication : publishes
@@ -101,3 +106,18 @@ owner/admin 외 역할의 서비스 자산 접근은 별도 `ServiceGrant`가 �
 | PG·카카오·문자/알림톡 | 공급자 계약/자격증명·단가 정책 미확정 | 제안 API와 실제 연결을 구분한다. 고객 요청 금액·성공 URL만으로 결제/전송/차감을 확정하지 않는다. |
 
 이 결정이 모든 원본 경로의 UX를 관찰했다는 뜻은 아니다. [원본 관찰 상태](../../research/COVERAGE.md)의 제한 경로는 해당 구현 Task에서 다시 확인한다.
+
+
+## P07-T03 파기 계약 보완
+
+현재 항목별 작업 권한·실제 기한·검색/정렬/페이지·엄격한 쿼리·증명서 무결성 검사를 연결했다. 계약 257경로·376작업·33정책, 매핑/권한/입력 누락 0이며 공식 완료는 15/72다. [검증](../../qa/P07-T03/README.md).
+
+
+## P07-T01 CSV 현재 계약
+
+현재 작업 권한, 최종 기한, 실행 번호/임대 검사와 엄격한 쿼리·실제 페이지를 연결했다. 계약 257경로·376작업·33정책과 공식 완료 15/72를 유지한다. [검증](../../qa/P07-T01/README.md).
+
+
+## P07-T02 마케팅 현재 계약
+
+현재 권한·최종 기한·엄격한 쿼리·페이지/정렬·현재 생성 재실행과 사본 정리/재시도를 연결했다. 257경로·376작업·33정책과 공식 완료 15/72를 유지한다. [검증](../../qa/P07-T02/README.md).

@@ -231,6 +231,8 @@ describe("persistent campaign CRUD, privacy and delivery", () => {
     await cleanupMarketingJobs(); expect((await db.campaignDelivery.findFirstOrThrow({ where: { campaignId: campaign.id } })).contactCipher).toBeNull();
     await cleanupCampaigns(); expect((await db.campaign.findUniqueOrThrow({ where: { id: unknown.id } })).contentCipher).toBeNull();
     expect((await db.campaignDelivery.findFirstOrThrow({ where: { campaignId: unknown.id } })).contactCipher).toBeNull();
+    await expect(readCampaign(ctx, campaign.id, randomUUID())).rejects.toMatchObject({ status: 401 });
+    vi.useRealTimers();
     expect((await readCampaign(ctx, campaign.id, randomUUID())).status).toBe("expired"); void target;
   });
   test("a known local storage failure can be retried without editing the original request", async () => {
@@ -668,7 +670,8 @@ test("suppression lists enforce tenant, service, role, exact address search and 
   const { job, target } = await sentFor(); await ok(await feedbackPost(relayRequest(relayInput(job.id))), 202);
   const path = "/email-suppressions?" + new URLSearchParams({ serviceId: service, search: target.contact, pageSize: "1" });
   const one = await ok<{ total: number; items: { contact: string }[] }>(await suppressionGet(req(path))); expect(one.total).toBe(1); expect(one.items[0].contact).toBe(target.contact);
-  const two = await ok<{ total: number; items: unknown[] }>(await suppressionGet(req(path + "&page=2"))); expect(two.total).toBe(1); expect(two.items).toEqual([]);
+  const two = await ok<{ total: number; page: number; items: { contact: string }[] }>(await suppressionGet(req(path + "&page=2")));
+  expect(two).toMatchObject({ total: 1, page: 1 }); expect(two.items.map(row => row.contact)).toEqual([target.contact]);
   expect((await suppressionGet(req(path, "GET", "viewer"))).status).toBe(403); expect([403, 404]).toContain((await suppressionGet(req(path, "GET", "foreign"))).status);
   await ok(await suppressionGet(req(path, "GET", "sender")));
   await db.serviceGrant.deleteMany({ where: { memberId: members.sender, serviceId: service } }); expect((await suppressionGet(req(path, "GET", "sender"))).status).toBe(403);

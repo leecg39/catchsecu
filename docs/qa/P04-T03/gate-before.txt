@@ -1,0 +1,389 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:1923) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/publication-access-gate.test.ts (14 tests | 12 failed) 12611ms
+   × 게시 요청 재전송은 현재 서비스 게시 권한을 검사하며 회수 후 토큰을 반환하지 않는다 1311ms
+   × 승인 요청 재전송은 현재 작성 권한을 검사하며 검토 메시지를 노출하지 않는다 666ms
+   × 고정 URL 생성 재전송도 현재 연결 서비스 게시 권한을 검사한다 752ms
+   × 조회 권한을 회수한 이전 Context는 승인 이력과 고정 URL을 읽지 못한다 824ms
+   × 세션이 종료된 이전 Context는 고정 URL 조회·생성·변경·종료와 승인 조회를 처리하지 못한다 886ms
+   × 이메일 인증을 회수한 이전 Context는 고정 URL과 승인 목록을 읽지 못한다 815ms
+   × 고정 URL 변경·종료는 이전 Context의 회수된 게시 권한으로 수행할 수 없다 821ms
+   × 다른 서비스로 연결할 때 현재 원래 서비스와 대상 서비스의 게시 권한이 모두 필요하다 1050ms
+   × 전문가 배정 만료와 배정 외 여분 grant는 고정 URL·승인 조회를 허용하지 않는다 1026ms
+   × 보관 서비스의 고정 URL 이력은 읽되 생성·변경·종료는 막는다 874ms
+   × 내용 없는 고정 URL PATCH는 version·감사를 변경하지 않는다 786ms
+   × 고정 URL과 승인 목록은 범위를 벗어난 페이지를 실제 마지막 페이지로 보정한다 765ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 게시 요청 재전송은 현재 서비스 게시 권한을 검사하며 회수 후 토큰을 반환하지 않는다
+AssertionError: expected 201 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 201
+
+ ❯ tests/server/publication-access-gate.test.ts:69:130
+     67|   const f=await fixture(), p=await publish(f), before=await db.auditEv…
+     68|   await db.serviceGrant.update({ where:{ id:f.grant.id },data:{ capabi…
+     69|   const replay=await action(req("/forms/" + f.form.id + "/publish",f.e…
+       |                                                                                                                                  ^
+     70|   expect(await db.publication.count()).toBe(1); expect(await db.auditE…
+     71| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 승인 요청 재전송은 현재 작성 권한을 검사하며 검토 메시지를 노출하지 않는다
+AssertionError: expected 201 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 201
+
+ ❯ tests/server/publication-access-gate.test.ts:75:113
+     73|   const f=await fixture(), a=await approval(f);
+     74|   await db.serviceGrant.update({ where:{ id:f.grant.id },data:{ capabi…
+     75|   expect((await action(req("/forms/" + f.form.id + "/approvals",f.edit…
+       |                                                                                                                 ^
+     76|   expect(await db.approvalRequest.count()).toBe(1);
+     77| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 고정 URL 생성 재전송도 현재 연결 서비스 게시 권한을 검사한다
+AssertionError: expected 201 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 201
+
+ ❯ tests/server/publication-access-gate.test.ts:81:95
+     79|   const f=await fixture(), a=await fixed(f);
+     80|   await db.serviceGrant.update({ where:{ id:f.grant.id },data:{ capabi…
+     81|   expect((await fixedCreate(req("/fixed-urls",f.editor.cookie,"POST",a…
+       |                                                                                               ^
+     82| });
+     83| test("조회 권한을 회수한 이전 Context는 승인 이력과 고정 URL을 읽지 못한다",async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 조회 권한을 회수한 이전 Context는 승인 이력과 고정 URL을 읽지 못한다
+AssertionError: promise resolved "{ …(19) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-03T12:57:20.641Z,
++   "decidedAt": null,
++   "formId": "324f89af-654c-4058-ae24-8efeceb20d2a",
++   "formRevision": 2,
++   "formVersionId": "fb6169d1-4eb9-4463-b7ec-a528b12404a3",
++   "id": "d0af0506-821b-4c83-9e82-222f0cfb1b62",
++   "message": "합성 검토 메시지",
++   "policyRevision": 1,
++   "reason": null,
++   "reference": "QA",
++   "requestedBy": "389e1f46-cd5d-4700-bd50-deda7497baa6",
++   "requesterName": "검증 사용자",
++   "reviewerName": null,
++   "serviceId": "9d1dc4c6-230e-40e7-ae8c-13a1ac9d12c0",
++   "serviceName": "다른 서비스",
++   "snapshot": {
++     "consentBundle": {
++       "display": {
++         "kind": "collection",
++         "name": "다른(게시 검증)",
++         "optionalText": "",
++         "policy": null,
++         "policyText": "",
++         "processorText": "",
++         "requiredText": "",
++         "schemaVersion": 1,
++         "startText": "",
++         "version": 0,
++       },
++       "documents": [],
++     },
++     "content": {
++       "body": "게시 원문",
++       "bold": false,
++       "consentPurpose": "",
++       "consentRequired": false,
++       "documentConsents": [],
++       "font": "14px",
++       "marketing": null,
++       "maxResponses": 1,
++       "questions": [
++         {
++           "id": "68b36bed-1cc3-4f5e-8251-25eb292ec905",
++           "label": "답변",
++           "options": [],
++           "required": true,
++           "type": "단문형 답변",
++         },
++       ],
++       "retentionDays": 30,
++       "showSubmitNotice": true,
++       "verify": false,
++     },
++     "title": "게시할 폼",
++   },
++   "status": "pending",
++   "title": "게시할 폼",
++   "version": 1,
+  }
+
+ ❯ tests/server/publication-access-gate.test.ts:87:101
+     85|   await db.serviceGrant.update({ where:{ id:f.grant.id },data:{ capabi…
+     86|   for (const call of [() => getApproval(f.ctx,a.row.id),() => approval…
+     87|     () => listApprovals(f.ctx,approvalQuery.parse({ serviceId:f.servic…
+       |                                                                                                     ^
+     88|   expect((await listApprovals(f.ctx,approvalQuery.parse({}))).total).t…
+     89| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 세션이 종료된 이전 Context는 고정 URL 조회·생성·변경·종료와 승인 조회를 처리하지 못한다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-03T12:57:21.541Z,
++   "id": "adabb9d8-13cd-427c-b3fc-4bc1a4b07c9b",
++   "name": "고정 주소",
++   "publication": {
++     "form": {
++       "serviceId": "d0a40850-dfec-4ede-859e-734f59a14fb8",
++       "title": "게시할 폼",
++     },
++     "formId": "f8fc2da8-0720-4ea5-9741-67cee576bdf9",
++   },
++   "publicationId": "18c6377c-9cd7-4283-8004-9c4db2db8a14",
++   "slug": "21fd5ce49161414dabf6fed3372d0e2f",
++   "status": "active",
++   "tenantId": "1877d5ef-a969-4366-84ee-ec1772063fa5",
++   "updatedAt": 2026-10-03T12:57:21.541Z,
++   "version": 1,
+  }
+
+ ❯ tests/server/publication-access-gate.test.ts:95:71
+     93|     () => db.$transaction(tx => createFixedUrl(f.ctx,{ name:"새 주소",for…
+     94|     () => updateFixedUrl(f.ctx,a.row.id,{ version:1,name:"변경" },random…
+     95|     () => approvalForForm(f.ctx,f.form.id,1,20)]) await expect(call())…
+       |                                                                       ^
+     96|   expect((await db.fixedUrl.findUniqueOrThrow({ where:{ id:a.row.id } …
+     97| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 이메일 인증을 회수한 이전 Context는 고정 URL과 승인 목록을 읽지 못한다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-03T12:57:22.357Z,
++   "id": "b49b16e7-3112-41e2-88dd-12180dd15065",
++   "name": "고정 주소",
++   "publication": {
++     "form": {
++       "serviceId": "62d25d77-32ef-4dd3-91c7-51a24e4b0529",
++       "title": "게시할 폼",
++     },
++     "formId": "fe423c88-b1e3-49b5-b01c-6f45642f60d4",
++   },
++   "publicationId": "a5854c27-56fd-4edc-86c5-5d6301b9e750",
++   "slug": "6adc5f6da0d440a2a54d5af452a025b4",
++   "status": "active",
++   "tenantId": "da7fbe59-30d8-4dfb-80d9-9a9dece46907",
++   "updatedAt": 2026-10-03T12:57:22.357Z,
++   "version": 1,
+  }
+
+ ❯ tests/server/publication-access-gate.test.ts:100:48
+     98| test("이메일 인증을 회수한 이전 Context는 고정 URL과 승인 목록을 읽지 못한다",async () => {
+     99|   const f=await fixture(), a=await fixed(f); await db.user.update({ wh…
+    100|   await expect(requireFixedUrl(f.ctx,a.row.id)).rejects.toMatchObject(…
+       |                                                ^
+    101|   await expect(listApprovals(f.ctx,approvalQuery.parse({}))).rejects.t…
+    102| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 고정 URL 변경·종료는 이전 Context의 회수된 게시 권한으로 수행할 수 없다
+AssertionError: promise resolved "{ …(9) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-03T12:57:23.173Z,
++   "formId": "84703e93-9f8b-4b45-acb3-679d1021db46",
++   "formTitle": "게시할 폼",
++   "id": "48e69bae-5f2c-454f-9582-ccf2158b53c0",
++   "name": "변경",
++   "slug": "29258b24e92048bab3f0e789d6786e87",
++   "status": "active",
++   "url": "/url/29258b24e92048bab3f0e789d6786e87",
++   "version": 2,
+  }
+
+ ❯ tests/server/publication-access-gate.test.ts:106:84
+    104|   const f=await fixture(), a=await fixed(f);
+    105|   await db.serviceGrant.update({ where:{ id:f.grant.id },data:{ capabi…
+    106|   await expect(updateFixedUrl(f.ctx,a.row.id,{ version:1,name:"변경" },r…
+       |                                                                                    ^
+    107|   await expect(revokeFixedUrl(f.ctx,a.row.id,1,randomUUID())).rejects.…
+    108|   expect((await db.fixedUrl.findUniqueOrThrow({ where:{ id:a.row.id } …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 다른 서비스로 연결할 때 현재 원래 서비스와 대상 서비스의 게시 권한이 모두 필요하다
+AssertionError: promise resolved "{ …(9) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-03T12:57:24.087Z,
++   "formId": "e8fa5caa-095f-4205-99d5-99bc0a33a8b8",
++   "formTitle": "다른 서비스 폼",
++   "id": "73ab07db-fedf-458d-8321-dd61575fe4eb",
++   "name": "고정 주소",
++   "slug": "c80d030a935845fdb680b52a5d6b3e1c",
++   "status": "active",
++   "url": "/url/c80d030a935845fdb680b52a5d6b3e1c",
++   "version": 2,
+  }
+
+ ❯ tests/server/publication-access-gate.test.ts:116:89
+    114|   const grant=await db.serviceGrant.create({ data:{ tenantId:f.company…
+    115|   const ctx=await requireContext(req("/context",f.editor.cookie).heade…
+    116|   await expect(updateFixedUrl(ctx,a.row.id,{ version:1,formId:second.i…
+       |                                                                                         ^
+    117|   expect((await db.fixedUrl.findUniqueOrThrow({ where:{ id:a.row.id } …
+    118| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 전문가 배정 만료와 배정 외 여분 grant는 고정 URL·승인 조회를 허용하지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.expertAssignment.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/publication-access-gate.test.ts:129:29
+
+  126 const ctx=await requireContext(req("/context",user.cookie).headers,"form.read");
+  127 await expect(requireFixedUrl(ctx,a.row.id)).rejects.toMatchObject({ status:403 });
+  128 expect((await listFixedUrls(ctx,listQuery.parse({}))).total).toBe(0);
+→ 129 await db.expertAssignment.update(
+Database error. Code: `23514`. Message: `new row for relation "ExpertAssignment" violates check constraint "ExpertAssignment_state_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/publication-access-gate.test.ts:129:3
+    127|   await expect(requireFixedUrl(ctx,a.row.id)).rejects.toMatchObject({ …
+    128|   expect((await listFixedUrls(ctx,listQuery.parse({}))).total).toBe(0);
+    129|   await db.expertAssignment.update({ where:{ id:assigned.id },data:{ e…
+       |   ^
+    130|   await expect(listFixedUrls(ctx,listQuery.parse({}))).rejects.toMatch…
+    131|   await expect(listApprovals(ctx,approvalQuery.parse({}))).rejects.toM…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 보관 서비스의 고정 URL 이력은 읽되 생성·변경·종료는 막는다
+AssertionError: promise resolved "{ …(9) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-03T12:57:26.130Z,
++   "formId": "a847026b-16a4-4fa1-a5c2-6bdf348ebb10",
++   "formTitle": "게시할 폼",
++   "id": "6f847ee2-a2a2-409e-b7b0-ea1808129bb0",
++   "name": "변경",
++   "slug": "19fe328a491f4a888693ab9aa3534f86",
++   "status": "active",
++   "url": "/url/19fe328a491f4a888693ab9aa3534f86",
++   "version": 2,
+  }
+
+ ❯ tests/server/publication-access-gate.test.ts:136:84
+    134|   const f=await fixture(), a=await fixed(f); await db.service.update({…
+    135|   expect((await requireFixedUrl(f.ctx,a.row.id)).id).toBe(a.row.id);
+    136|   await expect(updateFixedUrl(f.ctx,a.row.id,{ version:1,name:"변경" },r…
+       |                                                                                    ^
+    137|   await expect(revokeFixedUrl(f.ctx,a.row.id,1,randomUUID())).rejects.…
+    138|   await expect(db.$transaction(tx => createFixedUrl(f.ctx,{ name:"보관 중…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 내용 없는 고정 URL PATCH는 version·감사를 변경하지 않는다
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/publication-access-gate.test.ts:142:107
+    140| test("내용 없는 고정 URL PATCH는 version·감사를 변경하지 않는다",async () => {
+    141|   const f=await fixture(), a=await fixed(f), before=await db.auditEven…
+    142|   expect((await fixedPatch(req("/fixed-urls/" + a.row.id,f.editor.cook…
+       |                                                                                                           ^
+    143|   expect((await db.fixedUrl.findUniqueOrThrow({ where:{ id:a.row.id } …
+    144| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  tests/server/publication-access-gate.test.ts > 고정 URL과 승인 목록은 범위를 벗어난 페이지를 실제 마지막 페이지로 보정한다
+AssertionError: expected 99 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 99
+
+ ❯ tests/server/publication-access-gate.test.ts:147:85
+    145| test("고정 URL과 승인 목록은 범위를 벗어난 페이지를 실제 마지막 페이지로 보정한다",async () => {
+    146|   const f=await fixture(); await fixed(f);
+    147|   expect((await listFixedUrls(f.ctx,listQuery.parse({ page:99,pageSize…
+       |                                                                                     ^
+    148|   const updated=await draft(req("/forms/" + f.form.id + "/draft",f.edi…
+    149|   const a=await approval({ ...f,form:await db.form.findUniqueOrThrow({…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  12 failed | 2 passed (14)
+   Start at  21:57:15
+   Duration  14.34s (tests 89%, import 7%, transform 4%)
+

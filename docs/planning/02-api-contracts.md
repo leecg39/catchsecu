@@ -1,5 +1,13 @@
 # API·권한·화면 계약 설계안
 
+## P06-T06 서비스별 공급자 설정 (2026-10-04, 진행 중)
+
+`GET/POST/PATCH/DELETE /services/{id}/verification`을 구현했다. 조회는 현재 `form.read`, 변경은 현재 `integration.manage`와 서비스 grant·세션·회사 정책을 검사한다. 생성은 16~128자의 Idempotency-Key, 수정은 version, 삭제는 현재 버전의 If-Match를 요구한다. 알려지지 않은/중복 조회 키와 ready/비밀 키/공급자 URL 입력을 거부한다. 설정과 최근 20개 이력은 안전 DTO이며 `ready`/`sandboxVerified`는 false다.
+
+폼 편집기에서 서비스별 공급자 식별자·테스트/운영 환경·대기/사용 중지 설정을 관리한다. 설정 변경/중지/삭제는 이전 미소비 요청을 취소하고 생성 응답 캐시를 지운다. 삭제 후 재등록은 새 세대로 기록한다. 잠금·감사·생성 키 저장 뒤 실제 세션/배정/비밀번호 기한이 끝나면 설정·이력·감사·캐시를 같은 transaction에서 롤백한다.
+
+외부 공급자 선정/자격증명과 실제 sandbox 검증이 아직 없다. 공개 인증 요청·callback·전자서명 대상 문서 생성·제출과의 일회 영수증 소비 API는 구현 전이며 verify 폼 게시·접수는 계속 503이다. P06-T06 전체 완료 조건을 줄이지 않는다.
+
 endpoint는 독립 백엔드의 계약이다. [P00-T03 기준선](contracts/README.md)의 OpenAPI와 작업별 정책 표에 method·권한·범위·입력·응답·삭제/금지 규칙을 기록했다. `planned` 경로는 아직 구현되지 않은 제안이다. 하나의 범용 JSON 저장 API로 전 페이지를 처리하지 않는다.
 
 ## 공통 HTTP 계약
@@ -54,6 +62,28 @@ prefix: `/api/v1`. 매핑 CSV의 `CRUD /resources`는 다음을 의미한다. �
 
 `GET /audit-events`는 `scope=company|mine`, `kind=all|service|info|marketing|customer|member|authority|external|access|mail`, `serviceId`, `actorId`, ISO `from/to`, `search`, `searchField=action|resource|actor`, `page/pageSize`를 지원한다. `from`은 포함, `to`는 미포함이다. 회사 범위는 `audit.read` 역할과 현재 서비스 grant를 재검사하고, 본인 범위는 현재 회사의 본인 이벤트만 반환한다. 전체 관리자/보안/감사 역할 외에는 처리자명·대상 ID를 숨기며 원문 `detail`은 어떤 역할에도 응답하지 않는다. `GET /audit-events/export`는 같은 범위·필터의 CSV를 최대 5,000건까지 반환하며 초과 시 413을 준다. 성공한 다운로드는 원장에 요청 ID·처리자·건수를 기록하며 검색어 원문은 남기지 않는다. 원장에는 기존 DB 불변 트리거가 적용돼 있다. 모든 원천 이벤트·운영 보존·PDF 내보내기는 P12-T01의 남은 범위다.
 
+## 공개 조회·접수 계약 보강 (2026-10-04)
+
+`GET /public/forms/{token}`는 현재 회사/폼/서비스/게시본을 잠금 순서로 검사하고 현재 게시 버전의 질문/동의만 제공한다. 한도 도달은 `closed=true`로 표시한다. 종료/중지/회수/만료는 410이며 내부 관리자·게시/문서 버전 ID·토큰 암호문은 공개 DTO에 포함하지 않는다.
+
+`POST /public/forms/{token}/submissions`는 strict 입력과 16~128자의 Idempotency-Key를 검사한다. 한도 증가·응답/암호화 답변·검사 완료 파일 연결·동의 영수증/이벤트·감사는 같은 transaction이다. 같은 키/본문은 같은 ID/시각/submitted 상태를 반환하고 다른 유효 본문은 409다. 정상 마지막 한도 접수의 재전송은 한도를 다시 소비하지 않는다. 캐시 재전송도 잠금 대기 후 현재 공개 상태를 검사하며 종료는 410이다. 성공 여부가 불확실한 화면은 원래 본문/키·첨부로 재확인하고 새 입력을 추가 접수하지 않는다. [실행 증거와 남은 범위](../qa/P06-T01/README.md).
+
+## 응답 목록·CSV 내보내기 계약 (2026-10-03)
+
+`GET /forms/{id}/submissions`와 `GET /forms/{id}/submissions/export`는 같은 상태·응답 ID 검색·제출 기간 필터를 사용한다. from은 포함하고 to는 제외한다. 목록은 page/pageSize를 허용하고 빈 마지막 페이지를 보정한다. CSV는 같은 필터의 전체 결과를 UTF-8 BOM·CRLF로 반환한다. 현재 회사·서비스·사용자·세션·구성원/전문가·권한을 transaction 안에서 확인하고 응답 잠금 후 보유 상태를 재검사한다.
+
+CSV 열은 게시 버전·질문 순서·행렬의 행별로 구분하고 복수 선택은 JSON 배열을 유지한다. 보유 기한 종료·파기 중/완료 원문은 비우며 현재 파일 조회 권한에 따라 파일 이름을 제공한다. 파일 ID·저장소 키·다운로드 URL·정정 과거 원문·메모는 내보내지 않는다. 수식 방어와 5,000건·1,000열·20MB 상한을 적용한다. 성공 시 원문/검색어 없이 `submission.exported` 감사를 남긴다. 파일은 attachment·private no-store·nosniff와 행 수 헤더로 제공한다. [구현·검증과 남은 범위](../qa/P06-T02/README.md).
+
+## 비동기 응답 CSV 계약 (2026-10-04)
+
+`POST /exports`는 `{formId, filters}`와 Idempotency-Key로 201 작업 DTO를 반환한다. 같은 요청자/키/본문은 같은 ID를 반환하며 조건 변경은 409, 삭제·만료된 키 재사용은 410이다. 현재 응답 조회 권한·회사/서비스 범위를 확인한다. 요청자별 진행 중 작업 5개, 결과 100,000건·1,000열·20MB를 제한한다.
+
+`GET /exports?formId=…&page=…&pageSize=…`와 `GET /exports/{id}`는 요청자 본인의 현재 허용 범위에서 상태·version·진행·기한·안전 오류와 가능 동작을 반환한다. 검색 조건·암호화 값·원천 해시·요청 키는 노출하지 않는다. `POST /exports/{id}/cancel`과 `DELETE /exports/{id}`는 `{version}`을 받고 CSV 조각·조건·결과 해시를 제거한다. 삭제는 204이며 원천 응답을 유지한다.
+
+`GET /exports/{id}/download`는 현재 세션/권한·파일 이름 권한·원천 상태/해시·기한을 재검사하고 성공 다운로드 감사를 남긴다. 처리 중은 409, 취소·삭제·만료·원천 변경 결과는 410이다. 다른 회사/요청자 ID는 404다. 응답/파일 변경·권한 회수·파기에 연결한 DB trigger는 결과를 무효화하고 복사 원문을 같은 transaction에서 지운다. 결과는 최대 24시간이며 포함된 응답의 더 빠른 보유 기한을 따른다.
+
+처리기는 100건씩 암호화 CSV 조각과 진행을 저장하고 60초 lease·version·SKIP LOCKED로 중복 claim/옛 worker를 차단한다. `npm run worker:exports`는 내보내기 처리와 결과 만료 정리 전용이다. 화면은 현재 적용한 필터로 생성·진행 조회·다운로드·취소·삭제를 제공한다. 즉시/비동기 CSV는 같은 열/수식 방어 규칙을 사용한다. [구현 증거와 남은 게이트](../qa/P06-T02/exports/README.md).
+
 ## 역할 초안
 
 | 역할 | 범위 |
@@ -101,10 +131,23 @@ prefix: `/api/v1`. 매핑 CSV의 `CRUD /resources`는 다음을 의미한다. �
 - 응답 정정은 `PATCH /submissions/{id}`, 철회·보존 조치·파기 요청은 각각 `POST .../withdraw`, `.../hold`, `.../destruction-request`이다. 파기 요청 등록은 실제 원문 삭제 완료를 의미하지 않는다.
 - 상세 입력 계약과 구현 여부는 [생성된 OpenAPI](contracts/openapi.json)에 반영했다. 현재 121개 경로의 구현/계획 상태를 구분하며, 계획 단계 계약의 응답 스키마 등은 계속 보완한다.
 
+## 단계별 편집기 초안 저장 계약 (2026-10-03)
+
+- POST `/forms`는 생성 키를, PATCH `/forms/:id`와 `/forms/:id/draft`는 선택적 Idempotency-Key를 받는다. 자동저장은 키를 보내며 같은 키/본문/version의 재시도는 저장·감사를 추가하지 않는다. 같은 키/다른 본문은 409 `IDEMPOTENCY_MISMATCH`, 다른 키/오래된 version은 409 `VERSION_CONFLICT`다. 재전송 결과를 열기 전에도 현재 세션/이메일 인증/역할/전문가/서비스와 활성 상태를 검사한다.
+- 입력 후 1.2초 자동저장은 한 요청씩 처리하며 저장 중 추가 입력을 유지한다. 응답 유실은 정확히 같은 요청을 다시 확인한 후 새 입력을 최신 version으로 저장한다. 409 뒤에는 자동 덮어쓰기를 멈추고 수정본 다운로드·최신본 불러오기를 제공한다. 미완성 입력은 검증 안내와 함께 화면에 유지한다.
+- 최초 생성의 결과가 불확실하면 서비스 선택을 고정하고 같은 키를 재시도한다. 생성이 확정 거부되면 다른 서비스를 선택해 새 키로 생성한다. 생성된 폼의 서비스 ID는 변경하지 않는다.
+- 초안 PATCH 응답에는 공유 토큰을 포함하지 않는다. 과거 저장된 재전송 캐시에서도 토큰을 제거한다. 공유 화면의 GET `/forms/:id`는 현재 `form.publish` 권한을 검사하며 권한 회수 후 토큰을 반환하지 않는다.
+- 생성/basic-frame/v3/recipient/agreement/set/setting/share는 같은 formId를 사용한다. 질문 편집기는 기존 edit 링크도 지원한다. 제공/수집 문서 선택은 단계별로 나누고 서로 보존한다. 저장 완료 후 앞뒤/다음으로 이동하며 서버 재조회로 기기·새로고침 복원을 수행한다.
+- 게시 후 저장은 별도 새 초안을 만들며 공개 버전·문서·동의 표시는 유지한다. [P04-T02 검증](../qa/P04-T02/README.md)에 실제 production API와 PostgreSQL/재시작·편집 상태 시험을 기록한다. 수정 후 실제 브라우저 조작은 대기 중이다.
+
 ## 세션·2FA·게시 승인 구현 계약 (2026-10-02)
 
 - GET/PATCH/DELETE /security/policy. 변경/복원은 owner + 현재 암호 + tenantId + version. DELETE는 기본 정책 복원이며 행 삭제가 아니다.
 - GET/POST /forms/{id}/approvals. POST는 Idempotency-Key, 현재 form version, 메시지, 정책상 증빙 번호를 검사한다.
+- 게시·승인 요청·고정 URL 생성은 같은 키 재전송에도 현재 계정/세션/전문가/서비스 권한과 서비스·폼 활성 상태를 검사한다. 회수된 권한에는 캐시의 토큰·검토 메시지·고정 URL 결과를 반환하지 않는다.
+- 승인 이력/상세와 고정 URL 목록/상세는 transaction 안에서 현재 조회 범위를 다시 확인한다. 화면의 요청/검토/취소 가능 여부는 현재 구성원·grant·회사 정책으로 계산한다.
+- 고정 URL PATCH는 version과 이름/대상 폼 중 하나 이상을 요구한다. 대상 변경은 기존 서비스와 새 서비스의 게시 권한, 현재 유효한 게시본을 검사한다. Form을 먼저 잠근 뒤 FixedUrl을 잠가 재게시의 자동 연결과 변경/종료의 version 충돌을 유지한다.
+- 고정 URL/승인 목록과 폼 승인 이력은 범위를 벗어난 page를 마지막 페이지로 보정한다. 화면은 서버가 반환한 페이지를 표시한다. 고정 URL 목록은 이름·상태·서비스·정렬·페이지를 서버에서 처리한다.
 - GET /approvals, GET/DELETE /approvals/{id}, POST /approvals/{id}/decision. DELETE는 pending 취소이며 증거는 유지한다.
 - 승인 당시 snapshot과 정책 revision을 고정한다. 편집/승인 정책 변경으로 이전 요청을 무효화하고, 게시 전에 해시와 현재 담당자 권한을 다시 검사한다. 요청자와 담당자 분리는 현재 계약에서 강제하지 않는다.
 - 승인 담당 역할은 owner/admin/security 중 선택한다. owner는 복구 담당자로 항상 포함한다. security는 서비스별 form.read/form.approve 권한이 있어야 한다.
@@ -122,6 +165,10 @@ prefix: `/api/v1`. 매핑 CSV의 `CRUD /resources`는 다음을 의미한다. �
 - 근거: [비밀번호 정책 검증](../qa/password-policy/README.md). 사후 파기일·IP/SSO는 별도 미완료 범위이다.
 
 ## 첨부파일 구현 계약 (2026-10-02)
+
+2026-10-04 보강: 로그인 파일/업로드 요청은 현재 계정·이메일 인증·회사 소속/선택·서비스 권한·세션/비활동 기한·MFA/비밀번호 정책을 잠금 아래 재검사한다. 처리기와 외부 공유는 현재 발급자 권한을 별도로 검사한다. 파일 잠금·저장소 읽기/쓰기·감사 저장 후 기한을 다시 확인해 종료 요청은 이름/바이트를 반환하지 않고 성공 감사/변경을 롤백한다. 공유의 응답 보유 기한도 마지막 응답 직전에 검사한다.
+
+파일 목록 쿼리는 `submissionId`, `page`(1~100,000), `pageSize`(1~100, 기본 20)만 허용한다. 단건의 `submissionId`/`questionId`는 UUID와 stableKey를 검사하며 제출 파일은 정확한 조합이 필요하다. 미제출 구성원 파일은 본인 소유 범위로 읽는다. 공유 단건은 두 바인딩이 모두 필요하다. 중복·알 수 없는 쿼리는 422다. [실제 PostgreSQL·HTTP·재시작 검증](../qa/P06-T03/README.md).
 
 - POST /public/forms/{token}/uploads와 /uploads/init는 Idempotency-Key를 요구한다. 공개 업로드는 게시본·파일 질문·한도·스캐너 상태를, 구성원 업로드는 서비스 권한 또는 응답 정정 권한을 확인한다.
 - PUT /uploads/{id}/content는 raw bytes와 실제 MIME을 받고 10MB·크기·SHA-256·시그니처를 검증한다. POST /uploads/{id}/complete는 실제 ClamAV의 clean 결과만 활성화한다. GET/DELETE /uploads/{id}는 상태 조회·취소이다.
@@ -145,7 +192,7 @@ prefix: `/api/v1`. 매핑 CSV의 `CRUD /resources`는 다음을 의미한다. �
 
 ## 수집 목적·제공/수탁자 구현 계약 (2026-10-02)
 
-- `/processing-purposes`, `/recipients`의 GET은 `document.read` 및 현재 서비스 권한으로 목록을 조회한다. serviceId·search·status(active/archived/all)·page/pageSize·sort(createdAt/name)·direction을 받으며 ID를 보조 정렬로 사용한다. 회사·소속·권한이 바뀐 이전 context도 다시 검사한다.
+- `/processing-purposes`, `/recipients`의 GET은 `document.read` 및 현재 서비스 권한으로 목록을 조회한다. serviceId·search·status(active/archived/all)·page/pageSize·sort(createdAt/name)·direction을 받으며 ID를 보조 정렬로 사용한다. 읽기·변경·중복 요청 재전송 모두 transaction 안에서 현재 회사·활성 사용자·이메일 인증·유효 세션·구성원·역할·grant를 다시 검사한다. 전문가 서비스 범위는 활성/미만료 배정 서비스와 grant의 교집합이다. 보관 서비스의 조회·이력은 유지하고 변경은 거부한다. [현재 권한 검증](../qa/P05-T01/README.md).
 - POST는 `document.write`, 활성 서비스, `Idempotency-Key`를 요구한다. 필드·연결·중복 검사를 통과하면 본문·연결·개정본·감사를 함께 저장한다. 같은 키 재생 전에도 현재 권한을 확인한다.
 - `/{id}` GET은 상세, PATCH는 전체 허용 필드와 현재 version을 받는다. 회사·서비스 소속은 바꿀 수 없다. `/{id}/history`는 version 내림차순의 불변 개정본을 page/pageSize로 조회한다.
 - DELETE는 `If-Match`의 version으로 자료를 보관하고 204를 반환한다. `/{id}/restore` POST는 `{version}`으로 복원한다. 수정된 version·중복 이름·사용 중인 제공자 보관은 409, 보관된/다른 서비스 제공자 연결은 422이다.
@@ -163,10 +210,13 @@ prefix: `/api/v1`. 매핑 CSV의 `CRUD /resources`는 다음을 의미한다. �
 ## 구현 계약 — 문서·게시·서비스 표시 (2026-10-03)
 
 - documents: 목록/생성/상세/수정/보관/복원, options, preview, versions, publish/unpublish/revoke/apply-clause. 생성/게시 중복 요청은 같은 결과를 반환한다. 수정·상태 전이는 version을 검사한다.
+- 문서·문구·이력·미리보기·비공개 PDF·서비스 표시·폼의 문서 선택은 공통 `currentServiceScope`로 현재 사용자·이메일 인증·세션·구성원·역할·grant·전문가 배정/서비스를 transaction 안에서 다시 확인한다. 생성 재전송도 같은 검사를 적용한다.
+- 문서 목록·상세·변경·게시 응답의 `DocumentRecord.hasActivePublication`은 최신 게시 버전의 활성·미만료 링크 존재 여부다. 동일 본문과 최신 유효 링크가 있으면 중복 게시를 409로 거부한다. 최신 링크가 만료/회수되면 동일 내용으로 새 불변 버전을 게시할 수 있고, 이전 버전의 유효 링크는 유지한다. 이력은 만료 상태를 계산하며 만료 URL을 제공하지 않는다. OpenAPI의 실제 응답 스키마와 화면의 게시 가능 상태를 연결했다.
 - clause-templates: 목록/생성/상세/수정/보관/복원. document.write 권한과 같은 서비스·문서 종류를 적용 시 확인한다.
 - services/:id/consent-display/:kind: GET/PATCH. service.manage 권한, 두 탭별 version과 입력 엄격 검사, 외부 HTTPS 및 같은 서비스 게시 처리방침 연결.
 - public/documents/:token: 익명 GET, 현재 회사/서비스/문서/링크/만료 검사. 공개 스냅샷만 반환, no-store/no-referrer/noindex. 본문은 일반 문자열로 렌더링한다.
 - 공개 URL, 버전별 본문/해시, 경합 및 실제 DB·Ego 검증: [문서 보고서](../qa/documents/README.md).
+- 현재 권한·최신 게시본 만료/재게시·불변 문서/동의/PDF와 실제 서버 재시작: [P05-T02 검증](../qa/P05-T02/README.md). 수정 후 브라우저 조작은 대기 중이다.
 
 ## 구현 계약 — 게시 문서 PDF (2026-10-03)
 
@@ -185,6 +235,10 @@ prefix: `/api/v1`. 매핑 CSV의 `CRUD /resources`는 다음을 의미한다. �
 
 ## 구현 계약 — 외부 공유 (2026-10-03)
 
+2026-10-04 보강: 생성 재전송도 현재 로그인/파일 권한·폼/서비스와 실제 공유의 게시본·발급자·세대·기한을 검사한다. 변경·재발송·회수는 신규/이전 생성 캐시의 암호화 원문/본문 해시를 제거한다. 관리 작업과 인증 성공 감사 저장 후 실제 로그인/challenge/공유 기한을 검사하며 종료 시 변경·메일·인증 세션·감사를 롤백한다.
+
+공유 목록은 `formId`, `page`(1~100,000), `pageSize`(1~100), `status`, `search`(전체 이메일·최대 254자)만 허용한다. options는 `formId`, 로그/외부 응답 목록은 페이지 두 키만 허용한다. 중복/미지정 키는422이며 페이지를 현재 마지막 페이지로 보정한다. `permissions`·공유 `actions`·질문 `selectable`은 현재 서비스/폼/파일 권한을 반영한다. UI의 생성 응답 유실은 원래 본문/키로 재확인한다. [실행 검증과 남은 조건](../qa/P06-T04/README.md).
+
 - GET/POST /share-grants, GET/PATCH/DELETE /share-grants/:id, GET /share-grants/options, POST /share-grants/:id/resend, GET /share-grants/:id/events. 현재 share.manage + submission.read + 서비스 권한, 파일 항목은 file.read 추가. 생성은 멱등키, 수정/재발송은 version, 회수는 If-Match 필수.
 - 생성은 formId/formVersionId/email/questionIds/expiresAt, 수정은 고정된 버전에 대해 email/questionIds/expiresAt을 변경한다. 최대 90일·1~100개 질문. 수정·재발송 후 기존 코드와 세션 무효화, 새 초대 메일 작업을 원자 저장한다.
 - POST /viewer/challenges: formCode(UUID), invitationCode(43자), email, consent=true. 유효/무효 모두 `{id,expiresAt}` 202, 브라우저 HttpOnly 쿠키. 코드·토큰 미반환.
@@ -192,7 +246,15 @@ prefix: `/api/v1`. 매핑 CSV의 `CRUD /resources`는 다음을 의미한다. �
 - GET /viewer/session, POST /viewer/logout, GET /viewer/submissions[/:id], GET /viewer/files[/:id[/download]]. 회사·발급 구성원·서비스·공유·세션 상태를 매 요청 재평가한다.
 - 공유 파일은 submissionId/questionId(stableKey) 바인딩 필수. 현재 Answer의 허용 첨부만 조회하며 다운로드는 no-store·attachment·nosniff·sandbox CSP. 다른 범위 404, 종료 응답 410, 만료/회수된 인증 401. [검증](../qa/sharing/README.md).
 
-## 구현 계약 — 정보주체 조회·동의 철회 (2026-10-03)
+### 현재 정보주체 보완 계약 — P06-T05 (2026-10-04)
+
+- 회사→서비스→응답 잠금 뒤, 인증 세션 INSERT와 성공 감사 저장 뒤 실제 세션·링크·반환 자료 보유 기한을 검사한다. 지연 중 종료는401/404/422이며 인증 일회 소비·세션·철회 이벤트·suppression·성공 감사를 함께 롤백한다.
+- GET /subjects/me와 철회 상세는 쿼리를 받지 않는다. 목록은page/pageSize만 받으며 중복/알려지지 않은 키는422다. page는 현재 보유 자료의 마지막 페이지로 보정하고 UI는 반환한page/pageSize를 표시한다.
+- 이름/이메일 HMAC으로 본인확인 때 고정한DataSubject 범위의 현재 보유 동의만 반환한다. 새 회사/서비스의 정보주체 연결을 나중에 추가하지 않는다. 답변·연락처·관리자 메모·인증 비밀을DTO에서 제외한다.
+- 인증 쿠키 수명은DB 세션의 남은 시간 안으로 제한한다. subject 인증 메일worker는 사용/만료/현재 조회 범위 종료를 전달 전에 거부한다. 본인 철회 후 기존 예약 메일과 앞으로의 같은 서비스 메일을 차단하며 다른 서비스와 유효한 필수 인증은 별도로 검사한다.
+- 안전SubjectSession/Consent/Receipt/Event/Withdrawal과 페이지 응답 스키마·검색 파라미터를OpenAPI에 명시했다. [현재 검증](../qa/P06-T05/README.md).
+
+## 구현 계약 — 정보주체 조회·동의 철회 (2026-10-03; 이전 단계 기록)
 
 - POST /subjects/access-requests: `{name,email,consent:true}`. 매칭 여부와 관계없이 `{accepted:true}` 202와 브라우저 쿠키. 이메일별·전체 요청 제한, 10분 일회용 메일 링크. 불일치 자료에는 메일/인증 범위를 만들지 않는다.
 - POST /subjects/sessions: `{token}`과 요청 브라우저 쿠키 필수. 성공 시 `{id,expiresAt}` 201과 30분 HttpOnly·SameSite=Strict 쿠키. HTTPS에서 Secure. 링크 GET은 소비하지 않고 버튼의 POST에서 한 번 소비한다.
@@ -285,3 +347,34 @@ prefix: `/api/v1`. 매핑 CSV의 `CRUD /resources`는 다음을 의미한다. �
 - `POST /expert-assignments`는 운영자만 `{companyId,expertEmail,serviceIds,expiresAt}`로 활성·인증 계정을 배정하거나 만료/회수 배정을 재활성화한다. 기존 일반 구성원, 타 회사 서비스, 본인/운영자 계정, 중복 활성 배정은 거부한다.
 - `PATCH /expert-assignments/:id`는 version과 서비스 목록/만료일을 확인해 범위와 grant를 원자 교체한다. `DELETE`는 If-Match로 즉시 회수하고 grant 및 선택된 회사 세션을 해제한다. GET 서비스 API는 현재 배정과 grant의 교집합만 제공한다.
 - `POST /context {companyId}`는 전문가가 배정된 활성 회사와 서비스를 명시적으로 선택할 때만 세션 회사를 변경한다. 선택 전 전문가는 회사 데이터 API에 접근할 수 없다. 만료 후 worker 정리 전에도 요청 단계에서 403/404를 반환한다. [부분 검증](../qa/P03-T02/README.md).
+
+## 폼 목록·작업 권한 구현 계약 (2026-10-03)
+
+- GET /forms와 /forms/{id}의 actions는 현재 역할·서비스 grant·서비스/폼 보관·가져오기 양식·공개/중단/만료 상태를 확인해 미리보기/응답/편집/복사/템플릿/공유/중단/재개/보관/삭제 조건 조회 권한을 반환한다.
+- 응답은 submission.read가 있어야 안내한다. 응답 권한이 없는 목록 제목은 미리보기로 연결한다. checkDeletion은 삭제 조건을 열람할 작성 권한이며 참조된 폼도 사유를 확인할 수 있다. 실제 영구 삭제는 /deletion의 canPurge와 /purge에서 다시 검사한다.
+- 목록 permissions의 canCreate/canImport/canViewImports는 현재 조회 가능한 선택 서비스의 권한과 서비스 상태를 따른다. 서비스 미선택 조회는 해당 범위 중 허용 서비스가 있는지 검사한다. 역할 전체 capabilities로 서비스별 버튼을 판단하지 않는다.
+- 삭제 조건 DTO의 canReadResponses에 따라 응답/파기 관리 링크를 안내한다. 변경·생성/저장/복사/템플릿 사용 응답의 멱등 캐시에는 작업 권한을 저장하지 않는다. 작업 권한은 새 GET 응답에서 계산한다.
+
+### 템플릿 현재 권한·삭제 계약
+
+GET 목록/상세는 현재 역할·grant·세션·전문가 배정/만료·서비스 상태를 검사하고 작업과 활성 생성 대상 서비스를 반환한다. 목록은 strict 입력·생성일/제목 정렬·검색·회사/공용·페이지 보정을 처리한다. 전문가의 보관 서비스 양식은 숨기며 직접 구성원의 읽기는 유지한다. 생성 캐시는 회사/템플릿에 연결한다. version과 현재 작성 권한을 확인한 삭제는 신규·회사 구성원 범위의 이전 생성 캐시 내용을 원자 제거하고 생성 재전송은410이다. 독립 폼/다른 캐시는 유지한다. 생성/수정/사용 응답에는 현재 작업 권한을 캐시하지 않는다.
+
+
+## P07-T03 현재 파기 API (2026-10-04)
+
+요청은 항목별 현재 canApprove/canReject/canCancel/canReschedule/canRetry 권한을 반환한다. 두 목록은 권한 범위 내 검색·정렬·페이지 보정을 지원한다. 증명서 createdAt 정렬은 completedAt와 같은 의미다. 중복/미지원 쿼리는 변경·증명서 상세/다운로드에서도 422로 거절한다. 잠금 대기·감사 저장 뒤 실제 기한을 검사하며 무결성 확인 후에만 성공 열람 감사를 저장한다. [P07-T03 검증](../qa/P07-T03/README.md).
+
+## P07-T01 CSV API 보완 (2026-10-04)
+
+`GET /imports`는 필수 serviceId, page/pageSize, 제목·ID search, status, sort(createdAt/name), direction(asc/desc)을 지원하고 실제 마지막 페이지로 보정한다. `/rows`는 page/pageSize/errorsOnly만 받는다. 다른 쿼리와 중복 키는 422이며 `If-Match`는 안전한 양의 정수 십진 표현이다.
+
+목록·상세·변경의 `permissions`는 현재 역할·서비스·작업·파일 상태로 canEdit/canInspect/canValidate/canCommit/canRetry/canClean을 계산한다. 감사·생성 캐시 저장 뒤에도 세션/비밀번호/배정/보관 기한을 검사한다. 실패 CSV는 private/no-store이며 연결 응답이 만료되면 원문을 제외한다. [현재 검증](../qa/P07-T01/README.md).
+
+
+## P07-T02 현재 권한·사본 정리
+
+현재 작업 권한·정렬/페이지·중복 쿼리 거부, 현재 버전의 생성 재실행과 삭제/기한 종료 410을 적용했다. 마케팅 DELETE는 DB 확정 뒤 사본을 정리하고 cleanup.pending을 반환한다. 같은 DELETE로 실패 사본을 재시도하며 중복 이력은 없다. 마케팅 발송은 게시/SMTP 호출 직전에 현재 동의·임대를 검사한다. URL 정규화 전에 원래 URL의 예약 키를 두 API에 한정된 Proxy에서 거부한다.
+
+## 회사 2FA·보안 현황 (2026-10-04)
+
+GET/PATCH /security/mfa-policy, POST /security/mfa-policy/exceptions, GET/PATCH/DELETE /security/mfa-policy/exceptions/{id}, GET /security/status. 조회는 직접 소속 security.read, 변경은 본인 인증을 등록한 직접 owner·현재 비밀번호·tenantId·version이다. 등록은 Idempotency-Key를 요구한다. 예외는 최초 등록부터 최대 24시간이며 만료·삭제 뒤 기존 세션도 회사 접근을 거부한다. 등록 상태와 보안 확인은 현재 DB 값이며 법적 준수 판단을 대신하지 않는다.

@@ -1,0 +1,137 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:66380) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+stderr | tests/server/ip-access.test.ts > PostgreSQL IP CRUD and enforcement > owner CRUD normalizes ranges, preserves current replay and erases deleted request copies
+{"requestId":"e4fdf7c0-4db5-4d63-8366-a32e66a84a5f","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/ip-access.test.ts > PostgreSQL IP CRUD and enforcement > editing, disabling and deleting the owner's last allowed network rolls back
+{"requestId":"3e199ec3-3baa-4590-8aa0-7e26104e66e9","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/ip-access.test.ts > PostgreSQL IP CRUD and enforcement > simultaneous owner changes preserve one current allowed network
+{"requestId":"7ea5ac15-5baa-47c3-933c-8fd486b9e9fd","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+stderr | tests/server/ip-access.test.ts > PostgreSQL IP CRUD and enforcement > simultaneous owner changes preserve one current allowed network
+{"requestId":"8b66f7fe-c9e9-4818-bed5-743af89c3915","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError"}
+
+ ❯ tests/server/ip-access.test.ts (31 tests | 4 failed) 10649ms
+   ✓ IP network and trusted transport (20)
+     ✓ normalizes 192.0.2.7/24 167ms
+     ✓ normalizes 192.0.2.7 157ms
+     ✓ normalizes 2001:0DB8:0000:1::abcd/64 148ms
+     ✓ normalizes ::1 148ms
+     ✓ normalizes ::ffff:192.0.2.7/120 161ms
+     ✓ normalizes 0.0.0.0/0 194ms
+     ✓ rejects malformed localhost 214ms
+     ✓ rejects malformed 192.0.2.1:80 167ms
+     ✓ rejects malformed 192.168.001.1 153ms
+     ✓ rejects malformed fe80::1%eth0 153ms
+     ✓ rejects malformed [::1] 123ms
+     ✓ rejects malformed 192.0.2.1/33 111ms
+     ✓ rejects malformed ::1/129 117ms
+     ✓ rejects malformed ::ffff:192.0.2.7/64 149ms
+     ✓ rejects malformed 192.0.2.1/24/1 202ms
+     ✓ IPv4, IPv6 and mapped addresses respect both ends and address families 166ms
+     ✓ a direct peer ignores forged headers; proxy chains stop at the nearest untrusted hop 173ms
+     ✓ an attestation rejects tampering, expiry, future timestamps and missing signing key 159ms
+     ✓ native TCP peer 127.0.0.1 overwrites the attacker's original and raw headers 202ms
+     ✓ native TCP peer ::1 overwrites the attacker's original and raw headers 166ms
+   ❯ PostgreSQL IP CRUD and enforcement (11)
+     × owner CRUD normalizes ranges, preserves current replay and erases deleted request copies 463ms
+     × admin and security read; only current direct owner can mutate 387ms
+     ✓ foreign tenant IDs and stale versions cannot change rows 417ms
+     ✓ strict queries, validation, duplicate canonical networks and page clamping 370ms
+     ✓ policy activation requires a trusted matching IP and current password 970ms
+     × editing, disabling and deleting the owner's last allowed network rolls back 587ms
+     ✓ denied target-company selection does not mutate the current session 180ms
+     ✓ login chooses an allowed company and refuses when every company is blocked 408ms
+     ✓ a stale authorized context is checked again inside a service transaction 356ms
+     × simultaneous owner changes preserve one current allowed network 452ms
+     ✓ database rejects malformed CIDR, stale versions, tenant moves and an empty active policy 340ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/ip-access.test.ts > PostgreSQL IP CRUD and enforcement > owner CRUD normalizes ranges, preserves current replay and erases deleted request copies
+AssertionError: expected 500 to be 204 // Object.is equality
+
+- Expected
++ Received
+
+- 204
++ 500
+
+ ❯ tests/server/ip-access.test.ts:97:134
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/ip-access.test.ts > PostgreSQL IP CRUD and enforcement > admin and security read; only current direct owner can mutate
+PrismaClientKnownRequestError: 
+Invalid `db.user.findUniqueOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/ip-access.test.ts:108:96
+
+  105   expect((await POST(request("/security/ip-rules","POST",{tenantId:a,cidr:peer,description:"",enabled:true},cookies[role],peer,{"idempotency-key":randomUUID()}))).status).toBe(403);
+  106 }
+  107 expect((await GET(request("/security/ip-rules","GET",undefined,cookies.viewer))).status).toBe(403);
+→ 108 const owner=await db.user.findUniqueOrThrow(
+Database error. Code: `23514`. Message: `LAST_OWNER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/ip-access.test.ts:108:76
+    106|     }
+    107|     expect((await GET(request("/security/ip-rules","GET",undefined,coo…
+    108|     const owner=await db.user.findUniqueOrThrow({where:{email:emails[0…
+       |                                                                            ^
+    109|     expect((await list()).policy.canManage).toBe(false);
+    110|     expect((await POST(request("/security/ip-rules","POST",{tenantId:a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/ip-access.test.ts > PostgreSQL IP CRUD and enforcement > editing, disabling and deleting the owner's last allowed network rolls back
+AssertionError: expected 500 to be 204 // Object.is equality
+
+- Expected
++ Received
+
+- 204
++ 500
+
+ ❯ tests/server/ip-access.test.ts:142:155
+    140|     expect((await DELETE(request("/security/ip-rules/"+c.row.id,"DELET…
+    141|     expect(await db.ipRule.findUnique({where:{id:c.row.id}})).toMatchO…
+    142|     expect((await toggle(false)).status).toBe(200);expect((await DELET…
+       |                                                                                                                                                           ^
+    143|   });
+    144|   test("denied target-company selection does not mutate the current se…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/ip-access.test.ts > PostgreSQL IP CRUD and enforcement > simultaneous owner changes preserve one current allowed network
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/ip-access.test.ts:167:49
+    165|       DELETE(request("/security/ip-rules/"+first.row.id,"DELETE",{tena…
+    166|     ]);
+    167|     expect(responses.filter(r=>r.status===204)).toHaveLength(1);expect…
+       |                                                 ^
+    168|     expect(await db.ipRule.count({where:{tenantId:a,enabled:true}})).t…
+    169|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 27 passed (31)
+   Start at  06:38:48
+   Duration  13.23s (tests 81%, import 9%, transform 9%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/P11-T02/ip-tests.json
