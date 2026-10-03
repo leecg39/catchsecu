@@ -3,7 +3,8 @@ import { approvalForForm, requestApproval } from "@/server/approvals";
 import { z } from "zod";
 import { requireContext } from "@/server/context";
 import { body, fail, json, listQuery, route } from "@/server/http";
-import { archiveForm, copyForm, formDeletionState, formDto, formPatch, lockCurrentForm, publishForm, purgeForm, readForm, setFormFavorite, transitionForm, updateForm, updateFormDraft } from "@/server/forms";
+import { archiveForm, copyForm, designateFormRetention, formDeletionState, formDto, formPatch, lockCurrentForm, publishForm, purgeForm, readForm, setFormFavorite, transitionForm, updateForm, updateFormDraft } from "@/server/forms";
+import { retentionDesignationInput } from "@/contracts/forms";
 import { listSubmissions } from "@/server/submissions";
 import { idempotent } from "@/server/idempotency";
 import { submissionListQuery } from "@/contracts/submissions";
@@ -35,6 +36,10 @@ export const GET = route(async (request, requestId) => {
 });
 export const PATCH = route(async (request, requestId) => {
   const { id, action } = parts(request);
+  if (action === "retention") {
+    const ctx = await requireContext(request.headers, "form.write"), input = await body(request, retentionDesignationInput);
+    return json(await designateFormRetention(ctx, id, input, requestId));
+  }
   if (action && action !== "draft") fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   const ctx = await requireContext(request.headers, "form.write"), input = await body(request, formPatch);
   const key = request.headers.get("idempotency-key");

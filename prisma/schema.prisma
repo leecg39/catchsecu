@@ -627,7 +627,6 @@ model SecurityPolicy {
   retentionDays   Int      @default(365)
   automaticDestruction Boolean @default(false)
   allowRetentionAdjustment Boolean @default(false)
-  ipRestriction   Boolean  @default(false)
   version         Int      @default(1)
   updatedAt       DateTime @updatedAt
 }
@@ -946,7 +945,7 @@ model FormVersion {
   consentDisplay   Json?
   marketing        Json?
   receiptEvidenceVersion Int @default(0)
-  retentionDays    Int      @default(365)
+  retentionDays    Int?
   maxResponses     Int      @default(100)
   showSubmitNotice Boolean  @default(true)
   publishedAt      DateTime?

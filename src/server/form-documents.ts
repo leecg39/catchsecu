@@ -5,6 +5,7 @@ import type { ConsentDisplaySnapshot, DocumentSelection, FormConsentBundle, Form
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
 import { documentScope } from "./documents";
+import { companyRetentionDays } from "./security-policy";
 import { fail } from "./http";
 
 export const consentVersionInclude = { documentBindings: { orderBy: { order: "asc" as const }, include: { documentVersion: true } } };
@@ -21,6 +22,10 @@ export function consentBundle(version: ConsentVersion): FormConsentBundle {
 function maximumRetention(snapshot: DocumentSnapshot) {
   const days = snapshot.purposes.filter(item => item.retentionMode === "days" && item.retentionDays !== null).map(item => item.retentionDays!);
   return days.length ? Math.min(...days) : null;
+}
+export function bindingMaximumRetention(bindings: { documentVersion: { snapshot: unknown } }[]) {
+  const maxima = bindings.map(binding => maximumRetention(binding.documentVersion.snapshot as unknown as DocumentSnapshot)).filter((days): days is number => days !== null);
+  return maxima.length ? Math.min(...maxima) : null;
 }
 async function assertDocumentAccess(tx: Transaction, ctx: Context, serviceId: string) {
   const scope = await documentScope(tx, ctx, "document.read");
@@ -58,9 +63,10 @@ async function captureDisplay(tx: Transaction, tenantId: string, serviceId: stri
   return { schemaVersion: 1, kind, version: value.version, name: names[value.nameMode as keyof typeof names], startText: value.startText,
     processorText: value.processorText, policyText: value.policyText, requiredText: value.requiredText, optionalText: value.optionalText, policy };
 }
-export async function validateDocumentSelections(tx: Transaction, ctx: Context, serviceId: string, selections: DocumentSelection[], retentionDays: number) {
+export async function validateDocumentSelections(tx: Transaction, ctx: Context, serviceId: string, selections: DocumentSelection[], retentionDays: number | null) {
   if (!selections.length) return [];
   await assertDocumentAccess(tx, ctx, serviceId);
+  const days = retentionDays ?? await companyRetentionDays(tx, ctx.tenantId);
   const rows = await tx.documentVersion.findMany({ where: { id: { in: selections.map(item => item.documentVersionId) }, tenantId: ctx.tenantId, serviceId,
     document: { status: "published", type: { in: ["consent", "overseas_transfer"] } },
     publications: { some: { status: "active", OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] } } } });
@@ -68,11 +74,11 @@ export async function validateDocumentSelections(tx: Transaction, ctx: Context, 
   if (new Set(rows.map(row => row.documentId)).size !== rows.length) fail(422, "DUPLICATE_CONSENT_DOCUMENT", "한 문서에서는 하나의 게시 버전만 선택해주세요.");
   for (const row of rows) {
     const maximum = maximumRetention(row.snapshot as unknown as DocumentSnapshot);
-    if (maximum !== null && retentionDays > maximum) fail(422, "CONSENT_RETENTION_MISMATCH", `폼의 보유 기간을 선택한 동의서의 ${maximum}일 이내로 설정해주세요.`);
+    if (maximum !== null && days > maximum) fail(422, "CONSENT_RETENTION_MISMATCH", `폼의 보유 기간을 선택한 동의서의 ${maximum}일 이내로 설정해주세요.`);
   }
   return selections.map(selection => rows.find(row => row.id === selection.documentVersionId)!);
 }
-export async function writeFormConsent(tx: Transaction, ctx: Context, serviceId: string, formVersionId: string, content: { documentConsents?: DocumentSelection[]; retentionDays: number }) {
+export async function writeFormConsent(tx: Transaction, ctx: Context, serviceId: string, formVersionId: string, content: { documentConsents?: DocumentSelection[]; retentionDays: number | null }) {
   const selections = content.documentConsents ?? [], versions = await validateDocumentSelections(tx, ctx, serviceId, selections, content.retentionDays);
   const collection = await captureDisplay(tx, ctx.tenantId, serviceId, "collection");
   const thirdParty = selections.some(item => item.kind === "third_party") ? await captureDisplay(tx, ctx.tenantId, serviceId, "third_party") : null;

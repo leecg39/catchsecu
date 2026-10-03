@@ -17,10 +17,10 @@ export function validateDocumentConsents(version: ConsentVersion, keys: string[]
   if (version.documentBindings.some(binding => binding.required && !keys.includes(binding.id)))
     fail(422, "DOCUMENT_CONSENT_REQUIRED", "필수 문서에 대한 동의가 필요합니다.");
 }
-function evidenceFor(version: ConsentVersion, submissionId: string, receiptId: string, grantedAt: Date, generalConsent: boolean, keys: string[]): ConsentEvidence {
+function evidenceFor(version: ConsentVersion, submissionId: string, receiptId: string, grantedAt: Date, generalConsent: boolean, keys: string[], policyDays: number): ConsentEvidence {
   const bundle = consentBundle(version);
   return { schemaVersion: 1, receiptId, submissionId, grantedAt: grantedAt.toISOString(), formTitle: version.title,
-    formVersion: version.number, formBody: version.body, purpose: version.consentPurpose, retentionDays: version.retentionDays,
+    formVersion: version.number, formBody: version.body, purpose: version.consentPurpose, retentionDays: version.retentionDays ?? policyDays,
     generalConsent, bundle: { display: bundle.display, documents: bundle.documents.filter(document => keys.includes(document.key)) } };
 }
 function displayText(display: ConsentDisplaySnapshot | null): string[] {
@@ -49,20 +49,20 @@ async function evidencePdf(evidence: ConsentEvidence) {
     text: renderConsentEvidence(evidence), contentHash, version: evidence.formVersion, publishedAt: new Date(evidence.grantedAt), label: "동의 영수증 · 폼 버전" });
   return { ...file, contentHash };
 }
-export async function preflightConsentReceipt(version: ConsentVersion) {
+export async function preflightConsentReceipt(version: ConsentVersion, policyDays: number) {
   if (version.receiptEvidenceVersion !== 1) return;
   // Include all optional documents too, so every allowed submission fits the renderer before publishing.
   await evidencePdf(evidenceFor(version, "00000000-0000-4000-8000-000000000001", "00000000-0000-4000-8000-000000000002",
-    new Date("2026-01-01T00:00:00.000Z"), true, version.documentBindings.map(binding => binding.id)));
+    new Date("2026-01-01T00:00:00.000Z"), true, version.documentBindings.map(binding => binding.id), policyDays));
 }
-export async function createConsentReceipt(tx: Transaction, version: ConsentVersion, submissionId: string, generalConsent: boolean, keys: string[]) {
+export async function createConsentReceipt(tx: Transaction, version: ConsentVersion, submissionId: string, generalConsent: boolean, keys: string[], policyDays: number) {
   if (!generalConsent && !keys.length) return;
   const id = randomUUID(), grantedAt = new Date();
-  const evidence = version.receiptEvidenceVersion === 1 ? evidenceFor(version, submissionId, id, grantedAt, generalConsent, keys) : null;
+  const evidence = version.receiptEvidenceVersion === 1 ? evidenceFor(version, submissionId, id, grantedAt, generalConsent, keys, policyDays) : null;
   const file = evidence ? await evidencePdf(evidence) : null;
   const receipt = await tx.consentReceipt.create({ data: {
-    id, tenantId: version.tenantId, submissionId, purpose: version.consentPurpose, retentionDays: version.retentionDays, grantedAt,
-    documentHash: file?.contentHash ?? tokenHash(JSON.stringify({ versionId: version.id, purpose: version.consentPurpose, days: version.retentionDays })),
+    id, tenantId: version.tenantId, submissionId, purpose: version.consentPurpose, retentionDays: version.retentionDays ?? policyDays, grantedAt,
+    documentHash: file?.contentHash ?? tokenHash(JSON.stringify({ versionId: version.id, purpose: version.consentPurpose, days: version.retentionDays ?? policyDays })),
     evidenceVersion: evidence ? 1 : 0, evidenceCipher: evidence ? encrypt(evidence) : null,
     pdfCipher: file ? encrypt(Buffer.from(file.bytes).toString("base64")) : null, pdfHash: file?.pdfHash,
   } });

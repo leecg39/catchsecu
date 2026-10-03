@@ -1,7 +1,11 @@
-import type { z } from "zod";
+import { z } from "zod";
 import type { formContentSchema } from "./domains";
 import type { Answers, MatrixRows } from "./questions";
 
+export const retentionDesignationInput = z.object({
+  version: z.number().int().positive(),
+  retentionDays: z.number().int().min(1).max(36500),
+}).strict();
 export type FormContent = z.infer<typeof formContentSchema>;
 export type Question = FormContent["questions"][number];
 export type FormActions = { preview: boolean; responses: boolean; edit: boolean; copy: boolean; registerTemplate: boolean;

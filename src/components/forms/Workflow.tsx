@@ -162,7 +162,10 @@ function Settings({ initial, path }: { initial: FormRecord; path: string }) {
     </> : <>{!recipient && <>
       <label><input type="checkbox" checked={content.consentRequired} onChange={event => update({ consentRequired: event.target.checked })} /> 개인정보 수집·이용 동의를 받습니다.</label>
       <label>수집·이용 목적<input className="cs-input" aria-label="수집·이용 목적" maxLength={3000} placeholder="수집·이용 목적을 입력해주세요" value={content.consentPurpose} onChange={event => update({ consentPurpose: event.target.value })} /></label>
-      <label>보유·이용 기간 (일)<input className="cs-input" aria-label="보유·이용 기간" type="number" min="1" max="36500" value={content.retentionDays} onChange={event => update({ retentionDays: Number(event.target.value) })} /></label>
+      <label className="member-check"><input type="checkbox" checked={content.retentionDays === null} onChange={event => update({ retentionDays: event.target.checked ? null : 365 })} /> 보유 기간 미지정 (제출 시점의 회사 기본 보유 기간 적용)</label>
+      {content.retentionDays !== null
+        ? <label>보유·이용 기간 (일)<input className="cs-input" aria-label="보유·이용 기간" type="number" min="1" max="36500" value={content.retentionDays} onChange={event => update({ retentionDays: Number(event.target.value) })} /></label>
+        : <p>이 폼의 응답은 접수 시점의 회사 기본 보유 기간으로 보유·이용 기간을 계산합니다. 회사 정책 변경은 이후 접수 건부터 반영됩니다.</p>}
       </>}{recipient && <p>제공받는 자와 항목·목적·기간을 담은 게시 문서를 연결합니다. 수집·이용 문서는 다음 단계에서 설정합니다.</p>}
       <FormDocumentsEditor serviceId={form.serviceId} selections={content.documentConsents ?? []} kind={recipient ? "third_party" : "collection"}
         stored={Object.fromEntries((form.content.documentConsents ?? []).map((selection, index) => [selection.documentVersionId, form.consentBundle?.documents[index]]))}

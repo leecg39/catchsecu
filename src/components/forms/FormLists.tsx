@@ -23,6 +23,7 @@ function ManageForms() {
   const [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20), [archive, setArchive] = useState<FormRecord>();
   const [sort, setSort] = useState("createdAt"), [direction, setDirection] = useState("desc");
   const [preview, setPreview] = useState<FormRecord>(), [remove, setRemove] = useState<FormRecord>();
+  const [designate, setDesignate] = useState<FormRecord>();
   const [error, setError] = useState(""), [message, setMessage] = useState(""), [busy, setBusy] = useState("");
   const copyKeys = useRef(new Map<string, string>());
   const params = new URLSearchParams({ search, page: String(page), pageSize: String(pageSize), favorite: String(favorite), sort, direction });
@@ -67,10 +68,11 @@ function ManageForms() {
           formStatus[form.status], form.serviceName,
           form.actions?.responses ? <Link key="responses" href={"/form/manage/applicant/" + form.id}>{form.title}</Link> : <button key="preview-title" className="cs-link" onClick={() => setPreview(form)}>{form.title}</button>, form.ownerName,
           form.publication ? form.publication.responseCount + " / " + form.publication.maxResponses : "-",
-          new Date(form.createdAt).toLocaleDateString("ko-KR"), form.content.retentionDays + "일",
+          new Date(form.createdAt).toLocaleDateString("ko-KR"), form.content.retentionDays === null ? "미지정" : form.content.retentionDays + "일",
           <div key="actions" className="forms-row-actions">
             {form.actions?.preview && <button disabled={!!busy} onClick={() => setPreview(form)}>미리보기</button>}
             {form.actions?.edit && <Link className="cs-link" href={"/form/ai/create?formId=" + form.id}>편집</Link>}
+            {form.actions?.edit && form.content.retentionDays === null && <button disabled={!!busy} onClick={() => { setError(""); setDesignate(form); }}>보유 지정</button>}
             {form.actions?.registerTemplate && <Link className="cs-link" href={"/form/ai/create?templateEdit=new&formId=" + form.id}>템플릿 등록</Link>}
             {form.actions?.copy && <button disabled={!!busy} onClick={() => {
                 const key = copyKeys.current.get(form.id) ?? crypto.randomUUID();
@@ -95,7 +97,21 @@ function ManageForms() {
       <ActionButton disabled={!!busy} onClick={() => perform(archive.id, async () => {
         await api("/forms/" + archive.id, { method: "DELETE", headers: { "If-Match": String(archive.version) } }); setArchive(undefined);
       }, "캐치폼을 보관했습니다.")}>보관</ActionButton></Modal>}
+    {designate && <DesignateRetention key={designate.id} form={designate} busy={!!busy} error={error} onSaved={() => setDesignate(undefined)} />}
   </>;
+}
+function DesignateRetention({ form, busy, error, onSaved }: { form: FormRecord; busy: boolean; error: string; onSaved: () => void }) {
+  const [days, setDays] = useState(365), [confirmed, setConfirmed] = useState(false);
+  return <Modal title="보유 기간 사후 지정" onClose={() => { if (!busy) onSaved(); }}>
+    <div className="cs-stack">
+      <p>“{form.title}” 캐치폼은 보유 기간이 미지정되어 접수 시점의 회사 기본 보유 기간이 적용되고 있습니다. 이 폼의 보유 기간을 직접 지정합니다.</p>
+      <label className="cs-label">보유 기간 (일)<input className="cs-input" aria-label="지정할 보유 기간" type="number" min={1} max={36500} value={days} onChange={event => setDays(Number(event.target.value))} /></label>
+      <label><input type="checkbox" checked={confirmed} disabled={busy} onChange={event => setConfirmed(event.target.checked)} /> 이미 접수된 응답의 보유 기한은 그대로 유지되고 이후 접수 건부터 지정한 기간이 적용되는 것을 확인했습니다.</label>
+      {error && <p role="alert">{error}</p>}
+      <ActionButton disabled={busy || !confirmed || !Number.isInteger(days) || days < 1 || days > 36500}
+        onClick={() => { void api("/forms/" + form.id + "/retention", { method: "PATCH", body: JSON.stringify({ version: form.version, retentionDays: days }) }).then(onSaved); }}>보유 기간 지정</ActionButton>
+    </div>
+  </Modal>;
 }
 function FormPreview({ id }: { id: string }) {
   const result = useResource<FormRecord>("/forms/" + id), form = result.data;
@@ -105,7 +121,7 @@ function FormPreview({ id }: { id: string }) {
     <p style={{ whiteSpace: "pre-wrap" }}>{form.content.body}</p>{form.content.questions.map((question, index) => <section className="forms-note" key={question.id}>
       <h3>Q{index + 1}. {question.label} {question.required && "(필수)"}</h3><p>{question.type}</p>
       {question.options?.length ? <ul>{question.options.map(option => <li key={option}>{option}</li>)}</ul> : null}<QuestionSummary question={question} questions={form.content.questions} />
-    </section>)}<p>보유 기간 {form.content.retentionDays}일 · 최대 응답 {form.content.maxResponses}건 · {form.content.verify ? "본인인증 사용" : "본인인증 미사용"}</p>
+    </section>)}<p>보유 기간 {form.content.retentionDays === null ? "미지정 (회사 기본 보유 기간 적용)" : form.content.retentionDays + "일"} · 최대 응답 {form.content.maxResponses}건 · {form.content.verify ? "본인인증 사용" : "본인인증 미사용"}</p>
     <p>개인정보 동의: {form.content.consentRequired ? "필수" : "선택"} · {form.content.consentPurpose || "별도 목적 없음"}</p>
     <ConsentDisplay display={form.consentBundle?.display} /><ConsentDocuments bundle={form.consentBundle} /></div>;
 }

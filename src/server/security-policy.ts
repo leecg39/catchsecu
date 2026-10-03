@@ -15,6 +15,7 @@ export function policyDto(policy: SecurityPolicy, ctx: Context) {
     approvalRoles: policy.approvalRoles, approvalReferenceRequired: policy.approvalReferenceRequired,
     approvalRequestTemplate: policy.approvalRequestTemplate, approvalRevision: policy.approvalRevision,
     automaticDestruction: policy.automaticDestruction, allowRetentionAdjustment: policy.allowRetentionAdjustment,
+    retentionDays: policy.retentionDays,
     version: policy.version, updatedAt: policy.updatedAt, canManage: ctx.member.role === "owner" };
 }
 export async function readPolicy(ctx: Context) {
@@ -34,6 +35,12 @@ export async function lockPolicy(tx: Transaction, tenantId: string) {
   const policy = await tx.securityPolicy.findUnique({ where: { tenantId } });
   if (!policy) fail(409, "POLICY_REQUIRED", "회사 보안 정책이 없습니다.");
   return policy;
+}
+// 보유 기간을 지정하지 않은 폼은 제출·게시 시점의 회사 기본 보유 기간으로 해석한다.
+export async function companyRetentionDays(tx: Transaction, tenantId: string) {
+  const policy = await tx.securityPolicy.findUnique({ where: { tenantId }, select: { retentionDays: true } });
+  if (!policy) fail(409, "POLICY_REQUIRED", "회사 보안 정책이 없습니다.");
+  return policy.retentionDays;
 }
 export async function updatePolicy(ctx: Context, version: number, settings: z.infer<typeof policySettings>, requestId: string, reset = false) {
   if (ctx.member.role !== "owner") fail(403, "FORBIDDEN", "최상위 관리자만 회사 보안 정책을 변경할 수 있습니다.");

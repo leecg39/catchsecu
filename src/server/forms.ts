@@ -12,7 +12,7 @@ import { fail, listQuery } from "./http";
 import { audit } from "./audit";
 import { decrypt, encrypt, opaqueToken, tokenHash } from "./crypto";
 import { formContentSchema, formInput, validateFormForPublish } from "@/contracts/domains";
-import { consentBundle, consentVersionInclude, writeFormConsent, validateFormDocuments } from "./form-documents";
+import { consentBundle, consentVersionInclude, writeFormConsent, validateFormDocuments, bindingMaximumRetention } from "./form-documents";
 import { formScope, lockFormService } from "./form-access";
 import { cloneFormContent } from "@/contracts/form-copy";
 import { conditionSchema, rowSchema, selectionLimitsSchema, validateQuestionDefinitions } from "@/contracts/questions";
@@ -20,6 +20,7 @@ import { preflightConsentReceipt } from "./consent-receipts";
 import { assertQuota } from "./entitlements";
 import { invalidateFormCache } from "./form-cache";
 import type { FormActions } from "@/contracts/forms";
+import { retentionDesignationInput } from "@/contracts/forms";
 
 export type FormContent = z.infer<typeof formContentSchema>;
 export const versionInclude = { ...consentVersionInclude, questions: { orderBy: { order: "asc" as const }, include: { options: { orderBy: { order: "asc" as const } } } } };
@@ -63,8 +64,11 @@ export function formDto(form: StoredForm, ctx: Context) {
       token: roleCan(ctx.member.role, "form.publish") && (["owner", "admin"].includes(ctx.member.role) || ctx.member.grants.some(grant => grant.serviceId === form.serviceId && grant.capabilities.includes("form.publish"))) ? decrypt<string>(publication.tokenCipher) : undefined } : null,
   };
 }
-export function fingerprint(version: StoredVersion) {
-  return createHash("sha256").update(JSON.stringify({ title: version.title, content: contentDto(version),
+// 보유 기간을 지정하지 않은 초안은 지문 계산 시점의 회사 기본 보유 기간으로 반영한다.
+// 회사 기본값이 바뀌면 지문이 달라져 진행 중 승인이 자동으로 무효화된다.
+export function fingerprint(version: StoredVersion, policyRetentionDays?: number) {
+  return createHash("sha256").update(JSON.stringify({ title: version.title,
+    content: { ...contentDto(version), ...(version.retentionDays === null && policyRetentionDays !== undefined ? { retentionDays: policyRetentionDays } : {}) },
     ...(version.receiptEvidenceVersion === 1 ? { consentBundle: consentBundle(version) } : {}) })).digest("hex");
 }
 function memberCan(ctx: Context, serviceId: string, capability: Capability) {
@@ -194,7 +198,7 @@ export async function publishForm(tx: Transaction, ctx: Context, id: string, inp
   const content = contentDto(draft);
   const approval = await tx.approvalRequest.findFirst({ where: { tenantId: ctx.tenantId, formId: id,
     formVersionId: draft.id, status: "approved", policyRevision: policy.approvalRevision,
-    contentHash: fingerprint(draft) }, orderBy: { createdAt: "desc" } });
+    contentHash: fingerprint(draft, policy.retentionDays) }, orderBy: { createdAt: "desc" } });
   if (policy.requireApproval && !approval) fail(409, "APPROVAL_REQUIRED", "현재 초안과 정책에 대한 게시 승인이 필요합니다.");
   if (approval) {
     const reviewer = await tx.membership.findFirst({ where: { id: approval.decidedBy!, tenantId: ctx.tenantId, status: "active" }, include: { grants: true, user: { select: { status: true } } } });
@@ -205,7 +209,7 @@ export async function publishForm(tx: Transaction, ctx: Context, id: string, inp
   }
   try { validateFormForPublish(content); } catch (error) { fail(422, "INVALID_FORM", error instanceof Error ? error.message : "폼 내용을 확인해주세요."); }
   await validateFormDocuments(tx, ctx, form.serviceId, draft);
-  await preflightConsentReceipt(draft);
+  await preflightConsentReceipt(draft, policy.retentionDays);
   await validateFormDocuments(tx, ctx, form.serviceId, draft);
   if (content.verify) fail(503, "IDENTITY_PROVIDER_REQUIRED", "본인인증 공급자 연결 후 게시할 수 있습니다.");
   if (content.questions.some(question => question.type === "파일 업로드")) await requireFileScanner();
@@ -224,6 +228,30 @@ export async function publishForm(tx: Transaction, ctx: Context, id: string, inp
   await tx.form.update({ where: { id }, data: { status: "published", publishedVersionId: draft.id } });
   await audit(tx, ctx, requestId, "form.published", "form", id, ["publishedVersion"], form.serviceId);
   return { id: publication.id, token, version: input.version + 1, url: "/projects/" + token + "/form" };
+}
+// 보유 기간을 지정하지 않은 폼의 사후 지정. 이미 지정된 값은 바꿀 수 없고
+// 이전 제출의 원래 보유 기한은 그대로 유지되며 이후 제출부터 지정값이 적용된다.
+export async function designateFormRetention(ctx: Context, id: string, input: z.infer<typeof retentionDesignationInput>, requestId: string) {
+  return db.$transaction(async tx => {
+    const { form } = await lockCurrentForm(tx, ctx, id, "form.write", true);
+    if (form.version !== input.version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    const versions = await tx.formVersion.findMany({ where: { tenantId: ctx.tenantId, formId: id },
+      include: { documentBindings: { orderBy: { order: "asc" as const }, include: { documentVersion: true } } } });
+    const unspecified = versions.filter(version => version.retentionDays === null);
+    if (!unspecified.length) fail(409, "RETENTION_ALREADY_SET", "이 폼에는 이미 보유 기간이 지정되어 있습니다.");
+    for (const version of unspecified) {
+      if (!version.documentBindings.length) continue;
+      const maximum = bindingMaximumRetention(version.documentBindings);
+      if (maximum !== null && input.retentionDays > maximum)
+        fail(422, "CONSENT_RETENTION_MISMATCH", `지정할 보유 기간을 연결된 동의서의 ${maximum}일 이내로 설정해주세요.`);
+    }
+    await tx.formVersion.updateMany({ where: { tenantId: ctx.tenantId, id: { in: unspecified.map(version => version.id) } },
+      data: { retentionDays: input.retentionDays } });
+    await tx.form.update({ where: { id }, data: { version: { increment: 1 } } });
+    await audit(tx, ctx, requestId, "form.retention_designated", "form", id, ["retentionDays"], form.serviceId);
+    const stored = await tx.form.findUniqueOrThrow({ where: { id }, include: formInclude });
+    return formReadDto(stored, await currentDtoContext(tx, ctx));
+  }, { timeout: 15000 });
 }
 export async function archiveForm(ctx: Context, id: string, version: number, requestId: string) {
   return db.$transaction(async tx => {

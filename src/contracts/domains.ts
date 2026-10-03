@@ -13,7 +13,7 @@ export const formContentSchema = z.object({
   bold: z.boolean().optional(),
   consentRequired: z.boolean(),
   consentPurpose: z.string().max(3000),
-  retentionDays: z.number().int().min(1).max(36500),
+  retentionDays: z.number().int().min(1).max(36500).nullable(),
   maxResponses: z.number().int().min(1).max(1000000),
   showSubmitNotice: z.boolean().optional(),
   documentConsents: formDocumentSelections.optional(),
@@ -43,12 +43,6 @@ export const invitationInput = z.object({
   serviceIds: z.array(z.uuid()).min(1).max(100),
 }).strict();
 export { documentInput } from "./documents";
-export const securityInput = z.object({
-  minPassword: z.number().int().min(12).max(128),
-  sessionMinutes: z.number().int().min(5).max(10080),
-  requireMfa: z.boolean(), requireApproval: z.boolean(),
-  retentionDays: z.number().int().min(1).max(36500), ipRestriction: z.boolean(),
-}).strict();
 
 // Cross-field publication validation stays stricter than draft saving.
 export function validateFormForPublish(content: z.infer<typeof formContentSchema>) {

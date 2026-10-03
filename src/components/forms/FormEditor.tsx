@@ -139,7 +139,8 @@ function Editor({ initial, initialTemplate, templateMode, path, services }: { in
         {templateMode && <Panel><h2>동의 및 응답 설정</h2><div className="cs-stack">
           <label><input type="checkbox" checked={content.consentRequired} onChange={event => update({ consentRequired: event.target.checked })} />개인정보 수집·이용 동의 필수</label>
           <label className="cs-label">수집·이용 목적<textarea className="cs-input" aria-label="수집·이용 목적" maxLength={3000} value={content.consentPurpose} onChange={event => update({ consentPurpose: event.target.value })} /></label>
-          <label className="cs-label">보유 기간 (일)<input className="cs-input" aria-label="보유 기간" type="number" min={1} max={36500} value={content.retentionDays} onChange={event => update({ retentionDays: Number(event.target.value) })} /></label>
+          <label className="member-check"><input type="checkbox" checked={content.retentionDays === null} onChange={event => update({ retentionDays: event.target.checked ? null : 365 })} />보유 기간 미지정 (제출 시점의 회사 기본 보유 기간 적용)</label>
+          {content.retentionDays !== null && <label className="cs-label">보유 기간 (일)<input className="cs-input" aria-label="보유 기간" type="number" min={1} max={36500} value={content.retentionDays} onChange={event => update({ retentionDays: Number(event.target.value) })} /></label>}
           <label className="cs-label">최대 응답 수<input className="cs-input" aria-label="최대 응답 수" type="number" min={1} max={1000000} value={content.maxResponses} onChange={event => update({ maxResponses: Number(event.target.value) })} /></label>
           <label><input type="checkbox" checked={!!content.showSubmitNotice} onChange={event => update({ showSubmitNotice: event.target.checked })} />제출 완료 안내 표시</label>
         </div></Panel>}
