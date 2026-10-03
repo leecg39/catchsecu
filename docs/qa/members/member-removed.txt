@@ -1,0 +1,154 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 풀스택 기능 검증"(30): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=649]
+        container
+          text "서비스명"
+          text "기본 서비스"
+        container
+          text "외부 ⓘ"
+          text "기본 서비스"
+          image
+      container [ref=650]
+        anchor [ref=651, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        button [ref=652]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=653]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=654]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=655]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=656]
+          image
+          text "알림 서비스"
+          text "⌄"
+        container
+          button [ref=657]
+            image
+            text "관리"
+            text "⌃"
+          container
+            anchor [ref=658, loc=href:/set/company, url=http://localhost:3100/set/company]
+              text "회사 기본 정보"
+            anchor [ref=659, loc=href:/set/company/policy, url=http://localhost:3100/set/company/policy]
+              text "회사 보안 정책 관리"
+            anchor [ref=660, loc=href:/set/service, url=http://localhost:3100/set/service]
+              text "서비스 관리"
+            anchor [ref=661, loc=href:/set/member, url=http://localhost:3100/set/member]
+              text "구성원 관리"
+        button [ref=662]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=663]
+          image
+          text "라이선스"
+          text "⌄"
+      container
+        container
+          anchor [ref=664, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=665, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          button [ref=666]
+            text "홈페이지"
+          button [ref=667]
+            text "개인정보"
+            text "처리방침"
+          button [ref=668]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          text "캐치시큐 테스트 회사 A"
+        container
+          button [ref=669]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=670, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+            image
+          button "문의" [ref=671, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=672, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+            image
+          button [ref=673]
+            image
+            text "MY"
+      container
+        container
+          heading
+            text "구성원 관리"
+          button [ref=688]
+            text "구성원 초대"
+        container
+          container
+            button [ref=689]
+              text "구성원"
+            button [ref=690]
+              text "초대 이력"
+          paragraph
+            text "역할과 서비스 범위로 접근 권한을 설정합니다. 자신의 권한 변경과 마지막 소유자 제외는 제한됩니다."
+          form
+            textbox "구성원 검색" [ref=691, loc=css:input[placeholder="이름 또는 이메일"]]
+              text "browser-member-20261002"
+            combobox "구성원 상태" [ref=692, loc=css:select[aria-label="구성원 상태"]]
+              text "전체"
+            button [ref=693]
+              text "검색"
+          status
+            text "구성원을 제외했습니다."
+          table
+            table_row
+              table_cell
+                text "이름 / 이메일"
+              table_cell
+                text "역할"
+              table_cell
+                text "서비스"
+              table_cell
+                text "상태"
+              table_cell
+                text "관리"
+            table_row
+              table_cell
+                text "브라우저 초대 검증"
+                text "browser-member-20261002@catchsecu.local.test"
+              table_cell
+                text "편집자"
+              table_cell
+                text "-"
+              table_cell
+                text "제외"
+              table_cell
+          container
+            container
+              text "총"
+              text "1"
+              text "개"
+            combobox "페이지당 행 수" [ref=694, loc=css:select[aria-label="페이지당 행 수"]]
+              text "20"
+            container
+              button "이전 페이지" [ref=695, loc=css:button[aria-label="이전 페이지"]]
+                text "‹"
+              container
+                text "1"
+                text "/"
+                text "1"
+              button "다음 페이지" [ref=696, loc=css:button[aria-label="다음 페이지"]]
+                text "›"

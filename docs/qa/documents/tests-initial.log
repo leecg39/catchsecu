@@ -1,0 +1,56 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/documents.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:5735) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/documents.test.ts (18 tests | 2 failed) 3761ms
+   ❯ documents with real PostgreSQL, public links and service displays (18)
+     × publishes immutable snapshots, hashes and only public fields 92ms
+     × invalid, expired and closed company/service links do not expose content 70ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/documents.test.ts > documents with real PostgreSQL, public links and service displays > publishes immutable snapshots, hashes and only public fields
+AssertionError: {"error":{"code":"VALIDATION_ERROR","message":"입력 내용을 확인해주세요.","fieldErrors":{},"requestId":"c78221af-a54b-4cd0-b689-888f26509b59"}}: expected 422 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 422
+
+ ❯ ok tests/server/documents.test.ts:31:171
+
+ ❯ tests/server/documents.test.ts:77:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/documents.test.ts > documents with real PostgreSQL, public links and service displays > invalid, expired and closed company/service links do not expose content
+PrismaClientKnownRequestError: 
+Invalid `db.company.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/documents.test.ts:110:22
+
+  107 expect((await publicRead(req("/public/documents/" + token))).status).toBe(410);
+  108 await db.service.update({ where: { id: service }, data: { status: "archived", version: { increment: 1 } } });
+  109 try { expect((await publicRead(req(publicUrl(row.url)))).status).toBe(410); } finally { await db.service.update({ where: { id: service }, data: { status: "active", version: { increment: 1 } } }); }
+→ 110 await db.company.update(
+Database error. Code: `23514`. Message: `new row for relation "Company" violates check constraint "Company_status_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/documents.test.ts:110:5
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 16 passed (18)
+   Start at  23:41:33
+   Duration  4.58s (tests 83%, import 12%, transform 5%)
+

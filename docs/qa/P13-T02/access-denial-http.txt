@@ -1,0 +1,5 @@
+2026-10-03 local production HTTP QA, catchsecu_dev, port 3100
+Command: node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/qa-access-denial.ts
+{"anonymous":307,"adminRedirect":"/access-not-allow?reason=admin","adminPage":200,"servicePage":200,"rolePage":200,"expertPage":200,"requestableServiceInApi":true,"cleanup":"pending"}
+{"cleanup":"complete","temporaryServiceRemoved":true}
+The HTML checks prove the server-rendered explanation. The service request option was verified through GET /api/v1/access-requests?scope=mine with a temporary local service. Client hydration and link visibility remain unverified without browser control.

@@ -1,0 +1,60 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/notifications.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:95070) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/notifications.test.ts (20 tests | 2 failed) 15682ms
+   ❯ notification CRUD and transactional delivery (15)
+     × shares the submission transaction, respects target and disabled filters, and never copies answers 960ms
+     × emits CSV completion from the actual importer once and preserves counts and target scope 243ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/notifications.test.ts > notification CRUD and transactional delivery > shares the submission transaction, respects target and disabled filters, and never copies answers
+AssertionError: expected [Function] to throw error including 'ROLLBACK' but got '\nInvalid `tx.submission.create()` in…'
+
+- Expected
++ Received
+
+- ROLLBACK
++
++ Invalid `tx.submission.create()` invocation in
++ /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/notifications.test.ts:152:80
++
++   149 while (await runOneNotification("events-worker")) { /* drain this scope */ }
++   150 const delivered = (await history(all)).items[0]; const file = await readFile(resolve(env.LOCAL_NOTIFICATION_DIR, delivered.id + ".json"), "utf8"); expect(file).toContain("새 응답"); expect(file).not.toContain("PRIVATE_ANSWER");
++   151 const rollback = await form(); const count = await db.notificationEvent.count();
++ → 152 await expect(db.$transaction(async tx => { const sub = await tx.submission.create(
++ Database error. Code: `23514`. Message: `new row for relation "Submission" violates check constraint "Submission_source_check"`
+
+ ❯ tests/server/notifications.test.ts:152:423
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/notifications.test.ts > notification CRUD and transactional delivery > emits CSV completion from the actual importer once and preserves counts and target scope
+AssertionError: {"error":{"code":"IMPORT_CONSENT","message":"동의 근거에는 행별 동의 컬럼이 필요합니다.","requestId":"402330ab-4b5e-40f3-b517-42a166851eca"}}: expected 422 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 422
+
+ ❯ ok tests/server/notifications.test.ts:42:169
+
+ ❯ startImport tests/server/notifications.test.ts:69:9
+ ❯ tests/server/notifications.test.ts:157:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 18 passed (20)
+   Start at  06:17:14
+   Duration  16.79s (tests 94%, import 4%, transform 2%)
+

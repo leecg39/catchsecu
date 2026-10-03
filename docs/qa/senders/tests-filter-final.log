@@ -1,0 +1,53 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/senders.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:44323) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/senders.test.ts (24 tests | 2 failed) 9252ms
+   ❯ service scoped sender CRUD, verification and delivery (24)
+     × server pagination is disjoint and verified filters exclude clock-expired rows 800ms
+     × renewal cancels an undelivered authentication mail and clears its secret 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/senders.test.ts > service scoped sender CRUD, verification and delivery > server pagination is disjoint and verified filters exclude clock-expired rows
+AssertionError: {"error":{"code":"UNAUTHENTICATED","message":"로그인이 필요합니다.","requestId":"175d9e89-787a-4ee9-ac27-cf7de5e7b3b5"}}: expected 401 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 401
+
+ ❯ ok tests/server/senders.test.ts:35:169
+
+ ❯ tests/server/senders.test.ts:250:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/senders.test.ts > service scoped sender CRUD, verification and delivery > renewal cancels an undelivered authentication mail and clears its secret
+AssertionError: {"error":{"code":"UNAUTHENTICATED","message":"로그인이 필요합니다.","requestId":"c87356df-8659-441a-b9fa-60a4d63caa55"}}: expected 401 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 401
+
+ ❯ ok tests/server/senders.test.ts:35:169
+
+ ❯ create tests/server/senders.test.ts:56:15
+ ❯ tests/server/senders.test.ts:255:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 22 passed (24)
+   Start at  03:45:27
+   Duration  10.96s (tests 86%, import 9%, transform 5%)
+

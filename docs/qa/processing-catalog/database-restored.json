@@ -1,0 +1,87 @@
+{
+  "checkedAt": "2026-10-02T13:33:37.699Z",
+  "stage": "restored",
+  "scope": "localhost catchsecu_dev synthetic browser fixtures",
+  "purpose": {
+    "id": "d481d3a7-514a-48fc-85e6-784015b2d142",
+    "serviceId": "08e5858c-6d69-451d-b509-7facf4e1867f",
+    "name": "브라우저 QA 상담 수집 목적 2026-10-02",
+    "version": 4,
+    "status": "active",
+    "retentionMode": "days",
+    "retentionDays": 45,
+    "retentionReason": "상담 종료와 답변 전달이 끝난 때",
+    "items": [
+      {
+        "kind": "general",
+        "name": "이름",
+        "required": true
+      },
+      {
+        "kind": "general",
+        "name": "이메일",
+        "required": false
+      }
+    ]
+  },
+  "recipient": {
+    "id": "0810ec37-bffa-413e-997b-d0fa3aa956bb",
+    "version": 4,
+    "status": "active",
+    "countryCode": "US",
+    "kind": "processor",
+    "purpose": "상담 접수 및 변경 알림 전달"
+  },
+  "revisions": [
+    {
+      "version": 1,
+      "status": "active",
+      "retentionMode": "until_purpose",
+      "retentionDays": null,
+      "linkedRecipientVersion": 1,
+      "linkedRecipientPurpose": "상담 접수 알림 전달"
+    },
+    {
+      "version": 2,
+      "status": "active",
+      "retentionMode": "days",
+      "retentionDays": 45,
+      "linkedRecipientVersion": 2,
+      "linkedRecipientPurpose": "상담 접수 및 변경 알림 전달"
+    },
+    {
+      "version": 3,
+      "status": "archived",
+      "retentionMode": "days",
+      "retentionDays": 45,
+      "linkedRecipientVersion": 2,
+      "linkedRecipientPurpose": "상담 접수 및 변경 알림 전달"
+    },
+    {
+      "version": 4,
+      "status": "active",
+      "retentionMode": "days",
+      "retentionDays": 45,
+      "linkedRecipientVersion": 4,
+      "linkedRecipientPurpose": "상담 접수 및 변경 알림 전달"
+    }
+  ],
+  "auditActions": [
+    "catalog.created",
+    "catalog.created",
+    "catalog.updated",
+    "catalog.updated",
+    "catalog.archived",
+    "catalog.archived",
+    "catalog.restored",
+    "catalog.restored"
+  ],
+  "checks": {
+    "serviceAndTenantBinding": true,
+    "linkedRecipient": true,
+    "allVersionsPersisted": true,
+    "originalSnapshotPreserved": true,
+    "optionalFieldPreserved": true,
+    "auditedEveryWrite": true
+  }
+}

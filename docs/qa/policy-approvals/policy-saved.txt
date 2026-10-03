@@ -1,0 +1,144 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 풀스택 기능 검증"(30): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=958]
+        container
+          text "서비스명"
+          text "기본 서비스"
+        container
+          text "외부 ⓘ"
+          text "기본 서비스"
+          image
+      container
+        anchor [ref=959, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        button [ref=960]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=961]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=962]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=963]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=964]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=965]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=966]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=967]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=968, loc=href:/shared-privacy/view, url=http://localhost:3100/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=969, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=970, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          button [ref=971]
+            text "홈페이지"
+          button [ref=972]
+            text "개인정보"
+            text "처리방침"
+          button [ref=973]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        image
+        text "캐치시큐 테스트 회사 A"
+        button [ref=974]
+          text "서비스 개선 제안"
+        anchor "공지사항" [ref=975, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+          image
+        button "문의" [ref=976, loc=css:button[aria-label="문의"]]
+          image
+        anchor "알림" [ref=977, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+          image
+        button [ref=978]
+          image
+          text "MY"
+      container
+        heading
+          text "회사 보안 정책 설정"
+        paragraph
+          text "회사에 적용할 보안 정책을 설정합니다. 최상위 관리자만 변경할 수 있습니다."
+        tablist "보안 정책"
+          tab [ref=979]
+            text "세션 유지시간"
+          tab [ref=980]
+            text "2단계 인증"
+          tab [ref=981]
+            text "캐치폼 사용 승인"
+        container
+          container
+            heading
+              text "캐치폼 사용 승인 정책"
+            container
+              button [ref=982]
+                text "기본값 복원"
+              button [ref=983]
+                text "저장하기"
+          group [ref=984]
+            heading
+              text "캐치폼 공개 전 사용 승인"
+            container
+              checkbox [ref=985]
+              text "새 초안을 게시하기 전에 승인을 받습니다."
+            paragraph
+              text "승인 요청에는 당시의 전체 질문과 설정이 보관됩니다. 내용을 수정하면 다시 승인받아야 합니다. 기존에 공개한 버전은 새 초안을 게시할 때까지 유�..."
+            heading
+              text "승인 담당자"
+            container
+              checkbox [ref=986]
+              text "최상위 관리자"
+            container
+              checkbox [ref=987]
+              text "관리자"
+            container
+              checkbox [ref=988]
+              text "보안 담당자"
+            paragraph
+              text "보안 담당자는 권한을 부여받은 서비스의 폼을 승인할 수 있습니다."
+            container
+              checkbox [ref=989]
+              text "승인 요청 시 증빙 번호를 필수로 받습니다."
+            container
+              text "승인 요청 기본 양식"
+              textbox "승인 요청 기본 양식" [ref=990, loc=css:textarea[aria-label="승인 요청 기본 양식"]]
+                text "신청 목적과 보유 기간을 검토해주세요."
+            paragraph
+              text "승인 관련 정책이 바뀌면 진행 중인 요청과 게시 전 승인을 다시 받아야 합니다."
+            anchor [ref=991, loc=href:/log/form-approval, url=http://localhost:3100/log/form-approval]
+              text "캐치폼 승인 내역"
+          status
+            text "정책을 저장했습니다. 다음 요청부터 적용됩니다."
+          paragraph
+            text "정책 버전"
+            text "2"
+            text "·"
+            text "2026. 10. 2. 오후 7:51:56"
+  alert

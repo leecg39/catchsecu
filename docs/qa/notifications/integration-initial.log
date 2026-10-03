@@ -1,0 +1,41 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/notifications.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/notifications.test.ts (20 tests | 20 skipped) 375ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/notifications.test.ts [ tests/server/notifications.test.ts ]
+PrismaClientKnownRequestError: 
+Invalid `db.service.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/notifications.test.ts:76:106
+
+  73 beforeAll(async () => {
+  74   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "SubjectAccessRequest" CASCADE');
+  75   for (const id of [tenant, foreign]) await db.company.create({ data: { id, name: "알림 QA", publicName: "알림 QA", policy: { create: {} } } });
+→ 76   for (const [id, tenantId] of [[service, tenant], [second, tenant], [other, foreign]]) await db.service.create(
+Unique constraint failed on the constraint: `Service_tenantId_name_key`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/notifications.test.ts:76:89
+     74|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+     75|   for (const id of [tenant, foreign]) await db.company.create({ data: …
+     76|   for (const [id, tenantId] of [[service, tenant], [second, tenant], […
+       |                                                                                         ^
+     77|   for (const [name, role] of [["owner", "owner"], ["admin", "admin"], …
+     78|   await signup("foreign", "owner", foreign);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  20 skipped (20)
+   Start at  06:16:58
+   Duration  1.90s (import 50%, transform 28%, tests 22%)
+

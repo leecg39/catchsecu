@@ -1,0 +1,15 @@
+로컬 생산 빌드 HTTP 검증 · 2026-10-03 KST
+합성 운영자 계정의 platformAdmin을 검증 중에만 부여하고 종료 시 원래 값으로 복원.
+원본 사이트에는 쓰기 요청을 보내지 않음.
+
+login 200
+create notice 201
+upload PDF 200
+draft file download 404
+operator preview 200 · 원본 PDF와 바이트 일치
+publish 200
+published file download 200 · 원본 PDF와 바이트 일치
+notice detail HTML 200
+archive 204
+archived file download 404
+private storage file removed · true

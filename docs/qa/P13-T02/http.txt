@@ -1,0 +1,9 @@
+2026-10-03 local production server / catchsecu_dev PostgreSQL
+command: node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/qa-access-requests.ts
+exit: 0
+{"login":200,"page":200,"create":201,"duplicate":200,"review":200,"approve":200,"contextAfterApproval":200,"serviceGranted":true,"getLogout":200,"sessionAfterGetLogout":200,"cleanup":"pending"}
+{"cleanup":"complete","temporaryServiceRemoved":true}
+
+The script creates one temporary service, signs in as seeded viewer/owner without printing credentials,
+requests access twice, approves once, verifies the viewer context, GET logout side-effect absence,
+then signs out and removes temporary request/grant/service. Immutable audit events remain.

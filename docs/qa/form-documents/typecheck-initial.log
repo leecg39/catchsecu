@@ -1,0 +1,10 @@
+
+> catchsecu-clone@0.1.0 typecheck
+> tsc --noEmit
+
+tests/server/form-documents.test.ts(186,50): error TS2322: Type '{ id: `${string}-${string}-${string}-${string}-${string}`; serviceId: `${string}-${string}-${string}-${string}-${string}`; order: number; tenantId: string; documentId: string; documentVersionId: string; required: boolean; kind: string; formVersionId: string; displaySnapshot: JsonValue; }' is not assignable to type '((Without<FormDocumentBindingCreateInput, FormDocumentBindingUncheckedCreateInput> & FormDocumentBindingUncheckedCreateInput) | (Without<...> & FormDocumentBindingCreateInput)) & object'.
+  Type '{ id: `${string}-${string}-${string}-${string}-${string}`; serviceId: `${string}-${string}-${string}-${string}-${string}`; order: number; tenantId: string; documentId: string; documentVersionId: string; required: boolean; kind: string; formVersionId: string; displaySnapshot: JsonValue; }' is not assignable to type 'Without<FormDocumentBindingCreateInput, FormDocumentBindingUncheckedCreateInput> & FormDocumentBindingUncheckedCreateInput & object'.
+    Type '{ id: `${string}-${string}-${string}-${string}-${string}`; serviceId: `${string}-${string}-${string}-${string}-${string}`; order: number; tenantId: string; documentId: string; documentVersionId: string; required: boolean; kind: string; formVersionId: string; displaySnapshot: JsonValue; }' is not assignable to type 'FormDocumentBindingUncheckedCreateInput'.
+      Types of property 'displaySnapshot' are incompatible.
+        Type 'JsonValue' is not assignable to type 'JsonNullClass | InputJsonValue'.
+          Type 'null' is not assignable to type 'JsonNullClass | InputJsonValue'.

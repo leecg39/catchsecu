@@ -1,0 +1,431 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/sharing.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:10877) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > creates one encrypted grant and one mail on retry; validates version and selected fields
+{"requestId":"44aa783f-5ad2-47de-a51c-0771427e9c8f","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > creates one encrypted grant and one mail on retry; validates version and selected fields
+{"requestId":"28f7215a-e37e-47a9-990d-8aae2743e015","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > role, tenant and current service grants protect all manager endpoints
+{"requestId":"c99a278a-f037-4deb-a479-67e07fd3da21","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > invalid combinations produce the same challenge shape without mail or a session
+{"requestId":"d82fd75b-cbe5-43ef-8d2c-7f7260db643a","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > local worker delivers a real authentication mail; cookie is HttpOnly and token never in JSON
+{"requestId":"d4cb3dbc-bb4a-4045-a66b-868abeb8efa5","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > only the requesting browser can verify and five failures persist
+{"requestId":"d56ddd0a-ec99-4db2-a738-b80202518802","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > concurrent verification consumes the challenge exactly once
+{"requestId":"90074d35-ed68-4515-a180-1e840bd11524","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > a new challenge replaces the old one and expiry prevents verification
+{"requestId":"265c56de-3f8b-42f6-95f7-4e4569870425","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > only selected fields are returned and new published versions remain outside the grant
+{"requestId":"f93c6277-0c9b-4914-9db8-e74e5afabdd7","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > updates, resend and revoke invalidate old cookies and invitation codes immediately
+{"requestId":"058905e1-d238-4271-b6e6-d7fd013634cd","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > changing recipient invalidates old email and session and invites the new email
+{"requestId":"a3539a6a-81fe-4cf7-8011-9d75417c671d","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > expired grant, expired session and logout deny a captured cookie
+{"requestId":"ffacfb2a-cea6-45c6-805c-5da3cc584fa0","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > creator service capability and member suspension block already authenticated sessions
+{"requestId":"f0fb9709-4624-46c4-85df-84bfc1b9e98b","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > withdrawn, pending destruction and expired responses including legal hold are hidden
+{"requestId":"4f0b6322-8259-4242-8324-ec9512f8975c","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > files require selected question, current answer, exact binding and fresh grant
+{"requestId":"58127f40-f600-4a94-bdaa-f5984c74c507","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > DB foreign keys reject cross-version fields, cross-grant sessions and revived revoked grants
+{"requestId":"bde28a13-d82f-41e5-9e04-ef4e63154df6","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > pagination, filters and audit events use server data without secret values
+{"requestId":"7e57eb79-6411-4f10-b4c9-448702e1f6fa","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+stderr | tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > origin and method validation prevent CSRF or unsupported mutations
+{"requestId":"2f387e1c-5f95-4cb8-9658-4e26cb1bb5d4","code":"INTERNAL_ERROR","kind":"PrismaClientValidationError"}
+
+ ❯ tests/server/sharing.test.ts (17 tests | 17 failed) 4851ms
+   ❯ external sharing with PostgreSQL, local mail and private attachments (17)
+     × creates one encrypted grant and one mail on retry; validates version and selected fields 378ms
+     × role, tenant and current service grants protect all manager endpoints 172ms
+     × invalid combinations produce the same challenge shape without mail or a session 136ms
+     × local worker delivers a real authentication mail; cookie is HttpOnly and token never in JSON 124ms
+     × only the requesting browser can verify and five failures persist 118ms
+     × concurrent verification consumes the challenge exactly once 130ms
+     × a new challenge replaces the old one and expiry prevents verification 150ms
+     × only selected fields are returned and new published versions remain outside the grant 226ms
+     × updates, resend and revoke invalidate old cookies and invitation codes immediately 208ms
+     × changing recipient invalidates old email and session and invites the new email 110ms
+     × expired grant, expired session and logout deny a captured cookie 113ms
+     × creator service capability and member suspension block already authenticated sessions 111ms
+     × withdrawn, pending destruction and expired responses including legal hold are hidden 300ms
+     × files require selected question, current answer, exact binding and fresh grant 285ms
+     × DB foreign keys reject cross-version fields, cross-grant sessions and revived revoked grants 244ms
+     × pagination, filters and audit events use server data without secret values 175ms
+     × origin and method validation prevent CSRF or unsupported mutations 111ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 17 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > creates one encrypted grant and one mail on retry; validates version and selected fields
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"44aa783f-5ad2-47de-a51c-0771427e9c8f"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:102:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > role, tenant and current service grants protect all manager endpoints
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"c99a278a-f037-4deb-a479-67e07fd3da21"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:111:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > invalid combinations produce the same challenge shape without mail or a session
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"d82fd75b-cbe5-43ef-8d2c-7f7260db643a"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:124:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > local worker delivers a real authentication mail; cookie is HttpOnly and token never in JSON
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"d4cb3dbc-bb4a-4045-a66b-868abeb8efa5"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:135:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > only the requesting browser can verify and five failures persist
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"d56ddd0a-ec99-4db2-a738-b80202518802"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:144:31
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > concurrent verification consumes the challenge exactly once
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"90074d35-ed68-4515-a180-1e840bd11524"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:153:31
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > a new challenge replaces the old one and expiry prevents verification
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"265c56de-3f8b-42f6-95f7-4e4569870425"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:158:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > only selected fields are returned and new published versions remain outside the grant
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"f93c6277-0c9b-4914-9db8-e74e5afabdd7"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:164:59
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > updates, resend and revoke invalidate old cookies and invitation codes immediately
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"058905e1-d238-4271-b6e6-d7fd013634cd"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:174:57
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > changing recipient invalidates old email and session and invites the new email
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"a3539a6a-81fe-4cf7-8011-9d75417c671d"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:187:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > expired grant, expired session and logout deny a captured cookie
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"ffacfb2a-cea6-45c6-805c-5da3cc584fa0"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:194:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > creator service capability and member suspension block already authenticated sessions
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"f0fb9709-4624-46c4-85df-84bfc1b9e98b"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:203:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > withdrawn, pending destruction and expired responses including legal hold are hidden
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"4f0b6322-8259-4242-8324-ec9512f8975c"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:214:99
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > files require selected question, current answer, exact binding and fresh grant
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"58127f40-f600-4a94-bdaa-f5984c74c507"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:222:93
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > DB foreign keys reject cross-version fields, cross-grant sessions and revived revoked grants
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"bde28a13-d82f-41e5-9e04-ef4e63154df6"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:235:58
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > pagination, filters and audit events use server data without secret values
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"7e57eb79-6411-4f10-b4c9-448702e1f6fa"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:243:59
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/17]⎯
+
+ FAIL  tests/server/sharing.test.ts > external sharing with PostgreSQL, local mail and private attachments > origin and method validation prevent CSRF or unsupported mutations
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"2f387e1c-5f95-4cb8-9658-4e26cb1bb5d4"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/sharing.test.ts:35:104
+     33| }
+     34| async function ok<T = Record<string, unknown>>(response: Response, sta…
+     35|   expect(response.status, response.status >= 400 ? JSON.stringify(awai…
+       |                                                                                                        ^
+     36| }
+     37| async function signup(name: string, role: Role, tenantId = tenant) {
+ ❯ tests/server/sharing.test.ts:250:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/17]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  17 failed (17)
+   Start at  01:29:28
+   Duration  5.90s (tests 84%, import 11%, transform 6%)
+

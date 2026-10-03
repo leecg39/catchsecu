@@ -1,0 +1,275 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "health",
+      "prefixes": ["/health"],
+      "scope": "공개 상태 조회. 회사·사용자 자료를 읽지 않는다.",
+      "validation": "GET만 허용하며 DB 연결 상태만 확인한다.",
+      "response": "상태와 점검 시각만 반환한다.",
+      "deletion": "삭제 동작 없음.",
+      "forbidden": "환경변수·DB 접속 문자열·오류 stack 공개 금지."
+    },
+    {
+      "id": "auth",
+      "prefixes": ["/auth"],
+      "scope": "전역 User와 본인 인증 증거. 인증 전과 인증 후 세션을 분리한다.",
+      "validation": "Better Auth 1.7.7 및 별도 Zod 계약의 이메일·암호·일회 token·시도 횟수·만료를 검사한다.",
+      "response": "세션·인증 상태만 반환하고 암호 hash·OTP secret·복구코드 원문을 제외한다.",
+      "deletion": "로그아웃은 현재 세션 회수. 계정·인증 이력의 물리 삭제가 아니다.",
+      "forbidden": "미검증 이메일 로그인, challenge 재사용, GET으로 인증 상태 변경 금지."
+    },
+    {
+      "id": "self",
+      "prefixes": ["/me"],
+      "scope": "현재 세션의 User 자신. 회사 정책 입력은 현재 Membership의 tenant만 허용한다.",
+      "validation": "변경 가능 필드 allowlist, 현재 암호·revision·세션 소유권을 확인한다.",
+      "response": "본인 프로필·세션 메타데이터·정책 상태. 비밀 token·암호 hash 제외.",
+      "deletion": "세션 DELETE는 해당 세션 회수. 계정 자산 폐쇄는 별도 인계 절차.",
+      "forbidden": "다른 사용자 세션 열람·회수, 마지막 소유자 자산 방치 금지."
+    },
+    {
+      "id": "context",
+      "prefixes": ["/context"],
+      "scope": "세션 User의 활성 Membership에서 회사·서비스를 선택한다.",
+      "validation": "선택 ID는 UUID, 활성 Membership·ServiceGrant와 회사/서비스 FK로 검증한다.",
+      "response": "현재 회사·서비스·허용 권한 DTO. 다른 회사의 목록 제외.",
+      "deletion": "삭제 동작 없음.",
+      "forbidden": "요청 본문의 tenantId만 믿고 회사 전환, 비활성 회사 선택 금지."
+    },
+    {
+      "id": "company",
+      "prefixes": ["/companies"],
+      "scope": "현재 활성 Membership의 tenant와 회사 관리 권한.",
+      "validation": "회사 입력 스키마, 사업자번호 형식, version과 회사 상태·소유권을 검사한다.",
+      "response": "현재 회사 프로필·설정의 안전 DTO. 타 회사 비공개 자료 제외.",
+      "deletion": "DELETE는 폐쇄 요청/상태 전이. 청구·자산·보존 확인 전 물리 삭제 금지.",
+      "forbidden": "마지막 owner 제거, tenantId 변경, 타 회사 ID 열람 금지."
+    },
+    {
+      "id": "members",
+      "prefixes": ["/members", "/invitations", "/access-requests"],
+      "scope": "현재 회사의 Membership·Invitation. ServiceGrant는 같은 tenant 서비스만.",
+      "validation": "역할 상한, 이메일 정규화, 서비스 ID, version·Idempotency-Key·초대 만료를 검사한다.",
+      "response": "구성원 역할·허용 서비스·초대 상태. 초대 token hash/원문 제외.",
+      "deletion": "구성원 제외는 권한·세션 회수 후 이력 보존. 초대 DELETE는 취소.",
+      "forbidden": "마지막 owner 제거, 자기보다 높은 역할 부여, 초대받지 않은 이메일 수락 금지."
+    },
+    {
+      "id": "experts",
+      "prefixes": ["/expert-assignments"],
+      "scope": "플랫폼 운영자만 회사 간 배정을 변경한다. 전문가는 본인 배정만 보며 선택 시 활성 회사·서비스·만료를 검사한다.",
+      "validation": "전문가 이메일·회사/서비스 복합 관계·만료 기간·version과 현재 운영자 플래그를 확인한다.",
+      "response": "배정 회사·서비스·기한·상태 DTO. 회사의 개인정보 응답은 이 API에 포함하지 않는다.",
+      "deletion": "DELETE는 회수 상태와 ServiceGrant 제거; 배정/감사 이력은 보존.",
+      "forbidden": "운영자 아닌 배정 변경, 다른 전문가 배정 열람, 만료/회수 배정으로 회사 선택 금지."
+    },
+    {
+      "id": "services",
+      "prefixes": ["/services"],
+      "scope": "현재 회사 Service. 서비스별 행은 같은 tenant 복합 FK와 현재 grant 검사.",
+      "validation": "이름·상태·버전과 서비스 표시 설정의 문서 종류·URL·게시본을 검증한다.",
+      "response": "허용 서비스 프로필·표시 설정. 다른 회사 문서·원문 비밀 제외.",
+      "deletion": "사용 중 서비스는 보관·비활성 상태 전이, 참조 자료를 임의 삭제하지 않는다.",
+      "forbidden": "회사 간 서비스 재귀속, 중지 서비스 신규 게시·발송 금지."
+    },
+    {
+      "id": "forms",
+      "prefixes": ["/forms", "/templates", "/fixed-urls", "/approvals"],
+      "scope": "현재 회사·서비스의 Form/Template/Publication. 현재 ServiceGrant 재검사.",
+      "validation": "질문 타입·분기·필수값·version·승인 revision·게시 token·멱등키를 검사한다.",
+      "response": "허용 폼 초안/게시본·질문·상태 DTO. 응답 원문은 별도 권한 API.",
+      "deletion": "초안/템플릿은 참조 확인 후 삭제·보관. 게시본·승인 증거는 회수 또는 새 버전.",
+      "forbidden": "게시본 제자리 수정, 승인 우회 게시, 다른 서비스 템플릿 사용 금지."
+    },
+    {
+      "id": "public-forms",
+      "prefixes": ["/public/forms", "/public/urls"],
+      "scope": "활성 공개 token에서 회사·서비스·게시 버전 범위를 도출한다.",
+      "validation": "token hash·만료·응답 한도·질문 타입·필수 동의·업로드 소유권·요청 제한을 검사한다.",
+      "response": "공개 당시 고정 질문/동의 문구와 제출 결과 ID. 내부 관리자 필드 제외.",
+      "deletion": "공개 URL은 관리자가 회수. 익명 직접 삭제 API 없음.",
+      "forbidden": "GET 제출·GET 상태 변경, token만으로 관리자 권한 상승, 다른 폼 질문 제출 금지."
+    },
+    {
+      "id": "documents",
+      "prefixes": ["/documents", "/clause-templates", "/processing-purposes", "/recipients"],
+      "scope": "현재 회사·서비스의 자료. 문서·목적·수탁자 연결은 복합 FK와 grant 검사.",
+      "validation": "문서 종류·길이·HTML 정제·국가·보유 근거·version·연결된 게시본을 검사한다.",
+      "response": "초안/고정 게시 버전·해시·연결 근거의 안전 DTO. 내부 token·암호문 제외.",
+      "deletion": "초안/근거 자료는 보관·복원; 게시 버전은 불변이며 공개 링크만 회수.",
+      "forbidden": "게시 당시 본문 덮어쓰기, 참조 중 버전 삭제, 미확인 P/C/OC 별칭 공개 승격 금지."
+    },
+    {
+      "id": "public-documents",
+      "prefixes": ["/public/documents"],
+      "scope": "활성 DocumentPublication token으로 회사·서비스·고정 버전을 도출한다.",
+      "validation": "token hash·만료·회수·문서 상태·PDF 바이트/해시를 확인한다.",
+      "response": "게시 당시 고정 본문 또는 PDF만. 초안·내부 연결·token 원문 제외.",
+      "deletion": "익명 삭제 동작 없음. 회수는 관리자 경로에서 처리.",
+      "forbidden": "회수된 링크 열람, 최신 초안으로 과거 링크 내용 대체 금지."
+    },
+    {
+      "id": "submissions",
+      "prefixes": ["/submissions"],
+      "scope": "현재 회사·서비스·폼의 Submission. 읽기/정정/파기 capability 분리.",
+      "validation": "답변의 게시 질문 소속·타입·현재 version·보유 기한·legal hold를 검사한다.",
+      "response": "권한/보유 상태별 마스킹 응답·변경 이력. 만료·파기 원문 제외.",
+      "deletion": "정정은 이벤트, 철회는 상태, 실제 삭제는 파기 작업·증명서로 처리.",
+      "forbidden": "과거 동의 증거 덮어쓰기, 파기 시작 뒤 원문 접근·캐시 재생 금지."
+    },
+    {
+      "id": "files",
+      "prefixes": ["/uploads", "/files"],
+      "scope": "회사·서비스·질문·응답의 파일 바인딩, 또는 소비 전 일회 업로드 token.",
+      "validation": "크기·MIME·시그니처·SHA-256·ClamAV·상태·version·부모 ID를 검사한다.",
+      "response": "안전 메타데이터 또는 권한 확인한 attachment 바이트. storageKey 제외.",
+      "deletion": "제출 전 임시 파일은 삭제 가능; 제출 증거는 파기/정정 수명주기에 따른다.",
+      "forbidden": "검사 전 다운로드, public 경로 저장, 경로 입력 신뢰, 다른 응답 첨부 교차 열람 금지."
+    },
+    {
+      "id": "destruction",
+      "prefixes": ["/retention-rules", "/destruction-requests", "/destruction-certificates"],
+      "scope": "현재 회사·서비스의 보존/파기 정책과 요청. 승인 역할과 현재 grant 재검사.",
+      "validation": "보유 기한·예약 시각·상태·version·승인자·보존 조치·실제 삭제 결과를 확인한다.",
+      "response": "진행 상태·파기 수량·무결성 증거. 삭제된 원문/파일 URL 제외.",
+      "deletion": "정책은 버전/보관. 파기 요청은 취소·반려 상태; 원문은 실제 worker 삭제 후 증명.",
+      "forbidden": "보존 조치 중 파기, 작업 202를 완료로 표시, 파기 후 원문 복원 금지."
+    },
+    {
+      "id": "sharing",
+      "prefixes": ["/share-grants"],
+      "scope": "현재 회사·서비스·게시 폼의 외부 grant. 발급자 권한도 매 요청 확인.",
+      "validation": "허용 질문·이메일·기한·version·게시본 고정·서비스 권한을 검사한다.",
+      "response": "공유 상태와 허용 필드, 감사 이력. 초대 코드·세션 token 제외.",
+      "deletion": "DELETE는 grant 회수 및 외부 세션 무효화; 열람 이력 보존.",
+      "forbidden": "임의 질문 추가, 회수 후 파일 링크 재사용, 타 회사 공유 금지."
+    },
+    {
+      "id": "viewer",
+      "prefixes": ["/viewer"],
+      "scope": "외부 이메일 확인 세션의 단일 grant·게시 버전·질문 범위.",
+      "validation": "challenge cookie·코드 횟수/기한·grant 세대·현재 발급자 권한·파일 바인딩 확인.",
+      "response": "허용 질문과 현재 답변/파일만. 미선택 응답·관리자 메모 제외.",
+      "deletion": "logout은 세션 회수. 원본 자료 삭제 권한 없음.",
+      "forbidden": "초대 코드만으로 열람, 다른 질문·응답·파일 교차 열람 금지."
+    },
+    {
+      "id": "imports",
+      "prefixes": ["/imports"],
+      "scope": "현재 회사·서비스의 ImportJob와 임시 행. 현재 grant 확인.",
+      "validation": "파일 인코딩·행/열/셀 크기·매핑·수집 근거·version·job/row 중복을 확인한다.",
+      "response": "작업 상태·건수·오류행만; 만료/삭제 원문 재노출 금지.",
+      "deletion": "DELETE는 취소·보관, 원본 파일 제거는 worker가 실제 처리.",
+      "forbidden": "validate에서 DB 반영, 다른 회사 목적/수탁자 연결, 재시도 중복 수집 금지."
+    },
+    {
+      "id": "subjects",
+      "prefixes": ["/subjects"],
+      "scope": "검증된 정보주체 세션의 고정 회사·서비스·응답 범위.",
+      "validation": "이름/이메일 일치·일회 링크·브라우저 쿠키·세션 ID·version·보유 상태 확인.",
+      "response": "본인 동의·처리·철회 이력. 답변 원문·관리자 메모 제외.",
+      "deletion": "철회는 불변 이벤트와 차단 상태; 원문 파기는 별도 보유 절차.",
+      "forbidden": "이메일 존재 여부 노출, GET 링크 소비, 타 주체 응답 열람 금지."
+    },
+    {
+      "id": "marketing",
+      "prefixes": ["/marketing"],
+      "scope": "현재 회사·서비스의 정보주체·채널별 동의 근거.",
+      "validation": "명시적 근거·수집 출처·현재 version·발송 직전 suppression을 확인한다.",
+      "response": "동의 상태·근거·집계; 만료/삭제 연락처는 마스킹.",
+      "deletion": "철회/제외는 상태와 이력; 증거 원문은 보유 정책에 따라 실제 삭제.",
+      "forbidden": "근거 없는 opt-in, 철회 뒤 발송, 타 서비스 동의 재사용 금지."
+    },
+    {
+      "id": "messaging",
+      "prefixes": ["/senders", "/campaigns", "/message-templates", "/message-content", "/kakao", "/email-suppressions"],
+      "scope": "현재 회사·서비스의 발신자·캠페인·템플릿; 현재 grant와 전송 capability.",
+      "validation": "발신자 인증·변수/HTML·대상 동의·예약·version·멱등키·공급자 상태 확인.",
+      "response": "초안/전송 상태·안전한 수신 결과. 연락처·비밀·공급자 원문은 권한별 제한.",
+      "deletion": "초안은 보관/삭제, 전송 이력은 불변; 첨부 원문은 기한에 따라 실제 제거.",
+      "forbidden": "미확인 발신자 사용, 수신거부 대상 전송, 접수를 실제 도달로 표시 금지."
+    },
+    {
+      "id": "email-feedback",
+      "prefixes": ["/email-feedback"],
+      "scope": "서명된 공급자 이벤트에서 실제 발송 Job을 통해 회사·서비스 도출.",
+      "validation": "raw body HMAC·5분 창·16KB·event ID·발송 Job 바인딩 확인.",
+      "response": "접수 상태만 반환. 수신 주소·원문 event 비노출.",
+      "deletion": "수신 결과 이벤트는 불변, 보유 정책에 따른 파기만.",
+      "forbidden": "서명 없는 콜백 반영, 중복 이벤트 중복 차감 금지."
+    },
+    {
+      "id": "email-unsubscribe",
+      "prefixes": ["/email-unsubscribe"],
+      "scope": "Job에 묶인 90일 불투명 token의 회사·서비스·연락처.",
+      "validation": "token HMAC·기한·Job 바인딩과 POST 확인 양식 검사.",
+      "response": "안내/처리 상태만 반환. 연락처 원문 제외.",
+      "deletion": "POST 철회는 차단 이력 추가; GET은 상태만 조회.",
+      "forbidden": "GET에서 수신거부 확정, token을 일반 로그인 세션으로 승격 금지."
+    },
+    {
+      "id": "integrations",
+      "prefixes": ["/integrations"],
+      "scope": "현재 회사·서비스의 알림 연결·구독·전달; 현재 grant 검사.",
+      "validation": "HTTPS 공식 호스트·DNS/IP·redirect 차단·구독 필터·version·멱등키 확인.",
+      "response": "설정·시도 이력의 URL 호스트만 마스킹 표시. 원문 URL·응답 본문 제외.",
+      "deletion": "삭제/중지는 이전 세대 대기 전달 취소와 비밀 제거.",
+      "forbidden": "내부 IP SSRF, 불확실 전송 자동 재시도, 타 서비스 이벤트 전송 금지."
+    },
+    {
+      "id": "billing",
+      "prefixes": ["/billing-history", "/ledger", "/usage-events", "/invoices", "/plans", "/subscriptions", "/entitlements", "/assets"],
+      "scope": "현재 회사 결제 자료; 서비스 필터는 같은 tenant 서비스만.",
+      "validation": "서버 가격·통화/정수 금액·결제 출처·월/페이지·원천 멱등키 확인.",
+      "response": "구독/체험 이력·잔액/원장·청구서의 안전 DTO. 카드 원문·원천 ID 제외.",
+      "deletion": "원장 거래 불변, 환불은 보정 거래; 이력은 보존 정책 준수.",
+      "forbidden": "success URL만으로 paid/충전 표시, 음수 잔액·중복 차감·원장 직접 수정 금지."
+    },
+    {
+      "id": "admin-plans",
+      "prefixes": ["/admin/plans"],
+      "scope": "플랫폼 운영자 전용 전역 상품/가격 버전.",
+      "validation": "상품 코드·통화·서버 가격·효력 기간·version과 과거 구독 참조 확인.",
+      "response": "상품/가격 공개 필드·버전. PG 비밀 제외.",
+      "deletion": "참조 중 가격 버전 삭제 금지; 신규 판매 중지만 허용.",
+      "forbidden": "고객 요청 금액 신뢰, 과거 청구 가격 소급 변경 금지."
+    },
+    {
+      "id": "security",
+      "prefixes": ["/security", "/identity-providers", "/me/password-policy"],
+      "scope": "현재 회사 보안 정책; 사용자 암호 정책 조회는 본인 Membership.",
+      "validation": "현재 암호·정책 revision·CIDR·SSO issuer/state/nonce·잠금 방지 확인.",
+      "response": "정책·인증 설정의 비밀 제거 DTO. client secret/OTP 비노출.",
+      "deletion": "정책 DELETE는 기본값 복원. IdP/IP 규칙은 참조·잠금 검사 후 보관.",
+      "forbidden": "마지막 인증 수단 제거, 정책 저장 후 미집행, 임의 returnTo 허용 금지."
+    },
+    {
+      "id": "analytics",
+      "prefixes": ["/analytics", "/compliance"],
+      "scope": "현재 회사와 허용 서비스의 원천 데이터에서 집계.",
+      "validation": "서비스 ID·기간 경계·페이지·집계 원천 시각과 현재 grant 확인.",
+      "response": "건수·기간·원천 freshness·판정 근거. 개인 원문 제외.",
+      "deletion": "집계 조회 API에 직접 수정/삭제 없음. 원천 삭제 후 재집계.",
+      "forbidden": "임의 준수 점수·과태료 생성, 다른 회사 건수 혼합 금지."
+    },
+    {
+      "id": "audit",
+      "prefixes": ["/audit-events"],
+      "scope": "현재 회사 audit.read 또는 본인 활동; 서비스 범위와 마스킹 재검사.",
+      "validation": "기간 from 포함/to 미포함·필터 allowlist·페이지·CSV 5,000건 상한.",
+      "response": "안전 diff·분류·시각과 권한별 처리자 정보. 원문/토큰 제외.",
+      "deletion": "사용자 수정/삭제 API 없음; 보존 정책·승인된 파기 별도.",
+      "forbidden": "감사 이벤트 임의 수정·삭제, 타 회사 export, 수식 실행 CSV 금지."
+    },
+    {
+      "id": "content",
+      "prefixes": ["/admin/notices", "/admin/guides", "/feedback", "/notices", "/guides", "/support-tickets"],
+      "scope": "공지/가이드는 플랫폼 운영자 변경·인증 사용자 공개 조회(가이드는 활성 회사 필요); 문의는 현재 회사/작성자 또는 운영자.",
+      "validation": "제목/본문 HTML·PDF 형식/검사·문의 암호화·version·작성자 범위 확인.",
+      "response": "게시 콘텐츠와 권한별 문의 DTO. 비공개 첨부 경로·문의 암호문 제외.",
+      "deletion": "공지/가이드는 게시 취소·보관; 문의는 권한별 삭제/상태 전이.",
+      "forbidden": "일반 회원의 운영자 변경, 초안/보관 자료 공개, 다른 작성자 문의 열람 금지."
+    }
+  ]
+}

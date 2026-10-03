@@ -1,0 +1,12 @@
+# 대시보드
+- 근거 dashboard-1440/768/390.json 및 PNG, 전체 raw CSS.
+- Welcome 카드: gradient to left #f1f0ff 14.9%,#e8f2ff100%, padding24px20px radius10 borderwhite1 gap24 mb16; 안내2카드 maxwidth384 padding16px24 radius10 white left border #5882ff/#7f7cff.
+- 전체 grid8 columns gap16; desktop 두 칼럼 카드 span4, wide span8. 모바일1열.
+- 일반 카드: padding24 radius12 bgwhite shadow 0 2px 4px #00000026.
+- 수집 안내/라이선스 카드 minheight183; 보관량 wide3개 내부카드 #f7f8fa radius8 height100.
+- 라이선스 상품 gradient135deg #6558ff→#5043f3 / #587fff→#3c73eb, white text, padding16px24px20px, listminheight86, divider white15%, 버튼white40px.
+- 서비스현황 네칸 #f7f8fa padding16 radius8 gap8. 실제 값 1/0/0/0.
+- 빈차트 영역 border1 #dbdee2 radius4 padding60, Empty120px SVG. 실제원문 표시할 데이터가 없습니다.
+- 서비스 응답 순위 표, 캐치폼 응답 순위 빈표. 공통 DataTable.
+- interactions welcome dismiss local state, 메뉴링크 실제 로컬 경로, 생성방법 Modal, 순위표 페이지크기.
+- assets dashboard-service/catchform/agreement/shield.svg, img-life.svg,img-term.svg 원본19개 다운로드됨.

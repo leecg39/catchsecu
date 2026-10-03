@@ -1,0 +1,10 @@
+
+> catchsecu-clone@0.1.0 typecheck
+> tsc --noEmit
+
+src/server/document-pdf.ts(16,60): error TS2322: Type '{ bytes: Buffer<ArrayBufferLike>; pageCount: number; pdfHash: string; rendererVersion: number; fontHash: string; tenantId: string; serviceId: string; documentId: string; documentVersionId: string; contentHash: string; }' is not assignable to type '((Without<DocumentPdfCreateInput, DocumentPdfUncheckedCreateInput> & DocumentPdfUncheckedCreateInput) | (Without<...> & DocumentPdfCreateInput)) & object'.
+  Type '{ bytes: Buffer<ArrayBufferLike>; pageCount: number; pdfHash: string; rendererVersion: number; fontHash: string; tenantId: string; serviceId: string; documentId: string; documentVersionId: string; contentHash: string; }' is not assignable to type 'Without<DocumentPdfCreateInput, DocumentPdfUncheckedCreateInput> & DocumentPdfUncheckedCreateInput & object'.
+    Type '{ bytes: Buffer<ArrayBufferLike>; pageCount: number; pdfHash: string; rendererVersion: number; fontHash: string; tenantId: string; serviceId: string; documentId: string; documentVersionId: string; contentHash: string; }' is not assignable to type 'DocumentPdfUncheckedCreateInput'.
+      The types of 'bytes.buffer' are incompatible between these types.
+        Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+          Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength

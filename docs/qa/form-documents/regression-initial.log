@@ -1,0 +1,44 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/foundation.test.ts tests/server/policy-approvals.test.ts tests/server/destruction.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:71828) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/foundation.test.ts (42 tests | 1 failed) 6269ms
+   ❯ immutable forms and encrypted public submissions (15)
+     × a different tenant cannot supply a parent service or a question from another version 17ms
+(node:71951) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:72037) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/foundation.test.ts > immutable forms and encrypted public submissions > a different tenant cannot supply a parent service or a question from another version
+AssertionError: expected 403 to be 404 // Object.is equality
+
+- Expected
++ Received
+
+- 404
++ 403
+
+ ❯ tests/server/foundation.test.ts:268:27
+    266|   test("a different tenant cannot supply a parent service or a questio…
+    267|     const denied = await createFormRoute(request("/forms", "POST", for…
+    268|     expect(denied.status).toBe(404);
+       |                           ^
+    269|     const submission = await db.submission.findFirstOrThrow({ where: {…
+    270|     const draft = await db.formVersion.findFirstOrThrow({ where: { for…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 74 passed (75)
+   Start at  00:49:28
+   Duration  20.56s (tests 90%, import 7%, transform 2%)
+

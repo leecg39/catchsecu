@@ -1,0 +1,146 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 풀스택 기능 검증"(30): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=917]
+        container
+          text "서비스명"
+          text "기본 서비스"
+        container
+          text "외부 ⓘ"
+          text "기본 서비스"
+          image
+      container [ref=918]
+        anchor [ref=919, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        container
+          button [ref=920]
+            image
+            text "개인정보 수집/관리"
+            text "⌃"
+          container
+            button [ref=921]
+              text "캐치폼 생성"
+            anchor [ref=922, loc=href:/form/template, url=http://localhost:3100/form/template]
+              text "캐치폼 템플릿"
+            anchor [ref=923, loc=href:/form/info-upload, url=http://localhost:3100/form/info-upload]
+              text "개인정보 업로드"
+            anchor [ref=924, loc=href:/form/manage, url=http://localhost:3100/form/manage]
+              text "캐치폼·업로드 목록"
+            anchor [ref=925, loc=href:/form/ad-manage, url=http://localhost:3100/form/ad-manage]
+              text "광고성 정보 수신동의 관리"
+            anchor [ref=926, loc=href:/form/fixed-url, url=http://localhost:3100/form/fixed-url]
+              text "고정URL 관리"
+        button [ref=927]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=928]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=929]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=930]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=931]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=932]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+      container
+        container
+          anchor [ref=933, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=934, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          button [ref=935]
+            text "홈페이지"
+          button [ref=936]
+            text "개인정보"
+            text "처리방침"
+          button [ref=937]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          text "캐치시큐 테스트 회사 A"
+        container
+          button [ref=938]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=939, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+            image
+          button "문의" [ref=940, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=941, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+            image
+          button [ref=942]
+            image
+            text "MY"
+      container
+        container
+          heading
+            text "캐치폼 템플릿"
+          paragraph
+            text "목적에 맞는 템플릿을 저장하고 질문·동의·응답 설정을 새 캐치폼으로 복제하세요."
+          anchor [ref=943, loc=href:/form/ai/create?templateEdit=new, url=http://localhost:3100/form/ai/create?templateEdit=new]
+            text "템플릿 생성"
+        tablist
+          tab [ref=944]
+            text "캐치폼 템플릿"
+          tab [ref=945]
+            text "서비스 템플릿"
+        container
+          form
+            textbox "템플릿 검색" [ref=946, loc=css:input[placeholder="제목 또는 분류"]]
+              text "제목 또는 분류"
+            button [ref=947]
+              text "검색"
+          table
+            table_row
+              table_cell
+                text "제목"
+              table_cell
+                text "분류"
+              table_cell
+                text "서비스"
+              table_cell
+                text "질문 수"
+              table_cell
+                text "수정일"
+              table_cell
+                text "관리"
+            table_row
+              table_cell
+                image
+                paragraph
+                  text "등록된 템플릿이 없습니다."
+          container
+            container
+              text "총"
+              text "0"
+              text "개"
+            combobox "페이지당 행 수" [ref=952, loc=css:select[aria-label="페이지당 행 수"]]
+              text "20"
+            container
+              button "이전 페이지" [ref=953, loc=css:button[aria-label="이전 페이지"]]
+                text "‹"
+              container
+                text "1"
+                text "/"
+                text "1"
+              button "다음 페이지" [ref=954, loc=css:button[aria-label="다음 페이지"]]
+                text "›"

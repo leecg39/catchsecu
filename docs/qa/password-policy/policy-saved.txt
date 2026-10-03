@@ -1,0 +1,146 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 풀스택 기능 검증"(30): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=1321]
+        container
+          text "서비스명"
+          text "비밀번호 검증 서비스"
+        container
+          text "외부 ⓘ"
+          text "검증 서비스"
+          image
+      container [ref=1322]
+        anchor [ref=1323, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        button [ref=1324]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=1325]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=1326]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=1327]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=1328]
+          image
+          text "알림 서비스"
+          text "⌄"
+        container
+          button [ref=1329]
+            image
+            text "관리"
+            text "⌃"
+          container
+            anchor [ref=1330, loc=href:/set/company, url=http://localhost:3100/set/company]
+              text "회사 기본 정보"
+            anchor [ref=1331, loc=href:/set/company/policy, url=http://localhost:3100/set/company/policy]
+              text "회사 보안 정책 관리"
+            anchor [ref=1332, loc=href:/set/service, url=http://localhost:3100/set/service]
+              text "서비스 관리"
+            anchor [ref=1333, loc=href:/set/member, url=http://localhost:3100/set/member]
+              text "구성원 관리"
+        button [ref=1334]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=1335]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=1336, loc=href:/shared-privacy/view, url=http://localhost:3100/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=1337, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=1338, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          button [ref=1339]
+            text "홈페이지"
+          button [ref=1340]
+            text "개인정보"
+            text "처리방침"
+          button [ref=1341]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          text "비밀번호 정책 QA 회사"
+        container
+          button [ref=1342]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=1343, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+            image
+          button "문의" [ref=1344, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=1345, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+            image
+          button [ref=1346]
+            image
+            text "MY"
+      container
+        heading
+          text "회사 보안 정책 설정"
+        paragraph
+          text "회사에 적용할 보안 정책을 설정합니다. 최상위 관리자만 변경할 수 있습니다."
+        tablist "보안 정책"
+          tab [ref=1347]
+            text "비밀번호 변경"
+          tab [ref=1348]
+            text "비밀번호 재사용"
+          tab [ref=1349]
+            text "세션 유지시간"
+          tab [ref=1350]
+            text "2단계 인증"
+          tab [ref=1351]
+            text "캐치폼 사용 승인"
+        container
+          container
+            heading
+              text "비밀번호 변경 정책"
+            container
+              button [ref=1352]
+                text "기본값 복원"
+              button [ref=1353]
+                text "저장하기"
+          group [ref=1354]
+            heading
+              text "비밀번호 변경 주기"
+            paragraph
+              text "설정한 기간이 지나면 회사 기능을 사용하기 전에 비밀번호를 변경해야 합니다."
+            container
+              text "변경 주기"
+              combobox "비밀번호 변경 주기" [ref=1355, loc=css:select[aria-label="비밀번호 변경 주기"]]
+                text "1개월"
+            container
+              text "비밀번호 다음에 변경하기"
+              combobox "비밀번호 변경 유예" [ref=1356, loc=css:select[aria-label="비밀번호 변경 유예"]]
+                text "다음 로그인까지 미룰 수 있습니다."
+            container
+              text "새 비밀번호 최소 길이"
+              spinbutton "비밀번호 최소 길이" [ref=1357, loc=css:input[aria-label="비밀번호 최소 길이"]]
+                text "16"
+            paragraph
+              text "최소 길이는 다음 비밀번호 변경·재설정부터 적용됩니다. 변경 주기와 유예 정책 변경은 다음 요청부터 적용됩니다."
+          status
+          paragraph
+            text "정책 버전"
+            text "2"
+            text "·"
+            text "2026. 10. 2. 오후 8:20:28"
+  alert

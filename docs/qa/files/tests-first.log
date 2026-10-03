@@ -1,0 +1,40 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/files.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:45770) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/files.test.ts (14 tests | 1 failed) 4252ms
+   ❯ private attachment storage with real PostgreSQL and ClamAV (14)
+     × EICAR is rejected by the real scanner and no infected bytes become downloadable 91ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/files.test.ts > private attachment storage with real PostgreSQL and ClamAV > EICAR is rejected by the real scanner and no infected bytes become downloadable
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/files.test.ts:153:28
+    151|     expect(response.status).toBe(201); expect((await uploadPut(rawReq(…
+    152|     const scanned = await uploadPost(req("/uploads/" + file.id + "/com…
+    153|     expect(scanned.status).toBe(422); expect((await scanned.json()).er…
+       |                            ^
+    154|     const row = await db.fileObject.findUniqueOrThrow({ where: { id: f…
+    155|     expect(row).toMatchObject({ status: "rejected", scanStatus: "infec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 passed (14)
+   Start at  20:57:39
+   Duration  5.15s (tests 84%, import 11%, transform 5%)
+

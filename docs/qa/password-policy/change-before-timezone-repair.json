@@ -1,0 +1,60 @@
+{
+  "checkedAt": "2026-10-02T11:22:29.454Z",
+  "userId": "4ba8ba75-364b-4cf2-afba-89c2d6f9c1bd",
+  "tenantId": "1cf0bbc4-be6a-48c5-976a-9edfe2e093dc",
+  "passwordChangedAt": "2026-10-02T20:22:17.451Z",
+  "newPasswordMatches": true,
+  "oldPasswordRejected": true,
+  "historyCount": 1,
+  "historyMatchesOldPassword": true,
+  "policy": {
+    "minPassword": 16,
+    "passwordMonths": 1,
+    "passwordReuse": 10,
+    "passwordDeferral": "session",
+    "passwordRevision": 2,
+    "version": 2
+  },
+  "deferrals": [],
+  "events": [
+    {
+      "action": "policy.updated",
+      "resource": "securityPolicy",
+      "createdAt": "2026-10-02T11:20:28.302Z",
+      "detail": {
+        "changedFields": [
+          "minPassword",
+          "passwordMonths",
+          "passwordReuse",
+          "passwordDeferral",
+          "sessionMinutes",
+          "requireMfa",
+          "requireApproval",
+          "approvalRoles",
+          "approvalReferenceRequired",
+          "approvalRequestTemplate"
+        ]
+      }
+    },
+    {
+      "action": "password.deferred",
+      "resource": "user",
+      "createdAt": "2026-10-02T11:21:09.377Z",
+      "detail": {
+        "changedFields": [
+          "passwordDeferral"
+        ]
+      }
+    },
+    {
+      "action": "password.changed",
+      "resource": "user",
+      "createdAt": "2026-10-02T20:22:17.453Z",
+      "detail": {
+        "changedFields": [
+          "password"
+        ]
+      }
+    }
+  ]
+}

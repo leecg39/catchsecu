@@ -1,0 +1,3007 @@
+[
+  {
+    "id": 1,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/",
+    "sourceUrl": "https://app.catchsecu.com/",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/app.catchsecu.com/dashboard-1440.json"
+    ],
+    "observedUrl": "",
+    "limitation": "대시보드 공통 화면을 재사용한다. 이 경로 자체의 원본 화면은 검증하지 않았다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 15,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/jap_intro",
+    "sourceUrl": "https://app.catchsecu.com/jap_intro",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_jap_intro.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/jap_intro",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 98,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/notice",
+    "sourceUrl": "https://app.catchsecu.com/notice",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_notice.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/notice",
+    "limitation": "원본 목록 일부만 수집. 공지 전문 및 전체 페이지 자료는 미확인. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 99,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/notice/:admNotiId",
+    "sourceUrl": "https://app.catchsecu.com/notice/:admNotiId",
+    "dynamic": true,
+    "status": "source-based",
+    "requiresFixture": true,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/notice-details.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/notice/59 | https://app.catchsecu.com/notice/58 | https://app.catchsecu.com/notice/56 | https://app.catchsecu.com/notice/55 | https://app.catchsecu.com/notice/54 | https://app.catchsecu.com/notice/53 | https://app.catchsecu.com/notice/52 | https://app.catchsecu.com/notice/51 | https://app.catchsecu.com/notice/50 | https://app.catchsecu.com/notice/49",
+    "limitation": "공지 상세 10개 표본(ID: 59, 58, 56, 55, 54, 53, 52, 51, 50, 49)의 실제 원본 본문을 수집해 표시한다. 그 외 ID는 미수집이며 안내/대체 화면을 제공한다. 전체 공지 상세 및 모든 인터랙션·반응형의 픽셀 일치 검증은 수행하지 않았다. 실제 백엔드·인증·결제·발송 없음."
+  },
+  {
+    "id": 148,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/service/none",
+    "sourceUrl": "https://app.catchsecu.com/service/none",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_service_none.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/service/none",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 149,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/company-info",
+    "sourceUrl": "https://app.catchsecu.com/company-info",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_company-info.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 172,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/IE",
+    "sourceUrl": "https://app.catchsecu.com/IE",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_IE.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 177,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/expert/select-company",
+    "sourceUrl": "https://app.catchsecu.com/expert/select-company",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_expert_select-company.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/expert/select-company",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 178,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/access-not-allow",
+    "sourceUrl": "https://app.catchsecu.com/access-not-allow",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_access-not-allow.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/access-not-allow",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 179,
+    "category": "공지·도움말·시스템",
+    "name": null,
+    "path": "/loading",
+    "sourceUrl": "https://app.catchsecu.com/loading",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_loading.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/loading",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 180,
+    "category": "공지·도움말·시스템",
+    "name": "캐치시큐 헬프센터",
+    "path": "/help-center",
+    "sourceUrl": "https://app.catchsecu.com/help-center",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_help-center.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/help-center",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 181,
+    "category": "공지·도움말·시스템",
+    "name": "로그아웃",
+    "path": "/logout",
+    "sourceUrl": "https://app.catchsecu.com/logout",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 2,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/two-step-setting",
+    "sourceUrl": "https://app.catchsecu.com/two-step-setting",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_two-step-setting.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/two-step-setting",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 14,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/identification/:result",
+    "sourceUrl": "https://app.catchsecu.com/identification/:result",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 16,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/gwloginUser/login",
+    "sourceUrl": "https://app.catchsecu.com/gwloginUser/login",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_gwloginUser_login.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 17,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login",
+    "sourceUrl": "https://app.catchsecu.com/login",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_login.json",
+      "docs/research/app.catchsecu.com/login-extraction.json",
+      "docs/research/app.catchsecu.com/login-1440.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 비로그인 시 별도 수집한 로그인 화면 근거를 사용한다. 로그인 이후 재접근 캡처는 대시보드다. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 18,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/password-change-email",
+    "sourceUrl": "https://app.catchsecu.com/password-change-email",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_password-change-email.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 19,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/passwordChange",
+    "sourceUrl": "https://app.catchsecu.com/passwordChange",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_passwordChange.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 20,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/password-change-email/complete",
+    "sourceUrl": "https://app.catchsecu.com/password-change-email/complete",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_password-change-email_complete.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/password-change-email/complete",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 21,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/password-change-rule",
+    "sourceUrl": "https://app.catchsecu.com/password-change-rule",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_password-change-rule.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/password-change-rule",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 22,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/auth-code",
+    "sourceUrl": "https://app.catchsecu.com/auth-code",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_auth-code.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 23,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/signup",
+    "sourceUrl": "https://app.catchsecu.com/signup",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_signup.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 24,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/expire/code",
+    "sourceUrl": "https://app.catchsecu.com/expire/code",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_expire_code.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 25,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/two-step",
+    "sourceUrl": "https://app.catchsecu.com/two-step",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_two-step.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/two-step-setting",
+    "limitation": "원본 직접 접근은 /two-step-setting로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 이동 대상인 2단계 인증 설정 화면을 동일 경로에서 표시한다. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 26,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/not-allow-ip",
+    "sourceUrl": "https://app.catchsecu.com/not-allow-ip",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_not-allow-ip.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/not-allow-ip",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 27,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login-email",
+    "sourceUrl": "https://app.catchsecu.com/login-email",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_login-email.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login-email",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 28,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login-otp",
+    "sourceUrl": "https://app.catchsecu.com/login-otp",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_login-otp.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login-otp",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 29,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login-failed",
+    "sourceUrl": "https://app.catchsecu.com/login-failed",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_login-failed.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login-failed",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 150,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login/oauth2",
+    "sourceUrl": "https://app.catchsecu.com/login/oauth2",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_login_oauth2.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login/oauth2",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 151,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login/oauth2/verified",
+    "sourceUrl": "https://app.catchsecu.com/login/oauth2/verified",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_login_oauth2_verified.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login/oauth2/verified",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 152,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login/gpki",
+    "sourceUrl": "https://app.catchsecu.com/login/gpki",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_login_gpki.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login/gpki",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 153,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login/saeol",
+    "sourceUrl": "https://app.catchsecu.com/login/saeol",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_login_saeol.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login/saeol",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 154,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/gpki/fail",
+    "sourceUrl": "https://app.catchsecu.com/gpki/fail",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_gpki_fail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 155,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/gpki/email-register",
+    "sourceUrl": "https://app.catchsecu.com/gpki/email-register",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_gpki_email-register.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "원본 직접 접근은 /dashboard로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 156,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/saeol/fail/:org",
+    "sourceUrl": "https://app.catchsecu.com/saeol/fail/:org",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 157,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/link/oauth2",
+    "sourceUrl": "https://app.catchsecu.com/link/oauth2",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_link_oauth2.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/link/oauth2",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 158,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/link/oauth2/verified",
+    "sourceUrl": "https://app.catchsecu.com/link/oauth2/verified",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_link_oauth2_verified.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/link/oauth2/verified",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 159,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/oauth2/fail",
+    "sourceUrl": "https://app.catchsecu.com/oauth2/fail",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_oauth2_fail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/oauth2/fail",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 160,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/oauth2/signup",
+    "sourceUrl": "https://app.catchsecu.com/oauth2/signup",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_oauth2_signup.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/oauth2/signup",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본은 오류 경계만 관찰했다. 로컬 가입 흐름은 데모 대체이다. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 161,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/oauth2/invite/signup",
+    "sourceUrl": "https://app.catchsecu.com/oauth2/invite/signup",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_oauth2_invite_signup.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/oauth2/invite/signup",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본은 오류 경계만 관찰했다. 로컬 가입 흐름은 데모 대체이다. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 165,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login/saml",
+    "sourceUrl": "https://app.catchsecu.com/login/saml",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_login_saml.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login/saml",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 166,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login/saml/start",
+    "sourceUrl": "https://app.catchsecu.com/login/saml/start",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_login_saml_start.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login/saml/start",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 167,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login/saml/verified",
+    "sourceUrl": "https://app.catchsecu.com/login/saml/verified",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_login_saml_verified.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/login/saml/verified",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 168,
+    "category": "로그인·가입·인증",
+    "name": null,
+    "path": "/login/saml/fail",
+    "sourceUrl": "https://app.catchsecu.com/login/saml/fail",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_login_saml_fail.json"
+    ],
+    "observedUrl": "",
+    "limitation": "로컬 데모 동작; 실제 인증/발송/비밀번호 변경 없음 원본 본문이 비어 있거나 수집 오류/유효 인증 상태 미확보. 모듈 조사 기록: docs/research/auth/auth-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 3,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/file-view/:customerId",
+    "sourceUrl": "https://app.catchsecu.com/file-view/:customerId",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 4,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/file-view/:customerId/shared",
+    "sourceUrl": "https://app.catchsecu.com/file-view/:customerId/shared",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 5,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/file-view/:customerId/:questionId/:fileId",
+    "sourceUrl": "https://app.catchsecu.com/file-view/:customerId/:questionId/:fileId",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 6,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/file-view/:customerId/:questionId/:fileId/shared",
+    "sourceUrl": "https://app.catchsecu.com/file-view/:customerId/:questionId/:fileId/shared",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 7,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/projects/:outerToken/form",
+    "sourceUrl": "https://app.catchsecu.com/projects/:outerToken/form",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 8,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/project/:outerToken/form",
+    "sourceUrl": "https://app.catchsecu.com/project/:outerToken/form",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 9,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/url/:outerToken",
+    "sourceUrl": "https://app.catchsecu.com/url/:outerToken",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 10,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/test-projects/:outerToken/form",
+    "sourceUrl": "https://app.catchsecu.com/test-projects/:outerToken/form",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 11,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/customer-use-case/:outerToken",
+    "sourceUrl": "https://app.catchsecu.com/customer-use-case/:outerToken",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 12,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/infoOwner/formComplete",
+    "sourceUrl": "https://app.catchsecu.com/infoOwner/formComplete",
+    "dynamic": false,
+    "status": "unavailable-placeholder",
+    "requiresFixture": false,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_infoOwner_formComplete.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/infoOwner/formComplete",
+    "limitation": "원본 본문 빈 상태만 수집. 로컬 안내 화면은 대체 화면이다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 13,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/infoOwner/form-interrupt",
+    "sourceUrl": "https://app.catchsecu.com/infoOwner/form-interrupt",
+    "dynamic": false,
+    "status": "unavailable-placeholder",
+    "requiresFixture": false,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_infoOwner_form-interrupt.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/infoOwner/form-interrupt",
+    "limitation": "원본 본문 빈 상태만 수집. 로컬 안내 화면은 대체 화면이다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 141,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/services/:serviceId/catchforms/category/:category/agree/:agree",
+    "sourceUrl": "https://app.catchsecu.com/services/:serviceId/catchforms/category/:category/agree/:agree",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 142,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/services/:serviceId/catchforms/recipients/agree/:agree",
+    "sourceUrl": "https://app.catchsecu.com/services/:serviceId/catchforms/recipients/agree/:agree",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 143,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/services/:serviceId/oversea/catchforms/agree/:agree",
+    "sourceUrl": "https://app.catchsecu.com/services/:serviceId/oversea/catchforms/agree/:agree",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 144,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/services/:serviceId/catchforms",
+    "sourceUrl": "https://app.catchsecu.com/services/:serviceId/catchforms",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 145,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/services/:serviceId/catchforms/recipients",
+    "sourceUrl": "https://app.catchsecu.com/services/:serviceId/catchforms/recipients",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 146,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/services/:serviceId/oversea/catchforms",
+    "sourceUrl": "https://app.catchsecu.com/services/:serviceId/oversea/catchforms",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 147,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/services/:serviceId/catchforms/:isDomestic/resident/agree/:agree",
+    "sourceUrl": "https://app.catchsecu.com/services/:serviceId/catchforms/:isDomestic/resident/agree/:agree",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 외부 토큰 화면 미확인. 브라우저에 저장한 데모 폼만 이용한다. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 162,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/document/P/:token",
+    "sourceUrl": "https://app.catchsecu.com/document/P/:token",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 163,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/document/C/:token",
+    "sourceUrl": "https://app.catchsecu.com/document/C/:token",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 164,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/document/OC/:token",
+    "sourceUrl": "https://app.catchsecu.com/document/OC/:token",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 169,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/shared-privacy/verify",
+    "sourceUrl": "https://app.catchsecu.com/shared-privacy/verify",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_shared-privacy_verify.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/shared-privacy/verify",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 170,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/shared-privacy/email-verify",
+    "sourceUrl": "https://app.catchsecu.com/shared-privacy/email-verify",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_shared-privacy_email-verify.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/shared-privacy/verify",
+    "limitation": "원본 직접 접근은 /shared-privacy/verify로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 원본은 인증 시작 화면으로 이동했다. 로컬 인증/열람은 데모 대체이다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 171,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/shared-privacy/view",
+    "sourceUrl": "https://app.catchsecu.com/shared-privacy/view",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/public/_shared-privacy_view.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/shared-privacy/verify",
+    "limitation": "원본 직접 접근은 /shared-privacy/verify로 이동했다. 해당 경로의 정상 내부 상태를 관찰한 것은 아니다. 원본은 인증 시작 화면으로 이동했다. 로컬 인증/열람은 데모 대체이다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 173,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/infoOwner/find",
+    "sourceUrl": "https://app.catchsecu.com/infoOwner/find",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_infoOwner_find.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/infoOwner/find",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 174,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/infoOwner/find/complete",
+    "sourceUrl": "https://app.catchsecu.com/infoOwner/find/complete",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_infoOwner_find_complete.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/infoOwner/find/complete",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 175,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/infoOwner/agree-history/:infoOwnerToken",
+    "sourceUrl": "https://app.catchsecu.com/infoOwner/agree-history/:infoOwnerToken",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 176,
+    "category": "외부 폼·문서·정보주체·공유 열람",
+    "name": null,
+    "path": "/infoOwner/action-history/:infoOwnerToken",
+    "sourceUrl": "https://app.catchsecu.com/infoOwner/action-history/:infoOwnerToken",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 30,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": null,
+    "path": "/set/authority",
+    "sourceUrl": "https://app.catchsecu.com/set/authority",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--authority.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 125,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": "회사 기본 정보",
+    "path": "/set/company",
+    "sourceUrl": "https://app.catchsecu.com/set/company",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--company.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/set/company",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 126,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": null,
+    "path": "/set/company/edit",
+    "sourceUrl": "https://app.catchsecu.com/set/company/edit",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--company--edit.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/set/company/edit",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 127,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": "회사 보안 정책 관리",
+    "path": "/set/company/policy",
+    "sourceUrl": "https://app.catchsecu.com/set/company/policy",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--company--policy.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/set/company/policy",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 128,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": null,
+    "path": "/set/company/policy/setting",
+    "sourceUrl": "https://app.catchsecu.com/set/company/policy/setting",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--company--policy--setting.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/set/company/policy/setting",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 129,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": "서비스 관리",
+    "path": "/set/service",
+    "sourceUrl": "https://app.catchsecu.com/set/service",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--service.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/set/service",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 130,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": null,
+    "path": "/set/service/modification",
+    "sourceUrl": "https://app.catchsecu.com/set/service/modification",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--service--modification.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/set/service/modification",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 131,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": null,
+    "path": "/set/service/consent",
+    "sourceUrl": "https://app.catchsecu.com/set/service/consent",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--service--consent.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/set/service/consent",
+    "limitation": "서비스 ID 없이 관찰했으며 편집은 로컬 데모만 지원 모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 132,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": null,
+    "path": "/set/service/consigment/mail",
+    "sourceUrl": "https://app.catchsecu.com/set/service/consigment/mail",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--service--consigment--mail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/set/service/consigment/mail",
+    "limitation": "서비스 ID 없이 관찰했으며 편집은 로컬 데모만 지원 모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 133,
+    "category": "회사·서비스·구성원·권한 관리",
+    "name": "구성원 관리",
+    "path": "/set/member",
+    "sourceUrl": "https://app.catchsecu.com/set/member",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/set--member.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/set/member",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 31,
+    "category": "모니터링·로그",
+    "name": null,
+    "path": "/log/authority",
+    "sourceUrl": "https://app.catchsecu.com/log/authority",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--authority.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/authority",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 80,
+    "category": "모니터링·로그",
+    "name": "개인정보 처리로그",
+    "path": "/log/info-monitoring",
+    "sourceUrl": "https://app.catchsecu.com/log/info-monitoring",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--info-monitoring.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/info-monitoring",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 81,
+    "category": "모니터링·로그",
+    "name": "광고성 정보 수신동의 처리로그",
+    "path": "/log/ad-monitoring",
+    "sourceUrl": "https://app.catchsecu.com/log/ad-monitoring",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--ad-monitoring.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/ad-monitoring",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 82,
+    "category": "모니터링·로그",
+    "name": null,
+    "path": "/log/customer",
+    "sourceUrl": "https://app.catchsecu.com/log/customer",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--customer.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/customer",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 83,
+    "category": "모니터링·로그",
+    "name": "서비스 이용로그",
+    "path": "/log/service",
+    "sourceUrl": "https://app.catchsecu.com/log/service",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--service.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/service",
+    "limitation": "Ego 동시 페이지 선택 간섭으로 특정 시간 조회 상태는 원본 미검증 모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 84,
+    "category": "모니터링·로그",
+    "name": null,
+    "path": "/log/collect-destruction",
+    "sourceUrl": "https://app.catchsecu.com/log/collect-destruction",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--collect-destruction.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/collect-destruction",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 85,
+    "category": "모니터링·로그",
+    "name": null,
+    "path": "/log/destruction_certificate",
+    "sourceUrl": "https://app.catchsecu.com/log/destruction_certificate",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--destruction_certificate.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/destruction_certificate",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 86,
+    "category": "모니터링·로그",
+    "name": null,
+    "path": "/log/form-approval",
+    "sourceUrl": "https://app.catchsecu.com/log/form-approval",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--form-approval.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/form-approval",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 87,
+    "category": "모니터링·로그",
+    "name": null,
+    "path": "/log/destruction-schedule",
+    "sourceUrl": "https://app.catchsecu.com/log/destruction-schedule",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--destruction-schedule.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/destruction-schedule",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 88,
+    "category": "모니터링·로그",
+    "name": "이메일 발송현황",
+    "path": "/log/mail",
+    "sourceUrl": "https://app.catchsecu.com/log/mail",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--mail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/mail",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 89,
+    "category": "모니터링·로그",
+    "name": "마감 데이터 조회",
+    "path": "/log/month-monitoring",
+    "sourceUrl": "https://app.catchsecu.com/log/month-monitoring",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--month-monitoring.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/month-monitoring",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 90,
+    "category": "모니터링·로그",
+    "name": null,
+    "path": "/log/access-history",
+    "sourceUrl": "https://app.catchsecu.com/log/access-history",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--access-history.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/access-history",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 91,
+    "category": "모니터링·로그",
+    "name": "외부 열람자 로그",
+    "path": "/log/external-viewer",
+    "sourceUrl": "https://app.catchsecu.com/log/external-viewer",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--external-viewer.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/external-viewer",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 134,
+    "category": "모니터링·로그",
+    "name": "구성원 로그",
+    "path": "/log/member",
+    "sourceUrl": "https://app.catchsecu.com/log/member",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/log--member.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/log/member",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 32,
+    "category": "대시보드·통계",
+    "name": null,
+    "path": "/dashboard/:serviceId",
+    "sourceUrl": "https://app.catchsecu.com/dashboard/:serviceId",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/app.catchsecu.com/dashboard-1440.json"
+    ],
+    "observedUrl": "",
+    "limitation": "대시보드 공통 화면을 재사용한다. 이 경로 자체의 원본 화면은 검증하지 않았다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 33,
+    "category": "대시보드·통계",
+    "name": "대시보드",
+    "path": "/dashboard",
+    "sourceUrl": "https://app.catchsecu.com/dashboard",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/app.catchsecu.com/dashboard-1440.json",
+      "docs/research/app.catchsecu.com/dashboard-raw.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 34,
+    "category": "대시보드·통계",
+    "name": null,
+    "path": "/privacy-detail",
+    "sourceUrl": "https://app.catchsecu.com/privacy-detail",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_privacy-detail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/privacy-detail",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 35,
+    "category": "대시보드·통계",
+    "name": null,
+    "path": "/privacy-detail/:serviceId",
+    "sourceUrl": "https://app.catchsecu.com/privacy-detail/:serviceId",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "전체 서비스 화면을 재사용하며 실제 서비스 ID별 원본 데이터/화면은 미확인. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 36,
+    "category": "대시보드·통계",
+    "name": null,
+    "path": "/marketing-detail",
+    "sourceUrl": "https://app.catchsecu.com/marketing-detail",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_marketing-detail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/marketing-detail",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 37,
+    "category": "대시보드·통계",
+    "name": null,
+    "path": "/marketing-detail/:serviceId",
+    "sourceUrl": "https://app.catchsecu.com/marketing-detail/:serviceId",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "전체 서비스 화면을 재사용하며 실제 서비스 ID별 원본 데이터/화면은 미확인. 실제 ID/토큰을 확보하지 못해 정상 원본 화면 증거가 없다. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 38,
+    "category": "대시보드·통계",
+    "name": null,
+    "path": "/compliance",
+    "sourceUrl": "https://app.catchsecu.com/compliance",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/public/_compliance.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/compliance",
+    "limitation": "실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 39,
+    "category": "동의서·처리방침",
+    "name": "동의서 생성",
+    "path": "/basic/info-usage-purpose",
+    "sourceUrl": "https://app.catchsecu.com/basic/info-usage-purpose",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/basic_info-usage-purpose.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/basic/info-usage-purpose",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 40,
+    "category": "동의서·처리방침",
+    "name": "동의서 목록",
+    "path": "/basic/result/consent",
+    "sourceUrl": "https://app.catchsecu.com/basic/result/consent",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/basic_result_consent.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/basic/result/consent",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 41,
+    "category": "동의서·처리방침",
+    "name": null,
+    "path": "/basic/result/consent/phrase",
+    "sourceUrl": "https://app.catchsecu.com/basic/result/consent/phrase",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/basic_result_consent_phrase.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/basic/result/consent/phrase",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 42,
+    "category": "동의서·처리방침",
+    "name": null,
+    "path": "/basic/result/consent/edit",
+    "sourceUrl": "https://app.catchsecu.com/basic/result/consent/edit",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/basic_result_consent_edit.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/basic/result/consent/edit",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 43,
+    "category": "동의서·처리방침",
+    "name": null,
+    "path": "/basic/result/consent/create",
+    "sourceUrl": "https://app.catchsecu.com/basic/result/consent/create",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/basic_result_consent_create.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/basic/result/consent/create",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 44,
+    "category": "동의서·처리방침",
+    "name": null,
+    "path": "/basic/info-usage-purpose/privacy-policy",
+    "sourceUrl": "https://app.catchsecu.com/basic/info-usage-purpose/privacy-policy",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/basic_info-usage-purpose_privacy-policy.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/basic/info-usage-purpose/privacy-policy",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 45,
+    "category": "동의서·처리방침",
+    "name": "처리방침 관리",
+    "path": "/basic/result/policy",
+    "sourceUrl": "https://app.catchsecu.com/basic/result/policy",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/basic_result_policy.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/basic/result/policy",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 46,
+    "category": "캐치폼·개인정보 수집",
+    "name": "캐치폼 템플릿",
+    "path": "/form/template",
+    "sourceUrl": "https://app.catchsecu.com/form/template",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/form_template.json",
+      "docs/research/forms/template-detail-1440.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/template",
+    "limitation": "원본 백엔드와 연결하지 않음. 미리보기는 원본 템플릿 이미지와 설명을 표시하며 원본 전체 응답 폼은 미확인. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 47,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/ai/create",
+    "sourceUrl": "https://app.catchsecu.com/form/ai/create",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/form_ai_create.json",
+      "docs/research/forms/create-detail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/ai/create",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 48,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/ai/recipient",
+    "sourceUrl": "https://app.catchsecu.com/form/ai/recipient",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/forms/form_ai_recipient.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/ai/recipient",
+    "limitation": "실제 응답 데이터 또는 저장 이후 원본 화면은 미확인. 로컬 데모 워크플로. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 49,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/ai/set",
+    "sourceUrl": "https://app.catchsecu.com/form/ai/set",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/forms/form_ai_set.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/ai/set",
+    "limitation": "실제 응답 데이터 또는 저장 이후 원본 화면은 미확인. 로컬 데모 워크플로. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 50,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/ai/share",
+    "sourceUrl": "https://app.catchsecu.com/form/ai/share",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/forms/form_ai_share.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/ai/share",
+    "limitation": "실제 응답 데이터 또는 저장 이후 원본 화면은 미확인. 로컬 데모 워크플로. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 51,
+    "category": "캐치폼·개인정보 수집",
+    "name": "캐치폼·업로드 목록",
+    "path": "/form/manage",
+    "sourceUrl": "https://app.catchsecu.com/form/manage",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/form_manage.json",
+      "docs/research/forms/manage-detail-1440.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/manage",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 52,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/manage/applicant/:formId",
+    "sourceUrl": "https://app.catchsecu.com/form/manage/applicant/:formId",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 응답 데이터 또는 저장 이후 원본 화면은 미확인. 로컬 데모 워크플로. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 53,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/manage/applicant/:serviceId/:formId",
+    "sourceUrl": "https://app.catchsecu.com/form/manage/applicant/:serviceId/:formId",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 응답 데이터 또는 저장 이후 원본 화면은 미확인. 로컬 데모 워크플로. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 54,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/manage/applicant/log/:formId",
+    "sourceUrl": "https://app.catchsecu.com/form/manage/applicant/log/:formId",
+    "dynamic": true,
+    "status": "local-demo-unverified",
+    "requiresFixture": true,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 응답 데이터 또는 저장 이후 원본 화면은 미확인. 로컬 데모 워크플로. 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 55,
+    "category": "캐치폼·개인정보 수집",
+    "name": "광고성 정보 수신동의 관리",
+    "path": "/form/ad-manage",
+    "sourceUrl": "https://app.catchsecu.com/form/ad-manage",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/form_ad-manage.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/ad-manage",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 56,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/ai/basic-frame",
+    "sourceUrl": "https://app.catchsecu.com/form/ai/basic-frame",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/form_ai_basic-frame.json",
+      "docs/research/forms/basic-frame-detail-1440.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/ai/basic-frame",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 57,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/ai/basic-frame/v3",
+    "sourceUrl": "https://app.catchsecu.com/form/ai/basic-frame/v3",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/forms/form_ai_basic-frame_v3.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/ai/basic-frame/v3",
+    "limitation": "실제 응답 데이터 또는 저장 이후 원본 화면은 미확인. 로컬 데모 워크플로. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 58,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/ai/agreement",
+    "sourceUrl": "https://app.catchsecu.com/form/ai/agreement",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/forms/form_ai_agreement.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/ai/agreement",
+    "limitation": "실제 응답 데이터 또는 저장 이후 원본 화면은 미확인. 로컬 데모 워크플로. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 59,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/ai/setting",
+    "sourceUrl": "https://app.catchsecu.com/form/ai/setting",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/forms/form_ai_setting.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/ai/setting",
+    "limitation": "실제 응답 데이터 또는 저장 이후 원본 화면은 미확인. 로컬 데모 워크플로. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 60,
+    "category": "캐치폼·개인정보 수집",
+    "name": "고정URL 관리",
+    "path": "/form/fixed-url",
+    "sourceUrl": "https://app.catchsecu.com/form/fixed-url",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/form_fixed-url.json",
+      "docs/research/forms/fixed-url-detail-1440.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/fixed-url",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 61,
+    "category": "캐치폼·개인정보 수집",
+    "name": "개인정보 업로드",
+    "path": "/form/info-upload",
+    "sourceUrl": "https://app.catchsecu.com/form/info-upload",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/form_info-upload.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/info-upload",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 62,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/info-upload/agreement",
+    "sourceUrl": "https://app.catchsecu.com/form/info-upload/agreement",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/form_info-upload_agreement.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/info-upload/agreement",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 63,
+    "category": "캐치폼·개인정보 수집",
+    "name": null,
+    "path": "/form/info-upload/recipient",
+    "sourceUrl": "https://app.catchsecu.com/form/info-upload/recipient",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/forms/form_info-upload_recipient.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/form/info-upload/recipient",
+    "limitation": "실제 백엔드 없음, 현재 무료 계정에서 관찰한 화면 기준. 모듈 조사 기록: docs/research/forms/forms-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 64,
+    "category": "알림 연동",
+    "name": "알림 받기",
+    "path": "/integration/message",
+    "sourceUrl": "https://app.catchsecu.com/integration/message",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/integration__message.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/integration/message",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 65,
+    "category": "카카오 알림톡",
+    "name": null,
+    "path": "/alimtalk",
+    "sourceUrl": "https://app.catchsecu.com/alimtalk",
+    "dynamic": false,
+    "status": "observed-error",
+    "requiresFixture": false,
+    "statusLabel": "원본 오류 화면 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/alimtalk.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/alimtalk",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 66,
+    "category": "카카오 알림톡",
+    "name": null,
+    "path": "/alimtalk/channels",
+    "sourceUrl": "https://app.catchsecu.com/alimtalk/channels",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/alimtalk__channels.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 67,
+    "category": "카카오 알림톡",
+    "name": null,
+    "path": "/alimtalk/templates",
+    "sourceUrl": "https://app.catchsecu.com/alimtalk/templates",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/alimtalk__templates.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 68,
+    "category": "카카오 알림톡",
+    "name": null,
+    "path": "/alimtalk/templates/register",
+    "sourceUrl": "https://app.catchsecu.com/alimtalk/templates/register",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/alimtalk__templates__register.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 69,
+    "category": "카카오 알림톡",
+    "name": null,
+    "path": "/alimtalk/templates/:templateId",
+    "sourceUrl": "https://app.catchsecu.com/alimtalk/templates/:templateId",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 70,
+    "category": "카카오 알림톡",
+    "name": null,
+    "path": "/alimtalk/templates/:templateId/edit",
+    "sourceUrl": "https://app.catchsecu.com/alimtalk/templates/:templateId/edit",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 71,
+    "category": "카카오 알림톡",
+    "name": null,
+    "path": "/alimtalk/send",
+    "sourceUrl": "https://app.catchsecu.com/alimtalk/send",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/alimtalk__send.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 72,
+    "category": "카카오 알림톡",
+    "name": null,
+    "path": "/alimtalk/history",
+    "sourceUrl": "https://app.catchsecu.com/alimtalk/history",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/alimtalk__history.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 73,
+    "category": "카카오 알림톡",
+    "name": null,
+    "path": "/kakao-playground",
+    "sourceUrl": "https://app.catchsecu.com/kakao-playground",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/kakao-playground.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/kakao-playground",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 74,
+    "category": "이메일 서비스",
+    "name": null,
+    "path": "/mail",
+    "sourceUrl": "https://app.catchsecu.com/mail",
+    "dynamic": false,
+    "status": "observed-empty",
+    "requiresFixture": false,
+    "statusLabel": "원본 빈 화면 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/mail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/mail",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 75,
+    "category": "이메일 서비스",
+    "name": "이메일 발송",
+    "path": "/mail/catchform",
+    "sourceUrl": "https://app.catchsecu.com/mail/catchform",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/mail__catchform.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/mail/catchform",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 76,
+    "category": "이메일 서비스",
+    "name": "직접 입력 이메일 발송",
+    "path": "/mail/direct",
+    "sourceUrl": "https://app.catchsecu.com/mail/direct",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/mail__direct.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/mail/direct",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 77,
+    "category": "이메일 서비스",
+    "name": "발신 주소 관리",
+    "path": "/mail/number",
+    "sourceUrl": "https://app.catchsecu.com/mail/number",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/mail__number.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/mail/number",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 78,
+    "category": "이메일 서비스",
+    "name": "발송 내역",
+    "path": "/mail/history",
+    "sourceUrl": "https://app.catchsecu.com/mail/history",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/mail__history.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/mail/history",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 79,
+    "category": "이메일 서비스",
+    "name": null,
+    "path": "/mail/no-mail",
+    "sourceUrl": "https://app.catchsecu.com/mail/no-mail",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/mail__no-mail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/mail/no-mail",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 92,
+    "category": "마이페이지",
+    "name": "마이페이지",
+    "path": "/my-page",
+    "sourceUrl": "https://app.catchsecu.com/my-page",
+    "dynamic": false,
+    "status": "local-demo-unverified",
+    "requiresFixture": false,
+    "statusLabel": "로컬 데모·원본 정상 화면 미검증",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/my-page.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/my-page",
+    "limitation": "원본 본문이 비어 있음 원본 본문은 비어 있었으며 로컬에서는 프로필 화면으로 대체한다. 모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 93,
+    "category": "마이페이지",
+    "name": null,
+    "path": "/my-page/info",
+    "sourceUrl": "https://app.catchsecu.com/my-page/info",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/my-page--info.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/my-page/info",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 94,
+    "category": "마이페이지",
+    "name": null,
+    "path": "/my-page/info/edit",
+    "sourceUrl": "https://app.catchsecu.com/my-page/info/edit",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/my-page--info--edit.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/my-page/info/edit",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 95,
+    "category": "마이페이지",
+    "name": null,
+    "path": "/my-page/delete",
+    "sourceUrl": "https://app.catchsecu.com/my-page/delete",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/my-page--delete.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/my-page/delete",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 96,
+    "category": "마이페이지",
+    "name": null,
+    "path": "/my-page/activity-log",
+    "sourceUrl": "https://app.catchsecu.com/my-page/activity-log",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/my-page--activity-log.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/my-page/activity-log",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 97,
+    "category": "마이페이지",
+    "name": null,
+    "path": "/my-page/info-activity-log",
+    "sourceUrl": "https://app.catchsecu.com/my-page/info-activity-log",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/my-page--info-activity-log.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/my-page/info-activity-log",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 100,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/membership/detail",
+    "sourceUrl": "https://app.catchsecu.com/pay/membership/detail",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/pay__membership__detail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/pay/membership/detail",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 101,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/billing-policy",
+    "sourceUrl": "https://app.catchsecu.com/pay/billing-policy",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/pay__billing-policy.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/pay/license-service",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 102,
+    "category": "라이선스·결제",
+    "name": "구독 및 결제수단 관리",
+    "path": "/pay/license-service",
+    "sourceUrl": "https://app.catchsecu.com/pay/license-service",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/pay__license-service.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/pay/license-service",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 103,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/service-asset",
+    "sourceUrl": "https://app.catchsecu.com/pay/service-asset",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/pay__service-asset.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/pay/service-asset",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 104,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/method",
+    "sourceUrl": "https://app.catchsecu.com/pay/method",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/pay__method.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/pay/license-service",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 105,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/cancel",
+    "sourceUrl": "https://app.catchsecu.com/pay/cancel",
+    "dynamic": false,
+    "status": "unavailable-placeholder",
+    "requiresFixture": false,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "취소 작업 안전상 미접속 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 106,
+    "category": "라이선스·결제",
+    "name": "자산 및 결제 내역",
+    "path": "/pay/history",
+    "sourceUrl": "https://app.catchsecu.com/pay/history",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/pay__history.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/pay/history",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 107,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/usage/history",
+    "sourceUrl": "https://app.catchsecu.com/pay/usage/history",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/pay__usage__history.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/pay/history",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 108,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/result/success/:purchaseId",
+    "sourceUrl": "https://app.catchsecu.com/pay/result/success/:purchaseId",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 109,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/credit/success/:purchaseId",
+    "sourceUrl": "https://app.catchsecu.com/pay/credit/success/:purchaseId",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 110,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/plus/success/:purchaseId",
+    "sourceUrl": "https://app.catchsecu.com/pay/plus/success/:purchaseId",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 111,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/plus/success/:purchasedId/:type",
+    "sourceUrl": "https://app.catchsecu.com/pay/plus/success/:purchasedId/:type",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 112,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/result/fail",
+    "sourceUrl": "https://app.catchsecu.com/pay/result/fail",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/pay__result__fail.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/pay/result/fail",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 113,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/pay/plus/fail/:errorCode",
+    "sourceUrl": "https://app.catchsecu.com/pay/plus/fail/:errorCode",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 114,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/creditBill/:id",
+    "sourceUrl": "https://app.catchsecu.com/creditBill/:id",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 115,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/bill/:id",
+    "sourceUrl": "https://app.catchsecu.com/bill/:id",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 116,
+    "category": "라이선스·결제",
+    "name": null,
+    "path": "/bill/:id/refund",
+    "sourceUrl": "https://app.catchsecu.com/bill/:id/refund",
+    "dynamic": true,
+    "status": "unavailable-placeholder",
+    "requiresFixture": true,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [],
+    "observedUrl": "",
+    "limitation": "실제 ID 필요 경로별 원본 캡처 파일 없음. coverage 메타데이터만으로 검증 처리하지 않는다. 모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 117,
+    "category": "보안 설정",
+    "name": null,
+    "path": "/security",
+    "sourceUrl": "https://app.catchsecu.com/security",
+    "dynamic": false,
+    "status": "unavailable-placeholder",
+    "requiresFixture": false,
+    "statusLabel": "데이터 없음·접근 불가 대체",
+    "sourceObserved": false,
+    "evidence": [
+      "docs/research/management/security.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/security",
+    "limitation": "원본 본문이 비어 있음 모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 118,
+    "category": "보안 설정",
+    "name": null,
+    "path": "/security/compliance",
+    "sourceUrl": "https://app.catchsecu.com/security/compliance",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/security--compliance.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/security/compliance",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 119,
+    "category": "보안 설정",
+    "name": null,
+    "path": "/security/sso",
+    "sourceUrl": "https://app.catchsecu.com/security/sso",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/security--sso.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/security/sso",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 120,
+    "category": "보안 설정",
+    "name": null,
+    "path": "/security/sso/setting",
+    "sourceUrl": "https://app.catchsecu.com/security/sso/setting",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/security--sso--setting.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/security/sso/setting",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 121,
+    "category": "보안 설정",
+    "name": null,
+    "path": "/security/ip",
+    "sourceUrl": "https://app.catchsecu.com/security/ip",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/security--ip.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/security/ip",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 122,
+    "category": "보안 설정",
+    "name": null,
+    "path": "/security/ip/setting",
+    "sourceUrl": "https://app.catchsecu.com/security/ip/setting",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/security--ip--setting.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/security/ip/setting",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  },
+  {
+    "id": 123,
+    "category": "보안 설정",
+    "name": null,
+    "path": "/security/two-factor",
+    "sourceUrl": "https://app.catchsecu.com/security/two-factor",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/security--two-factor.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 124,
+    "category": "보안 설정",
+    "name": null,
+    "path": "/security/two-factor/setting",
+    "sourceUrl": "https://app.catchsecu.com/security/two-factor/setting",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/management/security--two-factor--setting.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/dashboard",
+    "limitation": "모듈 조사 기록: docs/research/management/management-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 135,
+    "category": "문자 서비스",
+    "name": null,
+    "path": "/sms",
+    "sourceUrl": "https://app.catchsecu.com/sms",
+    "dynamic": false,
+    "status": "observed-empty",
+    "requiresFixture": false,
+    "statusLabel": "원본 빈 화면 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/sms.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/sms",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 136,
+    "category": "문자 서비스",
+    "name": "문자 발송",
+    "path": "/sms/catchform",
+    "sourceUrl": "https://app.catchsecu.com/sms/catchform",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/sms__catchform.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/sms/nonumber",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 137,
+    "category": "문자 서비스",
+    "name": "직접 입력 문자 발송",
+    "path": "/sms/direct",
+    "sourceUrl": "https://app.catchsecu.com/sms/direct",
+    "dynamic": false,
+    "status": "redirect-target",
+    "requiresFixture": false,
+    "statusLabel": "리디렉션 대상 대응",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/sms__direct.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/sms/nonumber",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 원본 이동 대상 화면 또는 해당 상태를 로컬에 표시하며 원래 경로의 업무 화면 재현을 뜻하지 않는다."
+  },
+  {
+    "id": 138,
+    "category": "문자 서비스",
+    "name": "발신 번호 관리",
+    "path": "/sms/number",
+    "sourceUrl": "https://app.catchsecu.com/sms/number",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/sms__number.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/sms/number",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 139,
+    "category": "문자 서비스",
+    "name": "발송 내역",
+    "path": "/sms/history",
+    "sourceUrl": "https://app.catchsecu.com/sms/history",
+    "dynamic": false,
+    "status": "source-based",
+    "requiresFixture": false,
+    "statusLabel": "원본 화면 기반",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/sms__history.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/sms/history",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다."
+  },
+  {
+    "id": 140,
+    "category": "문자 서비스",
+    "name": null,
+    "path": "/sms/nonumber",
+    "sourceUrl": "https://app.catchsecu.com/sms/nonumber",
+    "dynamic": false,
+    "status": "restricted-view",
+    "requiresFixture": false,
+    "statusLabel": "권한·이용조건 제한 화면",
+    "sourceObserved": true,
+    "evidence": [
+      "docs/research/services/sms__nonumber.json"
+    ],
+    "observedUrl": "https://app.catchsecu.com/sms/nonumber",
+    "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+  }
+]

@@ -1,0 +1,180 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/imports.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/imports.test.ts (13 tests | 8 failed) 3681ms
+   ❯ CSV parser and real PostgreSQL import lifecycle (13)
+     × partial import erases original before writing and handles concurrent workers without duplicates 210ms
+     × source deletion failure creates no submissions and retry succeeds 195ms
+     × expired worker leases recover and repeat processing never adds another response 180ms
+     × roles, fresh service grants, tenant boundaries and origins protect every surface 281ms
+     × stale config and catalog changes require revalidation 228ms
+     × contract basis has no fabricated consent, explicit end date and source provider required 169ms
+     × import evidence and duplicate raw rows are removed by actual destruction 150ms
+     × database rejects cross-service binding, unvalidated writes and modifying erased payloads 207ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/imports.test.ts > CSV parser and real PostgreSQL import lifecycle > partial import erases original before writing and handles concurrent workers without duplicates
+AssertionError: expected { …(20) } to match object { status: 'partialFailed', …(1) }
+(27 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "importedRows": 1,
+-   "status": "partialFailed",
++   "importedRows": 0,
++   "status": "retry",
+  }
+
+ ❯ tests/server/imports.test.ts:129:51
+    127|   await Promise.all([runOneImport('worker-a'),runOneImport('worker-b')…
+    128|   // Other validated jobs are not picked up; only explicit commit star…
+    129|   const saved=await readJob(row.id);expect(saved).toMatchObject({statu…
+       |                                                   ^
+    130|   expect(await db.submission.count({where:{importJobId:row.id}})).toBe…
+    131|   expect((await db.fileObject.findUniqueOrThrow({where:{id:row.fileId}…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/server/imports.test.ts > CSV parser and real PostgreSQL import lifecycle > source deletion failure creates no submissions and retry succeeds
+AssertionError: expected 'retry' to be 'partialFailed' // Object.is equality
+
+Expected: "partialFailed"
+Received: "retry"
+
+ ❯ tests/server/imports.test.ts:143:158
+    141|   const {row}=await validated();await start(row);const remove=vi.spyOn…
+    142|   await runOneImport('delete-fail');remove.mockRestore();expect(await …
+    143|   expect((await readJob(row.id)).status).toBe('retry');await runOneImp…
+       |                                                                                                                                                              ^
+    144|  });
+    145|  test('expired worker leases recover and repeat processing never adds …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/server/imports.test.ts > CSV parser and real PostgreSQL import lifecycle > expired worker leases recover and repeat processing never adds another response
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/imports.test.ts:148:48
+    146|   const {row}=await validated();await start(row);const claimed=await c…
+    147|   expect(await claimImport('too-early')).toBeNull();await runOneImport…
+    148|   expect((await readJob(row.id)).importedRows).toBe(1);await runOneImp…
+       |                                                ^
+    149|  });
+    150|  test('roles, fresh service grants, tenant boundaries and origins prot…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/server/imports.test.ts > CSV parser and real PostgreSQL import lifecycle > roles, fresh service grants, tenant boundaries and origins protect every surface
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/imports.test.ts:161:217
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  tests/server/imports.test.ts > CSV parser and real PostgreSQL import lifecycle > stale config and catalog changes require revalidation
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/imports.test.ts:167:228
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  tests/server/imports.test.ts > CSV parser and real PostgreSQL import lifecycle > contract basis has no fabricated consent, explicit end date and source provider required
+PrismaClientKnownRequestError: 
+Invalid `db.submission.findFirstOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/imports.test.ts:176:33
+
+  173 m={...m,retentionUntil:{mode:'fixed',value:new Date(Date.now()+10*86400000).toISOString().slice(0,10)}};
+  174 const updated=await ok<ImportJobRecord>(await patchImport(req('/imports/'+row.id,'PATCH','owner',{version:row.version,mapping:m})));
+  175 const checked=await ok<ImportJobRecord>(await actImport(req('/imports/'+row.id+'/validate','POST','owner',{version:updated.version})));await start(checked);await runOneImport('contract');
+→ 176 const sub=await db.submission.findFirstOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/imports.test.ts:176:13
+    174|   const updated=await ok<ImportJobRecord>(await patchImport(req('/impo…
+    175|   const checked=await ok<ImportJobRecord>(await actImport(req('/import…
+    176|   const sub=await db.submission.findFirstOrThrow({where:{importJobId:r…
+       |             ^
+    177|  });
+    178|  test('cancel and expiry remove staging payloads and private source by…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  tests/server/imports.test.ts > CSV parser and real PostgreSQL import lifecycle > import evidence and duplicate raw rows are removed by actual destruction
+PrismaClientKnownRequestError: 
+Invalid `db.submission.findFirstOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/imports.test.ts:191:115
+
+  188  expect((await actImport(req('/imports/'+row.id+'/commit','POST','owner',{version:row.version}))).status).toBe(409);
+  189 });
+  190 test('import evidence and duplicate raw rows are removed by actual destruction',async()=>{
+→ 191  const {row}=await validated();await start(row);await runOneImport('destroy-case');const sub=await db.submission.findFirstOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/imports.test.ts:191:95
+    189|  });
+    190|  test('import evidence and duplicate raw rows are removed by actual de…
+    191|   const {row}=await validated();await start(row);await runOneImport('d…
+       |                                                                                               ^
+    192|   const change=await ok<{destructionId:string}>(await actSub(req('/sub…
+    193|   const request=await db.destructionRequest.findUniqueOrThrow({where:{…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  tests/server/imports.test.ts > CSV parser and real PostgreSQL import lifecycle > database rejects cross-service binding, unvalidated writes and modifying erased payloads
+PrismaClientKnownRequestError: 
+Invalid `db.submission.findFirstOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/imports.test.ts:204:79
+
+  201 const {row}=await validated();const stored=await db.importJob.findUniqueOrThrow({where:{id:row.id}});
+  202 await expect(db.importJob.update({where:{id:row.id},data:{serviceId:second,version:{increment:1}}})).rejects.toThrow();
+  203 await expect(db.importJob.update({where:{id:row.id},data:{status:'completed',version:{increment:1}}})).rejects.toThrow();
+→ 204 await start(row);await runOneImport('guards');const sub=await db.submission.findFirstOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/imports.test.ts:204:59
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 5 passed (13)
+   Start at  23:03:26
+   Duration  4.70s (tests 82%, import 12%, transform 6%)
+

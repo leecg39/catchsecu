@@ -1,0 +1,24 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:86949) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+    at Client.query (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/pg/lib/client.js:780:7)
+    at PgTransaction.performIO (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@prisma/adapter-pg/dist/index.mjs:645:40)
+    at PgTransaction.queryRaw (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@prisma/adapter-pg/dist/index.mjs:595:41)
+    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:70523
+    at Wr (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:27324)
+    at e.#d (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:76666)
+    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:70492
+    at e.#u (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:75883)
+    at e.interpretNode (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:70406)
+    at e.interpretNode (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:69642)
+
+ Test Files  1 passed (1)
+      Tests  35 passed (35)
+   Start at  19:17:17
+   Duration  9.51s (tests 88%, import 8%, transform 4%)
+

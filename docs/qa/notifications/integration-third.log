@@ -1,0 +1,36 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/notifications.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:95856) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/notifications.test.ts (20 tests | 1 failed) 15347ms
+   ❯ notification CRUD and transactional delivery (15)
+     × emits CSV completion from the actual importer once and preserves counts and target scope 283ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/notifications.test.ts > notification CRUD and transactional delivery > emits CSV completion from the actual importer once and preserves counts and target scope
+AssertionError: {"error":{"code":"IMPORT_NOT_VALIDATED","message":"반영할 정상 행을 검증한 뒤 요청해주세요.","requestId":"d784ae7d-4dad-4da1-8e52-63aee49fcb53"}}: expected 409 to be 202 // Object.is equality
+
+- Expected
++ Received
+
+- 202
++ 409
+
+ ❯ ok tests/server/notifications.test.ts:42:169
+
+ ❯ tests/server/notifications.test.ts:157:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 19 passed (20)
+   Start at  06:18:00
+   Duration  16.64s (tests 93%, import 4%, transform 3%)
+

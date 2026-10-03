@@ -1,0 +1,117 @@
+{
+  "checkedAt": "2026-10-02T11:29:37.533Z",
+  "timezone": "UTC",
+  "userId": "4ba8ba75-364b-4cf2-afba-89c2d6f9c1bd",
+  "tenantId": "1cf0bbc4-be6a-48c5-976a-9edfe2e093dc",
+  "passwordChangedAt": "2026-10-02T11:29:19.083Z",
+  "newPasswordMatches": true,
+  "oldPasswordRejected": true,
+  "historyCount": 2,
+  "historyMatchesOldPassword": true,
+  "policy": {
+    "minPassword": 16,
+    "passwordMonths": 1,
+    "passwordReuse": 10,
+    "passwordDeferral": "period",
+    "passwordRevision": 3,
+    "version": 3
+  },
+  "deferrals": [],
+  "events": [
+    {
+      "id": "0fcdc204-9c09-479a-924b-9725679a5cf4",
+      "action": "policy.updated",
+      "resource": "securityPolicy",
+      "createdAt": "2026-10-02T11:20:28.302Z",
+      "detail": {
+        "changedFields": [
+          "minPassword",
+          "passwordMonths",
+          "passwordReuse",
+          "passwordDeferral",
+          "sessionMinutes",
+          "requireMfa",
+          "requireApproval",
+          "approvalRoles",
+          "approvalReferenceRequired",
+          "approvalRequestTemplate"
+        ]
+      }
+    },
+    {
+      "id": "8a528e0c-87e7-476d-b001-85e5ad76f5a1",
+      "action": "password.deferred",
+      "resource": "user",
+      "createdAt": "2026-10-02T11:21:09.377Z",
+      "detail": {
+        "changedFields": [
+          "passwordDeferral"
+        ]
+      }
+    },
+    {
+      "id": "ff9abb73-fe6e-4517-b49b-6c2b1d9fc6ab",
+      "action": "password.changed",
+      "resource": "user",
+      "createdAt": "2026-10-02T11:22:17.453Z",
+      "detail": {
+        "changedFields": [
+          "password"
+        ]
+      }
+    },
+    {
+      "id": "9d4df4f3-6b21-4323-9e4f-86a4e34409ef",
+      "action": "policy.updated",
+      "resource": "securityPolicy",
+      "createdAt": "2026-10-02T11:22:47.174Z",
+      "detail": {
+        "changedFields": [
+          "minPassword",
+          "passwordMonths",
+          "passwordReuse",
+          "passwordDeferral",
+          "sessionMinutes",
+          "requireMfa",
+          "requireApproval",
+          "approvalRoles",
+          "approvalReferenceRequired",
+          "approvalRequestTemplate"
+        ]
+      }
+    },
+    {
+      "id": "8f8bc50f-141c-4ce2-b83c-ed54473189bb",
+      "action": "password.deferred",
+      "resource": "user",
+      "createdAt": "2026-10-02T11:23:31.434Z",
+      "detail": {
+        "changedFields": [
+          "passwordDeferral"
+        ]
+      }
+    },
+    {
+      "id": "c4420bca-4009-482a-a0f4-665513df3e09",
+      "action": "password.changed",
+      "resource": "user",
+      "createdAt": "2026-10-02T11:29:19.085Z",
+      "detail": {
+        "changedFields": [
+          "password"
+        ]
+      }
+    }
+  ],
+  "timestampRepairs": [
+    {
+      "resourceId": "ff9abb73-fe6e-4517-b49b-6c2b1d9fc6ab",
+      "detail": {
+        "reason": "legacy_password_trigger_timezone",
+        "previousRecordedAt": "2026-10-02T20:22:17.453",
+        "correctedRecordedAt": "2026-10-02T11:22:17.453"
+      },
+      "createdAt": "2026-10-02T11:26:57.530Z"
+    }
+  ]
+}

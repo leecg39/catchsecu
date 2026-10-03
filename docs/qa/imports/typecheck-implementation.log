@@ -1,0 +1,7 @@
+
+> catchsecu-clone@0.1.0 typecheck
+> tsc --noEmit
+
+src/server/import-csv.ts(16,9): error TS2322: Type 'string[][]' is not assignable to type '{ record: string[]; info: { lines: number; }; }[]'.
+  Type 'string[]' is missing the following properties from type '{ record: string[]; info: { lines: number; }; }': record, info
+src/server/import-worker.ts(75,73): error TS2353: Object literal may only specify known properties, and 'tenantId' does not exist in type '(((Without<ConsentEventCreateWithoutReceiptInput, ConsentEventUncheckedCreateWithoutReceiptInput> & ConsentEventUncheckedCreateWithoutReceiptInput) | (Without<...> & ConsentEventCreateWithoutReceiptInput)) & object) | ConsentEventCreateWithoutReceiptInput[] | ConsentEventUncheckedCreateWithoutReceiptInput[]'.

@@ -1,0 +1,40 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/destruction.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:84199) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/destruction.test.ts (15 tests | 1 failed) 3653ms
+   ❯ approved destruction with real database and private storage (15)
+     × request, approve, erase all originals and caches, produce one immutable verified certificate 446ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/destruction.test.ts > approved destruction with real database and private storage > request, approve, erase all originals and caches, produce one immutable verified certificate
+AssertionError: expected 409 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 409
+
+ ❯ tests/server/destruction.test.ts:122:137
+    120|     const detail = await ok(await getSubmission(req("/submissions/" + …
+    121|     expect(detail).toMatchObject({ contentAvailable: false, values: {}…
+    122|     expect((await getFile(req("/files/" + before.id + "/download?submi…
+       |                                                                                                                                         ^
+    123|     const download = await getCertificate(req("/destruction-certificat…
+    124|     expect(download.status).toBe(200); expect(download.headers.get("co…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 14 passed (15)
+   Start at  21:37:18
+   Duration  4.54s (tests 82%, import 12%, transform 6%)
+

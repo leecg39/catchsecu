@@ -1,0 +1,41 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/message-content.test.ts tests/server/campaigns.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:26736) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/campaigns.test.ts (32 tests | 2 failed) 13282ms
+   ❯ message templates and HTML delivery (7)
+     × template application copies an exact version; later edits and deletion cannot change scheduled mail 1ms
+     × HTML sanitizer, escaped recipient values and plaintext fallback match actual delivered bytes 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/campaigns.test.ts > message templates and HTML delivery > template application copies an exact version; later edits and deletion cannot change scheduled mail
+ReferenceError: consent is not defined
+ ❯ tests/server/campaigns.test.ts:387:23
+    385|   });
+    386|   test("template application copies an exact version; later edits and …
+    387|     const recipient = await consent(); const t = await templateCreate(…
+       |                       ^
+    388|     let c = await targets(await create(), [recipient.contact]);
+    389|     expect((await POST(req("/campaigns/" + c.id + "/apply-template", "…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/campaigns.test.ts > message templates and HTML delivery > HTML sanitizer, escaped recipient values and plaintext fallback match actual delivered bytes
+ReferenceError: consent is not defined
+ ❯ tests/server/campaigns.test.ts:401:53
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 36 passed (38)
+   Start at  05:07:05
+   Duration  14.89s (tests 90%, import 6%, transform 3%)
+

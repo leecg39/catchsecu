@@ -1,0 +1,12 @@
+# AppShell
+- Sidebar fixed width280px height100vh bgwhite border-right1px #e7e9ed.
+- Top service selector padding12px16px4px. Nav padding8px16px16px gap4.
+- Primary nav row height36px radius4px label14px500; active #f0f0ff text#6558ff.
+- Footer help buttons border#cbcfd5 and external footer row padding12px20px.
+- Header height80px padding0 32px. Main padding8px32px40px bg#fbfbfc.
+- desktop content left padding280px; at768 and390 sidebar hidden, menu control shown.
+- 768 header padding24px, mobile0px; content mobile padding20px.
+- Sidebar accordion click model; active page changes by path. MY opens menu.
+- Actual menu data extracted to src/data/menu.json. Icons from original SVG numbered files.
+- Local settings/forms/actions never call source backend.
+- Screenshot dashboard-1440/768/390.png, CSS dashboard-1440/768/390.json.

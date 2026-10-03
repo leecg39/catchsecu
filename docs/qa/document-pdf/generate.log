@@ -1,0 +1,21 @@
+
+> catchsecu-clone@0.1.0 db:generate
+> node --env-file=.env.local node_modules/prisma/build/index.js generate
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Error: Prisma schema validation - (get-dmmf wasm)
+Error code: P1012
+error: Error parsing attribute "@relation": A one-to-one relation must use unique fields on the defining side. Either add an `@@unique([tenantId, serviceId, documentId, documentVersionId])` attribute to the model, or change the relation to one-to-many.
+  -->  prisma/schema.prisma:950
+   | 
+949 |   documentId String
+950 |   documentVersion DocumentVersion @relation(fields: [tenantId, serviceId, documentId, documentVersionId], references: [tenantId, serviceId, documentId, id], onDelete: Restrict)
+951 |   rendererVersion Int
+   | 
+
+Validation Error Count: 1
+[Context: getDmmf]
+
+Prisma CLI Version : 7.10.0

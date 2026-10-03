@@ -1,0 +1,40 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/destruction.test.ts -t request and certificate lists recheck
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:3750) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/destruction.test.ts (18 tests | 1 failed | 17 skipped) 1399ms
+   ❯ approved destruction with real database and private storage (18)
+     × request and certificate lists recheck service grants and roles after the context was read 264ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/destruction.test.ts > approved destruction with real database and private storage > request and certificate lists recheck service grants and roles after the context was read
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/server/destruction.test.ts:330:58
+    328|     try {
+    329|       await db.serviceGrant.update({ where: { id: grant.id }, data: { …
+    330|       expect((await listDestructions(ctx, query)).total).toBe(0);
+       |                                                          ^
+    331|       expect((await listDestructions(ctx, query, true)).total).toBe(0);
+    332|       await db.serviceGrant.update({ where: { id: grant.id }, data: { …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 skipped (18)
+   Start at  21:56:04
+   Duration  2.32s (tests 63%, import 24%, transform 13%)
+

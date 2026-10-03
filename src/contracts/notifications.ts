@@ -1,0 +1,22 @@
+import { z } from "zod";
+
+export const notificationKinds = ["submission.created", "import.completed"] as const;
+export type NotificationKind = typeof notificationKinds[number];
+export const notificationLabels = { "submission.created": "응답 제출", "import.completed": "CSV 반영 완료", test: "연결 테스트" };
+export const notificationStatuses = ["queued", "leased", "sending", "retry", "succeeded", "failed", "unknown", "cancelled"] as const;
+export const notificationStatusLabels = { queued: "대기", leased: "준비 중", sending: "전송 중", retry: "재시도 대기", succeeded: "처리 완료", failed: "실패", unknown: "결과 불명", cancelled: "취소" };
+export type NotificationProvider = "slack" | "teams";
+export const subscriptionInput = z.object({ kind: z.enum(notificationKinds), targetId: z.uuid().nullable() }).strict();
+export const subscriptionsInput = z.array(subscriptionInput).min(1).max(2).refine(v => new Set(v.map(s => s.kind)).size === v.length, "같은 이벤트를 중복 선택할 수 없습니다.");
+const fields = { name: z.string().trim().min(1).max(100), enabled: z.boolean(), subscriptions: subscriptionsInput };
+export const integrationCreate = z.object({ serviceId: z.uuid(), provider: z.enum(["slack", "teams"]), endpoint: z.string().min(1).max(2048), ...fields }).strict();
+export const integrationPatch = z.object({ version: z.number().int().positive(), endpoint: z.string().min(1).max(2048).optional(), ...fields }).strict();
+export const notificationVersion = z.object({ version: z.number().int().positive() }).strict();
+export const integrationToggle = notificationVersion.extend({ enabled: z.boolean() }).strict();
+export const integrationDeleteMany = z.object({ serviceId: z.uuid(), items: z.array(z.object({ id: z.uuid(), version: z.number().int().positive() }).strict()).min(1).max(100) }).strict().refine(v => new Set(v.items.map(i => i.id)).size === v.items.length, "중복된 선택입니다.");
+export const integrationQuery = z.object({ serviceId: z.uuid(), search: z.string().trim().max(100).default(""), enabled: z.enum(["all", "true", "false"]).default("all"), provider: z.enum(["all", "slack", "teams"]).default("all"), creatorId: z.uuid().optional(), kind: z.enum(["all", ...notificationKinds]).default("all"), targetId: z.uuid().optional(), page: z.coerce.number().int().min(1).max(100000).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20) });
+export const notificationHistoryQuery = z.object({ page: z.coerce.number().int().min(1).max(100000).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20), status: z.enum(["all", ...notificationStatuses]).default("all") });
+export type SubscriptionInput = z.infer<typeof subscriptionInput>;
+export type IntegrationRecord = { id: string; serviceId: string; name: string; provider: NotificationProvider; enabled: boolean; transport: "local" | "webhook"; endpointHost: string | null; version: number; generation: number; deletedAt: string | null; creatorId: string; creatorName: string; creatorRole: string; createdAt: string; subscriptions: (SubscriptionInput & { targetName: string | null })[] };
+export type NotificationRecord = { id: string; kind: NotificationKind | "test"; status: typeof notificationStatuses[number]; outcome: string | null; error: string | null; attempts: number; maxAttempts: number; version: number; createdAt: string; completedAt: string | null; nextAttemptAt: string; canRetry: boolean; history: { number: number; outcome: string; code: string | null; httpStatus: number | null; startedAt: string; finishedAt: string }[] };
+export type IntegrationOptions = { forms: { id: string; title: string }[]; imports: { id: string; title: string }[]; creators: { id: string; name: string }[]; transport: "local" | "webhook"; formsTruncated: boolean; importsTruncated: boolean };

@@ -1,0 +1,67 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/marketing.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:89954) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/marketing.test.ts (18 tests | 4 failed) 7074ms
+   ❯ marketing preferences, lifecycle and dispatch with real PostgreSQL (18)
+     × new consent needs a newer timestamp and cannot remove channel exclusion or subject suppression 417ms
+     × worker delivers only the consented current version and cancels queued mail after exclusion 299ms
+     × withdrawn marketing blocks business follow-up but authentication mail stays separate 316ms
+     × retention expiry and archived service deny delivery and never expose expired plaintext 253ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/marketing.test.ts > marketing preferences, lifecycle and dispatch with real PostgreSQL > new consent needs a newer timestamp and cannot remove channel exclusion or subject suppression
+AssertionError: expected true to be null
+
+- Expected:
+null
+
++ Received:
+true
+
+ ❯ tests/server/marketing.test.ts:151:97
+    149|     await ok(await PATCH(req("/marketing/preferences/" + p.id, "PATCH"…
+    150|     await ok(await subAction(req(`/submissions/${renewed.id}/withdraw`…
+    151|     await submit(f, ["email"]); expect(await withMarketingDelivery(sco…
+       |                                                                                                 ^
+    152|   });
+    153|   test("worker delivers only the consented current version and cancels…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/marketing.test.ts > marketing preferences, lifecycle and dispatch with real PostgreSQL > worker delivers only the consented current version and cancels queued mail after exclusion
+Error: job did not finish
+ ❯ drain tests/server/marketing.test.ts:68:9
+
+ ❯ tests/server/marketing.test.ts:156:74
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/marketing.test.ts > marketing preferences, lifecycle and dispatch with real PostgreSQL > withdrawn marketing blocks business follow-up but authentication mail stays separate
+Error: job did not finish
+ ❯ drain tests/server/marketing.test.ts:68:9
+
+ ❯ tests/server/marketing.test.ts:165:44
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/marketing.test.ts > marketing preferences, lifecycle and dispatch with real PostgreSQL > retention expiry and archived service deny delivery and never expose expired plaintext
+Error: job did not finish
+ ❯ drain tests/server/marketing.test.ts:68:9
+
+ ❯ tests/server/marketing.test.ts:184:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 14 passed (18)
+   Start at  02:51:02
+   Duration  8.14s (tests 88%, import 8%, transform 4%)
+

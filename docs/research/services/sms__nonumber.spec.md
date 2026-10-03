@@ -1,0 +1,20 @@
+# sms__nonumber Specification
+원본 URL: https://app.catchsecu.com/sms/nonumber
+화면: docs/design-references/services/sms__nonumber-1440.png
+상호작용: 클릭 탭, 필터. 저장/전송/결제는 로컬 데모로만 구현.
+## 실제 문구
+발신번호가 필요한 서비스 입니다. / 문자서비스를 이용하려면 발신번호를 미리 등록해야 합니다. / 지금 발송번호 관리 페이지로 이동해서 등록하시겠습니까? / 발신번호 등록
+## 실제 computed styles
+- DIV: {"fontFamily": "\"Noto Sans KR\"", "fontSize": "14px", "fontWeight": "400", "lineHeight": "21px", "color": "rgb(52, 52, 52)", "backgroundColor": "rgb(255, 255, 255)", "padding": "24px", "margin": "0px", "width": "482.172px", "height": "240.781px", "display": "block", "position": "static", "gap": "normal", "border": "0px solid rgb(238, 238, 238)", "borderRadius": "12px", "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 4px 0px, rgba(0, 0, 0, 0.08) 0px 0px 2px 0px", "transition": "all", "minWidth": "auto", "maxWidth": "none", "overflow": "visible"}
+- 발신번호가 필요한 서비스 입니다.: {"fontFamily": "\"Noto Sans KR\"", "fontSize": "20px", "fontWeight": "700", "lineHeight": "28px", "color": "rgb(72, 78, 85)", "backgroundColor": "rgba(0, 0, 0, 0)", "padding": "0px", "margin": "0px 0px 24px", "width": "434.172px", "height": "28px", "display": "block", "position": "static", "gap": "normal", "border": "0px solid rgb(238, 238, 238)", "borderRadius": "0px", "boxShadow": "none", "transition": "all", "minWidth": "0px", "maxWidth": "none", "overflow": "visible"}
+- DIV: {"fontFamily": "\"Noto Sans KR\"", "fontSize": "14px", "fontWeight": "400", "lineHeight": "21px", "color": "rgb(52, 52, 52)", "backgroundColor": "rgb(229, 242, 255)", "padding": "16px", "margin": "0px", "width": "434.172px", "height": "76.7812px", "display": "block", "position": "static", "gap": "normal", "border": "0px solid rgb(238, 238, 238)", "borderRadius": "8px", "boxShadow": "none", "transition": "all", "minWidth": "0px", "maxWidth": "none", "overflow": "visible"}
+- 문자서비스를 이용하려면 발신번호를 미리 등록해야 합니다.: {"fontFamily": "\"Noto Sans KR\"", "fontSize": "14px", "fontWeight": "700", "lineHeight": "22.4px", "color": "rgb(75, 117, 228)", "backgroundColor": "rgba(0, 0, 0, 0)", "padding": "0px", "margin": "0px", "width": "346.172px", "height": "22.3906px", "display": "block", "position": "static", "gap": "normal", "border": "0px solid rgb(238, 238, 238)", "borderRadius": "0px", "boxShadow": "none", "transition": "all", "minWidth": "0px", "maxWidth": "none", "overflow": "visible"}
+- 지금 발송번호 관리 페이지로 이동해서 등록하시겠습니까?: {"fontFamily": "\"Noto Sans KR\"", "fontSize": "14px", "fontWeight": "400", "lineHeight": "22.4px", "color": "rgb(75, 117, 228)", "backgroundColor": "rgba(0, 0, 0, 0)", "padding": "0px", "margin": "0px", "width": "346.172px", "height": "22.3906px", "display": "block", "position": "static", "gap": "normal", "border": "0px solid rgb(238, 238, 238)", "borderRadius": "0px", "boxShadow": "none", "transition": "all", "minWidth": "0px", "maxWidth": "none", "overflow": "visible"}
+- BUTTON: {"fontFamily": "\"Noto Sans KR\", sans-serif", "fontSize": "12px", "fontWeight": "500", "lineHeight": "16px", "color": "rgb(255, 255, 255)", "backgroundColor": "rgb(101, 88, 255)", "padding": "12px", "margin": "0px", "width": "107.203px", "height": "40px", "display": "flex", "position": "static", "gap": "normal", "border": "1px solid rgb(101, 88, 255)", "borderRadius": "4px", "boxShadow": "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 2px, rgba(0, 0, 0, 0) 0px 0px 0px 0px", "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)", "minWidth": "80px", "maxWidth": "none", "overflow": "visible"}
+- 발신번호 등록: {"fontFamily": "\"Noto Sans KR\"", "fontSize": "14px", "fontWeight": "500", "lineHeight": "16px", "color": "rgb(255, 255, 255)", "backgroundColor": "rgba(0, 0, 0, 0)", "padding": "0px", "margin": "0px", "width": "81.2031px", "height": "16px", "display": "block", "position": "static", "gap": "normal", "border": "0px solid rgb(238, 238, 238)", "borderRadius": "0px", "boxShadow": "none", "transition": "all", "minWidth": "auto", "maxWidth": "none", "overflow": "visible"}
+## 자산
+같은 이름 JSON의 images 및 svgs 원문.
+## 반응형
+768/390 관측: 네비게이션 숨김, 본문 폭 축소, 테이블 수평 스크롤. 카드 세로 배치. 원문 상태 파일 참조.
+## 제한
+실제 거래 ID 없는 동적 결제 경로 원본 미확인. 성공 화면 재현으로 표시하지 않음.

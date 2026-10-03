@@ -1,0 +1,4 @@
+2026-10-03 local production HTTP QA, catchsecu_dev, port 3100
+Command: node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/qa-audit-events.ts
+{"companyAccessLog":200,"viewerPage":307,"viewerApi":403,"viewerOwnActivity":200,"foreignService":404,"renderedPages":5,"mutationMethods":405,"csvStatus":200,"csvRowsMatchList":true,"csvAuditEvent":true,"viewerCsv":403,"foreignCsv":404}
+This checks server responses and DB-backed API data. Client hydration, filter interaction, and rendered table contents remain unverified without browser control.

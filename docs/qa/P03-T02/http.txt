@@ -1,0 +1,5 @@
+2026-10-03 local production HTTP QA, catchsecu_dev, port 3100
+Command: node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/qa-expert-assignments.ts
+{"selectionPage":200,"adminPage":200,"created":201,"mine":200,"selected":200,"scopedService":200,"revoked":204,"afterRevocation":200,"reselectAfterRevocation":404,"cleanup":"pending"}
+{"cleanup":"complete","qaAssignmentRemoved":true,"originalAdminRestored":true}
+After revocation, the account still has its pre-existing direct membership in company A. The 200 service response is for company A; company B and service B are absent. Re-selecting B is 404.

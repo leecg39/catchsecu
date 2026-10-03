@@ -1,0 +1,209 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 풀스택 기능 검증"(30): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  alert
+    text "개인정보 파기 증명서"
+  container
+    container
+      button [ref=2252]
+        container
+          text "서비스명"
+          text "비밀번호 검증 서비스"
+        container
+          text "외부 ⓘ"
+          text "검증 서비스"
+          image
+      container
+        anchor [ref=2253, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        button [ref=2254]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=2255]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=2256]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=2257]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=2258]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=2259]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=2260]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=2261]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=2262, loc=href:/shared-privacy/view, url=http://localhost:3100/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=2263, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=2264, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          button [ref=2265]
+            text "홈페이지"
+          button [ref=2266]
+            text "개인정보"
+            text "처리방침"
+          button [ref=2267]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          text "비밀번호 정책 QA 회사"
+        container
+          button [ref=2268]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=2269, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+            image
+          button "문의" [ref=2270, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=2271, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+            image
+          button [ref=2272]
+            image
+            text "MY"
+      container
+        container
+          heading
+            text "개인정보 파기 증명서"
+          button [ref=2273]
+            text "새로고침"
+        paragraph
+          text "현재 DB 원문과 비공개 저장소 파일의 삭제를 확인한 기록입니다. 백업과 데이터베이스 복구 로그의 물리 삭제는 이 증명 범위에 포함되지 않습니다."
+        container
+          container
+            combobox "파기 서비스" [ref=2274, loc=css:select[aria-label="파기 서비스"]]
+              text "권한이 있는 모든 서비스"
+            anchor [ref=2275, loc=href:/log/destruction-schedule, url=http://localhost:3100/log/destruction-schedule]
+              text "파기 일정"
+          table
+            table_row
+              table_cell
+                text "증명서 번호"
+              table_cell
+                text "응답 ID"
+              table_cell
+                text "파기 완료일"
+              table_cell
+                text "무결성"
+              table_cell
+                text "보기"
+            table_row
+              table_cell
+                text "4547ab46-bc60-4451-9efc-27132f5921b6"
+              table_cell
+                text "9458315e-9c98-4a82-959a-784ee4bc78d5"
+              table_cell
+                text "2026. 10. 2. 오후 9:47:00"
+              table_cell
+                text "확인"
+              table_cell
+                button [ref=2276]
+                  text "증명서 보기"
+          container
+            container
+              text "총"
+              text "1"
+              text "개"
+            combobox "페이지당 행 수" [ref=2277, loc=css:select[aria-label="페이지당 행 수"]]
+              text "20"
+            container
+              button "이전 페이지" [ref=2278, loc=css:button[aria-label="이전 페이지"]]
+                text "‹"
+              container
+                text "1"
+                text "/"
+                text "1"
+              button "다음 페이지" [ref=2279, loc=css:button[aria-label="다음 페이지"]]
+                text "›"
+        dialog "파기 증명서" [ref=2280, loc=role:dialog[name="파기 증명서"]]
+          container
+            heading
+              text "파기 증명서"
+            button "닫기" [ref=2281, loc=css:button[aria-label="닫기"]]
+              text "×"
+          container
+            paragraph
+              text "증명서 번호:"
+              text "4547ab46-bc60-4451-9efc-27132f5921b6"
+            paragraph
+              text "응답 ID:"
+              text "9458315e-9c98-4a82-959a-784ee4bc78d5"
+            paragraph
+              text "파기 완료:"
+              text "2026. 10. 2. 오후 9:47:00"
+            unordered_list
+              container
+                list_item
+                  text "첨부 저장 기록"
+                list_item
+                  text "1"
+                  text "개"
+              container
+                list_item
+                  text "담당자 메모"
+                list_item
+                  text "1"
+                  text "개"
+              container
+                list_item
+                  text "답변"
+                list_item
+                  text "2"
+                  text "개"
+              container
+                list_item
+                  text "동의 영수증"
+                list_item
+                  text "1"
+                  text "개"
+              container
+                list_item
+                  text "정정 기록"
+                list_item
+                  text "5"
+                  text "개"
+              container
+                list_item
+                  text "동의 변경 기록"
+                list_item
+                  text "1"
+                  text "개"
+              container
+                list_item
+                  text "정정 원문"
+                list_item
+                  text "5"
+                  text "개"
+            paragraph
+              text "DB에서 원문 행을 삭제하고 암호화 파일 객체를 저장소에서 제거했습니다. 관련 중복 요청의 응답 캐시도 제거했습니다."
+            paragraph
+              text "원문이 없는 감사 기록과 재실행 방지 표식은 남습니다. 백업·복구 로그·이미 내려받은 외부 사본은 이 증명서의 대상이 아닙니다."
+            paragraph
+              text "무결성:"
+              text "확인됨"
+            anchor [ref=2282, loc=href:/api/v1/destruction-certificates/4547ab46-bc60-4451-9efc-27132f5921b6/download, url=http://localhost:3100/api/v1/destruction-certificates/4547ab46-bc60-4451-9efc-27132f5921b6/download]
+              text "증명서 JSON 다운로드"

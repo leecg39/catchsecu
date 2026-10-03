@@ -1,0 +1,42 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/campaigns.test.ts -t the exact advertised
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:72922) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+stderr | tests/server/campaigns.test.ts > the exact advertised one-click URL redirects only GET and accepts receiver POST without redirects
+{"requestId":"2f0c49e1-efe8-4590-b836-77f325b8cfe8","code":"INTERNAL_ERROR","kind":"TypeError"}
+
+ ❯ tests/server/campaigns.test.ts (55 tests | 1 failed | 54 skipped) 6822ms
+   × the exact advertised one-click URL redirects only GET and accepts receiver POST without redirects 2909ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/campaigns.test.ts > the exact advertised one-click URL redirects only GET and accepts receiver POST without redirects
+AssertionError: expected 500 to be 302 // Object.is equality
+
+- Expected
++ Received
+
+- 302
++ 500
+
+ ❯ tests/server/campaigns.test.ts:684:89
+    682|   const policy = withEmailPolicy(job.id, { text: "한 번에 수신거부" }), adver…
+    683|   expect(new URL(advertised).pathname).toBe("/api/v1/email-unsubscribe…
+    684|   const landing = await unsubscribeGet(new Request(advertised)); expec…
+       |                                                                                         ^
+    685|   expect(await db.emailFeedback.count({ where: { jobId: job.id } })).t…
+    686|   const confirmed = await unsubscribePost(new Request(advertised, { me…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 54 skipped (55)
+   Start at  05:54:21
+   Duration  9.07s (tests 77%, import 12%, transform 11%)
+

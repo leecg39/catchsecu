@@ -1,0 +1,6 @@
+const fs=await import('node:fs/promises');
+const root='/Users/user01/Desktop/캐쳐시큐/catchsecu-clone';
+const t=await taskSpace(29),p=t.page('p1');
+await p.cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+const data=await p.evaluate(()=>({url:location.href,html:document.querySelector('#root').innerHTML,bodyText:document.querySelector('#root').innerText,styles:[...document.styleSheets].map(s=>{try{return {href:s.href,text:[...s.cssRules].map(r=>r.cssText).join('\n')}}catch{return {href:s.href,text:null}}}),tokens:Object.fromEntries([...getComputedStyle(document.documentElement)].filter(k=>k.startsWith('--')).map(k=>[k,getComputedStyle(document.documentElement).getPropertyValue(k)])),images:[...document.querySelectorAll('#root img')].map(e=>({src:e.src,alt:e.alt})),top:[...document.querySelector('#root').children].map(e=>({tag:e.tagName,cls:e.className,children:[...e.children].map(c=>({tag:c.tagName,cls:c.className,text:c.innerText.slice(0,150),rect:c.getBoundingClientRect().toJSON()}))}))}));
+await fs.writeFile(root+'/docs/research/app.catchsecu.com/dashboard-raw.json',JSON.stringify(data,null,2));await p.screenshot({path:root+'/docs/design-references/app.catchsecu.com/dashboard-1440.png',fullPage:true});console.log(data.top);console.log(data.tokens);console.log(await p.snapshot({scope:'full_page'}));

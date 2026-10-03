@@ -1,0 +1,40 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/document-pdf.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:50573) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/document-pdf.test.ts (10 tests | 1 failed) 7885ms
+   ❯ stored document PDF with real PostgreSQL (10)
+     × multi-page Korean rendering is deterministic and includes safe attachment naming 640ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/document-pdf.test.ts > stored document PDF with real PostgreSQL > multi-page Korean rendering is deterministic and includes safe attachment naming
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/server/document-pdf.test.ts:164:63
+    162|     expect(Buffer.from(regenerated.bytes)).toEqual(Buffer.from(stored.…
+    163|     const parsed = await parsedPdf(regenerated.bytes); expect(parsed.p…
+    164|     expect(parsed.pageTexts.every(text => text.length > 100)).toBe(tru…
+       |                                                               ^
+    165|     for (let i = 1; i <= 90; i++) expect(parsed.text).toContain("검증 문단…
+    166|     const clean = (text: string) => text.replace(/v\d+\s*\|\s*\d+\s*\/…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 9 passed (10)
+   Start at  00:27:08
+   Duration  11.60s (tests 69%, import 27%, transform 4%)
+

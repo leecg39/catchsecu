@@ -1,0 +1,54 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/processing-catalog.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/processing-catalog.test.ts (15 tests | 2 failed) 3044ms
+   ❯ processing catalog through actual PostgreSQL and API handlers (15)
+     × creates, reads, updates both resources and keeps the original recipient snapshot 192ms
+     × database cannot silently detach a recipient without creating a purpose revision 73ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/processing-catalog.test.ts > processing catalog through actual PostgreSQL and API handlers > creates, reads, updates both resources and keeps the original recipient snapshot
+TypeError: Cannot read properties of undefined (reading 'count')
+ ❯ tests/server/processing-catalog.test.ts:77:30
+     75|     expect(history.items[1].snapshot).toMatchObject({ retentionDays: 3…
+     76|     expect(await db.purposeRevision.count({ where: { purposeId: record…
+     77|     expect(await db.auditLog.count({ where: { resourceId: record.id } …
+       |                              ^
+     78|     const stored = await db.processingPurpose.findUniqueOrThrow({ wher…
+     79|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/processing-catalog.test.ts > processing catalog through actual PostgreSQL and API handlers > database cannot silently detach a recipient without creating a purpose revision
+AssertionError: promise resolved "{ count: 1 }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "count": 1,
+  }
+
+ ❯ tests/server/processing-catalog.test.ts:202:83
+    200|   test("database cannot silently detach a recipient without creating a…
+    201|     const party = await addRecipient(), row = await addPurpose(purpose…
+    202|     await expect(db.purposeRecipient.deleteMany({ where: { purposeId: …
+       |                                                                                   ^
+    203|     expect(await db.purposeRecipient.count({ where: { purposeId: row.i…
+    204|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 13 passed (15)
+   Start at  22:25:07
+   Duration  3.87s (tests 81%, import 14%, transform 5%)
+

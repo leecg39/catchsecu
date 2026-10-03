@@ -1,0 +1,57 @@
+
+> catchsecu-clone@0.1.0 test
+> node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/form-documents.test.ts
+
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:74872) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-documents.test.ts (14 tests | 2 failed) 6460ms
+   ❯ versioned form documents and consent receipt PDFs (14)
+     × stores one encrypted immutable receipt for retry and parses its actual Korean PDF bytes 460ms
+     × current grants, tenant and retention control PDF access even with a previously loaded context 204ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-documents.test.ts > versioned form documents and consent receipt PDFs > stores one encrypted immutable receipt for retry and parses its actual Korean PDF bytes
+AssertionError: expected '동의영수증·폼버전v1|2026-10-02T15:52:37.692Z개…' to contain '동의문서b19fb613-0ad3-406f-85f0-ac2af98eb…'
+
+Expected: "동의문서b19fb613-0ad3-406f-85f0-ac2af98ebdab개인정보수집·이용동의서당시회사·당시서비스시행일:2026-10-03당시의한글동의본문처리목적:증거목적47a2c1f5-8b30-4f22-a859-b2454c6ebe2c합성상담수집근거:정보주체동의항목:이름(일반개인정보,필수)보유기간:30일동의거부안내동의를거부할수있습니다.권리행사·문의QA문의"
+Received: "동의영수증·폼버전v1|2026-10-02T15:52:37.692Z개인정보동의영수증동의폼6fe32e7d-266b-48cc-95ff-ead2984feaa3폼버전:1동의일시(UTC):2026-10-02T15:52:37.692Z영수증ID:ee4e48dd-588c-497f-9ec5-8bef8e450fb4응답ID:21d22cf3-4822-4fe7-b3d2-6d4d88d0a95e제출시점의개인정보안내기본수집·이용동의:동의함처리목적:상담신청보유기간:30일당시서비스(당시회사)別설정필수항목안내:선택항목안내:필수문서동의:동의함수집·이용·동의문서b19fb613-0ad3-406f-85f0-ac2af98ebdabv1당시서비스(당시회사)別설정필수항목안내:선택항목안내:동의문서b19fb613-0ad3-406f-85f0-ac2af98ebdabv1|1/2개인정보수집·이용동의서당시회사·당시서비스시행일:2026-10-03당시의한글동의본문처리목적:증거목적47a2c1f5-8b30-4f22-a859-b2454c6ebe2c합성상담수집근거:정보주체동의항목:이름(일반개인정보,필수)보유기간:30일동의거부안내동의를거부할수있습니다.권리행사·문의QA문의문서본문해시:1706ddc0483f1be9bdfa4ce3cac355dfa49d933083c3e95140cca0b4e70e990c이파일은제출당시동의기록입니다.이후철회여부는응답상세의처리이력에서확인할수있습니다.본문해시(SHA-256)56551f3a980b91779c7402fc2d462ac7d2793735e7d9aa1a6ba560ab9aa3a1d5v1|2/2"
+
+ ❯ tests/server/form-documents.test.ts:137:140
+    135|       const text: string[] = []; for (let i = 1; i <= pdf.numPages; i+…
+    136|       const normalized = text.join("").replace(/\s/g, "");
+    137|       for (const expected of ["개인정보 동의 영수증", doc.input.title, doc.vers…
+       |                                                                                                                                            ^
+    138|       expect(normalized).not.toContain("합성응답자"); expect(await pdf.getJ…
+    139|     } finally { await task.destroy(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/form-documents.test.ts > versioned form documents and consent receipt PDFs > current grants, tenant and retention control PDF access even with a previously loaded context
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/server/form-documents.test.ts:195:67
+    193|     const row = await live(await form()), sub = await ok<{id:string}>(…
+    194|     expect((await download(sub.id, receipt.id, "anonymous")).status).t…
+    195|     expect((await download(sub.id, receipt.id, "viewer")).status).toBe…
+       |                                                                   ^
+    196|     const ctx = await requireContext(req("/context", "GET", "viewer").…
+    197|     await db.serviceGrant.updateMany({ where: { memberId: members.view…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 12 passed (14)
+   Start at  00:52:32
+   Duration  7.99s (tests 82%, import 13%, transform 5%)
+
