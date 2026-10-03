@@ -11,8 +11,8 @@ import sourceGuides from "../src/data/help-docs.json";
 import { sha256 } from "../src/server/file-validation";
 
 const url = new URL(env.DATABASE_URL);
-if (!["localhost", "127.0.0.1"].includes(url.hostname) || !["/catchsecu_dev", "/catchsecu_test"].includes(url.pathname)) {
-  throw new Error("Seed는 프로젝트의 로컬 dev/test DB에서만 실행할 수 있습니다.");
+if (!["localhost", "127.0.0.1"].includes(url.hostname) || !["/catchsecu_dev", "/catchsecu_test", "/catchsecu_shadow"].includes(url.pathname)) {
+  throw new Error("Seed는 프로젝트의 로컬 dev/test/shadow DB에서만 실행할 수 있습니다.");
 }
 export const fixtureIds = {
   companyA: "10000000-0000-4000-8000-000000000001",
@@ -75,7 +75,10 @@ async function main() {
     }
   }
   await writeFile(credentialFile, JSON.stringify(passwords, null, 2), { mode: 0o600 });
+  const { seedRouteFixtures } = await import("./seed-route-fixtures");
+  const routeFixtures = await seedRouteFixtures();
   console.info("회사 A/B, 서비스 3개, 역할별 10개 계정과 원본 공지·가이드 fixture 생성. 계정 정보: " + credentialFile);
+  console.info("라우트 fixture: " + JSON.stringify(routeFixtures));
   await db.$disconnect();
 }
 main().catch(() => { console.error("로컬 seed 실패. 환경 설정과 migration 상태를 확인하세요."); process.exitCode = 1; });

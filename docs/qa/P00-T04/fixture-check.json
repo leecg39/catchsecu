@@ -1,0 +1,1076 @@
+{
+  "checkedAt": "2026-10-03T03:16:58.179Z",
+  "result": "passed",
+  "routes": 181,
+  "orphanRoutes": 0,
+  "orphanTasks": 0,
+  "grades": {
+    "internal": 169,
+    "adapter": 0,
+    "staging": 12,
+    "mock": 0
+  },
+  "actors": [
+    {
+      "role": "owner",
+      "email": "owner@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000001",
+      "populated": true
+    },
+    {
+      "role": "admin",
+      "email": "admin@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000001",
+      "populated": true
+    },
+    {
+      "role": "editor",
+      "email": "editor@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000001",
+      "populated": true
+    },
+    {
+      "role": "viewer",
+      "email": "viewer@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000001",
+      "populated": true
+    },
+    {
+      "role": "privacy",
+      "email": "privacy@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000001",
+      "populated": true
+    },
+    {
+      "role": "sender",
+      "email": "sender@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000001",
+      "populated": true
+    },
+    {
+      "role": "billing",
+      "email": "billing@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000001",
+      "populated": true
+    },
+    {
+      "role": "security",
+      "email": "security@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000001",
+      "populated": true
+    },
+    {
+      "role": "auditor",
+      "email": "auditor@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000001",
+      "populated": true
+    },
+    {
+      "role": "owner",
+      "email": "owner-b@catchsecu.local.test",
+      "tenantId": "10000000-0000-4000-8000-000000000002",
+      "populated": false
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "EXT-01",
+      "grade": "adapter",
+      "name": "로컬 메일함 전달",
+      "evidence": "MAIL_TRANSPORT=local 일 때 .local 메일 파일",
+      "releasePass": false
+    },
+    {
+      "id": "EXT-02",
+      "grade": "adapter",
+      "name": "ClamAV 파일 검사",
+      "evidence": "CLAMAV_SOCKET이 연결될 때만 adapter. 없으면 blocked",
+      "releasePass": false
+    },
+    {
+      "id": "EXT-03",
+      "grade": "adapter",
+      "name": "로컬 Slack/Teams 알림 파일",
+      "evidence": "NOTIFICATION_TRANSPORT=local",
+      "releasePass": false
+    },
+    {
+      "id": "EXT-04",
+      "grade": "staging",
+      "name": "외부 SMTP 수신·반송",
+      "evidence": "공급자 receipt 없음",
+      "releasePass": false
+    },
+    {
+      "id": "EXT-05",
+      "grade": "staging",
+      "name": "문자·카카오 발송",
+      "evidence": "모델 또는 공급자 계정 없음",
+      "releasePass": false
+    },
+    {
+      "id": "EXT-06",
+      "grade": "staging",
+      "name": "PG 승인·환불",
+      "evidence": "구매·청구 모델과 sandbox 없음",
+      "releasePass": false
+    },
+    {
+      "id": "EXT-07",
+      "grade": "staging",
+      "name": "본인인증 callback",
+      "evidence": "검증 영수증 없음. URL의 result 값으로 성공 처리 금지",
+      "releasePass": false
+    },
+    {
+      "id": "EXT-08",
+      "grade": "staging",
+      "name": "SSO·새올",
+      "evidence": "테스트 IdP와 기관 계약 없음",
+      "releasePass": false
+    }
+  ],
+  "ciGates": {
+    "internal": {
+      "command": "npm run verify:fixtures",
+      "requiredOnEveryChange": true,
+      "skipIsPass": false,
+      "mockIsPass": false
+    },
+    "adapter": {
+      "command": "npm test",
+      "requiredOnEveryChange": true,
+      "skipIsPass": false,
+      "missingToolIs": "blocked"
+    },
+    "staging": {
+      "command": "npm run test:providers",
+      "requiredForRelease": true,
+      "requiredOnEveryChange": false,
+      "missingCredentialIs": "blocked",
+      "blockedIsPass": false
+    }
+  },
+  "seeded": {
+    "actors": 10,
+    "scenarios": 8,
+    "noticeId": "59",
+    "fileBytes": 24,
+    "fileSha256": "3a4b8d87a6efa05bc39a1bdae707012717c033b6ea54e10bb199c355de61076b"
+  },
+  "pages": [
+    {
+      "testId": "E2E-R001",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R002",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R003",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R004",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R005",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R006",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R007",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R008",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R009",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R010",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R011",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R012",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R013",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R014",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R015",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R016",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R017",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R018",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R019",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R020",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R021",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R022",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R023",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R024",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R025",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R026",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R027",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R028",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R029",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R030",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R031",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R032",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R033",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R034",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R035",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R036",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R037",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R038",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R039",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R040",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R041",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R042",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R043",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R044",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R045",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R046",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R047",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R048",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R049",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R050",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R051",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R052",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R053",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R054",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R055",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R056",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R057",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R058",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R059",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R060",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R061",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R062",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R063",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R064",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R065",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R066",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R067",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R068",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R069",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R070",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R071",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R072",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R073",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R074",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R075",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R076",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R077",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R078",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R079",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R080",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R081",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R082",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R083",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R084",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R085",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R086",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R087",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R088",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R089",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R090",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R091",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R092",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R093",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R094",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R095",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R096",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R097",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R098",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R099",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R100",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R101",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R102",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R103",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R104",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R105",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R106",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R107",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R108",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R109",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R110",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R111",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R112",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R113",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R114",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R115",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R116",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R117",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R118",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R119",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R120",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R121",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R122",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R123",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R124",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R125",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R126",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R127",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R128",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R129",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R130",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R131",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R132",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R133",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R134",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R135",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R136",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R137",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R138",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R139",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R140",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R141",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R142",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R143",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R144",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R145",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R146",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R147",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R148",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R149",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R150",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R151",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R152",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R153",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R154",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R155",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R156",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R157",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R158",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R159",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R160",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R161",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R162",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R163",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R164",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R165",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R166",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R167",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R168",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R169",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R170",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R171",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R172",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R173",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R174",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R175",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R176",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R177",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R178",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R179",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R180",
+      "status": 200,
+      "hops": 1
+    },
+    {
+      "testId": "E2E-R181",
+      "status": 200,
+      "hops": 1
+    }
+  ],
+  "publicApis": [
+    200,
+    200,
+    200,
+    200,
+    200
+  ],
+  "failures": []
+}

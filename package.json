@@ -13,7 +13,11 @@
     "worker": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/worker.ts",
     "test": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run",
     "typecheck": "tsc --noEmit",
-    "verify:plan": "python3 scripts/verify-plan.py"
+    "verify:plan": "python3 scripts/verify-plan.py",
+    "verify:fixtures": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-route-fixtures.ts",
+    "verify:p01-db": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-p01-db.ts",
+    "verify:p01-api": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-p01-api.ts",
+    "verify:s3": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-s3-storage.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

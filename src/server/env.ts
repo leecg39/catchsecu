@@ -26,6 +26,16 @@ const schema = z.object({
   SOLAPI_TENANT_ID: z.uuid().optional(),
   SOLAPI_API_KEY: z.string().regex(/^[A-Za-z0-9_-]+$/).optional(),
   SOLAPI_API_SECRET: z.string().min(16).optional(),
+  FILE_STORAGE: z.enum(["local", "s3"]).default("local"),
+  S3_ENDPOINT: z.url().optional(),
+  S3_REGION: z.string().min(1).max(32).default("us-east-1"),
+  S3_BUCKET: z.string().regex(/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/).optional(),
+  S3_ACCESS_KEY_ID: z.string().min(16).max(128).optional(),
+  S3_SECRET_ACCESS_KEY: z.string().min(16).max(128).optional(),
+}).superRefine((value, context) => {
+  if (value.FILE_STORAGE !== "s3") return;
+  for (const field of ["S3_ENDPOINT", "S3_BUCKET", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"] as const)
+    if (!value[field]) context.addIssue({ code: "custom", path: [field], message: "S3 저장소 설정이 필요합니다." });
 });
 const result = schema.safeParse(process.env);
 if (!result.success) {
