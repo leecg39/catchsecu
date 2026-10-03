@@ -797,7 +797,20 @@ model Job {
   completedAt   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  attemptsLog   JobAttempt[]
   @@index([status, dueAt])
+}
+model JobAttempt {
+  id         String    @id @default(uuid())
+  jobId      String
+  job        Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  workerId   String
+  attempt    Int
+  outcome    String
+  errorCode  String?
+  createdAt  DateTime  @default(now())
+  finishedAt DateTime?
+  @@index([jobId, createdAt])
 }
 model IdempotencyRecord {
   id             String   @id @default(uuid())

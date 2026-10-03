@@ -697,5 +697,23 @@ describe("email verification / recovery / MFA", () => {
     const second = await authCall("/sign-in/email", { email: "owner-a@test.local", password });
     const replay = await authCall("/two-factor/verify-backup-code", { code: backupCodes[0] }, cookies(second));
     expect(replay.status).not.toBe(200);
+    expect((await authCall("/two-factor/verify-totp", { code: "000000" }, cookies(second))).status).not.toBe(200);
+  });
+  test("an expired password reset link cannot change the password", async () => {
+    await db.rateLimit.deleteMany();
+    const email = "expire-" + randomUUID() + "@test.local";
+    expect((await authCall("/sign-up/email", { name: "만료", email, password })).status).toBe(200);
+    await runOneJob("expire-verify-mail");
+    const signupJobs = await db.job.findMany({ where: { type: "mail" }, orderBy: { createdAt: "desc" } });
+    const signupMail = signupJobs.map(item => decrypt<{ to: string; text: string }>(item.payloadCipher)).find(item => item.to === email)!;
+    expect([200, 302]).toContain((await auth.handler(new Request(signupMail.text.match(/https?:\/\/\S+/)![0]))).status);
+    expect((await authCall("/request-password-reset", { email, redirectTo: "/passwordChange" })).status).toBe(200);
+    await runOneJob("expire-reset-mail");
+    const resetJobs = await db.job.findMany({ where: { type: "mail" }, orderBy: { createdAt: "desc" } });
+    const resetMail = resetJobs.map(item => decrypt<{ to: string; text: string; subject: string }>(item.payloadCipher)).find(item => item.to === email && item.subject === "비밀번호 재설정")!;
+    const redirect = await auth.handler(new Request(resetMail.text.match(/https?:\/\/\S+/)![0]));
+    const token = new URL(redirect.headers.get("location")!, origin).searchParams.get("token");
+    await db.verification.updateMany({ data: { expiresAt: new Date(Date.now() - 60000) } });
+    expect((await authCall("/reset-password", { token, newPassword: password + "expired" })).status).not.toBe(200);
   });
 });

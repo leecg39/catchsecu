@@ -17,7 +17,8 @@
     "verify:fixtures": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-route-fixtures.ts",
     "verify:p01-db": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-p01-db.ts",
     "verify:p01-api": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-p01-api.ts",
-    "verify:s3": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-s3-storage.ts"
+    "verify:s3": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/verify-s3-storage.ts",
+    "verify:outbox": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/with-shadow.ts scripts/verify-outbox.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-03T08:02:43.210Z",
+  "result": "passed",
+  "calls": 180,
+  "blocked": 178,
+  "failures": [],
+  "safe": [
+    [
+      "/dashboard",
+      "/dashboard"
+    ],
+    [
+      "https://evil.example",
+      "/dashboard"
+    ],
+    [
+      "//evil.example",
+      "/dashboard"
+    ],
+    [
+      "/\\evil",
+      "/dashboard"
+    ],
+    [
+      "/%2f%2fevil.example",
+      "/dashboard"
+    ],
+    [
+      "/login?returnTo=https://evil.example",
+      "/login?returnTo=https://evil.example"
+    ]
+  ]
+}

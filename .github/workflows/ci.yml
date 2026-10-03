@@ -1,0 +1,45 @@
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: catchsecu_app
+          POSTGRES_PASSWORD: ci-test-password
+          POSTGRES_DB: catchsecu_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U catchsecu_app -d catchsecu_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://catchsecu_app:ci-test-password@localhost:5432/catchsecu_test
+      BETTER_AUTH_URL: http://localhost:3101
+      BETTER_AUTH_SECRET: ci-better-auth-secret-at-least-32-characters
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      MAIL_TRANSPORT: local
+      FILE_STORAGE: local
+      PRIVATE_STORAGE_DIR: .local/ci-storage
+      LOCAL_MAIL_DIR: .local/ci-mail
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run db:generate
+      - run: node node_modules/prisma/build/index.js migrate deploy
+      - run: npm run typecheck
+      - run: npm run lint
+      - name: database tests
+        run: node node_modules/vitest/vitest.mjs run --exclude tests/server/files.test.ts --exclude tests/server/notices.test.ts --exclude tests/server/guides.test.ts
+      - name: scanner suite
+        run: node --import tsx scripts/ci-scanner-blocked.ts
