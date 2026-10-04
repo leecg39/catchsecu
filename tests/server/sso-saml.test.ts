@@ -7,6 +7,7 @@ import { inflateRawSync } from "node:zlib";
 import { afterAll, beforeEach, expect, test } from "vitest";
 import { SignedXml } from "xml-crypto";
 import { auth } from "@/server/auth";
+import { tokenHash } from "@/server/crypto";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
 
@@ -86,9 +87,9 @@ async function makeProvider(cookie: string) {
   return { provider, created, patchProvider };
 }
 // 시작 요청 → SAMLRequest 디코딩 → IdP가 서명한 응답 POST까지의 정상 흐름
-async function begin(cookie: string, providerId: string) {
+async function begin(cookie: string, providerId: string, invitationId?: string) {
   const { startRoute } = await routes();
-  const started = await startRoute(req(`/auth/sso/${providerId}?mode=login`, cookie));
+  const started = await startRoute(req(`/auth/sso/${providerId}?mode=${invitationId ? "invite" : "login"}${invitationId ? `&invitation=${invitationId}` : ""}`, cookie));
   const url = new URL(started.headers.get("location")!);
   const requestXml = inflateRawSync(Buffer.from(url.searchParams.get("SAMLRequest")!, "base64")).toString();
   const requestId = /ID="([^"]+)"/.exec(requestXml)![1];
@@ -195,4 +196,38 @@ test("위조 SAML 응답은 모두 거부된다: 서명·issuer·audience·InRes
   const signedXml = Buffer.from(sign(samlResponse({ inResponseTo: requestId })), "base64").toString();
   const tampered = Buffer.from(signedXml.replace("sso-saml@catchsecu.test", "victim@catchsecu.test")).toString("base64");
   expect((await samlRoute(postSaml(tampered, relayState))).status).toBe(401);
+});
+
+test("SAML 초대가입: 초대된 역할·서비스로 수락, 다른 이메일·없는 초대는 거부", async () => {
+  const { cookie, company, user: owner } = await ownerCookie();
+  const { provider, samlRoute } = await makeProvider(cookie).then(async m => ({ ...m, ...(await routes()) }));
+  await db.ssoProvider.update({ where: { id: provider.id }, data: { enabled: true } });
+  const service = await db.service.create({ data: { tenantId: company.id, name: "대상 서비스", externalName: "svc" } });
+  const ownerMembership = await db.membership.findFirstOrThrow({ where: { tenantId: company.id, userId: owner.id } });
+  const invitation = await db.invitation.create({ data: { tenantId: company.id, invitedBy: ownerMembership.id,
+    email: "sso-saml@catchsecu.test", role: "editor", serviceIds: [service.id],
+    tokenHash: tokenHash(randomUUID()), expiresAt: new Date(Date.now() + 86400000) } });
+  // invitation 없는 invite 모드 → 422
+  const noInv = await (await routes()).startRoute(req(`/auth/sso/${provider.id}?mode=invite`));
+  expect(noInv.status).toBe(422);
+  // 정상 초대가입
+  const { url, requestId, relayState } = await begin(cookie, provider.id, invitation.id);
+  const res = await samlRoute(postSaml(sign(samlResponse({ inResponseTo: requestId })), relayState));
+  expect(res.status).toBe(302);
+  expect(res.headers.get("set-cookie")).toContain("better-auth.session_token=");
+  const user = await db.user.findUniqueOrThrow({ where: { email: "sso-saml@catchsecu.test" } });
+  const member = await db.membership.findFirstOrThrow({ where: { tenantId: company.id, userId: user.id } });
+  expect(member.role).toBe("editor");
+  const grant = await db.serviceGrant.findFirstOrThrow({ where: { tenantId: company.id, memberId: member.id, serviceId: service.id } });
+  expect(grant.capabilities.length).toBeGreaterThan(0);
+  expect((await db.invitation.findUniqueOrThrow({ where: { id: invitation.id } })).status).toBe("accepted");
+  // 다른 이메일 초대로 탈취 시도 → 410
+  const other = await db.invitation.create({ data: { tenantId: company.id, invitedBy: ownerMembership.id,
+    email: "victim@catchsecu.test", role: "admin", serviceIds: [service.id],
+    tokenHash: tokenHash(randomUUID()), expiresAt: new Date(Date.now() + 86400000) } });
+  const evil = await begin(cookie, provider.id, other.id);
+  const evilRes = await samlRoute(postSaml(sign(samlResponse({ inResponseTo: evil.requestId, nameId: "attacker-sub" })), evil.relayState));
+  expect(evilRes.status).toBe(410);
+  expect((await db.invitation.findUniqueOrThrow({ where: { id: other.id } })).status).toBe("pending");
+  expect(url.searchParams.get("SAMLRequest")).toBeTruthy();
 });

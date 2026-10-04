@@ -41,12 +41,12 @@ function mayAssign(actorRole: Role, targetRole: Role) {
   if (targetRole === "owner" || (actorRole !== "owner" && !roleCapabilities(targetRole).every(capability => roleCan(actorRole, capability))))
     fail(403, "ROLE_ESCALATION", "현재 권한으로 이 역할을 부여하거나 변경할 수 없습니다.");
 }
-async function validateServices(tx: Transaction, tenantId: string, serviceIds: string[], preservedArchivedIds: string[] = []) {
+export async function validateServices(tx: Transaction, tenantId: string, serviceIds: string[], preservedArchivedIds: string[] = []) {
   const count = await tx.service.count({ where: { id: { in: serviceIds }, tenantId,
     OR: [{ status: "active" }, { status: "archived", id: { in: preservedArchivedIds } }] } });
   if (count !== serviceIds.length) fail(404, "SERVICE_NOT_FOUND", "선택한 서비스를 찾을 수 없습니다.");
 }
-async function replaceGrants(tx: Transaction, tenantId: string, memberId: string, serviceIds: string[], role: Role) {
+export async function replaceGrants(tx: Transaction, tenantId: string, memberId: string, serviceIds: string[], role: Role) {
   await tx.serviceGrant.deleteMany({ where: { tenantId, memberId } });
   if (serviceIds.length) await tx.serviceGrant.createMany({ data: serviceIds.map(serviceId => ({
     tenantId, memberId, serviceId, capabilities: [...roleCapabilities(role)],

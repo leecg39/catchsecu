@@ -32,6 +32,7 @@
 - 콜백: `POST /api/v1/auth/sso/saml` — RelayState로 상태 조회 후 `validatePostResponseAsync`로 XML-DSig 서명(idpCert)·Conditions 시각·Audience·InResponseTo(캐시 프로바이더가 state의 요청ID 해시와 대조)를 검증한다. 서명은 응답 또는 어서션 중 하나 이상 필수.
 - node-saml이 검증하지 않는 항목을 직접 강제한다 — 로그인 응답의 `profile.issuer === provider.issuer`(idpIssuer는 logout 경로만 검증됨), 어서션 존재 시 생략되는 `StatusCode=Success`, `SubjectConfirmationData@Recipient === ACS URL`.
 - RelayState 조건부 삭제로 일회성 소비·재전송 차단은 OIDC와 동일하며, 프로비저닝/연결/세션 발급은 `completeSso` 공용 경로를 공유한다.
+- 초대가입(mode=invite): 시작 시 초대가 pending·미만료·동일 회사인지 검사하고, 콜백에서 초대를 조건부 수락(`status="pending"` 한정 updateMany으로 경합 차단)한 뒤 초대된 role·serviceIds로 멤버십+ServiceGrant를 생성한다. 초대 이메일 ≠ SSO 이메일이면 410, 초대 누락 422, 초대자 권한 상실 409.
 - POST 라우트는 Origin 검사를 `"saml-assertion"` 외부 인증으로 우회한다 — IdP가 리다이렉트 POST하므로 Origin이 없고, 대신 SAML 서명+state 바인딩이 자격증명 역할을 한다.
 
 ## 검증(실제 로컬 SAML IdP)
@@ -41,9 +42,9 @@
 - CRUD/게이트: protocol=saml 생성 → 인증서 사전검사(subject·만료 표시)→활성화, 인증서 누락 422, OIDC 필드 누락 422, 손상 PEM은 생성되지만 preflightOk=false, 비루프백 http SSO URL 422
 - 실제 로그인: AuthnRequest 디코딩(ACS·Destination·ID 확인) → 서명된 SAMLResponse POST → 302 + 세션 쿠키 → `/me` 200, viewer 멤버십·account 연결, RelayState 재전송 401
 - 적대적: 무서명 401, 다른 키 서명 401, issuer 불일치 401(직접 강제), audience 불일치 401, 위조 InResponseTo 401, 다른 ACS Recipient 401(직접 강제), 만료 어서션 401, RequestDenied 상태 401(직접 강제), 불명 RelayState 401, 서명 후 XML 변조 401
+- 초대가입: 초대 역할(editor)·서비스 그랜트로 수락됨을 DB 행으로 확인, 다른 이메일 초대 탈취 410+초대 pending 유지, 초대 없는 invite 422
 
 ## 미완료
 
 - 실제 외부 IdP(Okta/Entra/Google) 통합 검증
-- 초대가입 callback 모드의 초대 연결과 UI
-- 회사 관리 화면의 SSO 설정 UI(`/security/sso`는 현재 Gate 상태 — API는 완비)
+- 초대가입 UI(메일 링크 → mode=invite&invitation= 연결의 화면 검증)와 회사 관리 화면의 SSO 설정 UI(`/security/sso`는 현재 Gate 상태 — API는 완비)

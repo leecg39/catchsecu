@@ -12,6 +12,9 @@ import { decrypt, encrypt } from "./crypto";
 import { env } from "./env";
 import { fail, rateLimit } from "./http";
 import { trustedClientIp } from "./client-ip";
+import { assertQuota } from "./entitlements";
+import { replaceGrants, validateServices } from "./members";
+import { roleCan } from "./permissions";
 
 const sha256 = (value: string) => createHash("sha256").update(value).digest("hex");
 const baseUrl = () => env.BETTER_AUTH_URL.replace(/\/$/, "");
@@ -150,6 +153,12 @@ export async function startSso(providerId: string, mode: string, headers: Header
     if (!member) fail(403, "FORBIDDEN", "이 회사의 구성원만 계정을 연결할 수 있습니다.");
     userId = session.user.id;
   }
+  if (mode === "invite") {
+    if (!invitationId) fail(422, "INVITATION_REQUIRED", "초대가입에는 초대 ID가 필요합니다.");
+    const invitation = await db.invitation.findUnique({ where: { id: invitationId } });
+    if (!invitation || invitation.tenantId !== provider.tenantId || invitation.status !== "pending" || invitation.expiresAt <= new Date())
+      fail(410, "INVITATION_UNAVAILABLE", "초대가 만료되었거나 취소되었습니다.");
+  }
   const state = randomBytes(24).toString("base64url"), nonce = randomBytes(24).toString("base64url");
   const verifier = randomBytes(48).toString("base64url");
   const expiresAt = new Date(Date.now() + 10 * 60000);
@@ -246,7 +255,7 @@ export async function handleSsoCallback(query: URLSearchParams, headers: Headers
 
 type SsoSubject = { sub: string; iss: string; email?: string; name?: string; emailVerified: boolean };
 
-async function completeSso(provider: SsoProvider, state: { mode: string; userId: string | null }, subject: SsoSubject, headers: Headers) {
+async function completeSso(provider: SsoProvider, state: { mode: string; userId: string | null; invitationId: string | null }, subject: SsoSubject, headers: Headers) {
   const accountKey = `${subject.iss}|${subject.sub}`;
   return db.$transaction(async tx => {
     let user = await tx.account.findUnique({ where: { providerId_accountId: { providerId: "sso:" + provider.id, accountId: accountKey } } })
@@ -269,8 +278,32 @@ async function completeSso(provider: SsoProvider, state: { mode: string; userId:
             emailVerified: true } });
         }
         await tx.account.create({ data: { providerId: "sso:" + provider.id, accountId: accountKey, userId: user.id, scope: provider.scopes } });
-        const member = await tx.membership.findFirst({ where: { tenantId: provider.tenantId, userId: user.id } });
-        if (!member) await tx.membership.create({ data: { tenantId: provider.tenantId, userId: user.id, role: "viewer" } });
+        if (state.mode === "invite") {
+          // 초대가입: 초대를 조건부 수락하고 초대된 역할·서비스로 멤버십을 만든다.
+          const invitation = await tx.invitation.findUnique({ where: { id: state.invitationId ?? "" } });
+          if (!invitation || invitation.tenantId !== provider.tenantId || invitation.status !== "pending"
+            || invitation.expiresAt <= new Date() || invitation.email !== subject.email.toLowerCase())
+            fail(410, "INVITATION_UNAVAILABLE", "초대가 만료되었거나 이 계정의 초대가 아닙니다.");
+          const inviter = await tx.membership.findFirst({ where: { id: invitation.invitedBy, tenantId: invitation.tenantId, status: "active" } });
+          if (!inviter || !roleCan(inviter.role, "member.manage"))
+            fail(409, "INVITER_UNAVAILABLE", "초대한 담당자의 권한이 변경되었습니다. 다시 초대를 요청해주세요.");
+          await validateServices(tx, invitation.tenantId, invitation.serviceIds);
+          const accepted = await tx.invitation.updateMany({ where: { id: invitation.id, status: "pending", expiresAt: { gt: new Date() } },
+            data: { status: "accepted", acceptedBy: user.id, version: { increment: 1 } } });
+          if (!accepted.count) fail(410, "INVITATION_UNAVAILABLE", "초대가 이미 사용되었거나 취소되었습니다.");
+          await assertQuota(tx, invitation.tenantId, "members", true, invitation.id);
+          const existing = await tx.membership.findUnique({ where: { tenantId_userId: { tenantId: invitation.tenantId, userId: user.id } } });
+          if (existing && existing.status !== "revoked") fail(409, "MEMBER_EXISTS", "이미 회사에 소속된 계정입니다.");
+          const member = existing
+            ? await tx.membership.update({ where: { id: existing.id }, data: { role: invitation.role, status: "active",
+              accessKind: "direct", expertAssignmentId: null, version: { increment: 1 } } })
+            : await tx.membership.create({ data: { tenantId: invitation.tenantId, userId: user.id, role: invitation.role } });
+          await replaceGrants(tx, invitation.tenantId, member.id, invitation.serviceIds, invitation.role);
+          await audit(tx, { tenantId: provider.tenantId, user: { id: user.id } }, "sso-invite", "invitation.accepted", "invitation", invitation.id, ["status", "membership"]);
+        } else {
+          const member = await tx.membership.findFirst({ where: { tenantId: provider.tenantId, userId: user.id } });
+          if (!member) await tx.membership.create({ data: { tenantId: provider.tenantId, userId: user.id, role: "viewer" } });
+        }
       }
     }
     const member = await tx.membership.findFirst({ where: { tenantId: provider.tenantId, userId: user.id, status: "active" } });
