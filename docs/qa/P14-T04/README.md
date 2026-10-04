@@ -72,6 +72,6 @@
 - 로컬 디스크 스토리지만 검증 — S3/외부 객체저장소 미검증.
 - pg_dump 논리 백업만 — WAL 증분·PITR·MVCC 시점복구 미검증.
 - 빈환경 클린 설치 리허설 미수행(기존 노드 환경 재사용).
-- mail worker 재기동은 검증하지 않음(로컬 mail 디렉터리 분리만).
+- worker 재기동은 단위 수준에서 검증됨 — `foundation.test.ts`(만료 lease 회수·내구 local delivery·중복 claim 차단), `notifications.test.ts`(terminated-worker lease 회수→retry·모호 발송 보존·중복 효과 차단), `campaigns.test.ts`(중단된 local 쓰기의 기존 영수증 복구·바이트 불변). 실제 프로세스 재부팅 mid-flight 시나리오는 미검증.
 
 관련: [scripts/qa-restore-enqueue.ts](../../../scripts/qa-restore-enqueue.ts), [scripts/qa-restore-destroy.ts](../../../scripts/qa-restore-destroy.ts), [src/server/destruction-worker.ts](../../../src/server/destruction-worker.ts)

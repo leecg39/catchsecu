@@ -600,7 +600,7 @@
 - 증거: [docs/qa/P11-T01/](docs/qa/P11-T01/README.md) — 부분 증거 존재. 수용 조건 전수 충족 시 체크.
 
 - 비밀번호 정책·변경·유예 상세 검증: [검증 기록](docs/qa/password-policy/README.md).
-- 부분 구현 증거: [유한 보유 기한의 파기 정책·승인·일정 변경 집행](docs/qa/destruction/README.md). 보유 기간 미지정 폼의 사후 지정과 전체 게이트는 미완료.
+- 부분 구현 증거: [유한 보유 기한의 파기 정책·승인·일정 변경 집행](docs/qa/destruction/README.md). 보유 기간 미지정 폼의 사후 지정은 `designateFormRetention`+`tests/server/retention-designation.test.ts` 3/3로 검증됨(2026-10-07). 남은 것은 전체 게이트뿐.
 
 ### P11-T02 — IP·2FA 정책과 보안 현황
 
@@ -616,7 +616,7 @@
 - 작업: 회사 provider 설정 CRUD·사전검사, 로그인/연동/초대가입 callback을 표준 라이브러리로 구현한다.
 - 선행: P02-T05, P11-T02
 - 검증/완료: state/nonce/PKCE/audience/issuer/서명·재전송·연결탈취 검사; 테스트 IdP 실제 SSO
-- 부분 구현 증거: [OIDC+PKCE+JWKS와 SAML 2.0 POST 바인딩(node-saml+XML-DSig, 직접 issuer·Status·Recipient 강제), 회사별 provider CRUD·사전검사·계정연결, 로컬 RSA IdP·X.509 IdP 실제 SSO](docs/qa/P11-T03/README.md) (2026-10-07). 실제 SaaS IdP·초대가입 UI는 미완료.
+- 부분 구현 증거: [OIDC+PKCE+JWKS와 SAML 2.0 POST 바인딩(node-saml+XML-DSig, 직접 issuer·Status·Recipient 강제), 회사별 provider CRUD·사전검사·계정연결, 로컬 RSA IdP·X.509 IdP 실제 SSO](docs/qa/P11-T03/README.md) (2026-10-07). 관리 UI(`/security/sso` 목록·등록·사전검사·활성화·삭제)도 브라우저 실측 완료. 실제 SaaS IdP·초대가입 UI는 미완료.
 
 ### P11-T04 — GPKI·새올·그룹웨어 어댑터
 

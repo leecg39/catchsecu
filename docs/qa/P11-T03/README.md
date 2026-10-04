@@ -47,4 +47,14 @@
 ## 미완료
 
 - 실제 외부 IdP(Okta/Entra/Google) 통합 검증
-- 초대가입 UI(메일 링크 → mode=invite&invitation= 연결의 화면 검증)와 회사 관리 화면의 SSO 설정 UI(`/security/sso`는 현재 Gate 상태 — API는 완비)
+- 초대가입 UI(메일 링크 → mode=invite&invitation= 연결의 화면 검증)
+
+## 관리 화면 (2026-10-07 추가)
+
+`/security/sso`·`/security/sso/setting`에 `SsoProviders` 컴포넌트(`src/components/management/SsoProviders.tsx`)를 구현했다. 브라우저 실측(Chrome DevTools, owner@catchsecu.local.test):
+
+- 목록·빈 상태·등록 모달 렌더, OIDC↔SAML 전환 시 필드 교체(token/jwks ↔ idpCert PEM)
+- 사전검사 실패 경로: 죽은 IdP 등록 → "등록은 되었으나 사전검사에 실패" 알림 + 목록에 미통과 행, 사용 버튼 비활성(서버 PREFLIGHT_REQUIRED와 일치)
+- 사전검사 재실행 버튼 → 갱신된 결과 반영, 삭제 → 확인 다이얼로그 후 행 제거
+- `security.write` 없는 역할은 관리 버튼 미노출(capabilities 기반)
+- 미검증: 실제 IdP로의 로그인 버튼 왕복, SAML 프로토콜 등록의 UI 완주(서버는 별도 테스트로 검증됨)
