@@ -39,3 +39,47 @@ test("공급자가 없으면 문자를 보내지 않고 로컬 영수증과 서�
   await expect(applySmsReceipt(other, sign(other), secret)).rejects.toMatchObject({ status: 409 });
   expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: delivery.id } })).status).not.toBe("sent");
 });
+
+test("solapi 전송은 키 없으면 거부하고 응답 코드를 매핑한다", async () => {
+  const jobId = randomUUID();
+  if (env.SOLAPI_API_KEY) {
+    expect(env.SOLAPI_API_SECRET).toBeTruthy();
+    return;
+  }
+  await expect(deliverSms({ transport: "solapi", jobId, to: "01000000000", from: "0212345678", text: "안내" })).rejects.toMatchObject({ code: "SMS_PROVIDER_REQUIRED" });
+});
+
+test("solapi mock fetch는 HMAC 서명·페이로드·영수증 매핑을 검증한다", async () => {
+  const key = "test-solapi-key", apiSecret = "test-solapi-secret";
+  const saved = [env.SOLAPI_API_KEY, env.SOLAPI_API_SECRET];
+  env.SOLAPI_API_KEY = key; env.SOLAPI_API_SECRET = apiSecret;
+  const calls: { url: string; init: RequestInit }[] = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), init: init as RequestInit });
+    if (init && init.body && JSON.parse(init.body as string).message.to === "reject-me") {
+      return new Response(JSON.stringify({ messageId: "m1", groupId: "g1", to: "01000000000", type: "SMS", statusCode: "4000", statusMessage: "rejected" }), { status: 200 });
+    }
+    return new Response(JSON.stringify({ messageId: "mid-1", groupId: "gid-1", to: "01000000000", type: "SMS", statusCode: "2000", statusMessage: "ok" }), { status: 200 });
+  };
+  try {
+    const sent = await deliverSms({ transport: "solapi", jobId: randomUUID(), to: "01000000000", from: "0212345678", text: "안녕" });
+    expect(sent.receiptId).toBe("solapi:gid-1:mid-1");
+    expect(sent.status).toBe("provider_accepted");
+    const call = calls[0];
+    expect(call.url).toBe("https://api.solapi.com/messages/v4/send");
+    const auth = (call.init.headers as Record<string, string>).Authorization;
+    expect(auth).toContain(`apiKey=${key}`);
+    expect(auth).toMatch(/^HMAC-SHA256 /);
+    const m = /date=([^,]+), salt=([0-9a-f]{32}), signature=([0-9a-f]{64})/.exec(auth)!;
+    const expected = createHmac("sha256", apiSecret).update(m[1] + m[2]).digest("hex");
+    expect(m[3]).toBe(expected);
+    const payload = JSON.parse(call.init.body as string);
+    expect(payload.message).toMatchObject({ to: "01000000000", from: "0212345678", text: "안녕", type: "SMS" });
+    await deliverSms({ transport: "solapi", jobId: randomUUID(), to: "01000000000", from: "0212345678", text: "가".repeat(100) });
+    expect(JSON.parse(calls[1].init.body as string).message.type).toBe("LMS");
+    await expect(deliverSms({ transport: "solapi", jobId: randomUUID(), to: "reject-me", from: "0212345678", text: "x" })).rejects.toMatchObject({ code: "SMS_PROVIDER_REJECTED" });
+    globalThis.fetch = async () => new Response("<html>500</html>", { status: 500 });
+    await expect(deliverSms({ transport: "solapi", jobId: randomUUID(), to: "01000000000", from: "0212345678", text: "x" })).rejects.toMatchObject({ code: "SMS_PROVIDER_UNAVAILABLE" });
+  } finally { [env.SOLAPI_API_KEY, env.SOLAPI_API_SECRET] = saved; globalThis.fetch = originalFetch; }
+});
