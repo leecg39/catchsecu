@@ -12,13 +12,15 @@ export type BillingHistoryQuery = z.infer<typeof billingHistoryQuery>;
 export type BillingHistoryRecord = {
   id: string;
   occurredAt: string;
-  kind: "trial_started";
-  status: "trialing" | "expired";
-  method: "none";
-  amountKrw: 0;
+  kind: "trial_started" | "payment" | "refund";
+  status: "trialing" | "expired" | "paid" | "requested" | "refunded" | "rejected" | "pending" | "failed" | "cancelled";
+  method: "none" | "card" | "transfer";
+  amountKrw: number;
   planName: string;
   periodStart: string;
   periodEnd: string;
+  orderId?: string;
+  reason?: string;
 };
 export type BillingHistoryList = {
   items: BillingHistoryRecord[];

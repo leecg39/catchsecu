@@ -35,6 +35,15 @@ export async function createPaymentOrder(tx: Transaction, ctx: Context, subscrip
   await audit(tx, ctx, requestId, "billing.order_created", "paymentOrder", row.id, ["amount", "methodId"], undefined);
   return dto(row);
 }
+export type PaymentOrderListItem = PaymentOrderRecord & { planName: string; refundedTotal: number };
+export async function listPaymentOrders(ctx: Context) {
+  if (!roleCan(ctx.member.role, "billing.read")) fail(403, "FORBIDDEN", "결제 정보를 볼 권한이 없습니다.");
+  const rows = await db.paymentOrder.findMany({ where: { tenantId: ctx.tenantId },
+    include: { subscription: { include: { plan: { select: { name: true } } } }, refunds: { where: { status: "refunded" }, select: { amount: true } } },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 100 });
+  return { items: rows.map(row => ({ ...dto(row), planName: row.subscription.plan.name,
+    refundedTotal: row.refunds.reduce((sum, r) => sum + r.amount, 0) })) };
+}
 export async function readPaymentOrder(ctx: Context, id: string) {
   if (!roleCan(ctx.member.role, "billing.read")) fail(403, "FORBIDDEN", "결제 정보를 볼 권한이 없습니다.");
   const row = await db.paymentOrder.findFirst({ where: { id, tenantId: ctx.tenantId } });
