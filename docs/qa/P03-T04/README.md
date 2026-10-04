@@ -35,3 +35,5 @@
 2026-10-04 추가 구현: [발송 이력 재검증](revalidation/README.md). 실제 Job 상태·과거 주소·서버 페이지 보완, 관련41개·Ego/DB/재시작 통과. Task는 in_progress이며 전체 게이트는 미완료다.
 
 후속: [수신자 관리 화면 검증](revalidation/recipient-README.md). 등록/수정/보관/복원·검색/서버 페이지·103번째 선택·충돌 복구·발송 전 주소 버전 검사, 관련44개 및 Ego/DB/새 프로세스 유지·모바일 overflow 보완을 확인했다.
+
+후속: [브라우저 게이트 2026-10-04](browser-gate-20261004.md). live Chrome으로 동의 표시 설정(외부 처리방침 링크 HTTPS 강제·javascript:/http: 거부)과 재위탁 수신자 등록→선택→발송→이력→중복 409 차단·서비스 격리를 DB 행과 대조 확인.
