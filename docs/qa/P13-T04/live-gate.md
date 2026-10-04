@@ -41,3 +41,5 @@ dev 앱 :3100에서 03-route-matrix.csv의 파라미터 없는 **141개 정적 �
 ## 토큰 경로 실제 fixture (2026-10-04 추가)
 
 - `/url/:token`: API로 고정 URL 생성(`qa-gate-url`, 201) → 공개 `resolve` 200(익명 동일)·페이지 200 → 회수 204 후 resolve **410**. 테스트 후 회수 정리 완료.
+
+- `/document/P|C|OC/:token`: tokenCipher 복호 실토큰 3건 — 세 페이지 모두 200, 공개 API는 실제 스냅샷·렌더텍스트·contentHash 반환 + `X-Robots-Tag:noindex`·`Referrer-Policy:no-referrer`(scripts/qa-document-tokens.ts).
