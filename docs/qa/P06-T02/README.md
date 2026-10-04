@@ -39,3 +39,5 @@
 - 대량 내보내기 `POST /exports`의 5,001건 배치는 시험 DB에서, 기한·재다운로드는 시험 DB와 실제 API에서 검증했다. 운영 규모 장시간 부하와 결과 보존 배포 검증은 남아 있다.
 
 재현: 분리된 시험 DB에서 Node.js 24로 `node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/submission-export.test.ts`. Production HTTP 검증 스크립트는 P03/P04 합성 fixture를 사용하며 `scripts/qa-submission-export.ts prepare` → 실제 서버 재시작 → `finish` 순서다. 원본 사이트 데이터와 사용자 관리자 계정은 변경하지 않는다.
+
+후속: [브라우저 게이트 2026-10-04](browser-gate-20261004.md). 공개 제출 검증·멱등성·정정이력·CSV 실파일.
