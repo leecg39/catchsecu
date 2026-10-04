@@ -310,10 +310,35 @@ model BillingSubscription {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   events BillingSubscriptionEvent[]
+  paymentOrders PaymentOrder[]
   @@unique([tenantId, id])
   @@index([tenantId, status, periodEnd])
 }
 
+model PaymentOrder {
+  id String @id @default(uuid())
+  tenantId String
+  subscriptionId String
+  subscription BillingSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  amount Int
+  currency String
+  status String @default("pending")
+  version Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  events PaymentEvent[]
+  @@unique([tenantId, id])
+  @@index([tenantId, status, createdAt])
+}
+model PaymentEvent {
+  id String @id @default(uuid())
+  orderId String
+  order PaymentOrder @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  providerEventId String @unique
+  outcome String
+  createdAt DateTime @default(now())
+  @@index([orderId, createdAt])
+}
 model BillingSubscriptionEvent {
   id String @id @default(uuid())
   subscriptionId String

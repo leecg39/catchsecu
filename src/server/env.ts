@@ -16,6 +16,7 @@ const schema = z.object({
   LOCAL_SMS_DIR: z.string().default(".local/sms"),
   SMS_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),
   KAKAO_REVIEW_SECRET: z.string().min(32).max(128).optional(),
+  PAYMENT_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
   SMTP_USER: z.string().optional(),

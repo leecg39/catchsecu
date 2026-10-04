@@ -889,6 +889,10 @@ add("/entitlements", "get", "billing.read + current tenant", "구독 기간과 �
 add("/assets", "get", "billing.read + current tenant", "현재 서비스별 폼·정보주체 자산 집계", undefined, "implemented");
 add("/subscriptions", "get", "billing.read + current tenant", "회사 구독 상태와 entitlement", undefined, "implemented");
 add("/subscriptions", "post", "billing.write + current tenant", "서버 가격표에 따른 유료 구매 대기 요청; PG 승인 아님", purchaseRequest, "implemented", "201");
+add("/billing/orders", "post", "billing.write", "대기 구독의 결제 주문 생성. 금액은 서버 가격이며 카드 원문을 받지 않음", z.object({ subscriptionId: z.uuid() }).strict(), "implemented", "201");
+add("/billing/orders/{id}", "get", "billing.read", "결제 상태. result=success 쿼리는 무시하고 paid로 바꾸지 않음", undefined, "implemented");
+add("/billing/orders/{id}/return", "post", "billing.write", "성공 복귀 주소는 결제를 확정하지 않음", z.object({ result: z.enum(["success", "fail"]) }).strict(), "implemented");
+add("/billing/provider-events", "post", "signed payment webhook", "서명된 결제 결과만 반영. 중복은 같은 상태, 종료 후 다른 결과는 409", z.object({ orderId: z.uuid(), eventId: z.string(), outcome: z.enum(["paid", "failed"]) }).strict(), "implemented", "202");
 add("/subscriptions/entitlement", "get", "billing.read + current tenant", "회사별 실제 entitlement", undefined, "implemented");
 for (const [action, schema] of [["cancel", cancelRequest], ["undo-cancel", cancelRequest], ["schedule-cancel", scheduleTrialCancelRequest]] as const)
   add("/subscriptions/{id}/" + action, "post", "billing.write + current tenant", "체험/대기 구독의 " + action + " 상태 전이; 유료 PG 취소 아님", schema, "implemented");
