@@ -1240,6 +1240,7 @@ model Submission {
   @@unique([tenantId, id])
   @@unique([tenantId, id, formVersionId])
   @@index([tenantId, formVersionId, submittedAt, id])
+  @@index([tenantId, submittedAt])
   @@index([status, retentionUntil])
   @@index([tenantId, subjectId])
 }

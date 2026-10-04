@@ -5,7 +5,6 @@ const configs:Record<string,{title:string;description?:string;columns:string[];k
 '/log/info-monitoring':{title:'개인정보 처리로그',description:'구성원의 개인정보 조회, 다운로드, 파기 등의 로그를 확인할 수 있습니다. (‘26년 4월 이후의 외부 열람자 로그는 ‘외부 열람자 로그’ 화면에서 확인할 수 있습니다.)',columns:['#','서비스명','캐치폼·개인정보 업로드명','처리자명','처리일시','접속 IP','고객번호','처리내용','사유'],kind:'info'},
 '/log/ad-monitoring':{title:'광고성 정보 수신동의 처리로그',columns:['#','서비스명','처리자명','처리일시','접속 IP','고객번호','처리내용','사유'],kind:'ad'},
 '/log/customer':{title:'고객 이용 로그',columns:['#','서비스 명','캐치폼 명','고객번호','처리일시','접속 IP','수행내용'],kind:'customer'},
-'/log/collect-destruction':{title:'개인정보 수집 및 파기 내역',description:'서비스별/캐치폼·개인정보 업로드 항목 별 개인정보 수집, 잔여, 파기 내역을 하루 단위로 확인할 수 있습니다.',columns:['#','일자','서비스 명','캐치폼·개인정보 업로드 명','수집한 개인정보','당일 수집','당일 파기','당일 잔여(수집-파기)'],kind:'collect'},
 '/my-page/activity-log':{title:'나의 활동 로그',columns:['#','#','처리일시','접속 IP','수행내용'],kind:'activity'},
 '/my-page/info-activity-log':{title:'개인정보 활동 검토 이력',columns:['#','수신일시','발신자','내용','구분','대상자','상태','메시지 발송'],kind:'review'}};
 export function hasLog(path:string){return path in configs}
