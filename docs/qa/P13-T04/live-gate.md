@@ -56,3 +56,19 @@ dev 앱 :3100에서 03-route-matrix.csv의 파라미터 없는 **141개 정적 �
 - `/notice/59`(실제 공지) → 200
 
 무효값 스윝(통제 오류)·실fixture 스윝(정상) 양방향 커버. `/pay/*`·`/bill/:id`·`/alimtalk/templates/:id`·`/infoOwner/*`·`/saeol/*`·`/identification/*`는 로컬 fixture 부재 또는 외부 의존 — 무효값 스윝만 적용.
+
+## 반응형 뷰포트 실측 (2026-10-04 추가, chrome-devtools 에뮬레이션)
+
+`scrollWidth > innerWidth` 여부로 수평 오버플로 측정(owner 세션):
+
+| 뷰포트 | 경로 | 결과 |
+|---|---|---|
+| 390×844 모바일 | /dashboard | 오버플로 없음 |
+| 390×844 | /form/manage | 없음 |
+| 390×844 | /sms/history | 없음 |
+| 390×844 | /log/authority | 없음 |
+| 390×844 | /notice/59 | 없음 |
+| 768×1024 태블릿 | /dashboard | 없음 |
+| 1440×900 데스크톱 | /dashboard | 없음 |
+
+모든 측정 페이지 `scrollWidth == innerWidth`. 전 경로 전수 반응형 스윝은 미수행(대표 화면 검증 범위).
