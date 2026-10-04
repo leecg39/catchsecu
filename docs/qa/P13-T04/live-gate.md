@@ -19,3 +19,21 @@ dev 앱 :3100에서 03-route-matrix.csv의 파라미터 없는 **141개 정적 �
 - 132/141 → **200**(역할이 허용하는 화면의 셸 렌더), **5xx 0**.
 - 차단 9개는 전부 `/log/*` 계열 → `/access-not-allow?reason=role`(audit.read 없음) — 서버 측 역할 경계가 페이지 수준에서도 집행됨.
 - `/security/*`·`/set/*`은 셸 200이지만 데이터 API는 403(P11-T02 게이트 실측) — 셸/데이터 분리 설계.
+
+## 동적 경로 40개 (결과: [dynamic-invalid-sweep.json](dynamic-invalid-sweep.json))
+
+- 무효 파라미터 전수: **40/40 셸 200·5xx 0** — SPA 셸이 렌더되고 클라이언트가 오류 상태(`role=alert`)를 표시하는 구조.
+- 실제 fixture 대조(페이지+데이터 API):
+
+| 경로 | 페이지 | 데이터 API |
+|---|---|---|
+| `/dashboard/{serviceA}` | 200 | `analytics/dashboard` 200 |
+| `/form/manage/applicant/{실제폼}` | 200 | `forms/{id}/submissions` 200 |
+| `/notice/{게시공지}` | 200 | `notices/{id}` 200 |
+| `/services/{serviceA}/catchforms` | 200 | `forms?serviceId=` 200 |
+| `/file-view/{실제응답}` | 200 | `files?submissionId=` 200(첨부0), 없는 id → 404 |
+
+## 미수용 (갱신)
+
+- 토큰 경로(`/projects/:token`·`/url/:token`·`/document/*`·`/infoOwner/*`)의 실제 토큰 fixture 렌더는 개별 게이트(P04/P05/P06) 브라우저 실측으로 대체 검증됨 — 이번 스윕은 셸+API 경계만.
+- 새로고침·뒤로가기·1440/768/390 전수·캡처 목록은 여전히 미수행.
