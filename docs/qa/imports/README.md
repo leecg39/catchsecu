@@ -56,3 +56,17 @@ Ego TaskSpace 30의 p1에서 localhost 합성 자료만 사용했다. 수집 목
 - 모바일 표가 페이지 폭을 늘리는 현상: grid 최소 폭과 표 스크롤 범위를 고쳐 390px에서 측정했다.
 
 초기 실패 로그도 원인과 수정 과정을 남기기 위해 보관한다. 최종 판정은 위 최종 실행 로그와 실제 대조 결과를 기준으로 한다.
+
+## 2026-10-05 라이브 재검증 (Chrome DevTools + 실제 ClamAV)
+
+이번에는 브라우저에서 전체 흐름을 다시 실행하고 DB를 직접 대조했다.
+
+- **ClamAV 실기동**: quarantine 제거·ad-hoc 재서명 후 `scripts/` 경로로 clamd 기동, 소켓 `PONG` 응답 확인. 업로드 파일 `scanStatus=clean` 기록. 스캐너 부재 시 업로드가 fail-closed로 차단되는 것도 먼저 확인했다.
+- **검증 결과 (UI=DB)**: 7행 → 정상 5·오류 1(`not-an-email` 이메일 형식)·중복 1(파일 내 2번 행과 동일). 실패행 CSV는 행 번호·사유·원본 값을 보존.
+- **수식 무해화**: `=1+2`, `+SUM(A1:A2)`이 계산되지 않고 Answer에 문자열 그대로 암호화 저장됨을 복호화해 확인.
+- **반영**: `committing` → worker 실행 → `partialFailed`, 응답 5건 생성(importRowNo 2,3,5,7,8). 원본 FileObject는 반영 전 `deleted`.
+- **재업로드 독립 수집 확인**: 동일 CSV를 새 작업(`e30ac4fd`)으로 업로드 → 파일 내 중복만 재검출되고 5행이 **별도 formVersion의 새 응답 5건**으로 반영됨. 코드 주석상 "Separate imports are independent collections"의 의도된 동작이며 문서에도 명시돼 있다. 중복 행(row 4)은 row 2 응답에 링크만 연결.
+- **감사 추적 완전**: `import.created → previewed(3) → configured → validated → commit_requested → completed` + `import.viewed`가 모두 AuditEvent에 기록됨.
+- **수집 목적 조건 강제 확인**: "계약 처리"(이메일 선택 항목)는 정보주체 매핑 불가로 거부, "신청 처리"(동의 근거)는 행별 동의 컬럼 필수로 거부 — 목적별 스키마 검증이 서버에서 실제 동작.
+
+남은 게이트: 선행 Task(P06-T01·P05-T01·P01-T04) 전체 완료 후 정식 완료 판정.
