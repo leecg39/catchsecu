@@ -45,3 +45,5 @@ CRUD 시험은 합성 소유자의 QA 서비스에서 세 종류의 문서 3개�
 [기존 문서 화면 검증](../documents/README.md), [게시 문서 PDF](../document-pdf/README.md), [폼 문서·동의 영수증](../form-documents/README.md)은 당시 실행 증거로 유지한다. 이번 변경 후의 실제 브라우저 조작을 대신하지 않는다.
 
 기존 Ego 창의 제어 재개 응답 후 최신 게시본 만료·게시 버튼·버전 비교·초안 충돌·문구·서비스 연결·390px를 재검증해야 한다. [Ego 브라우저 스킬](/Users/user01/.agents/skills/ego-browser/SKILL.md:74)의 “if it cannot continue, stop and ask the user” 규칙에 따라 새 창이나 다른 브라우저로 제한을 우회하지 않는다. 원본 유료 `/basic/*` 정상 화면과 P/C/OC·agree 계약은 미확정이다. [독립 문서 계획](../documents/PLAN.md)을 구현하며 미확정 공개 경로는 P05-T03에서 관리한다. P05-T02는 진행 중이다.
+
+후속: [브라우저 게이트 2026-10-04](browser-gate-20261004.md). live 화면 실검증.

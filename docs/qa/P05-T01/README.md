@@ -44,3 +44,5 @@ HTTP는 별도 합성 소유자와 로컬 `catchsecu_dev`의 QA 서비스만 사
 [2026-10-02 CRUD 검증](../processing-catalog/README.md)의 서버 시나리오 15개·두 화면 저장/복원·검색·390px 기록은 당시 실행 증거다. 이번 변경 후의 브라우저 증거를 대신하지 않는다. 원본 두 화면은 라이선스 제한으로 정상 입력 화면을 확인하지 못했으므로 [독립 계약](../processing-catalog/PLAN.md)에 따라 구현했다. 원본 업무 필드와의 동일성은 미확정이다.
 
 기존 Ego 작업 창의 제어 재개 응답 후 수정된 권한 검사·두 CRUD 화면·검색·복원·모바일을 재검증해야 한다. [Ego 브라우저 스킬](/Users/user01/.agents/skills/ego-browser/SKILL.md:74)의 “if it cannot continue, stop and ask the user” 규칙에 따라 새 작업 창이나 다른 브라우저로 제어 제한을 우회하지 않는다. 문서·CSV 반영은 별도 Task의 전체 게이트를 따라 관리한다. P05-T01은 진행 중이다.
+
+후속: [브라우저 게이트 2026-10-04](browser-gate-20261004.md). live 화면 실검증.
