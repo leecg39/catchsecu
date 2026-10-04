@@ -47,3 +47,19 @@
 - 실제 운영 S3/외부 저장소, 보존·파기 운영 조건. 로컬 성공과 기존 S3 어댑터/서명 시험으로 외부 환경 성공을 대신하지 않는다.
 
 Ego skill의 중단 규칙 때문에 이 단계에서 브라우저를 호출하거나 새 창/다른 브라우저로 우회하지 않았다. 사용자 관리자 계정과 기존 회사 자료를 바꾸지 않았다. 전역 발송/파기 worker를 실행하지 않았으며 내보내기 전용 worker만 유지했다. 목표는 active다.
+
+## file-view 네 경로 라이브 보강 (2026-10-04 추가)
+
+`scripts/qa-file-view-routes.ts` — P06 체크포인트 합성 회사의 실제 응답·파일 fixture로 측정:
+
+| 경로/API | 결과 |
+|---|---|
+| `/file-view/{sub}`·`/shared`·`/{sub}/{q}/{file}`·`…/shared` | 전부 200(셸) |
+| `GET /api/v1/files?submissionId=`(소유자) | 200 · 첨부 2건 |
+| `GET /api/v1/files/{id}?submissionId&questionId`(소유자) | 200 |
+| `GET /api/v1/files/{id}/download`(소유자) | 200 text/plain 실바이트 |
+| 익명 `/api/v1/files` | 401 UNAUTHENTICATED |
+| 익명 `/api/v1/viewer/files*` | 401 VIEWER_AUTH_REQUIRED(공유 열람 세션 별도) |
+| 타 회사 owner가 타사 submission 조회 | 404 NOT_FOUND(격리) |
+
+외부 S3 업로드·본인인증 게이트는 기존과 동일하게 로컬 범위 한정.
