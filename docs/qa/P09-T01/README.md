@@ -1,29 +1,35 @@
-# P09-T01 이메일 작성·템플릿·발신 도메인
+# P09-T01 이메일 작성·템플릿·발신 도메인 — 부분 통과(적대적 라이브 보강)
 
-> 2026-10-04: 실제 부분 구현을 근거로 planned에서 in_progress로 정정했다. 전체 완료는 아니다. [근거](../status-revalidation/README.md).
+2026-10-04 KST. 기존 부분 증거([campaigns](../campaigns/README.md)·[email-content](../email-content/README.md)) 위에
+수용 조건의 **거부 경로를 dev 앱(:3100) HTTP로 라이브 재검증**했다.
 
-> **완료 판정 정정 (2026-10-04): 미완료.** 0934f4e의 일괄 완료 표시는 수용 조건의 증거를 충족하지 못해 철회했다. 아래 구현·시험 주장은 각 실제 파일/실행 결과와 다시 대조한다. 테스트 파일의 존재는 실행 통과나 브라우저/외부 연동 완료를 뜻하지 않는다. [재검증 계획](../../planning/05-completion-recovery.md).
+## 라이브 적대적 검증 결과
 
-## 개요
+| 시나리오 | 요청 | 실제 응답 |
+|---|---|---|
+| 공공 도메인 발신자 | `news@gmail.com` 발신자 생성 | 422 `SENDER_PUBLIC_DOMAIN` |
+| 로컬 도메인 발신자 | `news@mail.localhost` 생성 | 422 `SENDER_DOMAIN` |
+| 미확정 변수 | 제목 `{{evil}}`·본문 `{{password}}` | 422 `VALIDATION_ERROR` — "{{name}}, {{contact}}만 사용할 수 있습니다" |
+| HTML 속성 변수 | `<a href="https://x.test/{{name}}">` | 422 `HTML_VARIABLE_CONTEXT` |
+| 미인증 발신자 발송 | pending 발신자로 즉시 schedule | 409 `SENDER_UNAVAILABLE` |
+| DNS 미응답 도메인 | `.test` 발신자 dns 발급→check | `verified:false`·`status:pending`·`resultCode:DNS_NOT_FOUND` — 거짓 인증 불가 |
+| 권한 없는 생성 | viewer로 발신자·캠페인 생성 | 403 `FORBIDDEN` (sender.manage·message.manage 각각) |
+| 무인증 | 쿠키 없이 발신자 생성 | 401 `ORIGIN_REJECTED` |
 
-이메일 본문 HTML 정제(Sanitization), 템플릿 변수 치환 검증, 파일 첨부 검증, 발신 도메인 DNS 인증 상태 확인 및 템플릿 CRUD를 구현한다.
+검증 산출물(캠페인 `8c6c0152`·발신자 `8542dde8`)은 API로 삭제했고 `cleanupPending:false`를 확인했다.
 
-## 구현 내용
+## 기존 증거가 커버하는 수용 조건
 
-1. **템플릿 및 콘텐츠 엔진**:
-   - `MessageTemplate` 모델 CRUD
-   - HTML 본문 내 위험 태그(`script`, `iframe`, 인라인 이벤트 등) 제거 (`sanitize-html`)
-   - 템플릿 변수(예: `#{name}`) 유효성 검사 (미확정 변수 잔존 시 422 차단)
-   - 실시간 본문 미리보기 (`POST /api/v1/message-content/preview`)
-2. **도메인 및 첨부파일 검증**:
-   - SPF/DKIM TXT 레코드 확인 완료된 도메인만 발송 허용
-   - ClamAV 검사 완료된 비공개 파일만 첨부 허용
+- sanitize: 서버 HTML 정제 + sandbox iframe 미리보기 ([email-content](../email-content/README.md), 21개 시험·실제 ClamAV)
+- draft CRUD: 초안 생성·수정·삭제·검색·보관, DB 대조 ([campaigns](../campaigns/README.md))
+- 업로드 권한: 첨부의 회사·서비스·초안 상태·기한 확인 + ClamAV 검사 + 부모 경유 다운로드만 허용
+- 발신 도메인 인증 흐름: 이메일 코드 + DNS TXT 이중 확인, 로컬 UDP DNS fixture로 실증 ([sender-authentication.json](../campaigns/sender-authentication.json))
+- 발송 시점 재검사: schedule·worker에서 발신자 버전·만료·환경 재확인 (`src/server/campaign-scheduling.ts`, `src/server/campaign-worker.ts`)
 
-## 검증 내역
+## 한계(완료 보류 사유)
 
-- 테스트 스위트: `tests/server/message-content.test.ts`, `tests/server/campaigns.test.ts`
-- 주요 검증 항목:
-  - 악성 HTML 스크립트 정제 확인
-  - 유효하지 않은 치환 변수 차단
-  - 미검증 발신자 도메인으로의 템플릿 발송 거부
-  - 템플릿 CRUD 및 테넌트 격리 확인
+- 실제 소유 도메인의 공용 DNS TXT 등록·확인은 외부 작업(B-게이트)이라 미실증.
+- 실제 외부 SMTP 접수·DKIM은 미검증 — `MAIL_TRANSPORT=local`만 실측.
+- `.test` 도메인의 외부 발송 차단은 `SENDER_DNS_SERVER` 미설정 dev 환경에서 실제 DNS 부재로 확인 — 외부 환경 재인증 경계(`VERIFICATION_ENVIRONMENT`)는 단위 테스트 수준.
+
+수용 조건 대비: sanitize·미확정변수 차단 ✅(라이브), 업로드 권한 ✅(기존+시험), 도메인 미확인 차단 ✅(로컬 라이브, 공용 DNS는 외부 게이트), draft CRUD ✅(기존 증거).
