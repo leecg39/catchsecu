@@ -32,3 +32,16 @@
   - 승인 정책 활성화 시 미승인 폼의 공개 차단
   - 승인 결정(승인/반려) 및 반려 시 사유 기록
   - 정책 변경 시 대기 중인 승인 요청 원자적 롤백 및 무효화
+
+## 2026-10-05 라이브 검증: 세션 유지시간 정책의 즉시 집행
+
+Chrome DevTools + PostgreSQL 직접 대조. 계정 `p03-member-471489ff`, 회사 `2c21e75c`(owner).
+
+| 시나리오 | 결과 |
+|---|---|
+| sessionMinutes=30 상태에서 세션 `updatedAt`을 31분 전으로 조정 | 다음 요청에서 `/api/v1/imports`·`/api/v1/forms`·`/api/v1/me` 모두 **401**, Session 행 자체 삭제(`expireAuthSession`), 페이지 리로드 시 `/login?returnTo=…` 리다이렉트 |
+| 정책 PATCH(30→120, 비밀번호 재확인) 후 같은 세션의 `updatedAt`을 60분 전으로 조정 | 다음 요청 **인증 통과**(422=검증 오류) — 완화된 정책이 기존 세션에 즉시 적용 |
+| 정책 PATCH(120→30) 후 `updatedAt`을 45분 전으로 조정 | 다음 요청 **401**, Session 행 삭제 — 강화도 즉시 적용 |
+| 감사 기록 | `policy.updated` 2건 기록(changedFields에 sessionMinutes 포함) |
+
+결론: 세션 유지시간은 요청마다 현재 정책을 다시 읽어(`context.ts`/`service-actor.ts`/`file-access.ts`의 `updatedAt + sessionMinutes` 비교) 저장만 되는 설정이 아니며, 변경 시 기존 세션에도 다음 요청부터 적용된다. PATCH는 활동으로 `updatedAt`을 갱신하므로 본인 세션은 유지된다(관리자 자가 lockout 회피 경로와 별개로 확인).
