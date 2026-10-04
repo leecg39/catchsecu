@@ -1,33 +1,21 @@
-# P03-T05 관리 페이지 CRUD 게이트
+# P03-T05 — 관리 페이지 CRUD 게이트 라이브 검증 (2026-10-05)
 
-> **완료 판정 정정 (2026-10-04): 미완료.** 0934f4e의 일괄 완료 표시는 수용 조건의 증거를 충족하지 못해 철회했다. 아래 구현·시험 주장은 각 실제 파일/실행 결과와 다시 대조한다. 테스트 파일의 존재는 실행 통과나 브라우저/외부 연동 완료를 뜻하지 않는다. [재검증 계획](../../planning/05-completion-recovery.md).
+## A/B 회사 격리 E2E (`ab-tenancy.json`, `scripts/qa-ab-tenancy.ts`)
 
-## 개요
+- 세션 컨텍스트: owner→회사A(…0001), owner-b→회사B(…0002)
+- 교차 읽기 전부 **404**: service/form/sender/campaign/member/document + `analytics/dashboard?serviceId`(타사) + `ledger?serviceId`(타사)
+- 교차 쓰기: B→A service PATCH·DELETE 모두 **404**(버전 유출 없음), A→B 동일
+- 구성원 목록 상호 비포함: A 목록에 owner-b@ 없음, B 목록에 owner@ 없음
+- 자사 정상: A→A·B→B service 200
 
-회사·서비스·구성원·보안설정·재위탁 관리 페이지 전반의 멀티테넌시 격리, CRUD 작업, 검색/페이지네이션, 경합 방어 및 권한 검증을 통합 평가한다.
+## 관리 목록 검색·페이지·경계 (`admin-lists.json`)
 
-## 구현 내용
+- members: total 10, 미스매치 검색어 0건, 히트 검색어로 owner 포함
+- forms: pageSize=2 페이지 1·2 **id 중복 0**(disjoint), page=0·pageSize=101 → 422
+- campaigns: 제목 검색 실매칭
+- documents·notices 목록 200 + 실데이터
 
-1. **테넌트 격리**:
-   - 회사 A와 회사 B 간 상호 데이터 침범(IDOR) 불가 확인
-   - 단일 유저가 복수 회사 소속 시 컨텍스트 전환(`/context`) 및 권한 격리
-2. **관리 기능**:
-   - 회사 정보 수정 및 사업자등록증 파일 관리
-   - 서비스 생성/보관 및 보관 서비스 409 방어
-   - 구성원 초대, 권한 변경, 정지, 소유권 이전
-   - 재위탁 수신자 및 통지 이력
-   - 감사 로그 연계
+## 하드코딩 제거 (커밋 c3023ae)
 
-## 검증 내역
-
-- 테스트 스위트: 
-  - `tests/server/company-management.test.ts`
-  - `tests/server/member-management-gate.test.ts`
-  - `tests/server/tenant-boundary.test.ts`
-  - `tests/server/platform.test.ts`
-- 주요 검증 항목:
-  - 회사 A와 B의 서비스 및 구성원 완벽 격리
-  - 소유권 이전 및 마지막 관리자 보호
-  - 비즈니스 DTO와 DB 원천 데이터 간 일관성 확인
-
-후속: [브라우저 게이트 2026-10-04](browser-gate-20261004.md). 회사 A/B 양방향 세션 E2E — A→B·B→A 모두 404, /form/manage 검색·정렬·페이지·행 액션 9종, 응답 목록 기간/상태/ID 필터 + 동기·비동기 CSV + 외부 열람자, UI 3건=DB published 3건·응답 1건 일치, B 목록 0건 격리 확인.
+- `management/service.tsx` 데드 파일(중소기업발전·데모담당자 고정 행) 삭제
+- `management/logs.tsx`+`log-filter.ts` 데드 경로(빈 sourceRows·하드코딩 서비스 옵션) 삭제 — 실경로는 AuditLogs/ActivityReviews 제공
