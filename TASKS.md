@@ -632,7 +632,7 @@
 - 작업: 정책→로그인→IP→2FA→SSO→계정 회수→감사까지 통합 검사한다.
 - 선행: P11-T02, P11-T03, P11-T04
 - 검증/완료: 실제권한/반복공격·만료·회수·탈퇴 테스트; 비밀 관리/키 회전; critical/high 미해결0
-- 증거: [docs/qa/P11-T05/](docs/qa/P11-T05/README.md) — 부분 증거 존재. 수용 조건 전수 충족 시 체크.
+- 증거: [docs/qa/P11-T05/](docs/qa/P11-T05/README.md) — 통합 체인(정책→IP→2FA→회수→세션→감사) 실측 완료 `tests/server/security-gate.test.ts`. 키 회전·critical/high 감사·선행 전체 게이트는 미완료로 체크박스 유지.
 
 ## Phase 12: 감사·통계·준수 보고
 
