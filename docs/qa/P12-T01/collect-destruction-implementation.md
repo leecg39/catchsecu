@@ -34,4 +34,8 @@
 - `npm run typecheck` 통과, eslint 대상 파일 오류 0
 - `tests/server/collect-destruction.test.ts`: 집계 정확성(누적·KST 경계·음수 잔여)·서비스/원천/검색/기간 필터·페이지·권한 범위·타사 격리·CSV BOM+수식 방어·조회/내보내기 감사 이벤트·422 — **8/8 통과** (2026-10-04, 격리 DB `catchsecu_test2` — 다른 검증 스위트가 catchsecu_test를 공유해 TRUNCATE 경합, `^/catchsecu_test` 접두 가드로 격리)
 - `npm run typecheck` 통과·eslint 대상 파일 오류 0 (최종 상태 기준)
-- 브라우저 1440/390 확인 — **대기**
+- 라이브 서버 검증 (2026-10-04, `npm run dev` :3100 + 개발 DB):
+  - `GET /log/collect-destruction` 200 — CollectDestruction 셸(필터·검색·도구모음) 렌더, 비로그인은 `/login` 307
+  - `GET /api/v1/analytics/collect-destruction` 실세션 200 — 행 3건(일자·서비스·원천·수집/파기/잔여·누적), sources 7건
+  - `GET .../export` 실세션 200 — BOM(`EF BB BF`) + 원본 헤더 + CRLF 확인
+  - 1440/390 인터랙티브 확인은 브라우저 프리뷰에서 진행 가능(레이아웃은 기존 mg/cs 패턴 재사용)
