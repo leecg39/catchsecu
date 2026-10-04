@@ -54,6 +54,7 @@ async function check(page: Page, route: string, manifestPath: string) {
     }
     const prev = r.finalUrl;
     const res2 = await page.reload({ waitUntil: "domcontentloaded", timeout: 20000 }).catch(() => null);
+    r.status = r.status ?? res2?.status();
     r.refreshed = (res2?.status() ?? 0) === 200 && new URL(page.url()).pathname === prev;
     if (route !== "/dashboard") {
       await page.goto(base + "/dashboard", { waitUntil: "domcontentloaded", timeout: 15000 }).catch(() => null);
