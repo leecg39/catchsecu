@@ -38,3 +38,17 @@
 - 월별 스냅샷·준수 점검 근거·보고서는 P10-T04/`ComplianceClose`·`compliance-evidence`·`compliance-exports`로 구현됐다: 서비스별 월 마감 스냅샷(불변 evidence 해시 + 항목 CSV), 마감 후 사후 정정 감지, 멱등 출력 작업(PDF/CSV) → [billing-close 증거](../P10-T04/README.md)·`tests/server/billing-close.test.ts` 5/5.
 - 원장 재집계 경로는 P10-T03 캠페인 정산+`qa-billing-snapshot` 라이브 스크립트로 대조됨([P10-T03 증거](../P10-T03/README.md)).
 - 남은 것은 원본 대조·전체 게이트뿐이다.
+
+## 빈 상태 브라우저 실측 (2026-10-07)
+
+새로 가입한 빈 테넌트(empty@catchsecu.local.test → 신규 회사·기본 서비스, 자료 0건)로 Chrome DevTools 실측:
+
+- `/dashboard`: 온보딩 CTA + 실제 0 집계(현재 보유 0건·기간 접수 0건·파기 0건, 서비스 1/10, trialing 라이선스)
+- `/marketing-detail`: 현재 동의·철회·차단·발송 가능·기간 기록 전량 0, 서비스 행 실명 표시
+- `/privacy-detail`: 현재 보유 0건·기간 접수 0건·파기 완료 0건, 서비스별 표 실제 행
+- `/compliance`: 미판정 상태 문구 + 실제 자료 건수(서비스1·동의서0·방침0·보유응답0), 가짜 점수 없음
+- 콘솔 오류 없음(DevTools 광고·HMR 로그만)
+
+과정에서 회사 등록 폼의 선택 필드 빈 문자열이 `z.url().refine`의 `new URL` TypeError로 500을 내는 실버그를 발견·수정했다(`src/server/schemas.ts` website refine 방어 + 회귀 테스트 `tests/server/company-management.test.ts`).
+
+미완료 유지: 원본 Ego 화면 대조, 전체 P13-T04 게이트.

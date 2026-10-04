@@ -76,6 +76,15 @@ test("company mutation permissions, foreign IDs, Origin and strict inputs are en
   expect((await patchCompany(request("/companies/" + a, "PATCH", owner, { version: await version(), status: "closed" }))).status).toBe(422);
   expect((await createCompany(request("/companies", "POST", "", { name: "미인증", publicName: "미인증" }))).status).toBe(401);
 });
+test("optional company fields accept empty strings and malformed website is a clean 422, never 500", async () => {
+  const created = await createCompany(request("/companies", "POST", newcomer, {
+    name: "빈 필드 회사", publicName: "빈 필드 회사",
+    address: "", phone: "", website: "", businessNo: "", billingEmail: "", billingContactName: "", billingContactPhone: "" }));
+  expect(created.status).toBe(201);
+  expect((await patchCompany(request("/companies/" + a, "PATCH", owner, { version: await version(), website: "notaurl" }))).status).toBe(422);
+  expect((await patchCompany(request("/companies/" + a, "PATCH", owner, { version: await version(), website: "javascript:alert(1)" }))).status).toBe(422);
+  expect((await patchCompany(request("/companies/" + a, "PATCH", owner, { version: await version(), website: "https://example.com" }))).status).toBe(200);
+});
 test("concurrent company edits commit one version and one audit event", async () => {
   const v = await version(), before = await db.auditEvent.count({ where: { tenantId: a, action: "company.updated" } });
   const responses = await Promise.all(["편집 A", "편집 B"].map(address => patchCompany(request("/companies/" + a, "PATCH", owner, { version: v, address }))));

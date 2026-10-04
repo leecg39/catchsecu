@@ -14,7 +14,7 @@ export const companyInput = z.object({
   publicName: z.string().trim().min(1).max(100),
   address: z.string().trim().max(300).optional(),
   phone: z.string().trim().max(30).optional(),
-  website: z.union([z.url().refine(url => ["https:", "http:"].includes(new URL(url).protocol)), z.literal("")]).optional(),
+  website: z.union([z.url().refine(url => { try { return ["https:", "http:"].includes(new URL(url).protocol); } catch { return false; } }), z.literal("")]).optional(),
   businessNo: z.string().regex(/^(\d{3}-\d{2}-\d{5})?$/).optional(),
   billingEmail: z.union([z.email(), z.literal("")]).optional(),
   billingContactName: z.string().trim().max(100).optional(),
