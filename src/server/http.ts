@@ -44,7 +44,7 @@ export async function rateLimit(key: string, limit = 60, seconds = 60) {
 }
 type Handler = (request: Request, requestId: string) => Promise<Response>;
 /** Only cookie-independent endpoints that verify their own cryptographic credential may bypass Origin. */
-export function route(handler: Handler, externalAuthentication?: "signed-webhook" | "unsubscribe-token") {
+export function route(handler: Handler, externalAuthentication?: "signed-webhook" | "unsubscribe-token" | "saml-assertion") {
   return async (request: Request): Promise<Response> => {
     const requestId = randomUUID();
     try {

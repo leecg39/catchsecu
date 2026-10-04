@@ -801,12 +801,14 @@ model SsoProvider {
   tenantId     String
   tenant       Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
   name         String
+  protocol     String   @default("oidc")
   issuer       String
   clientId     String
   clientSecretCipher String?
   authorizationUrl String
-  tokenUrl     String
-  jwksUrl      String
+  tokenUrl     String?
+  jwksUrl      String?
+  idpCert      String?
   scopes       String   @default("openid profile email")
   enabled      Boolean  @default(false)
   preflightOk  Boolean  @default(false)

@@ -257,8 +257,18 @@ export function ServiceAssetPage() {
 }
 
 export function PaymentFailure() {
+  const params = useSearchParams();
+  const orderId = params.get("orderId") ?? params.get("purchaseId") ?? "";
+  const valid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId);
+  const order = useResource<PaymentOrderListItem>(valid ? `/billing/orders/${orderId}` : null);
+  const status = order.data?.status;
   return <section className="svc-payment-failure"><h1>결제 실패</h1><div className="svc-failure-content">
-    <div className="svc-red-note"><b>주문이 완료되지 않았습니다.</b></div><div className="svc-neutral-note">현재 결제 연동을 준비 중입니다.</div>
+    <div className="svc-red-note"><b>주문이 완료되지 않았습니다.</b></div>
+    {valid && order.loading && <div className="svc-neutral-note">주문 상태를 확인하는 중입니다.</div>}
+    {valid && order.error && <div className="svc-neutral-note">{order.error.message}</div>}
+    {status === "paid" && <div className="svc-neutral-note">결제는 이미 승인됐습니다. 청구서와 주문 내역에서 확인할 수 있습니다.</div>}
+    {status === "pending" && <div className="svc-neutral-note">승인이 아직 확정되지 않았습니다. 잠시 후 주문 내역에서 상태를 확인해 주세요.</div>}
+    {status === "failed" && <div className="svc-neutral-note">결제가 실패했습니다. 다른 결제수단으로 다시 시도해 주세요.</div>}
     <div className="svc-actions"><Link className="cs-button secondary" href="/dashboard">대시보드로 이동</Link>
       <Link className="cs-button" href="/pay/membership/detail">상품 확인하기</Link></div>
   </div></section>;
