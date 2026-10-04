@@ -1,0 +1,72 @@
+{
+  "path": "/log/authority",
+  "title": "권한 변경 로그",
+  "kind": "authority",
+  "initial": {
+    "status": 200,
+    "requestId": "8c2cd3b7-021c-49b1-be4f-9a4317d9d17c",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=authority&page=1&pageSize=10",
+    "body": {
+      "items": [
+        {
+          "id": "39812303-adb6-43d6-997d-cf96228d939e",
+          "createdAt": "2026-10-04T10:10:07.951Z",
+          "action": "ip_rule.created",
+          "resource": "ipRule",
+          "resourceId": "da75e6c8-6d02-4ea1-be1a-c0bfdeea6927",
+          "serviceId": null,
+          "serviceName": null,
+          "actorName": "가입 감사 화면 검증"
+        },
+        {
+          "id": "14740130-0cf6-49b9-bb46-217265fc9c35",
+          "createdAt": "2026-10-04T10:10:07.858Z",
+          "action": "invitation.created",
+          "resource": "invitation",
+          "resourceId": "d240c7c6-ac6c-4933-a828-6e2e06a025d5",
+          "serviceId": null,
+          "serviceName": null,
+          "actorName": "가입 감사 화면 검증"
+        }
+      ],
+      "total": 2,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "filtered": {
+    "status": 200,
+    "requestId": "599ff386-6a46-4e2a-9d63-7c834826f148",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=authority&page=1&pageSize=10&search=ip_rule.created&searchField=action",
+    "body": {
+      "items": [
+        {
+          "id": "39812303-adb6-43d6-997d-cf96228d939e",
+          "createdAt": "2026-10-04T10:10:07.951Z",
+          "action": "ip_rule.created",
+          "resource": "ipRule",
+          "resourceId": "da75e6c8-6d02-4ea1-be1a-c0bfdeea6927",
+          "serviceId": null,
+          "serviceName": null,
+          "actorName": "가입 감사 화면 검증"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "rows": [
+    "1\t회사 공통\t가입 감사 화면 검증\t2026. 10. 4. 오후 7:10:07\tip_rule.created\tipRule · da75e6c8"
+  ],
+  "layout": {
+    "width": 390,
+    "documentWidth": 390,
+    "tableOverflow": true
+  },
+  "emptyPassed": true,
+  "resetPassed": true,
+  "csvSaved": true
+}

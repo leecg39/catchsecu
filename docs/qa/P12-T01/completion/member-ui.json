@@ -1,0 +1,62 @@
+{
+  "path": "/log/member",
+  "title": "구성원 로그",
+  "kind": "member",
+  "initial": {
+    "status": 200,
+    "requestId": "f2e10bc8-6a2e-4b9b-8d90-98b67ebd73a6",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=member&page=1&pageSize=10",
+    "body": {
+      "items": [
+        {
+          "id": "14740130-0cf6-49b9-bb46-217265fc9c35",
+          "createdAt": "2026-10-04T10:10:07.858Z",
+          "action": "invitation.created",
+          "resource": "invitation",
+          "resourceId": "d240c7c6-ac6c-4933-a828-6e2e06a025d5",
+          "serviceId": null,
+          "serviceName": null,
+          "actorName": "가입 감사 화면 검증"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "filtered": {
+    "status": 200,
+    "requestId": "8c518e06-d09f-4801-b14b-e97dfe26233b",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=member&page=1&pageSize=10&search=invitation.created&searchField=action",
+    "body": {
+      "items": [
+        {
+          "id": "14740130-0cf6-49b9-bb46-217265fc9c35",
+          "createdAt": "2026-10-04T10:10:07.858Z",
+          "action": "invitation.created",
+          "resource": "invitation",
+          "resourceId": "d240c7c6-ac6c-4933-a828-6e2e06a025d5",
+          "serviceId": null,
+          "serviceName": null,
+          "actorName": "가입 감사 화면 검증"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "rows": [
+    "1\t회사 공통\t가입 감사 화면 검증\t2026. 10. 4. 오후 7:10:07\tinvitation.created\tinvitation · d240c7c6"
+  ],
+  "layout": {
+    "width": 390,
+    "documentWidth": 390,
+    "tableOverflow": true
+  },
+  "emptyPassed": true,
+  "resetPassed": true,
+  "csvSaved": true
+}

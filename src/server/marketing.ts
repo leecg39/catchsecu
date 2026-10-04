@@ -196,14 +196,16 @@ export async function createMarketingRequest(ctx: Context, input: z.infer<typeof
     if (!retentionUntil || retentionUntil <= new Date()) fail(410, "SOURCE_UNAVAILABLE", "원본 응답의 보유 기간이 끝났습니다.");
   });
 }
-export async function collectMarketing(tx: Transaction, source: { id: string; tenantId: string }, serviceId: string, raw: unknown, channels: MarketingChannel[]) {
+export async function collectMarketing(tx: Transaction, source: { id: string; tenantId: string }, serviceId: string, raw: unknown, channels: MarketingChannel[], requestId: string) {
   if (!channels.length) return;
   const config: MarketingConfig = marketingConfig.parse(raw);
   for (const channel of [...channels].sort()) {
     const contactQuestionId = channel === "email" ? config.emailQuestionId : config.smsQuestionId;
     if (!contactQuestionId) fail(422, "MARKETING_CHANNEL", "선택한 채널의 마케팅 동의 항목이 없습니다.");
-    await grantMarketing(tx, { tenantId: source.tenantId, serviceId, submissionId: source.id, channel, nameQuestionId: config.nameQuestionId, contactQuestionId,
+    const result = await grantMarketing(tx, { tenantId: source.tenantId, serviceId, submissionId: source.id, channel, nameQuestionId: config.nameQuestionId, contactQuestionId,
       grantedAt: new Date(), purpose: config.purpose, reference: "공개 폼의 채널별 선택 동의", sourceKind: "form" });
+    await audit(tx, { tenantId: source.tenantId, user: { id: null } }, requestId,
+      result.version === 1 ? "marketing.granted" : "marketing.reconsented", "marketing", result.id, ["consentEvidence"], serviceId);
   }
 }
 export async function updateMarketing(ctx: Context, id: string, input: { version: number; excluded: boolean }, requestId: string) {

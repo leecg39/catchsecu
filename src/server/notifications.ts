@@ -93,6 +93,8 @@ export async function cancelNotifications(tx: Transaction, integrationId: string
   await tx.notificationDelivery.updateMany({ where: { integrationId, status: { in: pendingNotification } }, data: { status: "cancelled", completedAt: now, leaseOwner: null, leaseUntil: null, lastError: code, version: { increment: 1 } } });
   const attempts = rows.filter(r => ["leased", "sending"].includes(r.status) && r.attempts > 0);
   if (attempts.length) await tx.notificationAttempt.createMany({ skipDuplicates: true, data: attempts.map(row => ({ deliveryId: row.id, number: row.attempts, outcome: "cancelled", code, startedAt: row.startedAt ?? row.createdAt, finishedAt: now })) });
+  for (const row of rows) await audit(tx, { tenantId: row.tenantId, user: { id: null } }, row.id,
+    "message.notification_cancelled", "notificationDelivery", row.id, ["status"], row.serviceId);
 }
 export async function updateIntegration(ctx: Context, id: string, input: z.infer<typeof integrationPatch>, requestId: string) {
   return db.$transaction(async tx => {

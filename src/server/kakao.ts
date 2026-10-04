@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import type { z } from "zod";
 import type { KakaoChannel, KakaoTemplate } from "@/generated/prisma/client";
 import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoReviewInput, kakaoTemplateInput, kakaoTemplatePatch, kakaoVariables, type KakaoChannelRecord, type KakaoTemplateRecord } from "@/contracts/kakao";
@@ -116,7 +116,7 @@ function signaturesMatch(secret: string, body: string, signature: string) {
   const left = Buffer.from(expected), right = Buffer.from(signature);
   return left.length === right.length && timingSafeEqual(left, right);
 }
-export async function applyKakaoReview(raw: string, signature: string, secret: string | undefined) {
+export async function applyKakaoReview(raw: string, signature: string, secret: string | undefined, requestId: string = randomUUID()) {
   if (!secret) fail(503, "KAKAO_PROVIDER_REQUIRED", "카카오 심사 결과 비밀이 설정되지 않았습니다.");
   if (!signaturesMatch(secret, raw, signature)) fail(401, "KAKAO_SIGNATURE_INVALID", "카카오 심사 서명을 확인할 수 없습니다.");
   const input = kakaoReviewInput.parse(JSON.parse(raw));
@@ -126,12 +126,14 @@ export async function applyKakaoReview(raw: string, signature: string, secret: s
       const row = await tx.kakaoChannel.findUnique({ where: { id: input.id } });
       if (!row || row.status === "archived") fail(404, "NOT_FOUND", "카카오 채널을 찾을 수 없습니다.");
       const saved = await tx.kakaoChannel.update({ where: { id: row.id }, data: { status: "verified", version: { increment: 1 } } });
+      await audit(tx, { tenantId: row.tenantId, user: { id: null } }, requestId, "kakao.channel_verified", "kakaoChannel", row.id, ["status"], row.serviceId);
       return channelDto(saved);
     }
     if (input.outcome === "verified") fail(422, "INVALID_REVIEW", "템플릿은 승인 또는 반려만 받을 수 있습니다.");
     const row = await tx.kakaoTemplate.findUnique({ where: { id: input.id } });
     if (!row || row.status !== "submitted") fail(409, "REVIEW_UNAVAILABLE", "심사 요청 중인 템플릿만 결과를 반영할 수 있습니다.");
     const saved = await tx.kakaoTemplate.update({ where: { id: row.id }, data: { status: input.outcome === "approved" ? "approved" : "rejected", reviewNote: input.note, version: { increment: 1 } } });
+    await audit(tx, { tenantId: row.tenantId, user: { id: null } }, requestId, "kakao.template_" + input.outcome, "kakaoTemplate", row.id, ["status", "reviewNote"], row.serviceId);
     return templateDto(saved);
   });
 }

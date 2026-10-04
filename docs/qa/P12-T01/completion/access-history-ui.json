@@ -1,0 +1,62 @@
+{
+  "path": "/log/access-history",
+  "title": "접속 이력",
+  "kind": "access",
+  "initial": {
+    "status": 200,
+    "requestId": "943a7336-e4bd-45fd-ad7e-af8bc3145f96",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=access&page=1&pageSize=10",
+    "body": {
+      "items": [
+        {
+          "id": "66e86053-1d9c-4a7e-b912-160f52ade6e5",
+          "createdAt": "2026-10-04T10:11:33.043Z",
+          "action": "context.company_selected",
+          "resource": "session",
+          "resourceId": "afe36235-0531-40e5-a258-c66251c0805d",
+          "serviceId": null,
+          "serviceName": null,
+          "actorName": "가입 감사 화면 검증"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "filtered": {
+    "status": 200,
+    "requestId": "81e95189-17dd-4b7d-b001-113349c604a8",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=access&page=1&pageSize=10&search=context.company_selected&searchField=action",
+    "body": {
+      "items": [
+        {
+          "id": "66e86053-1d9c-4a7e-b912-160f52ade6e5",
+          "createdAt": "2026-10-04T10:11:33.043Z",
+          "action": "context.company_selected",
+          "resource": "session",
+          "resourceId": "afe36235-0531-40e5-a258-c66251c0805d",
+          "serviceId": null,
+          "serviceName": null,
+          "actorName": "가입 감사 화면 검증"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "rows": [
+    "1\t회사 공통\t가입 감사 화면 검증\t2026. 10. 4. 오후 7:11:33\tcontext.company_selected\tsession · afe36235"
+  ],
+  "layout": {
+    "width": 390,
+    "documentWidth": 390,
+    "tableOverflow": true
+  },
+  "emptyPassed": true,
+  "resetPassed": true,
+  "csvSaved": true
+}

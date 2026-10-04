@@ -1,0 +1,72 @@
+{
+  "path": "/log/info-monitoring",
+  "title": "개인정보 처리로그",
+  "kind": "info",
+  "initial": {
+    "status": 200,
+    "requestId": "e3fe12d1-da00-47c6-a6bc-173eb950b0bf",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=info&page=1&pageSize=10",
+    "body": {
+      "items": [
+        {
+          "id": "7be9bf3e-b8a1-4b45-9ca4-1381a62e08fc",
+          "createdAt": "2026-10-04T10:10:08.795Z",
+          "action": "submission.viewed",
+          "resource": "submission",
+          "resourceId": "ea8ea4c4-e526-40d3-80d2-6402fbb7297a",
+          "serviceId": "4abc805e-569e-4d42-905c-7f1c2df0c503",
+          "serviceName": "감사 서비스 12",
+          "actorName": "가입 감사 화면 검증"
+        },
+        {
+          "id": "da09be93-39e3-4047-8e25-c4de748ece43",
+          "createdAt": "2026-10-04T10:10:08.708Z",
+          "action": "submission.created",
+          "resource": "submission",
+          "resourceId": "ea8ea4c4-e526-40d3-80d2-6402fbb7297a",
+          "serviceId": "4abc805e-569e-4d42-905c-7f1c2df0c503",
+          "serviceName": "감사 서비스 12",
+          "actorName": "처리자 정보 없음"
+        }
+      ],
+      "total": 2,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "filtered": {
+    "status": 200,
+    "requestId": "cba06d16-697e-42a8-b655-ccadfef22b30",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=info&page=1&pageSize=10&search=submission.viewed&searchField=action",
+    "body": {
+      "items": [
+        {
+          "id": "7be9bf3e-b8a1-4b45-9ca4-1381a62e08fc",
+          "createdAt": "2026-10-04T10:10:08.795Z",
+          "action": "submission.viewed",
+          "resource": "submission",
+          "resourceId": "ea8ea4c4-e526-40d3-80d2-6402fbb7297a",
+          "serviceId": "4abc805e-569e-4d42-905c-7f1c2df0c503",
+          "serviceName": "감사 서비스 12",
+          "actorName": "가입 감사 화면 검증"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "rows": [
+    "1\t감사 서비스 12\t-\t가입 감사 화면 검증\t2026. 10. 4. 오후 7:10:08\t-\t-\tsubmission.viewed\t-\t검토 요청"
+  ],
+  "layout": {
+    "width": 390,
+    "documentWidth": 390,
+    "tableOverflow": true
+  },
+  "emptyPassed": true,
+  "resetPassed": true,
+  "csvSaved": true
+}

@@ -1,0 +1,24 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/p12-final-checkout
+
+(node:36526) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/marketing.test.ts (51 tests | 1 failed) 92551ms
+   ❯ 마케팅 최종 권한·만료·삭제·실행 경합 (28)
+     × 공개 동의 감사 저장 실패는 접수·응답·동의 이력·접수 횟수를 함께 롤백한다 512ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/marketing.test.ts > 마케팅 최종 권한·만료·삭제·실행 경합 > 공개 동의 감사 저장 실패는 접수·응답·동의 이력·접수 횟수를 함께 롤백한다
+Error: Invariant: AsyncLocalStorage accessed in runtime where it is not available
+ ❯ Object.<anonymous> node_modules/next/src/server/app-render/async-local-storage.ts:3:50
+ ❯ Object.<anonymous> node_modules/next/dist/server/app-render/work-async-storage-instance.js:11:28
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 58 passed (59)
+   Start at  19:42:52
+   Duration  115.52s (tests 93%, import 4%, transform 2%)
+

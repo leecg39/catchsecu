@@ -3,8 +3,8 @@
   "task": "P12-T01",
   "method": "TypeScript AST inventory including local auth/file/worker helpers. Presence is a source map, not proof of execution or atomicity; full regressions and per-path transaction review are separate evidence.",
   "filesScanned": 239,
-  "callSites": 222,
-  "filesWithCalls": 66,
+  "callSites": 236,
+  "filesWithCalls": 69,
   "rootClientWrites": [],
   "producers": [
     {
@@ -13,7 +13,7 @@
       "function": "createKakaoChannel",
       "callee": "audit",
       "actionExpression": "kakao.channel_created",
-      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "sourceSha256": "2bfe6af52385d90d3f6f0ffdf33f3911b0564866e882b3efd20147e2c1e6d2b4",
       "rootClientWrite": false
     },
     {
@@ -22,7 +22,7 @@
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "kakao.channel_updated",
-      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "sourceSha256": "2bfe6af52385d90d3f6f0ffdf33f3911b0564866e882b3efd20147e2c1e6d2b4",
       "rootClientWrite": false
     },
     {
@@ -31,7 +31,7 @@
       "function": "createKakaoTemplate",
       "callee": "audit",
       "actionExpression": "kakao.template_created",
-      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "sourceSha256": "2bfe6af52385d90d3f6f0ffdf33f3911b0564866e882b3efd20147e2c1e6d2b4",
       "rootClientWrite": false
     },
     {
@@ -40,7 +40,7 @@
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "kakao.template_updated",
-      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "sourceSha256": "2bfe6af52385d90d3f6f0ffdf33f3911b0564866e882b3efd20147e2c1e6d2b4",
       "rootClientWrite": false
     },
     {
@@ -49,7 +49,25 @@
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "kakao.template_submitted",
-      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "sourceSha256": "2bfe6af52385d90d3f6f0ffdf33f3911b0564866e882b3efd20147e2c1e6d2b4",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/kakao.ts",
+      "line": 129,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "kakao.channel_verified",
+      "sourceSha256": "2bfe6af52385d90d3f6f0ffdf33f3911b0564866e882b3efd20147e2c1e6d2b4",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/kakao.ts",
+      "line": 136,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "2bfe6af52385d90d3f6f0ffdf33f3911b0564866e882b3efd20147e2c1e6d2b4",
       "rootClientWrite": false
     },
     {
@@ -135,20 +153,47 @@
     },
     {
       "path": "src/server/sharing.ts",
-      "line": 139,
-      "function": "createShare",
+      "line": 109,
+      "function": "anonymous",
       "callee": "audit",
-      "actionExpression": "share.created",
-      "sourceSha256": "f7912b0337390584e46803503f9bbf2e727bf70ddf579345fa601883920e44d9",
+      "actionExpression": "share.list_viewed",
+      "sourceSha256": "d4eaa769ece9472a6741be9e5fdd1b2a698f309cd3ca7714164493b2e7148445",
       "rootClientWrite": false
     },
     {
       "path": "src/server/sharing.ts",
-      "line": 167,
+      "line": 117,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "share.viewed",
+      "sourceSha256": "d4eaa769ece9472a6741be9e5fdd1b2a698f309cd3ca7714164493b2e7148445",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/sharing.ts",
+      "line": 130,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "share.viewed",
+      "sourceSha256": "d4eaa769ece9472a6741be9e5fdd1b2a698f309cd3ca7714164493b2e7148445",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/sharing.ts",
+      "line": 145,
+      "function": "createShare",
+      "callee": "audit",
+      "actionExpression": "share.created",
+      "sourceSha256": "d4eaa769ece9472a6741be9e5fdd1b2a698f309cd3ca7714164493b2e7148445",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/sharing.ts",
+      "line": 173,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "dynamic/local helper",
-      "sourceSha256": "f7912b0337390584e46803503f9bbf2e727bf70ddf579345fa601883920e44d9",
+      "sourceSha256": "d4eaa769ece9472a6741be9e5fdd1b2a698f309cd3ca7714164493b2e7148445",
       "rootClientWrite": false
     },
     {
@@ -265,7 +310,16 @@
       "function": "createPaymentOrder",
       "callee": "audit",
       "actionExpression": "billing.order_created",
-      "sourceSha256": "68b1705540a055374474ffa4d6f34f47622208a4a99c72a84f50febb86eb3825",
+      "sourceSha256": "7b54f38c3e4060863d81a07e2fa47b355db6b1f2d992c2a1879a239c0fed4518",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/payments.ts",
+      "line": 66,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "7b54f38c3e4060863d81a07e2fa47b355db6b1f2d992c2a1879a239c0fed4518",
       "rootClientWrite": false
     },
     {
@@ -346,7 +400,7 @@
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "dynamic/local helper",
-      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "sourceSha256": "afcfe633dcd42f1ba2eb8196dea3101bdd440d292d46c7b3f04bbbe7d5d87a03",
       "rootClientWrite": false
     },
     {
@@ -355,7 +409,7 @@
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "marketing.viewed",
-      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "sourceSha256": "afcfe633dcd42f1ba2eb8196dea3101bdd440d292d46c7b3f04bbbe7d5d87a03",
       "rootClientWrite": false
     },
     {
@@ -364,7 +418,7 @@
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "marketing.sources_viewed",
-      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "sourceSha256": "afcfe633dcd42f1ba2eb8196dea3101bdd440d292d46c7b3f04bbbe7d5d87a03",
       "rootClientWrite": false
     },
     {
@@ -373,43 +427,52 @@
       "function": "createMarketing",
       "callee": "audit",
       "actionExpression": "marketing.granted",
-      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "sourceSha256": "afcfe633dcd42f1ba2eb8196dea3101bdd440d292d46c7b3f04bbbe7d5d87a03",
       "rootClientWrite": false
     },
     {
       "path": "src/server/marketing.ts",
-      "line": 216,
+      "line": 207,
+      "function": "collectMarketing",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "afcfe633dcd42f1ba2eb8196dea3101bdd440d292d46c7b3f04bbbe7d5d87a03",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/marketing.ts",
+      "line": 218,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "marketing.exclusion_changed",
-      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "sourceSha256": "afcfe633dcd42f1ba2eb8196dea3101bdd440d292d46c7b3f04bbbe7d5d87a03",
       "rootClientWrite": false
     },
     {
       "path": "src/server/marketing.ts",
-      "line": 240,
+      "line": 242,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "dynamic/local helper",
-      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "sourceSha256": "afcfe633dcd42f1ba2eb8196dea3101bdd440d292d46c7b3f04bbbe7d5d87a03",
       "rootClientWrite": false
     },
     {
       "path": "src/server/marketing.ts",
-      "line": 268,
+      "line": 270,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "marketing.summary_viewed",
-      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "sourceSha256": "afcfe633dcd42f1ba2eb8196dea3101bdd440d292d46c7b3f04bbbe7d5d87a03",
       "rootClientWrite": false
     },
     {
       "path": "src/server/marketing.ts",
-      "line": 294,
+      "line": 296,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "marketing.summary_viewed",
-      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "sourceSha256": "afcfe633dcd42f1ba2eb8196dea3101bdd440d292d46c7b3f04bbbe7d5d87a03",
       "rootClientWrite": false
     },
     {
@@ -593,6 +656,15 @@
       "rootClientWrite": false
     },
     {
+      "path": "src/server/subscription-worker.ts",
+      "line": 18,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "billing.trial_expired",
+      "sourceSha256": "4df0e37066b58cf418988160b463ee174b7f8fba164d0a1be7da3197c1a3f628",
+      "rootClientWrite": false
+    },
+    {
       "path": "src/server/access-requests.ts",
       "line": 63,
       "function": "anonymous",
@@ -761,6 +833,15 @@
       "callee": "tx.auditEvent.create",
       "actionExpression": "\"billing.trial.cancel_revoked\"",
       "sourceSha256": "f6de9b8a5bddc7245d48e13611fa55e9b8dcbda3a5baad22513c9403f6d99eae",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/ledger.ts",
+      "line": 36,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "f8aa1c0086e071c707183a4c82afb8ddf161fa8ea60f3518c504a13d1ab71613",
       "rootClientWrite": false
     },
     {
@@ -1148,6 +1229,42 @@
       "callee": "audit",
       "actionExpression": "campaign.previewed",
       "sourceSha256": "156a1c493c3a9509cfe8e341d3da87c014487e1995ca5326e158128a97bea3f3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notification-worker.ts",
+      "line": 13,
+      "function": "notificationAudit",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "6bb9b58b1723cce76b21b606556fc57fbc504592cf6c6c238f32f6c95e82d9b1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notification-worker.ts",
+      "line": 25,
+      "function": "anonymous",
+      "callee": "notificationAudit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "6bb9b58b1723cce76b21b606556fc57fbc504592cf6c6c238f32f6c95e82d9b1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notification-worker.ts",
+      "line": 56,
+      "function": "notificationAttemptResult",
+      "callee": "notificationAudit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "6bb9b58b1723cce76b21b606556fc57fbc504592cf6c6c238f32f6c95e82d9b1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notification-worker.ts",
+      "line": 69,
+      "function": "anonymous",
+      "callee": "notificationAudit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "6bb9b58b1723cce76b21b606556fc57fbc504592cf6c6c238f32f6c95e82d9b1",
       "rootClientWrite": false
     },
     {
@@ -1624,52 +1741,61 @@
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "integration.created",
-      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "sourceSha256": "77d33d4350fb0eff8ab25872486e2c98474951135c51f48f78d9f91e0380015d",
       "rootClientWrite": false
     },
     {
       "path": "src/server/notifications.ts",
-      "line": 105,
+      "line": 96,
+      "function": "cancelNotifications",
+      "callee": "audit",
+      "actionExpression": "message.notification_cancelled",
+      "sourceSha256": "77d33d4350fb0eff8ab25872486e2c98474951135c51f48f78d9f91e0380015d",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notifications.ts",
+      "line": 107,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "integration.updated",
-      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "sourceSha256": "77d33d4350fb0eff8ab25872486e2c98474951135c51f48f78d9f91e0380015d",
       "rootClientWrite": false
     },
     {
       "path": "src/server/notifications.ts",
-      "line": 115,
+      "line": 117,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "dynamic/local helper",
-      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "sourceSha256": "77d33d4350fb0eff8ab25872486e2c98474951135c51f48f78d9f91e0380015d",
       "rootClientWrite": false
     },
     {
       "path": "src/server/notifications.ts",
-      "line": 130,
+      "line": 132,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "integration.deleted",
-      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "sourceSha256": "77d33d4350fb0eff8ab25872486e2c98474951135c51f48f78d9f91e0380015d",
       "rootClientWrite": false
     },
     {
       "path": "src/server/notifications.ts",
-      "line": 145,
+      "line": 147,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "integration.test_requested",
-      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "sourceSha256": "77d33d4350fb0eff8ab25872486e2c98474951135c51f48f78d9f91e0380015d",
       "rootClientWrite": false
     },
     {
       "path": "src/server/notifications.ts",
-      "line": 192,
+      "line": 194,
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "integration.retry_requested",
-      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "sourceSha256": "77d33d4350fb0eff8ab25872486e2c98474951135c51f48f78d9f91e0380015d",
       "rootClientWrite": false
     },
     {
@@ -1831,7 +1957,7 @@
       "function": "anonymous",
       "callee": "tx.auditEvent.create",
       "actionExpression": "\"submission.created\"",
-      "sourceSha256": "0c9fdcdee6e2b2a97a3e0f73fa15e69cbfd82027861e30e07219360165b3e3d0",
+      "sourceSha256": "09632df8301af299832ec72d653f8415244f7a0cef2c1a2a8ec9a9c8ecbfcf8f",
       "rootClientWrite": false
     },
     {
@@ -1840,7 +1966,7 @@
       "function": "anonymous",
       "callee": "audit",
       "actionExpression": "submission.list_viewed",
-      "sourceSha256": "0c9fdcdee6e2b2a97a3e0f73fa15e69cbfd82027861e30e07219360165b3e3d0",
+      "sourceSha256": "09632df8301af299832ec72d653f8415244f7a0cef2c1a2a8ec9a9c8ecbfcf8f",
       "rootClientWrite": false
     },
     {
@@ -1943,30 +2069,21 @@
       "rootClientWrite": false
     },
     {
-      "path": "src/app/api/v1/services/[id]/route.ts",
-      "line": 27,
+      "path": "src/app/api/v1/me/route.ts",
+      "line": 28,
       "function": "anonymous",
       "callee": "audit",
-      "actionExpression": "service.updated",
-      "sourceSha256": "4fb5cdf5eedc936aca1349b76c76bba72e252c477b21a8c9d56119b07cf367f1",
+      "actionExpression": "profile.updated",
+      "sourceSha256": "7b2ce923e39cd5670bbff913b5a5b52703fdc9e24cc447d4b4a61b9ebfccaea7",
       "rootClientWrite": false
     },
     {
-      "path": "src/app/api/v1/services/[id]/route.ts",
-      "line": 43,
+      "path": "src/app/api/v1/me/sessions/[id]/route.ts",
+      "line": 15,
       "function": "anonymous",
-      "callee": "audit",
-      "actionExpression": "service.archived",
-      "sourceSha256": "4fb5cdf5eedc936aca1349b76c76bba72e252c477b21a8c9d56119b07cf367f1",
-      "rootClientWrite": false
-    },
-    {
-      "path": "src/app/api/v1/services/route.ts",
-      "line": 26,
-      "function": "anonymous",
-      "callee": "audit",
-      "actionExpression": "service.created",
-      "sourceSha256": "171b8854587e31dc3940b46497dc2da1eec8d1a14519dfd715e12c5205b1921d",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"session.revoked\"",
+      "sourceSha256": "c40172cb4500b3f7a5da6786fca213b9b9c2a6d2c0a2167c47f0934decef56fe",
       "rootClientWrite": false
     },
     {
@@ -1988,21 +2105,30 @@
       "rootClientWrite": false
     },
     {
-      "path": "src/app/api/v1/me/route.ts",
-      "line": 28,
+      "path": "src/app/api/v1/services/route.ts",
+      "line": 26,
       "function": "anonymous",
       "callee": "audit",
-      "actionExpression": "profile.updated",
-      "sourceSha256": "7b2ce923e39cd5670bbff913b5a5b52703fdc9e24cc447d4b4a61b9ebfccaea7",
+      "actionExpression": "service.created",
+      "sourceSha256": "171b8854587e31dc3940b46497dc2da1eec8d1a14519dfd715e12c5205b1921d",
       "rootClientWrite": false
     },
     {
-      "path": "src/app/api/v1/me/sessions/[id]/route.ts",
-      "line": 15,
+      "path": "src/app/api/v1/services/[id]/route.ts",
+      "line": 27,
       "function": "anonymous",
-      "callee": "tx.auditEvent.create",
-      "actionExpression": "\"session.revoked\"",
-      "sourceSha256": "c40172cb4500b3f7a5da6786fca213b9b9c2a6d2c0a2167c47f0934decef56fe",
+      "callee": "audit",
+      "actionExpression": "service.updated",
+      "sourceSha256": "4fb5cdf5eedc936aca1349b76c76bba72e252c477b21a8c9d56119b07cf367f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/app/api/v1/services/[id]/route.ts",
+      "line": 43,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "service.archived",
+      "sourceSha256": "4fb5cdf5eedc936aca1349b76c76bba72e252c477b21a8c9d56119b07cf367f1",
       "rootClientWrite": false
     }
   ]

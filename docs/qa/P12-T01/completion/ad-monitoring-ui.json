@@ -1,0 +1,62 @@
+{
+  "path": "/log/ad-monitoring",
+  "title": "광고성 정보 수신동의 처리로그",
+  "kind": "marketing",
+  "initial": {
+    "status": 200,
+    "requestId": "222d9897-7097-4ec5-812e-f4d9d97f1c2e",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=marketing&page=1&pageSize=10",
+    "body": {
+      "items": [
+        {
+          "id": "af1263ed-eb5a-41c6-a502-ffe07bdcc0e0",
+          "createdAt": "2026-10-04T10:22:00.708Z",
+          "action": "marketing.granted",
+          "resource": "marketing",
+          "resourceId": "483d6ebe-2bc8-4a63-a05c-8aaa05da9051",
+          "serviceId": "4abc805e-569e-4d42-905c-7f1c2df0c503",
+          "serviceName": "감사 서비스 12",
+          "actorName": "처리자 정보 없음"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "filtered": {
+    "status": 200,
+    "requestId": "ca4ed335-6938-4fd1-b553-c089c7e03c8b",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=marketing&page=1&pageSize=10&search=marketing.granted&searchField=action",
+    "body": {
+      "items": [
+        {
+          "id": "af1263ed-eb5a-41c6-a502-ffe07bdcc0e0",
+          "createdAt": "2026-10-04T10:22:00.708Z",
+          "action": "marketing.granted",
+          "resource": "marketing",
+          "resourceId": "483d6ebe-2bc8-4a63-a05c-8aaa05da9051",
+          "serviceId": "4abc805e-569e-4d42-905c-7f1c2df0c503",
+          "serviceName": "감사 서비스 12",
+          "actorName": "처리자 정보 없음"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "rows": [
+    "1\t감사 서비스 12\t처리자 정보 없음\t2026. 10. 4. 오후 7:22:00\t-\t-\tmarketing.granted\t-"
+  ],
+  "layout": {
+    "width": 390,
+    "documentWidth": 390,
+    "tableOverflow": true
+  },
+  "emptyPassed": true,
+  "resetPassed": true,
+  "csvSaved": true
+}

@@ -1,0 +1,62 @@
+{
+  "path": "/log/external-viewer",
+  "title": "외부 열람자 로그",
+  "kind": "external",
+  "initial": {
+    "status": 200,
+    "requestId": "fa8282fe-8bb1-4d11-97c6-40c22d156876",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=external&page=1&pageSize=10",
+    "body": {
+      "items": [
+        {
+          "id": "79f361d2-6deb-4b33-bfe2-fe8dac25aa51",
+          "createdAt": "2026-10-04T10:11:33.004Z",
+          "action": "share.created",
+          "resource": "shareGrant",
+          "resourceId": "0abc2abb-225c-4e4b-8edd-03a1291f9803",
+          "serviceId": "4abc805e-569e-4d42-905c-7f1c2df0c503",
+          "serviceName": "감사 서비스 12",
+          "actorName": "가입 감사 화면 검증"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "filtered": {
+    "status": 200,
+    "requestId": "620a9ea4-df59-4aa6-82fd-98a57d556dcf",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=external&page=1&pageSize=10&search=share.created&searchField=action",
+    "body": {
+      "items": [
+        {
+          "id": "79f361d2-6deb-4b33-bfe2-fe8dac25aa51",
+          "createdAt": "2026-10-04T10:11:33.004Z",
+          "action": "share.created",
+          "resource": "shareGrant",
+          "resourceId": "0abc2abb-225c-4e4b-8edd-03a1291f9803",
+          "serviceId": "4abc805e-569e-4d42-905c-7f1c2df0c503",
+          "serviceName": "감사 서비스 12",
+          "actorName": "가입 감사 화면 검증"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "rows": [
+    "1\t감사 서비스 12\t가입 감사 화면 검증\t2026. 10. 4. 오후 7:11:33\tshare.created\tshareGrant · 0abc2abb"
+  ],
+  "layout": {
+    "width": 390,
+    "documentWidth": 390,
+    "tableOverflow": true
+  },
+  "emptyPassed": true,
+  "resetPassed": true,
+  "csvSaved": true
+}

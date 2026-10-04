@@ -4,6 +4,7 @@ import type { LedgerOverview, LedgerQuery } from "@/contracts/ledger";
 import { db } from "./db";
 import { fail } from "./http";
 import { roleCan } from "./permissions";
+import { audit } from "./audit";
 
 type LedgerKind = "funding" | "reserve" | "capture" | "release";
 type Transfer = {
@@ -30,8 +31,10 @@ export async function postTrustedLedgerTransfer(input: Transfer) {
         fail(409, "LEDGER_SOURCE_CONFLICT", "같은 원천에 다른 원장 내용이 사용되었습니다.");
       return existing;
     }
-    return tx.ledgerTransaction.create({ data: { ...key, currency: input.currency, amount: input.amount,
+    const row = await tx.ledgerTransaction.create({ data: { ...key, currency: input.currency, amount: input.amount,
       serviceId: input.serviceId ?? null, reservationId: input.reservationId ?? null } });
+    await audit(tx, { tenantId: input.tenantId, user: { id: null } }, row.id, "billing.ledger_" + input.kind, "ledgerTransaction", row.id, ["balance"], input.serviceId ?? undefined);
+    return row;
   }, { timeout: 15000 });
 }
 

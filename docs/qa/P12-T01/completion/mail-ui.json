@@ -1,0 +1,62 @@
+{
+  "path": "/log/mail",
+  "title": "이메일 발송현황",
+  "kind": "mail",
+  "initial": {
+    "status": 200,
+    "requestId": "16dc196b-8c2a-4846-bed0-b9e033e2850d",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=mail&page=1&pageSize=10",
+    "body": {
+      "items": [
+        {
+          "id": "ad917646-b757-462f-8a0e-8ced02add329",
+          "createdAt": "2026-10-04T10:11:34.993Z",
+          "action": "email.local_delivered",
+          "resource": "job",
+          "resourceId": "186d912d-99d0-4f10-8837-8cc200fbdd93",
+          "serviceId": null,
+          "serviceName": null,
+          "actorName": "처리자 정보 없음"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "filtered": {
+    "status": 200,
+    "requestId": "1dea8564-02dd-4044-810a-6177629a6e6b",
+    "path": "/api/v1/audit-events",
+    "query": "?scope=company&kind=mail&page=1&pageSize=10&search=email.local_delivered&searchField=action",
+    "body": {
+      "items": [
+        {
+          "id": "ad917646-b757-462f-8a0e-8ced02add329",
+          "createdAt": "2026-10-04T10:11:34.993Z",
+          "action": "email.local_delivered",
+          "resource": "job",
+          "resourceId": "186d912d-99d0-4f10-8837-8cc200fbdd93",
+          "serviceId": null,
+          "serviceName": null,
+          "actorName": "처리자 정보 없음"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "pageSize": 10
+    }
+  },
+  "rows": [
+    "1\t회사 공통\t처리자 정보 없음\t2026. 10. 4. 오후 7:11:34\temail.local_delivered\tjob · 186d912d"
+  ],
+  "layout": {
+    "width": 390,
+    "documentWidth": 390,
+    "tableOverflow": true
+  },
+  "emptyPassed": true,
+  "resetPassed": true,
+  "csvSaved": true
+}

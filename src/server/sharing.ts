@@ -1,4 +1,5 @@
 import type { Context } from "./context";
+import { randomUUID } from "node:crypto";
 import { db, type Transaction } from "./db";
 import { decrypt, encrypt, opaqueToken, tokenHash } from "./crypto";
 import { fail, requireVersion } from "./http";
@@ -95,7 +96,7 @@ export async function shareOptions(ctx: Context, formId: string) {
     return result;
   });
 }
-export async function listShares(ctx: Context, formId: string, query: { page: number; pageSize: number; status?: string; search?: string }) {
+export async function listShares(ctx: Context, formId: string, query: { page: number; pageSize: number; status?: string; search?: string }, requestId: string = randomUUID()) {
   return db.$transaction(async tx => {
     const form = await lockShareForm(tx, ctx, formId);
     const now = new Date(), where = { tenantId: ctx.tenantId, formId,
@@ -105,13 +106,16 @@ export async function listShares(ctx: Context, formId: string, query: { page: nu
     const total = await tx.shareGrant.count({ where }), page = Math.min(query.page, Math.max(1, Math.ceil(total / query.pageSize)));
     const items = await tx.shareGrant.findMany({ where, include: shareInclude, orderBy: [{ createdAt: "desc" }, { id: "asc" }], skip: (page - 1) * query.pageSize, take: query.pageSize });
     const permissions = await sharePermissions(tx, ctx, form), result = { items: items.map(row => shareDto(row, permissions)), total, page, pageSize: query.pageSize, permissions };
+    await audit(tx, ctx, requestId, "share.list_viewed", "shareGrant", undefined, [], form.serviceId);
     assertFileDeadlines(form.deadlines);
     return result;
   });
 }
-export async function getShare(ctx: Context, id: string) {
+export async function getShare(ctx: Context, id: string, requestId: string = randomUUID()) {
   return db.$transaction(async tx => { const { row, form } = await managerGrant(tx, ctx, id), permissions = await sharePermissions(tx, ctx, form);
-    const result = shareDto(row, permissions); assertFileDeadlines(form.deadlines); return result; });
+    const result = shareDto(row, permissions);
+    await audit(tx, ctx, requestId, "share.viewed", "shareGrant", id, [], form.serviceId);
+    assertFileDeadlines(form.deadlines); return result; });
 }
 export async function createShareRequest(ctx: Context, input: ShareInput, key: string | null, requestId: string) {
   return idempotent("share:create:" + ctx.tenantId + ":" + ctx.member.id, key, input, async tx => {
@@ -123,6 +127,8 @@ export async function createShareRequest(ctx: Context, input: ShareInput, key: s
       fail(410, "SHARE_REQUEST_EXPIRED", "공유 권한이 변경되었거나 종료되었습니다. 최신 공유 목록을 확인해주세요.");
     if (row.fields.some(f => f.question.type === "파일 업로드")) await lockFileContext(tx, ctx, form.serviceId, ["file.read"]);
     const result = shareDto(row, await sharePermissions(tx, ctx, form)); assertFileDeadlines(form.deadlines);
+    await audit(tx, ctx, requestId, "share.viewed", "shareGrant", row.id, [], form.serviceId);
+    assertFileDeadlines(form.deadlines);
     if (row.expiresAt <= new Date()) fail(410, "SHARE_REQUEST_EXPIRED", "공유 기한이 종료되었습니다. 최신 공유 목록을 확인해주세요.");
     return result;
   });

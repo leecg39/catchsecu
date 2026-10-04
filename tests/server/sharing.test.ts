@@ -63,6 +63,17 @@ async function fixture(serviceId = service) {
   return { form, token: pub.token, name, secret, fileQuestion, versionId: options.versions[0].id };
 }
 type Fixture = Awaited<ReturnType<typeof fixture>>;
+test.each(["share.list_viewed", "share.viewed"])("외부 열람자 이메일 접근은 %s를 요청 ID로 감사하고 감사 실패는 원문을 반환하지 않는다", async action => {
+  const f = await fixture(), row = await grant(f), read = () => action === "share.viewed" ? shareGet(req("/share-grants/" + row.id)) : shareList(req("/share-grants?formId=" + f.form.id));
+  const response = await read(); expect(response.status).toBe(200);
+  const events = await db.auditEvent.findMany({ where: { requestId: response.headers.get("x-request-id")! } });
+  expect(events).toHaveLength(1); expect(events[0]).toMatchObject({ tenantId: tenant, serviceId: service, action, detail: { changedFields: [] } });
+  expect(JSON.stringify(events)).not.toContain(row.email);
+  await db.$executeRawUnsafe(`CREATE FUNCTION qa_share_read_fault() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='${action}' THEN RAISE EXCEPTION 'synthetic read audit failure'; END IF; RETURN NEW; END $$`);
+  await db.$executeRawUnsafe('CREATE TRIGGER qa_share_read_fault BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION qa_share_read_fault()');
+  try { const denied = await read(); expect(denied.status).toBe(500); expect(await denied.text()).not.toContain(row.email); expect(await db.auditEvent.count({ where: { requestId: denied.headers.get("x-request-id")! } })).toBe(0); }
+  finally { await db.$executeRawUnsafe('DROP TRIGGER qa_share_read_fault ON "AuditEvent"'); await db.$executeRawUnsafe('DROP FUNCTION qa_share_read_fault()'); }
+});
 async function attachment(f: Fixture, body = bytes) {
   const file = await ok<{ id: string; uploadToken: string }>(await publicPost(req(`/public/forms/${f.token}/uploads`, "POST", "anonymous",
     { questionId: f.fileQuestion, name: "공유자료.txt", mime: "text/plain", size: body.length, sha256: sha256(body) }, { "idempotency-key": randomUUID() })), 201);

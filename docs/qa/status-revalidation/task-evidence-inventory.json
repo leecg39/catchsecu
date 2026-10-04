@@ -1,9 +1,9 @@
 {
   "date": "2026-10-04",
-  "method": "57-task source/QA inventory; no new completion claims or blanket test claims",
+  "method": "57-task source/QA inventory with later individual acceptance evidence; original source snapshots retained",
   "summary": {
-    "completed": 16,
-    "in_progress": 41,
+    "completed": 17,
+    "in_progress": 40,
     "planned": 15
   },
   "promotedFromPlannedToInProgress": [
@@ -3577,17 +3577,17 @@
       "id": "P12-T01",
       "title": "감사 이벤트 수집·조회",
       "previousStatus": "planned",
-      "currentStatus": "in_progress",
+      "currentStatus": "completed",
       "scope": "모든 변경·민감 열람·발송·권한·인증·파기에서 audit 이벤트를 생성한다. 각 로그 화면은 전용 필터/안전 DTO를 사용한다.",
       "acceptance": "변경과 event 원자성; 일반사용자 U/D 불가; 역할별 마스킹·필드/회사 격리",
       "dependencies": [
         "P01-T02",
         "P02-T03"
       ],
-      "present": "현재 권한·조회/CSV·열람 감사·선택·MFA/로그아웃/회수·가입/서명 확인/복구 요청/거절/이메일 코드 감사 원자성·실제 UI/DB/재시작",
-      "remaining": "비밀번호 변경의 개별 세션 종료·요청 상관, 나머지 변경/민감 열람/발송/권한/파기 생산 경로의 전체 매핑·원자성과 로그10개 화면의 전체 수용",
-      "complete": false,
-      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "present": "감사 생산/원자성·불변 원장·회사/역할/필드 격리, 최종 관련162개·실제10화면/CSV/독립DB/새프로세스",
+      "remaining": "",
+      "complete": true,
+      "reviewMethod": "source transaction mapping plus executed DB/HTTP/UI acceptance; full suite failure and external limits preserved",
       "sources": [
         {
           "path": "src/server/audit-events.ts",
@@ -3757,7 +3757,9 @@
         }
       ],
       "partialEvidence": "docs/qa/P12-T01/revalidation/public-auth/README.md",
-      "lastRevalidatedAt": "2026-10-04T09:46:16.202834+00:00"
+      "lastRevalidatedAt": "2026-10-04T10:59:05.049274+00:00",
+      "completionEvidence": "docs/qa/P12-T01/completion/README.md",
+      "completionSummary": "docs/qa/P12-T01/completion/summary.json"
     },
     {
       "id": "P12-T02",

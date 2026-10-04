@@ -77,7 +77,7 @@ export async function submitForm(token: string, input: z.infer<typeof submission
         valueType: question.type, valueCipher: encrypt(answers[question.stableKey]),
       })) });
     await bindSubmissionSubject(tx, submission.id, live.form.serviceId, questions, answers);
-    await collectMarketing(tx, submission, live.form.serviceId, publication.formVersion.marketing, input.marketingChannels ?? []);
+    await collectMarketing(tx, submission, live.form.serviceId, publication.formVersion.marketing, input.marketingChannels ?? [], requestId);
     await createConsentReceipt(tx, publication.formVersion, submission.id, input.consent, input.documentConsents ?? [], retentionDays);
     await tx.auditEvent.create({ data: {
       tenantId: live.tenantId, action: "submission.created", resource: "submission", resourceId: submission.id,

@@ -7,6 +7,12 @@ import { decrypt } from "./crypto";
 import { env } from "./env";
 import { HttpError } from "./http";
 import { deliverNotification, type NotificationResult } from "./notification-transport";
+import { audit } from "./audit";
+
+async function notificationAudit(tx: Transaction, row: NotificationDelivery, outcome: string) {
+  await audit(tx, { tenantId: row.tenantId, user: { id: null } }, row.id,
+    "message.notification_" + outcome, "notificationDelivery", row.id, ["status"], row.serviceId);
+}
 
 export async function recoverNotifications() {
   return db.$transaction(async tx => {
@@ -16,6 +22,7 @@ export async function recoverNotifications() {
       const status = unknown ? "unknown" : exhausted ? "failed" : "retry", code = unknown ? "LEASE_LOST" : exhausted ? "LEASE_EXHAUSTED" : "LEASE_RECOVERED", now = new Date();
       await tx.notificationDelivery.update({ where: { id: row.id }, data: { status, lastError: code, leaseOwner: null, leaseUntil: null, completedAt: status === "retry" ? null : now, nextAttemptAt: now, version: { increment: 1 } } });
       await tx.notificationAttempt.create({ data: { deliveryId: row.id, number: row.attempts, outcome: status, code, startedAt: row.startedAt ?? row.createdAt, finishedAt: now } });
+      await notificationAudit(tx, row, status);
     }
     return rows.length;
   });
@@ -46,6 +53,7 @@ export async function notificationAttemptResult(tx: Transaction, row: Notificati
     leaseOwner: null, leaseUntil: null, completedAt: terminal ? now : null, nextAttemptAt: new Date(now.getTime() + ("retrySeconds" in result ? result.retrySeconds ?? 5 : 5) * 1000), version: { increment: 1 } } });
   await tx.notificationAttempt.create({ data: { deliveryId: row.id, number: row.attempts, outcome: result.kind === "success" ? result.outcome! : status, code: result.code ?? null,
     httpStatus: "httpStatus" in result ? result.httpStatus : null, startedAt: row.startedAt ?? row.createdAt, finishedAt: now } });
+  await notificationAudit(tx, row, result.kind === "success" ? result.outcome! : status);
 }
 function message(event: NotificationEvent) {
   const label = notificationLabels[event.kind as keyof typeof notificationLabels];
@@ -57,7 +65,8 @@ export async function processNotification(claimed: NotificationDelivery, workerI
     await tx.$queryRaw`SELECT id FROM "NotificationDelivery" WHERE id=${claimed.id} FOR UPDATE`;
     const row = await tx.notificationDelivery.findUniqueOrThrow({ where: { id: claimed.id } });
     if (row.status !== "leased" || row.leaseOwner !== workerId || !row.leaseUntil || row.leaseUntil <= new Date()) return false;
-    await tx.notificationDelivery.update({ where: { id: row.id }, data: { status: "sending", version: { increment: 1 } } }); return true;
+    await tx.notificationDelivery.update({ where: { id: row.id }, data: { status: "sending", version: { increment: 1 } } });
+    await notificationAudit(tx, row, "sending"); return true;
   });
   if (!prepared) return;
   await db.$transaction(async tx => {

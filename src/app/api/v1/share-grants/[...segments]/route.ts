@@ -9,7 +9,7 @@ function parts(request: Request) {
   if (rest.length || !first) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   return { first, action };
 }
-export const GET = route(async request => {
+export const GET = route(async (request, requestId) => {
   const { first, action } = parts(request), ctx = await requireContext(request.headers, "share.manage");
   const url = new URL(request.url);
   if (first === "options" && !action) return json(await shareOptions(ctx, sharingQuery(url, shareOptionsQuery).formId));
@@ -17,7 +17,7 @@ export const GET = route(async request => {
   if (action === "events") return json(await shareEvents(ctx, id, sharingQuery(url, sharingPageQuery)));
   if (action) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   sharingQuery(url, sharingEmptyQuery);
-  return json(await getShare(ctx, id));
+  return json(await getShare(ctx, id, requestId));
 });
 export const PATCH = route(async (request, requestId) => {
   const { first, action } = parts(request); if (action) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");

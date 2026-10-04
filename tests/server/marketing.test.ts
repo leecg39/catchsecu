@@ -2,14 +2,20 @@ import { randomUUID } from "node:crypto";
 import { access, readFile, mkdir, writeFile, rename, rmdir } from "node:fs/promises";
 import { Client } from "pg";
 import { resolve } from "node:path";
-import { beforeAll, beforeEach, afterAll, describe, expect, test } from "vitest";
+import { beforeAll, beforeEach, afterAll, describe, expect, test, vi } from "vitest";
+
+vi.hoisted(async () => {
+  // Match Next's Node environment before its error inspection modules load.
+  const { AsyncLocalStorage } = await import("node:async_hooks");
+  Object.assign(globalThis, { AsyncLocalStorage });
+});
 import { db } from "@/server/db";
 import { env } from "@/server/env";
 import { auth } from "@/server/auth";
 import { requireContext } from "@/server/context";
 import { roleCapabilities } from "@/server/permissions";
 import type { Role } from "@/generated/prisma/client";
-import { decrypt } from "@/server/crypto";
+import { decrypt, tokenHash } from "@/server/crypto";
 import { cleanupMarketingJobs, cleanupMarketingLocalCopies } from "@/server/marketing-jobs";
 import { marketingContactHash, withMarketingDelivery, readMarketing } from "@/server/marketing";
 import { enqueueMarketingMail, enqueueMail, enqueueServiceMail, runOneJob, deliverMail } from "@/server/jobs";
@@ -97,6 +103,35 @@ const mail = (f: Fixture) => ({ to: f.contact.email, subject: "합성 마케팅 
 const scope = (f: Fixture, channel: "email" | "sms" = "email") => ({ tenantId: f.who === "foreign" ? foreign : tenant, serviceId: f.serviceId, channel, contact: channel === "email" ? f.contact.email : f.contact.phone });
 const manual = (f: Fixture, subId: string) => ({ serviceId: f.serviceId, submissionId: subId, channel: "email", nameQuestionId: f.name, contactQuestionId: f.email, grantedAt: new Date(Date.now() - 1000).toISOString(), purpose: "별도 마케팅 목적", reference: "합성 수신동의 기록 01", attested: true });
 describe("마케팅 최종 권한·만료·삭제·실행 경합", () => {
+  test("공개 채널 동의와 재동의는 접수와 같은 요청 ID의 안전한 감사 이벤트를 남긴다", async () => {
+    const f = await fixture();
+    const input = { answers: { [f.name]: f.contact.name, [f.email]: f.contact.email, [f.phone]: f.contact.phone }, consent: true, marketingChannels: ["email", "sms"] };
+    for (const action of ["marketing.granted", "marketing.reconsented"]) {
+      const response = await publicPost(req(`/public/forms/${f.token}/submissions`, "POST", "anonymous", input, { "idempotency-key": randomUUID() }));
+      await ok(response, 201);
+      const rows = await db.auditEvent.findMany({ where: { requestId: response.headers.get("x-request-id")!, action } });
+      expect(rows).toHaveLength(2); expect(rows.every(row => row.actorId === null && row.tenantId === tenant && row.serviceId === service)).toBe(true);
+      expect(await db.auditEvent.count({ where: { requestId: response.headers.get("x-request-id")!, action: "submission.created" } })).toBe(1);
+      for (const value of [f.contact.name, f.contact.email, f.contact.phone]) expect(JSON.stringify(rows)).not.toContain(value);
+    }
+  });
+  test("공개 동의 감사 저장 실패는 접수·응답·동의 이력·접수 횟수를 함께 롤백한다", async () => {
+    const f = await fixture(), before = await db.publication.findUniqueOrThrow({ where: { tokenHash: tokenHash(f.token) } });
+    const counts = { submissions: await db.submission.count(), answers: await db.answer.count(), preferences: await db.marketingPreference.count(), events: await db.marketingEvent.count() };
+    await db.$executeRawUnsafe(`CREATE FUNCTION qa_public_marketing_audit_fault() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+      IF NEW.action='marketing.granted' AND NEW."actorId" IS NULL THEN RAISE EXCEPTION 'synthetic public consent audit failure'; END IF; RETURN NEW; END $$`);
+    await db.$executeRawUnsafe('CREATE TRIGGER qa_public_marketing_audit_fault BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION qa_public_marketing_audit_fault()');
+    try {
+      const response = await publicPost(req(`/public/forms/${f.token}/submissions`, "POST", "anonymous", { answers: { [f.name]: f.contact.name, [f.email]: f.contact.email }, consent: true, marketingChannels: ["email"] }, { "idempotency-key": randomUUID() }));
+      expect(response.status).toBe(500);
+      expect({ submissions: await db.submission.count(), answers: await db.answer.count(), preferences: await db.marketingPreference.count(), events: await db.marketingEvent.count() }).toEqual(counts);
+      expect((await db.publication.findUniqueOrThrow({ where: { id: before.id } })).responseCount).toBe(before.responseCount);
+      expect(await db.auditEvent.count({ where: { requestId: response.headers.get("x-request-id")! } })).toBe(0);
+    } finally {
+      await db.$executeRawUnsafe('DROP TRIGGER IF EXISTS qa_public_marketing_audit_fault ON "AuditEvent"');
+      await db.$executeRawUnsafe('DROP FUNCTION IF EXISTS qa_public_marketing_audit_fault()');
+    }
+  });
   test("원래 URL의 예약 키를 거절하고 Proxy는 대상 API에만 적용한다", async () => {
     for (const path of ["/api/v1/marketing/preferences", "/api/v1/marketing/preferences/export", "/api/v1/email-suppressions", "/api/v1/senders", "/api/v1/senders/a/evidence"]) {
       expect(unstable_doesMiddlewareMatch({ config: proxyConfig, nextConfig: { skipProxyUrlNormalize: true }, url: path })).toBe(true);

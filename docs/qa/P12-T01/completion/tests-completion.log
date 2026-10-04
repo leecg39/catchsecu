@@ -1,0 +1,90 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/p12-final-checkout
+
+(node:26642) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/marketing.test.ts (0 test)
+(node:28544) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:30268) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:31599) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:32539) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/system-producer-audit.test.ts (8 tests | 2 failed) 11036ms
+   × 알림 결과 감사 실패는 시도와 최종 상태를 롤백하고 복구 후 같은 범위에 안전한 결과를 남긴다 969ms
+   × 알림 lease 복구 감사 실패는 불확실 상태와 시도 기록을 함께 롤백한다 957ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/marketing.test.ts [ tests/server/marketing.test.ts ]
+Error: Cannot find module '../client/components/redirect-status-code'
+Require stack:
+- /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/p12-final-checkout/node_modules/next/dist/lib/redirect-status.js
+- /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/p12-final-checkout/node_modules/next/dist/lib/load-custom-routes.js
+- /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/p12-final-checkout/node_modules/next/dist/lib/build-custom-route.js
+- /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/p12-final-checkout/node_modules/next/dist/experimental/testing/server/config-testing-utils.js
+ ❯ Object.<anonymous> node_modules/next/dist/lib/redirect-status.js:27:29
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/system-producer-audit.test.ts > 알림 결과 감사 실패는 시도와 최종 상태를 롤백하고 복구 후 같은 범위에 안전한 결과를 남긴다
+PrismaClientKnownRequestError: 
+Invalid `db.notificationIntegration.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/p12-final-checkout/tests/server/system-producer-audit.test.ts:82:56
+
+  79 async function notification(expired = false) {
+  80   const f = await fixture(), user = await db.user.create({ data: { name: "합성 담당자", email: randomUUID() + "@example.test", emailVerified: true } });
+  81   const member = await db.membership.create({ data: { tenantId: f.tenantId, userId: user.id, role: "owner" } });
+→ 82   const integration = await db.notificationIntegration.create(
+Database error. Code: `23514`. Message: `new row for relation "NotificationIntegration" violates check constraint "NotificationIntegration_check"`
+ ❯ vn.handleRequestError ../../node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError ../../node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request ../../node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a ../../node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ notification tests/server/system-producer-audit.test.ts:82:23
+     80|   const f = await fixture(), user = await db.user.create({ data: { nam…
+     81|   const member = await db.membership.create({ data: { tenantId: f.tena…
+     82|   const integration = await db.notificationIntegration.create({ data: …
+       |                       ^
+     83|   const event = await db.notificationEvent.create({ data: { ...f, even…
+     84|   await db.notificationDelivery.create({ data: { ...f, integrationId: …
+ ❯ tests/server/system-producer-audit.test.ts:89:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/server/system-producer-audit.test.ts > 알림 lease 복구 감사 실패는 불확실 상태와 시도 기록을 함께 롤백한다
+PrismaClientKnownRequestError: 
+Invalid `db.notificationIntegration.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/p12-final-checkout/tests/server/system-producer-audit.test.ts:82:56
+
+  79 async function notification(expired = false) {
+  80   const f = await fixture(), user = await db.user.create({ data: { name: "합성 담당자", email: randomUUID() + "@example.test", emailVerified: true } });
+  81   const member = await db.membership.create({ data: { tenantId: f.tenantId, userId: user.id, role: "owner" } });
+→ 82   const integration = await db.notificationIntegration.create(
+Database error. Code: `23514`. Message: `new row for relation "NotificationIntegration" violates check constraint "NotificationIntegration_check"`
+ ❯ vn.handleRequestError ../../node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError ../../node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request ../../node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a ../../node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ notification tests/server/system-producer-audit.test.ts:82:23
+     80|   const f = await fixture(), user = await db.user.create({ data: { nam…
+     81|   const member = await db.membership.create({ data: { tenantId: f.tena…
+     82|   const integration = await db.notificationIntegration.create({ data: …
+       |                       ^
+     83|   const event = await db.notificationEvent.create({ data: { ...f, even…
+     84|   await db.notificationDelivery.create({ data: { ...f, integrationId: …
+ ❯ tests/server/system-producer-audit.test.ts:97:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 11 passed (13)
+      Tests  2 failed | 109 passed (111)
+   Start at  19:38:16
+   Duration  231.31s (tests 88%, import 10%, transform 2%)
+

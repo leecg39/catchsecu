@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import type { PaymentOrder } from "@/generated/prisma/client";
 import { db, type Transaction } from "./db";
@@ -46,7 +46,7 @@ function signaturesMatch(secret: string, body: string, signature: string) {
   const left = Buffer.from(expected), right = Buffer.from(signature);
   return left.length === right.length && timingSafeEqual(left, right);
 }
-export async function applyPaymentEvent(raw: string, signature: string, secret: string | undefined) {
+export async function applyPaymentEvent(raw: string, signature: string, secret: string | undefined, requestId: string = randomUUID()) {
   if (!secret) fail(503, "PAYMENT_PROVIDER_REQUIRED", "결제 결과 수신 비밀이 설정되지 않았습니다.");
   if (/"cardNumber"|"pan"|"cvc"/i.test(raw)) fail(422, "CARD_DATA_REJECTED", "카드 원문은 받을 수 없습니다.");
   if (!signaturesMatch(secret, raw, signature)) fail(401, "PAYMENT_SIGNATURE_INVALID", "결제 결과 서명을 확인할 수 없습니다.");
@@ -63,6 +63,7 @@ export async function applyPaymentEvent(raw: string, signature: string, secret: 
     if (order.status !== "pending") fail(409, "OUT_OF_ORDER", "이미 종료된 결제에 다른 결과를 적용할 수 없습니다.");
     await tx.paymentEvent.create({ data: { orderId: order.id, providerEventId: input.eventId, outcome: input.outcome } });
     const saved = await tx.paymentOrder.update({ where: { id: order.id }, data: { status: input.outcome, version: { increment: 1 } } });
+    await audit(tx, { tenantId: order.tenantId, user: { id: null } }, requestId, "billing.payment_" + input.outcome, "paymentOrder", order.id, ["status"]);
     return { ...dto(saved), duplicate: false };
   });
 }
