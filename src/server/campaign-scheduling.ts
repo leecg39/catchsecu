@@ -19,8 +19,9 @@ function validateTime(row: Campaign, at: string | null) {
   return date;
 }
 function requireTransport(row: Campaign, sender: Sender | null, at: Date, snapshot = false) {
-  if (row.channel !== "email") fail(503, "SMS_PROVIDER_REQUIRED", "문자 전송·요금 공급자를 연결한 뒤 발송할 수 있습니다.");
-  if (env.MAIL_TRANSPORT !== "local" && !env.SMTP_HOST) fail(503, "SMTP_REQUIRED", "SMTP 연결 설정이 필요합니다.");
+  if (row.channel === "sms") {
+    if (env.SMS_TRANSPORT !== "local") fail(503, "SMS_PROVIDER_REQUIRED", "문자 전송·요금 공급자를 연결한 뒤 발송할 수 있습니다.");
+  } else if (env.MAIL_TRANSPORT !== "local" && !env.SMTP_HOST) fail(503, "SMTP_REQUIRED", "SMTP 연결 설정이 필요합니다.");
   if (!sender || senderDenial(sender) || !sender.expiresAt || sender.expiresAt <= at || snapshot && sender.version !== row.senderVersion)
     fail(409, "SENDER_UNAVAILABLE", "발송 시각까지 유효한 최신 인증 발신자가 필요합니다.");
 }
@@ -28,7 +29,7 @@ async function enqueue(tx: Transaction, campaign: Campaign, rows: CampaignDelive
   await tx.job.createMany({ data: rows.map(row => ({ type: campaign.mailProtocol, tenantId: row.tenantId, senderId: campaign.senderId,
     campaignDeliveryId: row.id, marketingPreferenceId: row.preferenceId, marketingSubmissionId: row.sourceSubmissionId,
     dedupeKey: "campaign:" + row.id + ":" + row.attempt, dueAt,
-    payloadCipher: encrypt({ campaignId: campaign.id, deliveryId: row.id, attempt: row.attempt, transport: env.MAIL_TRANSPORT }) })) });
+    payloadCipher: encrypt({ campaignId: campaign.id, deliveryId: row.id, attempt: row.attempt, transport: campaign.channel === "sms" ? "sms-local" : env.MAIL_TRANSPORT }) })) });
 }
 export async function scheduleCampaign(ctx: Context, id: string, input: z.infer<typeof campaignSchedule>, key: string | null, requestId: string) {
   return idempotent("campaign:schedule:" + ctx.member.id + ":" + id, key, input, async tx => {

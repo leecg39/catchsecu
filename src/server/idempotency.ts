@@ -7,7 +7,7 @@ function canonical(value: unknown): string {
   return JSON.stringify(value);
 }
 export async function idempotent<T>(scope: string, key: string | null, payload: unknown,
-  operation: (tx: Transaction) => Promise<{ status: number; body: T; resource?: { tenantId?: string; resourceType: "mfa-exception" | "ip-rule" | "submission" | "file" | "support-ticket" | "notice" | "guide" | "form" | "template" | "shareGrant" | "verificationIntegration"; resourceId: string } }>,
+  operation: (tx: Transaction) => Promise<{ status: number; body: T; resource?: { tenantId?: string; resourceType: "mfa-exception" | "ip-rule" | "submission" | "file" | "support-ticket" | "notice" | "guide" | "form" | "template" | "shareGrant" | "verificationIntegration" | "subprocessor" | "subprocessor-notice" | "kakao-channel" | "kakao-template"; resourceId: string } }>,
   validateReplay?: (tx: Transaction) => Promise<unknown>,
   replayBody?: (tx: Transaction, cached: T) => Promise<T>,
   finalCheck?: (tx: Transaction) => Promise<unknown>): Promise<{ status: number; body: T }> {

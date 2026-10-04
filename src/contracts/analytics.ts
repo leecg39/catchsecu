@@ -8,6 +8,16 @@ export const analyticsQuery = z.object({
   { path: ["to"], message: "종료 시각은 시작 시각 이후여야 합니다." });
 
 export type AnalyticsQuery = z.infer<typeof analyticsQuery>;
+export const complianceCloseInput = z.object({
+  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
+  serviceId: z.uuid().optional(),
+}).strict();
+export type ComplianceCloseRecord = {
+  id: string; month: string; serviceId: string | null; createdAt: string;
+  verdict: "not_assessed";
+  period: { from: string; to: string };
+  totals: AnalyticsDashboard["totals"];
+};
 export type AnalyticsDashboard = {
   asOf: string;
   period: { from: string; to: string };

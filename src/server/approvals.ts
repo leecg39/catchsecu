@@ -36,13 +36,13 @@ export async function requestApproval(tx: Transaction, ctx: Context, id: string,
   const content = contentDto(draft);
   try { validateFormForPublish(content); } catch (error) { fail(422, "INVALID_FORM", error instanceof Error ? error.message : "폼 내용을 확인해주세요."); }
   await validateFormDocuments(tx, ctx, form.serviceId, draft);
-  await preflightConsentReceipt(draft);
+  await preflightConsentReceipt(draft, policy.retentionDays);
   if (await tx.approvalRequest.count({ where: { formId: id, status: { in: ["pending", "approved"] } } })) fail(409, "APPROVAL_EXISTS", "진행 중이거나 승인된 요청이 있습니다.");
   const changed = await tx.form.update({ where: { id }, data: {
     status: form.status === "draft" ? "pendingApproval" : form.status, version: { increment: 1 },
   } });
   const row = await tx.approvalRequest.create({ data: { tenantId: ctx.tenantId, formId: id, formVersionId: draft.id,
-    formRevision: changed.version, policyRevision: policy.approvalRevision, contentHash: fingerprint(draft),
+    formRevision: changed.version, policyRevision: policy.approvalRevision, contentHash: fingerprint(draft, policy.retentionDays),
     snapshot: { title: draft.title, content, consentBundle: consentBundle(draft) } as Prisma.InputJsonValue, requestedBy: ctx.member.id,
     requestCipher: encrypt({ message: input.message, reference: input.reference }) }, include: approvalInclude });
   await audit(tx, ctx, requestId, "approval.requested", "approval", row.id, ["status"], form.serviceId);
@@ -110,7 +110,7 @@ export async function decideApproval(ctx: Context, id: string, input: z.infer<ty
     if (cancel && row.requestedBy !== member.id && member.role !== "owner") fail(403, "FORBIDDEN", "요청자 또는 최상위 관리자만 취소할 수 있습니다.");
     if (row.version !== input.version || row.status !== "pending") fail(409, "VERSION_CONFLICT", "이미 처리되거나 수정된 승인 요청입니다.");
     const draft = form.versions.find(version => version.status === "draft");
-    if (!policy.requireApproval || policy.approvalRevision !== row.policyRevision || !draft || draft.id !== row.formVersionId || fingerprint(draft) !== row.contentHash)
+    if (!policy.requireApproval || policy.approvalRevision !== row.policyRevision || !draft || draft.id !== row.formVersionId || fingerprint(draft, policy.retentionDays) !== row.contentHash)
       fail(409, "STALE_APPROVAL", "폼이나 회사 정책이 변경되었습니다. 승인을 다시 요청해주세요.");
     const saved = await tx.approvalRequest.update({ where: { id }, data: { status: input.decision, version: { increment: 1 },
       decidedBy: member.id, decidedAt: new Date(), decisionCipher: encrypt("reason" in input ? input.reason : "요청 취소") }, include: approvalInclude });

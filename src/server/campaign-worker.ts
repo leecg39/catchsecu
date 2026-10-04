@@ -13,8 +13,9 @@ import { evaluateRecipient, lockCampaign, lockCampaignConsents, settleCampaign, 
 import { readCampaignAttachments, markCampaignFilesForDeletion } from "./campaign-files";
 import { finishFileDeletion } from "./files";
 import { deliverMail, type MailAttachment, type ClaimedJob } from "./jobs";
+import { deliverSms, smsReceiptFile } from "./sms-adapter";
 
-const jobPayload = z.object({ campaignId: z.uuid(), deliveryId: z.uuid(), attempt: z.number().int().positive(), transport: z.enum(["local", "smtp"]) }).strict();
+const jobPayload = z.object({ campaignId: z.uuid(), deliveryId: z.uuid(), attempt: z.number().int().positive(), transport: z.enum(["local", "smtp", "sms-local"]) }).strict();
 type Payload = z.infer<typeof jobPayload>;
 async function lockedState(tx: Transaction, job: ClaimedJob, workerId: string, payload: Payload) {
   const initial = await tx.campaignDelivery.findUnique({ where: { id: payload.deliveryId }, include: { campaign: true } });
@@ -38,7 +39,8 @@ async function lockedState(tx: Transaction, job: ClaimedJob, workerId: string, p
   if (current.status !== "leased" || current.leaseOwner !== workerId || !current.leaseUntil || current.leaseUntil <= new Date() || current.payloadErasedAt) return null;
   if (!["scheduled", "dispatching"].includes(campaign.status)) reason = "CANCELLED";
   if (campaign.expiresAt <= new Date() || !campaign.contentCipher || recipient.erasedAt) reason = "DATA_ERASED";
-  if (!sender || sender.version !== campaign.senderVersion || senderDenial(sender) || payload.transport !== env.MAIL_TRANSPORT) reason ??= "SENDER_UNAVAILABLE";
+  if (!sender || sender.version !== campaign.senderVersion || senderDenial(sender)) reason ??= "SENDER_UNAVAILABLE";
+  if (campaign.channel === "sms" ? payload.transport !== "sms-local" || env.SMS_TRANSPORT !== "local" : payload.transport !== env.MAIL_TRANSPORT) reason ??= campaign.channel === "sms" ? "SMS_PROVIDER_REQUIRED" : "SENDER_UNAVAILABLE";
   const evaluated = await evaluateRecipient(tx, recipient, campaign, consents.get(recipient.contactHash), true);
   reason ??= evaluated.reason;
   return { campaign, recipient, reason, evaluated, sender };
@@ -60,7 +62,7 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
     const state = await lockedState(tx, job, workerId, payload); if (!state) return false;
     const { campaign, recipient, reason } = state;
     if (recipient.status === "sending") {
-      const receipt = payload.transport === "local" ? await localReceipt(job.id) : null;
+      const receipt = payload.transport === "local" ? await localReceipt(job.id) : payload.transport === "sms-local" ? await smsReceiptFile(job.id) : null;
       if (receipt || payload.transport === "smtp") {
         await finish(tx, job, campaign, recipient, receipt ? "local_delivered" : "unknown", receipt ? null : "DELIVERY_UNCERTAIN", receipt ?? undefined); return false;
       }
@@ -78,6 +80,16 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
     const { campaign, recipient, reason, sender, evaluated } = state;
     if (recipient.status !== "sending") { await finish(tx, job, campaign, recipient, recipient.status, recipient.reason, recipient.acceptedAt ?? undefined); return; }
     if (reason) { await finish(tx, job, campaign, recipient, "cancelled", reason); return; }
+    if (payload.transport === "sms-local") {
+      try { await deliverSms({ transport: "local", jobId: job.id, to: evaluated.contact!.contact, from: decrypt<string>(sender!.addressCipher!), text: evaluated.content!.text }); }
+      catch (error) {
+        if (error instanceof HttpError && error.status === 422) { await finish(tx, job, campaign, recipient, "failed", error.code); return; }
+        if (job.attempts >= job.maxAttempts) { await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
+        await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "queued", reason: "DELIVERY_FAILED" } });
+        await tx.job.update({ where: { id: job.id }, data: { status: "retry", dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } }); return;
+      }
+      await finish(tx, job, campaign, recipient, "local_delivered", null, new Date()); return;
+    }
     let attachments: MailAttachment[];
     try { attachments = (await readCampaignAttachments(tx, campaign)).attachments; } catch { await finish(tx, job, campaign, recipient, "failed", "ATTACHMENT_UNAVAILABLE"); return; }
     let status: "local_delivered" | "accepted";
@@ -102,7 +114,7 @@ export async function cleanupCampaigns() {
     // No source locks here: erasure and expiry both proceed parent/source → delivery → job.
     const recipients = await tx.campaignDelivery.findMany({ where: { campaignId: campaign.id, erasedAt: null }, orderBy: { id: "asc" } });
     for (const row of recipients) await tx.campaignDelivery.update({ where: { id: row.id }, data: { contactCipher: null, erasedAt: new Date(),
-      ...(["accepted", "local_delivered", "unknown"].includes(row.status) ? {} : row.status === "sending" ? { status: "unknown", reason: "DELIVERY_UNCERTAIN" } : { status: "cancelled", reason: "DATA_ERASED" }) } });
+      ...(["accepted", "local_delivered", "provider_accepted", "unknown"].includes(row.status) ? {} : row.status === "sending" ? { status: "unknown", reason: "DELIVERY_UNCERTAIN" } : { status: "cancelled", reason: "DATA_ERASED" }) } });
     const jobs = await tx.job.findMany({ where: { campaignDelivery: { campaignId: campaign.id }, payloadErasedAt: null }, orderBy: { id: "asc" } });
     for (const job of jobs) {
       try { await unlink(resolve(env.LOCAL_MAIL_DIR, job.id + ".json")); } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
@@ -129,7 +141,8 @@ export async function cleanupCampaigns() {
     await tx.$queryRaw`SELECT id FROM "Job" WHERE id=${job.id} FOR UPDATE`;
     const current = await tx.job.findUniqueOrThrow({ where: { id: job.id } });
     if (!["dead", "cancelled"].includes(current.status) || current.dedupeKey !== "campaign:" + row.id + ":" + row.attempt) return;
-    const receipt = await localReceipt(job.id);
+    const smsJob = (() => { try { return jobPayload.parse(decrypt(current.payloadCipher)).transport === "sms-local"; } catch { return false; } })();
+    const receipt = smsJob ? await smsReceiptFile(job.id) : await localReceipt(job.id);
     const status = receipt && row.status === "sending" ? "local_delivered" : row.status === "sending" ? "unknown" : job.status === "cancelled" ? "cancelled" : "failed";
     await finish(tx, job, campaign, row, status, receipt ? null : status === "unknown" ? "DELIVERY_UNCERTAIN" : "DELIVERY_FAILED", receipt ?? undefined);
   });

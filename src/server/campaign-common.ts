@@ -99,7 +99,7 @@ export async function settleCampaign(tx: Transaction, row: Campaign) {
   if (["draft", "cancelled", "deleted", "expired"].includes(row.status)) return;
   const rows = await tx.campaignDelivery.groupBy({ by: ["status"], where: { campaignId: row.id }, _count: true });
   const count = (states: string[]) => rows.filter(r => states.includes(r.status)).reduce((n, r) => n + r._count, 0);
-  const pending = count(["queued", "sending"]), good = count(["local_delivered", "accepted"]), bad = count(["failed", "unknown", "excluded", "cancelled"]);
+  const pending = count(["queued", "sending"]), good = count(["local_delivered", "accepted", "provider_accepted"]), bad = count(["failed", "unknown", "excluded", "cancelled"]);
   const status = pending ? "dispatching" : good ? bad ? "partial_failed" : "completed" : "failed";
   if (row.status !== status) await changeCampaign(tx, row, { status, completedAt: pending ? null : new Date() }, pending ? "dispatching" : "settled");
 }

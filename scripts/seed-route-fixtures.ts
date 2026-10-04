@@ -37,7 +37,7 @@ export async function seedRouteFixtures() {
     await once(() => tx.formVersion.findUnique({ where: { id: records.formVersion } }), async () => {
       const version = await tx.formVersion.create({ data: {
         id: records.formVersion, tenantId: companies.a, formId: records.form, number: 1, title: "라우트 fixture 폼",
-        status: "draft", body: "고정 fixture 본문", consentPurpose: "라우트 이동 검증",
+        status: "draft", body: "고정 fixture 본문", consentPurpose: "라우트 이동 검증", retentionDays: 365,
       } });
       for (const question of [
         { id: records.questionName, stableKey: "name", subjectRole: "name", type: "단문형 답변", label: "이름", order: 0 },

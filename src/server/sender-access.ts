@@ -2,12 +2,15 @@ import type { Sender } from "@/generated/prisma/client";
 import type { Transaction } from "./db";
 import { decrypt } from "./crypto";
 import { fail } from "./http";
+import { env } from "./env";
 import { emailTransportDenial, solapiConfigured } from "./sender-providers";
 
 export function senderDenial(row: Sender) {
   if (row.status !== "verified") return "인증을 완료한 발신자만 사용할 수 있습니다.";
   if (!row.expiresAt || row.expiresAt <= new Date()) return "발신자 인증이 만료되었습니다.";
-  return row.channel === "email" ? emailTransportDenial(row.domain!, row.environment) : solapiConfigured(row.tenantId) && row.environment === "live" ? null : "이 회사의 문자 공급자 연결이 필요합니다.";
+  if (row.channel === "email") return emailTransportDenial(row.domain!, row.environment);
+  if (env.SMS_TRANSPORT === "local") return null;
+  return solapiConfigured(row.tenantId) && row.environment === "live" ? null : "이 회사의 문자 공급자 연결이 필요합니다.";
 }
 export async function requireVerifiedSender(tx: Transaction, input: { tenantId: string; serviceId: string; id: string; version: number; channel: "email" | "sms" }) {
   await tx.$queryRaw`SELECT id FROM "Sender" WHERE id=${input.id} AND "tenantId"=${input.tenantId} FOR SHARE`;

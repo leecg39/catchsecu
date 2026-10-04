@@ -56,11 +56,12 @@ export async function updatePolicy(ctx: Context, version: number, settings: z.in
     if (settings.requireMfa && !user.twoFactorEnabled) fail(409, "MFA_SETUP_REQUIRED", "관리자 계정의 2단계 인증을 먼저 등록해주세요.");
     const passwordChanged = current.minPassword !== settings.minPassword || current.passwordMonths !== settings.passwordMonths
       || current.passwordReuse !== settings.passwordReuse || current.passwordDeferral !== settings.passwordDeferral;
+    const retentionChanged = current.retentionDays !== settings.retentionDays;
     const approvalChanged = current.requireApproval !== settings.requireApproval
       || [...current.approvalRoles].sort().join() !== [...settings.approvalRoles].sort().join()
       || current.approvalReferenceRequired !== settings.approvalReferenceRequired
       || current.approvalRequestTemplate !== settings.approvalRequestTemplate;
-    if (approvalChanged) {
+    if (approvalChanged || retentionChanged) {
       // Lock affected forms before approval rows, like decision, edit and publication.
       await tx.$queryRaw`SELECT id FROM "Form" WHERE "tenantId" = ${ctx.tenantId} ORDER BY id FOR UPDATE`;
       await tx.approvalRequest.updateMany({ where: { tenantId: ctx.tenantId, status: { in: ["pending", "approved"] } },
@@ -68,7 +69,7 @@ export async function updatePolicy(ctx: Context, version: number, settings: z.in
       await tx.form.updateMany({ where: { tenantId: ctx.tenantId, status: "pendingApproval" }, data: { status: "draft", version: { increment: 1 } } });
     }
     const saved = await tx.securityPolicy.update({ where: { tenantId: ctx.tenantId },
-      data: { ...settings, version: { increment: 1 }, passwordRevision: { increment: passwordChanged ? 1 : 0 }, approvalRevision: { increment: approvalChanged ? 1 : 0 } } });
+      data: { ...settings, version: { increment: 1 }, passwordRevision: { increment: passwordChanged ? 1 : 0 }, approvalRevision: { increment: approvalChanged || retentionChanged ? 1 : 0 } } });
     await audit(tx, ctx, requestId, reset ? "policy.reset" : "policy.updated", "securityPolicy", ctx.tenantId, Object.keys(settings));
     assertFileDeadlines(actor.deadlines);
     return policyDto(saved, ctx);

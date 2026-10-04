@@ -20,7 +20,9 @@ DELEGATED_AUTH = {"/auth/sign-up/email", "/auth/sign-in/email", "/auth/request-p
 NO_BODY = {("post", "/uploads/{id}/complete"), ("put", "/forms/{id}/favorite"),
            ("post", "/viewer/logout"), ("post", "/subjects/logout"),
            ("post", "/subjects/me/withdrawals/{id}/confirm"),
-           ("post", "/subjects/me/withdrawals/{id}/cancel")}
+           ("post", "/subjects/me/withdrawals/{id}/cancel"),
+           ("post", "/kakao/channels/{id}/verify"),
+           ("post", "/kakao/templates/{id}/send")}
 HEADERS = ["method", "path", "implementation", "policy", "permission", "data_scope",
            "input_validation", "response_dto", "deletion_policy", "forbidden_action"]
 

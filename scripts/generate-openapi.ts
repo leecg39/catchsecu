@@ -6,6 +6,9 @@ import { relayFeedback, suppressionQuery } from "../src/contracts/email-feedback
 import { subjectAccessInput, subjectSessionInput, subjectWithdrawalInput } from "../src/contracts/subjects";
 import { shareCreateInput, shareUpdateInput, shareVersionInput, challengeInput, verificationInput } from "../src/contracts/sharing";
 import { documentPatch, documentAction, documentPublish, clauseInput, clausePatch, clauseApply, displayInput } from "../src/contracts/documents";
+import { subprocessorInput, subprocessorPatch, subprocessorNoticeInput } from "../src/contracts/subprocessors";
+import { complianceCloseInput } from "../src/contracts/analytics";
+import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoReviewInput, kakaoTemplateInput, kakaoTemplatePatch } from "../src/contracts/kakao";
 import { importCreate, importPatch, importAction } from "../src/contracts/imports";
 import { policyPatch, policyReset, approvalRequestInput, approvalDecisionInput, approvalCancelInput, passwordDeferralInput, passwordChangeInput, passwordResetInput } from "../src/contracts/security";
 import { memberInput } from "../src/server/members";
@@ -29,7 +32,8 @@ import { messageTemplateCreate, messageTemplatePatch, messageTemplateVersion, me
 import { campaignCreate, campaignPatch, campaignTargets, campaignSchedule, campaignReschedule, campaignRetry, campaignVersion, campaignList, campaignSourceList, deliveryList } from "../src/contracts/campaigns";
 import { z } from "zod";
 import { companyInput, serviceInput, servicePatch, profilePatch } from "../src/server/schemas";
-import { formContentSchema, formInput, documentInput, invitationInput, submissionInput, fileInput, securityInput } from "../src/contracts/domains";
+import { retentionDesignationInput } from "../src/contracts/forms";
+import { formContentSchema, formInput, documentInput, invitationInput, submissionInput, fileInput } from "../src/contracts/domains";
 import { submissionListQuery, submissionFilters } from "../src/contracts/submissions";
 import { createExportInput, exportChangeInput, exportListQuery } from "../src/contracts/exports";
 import { submissionReceiptSchema } from "../src/contracts/public-forms";
@@ -160,8 +164,17 @@ for (const path of ["/uploads/{id}", "/files/{id}"]) (paths[path].delete as Oper
   description: "권한 확인 후 내려받는 원본 바이트; Content-Disposition: attachment 및 private,no-store",
   content: { "application/octet-stream": { schema: { type: "string", format: "binary" } } } } };
 add("/security/policy", "get", "security.read", "실제로 집행되는 정책");
-add("/security/policy", "patch", "security.write", "정책 변경·감사 기록", securityInput.partial().extend({ version: z.number().int().positive() }));
+add("/security/policy", "patch", "security.write", "정책 변경·감사 기록", policyPatch);
 add("/public/forms/{token}", "get", "active publication grant", "게시 당시 질문과 동의문 표시");
+add("/public/services/{serviceId}/documents", "get", "public active service", "게시 중인 문서의 제목·버전·해시·공개 경로만 반환. 초안·회수·만료·응답 원문 제외. category/agreement/domestic 허용값 외에는 422", undefined, "implemented");
+(paths["/public/services/{serviceId}/documents"].get as Operation).parameters = [
+  { in: "query", name: "view", required: true, schema: { type: "string", enum: ["collection", "recipients", "overseas", "resident"] } },
+  { in: "query", name: "category", schema: { type: "string", enum: ["items"] } },
+  { in: "query", name: "agreement", schema: { type: "string", enum: ["required"] } },
+  { in: "query", name: "domestic", schema: { type: "string", enum: ["domestic"] } },
+  { in: "query", name: "recipient", schema: { type: "string", format: "uuid" } },
+  { in: "query", name: "country", schema: { type: "string" } },
+];
 add("/public/forms/{token}/submissions", "post", "active publication grant + idempotency + rate limit", "응답 타입·한도·동의 검증 후 원자 저장", submissionInput, "planned", "201");
 for (const action of ["publish", "copy", "pause", "revise"]) add("/forms/{id}/" + action, "post", "form.publish or form.write", "폼 상태 전이 " + action, z.object({ version: z.number().int().positive() }).strict());
 for (const action of ["corrections", "withdrawals", "destruction"]) add("/submissions/{id}/" + action, "post", "submission.write or submission.destroy", "증거를 보존하는 " + action);
@@ -322,6 +335,7 @@ for (const [path, response] of [["/forms", "FormPage"], ["/forms/{id}", "FormRea
 (paths["/forms/{id}"].get as Operation).description = "현재 조회 권한과 계정·세션을 재검사합니다. 공유 토큰은 현재 form.publish 권한이 있을 때만 반환합니다. 작업 actions는 현재 서비스 grant·보관/가져오기 양식·공개 링크 만료를 반영합니다. publish는 활성 서비스의 게시 grant와 초안 유무이며 실제 게시에서 승인·질문·문서·파일 공급자를 재검사합니다. 작성 grant 없이 게시 grant만 가진 구성원도 저장된 초안을 게시할 수 있습니다. checkDeletion은 삭제 조건을 조회할 권한이며 실제 삭제 가능 여부는 /deletion에서 다시 확인합니다.";
 add("/forms", "post", "form.write + service grant", "질문·선택지·초안 생성", formInput, "implemented", "201");
 add("/forms/{id}", "patch", "form.write + service grant", "초안 변경; 게시본 불변", formPatch, "implemented");
+add("/forms/{id}/retention", "patch", "form.write + current service grant", "보유 기간을 비운 폼의 사후 지정. 이미 지정된 폼은 409이며 기존 응답의 보유 기한은 유지한다", retentionDesignationInput, "implemented");
 add("/forms/{id}/draft", "patch", "form.write + current service grant", "자동저장 초안; version 충돌·게시본 불변·동일 키 재시도는 한 번만 저장", formPatch, "implemented");
 for (const path of ["/forms/{id}", "/forms/{id}/draft"]) (paths[path].patch as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: false,
   schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" }, description: "자동저장은 매 저장의 키를 보냅니다. 동일 본문·키 재전송은 현재 권한 검사 후 기존 결과를 반환합니다." }];
@@ -575,6 +589,11 @@ for (const path of ["/documents/{id}/versions/{number}/pdf", "/public/documents/
 }
 add("/services/{id}/consent-display/{kind}", "get", "service.manage + current service grant", "collection/third_party 표시 설정·회사/서비스 공개명 조회", undefined, "implemented");
 add("/services/{id}/consent-display/{kind}", "patch", "service.manage + current service grant", "표시 문구·HTTPS 외부 주소 또는 동일 서비스 처리방침 게시 버전 저장; 최초 version=0", displayInput, "implemented");
+add("/services/{id}/subprocessors", "get", "service.manage + current service grant", "현재 서비스의 재위탁 수신자 목록. 암호문 제외", undefined, "implemented");
+add("/services/{id}/subprocessors", "post", "service.manage + current service grant", "재위탁 수신자 등록. 같은 이메일 중복과 보관 수신자 재등록 거부", subprocessorInput, "implemented", "201");
+add("/services/{id}/subprocessors/{subId}", "patch", "service.manage + current service grant", "재위탁 수신자 수정·보관·복원. version 충돌 검사", subprocessorPatch, "implemented");
+add("/services/{id}/subprocessor-notices", "get", "service.manage + current service grant", "재위탁 안내 발송 이력. 본문 암호문 제외", undefined, "implemented");
+add("/services/{id}/subprocessor-notices", "post", "service.manage + current service grant", "재위탁 안내를 로컬 메일 대기열에 기록. 같은 수신자·제목·본문 재발송 거부", subprocessorNoticeInput, "implemented", "201");
 schemas.DocumentInput = z.toJSONSchema(documentInput); schemas.ClauseInput = z.toJSONSchema(clauseInput); schemas.ServiceConsentDisplayInput = z.toJSONSchema(displayInput);
 schemas.DocumentRecord = z.toJSONSchema(documentInput.extend({ id: z.uuid(), version: z.number().int().positive(), draftRevision: z.number().int().positive(),
   status: z.enum(["draft", "published", "private", "archived"]), serviceName: z.string(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(),
@@ -717,6 +736,22 @@ add("/marketing/summary", "get", "marketing.read + current service grants", "동
   { in: "query", name: "from", schema: { type: "string", format: "date-time" }, description: "변경 이벤트 포함 시작 시각" },
   { in: "query", name: "to", schema: { type: "string", format: "date-time" }, description: "변경 이벤트 미포함 종료 시각; 현재 이후면 현재 시각으로 제한" },
 ];
+add("/sms/receipts", "post", "signed sms provider webhook", "서명된 문자 결과만 접수. 같은 영수증은 한 번이고 sent로 표시하지 않음", z.object({ deliveryId: z.uuid(), receiptId: z.string(), outcome: z.enum(["accepted", "failed", "timeout"]) }).strict(), "implemented", "202");
+add("/kakao/channels", "get", "message.manage + current service", "현재 서비스의 카카오 채널. 공급자 확인 전 verified가 아님", undefined, "implemented");
+add("/kakao/channels", "post", "message.manage + current service", "카카오 채널 등록. 같은 검색 아이디 거부", kakaoChannelInput, "implemented", "201");
+add("/kakao/channels/{id}", "patch", "message.manage + current service", "채널 이름·보관. 사용 중 템플릿이 있으면 보관 거부. 자체 인증 불가", kakaoChannelPatch, "implemented");
+add("/kakao/channels/{id}/verify", "post", "message.manage + current service", "공급자 없으면 503이며 pending 유지", undefined, "implemented");
+add("/kakao/templates", "get", "message.manage + current service", "알림톡 템플릿 목록", undefined, "implemented");
+add("/kakao/templates", "post", "message.manage + current service", "알림톡 템플릿 초안", kakaoTemplateInput, "implemented", "201");
+add("/kakao/templates/preview", "post", "message.manage", "변수 치환 미리보기. 저장하지 않음", kakaoPreviewInput, "implemented");
+add("/kakao/templates/{id}", "patch", "message.manage + current service", "템플릿 수정 시 draft로 되돌려 재심사", kakaoTemplatePatch, "implemented");
+add("/kakao/templates/{id}/submit", "post", "message.manage + current service", "심사 요청. approved로 만들지 않음", z.object({ version: z.number().int().positive() }).strict(), "implemented");
+add("/kakao/templates/{id}/review", "get", "message.manage + current service", "저장된 심사 상태. providerMatched는 공급자 대조 전 false", undefined, "implemented");
+add("/kakao/templates/{id}/send", "post", "message.manage + current service", "미승인 템플릿 409. 승인돼도 발송 공급자 없으면 503", undefined, "implemented");
+add("/kakao/reviews", "post", "signed kakao review webhook", "서명된 채널 확인·템플릿 승인/반려. 심사 중이 아니면 반영하지 않음", kakaoReviewInput, "implemented", "202");
+add("/analytics/closes", "get", "service.read + current service grants", "저장된 월마감 집계. 없으면 close는 null. 준수 통과를 반환하지 않음", undefined, "implemented");
+add("/analytics/closes", "post", "service.read + current service grants", "한국 시간 월의 집계를 한 번 고정. 같은 범위의 재요청은 저장된 합계를 반환", complianceCloseInput, "implemented");
+add("/analytics/closes/{id}/export", "get", "service.read + current company", "마감 합계 CSV. 5,000행 상한·수식 방어. 판정은 미판정", undefined, "implemented");
 add("/analytics/dashboard", "get", "service.read + current service grants",
   "동일 DB 시점의 활성 서비스·폼·문서·현재 보유 응답·기간 내 접수/파기 집계; 종료 시각 미포함", undefined, "implemented");
 (paths["/analytics/dashboard"].get as Operation).parameters = [

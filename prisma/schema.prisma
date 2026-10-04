@@ -222,6 +222,7 @@ model Company {
   updatedAt    DateTime @updatedAt
   memberships  Membership[]
   services     Service[]
+  complianceCloses ComplianceClose[]
   sessions     Session[]
   policy       SecurityPolicy?
   ipRules      IpRule[]
@@ -390,6 +391,7 @@ model Membership {
   grants      ServiceGrant[]
   ownedForms  Form[]
   favorites   FormFavorite[]
+  subprocessorNotices SubprocessorNotice[]
   approvalRequests ApprovalRequest[] @relation("ApprovalRequester")
   approvalDecisions ApprovalRequest[] @relation("ApprovalReviewer")
   passwordDeferrals PasswordDeferral[]
@@ -448,6 +450,8 @@ model Service {
   documents Document[]
   clauseTemplates ClauseTemplate[]
   consentDisplays ServiceConsentDisplay[]
+  subprocessors Subprocessor[]
+  kakaoChannels KakaoChannel[]
   dataSubjects DataSubject[]
   suppressions Suppression[]
   supportTickets SupportTicket[]
@@ -511,6 +515,41 @@ model Recipient {
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, status, createdAt, id])
+}
+model Subprocessor {
+  id String @id @default(uuid())
+  tenantId String
+  serviceId String
+  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  name String
+  emailCipher String
+  emailHash String
+  changeSummary String
+  status String @default("active")
+  version Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  notices SubprocessorNotice[]
+  @@unique([tenantId, serviceId, emailHash])
+  @@unique([tenantId, id])
+  @@index([tenantId, serviceId, status, createdAt, id])
+}
+model SubprocessorNotice {
+  id String @id @default(uuid())
+  tenantId String
+  serviceId String
+  subprocessorId String
+  subprocessor Subprocessor @relation(fields: [tenantId, subprocessorId], references: [tenantId, id], onDelete: Restrict)
+  subject String
+  bodyCipher String
+  contentHash String
+  status String @default("queued")
+  jobId String?
+  actorId String
+  actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onDelete: Restrict)
+  createdAt DateTime @default(now())
+  @@unique([tenantId, subprocessorId, contentHash])
+  @@index([tenantId, serviceId, createdAt, id])
 }
 model PurposeRecipient {
   tenantId String
@@ -608,6 +647,18 @@ model ExpertAssignmentService {
   service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
   @@unique([tenantId, assignmentId, serviceId])
   @@index([tenantId, serviceId])
+}
+model ComplianceClose {
+  id String @id @default(uuid())
+  tenantId String
+  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  serviceKey String @default("")
+  month String
+  snapshot Json
+  createdBy String
+  createdAt DateTime @default(now())
+  @@unique([tenantId, serviceKey, month])
+  @@index([tenantId, createdAt])
 }
 model SecurityPolicy {
   tenantId        String   @id
@@ -916,6 +967,7 @@ model Form {
   publishedVersionId String?
   publishedVersion   FormVersion? @relation("PublishedVersion", fields: [tenantId, id, publishedVersionId], references: [tenantId, formId, id], onDelete: Restrict)
   version            Int      @default(1)
+  designatedRetentionDays Int?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   versions           FormVersion[] @relation("FormVersions")
@@ -1680,6 +1732,50 @@ model MarketingEvent {
   @@unique([preferenceId, version])
 }
 
+model KakaoChannel {
+  id String @id @default(uuid())
+  tenantId String
+  serviceId String
+  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  name String
+  searchId String
+  status String @default("pending")
+  version Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  templates KakaoTemplate[]
+  @@unique([tenantId, serviceId, searchId])
+  @@unique([tenantId, id])
+  @@index([tenantId, serviceId, status, createdAt])
+}
+model KakaoTemplate {
+  id String @id @default(uuid())
+  tenantId String
+  serviceId String
+  channelId String
+  channel KakaoChannel @relation(fields: [tenantId, channelId], references: [tenantId, id], onDelete: Restrict)
+  name String
+  body String
+  buttons Json
+  status String @default("draft")
+  reviewNote String @default("")
+  version Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([tenantId, serviceId, name])
+  @@unique([tenantId, id])
+  @@index([tenantId, channelId, status])
+}
+model SmsReceipt {
+  id String @id @default(uuid())
+  tenantId String
+  deliveryId String @unique
+  delivery CampaignDelivery @relation(fields: [deliveryId], references: [id], onDelete: Restrict)
+  receiptId String @unique
+  status String
+  createdAt DateTime @default(now())
+  @@index([tenantId, createdAt])
+}
 model Campaign {
   files FileObject[]
   attachmentSnapshot Json @default("[]")
@@ -1741,6 +1837,7 @@ model CampaignDelivery {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   jobs Job[]
+  smsReceipt SmsReceipt?
   @@unique([tenantId, id])
   @@unique([campaignId, contactHash])
   @@index([campaignId, status, position, id])

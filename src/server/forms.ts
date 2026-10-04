@@ -55,7 +55,8 @@ export function formDto(form: StoredForm, ctx: Context) {
   return {
     id: form.id, serviceId: form.serviceId, serviceName: form.service.name, ownerName: form.owner.user.name,
     title: form.title, status: form.status, version: form.version, sourceType: form.sourceType,
-    createdAt: form.createdAt, updatedAt: form.updatedAt, content: current ? contentDto(current) : null,
+    createdAt: form.createdAt, updatedAt: form.updatedAt,
+    content: current ? { ...contentDto(current), retentionDays: current.retentionDays ?? form.designatedRetentionDays } : null,
     consentBundle: current ? consentBundle(current) : null,
     draftNumber: current?.number, hasDraft: current?.status === "draft", published: form.status === "published",
     favorite: form.favorites.some(item => item.memberId === ctx.member.id),
@@ -235,19 +236,17 @@ export async function designateFormRetention(ctx: Context, id: string, input: z.
   return db.$transaction(async tx => {
     const { form } = await lockCurrentForm(tx, ctx, id, "form.write", true);
     if (form.version !== input.version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    if (form.designatedRetentionDays !== null) fail(409, "RETENTION_ALREADY_SET", "이 폼에는 이미 보유 기간이 지정되어 있습니다.");
     const versions = await tx.formVersion.findMany({ where: { tenantId: ctx.tenantId, formId: id },
       include: { documentBindings: { orderBy: { order: "asc" as const }, include: { documentVersion: true } } } });
-    const unspecified = versions.filter(version => version.retentionDays === null);
-    if (!unspecified.length) fail(409, "RETENTION_ALREADY_SET", "이 폼에는 이미 보유 기간이 지정되어 있습니다.");
-    for (const version of unspecified) {
+    if (versions.some(version => version.retentionDays !== null)) fail(409, "RETENTION_ALREADY_SET", "이 폼에는 이미 보유 기간이 지정되어 있습니다.");
+    for (const version of versions) {
       if (!version.documentBindings.length) continue;
       const maximum = bindingMaximumRetention(version.documentBindings);
       if (maximum !== null && input.retentionDays > maximum)
         fail(422, "CONSENT_RETENTION_MISMATCH", `지정할 보유 기간을 연결된 동의서의 ${maximum}일 이내로 설정해주세요.`);
     }
-    await tx.formVersion.updateMany({ where: { tenantId: ctx.tenantId, id: { in: unspecified.map(version => version.id) } },
-      data: { retentionDays: input.retentionDays } });
-    await tx.form.update({ where: { id }, data: { version: { increment: 1 } } });
+    await tx.form.update({ where: { id }, data: { designatedRetentionDays: input.retentionDays, version: { increment: 1 } } });
     await audit(tx, ctx, requestId, "form.retention_designated", "form", id, ["retentionDays"], form.serviceId);
     const stored = await tx.form.findUniqueOrThrow({ where: { id }, include: formInclude });
     return formReadDto(stored, await currentDtoContext(tx, ctx));
@@ -317,7 +316,8 @@ export async function purgeForm(ctx: Context, id: string, version: number, reque
 }
 export async function copyForm(tx: Transaction, ctx: Context, id: string, title: string | undefined, requestId: string) {
   const { form } = await lockCurrentForm(tx, ctx, id, "form.write", true);
-  const content = cloneFormContent(contentDto(form.versions.find(version => version.status === "draft") ?? form.versions[0]));
+  const source = form.versions.find(version => version.status === "draft") ?? form.versions[0];
+  const content = cloneFormContent({ ...contentDto(source), retentionDays: source.retentionDays ?? form.designatedRetentionDays });
   const copied = await createForm(ctx, { serviceId: form.serviceId, title: title ?? (form.title.slice(0, 195) + " (복사)"), content }, requestId, tx);
   await audit(tx, ctx, requestId, "form.copied", "form", copied.id, ["title", "content"], form.serviceId);
   return formDto(copied, ctx);

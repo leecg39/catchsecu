@@ -38,9 +38,13 @@ export async function publicForm(token: string) {
   const { documentConsents: _selections, ...content } = contentDto(publication.formVersion); void _selections;
   // 보유 기간을 지정하지 않은 폼은 현재 회사 기본 보유 기간을 안내에 표시한다.
   if (content.retentionDays === null) {
-    const policy = await db.securityPolicy.findUnique({ where: { tenantId: publication.tenantId }, select: { retentionDays: true } });
-    if (!policy) fail(409, "POLICY_REQUIRED", "회사 보안 정책이 없습니다.");
-    content.retentionDays = policy.retentionDays;
+    const designated = publication.form.designatedRetentionDays;
+    if (designated !== null) content.retentionDays = designated;
+    else {
+      const policy = await db.securityPolicy.findUnique({ where: { tenantId: publication.tenantId }, select: { retentionDays: true } });
+      if (!policy) fail(409, "POLICY_REQUIRED", "회사 보안 정책이 없습니다.");
+      content.retentionDays = policy.retentionDays;
+    }
   }
   return { title: publication.formVersion.title, content, consentBundle: consentBundle(publication.formVersion),
     closed: publication.responseCount >= publication.maxResponses, expiresAt: publication.expiresAt };
@@ -59,7 +63,7 @@ export async function submitForm(token: string, input: z.infer<typeof submission
     await tx.publication.update({ where: { id: live.id }, data: { responseCount: { increment: 1 } } });
     // 폼에 보유 기간이 없으면 제출 시점의 회사 기본 보유 기간을 적용한다. 정책 변경은 다음 제출부터 반영된다.
     const policyDays = await companyRetentionDays(tx, live.tenantId);
-    const retentionDays = publication.formVersion.retentionDays ?? policyDays;
+    const retentionDays = live.formVersion.retentionDays ?? live.form.designatedRetentionDays ?? policyDays;
     const retentionUntil = new Date(Date.now() + retentionDays * 86400000);
     const submission = await tx.submission.create({ data: {
       tenantId: live.tenantId, formVersionId: live.formVersionId, publicationId: live.id,
@@ -74,7 +78,7 @@ export async function submitForm(token: string, input: z.infer<typeof submission
       })) });
     await bindSubmissionSubject(tx, submission.id, live.form.serviceId, questions, answers);
     await collectMarketing(tx, submission, live.form.serviceId, publication.formVersion.marketing, input.marketingChannels ?? []);
-    await createConsentReceipt(tx, publication.formVersion, submission.id, input.consent, input.documentConsents ?? [], policyDays);
+    await createConsentReceipt(tx, publication.formVersion, submission.id, input.consent, input.documentConsents ?? [], retentionDays);
     await tx.auditEvent.create({ data: {
       tenantId: live.tenantId, action: "submission.created", resource: "submission", resourceId: submission.id,
       serviceId: live.form.serviceId, requestId, detail: { formId: live.formId },

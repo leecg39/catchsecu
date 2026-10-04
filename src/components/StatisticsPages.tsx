@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import type { AnalyticsDashboard } from "@/contracts/analytics";
-import { useResource } from "@/lib/api";
+import type { AnalyticsDashboard, ComplianceCloseRecord } from "@/contracts/analytics";
+import { api, errorText, useResource } from "@/lib/api";
 import { ActionButton, DataTable, PageHeading, Panel } from "./shared";
 
 const date = (value: string) => new Date(value).toLocaleDateString("ko-KR");
@@ -63,9 +63,21 @@ export function PrivacyStatistics({ path }: { path: string }) {
 export function CompliancePage() {
   const result = useResource<AnalyticsDashboard>("/analytics/dashboard");
   const data = result.data;
+  const month = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit" }).format(new Date());
+  const closed = useResource<{ close: ComplianceCloseRecord | null }>("/analytics/closes?month=" + month);
+  const [busy, setBusy] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
+  async function closeMonth() {
+    if (busy) return; setBusy(true); setError(""); setMessage("");
+    try { await api("/analytics/closes", { method: "POST", body: JSON.stringify({ month }) }); setMessage("이번 달 집계를 마감했습니다. 준수 통과로 판정하지 않습니다."); closed.reload(); }
+    catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
+  }
   return <div className="public-statistics"><PageHeading title="개인정보 보호현황 점검 결과" />
     <Panel title="점검 상태"><p role="status">검증된 준수 점검 결과가 아직 없습니다.</p>
-      <p className="public-stat-note">점수와 과태료는 실제 점검 항목 및 근거가 확인된 뒤 산정합니다.</p></Panel>
+      <p className="public-stat-note">점수와 과태료는 실제 점검 항목 및 근거가 확인된 뒤 산정합니다. 월마감은 당시 집계를 고정할 뿐 통과를 뜻하지 않습니다.</p>
+      <ActionButton disabled={busy} onClick={() => { void closeMonth(); }}>{busy ? "마감 중…" : month + " 집계 마감"}</ActionButton>
+      {closed.data?.close && <p><a href={"/api/v1/analytics/closes/" + closed.data.close.id + "/export"}>마감 CSV 내려받기</a> · 보유 응답 {closed.data.close.totals.retainedSubmissions}건 · 판정 없음</p>}
+      {message && <p role="status">{message}</p>}{error && <p role="alert">{error}</p>}
+    </Panel>
     {result.loading ? <Panel><p role="status">현황을 불러오는 중입니다.</p></Panel>
       : result.error ? <Panel><p role="alert">{result.error.message}</p></Panel>
       : data && <Panel title="점검을 위한 현재 자료"><div className="public-stat-overview">
