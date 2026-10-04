@@ -36,3 +36,17 @@
 - `/access-not-allow`의 사유별 안내와 서비스 요청 가능성 조회는 연결했다. 실제 브라우저에서 요청 링크의 조건부 노출·클릭, 역할·전문가 제한 시 미노출, 회수 직후 새로고침을 확인해야 한다. 서비스가 아닌 기능 권한을 서비스 승인으로 올리지 않는 API 경계도 계속 검증해야 한다.
 - 원본 Ego 화면 비교, 세션/회사/서비스별 브라우저 직접 URL·새로고침·뒤로가기·모바일 검증, 리디렉션 루프 측정이 남아 있다. 원본 브라우저 제어권이 돌아오기 전까지 원본 동일성을 주장하지 않는다.
 - 실제 HTTP 응답은 확인했지만 사용자 조작을 포함한 브라우저 검증은 아직 기록되지 않았다.
+
+## 실브라우저 검증 추가 (2026-10-07, chrome-devtools → dev 서버 :3100 + catchsecu_dev)
+
+| 수용 조건 | 실측 |
+|---|---|
+| 리디렉션 루프 0 | 익명 `/`·`/dashboard`·`/IE`·`/company-info` 각각 **단일 307** → `/login?returnTo=<path>`; viewer `/log/member` → 단일 307 → `/access-not-allow?reason=role` |
+| GET 로그아웃 부작용 제거 | `GET /logout` = 확인 버튼만 렌더, 그 상태에서 `/api/v1/context` → **200(세션 유지)**; 로그아웃 버튼 클릭(POST) 후 context **401** + `/login` 이동 |
+| 빈권한→정당한 요청흐름 | viewer의 `/service/none` → 실제 상태 표시("사용 가능한 서비스가 있습니다"·대시보드 이동·제한 서비스 요청 폼·로그아웃) |
+| `/loading` 실제 context 연결 | 정상 세션 → `/dashboard`; 서버에서 세션 행 삭제 후 → `/login?returnTo=%2Floading` 단일 리디렉션(루프 없음) |
+| 오류후 재시도 | `access-not-allow`의 "권한 상태 다시 확인" 클릭 → context 재조회 후 사유 유지(무한루프 아님) |
+| 오픈 리디렉션 방어(추가) | `?returnTo=https://evil.example/`로 로그인 → **내부 `/dashboard`로 무력화**, 외부 도메인 이동 없음 |
+| 세션 쿠키 속성 | `document.cookie`에서 세션 쿠키 비노출(HttpOnly), `sc_locale`만 가시 |
+
+남은 범위(외부/대규모): `/expert/select-company` 배정 회사 실브라우저 선택 흐름, 181개 전 경로 레이아웃 게이트(P13-T04), 원본 Catchsecu 화면 대조.

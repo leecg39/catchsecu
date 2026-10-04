@@ -690,7 +690,7 @@
 - 작업: /, /IE, /loading, /service/none, /company-info, /expert/select-company 등 시스템 경로를 실제 인증/회사 상태에 연결한다.
 - 선행: P03-T02, P13-T01
 - 검증/완료: 리디렉션 루프0; GET 로그아웃 부작용 제거; 빈권한→정당한 요청흐름; 오류후 재시도
-- 증거: [P13-T02 진행 중 검증](docs/qa/P13-T02/README.md). 서비스 접근 요청과 전문가 회사 배정의 PostgreSQL/API 시험은 통과. 원본/로컬 브라우저·접근 오류 게이트가 남아 체크박스는 미완료.
+- 증거: [P13-T02 진행 중 검증](docs/qa/P13-T02/README.md). 서비스 접근 요청과 전문가 회사 배정의 PostgreSQL/API 시험은 통과. 2026-10-07 실브라우저(chrome-devtools→:3100): 익명 `/`·`/dashboard`·`/IE`·`/company-info` 단일 307(루프 0), GET 로그아웃 무부작용·POST 세션 파기, `/service/none` 실제 상태·`/loading`→dashboard/만료→login, `access-not-allow` 사유 표시·재시도 무한루프 없음, 외부 returnTo 무력화, 세션 쿠키 HttpOnly 확인. expert/select-company 브라우저 흐름과 전 페이지 게이트(P13-T04)·원본 대조는 남아 체크박스는 미완료.
 
 ### P13-T03 — 내비게이션·모달·캐시 일관성
 
