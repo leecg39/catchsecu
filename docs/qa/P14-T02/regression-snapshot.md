@@ -24,3 +24,12 @@
 - **5xx 0건** — 모든 경로가 통제된 응답.
 - 익명: `health`·`ready`만 200 공개, 나머지 **401**(인증 필요) 또는 로그인 리다이렉트.
 - owner 인증: 422는 필수 쿼리 부재(serviceId 등 계약 검증), 405는 POST 전용(orders·webhook·migration), 403은 권한 부족(expert-assignments/options) — 모두 올바른 경계.
+
+## 익명 쓰기 경계 (2026-10-04, scripts/qa-anon-write.ts)
+
+주요 쓰기 엔드포인트 15건 익명 호출:
+
+- 인증 필요 쓰기(campaigns·senders·notices·forms·services·invitations·support-tickets·exports·subscriptions·billing/orders·PATCH/DELETE 자원) → **전부 401 UNAUTHENTICATED**
+- `POST /members`·`POST /security/policy` → 405(해당 메서드 미존재 — 멤버는 invitation, 정책은 PATCH 계약)
+- `PUT /message-content` → 404
+- 유출(2xx)·5xx **0건** — 익명 상태 변경 불가 확인.
