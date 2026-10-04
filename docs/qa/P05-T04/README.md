@@ -32,3 +32,5 @@
   - 개정 후 구 버전의 바이트 불변성 보존
   - 무권한(anonymous/viewer/다른 회사) 접근 차단
   - 감사 로그 기록 확인
+
+후속: [live PDF 증거 2026-10-04](live-evidence-20261004.md). 실제 PDF 46,350바이트(%PDF-1.3·%%EOF·PDFKit·2페이지), pdftotext 한글·버전 v3 본문 고정·XSS 리터럴 무해화, 다운로드=저장 바이트·contentHash 일치, 해시 불일치 문서 409 거부 확인.
