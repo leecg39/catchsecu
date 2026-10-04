@@ -22,3 +22,17 @@ dev 앱 :3100 owner 세션으로 `/api/v1/analytics/dashboard`를 호출하고 *
 
 - 라이선스 원장·재집계 스냅샷 전체 비교는 선행 P10-T03(PG 외부) 게이트에 의존.
 - 정정·철회·파기 반영의 라이브 브라우저 단은 기존 시험(analytics.test.ts·campaigns.test.ts 수신거부 흐름)으로 커버.
+
+## 재집계·원장 라이브 대조 (2026-10-05 추가, `live-recompute.json`)
+
+dev :3100 owner 세션 + 독립 SQL 동시 대조:
+
+| 항목 | API | SQL | 판정 |
+|---|---|---|---|
+| 활성 서비스 | 2 | 2 | 일치 |
+| 폼 | 13 | 13 | 일치 |
+| 현재 보유 응답 | 7 | 7 | 일치 |
+| 월 기간 접수(10월) | 7 | 7 | 일치 |
+| 원장 available/held(KRW) | 0/0, total 0 | CreditAccount 0·LedgerTransaction 0 | 일치(빈 원장 경계) |
+
+**월마감 재집계·불변**: `POST /analytics/closes {month:2026-10}`의 `close.totals`가 동시점 대시보드 재집계와 전 항목 일치. 재POST는 `created:false`+**스냅샷 완전 동일**(불변), GET도 동일 스냅샷 200. `checkedAt`·`evidence.hash` 기록됨.
