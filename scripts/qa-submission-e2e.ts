@@ -80,7 +80,7 @@ const dNow = await api(`/submissions/${subId}`);
 const corr = await api(`/submissions/${subId}`, "PATCH", { version: (dNow.body as { version: number }).version, reason: "E2E 정정", answers: { [qMemo]: "정정된 메모" } }, ik());
 if (corr.status !== 200) throw new Error("correct " + JSON.stringify(corr.body));
 const afterCorr = await api(`/submissions/${subId}`);
-step("corrected", { status: (afterCorr.body as { status: string }).status, memo: Object.values((afterCorr.body as { answers: Record<string, string> }).values).includes("정정된 메모") });
+step("corrected", { status: (afterCorr.body as { status: string }).status, memo: Object.values((afterCorr.body as { values: Record<string, string> }).values).includes("정정된 메모") });
 // 6) 철회
 const wd = await api(`/submissions/${subId}/withdraw`, "POST", { version: (afterCorr.body as { version: number }).version, reason: "E2E 철회" }, ik());
 if (wd.status !== 200) throw new Error("withdraw " + JSON.stringify(wd.body));
