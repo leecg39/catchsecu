@@ -23,3 +23,23 @@
   - 10개 로그 화면 전반의 테넌트/서비스 격리 검증
   - 페이지네이션 및 검색 필터링 안정성 확인
   - 대시보드 통계 수치와 세부 로그 합계 간 정합성 일치
+
+## 경계 페이지네이션·실행계획 재검증 (2026-10-07)
+
+`tests/server/log-gate.test.ts` — 격리 test DB에서 결정적 경계 검증 (4/4 통과):
+
+| 수용 조건 | 실측 |
+|---|---|
+| 비UUID serviceId | `audit-events?serviceId=not-a-uuid` → **422** |
+| 존재하지 않는 serviceId | 무작위 UUID → **404** (audit·dashboard 동일) |
+| 다른 회사 serviceId | 회사 B 서비스 → **404** (audit·dashboard 동일) |
+| 권한 밖 스코프 | privacy(서비스A grant)의 무필터 목록에 타사·타서비스 이벤트 0건 |
+| pagination 0건 | `kind=mail`(이벤트 없음) → total 0, items [] |
+| pagination 1건 | pageSize=1 → 정확히 1건, total 25 |
+| pagination 11건 | pageSize=11 → p1=11건, p3=3건(25건 경계 정확) |
+| pagination 100건 | pageSize=100 → 25건 전부 1페이지 |
+| 범위 초과 페이지 | page=99 → 마지막 페이지(3)로 클램프, 5건 |
+| 경계 거부 | pageSize=0 → 422, pageSize=101 → 422 |
+| 대량조회 plan/index | 4,000행 bulk insert + ANALYZE 후 `EXPLAIN (FORMAT JSON)` → **`AuditEvent_tenantId_createdAt_id_idx` Index Scan**, Seq Scan 없음 |
+
+관련 회귀: audit-events·audit-current-authority·analytics **40/40 통과**, tsc·eslint 0 오류.

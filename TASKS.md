@@ -667,9 +667,9 @@
 
 - [ ] P12-T04 구현·검증 완료
 - 작업: 모든 로그 경로와 서비스별 동적 대시보드를 실제 이벤트로 검증한다.
-- 선행: P12-T03, P11-T05
+- 선행: P12-T03, P11-T05 (P11-T05 미완으로 체크 유지)
 - 검증/완료: 존재하지 않는 serviceId·다른회사 거부; 0/1/11/100개 pagination; 대량조회 plan/index 확인
-- 증거: `docs/qa/P12-T04/` (구현 시 생성; 현재 없음)
+- 증거: [P12-T04 게이트](docs/qa/P12-T04/README.md). 개별 수용 조건 실증 — 비UUID 422·없음/타사 404(audit·dashboard), 권한 밖 스코프 제외, 페이지 경계 0/1/11/100·범위초과 클램프·0/101 거부, 4,000행 EXPLAIN 인덱스 스캔(Seq Scan 0). `tests/server/log-gate.test.ts` 4/4 + audit·analytics 회귀 40/40. live 게이트 live-gate.md. 선행 P11-T05 게이트 미충족으로 완료 미표시.
 
 ## Phase 13: 공지·도움말·시스템 화면
 
