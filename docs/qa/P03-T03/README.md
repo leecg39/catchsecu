@@ -36,3 +36,7 @@ HTTP 시험은 이전 P03-T02에서 만든 합성 계정의 소유권을 합성 
 실제 화면의 입력·오류·뒤로가기·모바일 검증은 Ego 제어 재개 응답을 기다린다. HTTP 200과 API/DB 시험을 브라우저 조작 증거로 집계하지 않는다. 개인정보 활동 검토 이력은 일반 본인 활동과 별도 계약이 필요하다. 원본은 빈 표와 잘못된 접근 안내만 관찰해 수신·검토·발송 계약을 확정하지 않았다. 인증 수단이 비밀번호 없는 SSO뿐인 계정의 재인증·폐쇄는 P11-T04의 실제 IdP 연결 후 검증할 범위다.
 
 재현은 새 합성 계정이 필요하다. `qa-member-management.ts` → `qa-member-archived-service.ts` → `qa-account-closure.ts prepare` → production 서버 재시작 → `qa-account-closure.ts finish` 순서로 실행한다. 모든 스크립트는 로컬 개발 DB만 허용하며 메일 worker는 다른 사용자의 대기 작업이 있으면 중단한다.
+
+## 2026-10-04 브라우저 게이트 (Chrome 실제 브라우저)
+
+[browser-gate-20261004.md](browser-gate-20261004.md). dev 서버+실제 Chrome으로 프로필 편집→PostgreSQL 대조·로그인한 기기 목록·owner 탈퇴 차단 화면(소유권 이전 요구+버튼 비활성)·본인 활동 로그 133건을 확인했다. owner 인계 전 탈퇴 불가는 화면에서 직접 검증됐다. 실제 탈퇴 실행·외부 메일 전달은 기존 한계와 같다.
