@@ -22,7 +22,7 @@ export async function plans(ctx: Context): Promise<PlanRecord[]> {
 type SubRow = Awaited<ReturnType<typeof db.billingSubscription.findFirstOrThrow>> & { plan: { name: string } };
 function subDto(row: SubRow): SubscriptionRecord {
   const trialEnd = row.cancelAt && row.periodEnd && row.cancelAt < row.periodEnd ? row.cancelAt : row.periodEnd;
-  const status = row.status === "trialing" && trialEnd && trialEnd <= new Date() ? "expired" : row.status;
+  const status = (row.status === "trialing" || row.status === "active") && trialEnd && trialEnd <= new Date() ? "expired" : row.status;
   return { id: row.id, planId: row.planId, planName: row.plan.name, planVersionId: row.planVersionId,
     status, periodStart: row.periodStart?.toISOString() ?? null, periodEnd: row.periodEnd?.toISOString() ?? null,
     cancelAt: row.cancelAt?.toISOString() ?? null, priceKrw: row.priceKrw, currency: row.currency,
@@ -95,7 +95,7 @@ export async function cancelPurchase(ctx: Context, id: string, version: number, 
   });
 }
 
-export async function scheduleTrialCancellation(ctx: Context, id: string, version: number, effectiveAt: Date, key: string | null, requestId: string) {
+export async function scheduleTrialCancellation(ctx: Context, id: string, version: number, effectiveAt: Date, key: string | null, requestId: string, reason?: string) {
   billingWrite(ctx);
   return idempotent("billing:trial-schedule:" + ctx.tenantId + ":" + id, key,
     { id, version, effectiveAt: effectiveAt.toISOString() }, async tx => {
@@ -104,17 +104,18 @@ export async function scheduleTrialCancellation(ctx: Context, id: string, versio
       if (!row) fail(404, "NOT_FOUND", "체험 구독을 찾을 수 없습니다.");
       requireVersion({ version }, row);
       const now = new Date();
-      if (row.planId !== "trial" || row.status !== "trialing" || !row.periodEnd || row.periodEnd <= now || (row.cancelAt && row.cancelAt <= now))
-        fail(409, "TRIAL_UNAVAILABLE", "종료 예약할 수 있는 체험이 없습니다.");
+      const trial = row.planId === "trial" && row.status === "trialing", paid = row.status === "active";
+      if ((!trial && !paid) || !row.periodEnd || row.periodEnd <= now || (row.cancelAt && row.cancelAt <= now))
+        fail(409, "SUBSCRIPTION_UNAVAILABLE", "종료 예약할 수 있는 구독이 없습니다.");
       if (effectiveAt <= now || effectiveAt > row.periodEnd)
-        fail(422, "INVALID_CANCEL_DATE", "체험 기간 안의 미래 시각을 선택해주세요.");
+        fail(422, "INVALID_CANCEL_DATE", "구독 기간 안의 미래 시각을 선택해주세요.");
       if (row.cancelAt?.getTime() === effectiveAt.getTime()) fail(409, "ALREADY_SCHEDULED", "이미 같은 시각으로 예약되었습니다.");
       const updated = await tx.billingSubscription.update({ where: { id, tenantId: ctx.tenantId, version }, data: {
         cancelAt: effectiveAt, version: { increment: 1 },
-        events: { create: { version: version + 1, kind: "trial_cancel_scheduled", detail: { effectiveAt: effectiveAt.toISOString() } } },
+        events: { create: { version: version + 1, kind: trial ? "trial_cancel_scheduled" : "cancel_scheduled", detail: { effectiveAt: effectiveAt.toISOString(), ...(reason ? { reason } : {}) } } },
       }, include: { plan: true } });
-      await tx.auditEvent.create({ data: { tenantId: ctx.tenantId, actorId: ctx.user.id, action: "billing.trial.cancel_scheduled",
-        resource: "subscription", resourceId: id, requestId, detail: { effectiveAt: effectiveAt.toISOString() } } });
+      await tx.auditEvent.create({ data: { tenantId: ctx.tenantId, actorId: ctx.user.id, action: "billing." + (trial ? "trial." : "") + "cancel_scheduled",
+        resource: "subscription", resourceId: id, requestId, detail: { effectiveAt: effectiveAt.toISOString(), ...(reason ? { reason } : {}) } } });
       return { status: 200, body: subDto(updated) };
     });
 }
@@ -124,15 +125,16 @@ export async function undoTrialCancellation(ctx: Context, id: string, version: n
   return idempotent("billing:trial-undo:" + ctx.tenantId + ":" + id, key, { id, version }, async tx => {
     await tx.$queryRaw`SELECT id FROM "BillingSubscription" WHERE id=${id} AND "tenantId"=${ctx.tenantId} FOR UPDATE`;
     const row = await tx.billingSubscription.findFirst({ where: { id, tenantId: ctx.tenantId }, include: { plan: true } });
-    if (!row) fail(404, "NOT_FOUND", "체험 구독을 찾을 수 없습니다.");
+    if (!row) fail(404, "NOT_FOUND", "구독을 찾을 수 없습니다.");
     requireVersion({ version }, row);
-    if (row.planId !== "trial" || row.status !== "trialing" || !row.cancelAt || row.cancelAt <= new Date())
-      fail(409, "TRIAL_UNAVAILABLE", "취소할 종료 예약이 없습니다.");
+    const trial = row.planId === "trial" && row.status === "trialing", paid = row.status === "active";
+    if ((!trial && !paid) || !row.cancelAt || row.cancelAt <= new Date())
+      fail(409, "SUBSCRIPTION_UNAVAILABLE", "취소할 종료 예약이 없습니다.");
     const updated = await tx.billingSubscription.update({ where: { id, tenantId: ctx.tenantId, version }, data: {
       cancelAt: null, version: { increment: 1 },
-      events: { create: { version: version + 1, kind: "trial_cancel_revoked", detail: {} } },
+      events: { create: { version: version + 1, kind: trial ? "trial_cancel_revoked" : "cancel_revoked", detail: {} } },
     }, include: { plan: true } });
-    await tx.auditEvent.create({ data: { tenantId: ctx.tenantId, actorId: ctx.user.id, action: "billing.trial.cancel_revoked",
+    await tx.auditEvent.create({ data: { tenantId: ctx.tenantId, actorId: ctx.user.id, action: "billing." + (trial ? "trial." : "") + "cancel_revoked",
       resource: "subscription", resourceId: id, requestId, detail: {} } });
     return { status: 200, body: subDto(updated) };
   });

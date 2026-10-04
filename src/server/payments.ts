@@ -11,7 +11,8 @@ import { postLedgerTransfer } from "./ledger";
 const providerEvent = z.object({
   orderId: z.uuid(),
   eventId: z.string().trim().min(8).max(80).regex(/^[A-Za-z0-9:_-]+$/),
-  outcome: z.enum(["paid", "failed"]),
+  outcome: z.enum(["paid", "failed", "refunded", "refund_rejected"]),
+  refundId: z.uuid().optional(),
 }).strict();
 export type PaymentOrderRecord = { id: string; subscriptionId: string; methodId: string | null; amount: number; currency: string; status: "pending" | "paid" | "failed"; version: number };
 
@@ -62,9 +63,29 @@ export async function applyPaymentEvent(raw: string, signature: string, secret: 
     if (!order) fail(404, "NOT_FOUND", "결제 주문을 찾을 수 없습니다.");
     const existing = await tx.paymentEvent.findUnique({ where: { providerEventId: input.eventId } });
     if (existing) {
-      if (existing.orderId !== order.id || existing.outcome !== input.outcome) fail(409, "DUPLICATE_EVENT", "이미 다른 결제 결과가 기록되어 있습니다.");
+      if (existing.orderId !== order.id || existing.outcome !== input.outcome ||
+        (input.refundId && !(await tx.paymentRefund.findFirst({ where: { id: input.refundId, providerRef: input.eventId } }))))
+        fail(409, "DUPLICATE_EVENT", "이미 다른 결제 결과가 기록되어 있습니다.");
       const current = await tx.paymentOrder.findUniqueOrThrow({ where: { id: order.id } });
       return { ...dto(current), duplicate: true };
+    }
+    const isRefund = input.outcome === "refunded" || input.outcome === "refund_rejected";
+    if (isRefund) {
+      // 환불 결과는 paid 주문의 요청된 환불에만 적용한다. 주문 상태는 변경하지 않는다.
+      if (order.status !== "paid") fail(409, "OUT_OF_ORDER", "결제 완료된 주문에만 환불 결과를 적용할 수 있습니다.");
+      if (!input.refundId) fail(422, "REFUND_REQUIRED", "환불 식별자가 필요합니다.");
+      const refund = await tx.paymentRefund.findFirst({ where: { id: input.refundId, orderId: order.id, tenantId: order.tenantId } });
+      if (!refund) fail(404, "NOT_FOUND", "환불 요청을 찾을 수 없습니다.");
+      if (refund.status !== "requested") fail(409, "OUT_OF_ORDER", "이미 종료된 환불입니다.");
+      await tx.paymentEvent.create({ data: { orderId: order.id, providerEventId: input.eventId, outcome: input.outcome } });
+      const settled = await tx.paymentRefund.update({ where: { id: refund.id },
+        data: { status: input.outcome === "refunded" ? "refunded" : "rejected", providerRef: input.eventId, version: { increment: 1 } } });
+      if (settled.status === "refunded")
+        await postLedgerTransfer(tx, { tenantId: order.tenantId, currency: order.currency, kind: "refund",
+          amount: BigInt(refund.amount), sourceKind: "payment_refund", sourceId: refund.id });
+      await audit(tx, { tenantId: order.tenantId, user: { id: null } }, requestId, "billing." + input.outcome, "paymentRefund", refund.id, ["status"]);
+      const current = await tx.paymentOrder.findUniqueOrThrow({ where: { id: order.id } });
+      return { ...dto(current), duplicate: false };
     }
     if (order.status !== "pending") fail(409, "OUT_OF_ORDER", "이미 종료된 결제에 다른 결과를 적용할 수 없습니다.");
     await tx.paymentEvent.create({ data: { orderId: order.id, providerEventId: input.eventId, outcome: input.outcome } });

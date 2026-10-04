@@ -15,7 +15,7 @@ export type LedgerOverview = {
   held: string;
   items: {
     id: string; serviceId: string | null; serviceName: string | null;
-    kind: "funding" | "reserve" | "capture" | "release";
+    kind: "funding" | "reserve" | "capture" | "release" | "refund";
     amount: string; createdAt: string;
   }[];
   total: number; page: number; pageSize: number;

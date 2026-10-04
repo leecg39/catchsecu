@@ -238,6 +238,7 @@ model Company {
   creditAccounts CreditAccount[]
   ledgerTransactions LedgerTransaction[]
   paymentMethods PaymentMethod[]
+  monthCloses BillingMonthClose[]
   supportTickets SupportTicket[]
   accessRequests AccessRequest[]
   expertAssignments ExpertAssignment[]
@@ -349,6 +350,7 @@ model PaymentOrder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   events PaymentEvent[]
+  refunds PaymentRefund[]
   @@unique([tenantId, id])
   @@index([tenantId, status, createdAt])
   @@index([tenantId, methodId])
@@ -361,6 +363,33 @@ model PaymentEvent {
   outcome String
   createdAt DateTime @default(now())
   @@index([orderId, createdAt])
+}
+model PaymentRefund {
+  id String @id @default(uuid())
+  tenantId String
+  orderId String
+  order PaymentOrder @relation(fields: [tenantId, orderId], references: [tenantId, id], onDelete: Restrict)
+  amount Int
+  currency String @default("KRW")
+  reason String
+  status String @default("requested")
+  providerRef String?
+  version Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([tenantId, id])
+  @@index([tenantId, orderId, status])
+}
+model BillingMonthClose {
+  id String @id @default(uuid())
+  tenantId String
+  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  month String
+  currency String
+  totals Json
+  closedBy String
+  closedAt DateTime @default(now())
+  @@unique([tenantId, month, currency])
 }
 model BillingSubscriptionEvent {
   id String @id @default(uuid())

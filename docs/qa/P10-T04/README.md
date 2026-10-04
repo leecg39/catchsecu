@@ -1,22 +1,44 @@
-# P10-T04 해지·환불·청구서·마감 — 미완료
+# P10-T04 해지·환불·청구서·마감 — 로컬 구현·검증
 
-> 2026-10-04: 실제 부분 구현을 근거로 planned에서 in_progress로 정정했다. 전체 완료는 아니다. [근거](../status-revalidation/README.md).
+> 2026-10-06. 환불 누계·서명 이벤트 정산·유료 해지 예약·청구서 PDF·월마감을 로컬에서 구현하고 적대적 검증했다. 실제 PG 환불 승인과 원본 화면 대조는 외부 자격증명이 필요해 미완료로 둔다.
 
-2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
+## 구현 범위
 
-## 현재 확인
+### 환불 (`PaymentRefund`, 마이그레이션 `20261006120000_refund_closing`)
 
-체험 종료 예약/철회만 부분 구현. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
+- `POST /api/v1/billing/orders/:id/refunds`는 `billing.write`와 Idempotency-Key를 요구한다. paid 주문에만 요청되고 주문 행 잠금 아래 누계를 확인해 `requested+refunded` 합계가 결제액을 넘으면 409 `REFUND_EXCEEDS_PAID`.
+- DB 트리거가 환불을 고정한다: `requested`로만 시작, 종료 상태 변경 불가, `refunded` 전이는 `providerRef` 필수, 환불 누계 초과를 INSERT/승인 양쪽에서 거부(`REFUND_EXCEEDS_PAID`), 미결제 주문 환불 거부(`PAYMENT_REFUND_ORDER_INVALID`).
+- 서명된 공급자 이벤트 `outcome: "refunded" | "refund_rejected"`가 환불을 정산한다. 이벤트 ID로 멱등 중복을 처리하고, 정산 성공 시 `kind='refund'` 원장 거래(원천키 `payment_refund:{refundId}`)가 가용 잔액을 외부 계정으로 이동한다. 잔액 부족 환불은 `REFUND_EXCEEDS_BALANCE`로 DB가 거부한다.
+- 주문 상태는 환불해도 `paid`를 유지한다(부분 환불 지원). `refundedTotal`/`refundable`을 목록 응답에 포함한다.
 
-- [src/server/subscriptions.ts](../../../src/server/subscriptions.ts) — plans, subscriptions, entitlement, assetOverview
-- [tests/server/subscriptions.test.ts](../../../tests/server/subscriptions.test.ts)
+### 유료 해지 예약
 
-## 남은 구현·수용
+- `POST /subscriptions/:id/schedule-cancel`이 체험(trialing)과 유료(active) 모두를 받는다. `effectiveAt`은 미래·기간 내 시각이어야 하고 `reason`을 이벤트·감사에 남긴다. 유료는 `cancel_scheduled`/`cancel_revoked` 이벤트로 구분한다.
+- DB 트리거가 `active→active`의 `cancelAt` 전용 변경만 허용하고, `active→expired`는 `LEAST(cancelAt, periodEnd)` 도래 후에만 허용한다.
+- `undo-cancel`은 두 구독 유형의 해지 예약을 철회한다. 읽기 경로(`entitlement`/`subDto`)는 `cancelAt` 도래 시 expired로 표시한다.
 
-유료 해지·부분/전체환불·청구서PDF·PG대사.
+### 청구서 PDF
 
-원래 범위: 부분/전체환불·해지 effective date·취소사유·청구서 PDF·월마감·조정을 구현한다.
+- `GET /api/v1/billing/orders/:id/invoice` — paid 주문만 한글 임베디드 폰트 PDF를 발행한다(공급가액/부가세/환불 누계/실결제 잔액). `x-content-sha256` 헤더로 해시를 반환한다. 미결제 409, 익명 401, 타 회사 404.
 
-수용 조건: 환불누계 초과 거부; PG와 DB 대사; refund retry 중복0; 마감후 정정 이벤트
+### 월마감 (`BillingMonthClose`)
 
-선행: P10-T03, P01-T03. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.
+- `POST /api/v1/billing/closing` `{month, currency}` — 지난달만 마감(앱 422 + DB 트리거 `MONTH_CLOSE_NOT_PAST`). 스냅샷 합계(funded/refunded/reservedNet/captured/released)를 JSONB로 고정하고 멱등·유니크하다. 마감 행은 변경·삭제 불가.
+- `GET /api/v1/billing/closing?month=&currency=` — 미마감이면 실시간 합계, 마감됐으면 고정 스냅샷 + `postCloseAdjustments`(마감 월에 귀속하지만 마감 이후 기록된 거래 — 원장 불변이라 기록 시각은 감사 이벤트로 판별).
+
+## 적대적 검증 (tests/server/billing-refunds.test.ts — 5/5 통과)
+
+- 환불 누계 초과(요청 13000/추가 8000 → 409), 같은 키 재시도는 같은 환불 행, 다른 본문 재사용은 409, 미로그인 401, 미존재 주문 404, 키 누락 400.
+- 환불 이벤트: `refundId` 누락 422, 모르는 환불 404, 카드 필드 422, 무서명 401, `refunded` 정산(잔액 12000→8000, 환불 원장 1건) 후 재적용 duplicate·이중 원장 0, 이미 정산된 환불에 다른 이벤트 409, `refund_rejected`는 원장을 오염시키지 않는다. 종료된 환불의 역전(UPDATE)과 미결제 주문 환불 INSERT는 DB가 거부한다.
+- 청구서: 실제 PDF 바이트(%PDF 헤더), 익명 401, 타 회사·미존재 404.
+- 마감: 당월 422, 지난달 201 스냅샷, 재마감 200 멱등, 마감 후 해당 월 귀속 거래가 `postCloseAdjustments=1`로 식별됨.
+- 유료 해지: 과거 시각 422, 예약 후 `cancelAt`+`cancel_scheduled`(사유 보존), 철회로 null 복귀, 버전 충돌 409.
+
+## 회귀
+
+- subscriptions/payment-orders/payment-methods/ledger/billing-settlement 23건 통과.
+
+## 남은 조건
+
+- 실제 PG sandbox 환불 승인/거절과 부분환불 한도를 외부에서 확인해야 한다(현재는 서명된 로컬 이벤트).
+- PG 정산 리포트와 DB 원장의 자동 대사(PG와 DB 대사), 청구서의 원본 화면 대조는 미완료다.

@@ -2,7 +2,8 @@ import { z } from "zod";
 
 export const purchaseRequest = z.object({ planVersionId: z.string().min(1).max(100) }).strict();
 export const cancelRequest = z.object({ version: z.number().int().positive() }).strict();
-export const scheduleTrialCancelRequest = cancelRequest.extend({ effectiveAt: z.iso.datetime({ offset: true }) }).strict();
+export const scheduleTrialCancelRequest = cancelRequest.extend({ effectiveAt: z.iso.datetime({ offset: true }),
+  reason: z.string().trim().min(1).max(300).optional() }).strict();
 
 export type PlanRecord = {
   id: string; name: string; description: string;

@@ -6,7 +6,7 @@ import { fail } from "./http";
 import { roleCan } from "./permissions";
 import { audit } from "./audit";
 
-type LedgerKind = "funding" | "reserve" | "capture" | "release";
+type LedgerKind = "funding" | "reserve" | "capture" | "release" | "refund";
 type Transfer = {
   tenantId: string; serviceId?: string | null; currency: string; kind: LedgerKind;
   amount: bigint; sourceKind: string; sourceId: string; reservationId?: string | null;

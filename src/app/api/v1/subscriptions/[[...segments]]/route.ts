@@ -16,7 +16,7 @@ export const POST = route(async (request, requestId) => {
   if (p.length === 2 && p[1] === "cancel") { const result = await cancelPurchase(ctx, z.uuid().parse(p[0]), (await body(request, cancelRequest)).version, key, requestId); return json(result.body, result.status); }
   if (p.length === 2 && p[1] === "schedule-cancel") {
     const input = await body(request, scheduleTrialCancelRequest);
-    const result = await scheduleTrialCancellation(ctx, z.uuid().parse(p[0]), input.version, new Date(input.effectiveAt), key, requestId);
+    const result = await scheduleTrialCancellation(ctx, z.uuid().parse(p[0]), input.version, new Date(input.effectiveAt), key, requestId, input.reason);
     return json(result.body, result.status);
   }
   if (p.length === 2 && p[1] === "undo-cancel") {
