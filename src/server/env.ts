@@ -5,6 +5,9 @@ const schema = z.object({
   BETTER_AUTH_URL: z.url(),
   BETTER_AUTH_SECRET: z.string().min(32),
   DATA_ENCRYPTION_KEY: z.string().regex(/^[a-f0-9]{64}$/i),
+  DATA_ENCRYPTION_KEY_PREVIOUS: z.string().regex(/^[a-f0-9]{64}$/i).optional(),
+  // 해시 전용 키: 미지정 시 DATA_ENCRYPTION_KEY와 동일(기존 데이터 호환). 암호화 키 회전 전 이 값을 기존 키로 고정하면 조회 해시가 보존된다.
+  DATA_LOOKUP_KEY: z.string().regex(/^[a-f0-9]{64}$/i).optional(),
   MAIL_TRANSPORT: z.enum(["local", "smtp"]).default("local"),
   MAIL_FROM: z.email().default("catchsecu@localhost.test"),
   PRIVATE_STORAGE_DIR: z.string().default(".local/storage"),
