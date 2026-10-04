@@ -616,7 +616,7 @@
 - 작업: 회사 provider 설정 CRUD·사전검사, 로그인/연동/초대가입 callback을 표준 라이브러리로 구현한다.
 - 선행: P02-T05, P11-T02
 - 검증/완료: state/nonce/PKCE/audience/issuer/서명·재전송·연결탈취 검사; 테스트 IdP 실제 SSO
-- 증거: `docs/qa/P11-T03/` (구현 시 생성; 현재 없음)
+- 부분 구현 증거: [OIDC+PKCE+JWKS 서명 검증과 회사별 provider CRUD·사전검사·계정연결, 로컬 RSA IdP 실제 SSO](docs/qa/P11-T03/README.md) (2026-10-06). SAML·실제 SaaS IdP·초대가입 UI는 미완료.
 
 ### P11-T04 — GPKI·새올·그룹웨어 어댑터
 

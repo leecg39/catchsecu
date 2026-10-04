@@ -225,6 +225,7 @@ model Company {
   complianceCloses ComplianceClose[]
   sessions     Session[]
   policy       SecurityPolicy?
+  ssoProviders SsoProvider[]
   ipRules      IpRule[]
   ipAccessPolicy IpAccessPolicy?
   invitations  Invitation[]
@@ -795,6 +796,44 @@ model SecurityPolicy {
   version         Int      @default(1)
   updatedAt       DateTime @updatedAt
 }
+model SsoProvider {
+  id           String   @id @default(uuid())
+  tenantId     String
+  tenant       Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  name         String
+  issuer       String
+  clientId     String
+  clientSecretCipher String?
+  authorizationUrl String
+  tokenUrl     String
+  jwksUrl      String
+  scopes       String   @default("openid profile email")
+  enabled      Boolean  @default(false)
+  preflightOk  Boolean  @default(false)
+  preflightDetail String @default("")
+  version      Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  states       SsoState[]
+  @@index([tenantId, enabled])
+}
+
+model SsoState {
+  id          String   @id @default(uuid())
+  tenantId    String
+  providerId  String
+  provider    SsoProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  stateHash   String   @unique
+  nonceHash   String
+  verifierCipher String
+  mode        String
+  userId      String?
+  invitationId String?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  @@index([expiresAt])
+}
+
 model PasswordHistory {
   id BigInt @id @default(autoincrement())
   userId String
