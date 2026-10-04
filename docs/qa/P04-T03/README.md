@@ -40,3 +40,5 @@ Production API 91개(준비 78개·최종 재시작 후 13개)를 실제 서버�
 ## 남은 완료 게이트
 
 [실행 대기 화면 목록](ui-checklist.md)에 따라 기존 Ego 창의 제어 재개 응답 후 desktop/390px의 승인·고정 URL·공유·오류·페이지를 조작해야 한다. [Ego 스킬](/Users/user01/.agents/skills/ego-browser/SKILL.md:74)의 “if it cannot continue, stop and ask the user” 규칙이 적용된다. 정상 원본 승인/고정 URL 흐름과 선행 Task 전체 게이트가 남아 P04-T03은 진행 중이다.
+
+후속: [브라우저 게이트 2026-10-04](browser-gate-20261004.md). 편집기·자동저장·상한검증·게시·공개폼·제출 E2E.

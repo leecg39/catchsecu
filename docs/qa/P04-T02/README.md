@@ -43,3 +43,5 @@
 ## 남은 완료 게이트
 
 [실행 대기 체크리스트](ui-checklist.md)에 따라 기존 Ego 창의 제어 재개 응답 후 전체 단계, 자동저장 중 추가 입력, 앞뒤 이동/새로고침/다른 기기, 충돌/복구, 이탈 경고와 390px를 실제로 조작해야 한다. [Ego 브라우저 스킬](/Users/user01/.agents/skills/ego-browser/SKILL.md:74)의 “if it cannot continue, stop and ask the user” 규칙에 따라 기존 제어 재개 응답을 기다린다. 보관된 원본 관찰은 basic-frame 편집기를 보여 주며 v3/recipient/agreement/set/setting은 오류로 남았다. 정상 원본 흐름의 동일성은 미확정이다.
+
+후속: [브라우저 게이트 2026-10-04](browser-gate-20261004.md). 편집기·자동저장·상한검증·게시·공개폼·제출 E2E.
