@@ -10,6 +10,8 @@ import { idempotent } from "./idempotency";
 import { privateFiles } from "./file-storage";
 import { scanFile } from "./file-scanner";
 import { sha256, validateFileBytes } from "./file-validation";
+import { lockDownloadActor, type DownloadActor } from "./download-actor";
+import { assertFileDeadlines } from "./file-access";
 
 type Actor = { user: User };
 const admin = (actor: Actor) => { if (!actor.user.platformAdmin) fail(403, "FORBIDDEN", "운영자 권한이 필요합니다."); };
@@ -114,27 +116,33 @@ export async function archiveGuide(actor: Actor, id: string, version: number, re
   });
   if (oldKey) await privateFiles.remove(oldKey);
 }
-export async function downloadGuide(actor: Actor, id: string, preview: boolean, requestId: string) {
-  if (preview) admin(actor);
-  const row = await db.guide.findUnique({ where: { id } });
-  if (!row || (!preview && row.status !== "published") || !row.fileName || !row.fileSha256 || !row.fileSize)
-    fail(404, "NOT_FOUND", "가이드 PDF를 찾을 수 없습니다.");
-  let bytes: Buffer;
-  try {
-    if (row.assetKey) {
-      if (!/^[0-9]+-[0-9]+$/.test(row.assetKey)) fail(404, "FILE_UNAVAILABLE", "PDF를 찾을 수 없습니다.");
-      bytes = await readFile(join(process.cwd(), "assets", "help-pdfs", row.assetKey + ".pdf"));
-    } else if (row.storageKey) bytes = await privateFiles.read(row.storageKey);
-    else fail(404, "FILE_UNAVAILABLE", "PDF를 찾을 수 없습니다.");
-  } catch { fail(404, "FILE_UNAVAILABLE", "PDF를 찾을 수 없습니다."); }
-  if (bytes.length !== row.fileSize || sha256(bytes) !== row.fileSha256) fail(503, "FILE_INTEGRITY", "PDF 내용을 확인할 수 없습니다.");
-  await db.auditEvent.create({ data: { actorId: actor.user.id, action: "guide.downloaded", resource: "guide",
-    resourceId: id, requestId, detail: { fileSha256: row.fileSha256 } } });
-  const encoded = encodeURIComponent(row.fileName).replaceAll("'", "%27");
-  return new Response(new Uint8Array(bytes), { status: 200, headers: {
-    "Content-Type": "application/pdf", "Content-Length": String(bytes.length),
-    "Content-Disposition": `attachment; filename="guide.pdf"; filename*=UTF-8''${encoded}`,
-    "X-Content-SHA256": row.fileSha256, "X-Content-Type-Options": "nosniff",
-    "Content-Security-Policy": "sandbox", "Cache-Control": "private, no-store",
-  } });
+export async function downloadGuide(actor: DownloadActor, id: string, preview: boolean, requestId: string) {
+  return db.$transaction(async tx => {
+    const current = await lockDownloadActor(tx, actor, true);
+    if (preview) admin(current);
+    await tx.$queryRaw`SELECT id FROM "Guide" WHERE id=${id} FOR SHARE`;
+    const row = await tx.guide.findUnique({ where: { id } });
+    if (!row || (preview ? row.status === "archived" : row.status !== "published") || !row.fileName || !row.fileSha256 || !row.fileSize)
+      fail(404, "NOT_FOUND", "가이드 PDF를 찾을 수 없습니다.");
+    let bytes: Buffer;
+    try {
+      if (row.assetKey) {
+        if (!/^[0-9]+-[0-9]+$/.test(row.assetKey)) fail(404, "FILE_UNAVAILABLE", "PDF를 찾을 수 없습니다.");
+        bytes = await readFile(join(process.cwd(), "assets", "help-pdfs", row.assetKey + ".pdf"));
+      } else if (row.storageKey) bytes = await privateFiles.read(row.storageKey);
+      else fail(404, "FILE_UNAVAILABLE", "PDF를 찾을 수 없습니다.");
+    } catch { fail(404, "FILE_UNAVAILABLE", "PDF를 찾을 수 없습니다."); }
+    if (bytes.length !== row.fileSize || sha256(bytes) !== row.fileSha256) fail(503, "FILE_INTEGRITY", "PDF 내용을 확인할 수 없습니다.");
+    await tx.auditEvent.create({ data: { actorId: current.user.id, action: "guide.downloaded", resource: "guide",
+      resourceId: id, requestId, detail: { fileSha256: row.fileSha256 } } });
+    const encoded = encodeURIComponent(row.fileName).replaceAll("'", "%27");
+    const response = new Response(new Uint8Array(bytes), { status: 200, headers: {
+      "Content-Type": "application/pdf", "Content-Length": String(bytes.length),
+      "Content-Disposition": `attachment; filename="guide.pdf"; filename*=UTF-8''${encoded}`,
+      "X-Content-SHA256": row.fileSha256, "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "sandbox", "Cache-Control": "private, no-store",
+    } });
+    assertFileDeadlines(current.deadlines);
+    return response;
+  }, { timeout: 15000 });
 }

@@ -378,3 +378,20 @@ GET 목록/상세는 현재 역할·grant·세션·전문가 배정/만료·서�
 ## 회사 2FA·보안 현황 (2026-10-04)
 
 GET/PATCH /security/mfa-policy, POST /security/mfa-policy/exceptions, GET/PATCH/DELETE /security/mfa-policy/exceptions/{id}, GET /security/status. 조회는 직접 소속 security.read, 변경은 본인 인증을 등록한 직접 owner·현재 비밀번호·tenantId·version이다. 등록은 Idempotency-Key를 요구한다. 예외는 최초 등록부터 최대 24시간이며 만료·삭제 뒤 기존 세션도 회사 접근을 거부한다. 등록 상태와 보안 확인은 현재 DB 값이며 법적 준수 판단을 대신하지 않는다.
+
+
+## 개인정보 활동 검토 모델/API (2026-10-04, 진행 중)
+
+GET/POST `/activity-reviews`, GET `/{id}`, POST `/{id}/actions`를 구현했다. 생성은 현재 보안 관리 및 감사 열람 서비스 권한으로 원본 처리자에게만 요청한다. 대상자 답변·관리자 완료/취소와 version/요청키/최종기한 검사를 원자 처리한다. 목록 본문 제외, 상세 권한 후 복호화, 캐시 ID만 저장. OpenAPI와 activity-review 도메인 정책에 입력·출력·권한을 기록했다. 화면·이메일 알림은 미구현이며 [명세](06-privacy-activity-review.md)와 [증거](../qa/P03-T03/revalidation/activity-README.md)를 함께 적용한다.
+
+
+## P12-T03 월마감 현재 권한 (2026-10-04)
+
+GET/POST `/analytics/closes`, GET `/analytics/closes/{id}/export`는 저장된 기존 기록에도 현재 세션·정책·서비스 권한과 최종 기한을 적용한다. 회사 전체는 직접 owner/admin, 서비스 범위는 현재 service.read grant가 있는 활성 서비스다. 집계/생성/감사는 단일 Repeatable Read이며 동시 생성은 최대3회 전체 작업을 재검사한다. 조회와 CSV 감사도 기록한다. 손상된 범위는409, 접근 불가 서비스는404, 회사 전체 권한 부재는403이다. [부분 구현 증거](../qa/P12-T03/revalidation/README.md).
+
+
+## P12-T03 출력 작업 (2026-10-04)
+
+POST/GET `/analytics/exports`, GET/DELETE `/{id}`, POST `/{id}/cancel`, GET `/{id}/download`. 입력은 closeId+format, 변경은 version이며 생성은 요청 키와202응답이다. 현재 권한 및 요청자만 접근하고 회사 전체는 direct owner/admin이다. 동일 마감 PDF/CSV를 생성하며24시간 만료·16MB·대기5개 제한, 파일 해시 및 최종 기한을 검사한다. UI에서 요청/조회/취소/삭제/다운로드를 제공한다. 비동기 worker는 현재 발급자 권한을 독립적으로 확인하고 브라우저 세션은 다운로드에서 새로 검사한다. OpenAPI289/418작업/38정책. [검증](../qa/P12-T03/revalidation/exports/README.md).
+
+2026-10-04 P12-T03: 선택 범위의 5개 기술적 점검 근거(version=1/checkedAt/serviceIds/facts/hash)를 월마감 JSON에 선택 필드로 저장하고 화면·CSV·PDF에서 재사용한다. 과거 마감의 근거 미저장 상태·기존 원천 해시를 보존한다. 회사 인증 집계는 회사 전체 direct owner/admin 마감에만 포함한다. 관련77개와 실제파일·SQL·새프로세스 검증. 선행3개/FLOW-12 수용은 남았다. 상세: docs/qa/P12-T03/revalidation/evidence/README.md.

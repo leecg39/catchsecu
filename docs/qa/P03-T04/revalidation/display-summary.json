@@ -1,0 +1,101 @@
+{
+  "task": "P03-T04",
+  "status": "in_progress",
+  "counts": {
+    "completed": 15,
+    "in_progress": 21,
+    "planned": 36
+  },
+  "tests": {
+    "files": 4,
+    "passed": 52,
+    "newTests": 8,
+    "baselineFailed": 6
+  },
+  "build": "production-v10",
+  "port": 3111,
+  "pid": 45099,
+  "browser": {
+    "koreanNetworkError": true,
+    "retryRecovered": true,
+    "newProcessCollectionRestored": true,
+    "mobile": {
+      "width": 390,
+      "clientWidth": 375,
+      "scrollWidth": 375,
+      "text": "제3자 제공 표시 검증 A"
+    }
+  },
+  "db": {
+    "phase": "after-restart",
+    "checkedAt": "2026-10-04T06:37:46.173Z",
+    "rows": [
+      {
+        "id": "25c470f0-1095-48ea-ae6e-48582af2300f",
+        "tenantId": "1600c8e7-888b-4d0e-8b61-ee248839142e",
+        "serviceId": "18f261ef-e937-40f1-858d-e6d73ceb338c",
+        "kind": "collection",
+        "nameMode": "service_company",
+        "startText": "수집 표시 검증 B",
+        "processorText": "",
+        "policyText": "",
+        "requiredText": "",
+        "optionalText": "",
+        "policyMode": "none",
+        "externalUrl": "",
+        "publicationId": null,
+        "version": 1,
+        "createdAt": "2026-10-04T06:32:43.548Z",
+        "updatedAt": "2026-10-04T06:32:43.548Z"
+      },
+      {
+        "id": "ce78b328-d575-4b0e-926e-cc4cf6e3cf29",
+        "tenantId": "1600c8e7-888b-4d0e-8b61-ee248839142e",
+        "serviceId": "fc3f728c-406b-4313-bb77-4c79d36c12e7",
+        "kind": "collection",
+        "nameMode": "company_service",
+        "startText": "최종 수집 표시 검증 A",
+        "processorText": "수탁사 검증 문구",
+        "policyText": "처리방침 검증 문구",
+        "requiredText": "필수 동의 거부 시 안내",
+        "optionalText": "선택 동의 거부 시 안내",
+        "policyMode": "document",
+        "externalUrl": "",
+        "publicationId": "0e6bc488-0d56-494b-b831-edabb7d7cc58",
+        "version": 3,
+        "createdAt": "2026-10-04T06:32:37.101Z",
+        "updatedAt": "2026-10-04T06:33:35.351Z"
+      },
+      {
+        "id": "f4ef2f0c-e8a9-4f1e-81b3-1d823c7356e2",
+        "tenantId": "1600c8e7-888b-4d0e-8b61-ee248839142e",
+        "serviceId": "fc3f728c-406b-4313-bb77-4c79d36c12e7",
+        "kind": "third_party",
+        "nameMode": "company",
+        "startText": "제3자 제공 표시 검증 A",
+        "processorText": "",
+        "policyText": "",
+        "requiredText": "",
+        "optionalText": "",
+        "policyMode": "external",
+        "externalUrl": "https://example.test/recovery/privacy",
+        "publicationId": null,
+        "version": 1,
+        "createdAt": "2026-10-04T06:32:40.778Z",
+        "updatedAt": "2026-10-04T06:32:40.778Z"
+      }
+    ],
+    "auditCount": 5,
+    "sha256": "f4601d6dc5c09a47ce66ee821d99612ea036d52bd51adb841eda830e65dc2ddb"
+  },
+  "sourceHashes": {
+    "src/server/documents.ts": "7fc7a57f3a6392a98e077ca003c9bf380decf1909509ddf1abc9d0804d42e7ab",
+    "src/components/management/ConsentDisplay.tsx": "a756a572af40e02f74c490a123c8f7ecdc6c3a0187be1ce7524df0b73ec84d27",
+    "tests/server/consent-display-authority.test.ts": "e385a2662cfce0b1a2369f3a0807ef6e42d0128e15ce9fafd0792d89cd72b33c"
+  },
+  "limitations": [
+    "scope-specific, not full regression",
+    "external SMTP unverified",
+    "Task dependencies and common DoD remain"
+  ]
+}

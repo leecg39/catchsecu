@@ -1,0 +1,40 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:70335) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/activity-reviews.test.ts (20 tests | 1 failed) 12256ms
+   × 전문가 보안 담당자는 배정과 세 서비스 권한을 모두 가져야 요청한다 309ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/activity-reviews.test.ts > 전문가 보안 담당자는 배정과 세 서비스 권한을 모두 가져야 요청한다
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/activity-reviews.test.ts:187:22
+
+  184 test("전문가 보안 담당자는 배정과 세 서비스 권한을 모두 가져야 요청한다",async()=>{
+  185  await db.membership.update({where:{id:actors.stranger.member.id},data:{role:"owner"}});
+  186  const assignment=await db.expertAssignment.create({data:{tenantId,expertUserId:users.owner,assignedById:users.stranger,expiresAt:new Date(Date.now()+600000),services:{create:{serviceId}}}});
+→ 187  await db.membership.update(
+Database error. Code: `23514`. Message: `new row for relation "Membership" violates check constraint "Membership_accessKind_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/activity-reviews.test.ts:187:2
+    185|  await db.membership.update({where:{id:actors.stranger.member.id},data…
+    186|  const assignment=await db.expertAssignment.create({data:{tenantId,exp…
+    187|  await db.membership.update({where:{id:actors.owner.member.id},data:{r…
+       |  ^
+    188|  const grant=await db.serviceGrant.create({data:{tenantId,memberId:act…
+    189|  await expect(create()).rejects.toMatchObject({status:403});
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 40 passed (41)
+   Start at  15:53:42
+   Duration  26.79s (tests 85%, import 12%, transform 3%)
+

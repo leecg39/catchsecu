@@ -7,6 +7,8 @@ import { roleCapabilities } from "./permissions";
 import { fail } from "./http";
 import { audit } from "./audit";
 import { assertQuota } from "./entitlements";
+import { lockAccountActor } from "./account-actor";
+import { assertFileDeadlines } from "./file-access";
 
 type Actor = Awaited<ReturnType<typeof requireActor>>;
 const serviceIds = z.array(z.uuid()).min(1).max(100).refine(values => new Set(values).size === values.length, "서비스가 중복되었습니다.");
@@ -35,9 +37,10 @@ function checkedExpiry(value: string) {
   return date;
 }
 async function admin(tx: Transaction, actor: Actor) {
-  const current = await tx.user.findUnique({ where: { id: actor.user.id } });
-  if (!current || current.status !== "active" || !current.emailVerified || !current.platformAdmin)
+  const current = await lockAccountActor(tx, actor);
+  if (!current.user.platformAdmin)
     fail(403, "PLATFORM_ADMIN_REQUIRED", "전문가 배정 관리 권한이 없습니다.");
+  return current;
 }
 async function companyLock(tx: Transaction, companyId: string) {
   await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${companyId} FOR UPDATE`;
@@ -56,39 +59,46 @@ async function replaceScope(tx: Transaction, row: { id: string; tenantId: string
     capabilities: [...roleCapabilities("viewer")] })) });
 }
 export async function listExpertAssignments(actor: Actor, input: { scope: "mine" | "admin"; page: number; pageSize: number; search: string }) {
-  if (input.scope === "admin" && !actor.user.platformAdmin) fail(403, "PLATFORM_ADMIN_REQUIRED", "전문가 배정 관리 권한이 없습니다.");
-  const where: Prisma.ExpertAssignmentWhereInput = input.scope === "mine" ? { expertUserId: actor.user.id,
-    tenant: { name: { contains: input.search, mode: "insensitive" } } }
-    : { OR: [{ tenant: { name: { contains: input.search, mode: "insensitive" } } },
-      { expertUser: { email: { contains: input.search, mode: "insensitive" } } }] };
-  const [items, total] = await db.$transaction([
-    db.expertAssignment.findMany({ where, include, orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      skip: (input.page - 1) * input.pageSize, take: input.pageSize }),
-    db.expertAssignment.count({ where }),
-  ]);
-  return { items: items.map(dto), total, page: input.page, pageSize: input.pageSize };
+  return db.$transaction(async tx => {
+    const current = input.scope === "admin" ? await admin(tx, actor) : await lockAccountActor(tx, actor);
+    const where: Prisma.ExpertAssignmentWhereInput = input.scope === "mine" ? { expertUserId: current.user.id,
+      tenant: { name: { contains: input.search, mode: "insensitive" } } }
+      : { OR: [{ tenant: { name: { contains: input.search, mode: "insensitive" } } },
+        { expertUser: { email: { contains: input.search, mode: "insensitive" } } }] };
+    const total = await tx.expertAssignment.count({ where });
+    const page = Math.min(input.page, Math.max(1, Math.ceil(total / input.pageSize)));
+    const items = await tx.expertAssignment.findMany({ where, include, orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      skip: (page - 1) * input.pageSize, take: input.pageSize });
+    assertFileDeadlines(current.deadlines);
+    return { items: items.map(dto), total, page, pageSize: input.pageSize };
+  });
 }
 export async function getExpertAssignment(actor: Actor, id: string) {
-  const row = await db.expertAssignment.findUnique({ where: { id }, include });
-  if (!row || (!actor.user.platformAdmin && row.expertUserId !== actor.user.id))
-    fail(404, "NOT_FOUND", "전문가 배정을 찾을 수 없습니다.");
-  return dto(row);
+  return db.$transaction(async tx => {
+    const current = await lockAccountActor(tx, actor);
+    const row = await tx.expertAssignment.findUnique({ where: { id }, include });
+    if (!row || (!current.user.platformAdmin && row.expertUserId !== current.user.id))
+      fail(404, "NOT_FOUND", "전문가 배정을 찾을 수 없습니다.");
+    assertFileDeadlines(current.deadlines);
+    return dto(row);
+  });
 }
 export async function expertOptions(actor: Actor, input: { companyId?: string; search: string }) {
-  if (!actor.user.platformAdmin) fail(403, "PLATFORM_ADMIN_REQUIRED", "전문가 배정 관리 권한이 없습니다.");
-  const [companies, services] = await Promise.all([
-    db.company.findMany({ where: { status: "active", name: { contains: input.search, mode: "insensitive" } },
-      select: { id: true, name: true }, orderBy: [{ name: "asc" }, { id: "asc" }], take: 100 }),
-    input.companyId ? db.service.findMany({ where: { tenantId: input.companyId, status: "active", tenant: { status: "active" } },
-      select: { id: true, name: true }, orderBy: [{ name: "asc" }, { id: "asc" }], take: 100 }) : Promise.resolve([]),
-  ]);
-  return { companies, services };
+  return db.$transaction(async tx => {
+    const current = await admin(tx, actor);
+    const companies = await tx.company.findMany({ where: { status: "active", name: { contains: input.search, mode: "insensitive" } },
+      select: { id: true, name: true }, orderBy: [{ name: "asc" }, { id: "asc" }], take: 100 });
+    const services = input.companyId ? await tx.service.findMany({ where: { tenantId: input.companyId, status: "active", tenant: { status: "active" } },
+      select: { id: true, name: true }, orderBy: [{ name: "asc" }, { id: "asc" }], take: 100 }) : [];
+    assertFileDeadlines(current.deadlines);
+    return { companies, services };
+  });
 }
 export async function createExpertAssignment(actor: Actor, input: z.infer<typeof createExpertInput>, requestId: string) {
   const expiry = checkedExpiry(input.expiresAt);
   return db.$transaction(async tx => {
     await companyLock(tx, input.companyId);
-    await admin(tx, actor);
+    const current = await admin(tx, actor);
     await validateServices(tx, input.companyId, input.serviceIds);
     const user = await tx.user.findUnique({ where: { email: input.expertEmail } });
     if (!user || user.status !== "active" || !user.emailVerified || user.platformAdmin || user.id === actor.user.id)
@@ -114,7 +124,9 @@ export async function createExpertAssignment(actor: Actor, input: z.infer<typeof
     await replaceScope(tx, assignment, member.id, input.serviceIds);
     await audit(tx, { tenantId: input.companyId, user: actor.user }, requestId,
       existing ? "expert.reassigned" : "expert.assigned", "expert_assignment", assignment.id, ["expertUserId", "expiresAt", "services"]);
-    return { status: existing ? 200 : 201, body: dto(await tx.expertAssignment.findUniqueOrThrow({ where: { id: assignment.id }, include })) };
+    const result = dto(await tx.expertAssignment.findUniqueOrThrow({ where: { id: assignment.id }, include }));
+    assertFileDeadlines(current.deadlines);
+    return { status: existing ? 200 : 201, body: result };
   }, { timeout: 15000 });
 }
 export async function updateExpertAssignment(actor: Actor, id: string, input: z.infer<typeof updateExpertInput>, requestId: string) {
@@ -123,7 +135,7 @@ export async function updateExpertAssignment(actor: Actor, id: string, input: z.
   if (!initial) fail(404, "NOT_FOUND", "전문가 배정을 찾을 수 없습니다.");
   return db.$transaction(async tx => {
     await companyLock(tx, initial.tenantId);
-    await admin(tx, actor);
+    const current = await admin(tx, actor);
     const row = await tx.expertAssignment.findUnique({ where: { id }, include: { membership: true, services: true } });
     if (!row || row.status !== "active" || row.expiresAt <= new Date() || row.version !== input.version || !row.membership || row.membership.status !== "active")
       fail(409, "VERSION_CONFLICT", "배정 상태가 변경되었습니다. 다시 불러와주세요.");
@@ -135,7 +147,9 @@ export async function updateExpertAssignment(actor: Actor, id: string, input: z.
     }
     await audit(tx, { tenantId: row.tenantId, user: actor.user }, requestId, "expert.updated", "expert_assignment", id,
       Object.keys(input).filter(key => key !== "version"));
-    return dto(await tx.expertAssignment.findUniqueOrThrow({ where: { id }, include }));
+    const result = dto(await tx.expertAssignment.findUniqueOrThrow({ where: { id }, include }));
+    assertFileDeadlines(current.deadlines);
+    return result;
   }, { timeout: 15000 });
 }
 export async function revokeExpertAssignment(actor: Actor, id: string, version: number, requestId: string) {
@@ -143,7 +157,7 @@ export async function revokeExpertAssignment(actor: Actor, id: string, version: 
   if (!initial) fail(404, "NOT_FOUND", "전문가 배정을 찾을 수 없습니다.");
   return db.$transaction(async tx => {
     await companyLock(tx, initial.tenantId);
-    await admin(tx, actor);
+    const current = await admin(tx, actor);
     const row = await tx.expertAssignment.findUnique({ where: { id }, include: { membership: true } });
     if (!row || row.status !== "active" || row.version !== version || !row.membership)
       fail(409, "VERSION_CONFLICT", "배정 상태가 변경되었습니다. 다시 불러와주세요.");
@@ -153,6 +167,7 @@ export async function revokeExpertAssignment(actor: Actor, id: string, version: 
     await tx.session.updateMany({ where: { userId: row.expertUserId, activeCompanyId: row.tenantId },
       data: { activeCompanyId: null, activeServiceId: null } });
     await audit(tx, { tenantId: row.tenantId, user: actor.user }, requestId, "expert.revoked", "expert_assignment", id, ["status"]);
+    assertFileDeadlines(current.deadlines);
   }, { timeout: 15000 });
 }
 export async function expireExpertAssignments(now = new Date()) {

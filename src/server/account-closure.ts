@@ -3,18 +3,22 @@ import { db } from "./db";
 import { auth } from "./auth";
 import { encrypt } from "./crypto";
 import { fail } from "./http";
+import { lockAccountActor } from "./account-actor";
+import { assertFileDeadlines } from "./file-access";
 import { accountClosureInput } from "@/contracts/account-closure";
 type Actor = Awaited<ReturnType<typeof import("./context").requireActor>>;
 
 export async function accountClosureStatus(actor: Actor) {
-  const [memberships, credential, admins] = await Promise.all([
-    db.membership.findMany({ where: { userId: actor.user.id, role: "owner", status: "active", tenant: { status: { not: "closed" } } },
-      select: { tenant: { select: { id: true, name: true } } }, orderBy: { tenantId: "asc" } }),
-    db.account.findFirst({ where: { userId: actor.user.id, providerId: "credential" }, select: { password: true } }),
-    actor.user.platformAdmin ? db.user.count({ where: { id: { not: actor.user.id }, platformAdmin: true, status: "active" } }) : Promise.resolve(1),
-  ]);
-  return { version: actor.user.version, email: actor.user.email, hasPassword: !!credential?.password,
-    platformAdminHandoffRequired: !admins, ownedCompanies: memberships.map(member => member.tenant) };
+  return db.$transaction(async tx => {
+    const current = await lockAccountActor(tx, actor);
+    const memberships = await tx.membership.findMany({ where: { userId: current.user.id, role: "owner", status: "active", tenant: { status: { not: "closed" } } },
+      select: { tenant: { select: { id: true, name: true } } }, orderBy: { tenantId: "asc" } });
+    const credential = await tx.account.findFirst({ where: { userId: current.user.id, providerId: "credential" }, select: { password: true } });
+    const admins = current.user.platformAdmin ? await tx.user.count({ where: { id: { not: current.user.id }, platformAdmin: true, status: "active" } }) : 1;
+    assertFileDeadlines(current.deadlines);
+    return { version: current.user.version, email: current.user.email, hasPassword: !!credential?.password,
+      platformAdminHandoffRequired: !admins, ownedCompanies: memberships.map(member => member.tenant) };
+  });
 }
 
 export async function closeAccount(actor: Actor, input: z.infer<typeof accountClosureInput>, requestId: string) {
@@ -24,9 +28,10 @@ export async function closeAccount(actor: Actor, input: z.infer<typeof accountCl
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${"password:" + actor.user.id}, 0))`;
     await tx.$queryRaw`SELECT c.id FROM "Company" c JOIN "Membership" m ON m."tenantId" = c.id
       WHERE m."userId" = ${actor.user.id} ORDER BY c.id FOR UPDATE OF c`;
-    if (actor.user.platformAdmin) await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended('platform-admin-closure', 0))`;
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended('platform-admin-closure', 0))`;
     await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${actor.user.id} FOR UPDATE`;
     const user = await tx.user.findUniqueOrThrow({ where: { id: actor.user.id } });
+    await tx.$queryRaw`SELECT id FROM "Session" WHERE id=${actor.session.id} AND "userId"=${user.id} FOR UPDATE`;
     const session = await tx.session.findFirst({ where: { id: actor.session.id, userId: user.id, expiresAt: { gt: new Date() } } });
     if (!session || user.status !== "active" || !user.emailVerified) fail(401, "ACCOUNT_UNAVAILABLE", "다시 로그인해주세요.");
     if (user.version !== input.version) fail(409, "VERSION_CONFLICT", "계정 정보가 변경되었습니다. 다시 불러와주세요.");
@@ -59,6 +64,7 @@ export async function closeAccount(actor: Actor, input: z.infer<typeof accountCl
       tenantId, actorId: user.id, action: "account.closed", resource: "user", resourceId: user.id, requestId,
       detail: { changedFields: ["status", "memberships", "sessions", "credentials"], closureId: closure.id },
     } });
+    assertFileDeadlines({ session: session.expiresAt, expert: null, password: null });
     return { id: closure.id, status: "closed", completedAt: closure.completedAt };
   }, { isolationLevel: "Serializable", timeout: 30000 });
 }

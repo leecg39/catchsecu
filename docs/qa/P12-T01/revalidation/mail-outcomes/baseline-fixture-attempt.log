@@ -1,0 +1,147 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/mail-job-audit.test.ts (7 tests | 7 failed) 631ms
+   × local delivery commits the job, attempt and safe event under one attempt correlation ID 56ms
+   × a suppressed service send commits a suppression event and no successful delivery event 17ms
+   × delivery failure with maxAttempts 5 records a safe retry/dead outcome atomically 15ms
+   × delivery failure with maxAttempts 1 records a safe retry/dead outcome atomically 14ms
+   × a completion audit failure leaves no done outcome and distinguishes receipt persistence from dispatch failure 20ms
+   × failure of both outcome audits preserves the leased row and unfinished attempt for lease recovery 19ms
+   × an exhausted lease and attempt are recorded together without dispatching again 15ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/mail-job-audit.test.ts > local delivery commits the job, attempt and safe event under one attempt correlation ID
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/mail-job-audit.test.ts:34:16
+     32|   const attempt = await db.jobAttempt.findFirstOrThrow({ where: { jobI…
+     33|   expect(await db.job.findUnique({ where: { id: job.id } })).toMatchOb…
+     34|   expect(rows).toHaveLength(1); expect(rows[0]).toMatchObject({ reques…
+       |                ^
+     35|   expect(JSON.stringify(rows).includes(address)).toBe(false);
+     36|   expect((await readFile(resolve(env.LOCAL_MAIL_DIR, job.id + ".json")…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/server/mail-job-audit.test.ts > a suppressed service send commits a suppression event and no successful delivery event
+AssertionError: expected { campaignDeliveryId: null, …(20) } to match object { status: 'cancelled' }
+(20 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "status": "cancelled",
++   "status": "retry",
+  }
+
+ ❯ tests/server/mail-job-audit.test.ts:41:101
+     39| test("a suppressed service send commits a suppression event and no suc…
+     40|   const job = await create({ payloadCipher: encrypt({ to: address, sub…
+     41|   expect(await work(job.id)).toBe(true); expect(await db.job.findUniqu…
+       |                                                                                                     ^
+     42|   expect((await events(job.id)).map(e => e.action)).toEqual(["email.su…
+     43| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/server/mail-job-audit.test.ts > delivery failure with maxAttempts 5 records a safe retry/dead outcome atomically
+ FAIL  tests/server/mail-job-audit.test.ts > delivery failure with maxAttempts 1 records a safe retry/dead outcome atomically
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/mail-job-audit.test.ts:47:51
+     45|   const job = await create({ maxAttempts, payloadCipher: encrypt({ inv…
+     46|   expect(await db.job.findUnique({ where: { id: job.id } })).toMatchOb…
+     47|   const rows = await events(job.id); expect(rows).toHaveLength(1); exp…
+       |                                                   ^
+     48| });
+     49| test("a completion audit failure leaves no done outcome and distinguis…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/server/mail-job-audit.test.ts > a completion audit failure leaves no done outcome and distinguishes receipt persistence from dispatch failure
+AssertionError: expected { campaignDeliveryId: null, …(20) } to match object { status: 'retry', …(1) }
+(19 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "lastError": "RECEIPT_PERSISTENCE_FAILED",
+-   "status": "retry",
++   "lastError": null,
++   "status": "done",
+  }
+
+ ❯ tests/server/mail-job-audit.test.ts:51:62
+     49| test("a completion audit failure leaves no done outcome and distinguis…
+     50|   const job = await create(); fault.action = "email.local_delivered"; …
+     51|   expect(await db.job.findUnique({ where: { id: job.id } })).toMatchOb…
+       |                                                              ^
+     52|   expect((await events(job.id)).map(e => e.action)).toEqual(["email.re…
+     53|   await db.job.update({ where: { id: job.id }, data: { dueAt: new Date…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/server/mail-job-audit.test.ts > failure of both outcome audits preserves the leased row and unfinished attempt for lease recovery
+AssertionError: promise resolved "true" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+true
+
+ ❯ tests/server/mail-job-audit.test.ts:57:79
+     55| });
+     56| test("failure of both outcome audits preserves the leased row and unfi…
+     57|   const job = await create(); fault.action = "all"; await expect(work(…
+       |                                                                               ^
+     58|   expect(await db.job.findUnique({ where: { id: job.id } })).toMatchOb…
+     59|   expect(await db.jobAttempt.findFirst({ where: { jobId: job.id } })).…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/server/mail-job-audit.test.ts > an exhausted lease and attempt are recorded together without dispatching again
+AssertionError: expected [] to deeply equal [ 'email.lease_exhausted' ]
+
+- Expected
++ Received
+
+- [
+-   "email.lease_exhausted",
+- ]
++ []
+
+ ❯ tests/server/mail-job-audit.test.ts:66:53
+     64|   expect(await work(job.id)).toBe(false); expect(await db.job.findUniq…
+     65|   expect(await db.jobAttempt.findFirst({ where: { jobId: job.id } })).…
+     66|   expect((await events(job.id)).map(e => e.action)).toEqual(["email.le…
+       |                                                     ^
+     67| });
+     68|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed (7)
+   Start at  18:56:54
+   Duration  1.79s (import 40%, tests 37%, transform 22%)
+

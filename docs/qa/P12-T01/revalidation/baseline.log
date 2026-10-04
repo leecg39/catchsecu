@@ -1,0 +1,895 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/audit-current-authority.test.ts (28 tests | 28 failed) 3602ms
+   × list: 초기 인증 뒤 role 변경을 현재 상태로 검사한다 177ms
+   × list: 초기 인증 뒤 membership 변경을 현재 상태로 검사한다 118ms
+   × list: 초기 인증 뒤 company 변경을 현재 상태로 검사한다 113ms
+   × list: 초기 인증 뒤 session 변경을 현재 상태로 검사한다 114ms
+   × list: 초기 인증 뒤 expiry 변경을 현재 상태로 검사한다 108ms
+   × list: 초기 인증 뒤 selection 변경을 현재 상태로 검사한다 99ms
+   × list: 초기 인증 뒤 email 변경을 현재 상태로 검사한다 101ms
+   × list: 초기 인증 뒤 mfa 변경을 현재 상태로 검사한다 100ms
+   × list: 초기 인증 뒤 policy-timeout 변경을 현재 상태로 검사한다 114ms
+   × list: owner에서 서비스 제한 역할로 바뀌면 현재 grant와 마스킹을 적용한다 165ms
+   × list: 감사 쓰기 실패는 민감 결과를 반환하지 않고 열람 감사를 롤백한다 120ms
+   × list: 감사 저장 도중 세션 기한이 지나면 결과와 감사를 거절한다 115ms
+   × export: 초기 인증 뒤 role 변경을 현재 상태로 검사한다 129ms
+   × export: 초기 인증 뒤 membership 변경을 현재 상태로 검사한다 108ms
+   × export: 초기 인증 뒤 company 변경을 현재 상태로 검사한다 99ms
+   × export: 초기 인증 뒤 session 변경을 현재 상태로 검사한다 101ms
+   × export: 초기 인증 뒤 expiry 변경을 현재 상태로 검사한다 95ms
+   × export: 초기 인증 뒤 selection 변경을 현재 상태로 검사한다 94ms
+   × export: 초기 인증 뒤 email 변경을 현재 상태로 검사한다 93ms
+   × export: 초기 인증 뒤 mfa 변경을 현재 상태로 검사한다 92ms
+   × export: 초기 인증 뒤 policy-timeout 변경을 현재 상태로 검사한다 91ms
+   × export: owner에서 서비스 제한 역할로 바뀌면 현재 grant와 마스킹을 적용한다 121ms
+   × export: 감사 쓰기 실패는 민감 결과를 반환하지 않고 열람 감사를 롤백한다 103ms
+   × export: 감사 저장 도중 세션 기한이 지나면 결과와 감사를 거절한다 93ms
+   × 감사 목록 열람도 요청 ID로 기록하고 현재 조회 결과에는 새 열람 이벤트를 끼워 넣지 않는다 105ms
+   × 목록의 마지막 페이지가 비면 서버가 존재하는 페이지로 보정한다 97ms
+   × 본인 활동 열람은 회사와 무관하게 본인에게만 연결하고 원문 검색어를 기록하지 않는다 105ms
+   × 회사/본인 목록·CSV는 중복 검색 조건을 덮어쓰지 않는다 105ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 28 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 초기 인증 뒤 role 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:38.945Z,
++       "id": "d9506bb5-08c7-4113-9930-b96bcc8d7258",
++       "resource": "submission",
++       "resourceId": "31194fc4-195c-44db-92b0-d369b274eeeb",
++       "serviceId": "f4a9c8e7-ef20-4616-be22-c0a827748df3",
++       "serviceName": "허용",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:38.945Z,
++       "id": "99ae6373-7491-4126-81b5-9802b9e5eb83",
++       "resource": "submission",
++       "resourceId": "ae2ccca7-88a0-45ab-b540-8388f15103bd",
++       "serviceId": "c7c0ebdf-9d89-4414-817d-f862bdaef8f1",
++       "serviceName": "회수",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 초기 인증 뒤 membership 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.094Z,
++       "id": "d6e1e010-48eb-4fbf-a219-9323794376d7",
++       "resource": "submission",
++       "resourceId": "1742aacb-0b93-4545-96b1-feb8250420b5",
++       "serviceId": "f8e945dd-ca53-40b6-8aab-5c0a89491af8",
++       "serviceName": "회수",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.094Z,
++       "id": "42d49a17-3b10-4b48-86f9-dff54d5e3095",
++       "resource": "submission",
++       "resourceId": "bfa3b7ac-bc21-469b-8108-e75bf10456d0",
++       "serviceId": "cdc92b26-f005-4cca-a1ce-d71c38bf18bc",
++       "serviceName": "허용",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 초기 인증 뒤 company 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.201Z,
++       "id": "f0622c8c-1d7f-4449-aa68-3c5375c47383",
++       "resource": "submission",
++       "resourceId": "33e3b515-b590-4aec-a0b3-e8bda2ae25db",
++       "serviceId": "22a7e01e-14f5-4ff5-8a4c-b1256e663e5e",
++       "serviceName": "허용",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.201Z,
++       "id": "9fb995ca-6e43-485f-a70d-b31806f6144d",
++       "resource": "submission",
++       "resourceId": "78890792-ef36-4e79-a31e-3c14a4a9c96a",
++       "serviceId": "8d3df651-c93d-4a86-ba6f-ad104fca03eb",
++       "serviceName": "회수",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 초기 인증 뒤 session 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.324Z,
++       "id": "a9eaa770-0a47-472b-b52a-d5326fd6fe03",
++       "resource": "submission",
++       "resourceId": "b9474f4e-3b90-46e1-ad5c-665ad192455b",
++       "serviceId": "2dbfe67d-237b-447c-b543-59c0388ad958",
++       "serviceName": "허용",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.324Z,
++       "id": "46d4948f-e1d9-4912-87ba-97ff99b2f92a",
++       "resource": "submission",
++       "resourceId": "c8360833-4ffb-488b-80b4-abe945fb3e35",
++       "serviceId": "30642efd-bc50-4019-af4b-d0e28395b7fe",
++       "serviceName": "회수",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 초기 인증 뒤 expiry 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.430Z,
++       "id": "85f8bd0f-a490-4f47-82ff-5e27a05d2499",
++       "resource": "submission",
++       "resourceId": "7fadf22e-7dfe-46c5-9c2d-5d8fb8fb9f9a",
++       "serviceId": "17275f5a-9ee1-4d61-84f1-f4f2f299243c",
++       "serviceName": "허용",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.430Z,
++       "id": "570cfa88-7e0f-4ceb-be1d-005cbd104b3a",
++       "resource": "submission",
++       "resourceId": "8faa371e-0da6-475d-9bf9-5b93915ff2cc",
++       "serviceId": "be73ee94-4856-4054-a23f-50bcb30e8674",
++       "serviceName": "회수",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 초기 인증 뒤 selection 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.532Z,
++       "id": "c31dfa9a-bb8f-41f5-8c2a-97e5ac189a33",
++       "resource": "submission",
++       "resourceId": "49c3bbe7-9eba-46e6-bf17-3c7d5c03de43",
++       "serviceId": "575bac2e-d134-4f56-9f48-701edd2ceda9",
++       "serviceName": "회수",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.532Z,
++       "id": "6633b72c-e8fe-4e97-abe2-0022ce175b79",
++       "resource": "submission",
++       "resourceId": "cb73e910-4e33-4c49-8002-08858c7aced5",
++       "serviceId": "d2cff5a6-7cd8-43b4-b58d-aaabe859e1bd",
++       "serviceName": "허용",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 초기 인증 뒤 email 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.631Z,
++       "id": "ea766bd7-9fd9-4d3b-9104-2df95682f99a",
++       "resource": "submission",
++       "resourceId": "04d3e53f-1121-4a1b-9781-4cdc25db147b",
++       "serviceId": "70c2eb6f-19da-4a62-b776-6865c41d85e1",
++       "serviceName": "회수",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.631Z,
++       "id": "1e3601c4-32d1-485d-82b1-4a96ea2cc8d3",
++       "resource": "submission",
++       "resourceId": "09c7321e-a947-4296-ab29-6531f8515a7b",
++       "serviceId": "dbfdd283-8d2f-43c6-af5b-48f358806b73",
++       "serviceName": "허용",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 초기 인증 뒤 mfa 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.732Z,
++       "id": "fcf8304a-26ca-489b-a790-015dfae7e036",
++       "resource": "submission",
++       "resourceId": "0fe788e7-bc20-49e9-91ec-515c5d0308ed",
++       "serviceId": "7689ddda-adc2-48d4-926d-f2fea7830ecf",
++       "serviceName": "허용",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:39.732Z,
++       "id": "9b85ef3e-9c62-4094-9807-e1dd49448dc0",
++       "resource": "submission",
++       "resourceId": "c6f63c1c-d0ea-4f86-ab5b-6d8dee5c8dba",
++       "serviceId": "2b210645-8dc7-4c84-8994-5935186dbcb0",
++       "serviceName": "회수",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 초기 인증 뒤 policy-timeout 변경을 현재 상태로 검사한다
+ FAIL  tests/server/audit-current-authority.test.ts > export: 초기 인증 뒤 policy-timeout 변경을 현재 상태로 검사한다
+PrismaClientKnownRequestError: 
+Invalid `db.securityPolicy.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/audit-current-authority.test.ts:75:31
+
+  72 if (change === "email") await db.user.update({ where: { id: userId }, data: { emailVerified: false } });
+  73 if (change === "mfa") await db.securityPolicy.update({ where: { tenantId: ctx.tenantId }, data: { requireMfa: true } });
+  74 if (change === "policy-timeout") {
+→ 75   await db.securityPolicy.update(
+Database error. Code: `23514`. Message: `new row for relation "SecurityPolicy" violates check constraint "SecurityPolicy_ranges"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/audit-current-authority.test.ts:75:7
+     73|     if (change === "mfa") await db.securityPolicy.update({ where: { te…
+     74|     if (change === "policy-timeout") {
+     75|       await db.securityPolicy.update({ where: { tenantId: ctx.tenantId…
+       |       ^
+     76|       await db.session.update({ where: { id: ctx.session.id }, data: {…
+     77|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: owner에서 서비스 제한 역할로 바뀌면 현재 grant와 마스킹을 적용한다
+AssertionError: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ tests/server/audit-current-authority.test.ts:90:27
+     88|       expect(rows).toHaveLength(2); expect(rows[1][3]).toBe("비공개"); ex…
+     89|     } else {
+     90|       expect(value.total).toBe(1); expect(value.items[0]).toMatchObjec…
+       |                           ^
+     91|     }
+     92|     expect(JSON.stringify(value)).not.toContain("private-secret");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 감사 쓰기 실패는 민감 결과를 반환하지 않고 열람 감사를 롤백한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:40.131Z,
++       "id": "e007882f-eb78-4251-9f89-7e57300101a6",
++       "resource": "submission",
++       "resourceId": "b36dbebb-1b7a-4bb0-bcf1-0d29413aaf95",
++       "serviceId": "aecf1a8f-b72a-4b3e-9046-dca4938f6f7c",
++       "serviceName": "회수",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:40.131Z,
++       "id": "2d774a1e-609b-4304-8bfe-e7ac51bf58fc",
++       "resource": "submission",
++       "resourceId": "d2925f9a-2cb1-4700-be56-152d3ba69fbb",
++       "serviceId": "eaff62d4-3873-4024-86dc-5c3e7645fd6a",
++       "serviceName": "허용",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:97:46
+     95|   test(`${operation}: 감사 쓰기 실패는 민감 결과를 반환하지 않고 열람 감사를 롤백한다`, async () …
+     96|     const id = randomUUID(); faults.fail = true;
+     97|     try { await expect(action(operation, id)).rejects.toThrow("synthet…
+       |                                              ^
+     98|     finally { faults.fail = false; }
+     99|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > list: 감사 저장 도중 세션 기한이 지나면 결과와 감사를 거절한다
+AssertionError: promise resolved "{ items: [ { …(8) }, { …(8) } ], …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:40.247Z,
++       "id": "ba775596-e02f-416f-a344-32f2ec9898e1",
++       "resource": "submission",
++       "resourceId": "70943609-99da-4c28-baf0-aad65284223c",
++       "serviceId": "26cd1eb3-82cd-4b8a-a96a-6c3380a96617",
++       "serviceName": "회수",
++     },
++     {
++       "action": "submission.viewed",
++       "actorName": "감사 주체",
++       "createdAt": 2026-10-04T08:26:40.247Z,
++       "id": "3a17d77d-7615-4cff-b6d5-932ad977df96",
++       "resource": "submission",
++       "resourceId": "e7366825-ec3d-47ba-bcf0-c4cd007507df",
++       "serviceId": "0d7881aa-b3ea-4ef0-a03c-f2b277708af3",
++       "serviceName": "허용",
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:104:46
+    102|     await db.session.update({ where: { id: ctx.session.id }, data: { e…
+    103|     const id = randomUUID(); faults.expire = true;
+    104|     try { await expect(action(operation, id)).rejects.toMatchObject({ …
+       |                                              ^
+    105|     finally { faults.expire = false; vi.useRealTimers(); }
+    106|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 초기 인증 뒤 role 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"ea7485e3-5dfa-4a23-935f-695a9f7302ac\",\"2026-10-04T08:26:40.375Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"98b3cf62-a849-430a-83c5-0c0d8465ce2a\"
+\"0bea8ecb-977a-43c8-aa24-945455de9a75\",\"2026-10-04T08:26:40.375Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"db120a71-c3a6-4097-b2b5-b7eea028bf11\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 초기 인증 뒤 membership 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"f93ebcea-692a-41c9-824c-2e8118dc3762\",\"2026-10-04T08:26:40.483Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"d58c68a7-aede-41cc-88a9-d834c965b37f\"
+\"50a9ac2d-ac0f-4495-85ed-697afc43fa0b\",\"2026-10-04T08:26:40.483Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"092071f3-b728-4547-a25e-0b890eca109d\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 초기 인증 뒤 company 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"5237570c-bc72-4df7-96ea-85f1ac84778d\",\"2026-10-04T08:26:40.584Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"9b4a6c78-30aa-4aab-a4a0-c52de2cb317c\"
+\"3a4ef3b8-de4b-40ae-9dea-5d67c4252cfe\",\"2026-10-04T08:26:40.584Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"7ce46c55-a331-4e22-bfe9-55d19ef1a9d2\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 초기 인증 뒤 session 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"4e7edcd7-7a5e-4971-983f-7317bdcd0185\",\"2026-10-04T08:26:40.685Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"6c8ed87f-bf7b-4803-96fd-89946d563712\"
+\"3c00fed4-43de-4a69-bd73-6afc46b90cb2\",\"2026-10-04T08:26:40.685Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"232f4e79-27f5-474c-a62e-d4d31ecfe524\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 초기 인증 뒤 expiry 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"e97ea2f0-ea27-4204-83b4-d1a9cc85a29a\",\"2026-10-04T08:26:40.780Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"425b8a34-8060-4ca6-a9d1-107b05fc6398\"
+\"b9ef5c47-20cc-451e-86bd-f6f46fb8e8c1\",\"2026-10-04T08:26:40.780Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"f0c16cd6-cfb1-46a0-82df-c7b46c351d70\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 초기 인증 뒤 selection 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"a5e004a4-f2be-43b2-8bd7-98bdc4f58945\",\"2026-10-04T08:26:40.875Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"5d557e8d-8ae0-495b-bc3d-72f0b1373852\"
+\"4f8c3d2a-c3cb-492c-8272-eeef5c053913\",\"2026-10-04T08:26:40.875Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"b668200d-6e92-4877-b849-61bea28aa0fb\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 초기 인증 뒤 email 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"e362d0bf-9cb6-4151-bbca-5dbab7c6369e\",\"2026-10-04T08:26:40.968Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"8b2732fc-2058-43a9-b61b-1874573dece0\"
+\"8444712d-3a1b-414d-9512-710b347397a1\",\"2026-10-04T08:26:40.968Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"0a6a0a68-c22c-4649-916e-af5552dfaf38\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 초기 인증 뒤 mfa 변경을 현재 상태로 검사한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"cbaf6963-632a-45a7-bc23-03b6d2bc3a2b\",\"2026-10-04T08:26:41.060Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"60902059-ce24-4d01-966b-e38cf0216adc\"
+\"5ad3bafc-42e0-4da3-b1c6-1a54e7f7a05b\",\"2026-10-04T08:26:41.060Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"7a56fa60-efbe-4ccc-9b28-05b891499bef\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:79:40
+     77|     }
+     78|     const id = randomUUID();
+     79|     await expect(action(operation, id)).rejects.toMatchObject({ status…
+       |                                        ^
+     80|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: owner에서 서비스 제한 역할로 바뀌면 현재 grant와 마스킹을 적용한다
+AssertionError: expected [ …(3) ] to have a length of 2 but got 3
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ tests/server/audit-current-authority.test.ts:88:20
+     86|     if (typeof value === "string") {
+     87|       const rows = parse(value, { bom: true }) as string[][];
+     88|       expect(rows).toHaveLength(2); expect(rows[1][3]).toBe("비공개"); ex…
+       |                    ^
+     89|     } else {
+     90|       expect(value.total).toBe(1); expect(value.items[0]).toMatchObjec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 감사 쓰기 실패는 민감 결과를 반환하지 않고 열람 감사를 롤백한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"34fd20cf-7a89-4689-b0a8-5a3e93c83f48\",\"2026-10-04T08:26:41.376Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"7c7ef805-be64-4cbd-a6f9-f783175f67f0\"
+\"080b41cc-93f6-478f-85c5-57219aadc430\",\"2026-10-04T08:26:41.376Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"943b3188-a949-4866-af56-fbddc10879db\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:97:46
+     95|   test(`${operation}: 감사 쓰기 실패는 민감 결과를 반환하지 않고 열람 감사를 롤백한다`, async () …
+     96|     const id = randomUUID(); faults.fail = true;
+     97|     try { await expect(action(operation, id)).rejects.toThrow("synthet…
+       |                                              ^
+     98|     finally { faults.fail = false; }
+     99|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > export: 감사 저장 도중 세션 기한이 지나면 결과와 감사를 거절한다
+AssertionError: promise resolved "'\ufeff"이벤트 ID","처리일시","서비스명","처리자명","…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"이벤트 ID\",\"처리일시\",\"서비스명\",\"처리자명\",\"처리내용\",\"처리대상\",\"대상 ID\"
+\"eaa821f7-aaf9-4144-8daa-0825000aafbd\",\"2026-10-04T08:26:41.469Z\",\"허용\",\"감사 주체\",\"submission.viewed\",\"submission\",\"62e1c37d-1a51-48cc-99d2-0942cfd28546\"
+\"5f9cc694-3c7c-418b-8250-11ab7ef97dba\",\"2026-10-04T08:26:41.469Z\",\"회수\",\"감사 주체\",\"submission.viewed\",\"submission\",\"5e5ed585-c80c-432d-b033-439b8e657b5b\"
+"
+
+ ❯ tests/server/audit-current-authority.test.ts:104:46
+    102|     await db.session.update({ where: { id: ctx.session.id }, data: { e…
+    103|     const id = randomUUID(); faults.expire = true;
+    104|     try { await expect(action(operation, id)).rejects.toMatchObject({ …
+       |                                              ^
+    105|     finally { faults.expire = false; vi.useRealTimers(); }
+    106|     expect(await db.auditEvent.count({ where: { requestId: id } })).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > 감사 목록 열람도 요청 ID로 기록하고 현재 조회 결과에는 새 열람 이벤트를 끼워 넣지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.auditEvent.findFirstOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/audit-current-authority.test.ts:113:37
+
+  110 const id = randomUUID(), input = auditEventQuery.parse({ search: "submission.viewed", serviceId });
+  111 const result = await listAuditEvents(ctx, input, id);
+  112 expect(result.total).toBe(1);
+→ 113 const event = await db.auditEvent.findFirstOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/audit-current-authority.test.ts:113:17
+    111|   const result = await listAuditEvents(ctx, input, id);
+    112|   expect(result.total).toBe(1);
+    113|   const event = await db.auditEvent.findFirstOrThrow({ where: { reques…
+       |                 ^
+    114|   expect(event).toMatchObject({ action: "audit.viewed", actorId: userI…
+    115|     detail: { scope: "company", rowCount: 1, hasSearch: true } });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > 목록의 마지막 페이지가 비면 서버가 존재하는 페이지로 보정한다
+AssertionError: expected { Object (items, total, ...) } to match object { total: 2, page: 1, pageSize: 10 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "page": 1,
++   "page": 100,
+    "pageSize": 10,
+    "total": 2,
+  }
+
+ ❯ tests/server/audit-current-authority.test.ts:121:18
+    119| test("목록의 마지막 페이지가 비면 서버가 존재하는 페이지로 보정한다", async () => {
+    120|   const result = await listAuditEvents(ctx, auditEventQuery.parse({ ki…
+    121|   expect(result).toMatchObject({ total: 2, page: 1, pageSize: 10 }); e…
+       |                  ^
+    122| });
+    123| test("본인 활동 열람은 회사와 무관하게 본인에게만 연결하고 원문 검색어를 기록하지 않는다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > 본인 활동 열람은 회사와 무관하게 본인에게만 연결하고 원문 검색어를 기록하지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.auditEvent.findFirstOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/audit-current-authority.test.ts:127:37
+
+  124 const actor = await requireActor(req("/me").headers), id = randomUUID();
+  125 const result = await listOwnAuditEvents(actor, auditEventQuery.parse({ scope: "mine", search: "submission.viewed" }), id);
+  126 expect(result.items.every(row => row.resourceId === null && row.serviceId === null)).toBe(true);
+→ 127 const event = await db.auditEvent.findFirstOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/audit-current-authority.test.ts:127:17
+    125|   const result = await listOwnAuditEvents(actor, auditEventQuery.parse…
+    126|   expect(result.items.every(row => row.resourceId === null && row.serv…
+    127|   const event = await db.auditEvent.findFirstOrThrow({ where: { reques…
+       |                 ^
+    128|   expect(event).toMatchObject({ actorId: userId, tenantId: null, actio…
+    129|   expect(JSON.stringify(event.detail)).not.toContain("submission.viewe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/28]⎯
+
+ FAIL  tests/server/audit-current-authority.test.ts > 회사/본인 목록·CSV는 중복 검색 조건을 덮어쓰지 않는다
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/audit-current-authority.test.ts:139:29
+    137|   ] as const) {
+    138|     const response = await handler(req(path + "?" + duplicate));
+    139|     expect(response.status).toBe(422); expect((await response.json()).…
+       |                             ^
+    140|   }
+    141| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/28]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  28 failed (28)
+   Start at  17:26:37
+   Duration  4.88s (tests 76%, import 16%, transform 8%)
+

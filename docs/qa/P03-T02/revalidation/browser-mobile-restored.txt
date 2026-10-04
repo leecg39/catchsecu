@@ -1,0 +1,77 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 미완료 기능 검증"(45): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button "메뉴 열기" [ref=289, loc=css:button[aria-label="메뉴 열기"]]
+        text "☰"
+      container
+        anchor "공지사항" [ref=290, loc=css:a[aria-label="공지사항"], url=http://localhost:3102/notice]
+          image
+        button "문의" [ref=291, loc=css:button[aria-label="문의"]]
+          image
+        anchor "알림" [ref=292, loc=css:a[aria-label="알림"], url=http://localhost:3102/integration/message]
+          image
+        button [ref=293]
+          image
+          text "MY"
+    container
+      container
+        heading
+          text "구성원 관리"
+        button [ref=315]
+          text "구성원 초대"
+      container
+        container
+          button [ref=316]
+            text "구성원"
+          button [ref=317]
+            text "초대 이력"
+        paragraph
+          text "역할과 서비스 범위로 접근 권한을 설정합니다. 자신의 권한 변경과 마지막 소유자 제외는 제한됩니다."
+        form
+          textbox "구성원 검색" [ref=318, loc=css:input[placeholder="이름 또는 이메일"]]
+            text "이름 또는 이메일"
+          combobox "구성원 상태" [ref=319, loc=css:select[aria-label="구성원 상태"]]
+            text "전체"
+          button [ref=320]
+            text "검색"
+        status
+          text "구성원 정보를 저장했습니다."
+        container [ref=321]
+          table
+            table_row
+              table_cell
+                text "이름 / 이메일"
+              table_cell
+                text "역할"
+            table_row
+              table_cell
+                text "재검증 owner"
+                text "(나)"
+                text "recovery-owner-6d8eed27@example.test"
+              table_cell
+                text "소유자"
+            table_row
+              table_cell
+                text "재검증 member"
+                text "recovery-member-6d8eed27@example.test"
+              table_cell
+                text "편집자"
+        container
+          container
+            text "총"
+            text "2"
+            text "개"
+          combobox "페이지당 행 수" [ref=322]
+            text "20"
+          container
+            button "이전 페이지" [ref=323]
+              text "‹"
+            container
+              text "1"
+              text "/"
+              text "1"
+            button "다음 페이지" [ref=324]
+              text "›"
+      heading
+        text "서비스 접근 요청"

@@ -1,0 +1,248 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/compliance-close-authority.test.ts (13 tests | 12 failed) 3569ms
+   × read: 기존 다른 서비스 마감에서 현재 권한을 검사한다 213ms
+   × read: 기존 회사 전체 마감에서 현재 권한을 검사한다 177ms
+   × replay: 기존 다른 서비스 마감에서 현재 권한을 검사한다 403ms
+   × replay: 기존 회사 전체 마감에서 현재 권한을 검사한다 747ms
+   × csv: 기존 다른 서비스 마감에서 현재 권한을 검사한다 216ms
+   × csv: 기존 회사 전체 마감에서 현재 권한을 검사한다 236ms
+   × 제한된 구성원이 회사 전체 키에 일부 집계를 저장하지 못한다 183ms
+   × read: 인증 이후 세션이 삭제되면 저장된 기록도 거부한다 154ms
+   × replay: 인증 이후 세션이 삭제되면 저장된 기록도 거부한다 174ms
+   × csv: 인증 이후 세션이 삭제되면 저장된 기록도 거부한다 157ms
+   × 감사 실패 시 마감과 집계 조회 감사까지 함께 롤백한다 145ms
+   × 감사 후 세션 만료도 마감과 감사를 롤백한다 117ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/compliance-close-authority.test.ts > read: 기존 다른 서비스 마감에서 현재 권한을 검사한다
+ FAIL  tests/server/compliance-close-authority.test.ts > read: 기존 회사 전체 마감에서 현재 권한을 검사한다
+ FAIL  tests/server/compliance-close-authority.test.ts > replay: 기존 다른 서비스 마감에서 현재 권한을 검사한다
+ FAIL  tests/server/compliance-close-authority.test.ts > replay: 기존 회사 전체 마감에서 현재 권한을 검사한다
+ FAIL  tests/server/compliance-close-authority.test.ts > csv: 기존 다른 서비스 마감에서 현재 권한을 검사한다
+ FAIL  tests/server/compliance-close-authority.test.ts > csv: 기존 회사 전체 마감에서 현재 권한을 검사한다
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/compliance-close-authority.test.ts:49:23
+
+  46 });
+  47 afterAll(async () => { faults.audit = false; faults.advance = false; vi.useRealTimers(); await db.$disconnect(); });
+  48 async function restrict() {
+→ 49   await db.membership.update(
+Database error. Code: `23514`. Message: `LAST_OWNER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ restrict tests/server/compliance-close-authority.test.ts:49:3
+     47| afterAll(async () => { faults.audit = false; faults.advance = false; v…
+     48| async function restrict() {
+     49|   await db.membership.update({ where: { id: ctx.member.id }, data: { r…
+       |   ^
+     50|   await db.serviceGrant.create({ data: { tenantId: ctx.tenantId, membe…
+     51| }
+ ❯ tests/server/compliance-close-authority.test.ts:56:43
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  tests/server/compliance-close-authority.test.ts > 제한된 구성원이 회사 전체 키에 일부 집계를 저장하지 못한다
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/compliance-close-authority.test.ts:49:23
+
+  46 });
+  47 afterAll(async () => { faults.audit = false; faults.advance = false; vi.useRealTimers(); await db.$disconnect(); });
+  48 async function restrict() {
+→ 49   await db.membership.update(
+Database error. Code: `23514`. Message: `LAST_OWNER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ restrict tests/server/compliance-close-authority.test.ts:49:3
+     47| afterAll(async () => { faults.audit = false; faults.advance = false; v…
+     48| async function restrict() {
+     49|   await db.membership.update({ where: { id: ctx.member.id }, data: { r…
+       |   ^
+     50|   await db.serviceGrant.create({ data: { tenantId: ctx.tenantId, membe…
+     51| }
+ ❯ tests/server/compliance-close-authority.test.ts:63:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  tests/server/compliance-close-authority.test.ts > read: 인증 이후 세션이 삭제되면 저장된 기록도 거부한다
+AssertionError: promise resolved "{ close: { …(7) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "close": {
++     "createdAt": "2026-10-04T07:26:47.114Z",
++     "id": "046b3df0-3b24-4db9-b5ab-6c569e656d05",
++     "month": "2026-09",
++     "period": {
++       "from": "2026-08-31T15:00:00.000Z",
++       "to": "2026-09-30T15:00:00.000Z",
++     },
++     "serviceId": "62d46423-617c-465f-ab1e-65061d982684",
++     "totals": {
++       "consentDocuments": 0,
++       "forms": 0,
++       "periodDestructions": 0,
++       "periodSubmissions": 0,
++       "policyDocuments": 0,
++       "retainedSubmissions": 0,
++       "services": 1,
++     },
++     "verdict": "not_assessed",
++   },
+  }
+
+ ❯ tests/server/compliance-close-authority.test.ts:76:25
+     74|   const action = operation === "read" ? () => readComplianceClose(ctx,…
+     75|     : operation === "replay" ? () => create(serviceId) : () => complia…
+     76|   await expect(action()).rejects.toMatchObject({ status: 401 });
+       |                         ^
+     77| });
+     78| test("감사 실패 시 마감과 집계 조회 감사까지 함께 롤백한다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  tests/server/compliance-close-authority.test.ts > replay: 인증 이후 세션이 삭제되면 저장된 기록도 거부한다
+AssertionError: promise resolved "{ created: false, close: { …(7) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "close": {
++     "createdAt": "2026-10-04T07:26:47.291Z",
++     "id": "d192ff20-e414-45eb-8367-6d1a2b8a85a7",
++     "month": "2026-09",
++     "period": {
++       "from": "2026-08-31T15:00:00.000Z",
++       "to": "2026-09-30T15:00:00.000Z",
++     },
++     "serviceId": "04123f0b-cf39-4c08-b713-084289efdc0c",
++     "totals": {
++       "consentDocuments": 0,
++       "forms": 0,
++       "periodDestructions": 0,
++       "periodSubmissions": 0,
++       "policyDocuments": 0,
++       "retainedSubmissions": 0,
++       "services": 1,
++     },
++     "verdict": "not_assessed",
++   },
++   "created": false,
+  }
+
+ ❯ tests/server/compliance-close-authority.test.ts:76:25
+     74|   const action = operation === "read" ? () => readComplianceClose(ctx,…
+     75|     : operation === "replay" ? () => create(serviceId) : () => complia…
+     76|   await expect(action()).rejects.toMatchObject({ status: 401 });
+       |                         ^
+     77| });
+     78| test("감사 실패 시 마감과 집계 조회 감사까지 함께 롤백한다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  tests/server/compliance-close-authority.test.ts > csv: 인증 이후 세션이 삭제되면 저장된 기록도 거부한다
+AssertionError: promise resolved "'\ufeff"월","판정","서비스","보유 응답","기간 접수",…'" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+"﻿\"월\",\"판정\",\"서비스\",\"보유 응답\",\"기간 접수\",\"기간 파기\"
+\"2026-09\",\"미판정\",\"선택 서비스\",\"0\",\"0\",\"0\"
+\"2026-09\",\"미판정\",\"A\",\"0\",\"0\",\"\"
+"
+
+ ❯ tests/server/compliance-close-authority.test.ts:76:25
+     74|   const action = operation === "read" ? () => readComplianceClose(ctx,…
+     75|     : operation === "replay" ? () => create(serviceId) : () => complia…
+     76|   await expect(action()).rejects.toMatchObject({ status: 401 });
+       |                         ^
+     77| });
+     78| test("감사 실패 시 마감과 집계 조회 감사까지 함께 롤백한다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  tests/server/compliance-close-authority.test.ts > 감사 실패 시 마감과 집계 조회 감사까지 함께 롤백한다
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/server/compliance-close-authority.test.ts:81:81
+     79|   const before = await db.auditEvent.count({ where: { tenantId: ctx.te…
+     80|   await expect(create()).rejects.toThrow("synthetic audit failure");
+     81|   expect(await db.complianceClose.count({ where: { tenantId: ctx.tenan…
+       |                                                                                 ^
+     82|   expect(await db.auditEvent.count({ where: { tenantId: ctx.tenantId }…
+     83| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  tests/server/compliance-close-authority.test.ts > 감사 후 세션 만료도 마감과 감사를 롤백한다
+AssertionError: promise resolved "{ created: true, close: { …(7) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "close": {
++     "createdAt": "2026-10-04T07:26:47.700Z",
++     "id": "d90d47e4-c9bf-4064-8d66-0ea131aeec16",
++     "month": "2026-09",
++     "period": {
++       "from": "2026-08-31T15:00:00.000Z",
++       "to": "2026-09-30T15:00:00.000Z",
++     },
++     "serviceId": null,
++     "totals": {
++       "consentDocuments": 0,
++       "forms": 0,
++       "periodDestructions": 0,
++       "periodSubmissions": 0,
++       "policyDocuments": 0,
++       "retainedSubmissions": 0,
++       "services": 2,
++     },
++     "verdict": "not_assessed",
++   },
++   "created": true,
+  }
+
+ ❯ tests/server/compliance-close-authority.test.ts:88:25
+     86|   const before = await db.auditEvent.count({ where: { tenantId: ctx.te…
+     87|   vi.useFakeTimers({ toFake: ["Date"] }); faults.advance = true;
+     88|   await expect(create()).rejects.toMatchObject({ status: 401, code: "S…
+       |                         ^
+     89|   expect(await db.complianceClose.count({ where: { tenantId: ctx.tenan…
+     90|   expect(await db.auditEvent.count({ where: { tenantId: ctx.tenantId }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  12 failed | 1 passed (13)
+   Start at  16:26:43
+   Duration  4.67s (tests 78%, import 13%, transform 8%)
+

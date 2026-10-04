@@ -1,0 +1,488 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/subprocessor-authority.test.ts (17 tests | 17 failed) 2988ms
+   × list: 인증 이후 회사 변경을 거부한다 269ms
+   × list: 인증 이후 MFA 정책을 적용한다 154ms
+   × detail: 인증 이후 회사 변경을 거부한다 202ms
+   × detail: 인증 이후 MFA 정책을 적용한다 117ms
+   × history: 인증 이후 회사 변경을 거부한다 114ms
+   × history: 인증 이후 MFA 정책을 적용한다 118ms
+   × create: 인증 이후 회사 변경을 거부한다 109ms
+   × create: 인증 이후 MFA 정책을 적용한다 109ms
+   × update: 인증 이후 회사 변경을 거부한다 107ms
+   × update: 인증 이후 MFA 정책을 적용한다 149ms
+   × send: 인증 이후 회사 변경을 거부한다 176ms
+   × send: 인증 이후 MFA 정책을 적용한다 159ms
+   × create: 감사 저장 후 세션 만료 시 업무·감사·메일 작업을 롤백한다 170ms
+   × update: 감사 저장 후 세션 만료 시 업무·감사·메일 작업을 롤백한다 114ms
+   × send: 감사 저장 후 세션 만료 시 업무·감사·메일 작업을 롤백한다 114ms
+   × create: 성공 요청 재전송도 보관된 서비스에서 거부한다 129ms
+   × send: 성공 요청 재전송도 보관된 서비스에서 거부한다 125ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 17 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > list: 인증 이후 회사 변경을 거부한다
+AssertionError: promise resolved "{ items: [ { …(8) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "changeSummary": "안내",
++       "createdAt": 2026-10-04T06:39:39.928Z,
++       "email": "authority@example.test",
++       "id": "3ac0fc51-4676-4974-8b60-6abfa0d8dcf9",
++       "name": "권한 검증",
++       "serviceId": "ee2e453c-bd90-4039-b900-8e8c81719389",
++       "status": "active",
++       "version": 1,
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:61:42
+     59|     const other=await db.company.create({data:{name:"다른 회사",publicName…
+     60|     await db.session.update({where:{id:ctx.session.id},data:{activeCom…
+     61|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     62|   });
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > list: 인증 이후 MFA 정책을 적용한다
+AssertionError: promise resolved "{ items: [ { …(8) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "changeSummary": "안내",
++       "createdAt": 2026-10-04T06:39:40.097Z,
++       "email": "authority@example.test",
++       "id": "780ed506-e7be-4182-a5f9-5e09827e6aac",
++       "name": "권한 검증",
++       "serviceId": "8a1cd4cb-14be-427c-b5af-fa73654b0bcc",
++       "status": "active",
++       "version": 1,
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:65:42
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+     64|     await db.securityPolicy.create({data:{tenantId:ctx.tenantId,requir…
+     65|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     66|   });
+     67| }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > detail: 인증 이후 회사 변경을 거부한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "changeSummary": "안내",
++   "createdAt": 2026-10-04T06:39:40.310Z,
++   "email": "authority@example.test",
++   "id": "e3e7c631-e060-4bbf-a9d6-2435b3cf0948",
++   "name": "권한 검증",
++   "serviceId": "505a3fa9-edaf-43c4-bf2a-df7d09a6c6bc",
++   "status": "active",
++   "version": 1,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:61:42
+     59|     const other=await db.company.create({data:{name:"다른 회사",publicName…
+     60|     await db.session.update({where:{id:ctx.session.id},data:{activeCom…
+     61|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     62|   });
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > detail: 인증 이후 MFA 정책을 적용한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "changeSummary": "안내",
++   "createdAt": 2026-10-04T06:39:40.434Z,
++   "email": "authority@example.test",
++   "id": "666a8058-c819-426d-a847-7722325984c1",
++   "name": "권한 검증",
++   "serviceId": "59948def-7fa9-483b-a2de-3a768af5da4e",
++   "status": "active",
++   "version": 1,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:65:42
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+     64|     await db.securityPolicy.create({data:{tenantId:ctx.tenantId,requir…
+     65|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     66|   });
+     67| }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > history: 인증 이후 회사 변경을 거부한다
+AssertionError: promise resolved "{ items: [], total: +0, page: 1, …(1) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [],
++   "page": 1,
++   "pageSize": 20,
++   "total": 0,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:61:42
+     59|     const other=await db.company.create({data:{name:"다른 회사",publicName…
+     60|     await db.session.update({where:{id:ctx.session.id},data:{activeCom…
+     61|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     62|   });
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > history: 인증 이후 MFA 정책을 적용한다
+AssertionError: promise resolved "{ items: [], total: +0, page: 1, …(1) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [],
++   "page": 1,
++   "pageSize": 20,
++   "total": 0,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:65:42
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+     64|     await db.securityPolicy.create({data:{tenantId:ctx.tenantId,requir…
+     65|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     66|   });
+     67| }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > create: 인증 이후 회사 변경을 거부한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "changeSummary": "안내",
++   "createdAt": 2026-10-04T06:39:40.784Z,
++   "email": "new@example.test",
++   "id": "59ff3f62-6dc2-45d6-8884-44805406191b",
++   "name": "권한 검증",
++   "serviceId": "51f077af-a77f-4a6e-958d-4a905886abe1",
++   "status": "active",
++   "version": 1,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:61:42
+     59|     const other=await db.company.create({data:{name:"다른 회사",publicName…
+     60|     await db.session.update({where:{id:ctx.session.id},data:{activeCom…
+     61|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     62|   });
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > create: 인증 이후 MFA 정책을 적용한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "changeSummary": "안내",
++   "createdAt": 2026-10-04T06:39:40.894Z,
++   "email": "new@example.test",
++   "id": "3c8ed9a6-6b39-4493-b853-5284432cbc32",
++   "name": "권한 검증",
++   "serviceId": "e19e8509-ad26-4b93-84c2-a1a39f794a7a",
++   "status": "active",
++   "version": 1,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:65:42
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+     64|     await db.securityPolicy.create({data:{tenantId:ctx.tenantId,requir…
+     65|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     66|   });
+     67| }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > update: 인증 이후 회사 변경을 거부한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "changeSummary": "안내",
++   "createdAt": 2026-10-04T06:39:40.989Z,
++   "email": "authority@example.test",
++   "id": "a9fbd574-16a3-46ba-ab4c-edb0d4883694",
++   "name": "수정",
++   "serviceId": "8f12b570-3999-4c43-b935-ece63ee29b24",
++   "status": "active",
++   "version": 2,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:61:42
+     59|     const other=await db.company.create({data:{name:"다른 회사",publicName…
+     60|     await db.session.update({where:{id:ctx.session.id},data:{activeCom…
+     61|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     62|   });
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > update: 인증 이후 MFA 정책을 적용한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "changeSummary": "안내",
++   "createdAt": 2026-10-04T06:39:41.102Z,
++   "email": "authority@example.test",
++   "id": "4c7181e0-ba48-4a74-87a1-a664949e089a",
++   "name": "수정",
++   "serviceId": "508ee4c0-d0be-4b0f-8587-c9b22296e791",
++   "status": "active",
++   "version": 2,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:65:42
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+     64|     await db.securityPolicy.create({data:{tenantId:ctx.tenantId,requir…
+     65|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     66|   });
+     67| }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > send: 인증 이후 회사 변경을 거부한다
+AssertionError: promise resolved "{ …(7) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-04T06:39:41.321Z,
++   "email": "authority@example.test",
++   "id": "5f548727-d584-4ef0-ac8d-19b9d7bcf8ed",
++   "name": "권한 검증",
++   "status": "queued",
++   "subject": "검증",
++   "subprocessorId": "75a7a023-0716-4da6-8351-0ec2caf2bf31",
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:61:42
+     59|     const other=await db.company.create({data:{name:"다른 회사",publicName…
+     60|     await db.session.update({where:{id:ctx.session.id},data:{activeCom…
+     61|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     62|   });
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > send: 인증 이후 MFA 정책을 적용한다
+AssertionError: promise resolved "{ …(7) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-04T06:39:41.483Z,
++   "email": "authority@example.test",
++   "id": "ee4da04b-98f4-4e25-9393-e5cb27ea0590",
++   "name": "권한 검증",
++   "status": "queued",
++   "subject": "검증",
++   "subprocessorId": "055107eb-f51a-4572-a395-e8a1ab0f7437",
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:65:42
+     63|   test(`${operation}: 인증 이후 MFA 정책을 적용한다`,async()=>{
+     64|     await db.securityPolicy.create({data:{tenantId:ctx.tenantId,requir…
+     65|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     66|   });
+     67| }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > create: 감사 저장 후 세션 만료 시 업무·감사·메일 작업을 롤백한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "changeSummary": "안내",
++   "createdAt": 2026-10-04T06:39:41.644Z,
++   "email": "new@example.test",
++   "id": "41463eef-d73a-49c0-b0a9-1071bc562790",
++   "name": "권한 검증",
++   "serviceId": "ad505ac9-3b6a-4507-b058-b8b00a1d996c",
++   "status": "active",
++   "version": 1,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:73:42
+     71|     await db.session.update({where:{id:ctx.session.id},data:{expiresAt…
+     72|     vi.useFakeTimers({toFake:["Date"]}); clock.advance=true;
+     73|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     74|     expect(await counts()).toEqual(before);
+     75|     expect((await db.subprocessor.findUniqueOrThrow({where:{id:recipie…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > update: 감사 저장 후 세션 만료 시 업무·감사·메일 작업을 롤백한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "changeSummary": "안내",
++   "createdAt": 2026-10-04T06:39:41.755Z,
++   "email": "authority@example.test",
++   "id": "d57e19a4-f064-4140-a43c-74f7a4c29ae5",
++   "name": "수정",
++   "serviceId": "a110e96a-06ef-4f76-ade4-151f5bcf9a5c",
++   "status": "active",
++   "version": 2,
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:73:42
+     71|     await db.session.update({where:{id:ctx.session.id},data:{expiresAt…
+     72|     vi.useFakeTimers({toFake:["Date"]}); clock.advance=true;
+     73|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     74|     expect(await counts()).toEqual(before);
+     75|     expect((await db.subprocessor.findUniqueOrThrow({where:{id:recipie…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > send: 감사 저장 후 세션 만료 시 업무·감사·메일 작업을 롤백한다
+AssertionError: promise resolved "{ …(7) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-04T06:39:41.871Z,
++   "email": "authority@example.test",
++   "id": "ee3fe5ed-2015-4d9f-8211-f729a2b7db77",
++   "name": "권한 검증",
++   "status": "queued",
++   "subject": "검증",
++   "subprocessorId": "44d1281a-cd51-45ca-b47a-8d551df17e5a",
+  }
+
+ ❯ tests/server/subprocessor-authority.test.ts:73:42
+     71|     await db.session.update({where:{id:ctx.session.id},data:{expiresAt…
+     72|     vi.useFakeTimers({toFake:["Date"]}); clock.advance=true;
+     73|     await expect(operations[operation]()).rejects.toMatchObject({statu…
+       |                                          ^
+     74|     expect(await counts()).toEqual(before);
+     75|     expect((await db.subprocessor.findUniqueOrThrow({where:{id:recipie…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/17]⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > create: 성공 요청 재전송도 보관된 서비스에서 거부한다
+ FAIL  tests/server/subprocessor-authority.test.ts > send: 성공 요청 재전송도 보관된 서비스에서 거부한다
+AssertionError: expected 201 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 201
+
+ ❯ tests/server/subprocessor-authority.test.ts:90:27
+     88|     await db.service.update({where:{id:serviceId},data:{status:"archiv…
+     89|     const result=await handler(req());
+     90|     expect(result.status).toBe(409); expect((await result.json()).erro…
+       |                           ^
+     91|     expect(await counts()).toEqual(before);
+     92|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/17]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  17 failed (17)
+   Start at  15:39:38
+   Duration  4.08s (tests 75%, import 16%, transform 8%)
+

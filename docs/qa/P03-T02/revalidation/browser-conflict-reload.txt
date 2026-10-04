@@ -1,0 +1,126 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 미완료 기능 검증"(45): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button "메뉴 열기" [ref=338, loc=css:button[aria-label="메뉴 열기"]]
+        text "☰"
+      container
+        anchor "공지사항" [ref=339, loc=css:a[aria-label="공지사항"], url=http://localhost:3103/notice]
+          image
+        button "문의" [ref=340, loc=css:button[aria-label="문의"]]
+          image
+        anchor "알림" [ref=341, loc=css:a[aria-label="알림"], url=http://localhost:3103/integration/message]
+          image
+        button [ref=342]
+          image
+          text "MY"
+    container
+      container
+        heading
+          text "구성원 관리"
+        button [ref=343]
+          text "구성원 초대"
+      container
+        container
+          button [ref=344]
+            text "구성원"
+          button [ref=345]
+            text "초대 이력"
+        paragraph
+          text "역할과 서비스 범위로 접근 권한을 설정합니다. 자신의 권한 변경과 마지막 소유자 제외는 제한됩니다."
+        form
+          textbox "구성원 검색" [ref=346, loc=css:input[placeholder="이름 또는 이메일"]]
+            text "이름 또는 이메일"
+          combobox "구성원 상태" [ref=347, loc=css:select[aria-label="구성원 상태"]]
+            text "전체"
+          button [ref=348]
+            text "검색"
+        container [ref=349]
+          table
+            table_row
+              table_cell
+                text "역할"
+              table_cell
+                text "서비스"
+              table_cell
+                text "상태"
+              table_cell
+                text "관리"
+            table_row
+              table_cell
+                text "소유자"
+              table_cell
+                text "전체 서비스"
+              table_cell
+                text "활성"
+              table_cell
+            table_row
+              table_cell
+                text "조회자"
+              table_cell
+                text "재검증 서비스 A"
+              table_cell
+                text "활성"
+              table_cell
+                button [ref=350]
+                  text "권한 수정"
+                button [ref=351]
+                  text "제외"
+                button [ref=352]
+                  text "소유권 이전"
+        container
+          container
+            text "총"
+            text "2"
+            text "개"
+          combobox "페이지당 행 수" [ref=353]
+            text "20"
+          container
+            button "이전 페이지" [ref=354]
+              text "‹"
+            container
+              text "1"
+              text "/"
+              text "1"
+            button "다음 페이지" [ref=355]
+              text "›"
+      container
+        heading
+          text "서비스 접근 요청"
+        paragraph
+          text "승인하면 해당 구성원의 현재 역할 권한으로 요청한 서비스 접근이 부여됩니다."
+      dialog "구성원 권한 수정"
+        container
+          heading
+            text "구성원 권한 수정"
+          button "닫기" [ref=356, loc=css:button[aria-label="닫기"]]
+            text "×"
+        form
+          paragraph
+            text "재검증 member"
+            text "recovery-member-6d8eed27@example.test"
+          container
+            text "역할"
+            combobox [ref=357]
+              text "조회자"
+          container
+            text "상태"
+            combobox [ref=358]
+              text "활성"
+          group [ref=359]
+            text "사용할 서비스"
+            container
+              checkbox [ref=360]
+              text "재검증 서비스 A"
+            container
+              checkbox [ref=361]
+              text "재검증 서비스 B"
+          alert
+            text "구성원 정보가 변경되었습니다. 다시 불러와주세요."
+          container
+            paragraph
+              text "다른 곳에서 변경한 정보를 불러오면 아직 저장하지 않은 입력이 최신 정보로 바뀝니다."
+            button [ref=363]
+              text "최신 정보 다시 불러오기"
+          button [ref=362]
+            text "변경 저장"

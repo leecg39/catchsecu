@@ -10,7 +10,7 @@ type ResetLookup = (token: string) => Promise<string | null>;
 class CredentialRollback { constructor(public response: Response) {} }
 
 export function guardCredentialRequests(handler: (request: Request) => Promise<Response>, userFromSession: SessionLookup, userFromReset: ResetLookup) {
-  const guarded = route(async request => {
+  const guarded = route(async (request, requestId) => {
     const path = new URL(request.url).pathname, reset = path.endsWith("/reset-password");
     const input = reset ? await body(request, passwordResetInput) : await body(request, passwordChangeInput);
     const token = reset ? ("token" in input && input.token) || new URL(request.url).searchParams.get("token") : null;
@@ -29,12 +29,13 @@ export function guardCredentialRequests(handler: (request: Request) => Promise<R
     try {
       return await db.$transaction(async tx => {
         await tx.$executeRaw`SET LOCAL lock_timeout = '5s'`;
+        await tx.$queryRaw`SELECT set_config('app.auth_request_id', ${requestId}, true)`;
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${"password:" + userId}, 0))`;
         await tx.$queryRaw`SELECT c.id FROM "Company" c JOIN "Membership" m ON m."tenantId" = c.id
           WHERE m."userId" = ${userId} AND m.status = 'active' AND c.status = 'active' ORDER BY c.id FOR SHARE OF c`;
         // The auth adapter and hooks use the scoped transaction through db.ts.
         // Failed responses must roll back token consumption as well as credentials.
-        return credentialScope.run({ userId, client: tx }, async () => {
+        return credentialScope.run({ userId, requestId, client: tx }, async () => {
           const response = await handler(forwarded);
           if (!response.ok) throw new CredentialRollback(response);
           return response;

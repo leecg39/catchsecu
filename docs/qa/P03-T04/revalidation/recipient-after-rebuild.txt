@@ -1,0 +1,107 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 미완료 기능 검증"(45): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button "메뉴 열기" [ref=1413, loc=css:button[aria-label="메뉴 열기"]]
+        text "☰"
+      container
+        anchor "공지사항" [ref=1414, loc=css:a[aria-label="공지사항"], url=http://localhost:3109/notice]
+          image
+        button "문의" [ref=1415, loc=css:button[aria-label="문의"]]
+          image
+        anchor "알림" [ref=1416, loc=css:a[aria-label="알림"], url=http://localhost:3109/integration/message]
+          image
+        button [ref=1417]
+          image
+          text "MY"
+    container
+      container
+        heading
+          text "재위탁 안내 메일 발송"
+        button [ref=1418]
+          text "메일 발송 이력"
+      container
+        text "서비스"
+        combobox "재위탁 서비스" [ref=1419, loc=css:select[aria-label="재위탁 서비스"]]
+          text "재검증 서비스 A"
+      paragraph
+        text "수신자 목록에서 안내를 받을 담당자를 선택하세요. 같은 수신자에게 같은 제목과 본문은 한 번만 기록됩니다."
+      container
+        heading
+          text "수신자 관리"
+        form
+          container
+            text "이름 검색"
+            textbox "수신자 이름 검색" [ref=1420, loc=css:input[aria-label="수신자 이름 검색"]]
+              text "관리 검증"
+          button [ref=1421]
+            text "검색"
+          button [ref=1422]
+            text "검색 초기화"
+          button [ref=1423]
+            text "수신자 등록"
+          button [ref=1424]
+            text "수신자 새로고침"
+        paragraph
+          text "전체"
+          text "1"
+          text "명 · 보관된 수신자는 복원 후 선택할 수 있습니다."
+        container [ref=1425]
+          table
+            table_row
+              table_cell
+                text "#"
+              table_cell
+                text "이름"
+              table_cell
+                text "이메일"
+              table_cell
+                text "변경 내용"
+              table_cell
+                text "상태"
+              table_cell
+                text "관리"
+            table_row
+              table_cell
+                text "1"
+              table_cell
+                text "관리 검증 6d8eed27"
+              table_cell
+                text "recipient-confirmed-6d8eed27@example.test"
+              table_cell
+                text "충돌 복구 완료"
+              table_cell
+                text "활성"
+              table_cell
+                button "관리 검증 6d8eed27 수신자 선택" [ref=1426, loc=css:button[aria-label="관리 검증 6d8eed27 수신자 선택"]]
+                  text "선택"
+                button "관리 검증 6d8eed27 수정" [ref=1427, loc=css:button[aria-label="관리 검증 6d8eed27 수정"]]
+                  text "수정"
+        container "재위탁 수신자 페이지"
+          combobox "수신자 페이지당 행 수" [ref=1428, loc=css:select[aria-label="수신자 페이지당 행 수"]]
+            text "10"
+          container
+            button "수신자 이전 페이지" [ref=1429, loc=css:button[aria-label="수신자 이전 페이지"]]
+              text "‹"
+            container
+              text "1"
+              text "/"
+              text "1"
+            button "수신자 다음 페이지" [ref=1430, loc=css:button[aria-label="수신자 다음 페이지"]]
+              text "›"
+      container
+        heading
+          text "안내 메일"
+        paragraph
+          text "수신자 목록의 선택 버튼을 눌러주세요."
+        form
+          group [ref=1431]
+            container
+              text "제목"
+              textbox "재위탁 안내 제목" [ref=1432, loc=css:input[aria-label="재위탁 안내 제목"]]
+            container
+              text "본문"
+              textbox "재위탁 안내 본문" [ref=1433, loc=css:textarea[aria-label="재위탁 안내 본문"]]
+          button [ref=1434]
+            text "메일 발송"
+  alert

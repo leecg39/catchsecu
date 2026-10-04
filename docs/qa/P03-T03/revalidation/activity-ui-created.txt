@@ -1,0 +1,223 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 미완료 기능 검증"(45): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=1641]
+        container
+          text "서비스명"
+          text "재검증 서비스 A"
+        container
+          text "외부 ⓘ"
+          text "재검증 서비스 A"
+          image
+      container
+        anchor [ref=1642, loc=href:/dashboard, url=http://localhost:3115/dashboard]
+          image
+          text "대시보드"
+        button [ref=1643]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=1644]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=1645]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=1646]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=1647]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=1648]
+          image
+          text "관리"
+          text "⌄"
+        container
+          button [ref=1649]
+            image
+            text "개인정보 모니터링"
+            text "⌃"
+          container
+            anchor [ref=1650, loc=href:/log/info-monitoring, url=http://localhost:3115/log/info-monitoring]
+              text "개인정보 처리로그"
+            anchor [ref=1651, loc=href:/log/ad-monitoring, url=http://localhost:3115/log/ad-monitoring]
+              text "광고성 정보 수신동의 처리로그"
+            anchor [ref=1652, loc=href:/log/service, url=http://localhost:3115/log/service]
+              text "서비스 이용로그"
+            anchor [ref=1653, loc=href:/log/member, url=http://localhost:3115/log/member]
+              text "구성원 로그"
+            anchor [ref=1654, loc=href:/log/external-viewer, url=http://localhost:3115/log/external-viewer]
+              text "외부 열람자 로그"
+            anchor [ref=1655, loc=href:/log/month-monitoring, url=http://localhost:3115/log/month-monitoring]
+              text "마감 데이터 조회"
+            anchor [ref=1656, loc=href:/log/mail, url=http://localhost:3115/log/mail]
+              text "이메일 발송현황"
+            anchor [ref=1657, loc=href:/log/destruction-schedule, url=http://localhost:3115/log/destruction-schedule]
+              text "파기 일정"
+            anchor [ref=1658, loc=href:/log/destruction_certificate, url=http://localhost:3115/log/destruction_certificate]
+              text "파기 증명서"
+        button [ref=1659]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=1660, loc=href:/shared-privacy/view, url=http://localhost:3115/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=1661, url=http://localhost:3115/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=1662, loc=href:/help-center, url=http://localhost:3115/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          button [ref=1663]
+            text "홈페이지"
+          button [ref=1664]
+            text "개인정보"
+            text "처리방침"
+          button [ref=1665]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          text "재검증 회사 6d8eed27"
+        container
+          button [ref=1666]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=1667, loc=css:a[aria-label="공지사항"], url=http://localhost:3115/notice]
+            image
+          button "문의" [ref=1668, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=1669, loc=css:a[aria-label="알림"], url=http://localhost:3115/integration/message]
+            image
+          button [ref=1670]
+            image
+            text "MY"
+      container
+        heading
+          text "개인정보 처리로그"
+        container
+          container
+            container
+              container
+                text "시작일"
+                textbox [ref=1671]
+                  spinbutton "연도" [ref=1672]
+                    text "연도"
+                  text "."
+                  spinbutton "월" [ref=1673]
+                    text "월"
+                  text "."
+                  spinbutton "일" [ref=1674]
+                    text "일"
+                  text "."
+              container
+                text "종료일"
+                textbox [ref=1675]
+                  spinbutton "연도" [ref=1676]
+                    text "연도"
+                  text "."
+                  spinbutton "월" [ref=1677]
+                    text "월"
+                  text "."
+                  spinbutton "일" [ref=1678]
+                    text "일"
+                  text "."
+              combobox "서비스" [ref=1679, loc=css:select[aria-label="서비스"]]
+                text "전체 서비스"
+            container
+              combobox "검색 조건" [ref=1680, loc=css:select[aria-label="검색 조건"]]
+                text "처리내용"
+              textbox "검색어" [ref=1681, loc=css:input[aria-label="검색어"]]
+              button [ref=1682]
+                text "검색 조건 초기화"
+              button [ref=1683]
+                text "검색"
+          container
+            container
+              text "전체"
+              text "1"
+              text "개"
+            button [ref=1684]
+              text "새로고침"
+            button [ref=1685]
+              text "CSV 내려받기"
+          table
+            table_row
+              table_cell
+                text "#"
+              table_cell
+                text "서비스명"
+              table_cell
+                text "캐치폼·개인정보 업로드명"
+              table_cell
+                text "처리자명"
+              table_cell
+                text "처리일시"
+              table_cell
+                text "접속 IP"
+              table_cell
+                text "고객번호"
+              table_cell
+                text "처리내용"
+              table_cell
+                text "사유"
+              table_cell
+                text "검토"
+            table_row
+              table_cell
+                text "1"
+              table_cell
+                text "재검증 서비스 A"
+              table_cell
+                text "-"
+              table_cell
+                text "재검증 member"
+              table_cell
+                text "2026. 10. 4. 오후 3:55:15"
+              table_cell
+                text "-"
+              table_cell
+                text "-"
+              table_cell
+                text "submission.read"
+              table_cell
+                text "-"
+              table_cell
+                button "활동 1 검토 요청" [ref=1686, loc=css:button[aria-label="활동 1 검토 요청"]]
+                  text "검토 요청"
+          container "로그 페이지"
+            combobox "페이지당 행 수" [ref=1687, loc=css:select[aria-label="페이지당 행 수"]]
+              text "10"
+            container
+              button "이전 페이지" [ref=1688, loc=css:button[aria-label="이전 페이지"]]
+                text "‹"
+              container
+                text "1"
+                text "/"
+                text "1"
+              button "다음 페이지" [ref=1689, loc=css:button[aria-label="다음 페이지"]]
+                text "›"
+          paragraph
+            text "감사 원장에 저장되지 않은 접속 IP·고객번호·사유는 표시하지 않습니다."
+        dialog "개인정보 활동 검토 요청"
+          container
+            heading
+              text "개인정보 활동 검토 요청"
+            button "닫기" [ref=1690, loc=css:button[aria-label="닫기"]]
+              text "×"
+          container
+            status
+              text "검토 요청을 등록했습니다. 대상자는 마이페이지에서 확인하고 답변할 수 있습니다."
+            anchor [ref=1696, loc=href:/my-page/info-activity-log?reviewId=1830f7be-0c6b-44b4-a1f3-09e23ded3b12, url=http://localhost:3115/my-page/info-activity-log?reviewId=1830f7be-0c6b-44b4-a1f3-09e23ded3b12]
+              text "검토 이력 열기"

@@ -1,0 +1,55 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:57531) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/compliance-lifecycle.test.ts (3 tests | 2 failed | 1 skipped) 768ms
+   × 월마감 조회는 월·서비스의 중복 필터를 거절하며 조회 감사를 남기지 않는다 74ms
+   × 출력 목록은 마감 ID·페이지의 중복 필터를 거절한다 88ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/compliance-lifecycle.test.ts > 월마감 조회는 월·서비스의 중복 필터를 거절하며 조회 감사를 남기지 않는다
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/compliance-lifecycle.test.ts:107:29
+    105|   for (const query of [`month=${month}&month=${month}`, `month=${month…
+    106|     const response = await readClose(req(`/analytics/closes?${query}`)…
+    107|     expect(response.status).toBe(422);
+       |                             ^
+    108|     expect((await response.json()).error.code).toBe("DUPLICATE_QUERY");
+    109|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/compliance-lifecycle.test.ts > 출력 목록은 마감 ID·페이지의 중복 필터를 거절한다
+AssertionError: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ tests/server/compliance-lifecycle.test.ts:117:29
+    115|   for (const query of [`closeId=${close.close.id}&closeId=${close.clos…
+    116|     const response = await readExports(req(`/analytics/exports?${query…
+    117|     expect(response.status).toBe(422);
+       |                             ^
+    118|     expect((await response.json()).error.code).toBe("DUPLICATE_QUERY");
+    119|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 skipped (3)
+   Start at  17:16:36
+   Duration  2.08s (tests 38%, import 35%, transform 26%)
+

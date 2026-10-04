@@ -1,0 +1,58 @@
+{
+  "taskSpace": 45,
+  "page": "p1",
+  "serverPid": 82181,
+  "build": "v28",
+  "cases": [
+    {
+      "phase": "login",
+      "path": "/api/v1/auth/sign-in/email",
+      "status": 200,
+      "requestId": "7af984ef-a950-440b-aad5-d93a68140b7c"
+    },
+    {
+      "phase": "setup",
+      "path": "/api/v1/auth/two-factor/enable",
+      "status": 200,
+      "requestId": "1b9ed449-77f6-4597-abae-baeeef9997ba"
+    },
+    {
+      "phase": "confirm",
+      "path": "/api/v1/auth/two-factor/verify-totp",
+      "status": 200,
+      "requestId": "dc3258d7-ba2d-49ff-a83d-a95db4ca62b7"
+    },
+    {
+      "phase": "logout-enrolled",
+      "path": "/api/v1/auth/sign-out",
+      "status": 200,
+      "requestId": "dc4f131c-a4d5-42b0-82f6-001808dce9cc"
+    },
+    {
+      "phase": "mfa-login",
+      "path": "/api/v1/auth/sign-in/email",
+      "status": 200,
+      "requestId": "afbbcea5-cd15-48f6-aeac-fdf47be0da52"
+    },
+    {
+      "phase": "backup-login",
+      "path": "/api/v1/auth/two-factor/verify-backup-code",
+      "status": 200,
+      "requestId": "65f7ad70-10ab-4d16-a7af-03dd80a86565"
+    },
+    {
+      "phase": "disable",
+      "path": "/api/v1/auth/two-factor/disable",
+      "status": 200,
+      "requestId": "1a81dbc9-3afc-42f5-b005-4cc67c445ec4"
+    },
+    {
+      "phase": "logout",
+      "path": "/api/v1/auth/sign-out",
+      "status": 200,
+      "requestId": "3be54658-e1ac-4831-998c-994aa84d3e70"
+    }
+  ],
+  "actualUiFlow": true,
+  "setupSecretsNeverSavedInPublicEvidence": true
+}

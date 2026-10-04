@@ -1,0 +1,139 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:45349) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/compliance-exports.test.ts (31 tests | 1 failed) 6842ms
+   × PDF는 한글·미판정·고정 합계와 원천 해시를 포함하며 활성 콘텐츠가 없다 539ms
+(node:45452) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/compliance-evidence.test.ts (11 tests | 4 failed) 2489ms
+   × 선택 서비스의 활성 목적과 유효 게시만 집계하며 중복 게시로 서비스 수를 늘리지 않는다 128ms
+   × 기한 경계·보존 조치·파기 중·파기 완료를 구분하며 타 서비스 응답을 제외한다 175ms
+   × 마감 후 원천 변경은 기존 근거·CSV·해시를 바꾸지 않고 다른 월의 새 점검에 반영한다 161ms
+   × 비동기 PDF와 CSV는 같은 저장 근거·상태를 사용하고 원천 변경을 반영하지 않는다 115ms
+(node:45488) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:45528) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/compliance-evidence.test.ts > 선택 서비스의 활성 목적과 유효 게시만 집계하며 중복 게시로 서비스 수를 늘리지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.processingPurpose.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/compliance-evidence.test.ts:41:31
+
+  38 afterAll(async () => { await db.$disconnect(); });
+  39 const close = async (id: string | undefined = serviceId, value = month) => (await closeComplianceMonth(ctx, { month: value, serviceId: id }, randomUUID())).close;
+  40 async function purpose(id = serviceId) {
+→ 41   return db.processingPurpose.create(
+Database error. Code: `23514`. Message: `new row for relation "ProcessingPurpose" violates check constraint "ProcessingPurpose_items_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/compliance-evidence.test.ts:58:3
+     56| });
+     57| test("선택 서비스의 활성 목적과 유효 게시만 집계하며 중복 게시로 서비스 수를 늘리지 않는다", async () => {
+     58|   await purpose(); await purpose(); await purpose(otherId);
+       |   ^
+     59|   const archived = await purpose(); await db.processingPurpose.update(…
+     60|   await publication(); await publication(); await publication(new Date…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/server/compliance-evidence.test.ts > 기한 경계·보존 조치·파기 중·파기 완료를 구분하며 타 서비스 응답을 제외한다
+PrismaClientKnownRequestError: 
+Invalid `db.submission.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/compliance-evidence.test.ts:74:27
+
+  71 const version = await db.formVersion.create({ data: { tenantId: ctx.tenantId, formId: form.id, number: 1, title: "응답" } });
+  72 for (const [offset, hold, status] of [[0, false, "submitted"], [-1, true, "submitted"], [1, false, "submitted"], [-1, false, "destroying"], [-1, false, "destroyed"]] as const) {
+  73   const at = new Date(now.getTime() + offset);
+→ 74   await db.submission.create(
+Database error. Code: `23514`. Message: `new row for relation "Submission" violates check constraint "Submission_source_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/compliance-evidence.test.ts:74:7
+     72|     for (const [offset, hold, status] of [[0, false, "submitted"], [-1…
+     73|       const at = new Date(now.getTime() + offset);
+     74|       await db.submission.create({ data: { tenantId: ctx.tenantId, for…
+       |       ^
+     75|     }
+     76|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/server/compliance-evidence.test.ts > 마감 후 원천 변경은 기존 근거·CSV·해시를 바꾸지 않고 다른 월의 새 점검에 반영한다
+PrismaClientKnownRequestError: 
+Invalid `db.processingPurpose.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/compliance-evidence.test.ts:41:31
+
+  38 afterAll(async () => { await db.$disconnect(); });
+  39 const close = async (id: string | undefined = serviceId, value = month) => (await closeComplianceMonth(ctx, { month: value, serviceId: id }, randomUUID())).close;
+  40 async function purpose(id = serviceId) {
+→ 41   return db.processingPurpose.create(
+Database error. Code: `23514`. Message: `new row for relation "ProcessingPurpose" violates check constraint "ProcessingPurpose_items_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/compliance-evidence.test.ts:94:3
+     92| test("마감 후 원천 변경은 기존 근거·CSV·해시를 바꾸지 않고 다른 월의 새 점검에 반영한다", async () => {
+     93|   const first = await close(), csv = await complianceCloseCsv(ctx, fir…
+     94|   await purpose(); await publication();
+       |   ^
+     95|   expect((await close()).evidence).toEqual(first.evidence);
+     96|   expect((await readComplianceClose(ctx, { month, serviceId })).close?…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/server/compliance-evidence.test.ts > 비동기 PDF와 CSV는 같은 저장 근거·상태를 사용하고 원천 변경을 반영하지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.processingPurpose.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/compliance-evidence.test.ts:41:31
+
+  38 afterAll(async () => { await db.$disconnect(); });
+  39 const close = async (id: string | undefined = serviceId, value = month) => (await closeComplianceMonth(ctx, { month: value, serviceId: id }, randomUUID())).close;
+  40 async function purpose(id = serviceId) {
+→ 41   return db.processingPurpose.create(
+Database error. Code: `23514`. Message: `new row for relation "ProcessingPurpose" violates check constraint "ProcessingPurpose_items_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/compliance-evidence.test.ts:126:32
+    124| });
+    125| test("비동기 PDF와 CSV는 같은 저장 근거·상태를 사용하고 원천 변경을 반영하지 않는다", async () => {
+    126|   const saved = await close(); await purpose();
+       |                                ^
+    127|   for (const format of ["pdf", "csv"] as const) {
+    128|     const job = await createComplianceExport(ctx, { closeId: saved.id,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/server/compliance-exports.test.ts > PDF는 한글·미판정·고정 합계와 원천 해시를 포함하며 활성 콘텐츠가 없다
+AssertionError: expected '월마감 집계 · 미판정 v1 | 2026-10-04T07:55:35…' to contain 'a574632c976f8654f365602bb0de86a0c774d…'
+
+Expected: "a574632c976f8654f365602bb0de86a0c774d33b8ceb2ed7de5ed0daaac53ff7"
+Received: "월마감 집계 · 미판정 v1 | 2026-10-04T07:55:35.297Z  개인정보 월마감 집계 2026-09 판정: 미판정 (법적 준수 통과를 의미하지 않습니다.) 범위: 선택 서비스 집계 저장 시각: 2026-10-04T07:55:35.297Z 접수·파기 기간: 2026-08-31T15:00:00.000Z 이상 2026-09-30T15:00:00.000Z 미만 서비스 1개 / 폼 0개 / 동의서 0개 / 처리방침 0개 보유 응답 0건 / 기간 접수 0건 / 기간 파기 0건 보유·문서 건수는 마감 저장 당시의 현황이며 과거 월말 상태를 복원한 값이 아닙니다. 서비스별 집계 A 보유 0건 / 기간 접수 0건 저장된 점검 근거 점검 시각: 2026-10-04T07:55:35.297Z 근거 해시: 02aa6e4ac517a1a2efa11e75605d5862c0671b3410504b4f7fc4ac9d03d4fcdb 조건 확인은 법적 준수 판정이 아닙니다. 점검은 마감 저장 당시의 데이터이며 과거 월말 복원이 아닙니다. 수집 · 처리 목적 등록 · 검토 필요 선택 서비스 1개 중 활성 처리 목적이 등록된 서비스 0개, 활성 목적 0개. 목적·법적 근거의 적정성은 별도 검토 가 필요합니다. 원천: ProcessingPurpose · status=active 이용 · 처리방침 게시 기록 · 검토 필요 선택 서비스 1개 중 유효한 내부 처리방침 게시가 있는 서비스 0개, 게시 0개. 외부 게시와 본문 적정성은 확인하 지 않습니다. 원천: DocumentPublication · 활성·미회수·미만료, 비보관 privacy_policy 파기 · 보유 기한 경과 응답 · 대상 없음  v1 | 1 / 2"
+
+ ❯ tests/server/compliance-exports.test.ts:89:99
+     87|     const page = await pdf.getPage(1), content = await page.getTextCon…
+     88|     const text = content.items.map(item => "str" in item ? item.str : …
+     89|     expect(text.replace(/\s/g," ")).toContain("미판정"); expect(text).toC…
+       |                                                                                                   ^
+     90|     expect(text).toContain("보유 0건"); expect(await pdf.getJSActions()).…
+     91|     expect(pdf.numPages).toBe(row.pageCount);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  5 failed | 70 passed (75)
+   Start at  16:55:32
+   Duration  20.16s (tests 82%, import 15%, transform 2%)
+

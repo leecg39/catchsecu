@@ -14,6 +14,7 @@ import { readCampaignAttachments, markCampaignFilesForDeletion } from "./campaig
 import { finishFileDeletion } from "./files";
 import { deliverMail, type MailAttachment, type ClaimedJob } from "./jobs";
 import { deliverSms, smsReceiptFile } from "./sms-adapter";
+import { audit } from "./audit";
 
 const jobPayload = z.object({ campaignId: z.uuid(), deliveryId: z.uuid(), attempt: z.number().int().positive(), transport: z.enum(["local", "smtp", "sms-local"]) }).strict();
 type Payload = z.infer<typeof jobPayload>;
@@ -50,6 +51,13 @@ async function finish(tx: Transaction, job: ClaimedJob, campaign: Campaign, reci
   await tx.job.update({ where: { id: job.id }, data: { status: ["local_delivered", "accepted"].includes(status) ? "done" : status === "cancelled" ? "cancelled" : "dead",
     lastError: reason, completedAt: new Date(), leaseOwner: null, leaseUntil: null } });
   await settleCampaign(tx, campaign);
+  await deliveryAudit(tx, job, recipient, status);
+}
+async function deliveryAudit(tx: Transaction, job: ClaimedJob, recipient: CampaignDelivery, status: string) {
+  await audit(tx, { tenantId: recipient.tenantId, user: { id: null } }, job.id,
+    "campaign.delivery_" + status, "campaignDelivery", recipient.id, ["status"], recipient.serviceId);
+  if (status !== "sending") await tx.jobAttempt.updateMany({ where: { jobId: job.id, attempt: job.attempts, outcome: "leased" },
+    data: { outcome: status === "local_delivered" || status === "accepted" ? "delivered" : status === "cancelled" ? "suppressed" : status === "queued" ? "retry" : "dead", finishedAt: new Date() } });
 }
 async function localReceipt(jobId: string) {
   try { return (await stat(resolve(env.LOCAL_MAIL_DIR, jobId + ".json"))).mtime; }
@@ -72,6 +80,7 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
     }
     if (reason) { await finish(tx, job, campaign, recipient, "cancelled", reason); return false; }
     await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "sending", reason: null } });
+    await deliveryAudit(tx, job, recipient, "sending");
     await settleCampaign(tx, campaign); return true;
   }, { timeout: 45000 });
   if (!prepared) return;
@@ -86,7 +95,8 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
         if (error instanceof HttpError && error.status === 422) { await finish(tx, job, campaign, recipient, "failed", error.code); return; }
         if (job.attempts >= job.maxAttempts) { await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
         await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "queued", reason: "DELIVERY_FAILED" } });
-        await tx.job.update({ where: { id: job.id }, data: { status: "retry", dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } }); return;
+        await tx.job.update({ where: { id: job.id }, data: { status: "retry", dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } });
+        await deliveryAudit(tx, job, recipient, "queued"); return;
       }
       await finish(tx, job, campaign, recipient, "local_delivered", null, new Date()); return;
     }
@@ -99,7 +109,8 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
       if (payload.transport === "smtp") { await finish(tx, job, campaign, recipient, "unknown", "DELIVERY_UNCERTAIN"); return; }
       if (job.attempts >= job.maxAttempts) { await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
       await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "queued", reason: "DELIVERY_FAILED" } });
-      await tx.job.update({ where: { id: job.id }, data: { status: "retry", dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } }); return;
+      await tx.job.update({ where: { id: job.id }, data: { status: "retry", dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } });
+      await deliveryAudit(tx, job, recipient, "queued"); return;
     }
     // Keep DB failure outside the transport catch: a successful external send must remain uncertain after rollback.
     await finish(tx, job, campaign, recipient, status, null, new Date());

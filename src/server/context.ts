@@ -3,6 +3,7 @@ import { assertCompanyIp } from "./ip-enforcement";
 import { mfaState } from "./mfa-enforcement";
 import { passwordState } from "./password-policy";
 import { auth } from "./auth";
+import { expireAuthSession } from "./auth-mutations";
 import { APIError } from "better-auth/api";
 import { db } from "./db";
 import { fail, rateLimit } from "./http";
@@ -38,8 +39,8 @@ export async function requireContext(headers: Headers, capability?: Capability, 
   const clientIp = trustedClientIp(headers);
   await assertCompanyIp(member.tenantId, clientIp);
   const policy = member.tenant.policy;
-  if (policy && Date.now() - new Date(actor.session.updatedAt).getTime() > policy.sessionMinutes * 60000) {
-    await db.session.deleteMany({ where: { id: actor.session.id } });
+  if (policy && Date.now() - new Date(actor.session.updatedAt).getTime() > policy.sessionMinutes * 60000
+    && await expireAuthSession(actor.session.id, policy.sessionMinutes)) {
     fail(401, "SESSION_EXPIRED", "세션이 만료되었습니다. 다시 로그인해주세요.");
   }
   const mfa = await mfaState(member.tenantId, member.id, actor.user.twoFactorEnabled, !!policy?.requireMfa);

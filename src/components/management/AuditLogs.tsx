@@ -1,5 +1,6 @@
 "use client";
 
+import { ActivityReviewRequest } from "./ActivityReviews";
 import { useState } from "react";
 import { useResource } from "@/lib/api";
 import type { AuditEventKind, AuditEventList, AuditEventRecord } from "@/contracts/audit-events";
@@ -51,6 +52,8 @@ export function AuditLogs({ path }: { path: string }) {
   const [applied, setApplied] = useState(blank);
   const [page, setPage] = useState(1), [pageSize, setPageSize] = useState(10), [error, setError] = useState("");
   const [exporting, setExporting] = useState(false);
+  const [reviewEvent, setReviewEvent] = useState<AuditEventRecord | null>(null);
+  const canReview = config.kind === "info" && ["security.write", "audit.read"].every(c => context.data?.capabilities.includes(c));
   const params = new URLSearchParams({ scope: config.scope ?? "company", kind: config.kind,
     page: String(page), pageSize: String(pageSize) });
   if (applied.start) params.set("from", iso(applied.start, false));
@@ -60,6 +63,7 @@ export function AuditLogs({ path }: { path: string }) {
   const auditPath = config.scope === "mine" ? "/me/audit-events" : "/audit-events";
   const result = useResource<AuditEventList>(auditPath + "?" + params.toString());
   const companyWide = ["owner", "admin", "security", "auditor"].includes(context.data?.company?.role ?? "");
+  const currentPage = result.data?.page ?? page;
   const pages = Math.max(1, Math.ceil((result.data?.total ?? 0) / pageSize));
   function search() {
     if (draft.start && draft.end && draft.start > draft.end) { setError("종료일은 시작일 이후로 선택해주세요."); return; }
@@ -119,17 +123,18 @@ export function AuditLogs({ path }: { path: string }) {
     {result.loading && <p role="status">실제 감사 기록을 불러오는 중입니다.</p>}
     {result.error && <p role="alert">{result.error.message}</p>}
     {result.data && <><div className="cs-table-wrap"><table className="cs-table"><thead><tr>
-      {config.columns.map((column, index) => <th key={index}>{column}</th>)}</tr></thead><tbody>
+      {config.columns.map((column, index) => <th key={index}>{column}</th>)}{canReview && <th>검토</th>}</tr></thead><tbody>
       {result.data.items.length ? result.data.items.map((item, index) => <tr key={item.id}>
-        {config.columns.map((column, columnIndex) => <td key={columnIndex}>{cell(column, item, (page - 1) * pageSize + index + 1)}</td>)}
-      </tr>) : <tr><td colSpan={config.columns.length}><EmptyState text="조회된 감사 기록이 없습니다." /></td></tr>}
+        {config.columns.map((column, columnIndex) => <td key={columnIndex}>{cell(column, item, (currentPage - 1) * pageSize + index + 1)}</td>)}
+        {canReview && <td><button className="cs-link" aria-label={"활동 " + ((currentPage - 1) * pageSize + index + 1) + " 검토 요청"} onClick={() => setReviewEvent(item)}>검토 요청</button></td>}
+      </tr>) : <tr><td colSpan={config.columns.length + (canReview ? 1 : 0)}><EmptyState text="조회된 감사 기록이 없습니다." /></td></tr>}
     </tbody></table></div><nav className="cs-pagination" aria-label="로그 페이지">
       <select aria-label="페이지당 행 수" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>
         {[10, 20, 50, 100].map(size => <option key={size}>{size}</option>)}
-      </select><div><button disabled={page <= 1} onClick={() => setPage(page - 1)} aria-label="이전 페이지">‹</button>
-        <span>{page} / {pages}</span>
-        <button disabled={page >= pages} onClick={() => setPage(page + 1)} aria-label="다음 페이지">›</button></div>
+      </select><div><button disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)} aria-label="이전 페이지">‹</button>
+        <span>{currentPage} / {pages}</span>
+        <button disabled={currentPage >= pages} onClick={() => setPage(currentPage + 1)} aria-label="다음 페이지">›</button></div>
     </nav></>}
     <p className="mg-description">감사 원장에 저장되지 않은 접속 IP·고객번호·사유는 표시하지 않습니다.</p>
-  </Panel></>;
+  </Panel>{reviewEvent && <ActivityReviewRequest event={reviewEvent} onClose={() => setReviewEvent(null)} />}</>;
 }

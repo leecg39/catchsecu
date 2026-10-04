@@ -1,0 +1,38 @@
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 19ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 13.4s
+  Running TypeScript ...
+  Finished TypeScript in 22.3s ...
+  Collecting page data using 7 workers ...
+Error: Failed to collect configuration for /api/v1/access-requests
+    at ignore-listed frames {
+  [cause]: Error: 운영 환경은 SMTP 설정이 필요합니다. 로컬 미리보기만 ALLOW_LOCAL_MAIL=1을 사용하세요.
+      at module evaluation (src/server/env.ts:52:9)
+      at <unknown> (src/server/db.ts:3:1)
+      at module evaluation (src/server/credential-scope.ts:3:53)
+    50 | export const env = result.data;
+    51 | if (process.env.NODE_ENV === "production" && env.MAIL_TRANSPORT === "local" && !process.env.ALLOW_LOCAL_MAIL) {
+  > 52 |   throw new Error("운영 환경은 SMTP 설정이 필요합니다. 로컬 미리보기만 ALLOW_LOCAL_MAIL=1을 사용하세요.");
+       |         ^
+    53 | }
+    54 |
+}
+Error: 운영 환경은 SMTP 설정이 필요합니다. 로컬 미리보기만 ALLOW_LOCAL_MAIL=1을 사용하세요.
+    at module evaluation (src/server/env.ts:52:9)
+    at <unknown> (src/server/db.ts:3:1)
+    at module evaluation (src/server/credential-scope.ts:3:53)
+  50 | export const env = result.data;
+  51 | if (process.env.NODE_ENV === "production" && env.MAIL_TRANSPORT === "local" && !process.env.ALLOW_LOCAL_MAIL) {
+> 52 |   throw new Error("운영 환경은 SMTP 설정이 필요합니다. 로컬 미리보기만 ALLOW_LOCAL_MAIL=1을 사용하세요.");
+     |         ^
+  53 | }
+  54 |
+
+> Build error occurred
+Error: Failed to collect page data for /api/v1/access-requests
+    at ignore-listed frames {
+  type: 'Error'
+}

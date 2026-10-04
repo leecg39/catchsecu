@@ -1,0 +1,308 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/auth-public-audit.test.ts (19 tests | 16 failed) 4014ms
+   × signup commits the account, encrypted verification job and request-linked safe audits together 207ms
+   × auth.account_registered failure rolls back signup even when the library catches it 97ms
+   × auth.verification_queued failure rolls back signup even when the library catches it 88ms
+   × signed email confirmation commits its flag and safe event despite the successful 302 callback 96ms
+   × email confirmation audit failure rolls back its flag and a retry of the same signed link succeeds 93ms
+   × concurrent email confirmation records one actual flag transition 103ms
+   × a signed email proof expiring after its audit cannot publish confirmation 98ms
+   × password reset proof, encrypted queued mail and audit share the request transaction 93ms
+   × auth.password_reset_queued failure restores reset proof/job counts and withholds success 89ms
+   × auth.password_reset_requested failure restores reset proof/job counts and withholds success 97ms
+   × unknown and inactive reset requests retain the generic reply and create no usable proof or mail 106ms
+   × verification resend and its audit roll back on storage failure 583ms
+   × an unverified sign-in retains its intended verification mail alongside the rejected-login audit 191ms
+   × wrong passwords produce only an anonymous rejected-login event without credentials or a successful session 156ms
+   × signup failures remain rate limited outside the rolled-back account transaction 344ms
+   × MFA challenge audit failure rolls back the transient session and challenge cookie/proof 390ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 16 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > signup commits the account, encrypted verification job and request-linked safe audits together
+AssertionError: expected [] to deeply equal ArrayContaining{…}
+
+- Expected
++ Received
+
+- ArrayContaining [
+-   "auth.account_registered",
+-   "auth.verification_queued",
+- ]
++ []
+
+ ❯ tests/server/auth-public-audit.test.ts:53:37
+     51|   const u = await db.user.findUniqueOrThrow({ where: { email } }), eve…
+     52|   expect(await db.account.count({ where: { userId: u.id } })).toBe(1);
+     53|   expect(events.map(e => e.action)).toEqual(expect.arrayContaining(["a…
+       |                                     ^
+     54|   expect(events.find(e => e.action === "auth.account_registered")).toM…
+     55|   safe(events, [email, password, (await mail("이메일 인증")).url]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > auth.account_registered failure rolls back signup even when the library catches it
+ FAIL  tests/server/auth-public-audit.test.ts > auth.verification_queued failure rolls back signup even when the library catches it
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ tests/server/auth-public-audit.test.ts:59:20
+     57| test.each(["auth.account_registered", "auth.verification_queued"])("%s…
+     58|   const before = await counts(); fault.action = action; const r = awai…
+     59|   expect(r.status).toBe(500); expect(r.headers.getSetCookie()).toHaveL…
+       |                    ^
+     60| });
+     61| test("duplicate signup preserves the generic response without another …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > signed email confirmation commits its flag and safe event despite the successful 302 callback
+AssertionError: expected undefined to match object { …(3) }
+
+- Expected:
+{
+  "actorId": "4821429e-cf32-4d8c-931a-5436b2b1e68b",
+  "detail": {
+    "changedFields": [
+      "emailVerified",
+    ],
+  },
+  "resourceId": "4821429e-cf32-4d8c-931a-5436b2b1e68b",
+}
+
++ Received:
+undefined
+
+ ❯ tests/server/auth-public-audit.test.ts:69:103
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > email confirmation audit failure rolls back its flag and a retry of the same signed link succeeds
+AssertionError: expected 302 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 302
+
+ ❯ tests/server/auth-public-audit.test.ts:73:88
+     71| test("email confirmation audit failure rolls back its flag and a retry…
+     72|   const u = await user(), link = (await proof()).url; fault.action = "…
+     73|   const r = await auth.handler(new Request(link)); fault.action = ""; …
+       |                                                                                        ^
+     74|   expect(await db.user.findUnique({ where: { id: u.id } })).toMatchObj…
+     75|   expect((await auth.handler(new Request(link))).status).toBe(302);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > concurrent email confirmation records one actual flag transition
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/auth-public-audit.test.ts:80:101
+     78|   const u = await user(), link = (await proof()).url;
+     79|   const results = await Promise.all([auth.handler(new Request(link)), …
+     80|   expect(await db.auditEvent.count({ where: { action: "auth.email_veri…
+       |                                                                                                     ^
+     81| });
+     82| test("a signed email proof expiring after its audit cannot publish con…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > a signed email proof expiring after its audit cannot publish confirmation
+AssertionError: expected 302 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 302
+
+ ❯ tests/server/auth-public-audit.test.ts:85:20
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > password reset proof, encrypted queued mail and audit share the request transaction
+AssertionError: expected undefined to match object { actorId: null, tenantId: null, …(2) }
+
+- Expected:
+{
+  "actorId": null,
+  "resource": "job",
+  "resourceId": "06949ad1-5fc9-4352-a661-d77908db9ad8",
+  "tenantId": null,
+}
+
++ Received:
+undefined
+
+ ❯ tests/server/auth-public-audit.test.ts:95:94
+     93|   const u = await user(true), r = await reset(); expect(r.status).toBe…
+     94|   expect(await db.verification.count({ where: { value: u.id } })).toBe…
+     95|   const queued = events.find(e => e.action === "auth.password_reset_qu…
+       |                                                                                              ^
+     96|   expect(events.some(e => e.action === "auth.password_reset_requested"…
+     97| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > auth.password_reset_queued failure restores reset proof/job counts and withholds success
+ FAIL  tests/server/auth-public-audit.test.ts > auth.password_reset_requested failure restores reset proof/job counts and withholds success
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ tests/server/auth-public-audit.test.ts:100:20
+     98| test.each(["auth.password_reset_queued", "auth.password_reset_requeste…
+     99|   await user(true); const before = await counts(); fault.action = acti…
+    100|   expect(r.status).toBe(500); expect(await counts()).toEqual(before); …
+       |                    ^
+    101| });
+    102| test("unknown and inactive reset requests retain the generic reply and…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > unknown and inactive reset requests retain the generic reply and create no usable proof or mail
+AssertionError: expected { users: 12, accounts: 12, …(3) } to deeply equal { users: 12, accounts: 12, …(3) }
+
+- Expected
++ Received
+
+  {
+    "accounts": 12,
+    "jobs": 15,
+-   "proofs": 3,
++   "proofs": 4,
+    "sessions": 0,
+    "users": 12,
+  }
+
+ ❯ tests/server/auth-public-audit.test.ts:105:85
+    103|   const u = await user(true); await db.user.update({ where: { id: u.id…
+    104|   const before = await counts(), missing = await reset("unknown-" + em…
+    105|   expect(await missing.json()).toEqual(await closed.json()); expect(aw…
+       |                                                                                     ^
+    106|   for (const r of [missing, closed]) expect(await requestEvents(r)).to…
+    107| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > verification resend and its audit roll back on storage failure
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ tests/server/auth-public-audit.test.ts:111:20
+    109|   await user(); const before = await counts(); fault.action = "auth.ve…
+    110|   const r = await auth.handler(req("/send-verification-email", { email…
+    111|   expect(r.status).toBe(500); expect(await counts()).toEqual(before); …
+       |                    ^
+    112| });
+    113| test("an unverified sign-in retains its intended verification mail alo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > an unverified sign-in retains its intended verification mail alongside the rejected-login audit
+AssertionError: expected [] to deeply equal ArrayContaining{…}
+
+- Expected
++ Received
+
+- ArrayContaining [
+-   "auth.verification_queued",
+-   "auth.login_rejected",
+- ]
++ []
+
+ ❯ tests/server/auth-public-audit.test.ts:115:123
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > wrong passwords produce only an anonymous rejected-login event without credentials or a successful session
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/auth-public-audit.test.ts:119:57
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > signup failures remain rate limited outside the rolled-back account transaction
+AssertionError: expected [ 200, 200, 200, 200, 200, 429 ] to deeply equal [ 500, 500, 500, 500, 500, 429 ]
+
+- Expected
++ Received
+
+  [
+-   500,
+-   500,
+-   500,
+-   500,
+-   500,
++   200,
++   200,
++   200,
++   200,
++   200,
+    429,
+  ]
+
+ ❯ tests/server/auth-public-audit.test.ts:124:19
+    122|   fault.action = "auth.account_registered"; const results: number[] = …
+    123|   for (let i = 0; i < 6; i++) results.push((await signup()).status); f…
+    124|   expect(results).toEqual([500, 500, 500, 500, 500, 429]); expect(awai…
+       |                   ^
+    125| });
+    126| test("MFA challenge audit failure rolls back the transient session and…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/16]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > MFA challenge audit failure rolls back the transient session and challenge cookie/proof
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ tests/server/auth-public-audit.test.ts:133:113
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/16]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  16 failed | 3 passed (19)
+   Start at  18:24:49
+   Duration  5.01s (tests 82%, import 12%, transform 6%)
+

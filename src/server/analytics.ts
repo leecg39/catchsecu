@@ -1,7 +1,7 @@
 import { Prisma } from "@/generated/prisma/client";
 import type { AnalyticsDashboard, AnalyticsQuery } from "@/contracts/analytics";
 import type { Context } from "./context";
-import { db } from "./db";
+import { db, type Transaction } from "./db";
 import { fail } from "./http";
 import { audit } from "./audit";
 import { documentScope } from "./documents";
@@ -11,10 +11,15 @@ type SubmissionCount = { serviceId: string; retained: bigint; period: bigint };
 type TopForm = { id: string; title: string; serviceId: string; createdAt: Date; retained: bigint };
 
 export async function dashboardAnalytics(ctx: Context, input: AnalyticsQuery, requestId: string): Promise<AnalyticsDashboard> {
-  return db.$transaction(async tx => {
+  return db.$transaction(tx => dashboardAnalyticsInTransaction(tx, ctx, input, requestId),
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 15000 });
+}
+
+// Reuse the same database snapshot when a monthly close stores this aggregate.
+export async function dashboardAnalyticsInTransaction(tx: Transaction, ctx: Context, input: AnalyticsQuery, requestId: string, authorizedScope?: Prisma.ServiceWhereInput): Promise<AnalyticsDashboard> {
     const [{ asOf }] = await tx.$queryRaw<{ asOf: Date }[]>`SELECT statement_timestamp() AS "asOf"`;
     const { from, to } = analyticsPeriod(input, asOf);
-    const scope = await documentScope(tx, ctx, "service.read");
+    const scope = authorizedScope ?? await documentScope(tx, ctx, "service.read");
     const visible = await tx.service.findMany({ where: { ...scope, status: "active" },
       select: { id: true, name: true, createdAt: true }, orderBy: [{ name: "asc" }, { id: "asc" }] });
     if (input.serviceId && !visible.some(service => service.id === input.serviceId))
@@ -75,5 +80,4 @@ export async function dashboardAnalytics(ctx: Context, input: AnalyticsQuery, re
     topForms: topRows.map(row => ({ id: row.id, title: row.title, serviceId: row.serviceId,
       serviceName: services.find(service => service.id === row.serviceId)?.name ?? "", createdAt: row.createdAt.toISOString(),
       retainedSubmissions: Number(row.retained) })) };
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 15000 });
 }

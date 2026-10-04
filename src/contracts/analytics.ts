@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { ComplianceEvidence } from "./compliance-evidence";
 
 export const analyticsQuery = z.object({
   serviceId: z.uuid().optional(),
@@ -17,6 +18,7 @@ export type ComplianceCloseRecord = {
   verdict: "not_assessed";
   period: { from: string; to: string };
   totals: AnalyticsDashboard["totals"];
+  evidence?: ComplianceEvidence;
 };
 export type AnalyticsDashboard = {
   asOf: string;

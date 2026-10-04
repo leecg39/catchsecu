@@ -2,7 +2,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { api, useResource, errorText } from "@/lib/api";
+import { api, ApiError, useResource, errorText } from "@/lib/api";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
 type Service = { id: string; name: string; externalName: string; description: string; type: string; status: string; version: number; createdAt: string };
@@ -103,19 +103,29 @@ export function CompanyOnboarding() {
 }
 function ProfileForm({ initial }: { initial: Profile }) {
   const [data, setData] = useState(initial), [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  const [conflict, setConflict] = useState(false);
   const lock = useRef(false);
   const app = useApplication(), router = useRouter();
+  async function reloadProfile() {
+    if (lock.current) return;
+    lock.current = true; setBusy(true); setError("");
+    try { setData(await api<Profile>("/me")); setConflict(false); }
+    catch (cause) { setError(errorText(cause)); }
+    finally { lock.current = false; setBusy(false); }
+  }
   return <form className="mg-fields" onSubmit={async event => {
-    event.preventDefault(); if (lock.current) return; lock.current = true; setBusy(true); setError("");
+    event.preventDefault(); if (lock.current || conflict) return; lock.current = true; setBusy(true); setError("");
     try {
-      await api("/me", { method: "PATCH", body: JSON.stringify({ version: initial.version, name: data.name, department: data.department ?? "", jobTitle: data.jobTitle ?? "", phone: data.phone ?? "", locale: data.locale }) });
+      await api("/me", { method: "PATCH", body: JSON.stringify({ version: data.version, name: data.name, department: data.department ?? "", jobTitle: data.jobTitle ?? "", phone: data.phone ?? "", locale: data.locale }) });
       app.reload(); router.push("/my-page/info");
-    } catch (error) { setError(errorText(error)); } finally { lock.current = false; setBusy(false); }
+    } catch (error) { setError(errorText(error)); if (error instanceof ApiError && error.code === "VERSION_CONFLICT") setConflict(true); } finally { lock.current = false; setBusy(false); }
   }}><label><span>회사명</span><input className="cs-input" disabled value={app.data?.company?.name ?? "소속 회사 없음"} /></label>
     {([["name", "이름"], ["department", "부서명"], ["jobTitle", "직책"], ["phone", "연락처"]] as const).map(([key, label]) => <label key={key}><span>{label}</span><input className="cs-input" disabled={busy} maxLength={key === "phone" ? 30 : 100} required={key === "name"} value={data[key] ?? ""} onChange={event => setData({ ...data, [key]: event.target.value })} /></label>)}
     <label><span>이메일</span><input className="cs-input" disabled value={data.email} /></label>
     <label><span>언어</span><select className="cs-input" disabled={busy} value={data.locale} onChange={event => setData({ ...data, locale: event.target.value })}><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option></select></label>
-    <ErrorNote error={error} /><div className="mg-flex"><Link className="cs-link" href="/my-page/delete">회원탈퇴</Link><ActionButton disabled={busy}>{busy ? "저장 중…" : "저장"}</ActionButton></div></form>;
+    <ErrorNote error={error} />{conflict && <div><p>다른 곳에서 변경한 프로필을 불러오면 아직 저장하지 않은 입력이 최신 정보로 바뀝니다.</p>
+      <ActionButton type="button" secondary disabled={busy} onClick={reloadProfile}>최신 프로필 다시 불러오기</ActionButton></div>}
+    <div className="mg-flex"><Link className="cs-link" href="/my-page/delete">회원탈퇴</Link><ActionButton disabled={busy || conflict}>{busy ? "저장 중…" : "저장"}</ActionButton></div></form>;
 }
 function Sessions() {
   const result = useResource<{ items: { id: string; current: boolean; userAgent: string | null; updatedAt: string }[] }>("/me/sessions");

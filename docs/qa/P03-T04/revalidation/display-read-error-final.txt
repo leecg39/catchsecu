@@ -1,0 +1,36 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 미완료 기능 검증"(45): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button "메뉴 열기" [ref=1532, loc=css:button[aria-label="메뉴 열기"]]
+        text "☰"
+      container
+        anchor "공지사항" [ref=1533, loc=css:a[aria-label="공지사항"], url=http://localhost:3111/notice]
+          image
+        button "문의" [ref=1534, loc=css:button[aria-label="문의"]]
+          image
+        anchor "알림" [ref=1535, loc=css:a[aria-label="알림"], url=http://localhost:3111/integration/message]
+          image
+        button [ref=1536]
+          image
+          text "MY"
+    container
+      heading
+        text "서비스 내 동의서 표시 설정"
+      container
+        container
+          text "서비스"
+          combobox "표시 설정 서비스" [ref=1537, loc=css:select[aria-label="표시 설정 서비스"]]
+            text "재검증 서비스 A"
+        anchor [ref=1538, loc=href:/basic/result/policy, url=http://localhost:3111/basic/result/policy]
+          text "처리방침 관리"
+      tablist "동의서 종류" [ref=1539, loc=role:tablist[name="동의서 종류"]]
+        tab [ref=1540]
+          text "개인정보 수집·이용 동의서"
+        tab [ref=1541]
+          text "개인정보 제3자 제공 동의서"
+      container
+        alert
+          text "표시 설정을 불러오지 못했습니다. 연결 상태를 확인한 후 다시 시도해주세요."
+        button [ref=1546]
+          text "표시 설정 다시 불러오기"

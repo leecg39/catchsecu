@@ -1,0 +1,42 @@
+{
+  "server": "v25:3126",
+  "login": 200,
+  "context": 200,
+  "cases": [
+    {
+      "path": "/analytics/closes?month=2026-10&month=2026-10",
+      "status": 422,
+      "error": "DUPLICATE_QUERY"
+    },
+    {
+      "path": "/analytics/closes?month=2026-10&serviceId=9e234e40-2a34-4fd3-b17b-c649da2e8686&serviceId=9e234e40-2a34-4fd3-b17b-c649da2e8686",
+      "status": 422,
+      "error": "DUPLICATE_QUERY"
+    },
+    {
+      "path": "/analytics/exports?closeId=bdd47ab9-ac53-43aa-9e59-7feb68eb420a&closeId=bdd47ab9-ac53-43aa-9e59-7feb68eb420a",
+      "status": 422,
+      "error": "DUPLICATE_QUERY"
+    },
+    {
+      "path": "/analytics/exports?closeId=bdd47ab9-ac53-43aa-9e59-7feb68eb420a&page=1&page=2",
+      "status": 422,
+      "error": "DUPLICATE_QUERY"
+    },
+    {
+      "path": "/analytics/exports?closeId=bdd47ab9-ac53-43aa-9e59-7feb68eb420a&pageSize=10&pageSize=20",
+      "status": 422,
+      "error": "DUPLICATE_QUERY"
+    },
+    {
+      "path": "/analytics/closes?month=2026-10&serviceId=9e234e40-2a34-4fd3-b17b-c649da2e8686",
+      "status": 200,
+      "error": null
+    },
+    {
+      "path": "/analytics/exports?closeId=bdd47ab9-ac53-43aa-9e59-7feb68eb420a&page=1&pageSize=10",
+      "status": 200,
+      "error": null
+    }
+  ]
+}

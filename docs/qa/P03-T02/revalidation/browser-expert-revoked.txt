@@ -1,0 +1,54 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 미완료 기능 검증"(45): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      heading
+        text "전문가 배정 관리"
+      anchor [ref=587, loc=href:/dashboard, url=http://localhost:3104/dashboard]
+        text "대시보드"
+      button [ref=588]
+        text "새 배정"
+    container
+      paragraph
+        text "운영자만 활성·인증된 계정에 회사별 조회 범위를 배정할 수 있습니다."
+      form
+        textbox "배정 검색" [ref=589, loc=css:input[placeholder="회사명 또는 전문가 이메일"]]
+          text "recovery-expert-6d8eed27@example.test"
+        button [ref=590]
+          text "검색"
+      status
+        text "전문가 배정을 회수했습니다."
+      table
+        table_row
+          table_cell
+            text "회사"
+          table_cell
+            text "전문가"
+          table_cell
+            text "서비스"
+          table_cell
+            text "상태"
+          table_cell
+            text "만료일"
+          table_cell
+            text "관리"
+        table_row
+          table_cell
+            status
+              text "불러오는 중입니다."
+      container
+        container
+          text "총"
+          text "0"
+          text "개"
+        combobox "페이지당 행 수" [ref=593, loc=css:select[aria-label="페이지당 행 수"]]
+          text "20"
+        container
+          button "이전 페이지" [ref=594, loc=css:button[aria-label="이전 페이지"]]
+            text "‹"
+          container
+            text "1"
+            text "/"
+            text "1"
+          button "다음 페이지" [ref=595, loc=css:button[aria-label="다음 페이지"]]
+            text "›"

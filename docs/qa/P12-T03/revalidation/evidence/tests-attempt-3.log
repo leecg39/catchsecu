@@ -1,0 +1,32 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:46766) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/compliance-evidence.test.ts (11 tests | 1 failed) 4667ms
+   × 선택 서비스의 활성 목적과 유효 게시만 집계하며 중복 게시로 서비스 수를 늘리지 않는다 298ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/compliance-evidence.test.ts > 선택 서비스의 활성 목적과 유효 게시만 집계하며 중복 게시로 서비스 수를 늘리지 않는다
+Error: 자료를 찾을 수 없습니다.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ locate src/server/processing-catalog.ts:45:13
+ ❯ src/server/processing-catalog.ts:125:23
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/src/runtime/getPrismaClient.ts:861:18
+ ❯ tests/server/compliance-evidence.test.ts:62:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  16:57:38
+   Duration  6.65s (tests 72%, import 20%, transform 8%)
+

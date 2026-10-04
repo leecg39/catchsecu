@@ -1,0 +1,106 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:56366) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/document-options-authority.test.ts (4 tests | 4 failed) 1377ms
+   × 문서 선택 목록은 인증 이후 회사 변경을 거부한다 195ms
+   × 문서 선택 목록은 인증 이후 MFA 정책을 적용한다 114ms
+   × 선택 목록의 마지막 DB 조회 중 세션 만료 시 내용을 반환하지 않는다 116ms
+   × 선택 목록 조회 중 만료된 처리방침은 선택지에서 제외한다 207ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/document-options-authority.test.ts > 문서 선택 목록은 인증 이후 회사 변경을 거부한다
+AssertionError: promise resolved "{ purposes: [], recipients: [], …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "policies": [],
++   "purposes": [],
++   "recipients": [],
++   "templates": [],
+  }
+
+ ❯ tests/server/document-options-authority.test.ts:49:47
+     47|   const other=await db.company.create({data:{name:"다른회사",publicName:"다…
+     48|   await db.session.update({where:{id:ctx.session.id},data:{activeCompa…
+     49|   await expect(documentOptions(ctx,serviceId)).rejects.toMatchObject({…
+       |                                               ^
+     50| });
+     51| test("문서 선택 목록은 인증 이후 MFA 정책을 적용한다",async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/document-options-authority.test.ts > 문서 선택 목록은 인증 이후 MFA 정책을 적용한다
+AssertionError: promise resolved "{ purposes: [], recipients: [], …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "policies": [],
++   "purposes": [],
++   "recipients": [],
++   "templates": [],
+  }
+
+ ❯ tests/server/document-options-authority.test.ts:53:47
+     51| test("문서 선택 목록은 인증 이후 MFA 정책을 적용한다",async()=>{
+     52|   await db.securityPolicy.create({data:{tenantId:ctx.tenantId,requireM…
+     53|   await expect(documentOptions(ctx,serviceId)).rejects.toMatchObject({…
+       |                                               ^
+     54| });
+     55| test("선택 목록의 마지막 DB 조회 중 세션 만료 시 내용을 반환하지 않는다",async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/document-options-authority.test.ts > 선택 목록의 마지막 DB 조회 중 세션 만료 시 내용을 반환하지 않는다
+AssertionError: promise resolved "{ purposes: [], recipients: [], …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "policies": [],
++   "purposes": [],
++   "recipients": [],
++   "templates": [],
+  }
+
+ ❯ tests/server/document-options-authority.test.ts:58:47
+     56|   await db.session.update({where:{id:ctx.session.id},data:{expiresAt:n…
+     57|   vi.useFakeTimers({toFake:["Date"]});clock.advance=true;
+     58|   await expect(documentOptions(ctx,serviceId)).rejects.toMatchObject({…
+       |                                               ^
+     59| });
+     60| test("선택 목록 조회 중 만료된 처리방침은 선택지에서 제외한다",async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/document-options-authority.test.ts > 선택 목록 조회 중 만료된 처리방침은 선택지에서 제외한다
+AssertionError: expected [ Array(1) ] to not include 'd366ffa1-d143-4012-a445-6f2509372807'
+ ❯ tests/server/document-options-authority.test.ts:67:87
+     65|   expect((await documentOptions(ctx,serviceId)).policies.map(p=>p.publ…
+     66|   vi.useFakeTimers({toFake:["Date"]});clock.advance=true;
+     67|   expect((await documentOptions(ctx,serviceId)).policies.map(p=>p.publ…
+       |                                                                                       ^
+     68| });
+     69|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  15:44:47
+   Duration  2.23s (tests 64%, import 22%, transform 14%)
+

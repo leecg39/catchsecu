@@ -1,0 +1,53 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/download-audit.test.ts (12 tests | 11 failed) 3351ms
+   × guide returns real PDF bytes with one request-linked safe event 197ms
+   × notice rejects an account revoked after the actor snapshot without a download event 239ms
+   × guide rejects an account revoked after the actor snapshot without a download event 228ms
+   × notice rejects a session revoked after the actor snapshot without a download event 249ms
+   × guide rejects a session revoked after the actor snapshot without a download event 268ms
+   × notice rechecks platform administration for preview 269ms
+   × guide rechecks platform administration for preview 210ms
+   × notice rolls back the event when its session deadline ends during file preparation 221ms
+   × guide rolls back the event when its session deadline ends during file preparation 225ms
+   × notice audit persistence failure cannot return successful file bytes 220ms
+   × guide audit persistence failure cannot return successful file bytes 225ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/download-audit.test.ts > guide returns real PDF bytes with one request-linked safe event
+ FAIL  tests/server/download-audit.test.ts > notice rejects an account revoked after the actor snapshot without a download event
+ FAIL  tests/server/download-audit.test.ts > guide rejects an account revoked after the actor snapshot without a download event
+ FAIL  tests/server/download-audit.test.ts > notice rejects a session revoked after the actor snapshot without a download event
+ FAIL  tests/server/download-audit.test.ts > guide rejects a session revoked after the actor snapshot without a download event
+ FAIL  tests/server/download-audit.test.ts > notice rechecks platform administration for preview
+ FAIL  tests/server/download-audit.test.ts > guide rechecks platform administration for preview
+ FAIL  tests/server/download-audit.test.ts > notice rolls back the event when its session deadline ends during file preparation
+ FAIL  tests/server/download-audit.test.ts > guide rolls back the event when its session deadline ends during file preparation
+ FAIL  tests/server/download-audit.test.ts > notice audit persistence failure cannot return successful file bytes
+ FAIL  tests/server/download-audit.test.ts > guide audit persistence failure cannot return successful file bytes
+PrismaClientKnownRequestError: 
+Invalid `db.guide.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/download-audit.test.ts:51:29
+
+  48 const storageKey = randomUUID(); keys.push(storageKey); await privateFiles.write(storageKey, pdf);
+  49 const notice = await db.notice.create({ data: { category: "공지사항", title: "감사 검증", bodyHtml: "<p>감사 검증</p>", status: "published", publishedAt: new Date(), attachments: { create: { fileName: "검증.pdf", mime: "application/pdf", fileSize: pdf.length, fileSha256: hash, storageKey } } }, include: { attachments: true } });
+  50 noticeId = notice.id; attachmentId = notice.attachments[0].id;
+→ 51 guideId = (await db.guide.create(
+Unique constraint failed on the constraint: `Guide_assetKey_key`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/download-audit.test.ts:51:14
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  11 failed | 1 passed (12)
+   Start at  18:51:08
+   Duration  4.61s (tests 76%, import 16%, transform 9%)
+

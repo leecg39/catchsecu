@@ -1,0 +1,101 @@
+{
+  "tasks": [
+    "P03-T03",
+    "P12-T01"
+  ],
+  "status": "in_progress",
+  "scope": "models and API; UI not implemented",
+  "newTestsPassed": 20,
+  "otherRelatedTestsPassed": 21,
+  "foreignKeyRetestPassed": 1,
+  "migrations": 75,
+  "models": 119,
+  "build": "production-v13",
+  "port": 3114,
+  "pid": 74637,
+  "http": {
+    "checks": [
+      {
+        "path": "/context",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/activity-reviews",
+        "method": "POST",
+        "status": 201
+      },
+      {
+        "path": "/context",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/activity-reviews",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/activity-reviews/34431d70-7a5b-45fa-9387-23f2d61c0c84",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/activity-reviews/34431d70-7a5b-45fa-9387-23f2d61c0c84/actions",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/activity-reviews/34431d70-7a5b-45fa-9387-23f2d61c0c84/actions",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/activity-reviews/34431d70-7a5b-45fa-9387-23f2d61c0c84/actions",
+        "method": "POST",
+        "status": 403
+      },
+      {
+        "path": "/context",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/activity-reviews/34431d70-7a5b-45fa-9387-23f2d61c0c84/actions",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/activity-reviews/34431d70-7a5b-45fa-9387-23f2d61c0c84",
+        "method": "GET",
+        "status": 200
+      }
+    ],
+    "reviewId": "34431d70-7a5b-45fa-9387-23f2d61c0c84",
+    "status": "resolved",
+    "version": 3,
+    "messageCount": 3,
+    "sourceEventSynthetic": true,
+    "uiWorkflowTested": false
+  },
+  "db": {
+    "phase": "after-restart",
+    "reviewId": "34431d70-7a5b-45fa-9387-23f2d61c0c84",
+    "status": "resolved",
+    "version": 3,
+    "messageCount": 3,
+    "auditCount": 3,
+    "requestCount": 3,
+    "sha256": "52d170794251ac65c89587485c08c62deea3ef1986579d8af4fcf84cab7b624e"
+  },
+  "sourceHashes": {
+    "prisma/schema.prisma": "87b2e993083c1f2d1033eb5993b7f66d632ff05d6c1786aae1080b2bb904a309",
+    "prisma/migrations/20261005070000_activity_reviews/migration.sql": "010697dc6f273112352ad2445a4d1e69ca4f50c42cac436fad53d3989b86a5ce",
+    "src/contracts/activity-reviews.ts": "327d6e98de31d156cc3953aa2dbd2c78925abf84dfc9b65ae7983898a9b35c98",
+    "src/server/activity-reviews.ts": "1e320cd72892b8d6091405aa453a722a881a968be9ef9727487dc4f67764bc70",
+    "tests/server/activity-reviews.test.ts": "12f2863526d1907afd7fbdd4fdb61a26318a235439f5ae09d449f934129d9ddd",
+    "src/app/api/v1/activity-reviews/route.ts": "713246e4496820bf28d6e09d0f08f58492cf2182438577f5a98133f92d9cab4f",
+    "src/app/api/v1/activity-reviews/[id]/route.ts": "340c232cab12b829feaffdc5d8931bf99cc9c103758bf924c76d90785a6ddcfc",
+    "src/app/api/v1/activity-reviews/[id]/actions/route.ts": "e3bba71ba53218447aa02d71b5734a93884f38447d69dbbd703053b7d614402b"
+  }
+}

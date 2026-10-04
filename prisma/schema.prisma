@@ -395,6 +395,7 @@ model LedgerEntry {
 }
 model Membership {
   exports ExportJob[]
+  complianceExports ComplianceExportJob[]
   notificationIntegrations NotificationIntegration[]
   messageTemplates MessageTemplate[]
   campaigns Campaign[] @relation("CampaignCreator")
@@ -433,6 +434,9 @@ model Membership {
   shareGrants ShareGrant[]
   requestedAccess AccessRequest[] @relation("AccessRequester")
   reviewedAccess AccessRequest[] @relation("AccessReviewer")
+  requestedActivityReviews ActivityReview[] @relation("ActivityRequester")
+  receivedActivityReviews ActivityReview[] @relation("ActivityRecipient")
+  activityReviewMessages ActivityReviewMessage[]
   @@unique([tenantId, expertAssignmentId, userId])
   @@unique([tenantId, id, userId])
   @@unique([tenantId, userId])
@@ -476,6 +480,7 @@ model Service {
   clauseTemplates ClauseTemplate[]
   consentDisplays ServiceConsentDisplay[]
   subprocessors Subprocessor[]
+  activityReviews ActivityReview[]
   kakaoChannels KakaoChannel[]
   dataSubjects DataSubject[]
   suppressions Suppression[]
@@ -673,6 +678,36 @@ model ExpertAssignmentService {
   @@unique([tenantId, assignmentId, serviceId])
   @@index([tenantId, serviceId])
 }
+model ComplianceExportJob {
+  id String @id @default(uuid())
+  tenantId String
+  closeId String
+  close ComplianceClose @relation(fields: [tenantId, closeId], references: [tenantId, id], onDelete: Restrict)
+  memberId String
+  requesterId String
+  requester Membership @relation(fields: [tenantId, memberId, requesterId], references: [tenantId, id, userId], onDelete: Restrict)
+  format String
+  sourceHash String
+  requestKeyHash String
+  status String @default("queued")
+  version Int @default(1)
+  resultCipher String?
+  resultHash String?
+  byteLength Int @default(0)
+  pageCount Int @default(0)
+  leaseOwner String?
+  leaseUntil DateTime?
+  attempts Int @default(0)
+  lastError String?
+  expiresAt DateTime
+  completedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([tenantId, memberId, requestKeyHash])
+  @@index([tenantId, memberId, closeId, createdAt, id])
+  @@index([status, leaseUntil, createdAt])
+  @@index([expiresAt])
+}
 model ComplianceClose {
   id String @id @default(uuid())
   tenantId String
@@ -682,6 +717,8 @@ model ComplianceClose {
   snapshot Json
   createdBy String
   createdAt DateTime @default(now())
+  exports ComplianceExportJob[]
+  @@unique([tenantId, id])
   @@unique([tenantId, serviceKey, month])
   @@index([tenantId, createdAt])
 }
@@ -800,6 +837,8 @@ model AuditEvent {
   requestId   String
   detail      Json
   createdAt   DateTime @default(now())
+  activityReviews ActivityReview[]
+  @@unique([tenantId, serviceId, id, actorId])
   @@index([tenantId, createdAt, id])
   @@index([actorId, createdAt])
 }
@@ -2207,4 +2246,43 @@ model VerificationReceipt {
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, attemptId])
   @@unique([tenantId, submissionId, kind])
+}
+
+
+model ActivityReview {
+  id String @id @default(uuid())
+  tenantId String
+  serviceId String
+  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  auditEventId String
+  recipientUserId String
+  auditEvent AuditEvent @relation(fields: [tenantId, serviceId, auditEventId, recipientUserId], references: [tenantId, serviceId, id, actorId], onDelete: Restrict)
+  requesterId String
+  requester Membership @relation("ActivityRequester", fields: [tenantId, requesterId], references: [tenantId, id], onDelete: Restrict)
+  recipientId String
+  recipient Membership @relation("ActivityRecipient", fields: [tenantId, recipientId, recipientUserId], references: [tenantId, id, userId], onDelete: Restrict)
+  title String
+  status String @default("requested")
+  version Int @default(1)
+  respondedAt DateTime?
+  closedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages ActivityReviewMessage[]
+  @@unique([tenantId, id])
+  @@index([tenantId, recipientId, status, createdAt, id])
+  @@index([tenantId, requesterId, status, createdAt, id])
+  @@index([tenantId, serviceId, status, createdAt, id])
+}
+model ActivityReviewMessage {
+  id String @id @default(uuid())
+  tenantId String
+  reviewId String
+  review ActivityReview @relation(fields: [tenantId, reviewId], references: [tenantId, id], onDelete: Restrict)
+  authorId String
+  author Membership @relation(fields: [tenantId, authorId], references: [tenantId, id], onDelete: Restrict)
+  kind String
+  bodyCipher String
+  createdAt DateTime @default(now())
+  @@index([tenantId, reviewId, createdAt, id])
 }

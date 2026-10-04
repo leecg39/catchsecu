@@ -10,6 +10,8 @@ import { currentServiceScope } from "./service-access";
 import { audit } from "./audit";
 import { decrypt, encrypt, opaqueToken, tokenHash } from "./crypto";
 import { fail, listQuery, requireVersion } from "./http";
+import { lockServiceActor } from "./service-actor";
+import { assertFileDeadlines } from "./file-access";
 
 export const documentQuery = listQuery.omit({ sort: true, direction: true }).extend({ serviceId: z.uuid().optional(), type: documentType.optional(), status: z.enum(["all", "draft", "published", "private", "archived"]).default("all") });
 export const clauseQuery = documentQuery.omit({ status: true }).extend({ status: z.enum(["active", "archived", "all"]).default("active") });
@@ -260,12 +262,19 @@ export async function applyClause(ctx: Context, id: string, input: { version: nu
 }
 export async function documentOptions(ctx: Context, serviceId: string) {
   return db.$transaction(async tx => {
-    await lockDocumentService(tx, ctx, serviceId, "document.read"); const where = { tenantId: ctx.tenantId, serviceId, status: "active" };
+    const actor = await lockServiceActor(tx, ctx, "document.read");
+    if (!await tx.service.count({ where: { AND: [actor.scope, { id: serviceId }] } }))
+      fail(403, "SERVICE_FORBIDDEN", "해당 서비스에 대한 권한이 없습니다.");
+    const where = { tenantId: ctx.tenantId, serviceId, status: "active" };
     const purposes = await tx.processingPurpose.findMany({ where, select: { id: true, name: true, version: true, status: true }, orderBy: { name: "asc" } });
     const recipients = await tx.recipient.findMany({ where: { ...where, kind: { not: "source" } }, select: { id: true, name: true, kind: true, countryCode: true, version: true, status: true }, orderBy: { name: "asc" } });
     const templates = (await tx.clauseTemplate.findMany({ where, orderBy: { title: "asc" } })).map(clauseDto);
-    const policies = (await tx.documentPublication.findMany({ where: { ...where, document: { type: "privacy_policy", status: "published" }, OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
-      include: { documentVersion: true }, orderBy: { createdAt: "desc" } })).map(item => ({ publicationId: item.id, title: (item.documentVersion.snapshot as unknown as DocumentSnapshot).title, number: item.documentVersion.number, expiresAt: item.expiresAt ? iso(item.expiresAt) : null }));
+    const publications = await tx.documentPublication.findMany({ where: { ...where, document: { type: "privacy_policy", status: "published" }, OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
+      include: { documentVersion: true }, orderBy: { createdAt: "desc" } });
+    assertFileDeadlines(actor.deadlines);
+    const now = new Date();
+    const policies = publications.filter(item => !item.expiresAt || item.expiresAt > now)
+      .map(item => ({ publicationId: item.id, title: (item.documentVersion.snapshot as unknown as DocumentSnapshot).title, number: item.documentVersion.number, expiresAt: item.expiresAt ? iso(item.expiresAt) : null }));
     return { purposes, recipients, templates, policies };
   });
 }
@@ -279,15 +288,28 @@ async function displayNames(tx: Transaction, serviceId: string) {
   const service = await tx.service.findUniqueOrThrow({ where: { id: serviceId }, include: { tenant: { select: { publicName: true } } } });
   return { companyName: service.tenant.publicName, serviceName: service.externalName };
 }
+async function lockDisplayService(tx: Transaction, ctx: Context, serviceId: string, write: boolean) {
+  // Serialize writers before lockServiceActor takes shared service locks; concurrent upgrades must not deadlock.
+  if (write) await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${ctx.tenantId} FOR UPDATE`;
+  const actor = await lockServiceActor(tx, ctx, "service.manage");
+  const service = await tx.service.findFirst({ where: { AND: [actor.scope, { id: serviceId }] } });
+  if (!service) fail(403, "SERVICE_FORBIDDEN", "해당 서비스에 대한 권한이 없습니다.");
+  if (service.status !== "active") fail(409, "SERVICE_ARCHIVED", "보관된 서비스에서는 표시 설정을 사용할 수 없습니다.");
+  if (write) await tx.$queryRaw`SELECT id FROM "Service" WHERE id=${serviceId} AND "tenantId"=${ctx.tenantId} FOR UPDATE`;
+  return actor.deadlines;
+}
 export async function readDisplay(ctx: Context, serviceId: string, kind: DisplayKind) {
   return db.$transaction(async tx => {
-    await lockDocumentService(tx, ctx, serviceId, "service.manage");
-    return { ...displayDto(await tx.serviceConsentDisplay.findUnique({ where: { tenantId_serviceId_kind: { tenantId: ctx.tenantId, serviceId, kind } }, include: { publication: true } }), serviceId, kind), ...await displayNames(tx, serviceId) };
+    const deadlines = await lockDisplayService(tx, ctx, serviceId, false);
+    const row = await tx.serviceConsentDisplay.findUnique({ where: { tenantId_serviceId_kind: { tenantId: ctx.tenantId, serviceId, kind } }, include: { publication: true } });
+    const names = await displayNames(tx, serviceId);
+    assertFileDeadlines(deadlines);
+    return { ...displayDto(row, serviceId, kind), ...names };
   });
 }
 export async function updateDisplay(ctx: Context, serviceId: string, kind: DisplayKind, input: DisplayInput, requestId: string) {
   return db.$transaction(async tx => {
-    await lockDocumentService(tx, ctx, serviceId, "service.manage");
+    const deadlines = await lockDisplayService(tx, ctx, serviceId, true);
     const where = { tenantId_serviceId_kind: { tenantId: ctx.tenantId, serviceId, kind } }, row = await tx.serviceConsentDisplay.findUnique({ where });
     if (input.version !== (row?.version ?? 0)) fail(409, "VERSION_CONFLICT", "표시 설정이 변경되었습니다. 최신 내용을 다시 불러와주세요.");
     if (input.publicationId && !await tx.documentPublication.findFirst({ where: { id: input.publicationId, tenantId: ctx.tenantId, serviceId, status: "active",
@@ -296,6 +318,10 @@ export async function updateDisplay(ctx: Context, serviceId: string, kind: Displ
     const result = row ? await tx.serviceConsentDisplay.update({ where, data, include: { publication: true } }) :
       await tx.serviceConsentDisplay.create({ data: { ...data, tenantId: ctx.tenantId, serviceId, kind }, include: { publication: true } });
     await audit(tx, ctx, requestId, "service.consent_display_updated", "service", serviceId, Object.keys(input).filter(key => key !== "version"), serviceId);
-    return { ...displayDto(result, serviceId, kind), ...await displayNames(tx, serviceId) };
+    const names = await displayNames(tx, serviceId);
+    assertFileDeadlines(deadlines);
+    if (result.publication?.expiresAt && result.publication.expiresAt <= new Date())
+      fail(422, "INVALID_POLICY_LINK", "처리방침 게시 기간이 끝났습니다. 공개 중인 버전을 다시 선택해주세요.");
+    return { ...displayDto(result, serviceId, kind), ...names };
   });
 }

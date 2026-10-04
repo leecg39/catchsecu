@@ -1,0 +1,89 @@
+{
+  "cases": [
+    {
+      "role": "owner",
+      "path": "/audit-events?kind=service&serviceId=35beff5d-72e0-44e7-b100-2c475a4e6ba2&page=100&pageSize=10",
+      "status": 200,
+      "requestId": "0b85c949-bbfb-4786-89ed-87ee4c562b45",
+      "rowCount": 1,
+      "total": 11
+    },
+    {
+      "role": "owner",
+      "path": "/audit-events?kind=service&kind=all",
+      "status": 422,
+      "requestId": "dd7ba228-6d0b-4d75-8c05-9c757be87c9e",
+      "rowCount": null,
+      "total": null
+    },
+    {
+      "role": "owner",
+      "path": "/audit-events/export?search=a&search=b",
+      "status": 422,
+      "requestId": "26f2604f-6c02-4d90-a69a-b1237283c478",
+      "rowCount": null,
+      "total": null
+    },
+    {
+      "role": "owner",
+      "path": "/api/v1/audit-events/export?kind=service&serviceId=35beff5d-72e0-44e7-b100-2c475a4e6ba2",
+      "status": 200,
+      "requestId": "b3a8c243-4079-451e-b891-0555037d870b",
+      "rowCount": 11,
+      "bomInDownloadedFile": true
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/audit-events?kind=service",
+      "status": 200,
+      "requestId": "096061ee-24de-44fc-870d-07b4eb505595",
+      "rowCount": 11,
+      "total": 11
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/audit-events/export?kind=service&serviceId=35beff5d-72e0-44e7-b100-2c475a4e6ba2",
+      "status": 200,
+      "requestId": "23699f0c-395f-4041-94da-a1e30c0bd2e5"
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/audit-events?kind=service&serviceId=dc1de9cb-1166-4c8c-b477-d40fc91e403c",
+      "status": 404,
+      "requestId": "235e8f6b-2b96-4fc7-bc86-cd7d63739751"
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/audit-events/export?kind=service&searchField=actor&search=owner",
+      "status": 403,
+      "requestId": "af78b074-9cdb-414b-95fc-5b92445f6b93"
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/audit-events?kind=service&kind=all",
+      "status": 422,
+      "requestId": "a6785d30-65b8-4c84-b533-daec4ad32622"
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/me/audit-events?kind=access",
+      "status": 200,
+      "requestId": "001246f1-2140-410b-8450-818fb9971322",
+      "rowCount": 1,
+      "total": 1
+    }
+  ],
+  "ui": {
+    "owner": {
+      "serviceFilteredTotal": 11,
+      "page2Rows": 1,
+      "csvDownload": true
+    },
+    "privacy": {
+      "masked": true,
+      "serviceBHidden": true,
+      "actorFilterHidden": true,
+      "csvDownload": true
+    }
+  }
+}

@@ -1,0 +1,42 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/subprocessor-notices.test.ts (5 tests | 1 failed) 14732ms
+   × 다른 발송 작업을 참조한 이력에서 해당 작업의 주소나 상태를 노출하지 않는다 4873ms
+(node:6489) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:6923) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/subprocessor-notices.test.ts > 다른 발송 작업을 참조한 이력에서 해당 작업의 주소나 상태를 노출하지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.job.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/subprocessor-notices.test.ts:139:16
+
+  136 const f = await queuedNotice();
+  137 await db.job.update({ where: { id: f.job.id }, data: { dedupeKey: "mail:unrelated:" + randomUUID() } });
+  138 expect((await (await listNotices(req(f.noticePath, f.owner.cookie))).json()).items[0]).toMatchObject({ email: null, status: "unknown" });
+→ 139 await db.job.update(
+Database error. Code: `23514`. Message: `immutable marketing job binding`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/subprocessor-notices.test.ts:139:3
+    137|   await db.job.update({ where: { id: f.job.id }, data: { dedupeKey: "m…
+    138|   expect((await (await listNotices(req(f.noticePath, f.owner.cookie)))…
+    139|   await db.job.update({ where: { id: f.job.id }, data: { dedupeKey: "m…
+       |   ^
+    140|   expect((await (await listNotices(req(f.noticePath, f.owner.cookie)))…
+    141| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 40 passed (41)
+   Start at  15:11:21
+   Duration  44.30s (tests 84%, import 12%, transform 3%)
+

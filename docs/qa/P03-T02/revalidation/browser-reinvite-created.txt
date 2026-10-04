@@ -1,0 +1,207 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 미완료 기능 검증"(45): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=724]
+        container
+          text "서비스명"
+          text "재검증 서비스 A"
+        container
+          text "외부 ⓘ"
+          text "재검증 서비스 A"
+          image
+      container
+        anchor [ref=725, loc=href:/dashboard, url=http://localhost:3104/dashboard]
+          image
+          text "대시보드"
+        button [ref=726]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=727]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=728]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=729]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=730]
+          image
+          text "알림 서비스"
+          text "⌄"
+        container
+          button [ref=731]
+            image
+            text "관리"
+            text "⌃"
+          container
+            anchor [ref=732, loc=href:/set/company, url=http://localhost:3104/set/company]
+              text "회사 기본 정보"
+            anchor [ref=733, loc=href:/set/company/policy, url=http://localhost:3104/set/company/policy]
+              text "회사 보안 정책 관리"
+            anchor [ref=734, loc=href:/set/service, url=http://localhost:3104/set/service]
+              text "서비스 관리"
+            anchor [ref=735, loc=href:/set/member, url=http://localhost:3104/set/member]
+              text "구성원 관리"
+        button [ref=736]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=737]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=738, loc=href:/shared-privacy/view, url=http://localhost:3104/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=739, url=http://localhost:3104/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=740, loc=href:/help-center, url=http://localhost:3104/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          button [ref=741]
+            text "홈페이지"
+          button [ref=742]
+            text "개인정보"
+            text "처리방침"
+          button [ref=743]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          text "재검증 회사 6d8eed27"
+        container
+          button [ref=744]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=745, loc=css:a[aria-label="공지사항"], url=http://localhost:3104/notice]
+            image
+          button "문의" [ref=746, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=747, loc=css:a[aria-label="알림"], url=http://localhost:3104/integration/message]
+            image
+          button [ref=748]
+            image
+            text "MY"
+      container
+        container
+          heading
+            text "구성원 관리"
+          button [ref=781]
+            text "구성원 초대"
+        container
+          container
+            button [ref=782]
+              text "구성원"
+            button [ref=783]
+              text "초대 이력"
+          paragraph
+            text "역할과 서비스 범위로 접근 권한을 설정합니다. 자신의 권한 변경과 마지막 소유자 제외는 제한됩니다."
+          form
+            textbox "구성원 검색" [ref=784, loc=css:input[placeholder="이름 또는 이메일"]]
+              text "이름 또는 이메일"
+            combobox "구성원 상태" [ref=785, loc=css:select[aria-label="구성원 상태"]]
+              text "전체"
+            button [ref=786]
+              text "검색"
+          status
+            text "초대 메일 전송을 요청했습니다."
+          table
+            table_row
+              table_cell
+                text "이름 / 이메일"
+              table_cell
+                text "역할"
+              table_cell
+                text "서비스"
+              table_cell
+                text "상태"
+              table_cell
+                text "관리"
+            table_row
+              table_cell
+                text "재검증 owner"
+                text "(나)"
+                text "recovery-owner-6d8eed27@example.test"
+              table_cell
+                text "소유자"
+              table_cell
+                text "전체 서비스"
+              table_cell
+                text "활성"
+              table_cell
+            table_row
+              table_cell
+                text "재검증 member"
+                text "recovery-member-6d8eed27@example.test"
+              table_cell
+                text "관리자"
+              table_cell
+                text "전체 서비스"
+              table_cell
+                text "제외"
+              table_cell
+            table_row
+              table_cell
+                text "재검증 expert"
+                text "(전문가 배정)"
+                text "recovery-expert-6d8eed27@example.test"
+              table_cell
+                text "조회자"
+              table_cell
+                text "-"
+              table_cell
+                text "제외"
+              table_cell
+          container
+            container
+              text "총"
+              text "3"
+              text "개"
+            combobox "페이지당 행 수" [ref=787]
+              text "20"
+            container
+              button "이전 페이지" [ref=788]
+                text "‹"
+              container
+                text "1"
+                text "/"
+                text "1"
+              button "다음 페이지" [ref=789]
+                text "›"
+        container
+          heading
+            text "서비스 접근 요청"
+          paragraph
+            text "승인하면 해당 구성원의 현재 역할 권한으로 요청한 서비스 접근이 부여됩니다."
+          container
+            text "상태"
+            combobox [ref=790]
+              text "검토 대기"
+          table
+            table_row
+              table_cell
+                text "요청자"
+              table_cell
+                text "서비스"
+              table_cell
+                text "사유"
+              table_cell
+                text "상태"
+              table_cell
+                text "요청 시각"
+              table_cell
+                text "검토"
+            table_row
+              table_cell
+                image

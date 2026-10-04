@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-04",
+  "task": "P12-T03",
+  "status": "in_progress",
+  "officialCounts": {
+    "completed": 15,
+    "in_progress": 42,
+    "planned": 15
+  },
+  "tests": {
+    "files": 3,
+    "passed": 33,
+    "newAuthorityTests": 27
+  },
+  "build": "recovery-production-v19",
+  "typecheck": "passed during production build",
+  "lint": "passed",
+  "browser": {
+    "denied": [
+      {
+        "path": "/api/v1/analytics/closes?month=2026-09",
+        "status": 403
+      },
+      {
+        "path": "/api/v1/analytics/closes/070086c3-869f-4e87-a93e-00ff7e869ba0/export",
+        "status": 403
+      },
+      {
+        "path": "/api/v1/analytics/closes",
+        "status": 403
+      },
+      {
+        "path": "/api/v1/analytics/closes?month=2026-09&serviceId=18f261ef-e937-40f1-858d-e6d73ceb338c",
+        "status": 404
+      }
+    ],
+    "replay": {
+      "status": 200,
+      "created": false,
+      "id": "ab09639f-40a0-4b0c-a9a3-13c2cb6c7469"
+    },
+    "geometry": {
+      "innerWidth": 390,
+      "scrollWidth": 390
+    }
+  },
+  "networkRecovery": {
+    "offlineError": "Failed to fetch",
+    "recovered": true
+  },
+  "database": {
+    "records": 2,
+    "beforeHash": "8ad213c16be985050347cd2b490b1d20a61ad658e2c34ad73ce943ad4d79f595",
+    "afterHash": "8ad213c16be985050347cd2b490b1d20a61ad658e2c34ad73ce943ad4d79f595",
+    "unchanged": true,
+    "afterRestartAuditCounts": [
+      {
+        "_count": {
+          "_all": 2
+        },
+        "action": "compliance.closed"
+      },
+      {
+        "_count": {
+          "_all": 4
+        },
+        "action": "compliance.exported"
+      },
+      {
+        "_count": {
+          "_all": 12
+        },
+        "action": "compliance.viewed"
+      }
+    ]
+  },
+  "files": [
+    {
+      "file": "company-close.csv",
+      "sha256": "7d21750d2a80dc5a0d3db09f47aa68e5f2ed476a39d9ef8e5215baec9fadcd22",
+      "rows": 4,
+      "bom": "efbbbf"
+    },
+    {
+      "file": "member-service-a-close.csv",
+      "sha256": "bf69c042e09c8aed2be4ec16ddd4607c4f17e3922a47e6dd5fd4ce32a1f59bef",
+      "rows": 3,
+      "bom": "efbbbf"
+    },
+    {
+      "file": "restart-service-a-close.csv",
+      "sha256": "bf69c042e09c8aed2be4ec16ddd4607c4f17e3922a47e6dd5fd4ce32a1f59bef",
+      "rows": 3,
+      "bom": "efbbbf"
+    },
+    {
+      "file": "service-a-close.csv",
+      "sha256": "bf69c042e09c8aed2be4ec16ddd4607c4f17e3922a47e6dd5fd4ce32a1f59bef",
+      "rows": 3,
+      "bom": "efbbbf"
+    }
+  ],
+  "remaining": [
+    "PDF/CSV async export jobs and expiry files",
+    "evidence-backed compliance checks",
+    "immutable snapshot database enforcement",
+    "original full acceptance gates and dependencies"
+  ],
+  "executionPreference": "one Task at a time, starting with P12-T03"
+}

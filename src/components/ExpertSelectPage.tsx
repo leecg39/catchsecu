@@ -17,6 +17,7 @@ export function ExpertSelectPage() {
   const assignments = useResource<ExpertAssignmentList>("/expert-assignments?scope=mine&pageSize=" + pageSize + "&page=" + page + "&search=" + encodeURIComponent(query.trim()));
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
   const lock = useRef(false), rows = assignments.data?.items ?? [], selected = rows.find(item => item.companyId === companyId);
+  const currentPage = assignments.data?.page ?? page;
   async function select(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (lock.current) return; lock.current = true; setError(""); setBusy(true);
     try {
@@ -48,11 +49,11 @@ export function ExpertSelectPage() {
         </label>)}</div>}
       {error && <p role="alert" className="auth-error">{error}</p>}
       {assignments.data && <div className="cs-pagination"><span>총 {assignments.data.total}개</span><div>
-        <button type="button" aria-label="이전 페이지" disabled={busy || assignments.loading || page <= 1}
-          onClick={() => { setPage(page - 1); setCompanyId(""); }}>‹</button>
-        <span>{page} / {Math.max(1, Math.ceil(assignments.data.total / pageSize))}</span>
-        <button type="button" aria-label="다음 페이지" disabled={busy || assignments.loading || page * pageSize >= assignments.data.total}
-          onClick={() => { setPage(page + 1); setCompanyId(""); }}>›</button>
+        <button type="button" aria-label="이전 페이지" disabled={busy || assignments.loading || currentPage <= 1}
+          onClick={() => { setPage(currentPage - 1); setCompanyId(""); }}>‹</button>
+        <span>{currentPage} / {Math.max(1, Math.ceil(assignments.data.total / pageSize))}</span>
+        <button type="button" aria-label="다음 페이지" disabled={busy || assignments.loading || currentPage * pageSize >= assignments.data.total}
+          onClick={() => { setPage(currentPage + 1); setCompanyId(""); }}>›</button>
       </div></div>}
       <ActionButton disabled={!selected?.canSelect || assignments.loading || busy}>{busy ? "확인 중…" : "전문가 PLUS 시작하기"}</ActionButton>
     </form>

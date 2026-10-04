@@ -1,0 +1,430 @@
+{
+  "task": "P12-T01",
+  "status": "in_progress",
+  "recordedAt": "2026-10-04T09:46:16.202834+00:00",
+  "counts": {
+    "completed": 16,
+    "in_progress": 41,
+    "planned": 15
+  },
+  "validation": {
+    "testFiles": 14,
+    "testsPassed": 264,
+    "testsFailed": 0,
+    "focusedNewTests": 26,
+    "build": "v29",
+    "buildId": "8px663E8SCuwhIcu0ecej",
+    "typecheckExit": 0,
+    "lintExit": 0,
+    "contractPaths": 289,
+    "operations": 418,
+    "policies": 38,
+    "planRoutes": 181,
+    "tasks": 72
+  },
+  "runtime": {
+    "port": 3129,
+    "beforePid": 93825,
+    "afterPid": 4512,
+    "betterAuth": "1.7.7",
+    "next": "16.3.8"
+  },
+  "browser": {
+    "taskSpace": 45,
+    "page": "p1",
+    "uiAuthPostCases": 9,
+    "successfulPosts": 7,
+    "rejectedSignins": 2,
+    "signedEmailConfirmedWithoutDbFixture": true,
+    "accessCsvRows": 5,
+    "databaseEvents": 20,
+    "sessionCount": 0,
+    "proofCount": 0,
+    "restartStateHash": "e36ad241251415c6cf037b90e103aa3accc1ea980b449819ba47c58d045713da",
+    "mobileWidth": 390,
+    "documentWidth": 390
+  },
+  "limitations": [
+    "Scoped related regression only; not the entire repository suite",
+    "Signed email/reset links were read privately from the encrypted development queue; external delivery and workers not verified",
+    "Password trigger uses its own UUID and deletes previous sessions without per-session termination events; next same-Task gap",
+    "Remaining producers and acceptance across all 10 log routes incomplete",
+    "v27/v28 evidence and historical source hashes preserved; v28 current-source mismatch is expected after these changes",
+    "First rejected-login phase label is retained with its observer issue documented",
+    "No commit/push; own old 3128 server stopped; user 3100 was not signaled"
+  ],
+  "productAndTestSources": [
+    {
+      "path": "prisma/migrations/20261002133000_utc_timestamps/migration.sql",
+      "bytes": 4329,
+      "sha256": "0a15996e62acaf1717b93e4f96d34e7f0642401f4bc70cfeea46607dd7aba1ed"
+    },
+    {
+      "path": "scripts/generate-openapi.ts",
+      "bytes": 135381,
+      "sha256": "1a4f5d9a8b8a6e695bae6c01fc23b697a55c797353b4c0601972b43893ca3dd1"
+    },
+    {
+      "path": "src/app/api/v1/audit-events/export/route.ts",
+      "bytes": 766,
+      "sha256": "72719c8ce451e4f4d1c133a2fef1a2312072ce7f8d3252a41864f04b3b6a2806"
+    },
+    {
+      "path": "src/app/api/v1/audit-events/route.ts",
+      "bytes": 517,
+      "sha256": "4116d5a4f7e08a00f517ae4109b1c2424801c2df96dee0c3104186147c0710e0"
+    },
+    {
+      "path": "src/app/api/v1/auth/[...all]/route.ts",
+      "bytes": 178,
+      "sha256": "afc2ecf64ebc05a440be2c215c73efdb0e23257bb228adb7b31c8bbaa592ca39"
+    },
+    {
+      "path": "src/app/api/v1/context/route.ts",
+      "bytes": 879,
+      "sha256": "302dfaacea7c614f6de7ea0a84bfd80e45d5ecb5a765a93b39b1729ae44f1df8"
+    },
+    {
+      "path": "src/app/api/v1/me/audit-events/export/route.ts",
+      "bytes": 628,
+      "sha256": "1579d637228503a0dcb98d645b7439cbf522cb22dfa23ee62a567b3dbfb98f51"
+    },
+    {
+      "path": "src/app/api/v1/me/audit-events/route.ts",
+      "bytes": 490,
+      "sha256": "6e28dcc5642b94b82a4474ab24aae95b44cf65ed93f4aee023e03f06851af662"
+    },
+    {
+      "path": "src/components/auth/LiveAuth.tsx",
+      "bytes": 18655,
+      "sha256": "32e5155229a23b90ea5a75b6e58ff4afa63988f716e7b809197e8c643f6254f9"
+    },
+    {
+      "path": "src/contracts/context.ts",
+      "bytes": 169,
+      "sha256": "cdaaa008dbac8ed5b2cd6d188411877e0f8b6c7adfaa24efb7422ea93c41ad70"
+    },
+    {
+      "path": "src/server/audit-events.ts",
+      "bytes": 11640,
+      "sha256": "a4d123d71948ac07d559652abe18aa93cfed3c59ef4aadd4ffb6197a8ce769dc"
+    },
+    {
+      "path": "src/server/audit.ts",
+      "bytes": 1309,
+      "sha256": "38e3ab79ea28195861f62658e9b2e74db110b5a3dee2f8b47612f62a99bd2898"
+    },
+    {
+      "path": "src/server/auth-adapter.ts",
+      "bytes": 10386,
+      "sha256": "f127be4a88391c8af541b6b464bcaae5ec6f4c5e98dfe29a5f272a516077646b"
+    },
+    {
+      "path": "src/server/auth-mutation-scope.ts",
+      "bytes": 472,
+      "sha256": "00a6bc9c132bdc2d3f9c163f303f13dca9cc2c2aab023d2f9c22a102dcdfabff"
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "bytes": 12074,
+      "sha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31"
+    },
+    {
+      "path": "src/server/auth.ts",
+      "bytes": 11496,
+      "sha256": "ed0fde147e6c490548d5f7b8c4604cca2664c01dd56f512b43ef6964d5f0dee8"
+    },
+    {
+      "path": "src/server/context-selection.ts",
+      "bytes": 4861,
+      "sha256": "02f7dbf5ff22223f4b6be425deacfb5ce94c8d12d8b6f31365007713ca0e04ed"
+    },
+    {
+      "path": "src/server/credential-lock.ts",
+      "bytes": 3364,
+      "sha256": "d2f1f3115ab3b525b2ee3591eeef93b0f3130a212d4776e47726b55a1d17d778"
+    },
+    {
+      "path": "src/server/credential-scope.ts",
+      "bytes": 221,
+      "sha256": "de115209ed11431f5ffd9186caefe76fa24af3ac5a5309f07c4691582c7b6d36"
+    },
+    {
+      "path": "src/server/db.ts",
+      "bytes": 1389,
+      "sha256": "d87f252fa82c1c0807956f96e64fe0271f549562cde5394b21f7a5e50a1a7622"
+    },
+    {
+      "path": "tests/server/account-current-authority.test.ts",
+      "bytes": 6251,
+      "sha256": "ba5f61c5a8152c73baa5d881029e5593a374971ca16c984ce8e82f54ae2e7d7e"
+    },
+    {
+      "path": "tests/server/audit-auth-atomicity.test.ts",
+      "bytes": 4065,
+      "sha256": "c6e3e9a3a3535202617cd8ee06a865be46fa4d745dbc84bb316fd9b783c867d1"
+    },
+    {
+      "path": "tests/server/audit-current-authority.test.ts",
+      "bytes": 10585,
+      "sha256": "f16297901a7bf48b585926dc1d0e672bea71b1913c09c74d9ded650093d0989f"
+    },
+    {
+      "path": "tests/server/audit-events.test.ts",
+      "bytes": 13342,
+      "sha256": "6593aa2cb3d122b47f795bc858af55bb5328a127972425a01282a96384dca07c"
+    },
+    {
+      "path": "tests/server/auth-mutations-audit.test.ts",
+      "bytes": 16736,
+      "sha256": "aeb397db861b66a1621d930632cc60c9009a5f2f0d57a7660f02db7c0a0ba208"
+    },
+    {
+      "path": "tests/server/auth-navigation.test.ts",
+      "bytes": 5309,
+      "sha256": "023ab7a7d38aa53708a5d0f9d4f161244bd3fb6ae90a451207084fcc271bf3fc"
+    },
+    {
+      "path": "tests/server/auth-public-audit.test.ts",
+      "bytes": 19134,
+      "sha256": "c52cd6d39428af3130a33033146967aa48e37e2f1452f3d274b6bee587c86688"
+    },
+    {
+      "path": "tests/server/auth-session-gate.test.ts",
+      "bytes": 7219,
+      "sha256": "9255c8e62d22fd8102ec84aca3d62b1fd170e23721ad08fe2a82d2e7f674e270"
+    },
+    {
+      "path": "tests/server/context-audit.test.ts",
+      "bytes": 9828,
+      "sha256": "eee66827f64d363bc9b92a785cc099acd805d0e0eb430b252278d576634ce5ec"
+    },
+    {
+      "path": "tests/server/expert-current-authority.test.ts",
+      "bytes": 6178,
+      "sha256": "a3a83a3c408e26b6d47c9de57958afc29cf8ecc2cf3e5d33112a1f75e9195910"
+    },
+    {
+      "path": "tests/server/foundation.test.ts",
+      "bytes": 64566,
+      "sha256": "557c5c235575aeeb8a3763a142f5d749c8ed175cf435db2b3b7d087577db8edf"
+    },
+    {
+      "path": "tests/server/ip-access.test.ts",
+      "bytes": 17806,
+      "sha256": "0a2c327176164ced67d9189bdbc150dc3b84adf16e002a5668057ffb5c9188f7"
+    },
+    {
+      "path": "tests/server/mfa-policy.test.ts",
+      "bytes": 17173,
+      "sha256": "135f3511c0811056e7f7c8e91f855cd098c084420ee2cede63b4f3ae9a359964"
+    },
+    {
+      "path": "tests/server/password-policy.test.ts",
+      "bytes": 25843,
+      "sha256": "068bd6f743c2deb39396de11401869b394a68e26473d560ddbcc532521f50868"
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/README.md",
+      "bytes": 8853,
+      "sha256": "18d09937aaa4fee401d03f02ee998ea4b05aa052babe345081b3d8ca044fe22d"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/activity-auth-desktop.png",
+      "bytes": 108003,
+      "sha256": "caed1cbf0f8897e30a0e871f7ba56ec5082a04c16f7a2ec0cf2da84ff9c65faa"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/activity-auth-http.json",
+      "bytes": 1833,
+      "sha256": "78183c0f7f126163158e0540b9fbb064130efd7def224cf78c26b0a1f1b3fe77"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/activity-auth-layout.json",
+      "bytes": 55,
+      "sha256": "f64d2dcdc4528e681fe3ac8094882f7b94cb66fb7b43fc868ccd5d880fddd7d4"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/activity-auth-mobile.png",
+      "bytes": 44352,
+      "sha256": "291101f631f43ecb7ef9d3c38e52a0af55cc70d8b4d21c4fdfb256100dfb650b"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/activity-auth.csv",
+      "bytes": 759,
+      "sha256": "a0ebf3298065d0d59329b4562ee6c4bce9d6774c45b441ef618d6ab187c66352"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/baseline.log",
+      "bytes": 11872,
+      "sha256": "56906f2900ed90ae9c358e7c05b485bb50b6dcfe36b7f40461278c7db1574910"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/browser-progress.json",
+      "bytes": 848,
+      "sha256": "4380d1bab2f203c3371f93a3b209f89d93abd96bf906620a9865d572d31fbdce"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/browser.json",
+      "bytes": 1805,
+      "sha256": "9799fd725f80fb96c15a51b64681405c606f3b20bddfff178617e8e08fdb4186"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/build-final.log",
+      "bytes": 4839,
+      "sha256": "2504b0ba189227452820a006fe77c7737d048e4c263464fc3cfe8a1639bae424"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/build-v29.log",
+      "bytes": 4840,
+      "sha256": "ccb7a613c53ae7f84b29a214f1efba3e85b4bbe7963db41bd5b4a86ffc529dc3"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/company-required-http.json",
+      "bytes": 314,
+      "sha256": "377c31473925df6f7e4be474f1a5f0012e106091bbe647a6bcbdd6c5d4b9ecef"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/confirmed.json",
+      "bytes": 871,
+      "sha256": "db0307fa601e63dd8b741a8bc2ccf085f94f12f81b4b15a3d000859a3a61d5c3"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/contracts-final.log",
+      "bytes": 230,
+      "sha256": "e767ac54d8d59f6b7352c18aa2c8ae779a6dada82645fc8c77e540e4a971d107"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/database-restarted.json",
+      "bytes": 8328,
+      "sha256": "1c37876301461dfcb0242edb077f510bc73546a8944fca81f88cc07593538fb4"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/database.json",
+      "bytes": 8328,
+      "sha256": "1c37876301461dfcb0242edb077f510bc73546a8944fca81f88cc07593538fb4"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/email-navigation.json",
+      "bytes": 80,
+      "sha256": "adb69230f8668d4227e63adf60cae91d8cf7d1c79627620cd3eb0de27c9800fb"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/event-producers.json",
+      "bytes": 66425,
+      "sha256": "c238ff60c94384c5b5b39b89696342a2dd980af01a0031f959093f0b46791115"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/evidence-check.json",
+      "bytes": 5984,
+      "sha256": "e9bed1cf098d93601e3080c5606bd23151e2b66c69b93266e22d5b8cb94d4b38"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/link-resend.json",
+      "bytes": 357,
+      "sha256": "9e7f3d51576797c457b73249edda2846c8550c90edfcdb6b7f6a539a151d112d"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/link-reset-request.json",
+      "bytes": 363,
+      "sha256": "69091bbed6e86fbfe639a86cef048da2d265464796bf03252c27d6d3770d22b4"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/link-signup.json",
+      "bytes": 357,
+      "sha256": "f07bcbc1b63dc28501e4c4cb251bda9e26d75a5346286d08fbb9367cb3dc221a"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/lint-attempt1.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/lint-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/password-changed.png",
+      "bytes": 21073,
+      "sha256": "3eff1d971ee6351281521cf66dcb1beb2f5bc549756cb466db4f4fdadd313cd7"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/plans-final.log",
+      "bytes": 423,
+      "sha256": "e0ebfe0a4e158cfff7974847eeeef4323a187c373d83685ffbe9685d12f22a4f"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/reset-navigation.json",
+      "bytes": 109,
+      "sha256": "979aba84df0035e18005e07de50fb2359246f506ff9b4e274fb382f6ce5985db"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/reset-requested.png",
+      "bytes": 25762,
+      "sha256": "d5c4974dfe621c9d0bd7bddcc36bf8db62d4a72fb07232ef89c820b924b16ccb"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/restart-http.json",
+      "bytes": 491,
+      "sha256": "1bb231c0d835ede87eeecd6a17d29f5a3f207a13c16ccb4afdf83e41c8c680fd"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/signup-requested.png",
+      "bytes": 30370,
+      "sha256": "4d7b37577f5a7413800eee348752aa2cc95961455bb47ea29c323e682cd1aa5d"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/tests-attempt1.log",
+      "bytes": 3262,
+      "sha256": "2d9a1592f99501ab7dd928378a9e98c4a147011d895dbf271435572f464be254"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/tests-attempt2.log",
+      "bytes": 214,
+      "sha256": "d2f0c6b2d88d66826d03188a0927e07ff3bb7de9765ec67fcb750a414e8e4296"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/tests-final.log",
+      "bytes": 2537,
+      "sha256": "0ff0cef71f2408ac4688849768f3ad98f0b70b570911fee6270f19a25b9d55ea"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/tests-regression.log",
+      "bytes": 2537,
+      "sha256": "6a65b6e7355c41e5c69be23412594147aa42b26c45593d8d2e8cbd28281a55a7"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/typecheck-attempt1.log",
+      "bytes": 375,
+      "sha256": "ec89ce4ea5eff16875b54b79f77557708fc4bf66ef35444e1a5154d4294c6d9e"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/typecheck-attempt2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/typecheck-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/v27-preserved.json",
+      "bytes": 260,
+      "sha256": "c1584b28f0448f422de788908b6bcf4526eb9a78707e93a786fbca38a25d3b53"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/v28-preserved.json",
+      "bytes": 9162,
+      "sha256": "e26aba32aeab39627a030516f852d83dee15848afa5b84cc594aded2e919b64d"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/public-auth/verified-profile.png",
+      "bytes": 94391,
+      "sha256": "b037710b9d9adde2b7a03efc05b6728350e37da1596020c6ec598b72369d3789"
+    }
+  ]
+}

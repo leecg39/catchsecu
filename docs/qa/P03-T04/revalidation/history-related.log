@@ -1,0 +1,42 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/subprocessor-notices.test.ts (3 tests | 1 failed) 2887ms
+   × 재시도·실패·취소·작업 누락을 구분하며 삭제된 발송 주소를 현재 주소로 대체하지 않는다 772ms
+(node:5256) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:5475) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/subprocessor-notices.test.ts > 재시도·실패·취소·작업 누락을 구분하며 삭제된 발송 주소를 현재 주소로 대체하지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.job.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/subprocessor-notices.test.ts:107:16
+
+  104   const history = await (await listNotices(req(f.noticePath, f.owner.cookie))).json();
+  105   expect(history.items[0].status).toBe(expected);
+  106 }
+→ 107 await db.job.update(
+Database error. Code: `23514`. Message: `erased jobs cannot run`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/subprocessor-notices.test.ts:107:3
+    105|     expect(history.items[0].status).toBe(expected);
+    106|   }
+    107|   await db.job.update({ where: { id: f.job.id }, data: { payloadErased…
+       |   ^
+    108|   expect((await (await listNotices(req(f.noticePath, f.owner.cookie)))…
+    109|   await db.subprocessorNotice.update({ where: { id: f.row.id }, data: …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 38 passed (39)
+   Start at  15:10:44
+   Duration  18.89s (tests 84%, import 12%, transform 4%)
+

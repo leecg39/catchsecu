@@ -1,0 +1,55 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/subprocessor-notices.test.ts (3 tests | 2 failed) 2607ms
+   × 수신자 변경 후에도 발송 당시 주소를 표시하고 로컬 작업 완료를 수신 완료로 오인하지 않는다 709ms
+   × 재시도·실패·취소·작업 누락을 구분하며 삭제된 발송 주소를 현재 주소로 대체하지 않는다 652ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/subprocessor-notices.test.ts > 수신자 변경 후에도 발송 당시 주소를 표시하고 로컬 작업 완료를 수신 완료로 오인하지 않는다
+AssertionError: expected { …(7) } to match object { …(2) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "email": "controller@example.com",
+-   "status": "processed",
++   "email": "changed@example.test",
++   "status": "queued",
+  }
+
+ ❯ tests/server/subprocessor-notices.test.ts:94:28
+     92|   expect((await db.job.findUniqueOrThrow({ where: { id: f.job.id } }))…
+     93|   const history = await (await listNotices(req(f.noticePath, f.owner.c…
+     94|   expect(history.items[0]).toMatchObject({ email: person.email, status…
+       |                            ^
+     95|   expect(history.items[0].completedAt).toBeTruthy();
+     96|   expect(JSON.stringify(history)).not.toContain("payloadCipher");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/subprocessor-notices.test.ts > 재시도·실패·취소·작업 누락을 구분하며 삭제된 발송 주소를 현재 주소로 대체하지 않는다
+AssertionError: expected 'queued' to be 'retry' // Object.is equality
+
+Expected: "retry"
+Received: "queued"
+
+ ❯ tests/server/subprocessor-notices.test.ts:105:37
+    103|     await db.job.update({ where: { id: f.job.id }, data: { status: job…
+    104|     const history = await (await listNotices(req(f.noticePath, f.owner…
+    105|     expect(history.items[0].status).toBe(expected);
+       |                                     ^
+    106|   }
+    107|   await db.job.update({ where: { id: f.job.id }, data: { payloadErased…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  15:09:54
+   Duration  3.78s (tests 71%, import 19%, transform 10%)
+

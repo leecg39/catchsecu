@@ -5,6 +5,9 @@ import Link from "next/link";
 import type { AnalyticsDashboard, ComplianceCloseRecord } from "@/contracts/analytics";
 import { api, errorText, useResource } from "@/lib/api";
 import { ActionButton, DataTable, PageHeading, Panel } from "./shared";
+import { ComplianceExports } from "./ComplianceExports";
+import { complianceEvidenceChecks, evidenceStatusLabels } from "@/contracts/compliance-evidence";
+import { useApplication } from "./ApplicationContext";
 
 const date = (value: string) => new Date(value).toLocaleDateString("ko-KR");
 const boundary = (value: string, end: boolean) => {
@@ -63,28 +66,62 @@ export function PrivacyStatistics({ path }: { path: string }) {
 export function CompliancePage() {
   const result = useResource<AnalyticsDashboard>("/analytics/dashboard");
   const data = result.data;
-  const month = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit" }).format(new Date());
-  const closed = useResource<{ close: ComplianceCloseRecord | null }>("/analytics/closes?month=" + month);
+  const app = useApplication();
+  const canCloseCompany = !!app.data?.company && ["owner", "admin"].includes(app.data.company.role) &&
+    app.data.memberships.some(member => member.tenantId === app.data?.company?.id && member.accessKind === "direct");
+  const [month, setMonth] = useState(() => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit" }).format(new Date()));
+  const [scope, setScope] = useState<string | null>(null);
+  const selected = scope ?? (canCloseCompany ? "" : null);
+  const selectedService = data?.services.find(service => service.id === selected);
+  const validScope = selected === "" ? canCloseCompany : !!selectedService;
+  const selectedDashboard = useResource<AnalyticsDashboard>(validScope && selected ? "/analytics/dashboard?serviceId=" + selected : null);
+  const current = selected ? selectedDashboard : result;
+  const closeQuery = "/analytics/closes?" + new URLSearchParams({ month, ...(selected ? { serviceId: selected } : {}) });
+  const closed = useResource<{ close: ComplianceCloseRecord | null }>(validScope && /^\d{4}-(0[1-9]|1[0-2])$/.test(month) ? closeQuery : null);
   const [busy, setBusy] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   async function closeMonth() {
-    if (busy) return; setBusy(true); setError(""); setMessage("");
-    try { await api("/analytics/closes", { method: "POST", body: JSON.stringify({ month }) }); setMessage("이번 달 집계를 마감했습니다. 준수 통과로 판정하지 않습니다."); closed.reload(); }
+    if (busy || !validScope || !month) return; setBusy(true); setError(""); setMessage("");
+    try { await api("/analytics/closes", { method: "POST", body: JSON.stringify({ month, ...(selected ? { serviceId: selected } : {}) }) }); setMessage("선택한 월과 범위의 집계를 마감했습니다. 준수 통과로 판정하지 않습니다."); closed.reload(); }
     catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
   }
   return <div className="public-statistics"><PageHeading title="개인정보 보호현황 점검 결과" />
-    <Panel title="점검 상태"><p role="status">검증된 준수 점검 결과가 아직 없습니다.</p>
-      <p className="public-stat-note">점수와 과태료는 실제 점검 항목 및 근거가 확인된 뒤 산정합니다. 월마감은 당시 집계를 고정할 뿐 통과를 뜻하지 않습니다.</p>
-      <ActionButton disabled={busy} onClick={() => { void closeMonth(); }}>{busy ? "마감 중…" : month + " 집계 마감"}</ActionButton>
+    <Panel title="점검 상태"><p role="status">법적 준수 여부는 미판정입니다.</p>
+      <p className="public-stat-note">월마감에 실제 등록·게시·보유 기한과 회사 인증 설정의 점검 근거를 저장합니다. 조건 확인은 준수 통과를 뜻하지 않으며 점수나 과태료를 산정하지 않습니다.</p>
+      <div className="public-stat-filters">
+        <label>마감 월 <input className="cs-input" type="month" aria-label="마감 월" value={month} disabled={busy}
+          onChange={event => { setMonth(event.target.value); setMessage(""); setError(""); }} /></label>
+        <label>마감 범위 <select className="cs-select" aria-label="마감 범위" value={selected ?? "select"} disabled={busy || result.loading}
+          onChange={event => { setScope(event.target.value); setMessage(""); setError(""); }}>
+          <option value="select" disabled>서비스를 선택해주세요</option>
+          {canCloseCompany && <option value="">회사 전체</option>}
+          {(data?.services ?? []).map(service => <option key={service.id} value={service.id}>{service.name}</option>)}
+        </select></label>
+        <ActionButton disabled={busy || !validScope || !month || closed.loading || !!closed.error || !!closed.data?.close}
+          onClick={() => { void closeMonth(); }}>{busy ? "마감 중…" : closed.data?.close ? "마감된 집계" : month + " 집계 마감"}</ActionButton>
+        <ActionButton secondary disabled={busy || !validScope || !month} onClick={closed.reload}>마감 새로고침</ActionButton>
+      </div>
+      {!canCloseCompany && <p className="public-stat-note">권한이 있는 서비스를 선택해 마감할 수 있습니다. 회사 전체 마감은 소유자와 관리자만 이용할 수 있습니다.</p>}
+      {closed.loading && <p role="status">선택한 범위의 마감을 확인하고 있습니다.</p>}
+      {closed.error && <p role="alert">{closed.error.message}</p>}
       {closed.data?.close && <p><a href={"/api/v1/analytics/closes/" + closed.data.close.id + "/export"}>마감 CSV 내려받기</a> · 보유 응답 {closed.data.close.totals.retainedSubmissions}건 · 판정 없음</p>}
       {message && <p role="status">{message}</p>}{error && <p role="alert">{error}</p>}
     </Panel>
-    {result.loading ? <Panel><p role="status">현황을 불러오는 중입니다.</p></Panel>
-      : result.error ? <Panel><p role="alert">{result.error.message}</p></Panel>
-      : data && <Panel title="점검을 위한 현재 자료"><div className="public-stat-overview">
-        <p>접근 가능한 서비스 <strong>{data.totals.services}</strong>개</p>
-        <p>동의서 <strong>{data.totals.consentDocuments}</strong>개</p>
-        <p>처리방침 <strong>{data.totals.policyDocuments}</strong>개</p>
-        <p>현재 보유 응답 <strong>{data.totals.retainedSubmissions}</strong>건</p>
+    {closed.data?.close && <Panel title="마감에 저장된 점검 근거">
+      {closed.data.close.evidence ? <>
+        <p className="public-stat-note">점검 시각 {new Date(closed.data.close.evidence.checkedAt).toLocaleString("ko-KR")} · 마감 저장 당시의 데이터입니다. 과거 월말 상태를 복원한 값이 아닙니다.</p>
+        <DataTable columns={["분류", "점검 항목", "상태", "근거와 확인 범위"]}
+          rows={complianceEvidenceChecks(closed.data.close.evidence).map(check => [check.category, check.title, evidenceStatusLabels[check.status], <div className="compliance-evidence-detail" key={check.id}>{check.detail}<p className="public-stat-note">원천: {check.source}</p></div>])} />
+        <p className="public-stat-note" style={{ overflowWrap: "anywhere" }}>저장된 근거의 무결성 해시: {closed.data.close.evidence.hash}</p>
+      </> : <p role="status">점검 근거 저장 기능이 추가되기 전의 마감입니다. 당시 집계만 보관되어 있으며 새 점검 결과를 소급해서 채우지 않습니다.</p>}
+    </Panel>}
+    {closed.data?.close && <ComplianceExports key={closed.data.close.id} closeId={closed.data.close.id} />}
+    {current.loading ? <Panel><p role="status">현황을 불러오는 중입니다.</p></Panel>
+      : current.error ? <Panel><p role="alert">{current.error.message}</p></Panel>
+      : validScope && current.data && <Panel title="선택 범위의 현재 자료"><div className="public-stat-overview">
+        <p>서비스 <strong>{current.data.totals.services}</strong>개</p>
+        <p>동의서 <strong>{current.data.totals.consentDocuments}</strong>개</p>
+        <p>처리방침 <strong>{current.data.totals.policyDocuments}</strong>개</p>
+        <p>현재 보유 응답 <strong>{current.data.totals.retainedSubmissions}</strong>건</p>
       </div><p className="public-stat-note">위 건수는 저장된 원천 데이터의 현황이며, 법적 준수 여부를 뜻하지 않습니다.</p>
         <Link className="cs-link" href="/privacy-detail">응답 보유 현황 보기</Link></Panel>}
   </div>;

@@ -1,0 +1,230 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 미완료 기능 검증"(45): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=1944]
+        container
+          text "서비스명"
+          text "재검증 서비스 A"
+        container
+          text "외부 ⓘ"
+          text "재검증 서비스 A"
+          image
+      container
+        anchor [ref=1945, loc=href:/dashboard, url=http://localhost:3115/dashboard]
+          image
+          text "대시보드"
+        button [ref=1946]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=1947]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=1948]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=1949]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=1950]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=1951]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=1952]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=1953]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=1954, loc=href:/shared-privacy/view, url=http://localhost:3115/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=1955, url=http://localhost:3115/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=1956, loc=href:/help-center, url=http://localhost:3115/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          button [ref=1957]
+            text "홈페이지"
+          button [ref=1958]
+            text "개인정보"
+            text "처리방침"
+          button [ref=1959]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          text "재검증 회사 6d8eed27"
+        container
+          button [ref=1960]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=1961, loc=css:a[aria-label="공지사항"], url=http://localhost:3115/notice]
+            image
+          button "문의" [ref=1962, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=1963, loc=css:a[aria-label="알림"], url=http://localhost:3115/integration/message]
+            image
+          button [ref=1964]
+            image
+            text "MY"
+      container
+        container
+          heading
+            text "개인정보 활동 검토 이력"
+          anchor [ref=1965, loc=href:/my-page/info, url=http://localhost:3115/my-page/info]
+            text "프로필"
+        paragraph
+          text "받은 검토 요청에 처리 사유를 답변하고 진행 상태를 확인합니다. 앱 내 메시지이며 이메일 발송 결과를 뜻하지 않습니다."
+        tablist "검토 이력 범위"
+          tab [ref=1966]
+            text "받은 요청"
+          tab [ref=1967]
+            text "보낸 요청"
+          tab [ref=1968]
+            text "회사 전체"
+        container
+          form
+            container
+              text "상태"
+              combobox "검토 상태" [ref=1969, loc=css:select[aria-label="검토 상태"]]
+                text "전체 상태"
+            container
+              text "서비스"
+              combobox "검토 서비스" [ref=1970, loc=css:select[aria-label="검토 서비스"]]
+                text "전체 서비스"
+            container
+              text "시작일"
+              textbox "검토 시작일" [ref=1971, loc=css:input[aria-label="검토 시작일"]]
+                spinbutton "연도" [ref=1972]
+                  text "연도"
+                text "."
+                spinbutton "월" [ref=1973]
+                  text "월"
+                text "."
+                spinbutton "일" [ref=1974]
+                  text "일"
+                text "."
+            container
+              text "종료일"
+              textbox "검토 종료일" [ref=1975, loc=css:input[aria-label="검토 종료일"]]
+                spinbutton "연도" [ref=1976]
+                  text "연도"
+                text "."
+                spinbutton "월" [ref=1977]
+                  text "월"
+                text "."
+                spinbutton "일" [ref=1978]
+                  text "일"
+                text "."
+            container
+              text "제목 검색"
+              textbox "검토 제목 검색" [ref=1979, loc=css:input[aria-label="검토 제목 검색"]]
+            button [ref=1980]
+              text "검색"
+            button [ref=1981]
+              text "검색 초기화"
+          container
+            container
+              text "전체"
+              text "0"
+              text "건"
+            button [ref=1982]
+              text "검토 이력 새로고침"
+          table
+            table_row
+              table_cell
+                text "#"
+              table_cell
+                text "수신일시"
+              table_cell
+                text "발신자"
+              table_cell
+                text "내용"
+              table_cell
+                text "구분"
+              table_cell
+                text "대상자"
+              table_cell
+                text "상태"
+              table_cell
+                text "메시지"
+            table_row
+              table_cell
+                image
+                paragraph
+                  text "조건에 맞는 검토 요청이 없습니다."
+          container "검토 이력 페이지"
+            combobox "검토 페이지당 행 수" [ref=1983, loc=css:select[aria-label="검토 페이지당 행 수"]]
+              text "10"
+            container
+              button "검토 이전 페이지" [ref=1984, loc=css:button[aria-label="검토 이전 페이지"]]
+                text "‹"
+              container
+                text "1"
+                text "/"
+                text "1"
+              button "검토 다음 페이지" [ref=1985, loc=css:button[aria-label="검토 다음 페이지"]]
+                text "›"
+        dialog "개인정보 활동 검토 상세"
+          container
+            heading
+              text "개인정보 활동 검토 상세"
+            button "닫기" [ref=1986, loc=css:button[aria-label="닫기"]]
+              text "×"
+          container
+            heading
+              text "화면 검증 개인정보 활동 검토"
+            paragraph
+              text "재검증 서비스 A"
+              text "·"
+              text "submission.read"
+            paragraph
+              text "요청자"
+              text "재검증 owner"
+              text "· 대상자"
+              text "재검증 member"
+            status
+              text "처리 완료"
+              text "· 버전"
+              text "3"
+            ordered_list
+              list_item
+                container
+                  text "검토 요청"
+                  text "·"
+                  text "재검증 owner"
+                text "2026. 10. 4. 오후 4:02:09"
+                paragraph
+                  text "화면에서 요청한 합성 기록입니다. 업무 목적을 답변해주세요."
+              list_item
+                container
+                  text "대상자 답변"
+                  text "·"
+                  text "재검증 member"
+                text "2026. 10. 4. 오후 4:02:32"
+                paragraph
+                  text "화면에서 확인했습니다. 합성 QA 업무 목적입니다."
+              list_item
+                container
+                  text "처리 완료"
+                  text "·"
+                  text "재검증 owner"
+                text "2026. 10. 4. 오후 4:02:44"
+                paragraph
+                  text "화면 답변 확인을 마쳤습니다."

@@ -1,0 +1,39 @@
+{
+  "cases": [
+    {
+      "role": "owner",
+      "path": "/api/v1/context",
+      "status": 200,
+      "requestId": "af0af460-158a-406a-8a6b-6e9eec8c3070"
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/audit-events?kind=service&serviceId=35beff5d-72e0-44e7-b100-2c475a4e6ba2",
+      "status": 200,
+      "requestId": "5fbca00e-ef9e-4dca-9a5e-85e7557df0e8"
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/audit-events?kind=service&serviceId=dc1de9cb-1166-4c8c-b477-d40fc91e403c",
+      "status": 404,
+      "requestId": "6f7fcf10-960b-4561-b780-fca038be99f9"
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/audit-events/export?kind=service&searchField=actor&search=owner",
+      "status": 403,
+      "requestId": "4c7bfe55-b472-4b6e-bed8-0cb3a25ef53d"
+    },
+    {
+      "role": "privacy",
+      "path": "/api/v1/audit-events?kind=service&kind=all",
+      "status": 422,
+      "requestId": "e4eb7e03-6e44-498f-bf29-f5c4ec5d6907"
+    }
+  ],
+  "ownerSelectionSurvivedRestart": true,
+  "privacyCsvByteIdentical": true,
+  "oldPid": 71152,
+  "newPid": 73040,
+  "build": "v27"
+}

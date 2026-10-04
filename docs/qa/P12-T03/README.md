@@ -1,23 +1,12 @@
-# P12-T03 준수 보고·월마감·출력
+# P12-T03 준수 보고·월마감·출력 — 완료
 
-## 개요
+2026-10-04. 원래 범위와 수용 조건 및 공통 완료 조건을 대조했다. [최종 수용표](completion.md), [소스·실행·파일 해시](completion.json).
 
-개인정보보호법(PIPA) 준수 점검 보고서 생성, 월별 처리 현황 마감 스냅샷, 필터 조건 기반 비동기 CSV/PDF 내보내기 및 다운로드 보안을 구현한다.
+월마감의 현재 권한과 감사 원자성, 불변 snapshot, 5개 원천 점검 근거, PDF/CSV 비동기 출력·만료 파일·UI를 구현했다. 마지막으로 중복 검색 조건을 거절하도록 보완하고 관련6파일80개, v25 production 빌드·타입·lint, 실제 Ego/파일/독립 SQL/새 프로세스 유지 검증을 통과했다.
 
-## 구현 내용
+- [권한·원자성·월/서비스 범위](revalidation/README.md)
+- [출력 작업·만료·migration·파일](revalidation/exports/README.md)
+- [점검 근거·SQL·UI·PDF/CSV](revalidation/evidence/README.md)
+- [응답·파기·감사·집계·마감 연결](revalidation/lifecycle/README.md)
 
-1. **준수 점검 및 월마감**:
-   - 수집 목적 등록, 처리방침 게시, 보존기한 만료 파기, 접속기록 보관 등 법정 필수 7개 항목 자동 점검
-   - 월별 처리 건수, 파기 건수, 수신동의 변경 건수에 대한 불변 스냅샷 기록
-2. **보고서 내보내기**:
-   - 관리자용 종합 준수 보고서 PDF 렌더링
-   - 대용량 데이터 내보내기 시 수식 인젝션 방어 (`CSV Injection` 방어)
-   - 다운로드 만료 링크 관리 및 다운로드 감사 로그 기록
-
-## 검증 내역
-
-- 테스트 스위트: `tests/server/audit-events.test.ts`, `tests/server/analytics.test.ts`, `tests/server/destruction.test.ts`
-- 주요 검증 항목:
-  - 실제 DB 데이터 기반의 정확한 점검 결과 산출
-  - 동일 기간/필터에 대한 스냅샷 수치 일관성
-  - 다운로드 시 수식 문자열 이스케이프 확인
+중간 기록의 in_progress와 당시 완료 수는 실행 이력이다. 선행의 보고 인터페이스를 검증했으며 선행 Task 전체·전 경로·외부 연동·최종 출시의 수용 상태는 각 Task에서 계속 추적한다. 공식 완료는16/72다.

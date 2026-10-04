@@ -37,7 +37,7 @@ import { POST as marketingPost, PATCH as marketingPatch, DELETE as marketingDele
 import { GET as marketingGet } from "@/app/api/v1/marketing/[...segments]/route";
 import type { MarketingSummary } from "@/contracts/marketing";
 import * as mailer from "@/server/jobs";
-import { cleanupCampaigns } from "@/server/campaign-worker";
+import { cleanupCampaigns, runCampaignJob } from "@/server/campaign-worker";
 import { cleanupMarketingJobs } from "@/server/marketing-jobs";
 import { requireContext } from "@/server/context";
 import { readCampaign } from "@/server/campaigns";
@@ -175,8 +175,33 @@ describe("persistent campaign CRUD, privacy and delivery", () => {
     await Promise.all([mailer.runOneJob("campaign-a"), mailer.runOneJob("campaign-b")]); expect((await db.job.findUniqueOrThrow({ where: { id: job.id } })).status).toBe("done");
     const mail = JSON.parse(await readFile(resolve(env.LOCAL_MAIL_DIR, job.id + ".json"), "utf8")); expect(mail.to).toBe(target.contact); expect(mail.from).toEqual({ name: sender.label, address: sender.address }); expect(mail.subject).toBe("합성 수신자 님 소식"); expect(mail.text).toContain(target.contact);
     expect((await deliveries(campaign.id)).items[0].status).toBe("local_delivered"); expect((await read(campaign.id)).status).toBe("completed");
+    const delivery = (await deliveries(campaign.id)).items[0];
+    expect(await db.auditEvent.count({ where: { resourceId: delivery.id, requestId: job.id, action: "campaign.delivery_local_delivered" } })).toBe(1);
+    expect(await db.auditEvent.count({ where: { resourceId: campaign.id, action: "campaign.settled", actorId: null } })).toBe(1);
     const current = await read(campaign.id); await ok(await POST(req("/campaigns/" + campaign.id + "/archive", "POST", "owner", { version: current.version })));
     expect((await read(campaign.id)).archivedAt).not.toBeNull();
+  });
+  test("campaign receipt audit failure rolls back delivery, job and attempt and recovers the actual local receipt", async () => {
+    const { campaign } = await ready(); await schedule(campaign);
+    const queued = await jobFor(campaign.id), job = await mailer.claimJob("audit-receipt", { tenantId: tenant, jobId: queued.id });
+    expect(job).toBeDefined();
+    await db.$executeRawUnsafe(`CREATE OR REPLACE FUNCTION qa_campaign_receipt_fault() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+      IF NEW.action='campaign.delivery_local_delivered' THEN RAISE EXCEPTION 'synthetic receipt audit failure'; END IF; RETURN NEW; END $$`);
+    await db.$executeRawUnsafe('CREATE TRIGGER qa_campaign_receipt_fault BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION qa_campaign_receipt_fault()');
+    try {
+      await expect(runCampaignJob(job!, "audit-receipt")).rejects.toThrow();
+      expect(await db.job.findUnique({ where: { id: job!.id } })).toMatchObject({ status: "leased" });
+      expect(await db.jobAttempt.findUnique({ where: { id: job!.attemptId } })).toMatchObject({ outcome: "leased" });
+      expect(await db.campaignDelivery.findUnique({ where: { id: job!.campaignDeliveryId! } })).toMatchObject({ status: "sending" });
+      expect(await db.auditEvent.count({ where: { requestId: job!.id, action: "campaign.delivery_local_delivered" } })).toBe(0);
+    } finally {
+      await db.$executeRawUnsafe('DROP TRIGGER IF EXISTS qa_campaign_receipt_fault ON "AuditEvent"');
+      await db.$executeRawUnsafe('DROP FUNCTION IF EXISTS qa_campaign_receipt_fault()');
+    }
+    await runCampaignJob(job!, "audit-receipt");
+    expect(await db.job.findUnique({ where: { id: job!.id } })).toMatchObject({ status: "done" });
+    expect(await db.jobAttempt.findUnique({ where: { id: job!.attemptId } })).toMatchObject({ outcome: "delivered" });
+    expect(await db.auditEvent.count({ where: { requestId: job!.id, action: "campaign.delivery_local_delivered" } })).toBe(1);
   });
   test("schedule bounds and unavailable SMS transport are explicit", async () => {
     const { campaign } = await ready();

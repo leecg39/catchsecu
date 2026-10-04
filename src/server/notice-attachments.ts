@@ -6,6 +6,8 @@ import { fail } from "./http";
 import { privateFiles } from "./file-storage";
 import { scanFile } from "./file-scanner";
 import { sha256, validateFileBytes } from "./file-validation";
+import { lockDownloadActor, type DownloadActor } from "./download-actor";
+import { assertFileDeadlines } from "./file-access";
 
 type Actor = { user: User };
 const extensions: Record<string, string> = {
@@ -58,26 +60,33 @@ export async function uploadNoticeAttachment(actor: Actor, noticeId: string, att
     });
   } catch (error) { await privateFiles.remove(storageKey); throw error; }
 }
-export async function downloadNoticeAttachment(actor: Actor, noticeId: string, attachmentId: string, preview: boolean, requestId: string) {
-  if (preview) admin(actor);
-  const row = await db.noticeAttachment.findFirst({ where: { id: attachmentId, noticeId, status: "active" }, include: { notice: true } });
-  if (!row || (preview ? row.notice.status === "archived" : row.notice.status !== "published") ||
-    !row.storageKey || !row.fileName || !row.fileSha256 || !row.mime)
-    fail(404, "NOT_FOUND", "첨부파일을 찾을 수 없습니다.");
-  let bytes: Buffer;
-  try { bytes = await privateFiles.read(row.storageKey); }
-  catch { fail(503, "FILE_UNAVAILABLE", "첨부파일을 읽을 수 없습니다."); }
-  if (bytes.length !== row.fileSize || sha256(bytes) !== row.fileSha256)
-    fail(503, "FILE_INTEGRITY", "첨부파일 내용을 확인할 수 없습니다.");
-  await db.auditEvent.create({ data: { actorId: actor.user.id, action: "notice.attachment_downloaded",
-    resource: "notice", resourceId: noticeId, requestId, detail: { attachmentId } } });
-  const encoded = encodeURIComponent(row.fileName).replaceAll("'", "%27");
-  return new Response(new Uint8Array(bytes), { status: 200, headers: {
-    "Content-Type": row.mime, "Content-Length": String(bytes.length),
-    "Content-Disposition": `attachment; filename="attachment.${extensions[row.mime]}"; filename*=UTF-8''${encoded}`,
-    "X-Content-SHA256": row.fileSha256, "X-Content-Type-Options": "nosniff",
-    "Content-Security-Policy": "sandbox", "Cache-Control": "private, no-store",
-  } });
+export async function downloadNoticeAttachment(actor: DownloadActor, noticeId: string, attachmentId: string, preview: boolean, requestId: string) {
+  return db.$transaction(async tx => {
+    const current = await lockDownloadActor(tx, actor);
+    if (preview) admin(current);
+    await tx.$queryRaw`SELECT id FROM "Notice" WHERE id=${noticeId} FOR SHARE`;
+    await tx.$queryRaw`SELECT id FROM "NoticeAttachment" WHERE id=${attachmentId} AND "noticeId"=${noticeId} FOR SHARE`;
+    const row = await tx.noticeAttachment.findFirst({ where: { id: attachmentId, noticeId, status: "active" }, include: { notice: true } });
+    if (!row || (preview ? row.notice.status === "archived" : row.notice.status !== "published") ||
+      !row.storageKey || !row.fileName || !row.fileSha256 || !row.mime)
+      fail(404, "NOT_FOUND", "첨부파일을 찾을 수 없습니다.");
+    let bytes: Buffer;
+    try { bytes = await privateFiles.read(row.storageKey); }
+    catch { fail(503, "FILE_UNAVAILABLE", "첨부파일을 읽을 수 없습니다."); }
+    if (bytes.length !== row.fileSize || sha256(bytes) !== row.fileSha256)
+      fail(503, "FILE_INTEGRITY", "첨부파일 내용을 확인할 수 없습니다.");
+    await tx.auditEvent.create({ data: { actorId: current.user.id, action: "notice.attachment_downloaded",
+      resource: "notice", resourceId: noticeId, requestId, detail: { attachmentId } } });
+    const encoded = encodeURIComponent(row.fileName).replaceAll("'", "%27");
+    const response = new Response(new Uint8Array(bytes), { status: 200, headers: {
+      "Content-Type": row.mime, "Content-Length": String(bytes.length),
+      "Content-Disposition": `attachment; filename="attachment.${extensions[row.mime]}"; filename*=UTF-8''${encoded}`,
+      "X-Content-SHA256": row.fileSha256, "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "sandbox", "Cache-Control": "private, no-store",
+    } });
+    assertFileDeadlines(current.deadlines);
+    return response;
+  }, { timeout: 15000 });
 }
 export async function finishNoticeAttachmentDeletion(id: string) {
   await db.$transaction(async tx => {

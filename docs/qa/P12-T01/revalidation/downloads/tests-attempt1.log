@@ -1,0 +1,44 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/notices.test.ts (5 tests | 5 skipped) 5ms
+ ❯ tests/server/guides.test.ts (3 tests | 3 skipped) 7ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/guides.test.ts [ tests/server/guides.test.ts ]
+Error: 파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ unavailable src/server/file-scanner.ts:7:33
+ ❯ requireFileScanner src/server/file-scanner.ts:30:77
+ ❯ tests/server/guides.test.ts:46:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/notices.test.ts [ tests/server/notices.test.ts ]
+Error: 파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ unavailable src/server/file-scanner.ts:7:33
+ ❯ requireFileScanner src/server/file-scanner.ts:30:77
+ ❯ tests/server/notices.test.ts:43:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 2 passed (4)
+      Tests  19 passed | 8 skipped (27)
+   Start at  18:52:50
+   Duration  8.05s (tests 65%, import 28%, transform 7%)
+

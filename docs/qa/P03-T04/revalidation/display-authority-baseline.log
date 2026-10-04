@@ -1,0 +1,232 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:33255) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/consent-display-authority.test.ts (8 tests | 6 failed) 1734ms
+   × read: 요청 인증 후 선택 회사 변경을 거부한다 212ms
+   × read: 요청 인증 후 추가된 MFA 정책을 적용한다 113ms
+   × write: 요청 인증 후 선택 회사 변경을 거부한다 117ms
+   × write: 요청 인증 후 추가된 MFA 정책을 적용한다 105ms
+   × 감사 저장 후 세션이 만료되면 표시 설정과 감사를 함께 롤백한다 149ms
+   × 저장 중 게시 기간이 끝나면 만료된 처리방침 연결을 롤백한다 241ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/consent-display-authority.test.ts > read: 요청 인증 후 선택 회사 변경을 거부한다
+AssertionError: promise resolved "{ version: +0, …(14) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "companyName": "표시 설정 검증",
++   "externalUrl": "",
++   "kind": "collection",
++   "nameMode": "service_company",
++   "optionalText": "",
++   "policyMode": "none",
++   "policyText": "",
++   "policyUrl": null,
++   "processorText": "",
++   "publicationId": null,
++   "requiredText": "",
++   "serviceId": "28df0d94-a443-445c-9339-66018d205c0e",
++   "serviceName": "표시 서비스",
++   "startText": "",
++   "version": 0,
+  }
+
+ ❯ tests/server/consent-display-authority.test.ts:54:42
+     52|     const other = await db.company.create({ data: { name: "다른 회사", pub…
+     53|     await db.session.update({ where: { id: ctx.session.id }, data: { a…
+     54|     await expect(operations[operation]()).rejects.toMatchObject({ code…
+       |                                          ^
+     55|     expect(await db.serviceConsentDisplay.count({ where: { tenantId: c…
+     56|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/server/consent-display-authority.test.ts > read: 요청 인증 후 추가된 MFA 정책을 적용한다
+AssertionError: promise resolved "{ version: +0, …(14) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "companyName": "표시 설정 검증",
++   "externalUrl": "",
++   "kind": "collection",
++   "nameMode": "service_company",
++   "optionalText": "",
++   "policyMode": "none",
++   "policyText": "",
++   "policyUrl": null,
++   "processorText": "",
++   "publicationId": null,
++   "requiredText": "",
++   "serviceId": "0f610b23-67d4-4afd-853d-915bc5af206c",
++   "serviceName": "표시 서비스",
++   "startText": "",
++   "version": 0,
+  }
+
+ ❯ tests/server/consent-display-authority.test.ts:59:42
+     57|   test(`${operation}: 요청 인증 후 추가된 MFA 정책을 적용한다`, async () => {
+     58|     await db.securityPolicy.create({ data: { tenantId: ctx.tenantId, r…
+     59|     await expect(operations[operation]()).rejects.toMatchObject({ code…
+       |                                          ^
+     60|     expect(await db.serviceConsentDisplay.count({ where: { tenantId: c…
+     61|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/server/consent-display-authority.test.ts > write: 요청 인증 후 선택 회사 변경을 거부한다
+AssertionError: promise resolved "{ …(15) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "companyName": "표시 설정 검증",
++   "externalUrl": "",
++   "kind": "collection",
++   "nameMode": "service_company",
++   "optionalText": "",
++   "policyMode": "none",
++   "policyText": "",
++   "policyUrl": null,
++   "processorText": "",
++   "publicationId": null,
++   "requiredText": "",
++   "serviceId": "f08df95b-6955-4aad-b9c6-34f683e05ae5",
++   "serviceName": "표시 서비스",
++   "startText": "저장하면 안 되는 문구",
++   "version": 1,
+  }
+
+ ❯ tests/server/consent-display-authority.test.ts:54:42
+     52|     const other = await db.company.create({ data: { name: "다른 회사", pub…
+     53|     await db.session.update({ where: { id: ctx.session.id }, data: { a…
+     54|     await expect(operations[operation]()).rejects.toMatchObject({ code…
+       |                                          ^
+     55|     expect(await db.serviceConsentDisplay.count({ where: { tenantId: c…
+     56|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/server/consent-display-authority.test.ts > write: 요청 인증 후 추가된 MFA 정책을 적용한다
+AssertionError: promise resolved "{ …(15) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "companyName": "표시 설정 검증",
++   "externalUrl": "",
++   "kind": "collection",
++   "nameMode": "service_company",
++   "optionalText": "",
++   "policyMode": "none",
++   "policyText": "",
++   "policyUrl": null,
++   "processorText": "",
++   "publicationId": null,
++   "requiredText": "",
++   "serviceId": "81165f0f-37c0-4204-af20-78a227440b93",
++   "serviceName": "표시 서비스",
++   "startText": "저장하면 안 되는 문구",
++   "version": 1,
+  }
+
+ ❯ tests/server/consent-display-authority.test.ts:59:42
+     57|   test(`${operation}: 요청 인증 후 추가된 MFA 정책을 적용한다`, async () => {
+     58|     await db.securityPolicy.create({ data: { tenantId: ctx.tenantId, r…
+     59|     await expect(operations[operation]()).rejects.toMatchObject({ code…
+       |                                          ^
+     60|     expect(await db.serviceConsentDisplay.count({ where: { tenantId: c…
+     61|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/server/consent-display-authority.test.ts > 감사 저장 후 세션이 만료되면 표시 설정과 감사를 함께 롤백한다
+AssertionError: promise resolved "{ …(15) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "companyName": "표시 설정 검증",
++   "externalUrl": "",
++   "kind": "collection",
++   "nameMode": "service_company",
++   "optionalText": "",
++   "policyMode": "none",
++   "policyText": "",
++   "policyUrl": null,
++   "processorText": "",
++   "publicationId": null,
++   "requiredText": "",
++   "serviceId": "2c0d2be4-c49a-4fd7-8095-085e55ca82af",
++   "serviceName": "표시 서비스",
++   "startText": "저장하면 안 되는 문구",
++   "version": 1,
+  }
+
+ ❯ tests/server/consent-display-authority.test.ts:71:35
+     69|   await db.session.update({ where: { id: ctx.session.id }, data: { exp…
+     70|   vi.useFakeTimers({ toFake: ["Date"] }); clock.advance = true;
+     71|   await expect(operations.write()).rejects.toMatchObject({ status: 401…
+       |                                   ^
+     72|   expect(await db.serviceConsentDisplay.count({ where: { tenantId: ctx…
+     73|   expect(await db.auditEvent.count({ where: { tenantId: ctx.tenantId }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/server/consent-display-authority.test.ts > 저장 중 게시 기간이 끝나면 만료된 처리방침 연결을 롤백한다
+AssertionError: promise resolved "{ …(15) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "companyName": "표시 설정 검증",
++   "externalUrl": "",
++   "kind": "collection",
++   "nameMode": "service_company",
++   "optionalText": "",
++   "policyMode": "document",
++   "policyText": "",
++   "policyUrl": null,
++   "processorText": "",
++   "publicationId": "9e6d9bda-80ba-4237-9264-7aa72dbc1b18",
++   "requiredText": "",
++   "serviceId": "5d9f8bce-ecba-4df0-8960-f05e5261df49",
++   "serviceName": "표시 서비스",
++   "startText": "",
++   "version": 1,
+  }
+
+ ❯ tests/server/consent-display-authority.test.ts:83:161
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 2 passed (8)
+   Start at  15:29:11
+   Duration  2.83s (tests 63%, import 24%, transform 13%)
+

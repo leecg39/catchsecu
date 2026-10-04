@@ -1,3 +1,5 @@
+import { reviewCreate, reviewAction, reviewQuery, reviewNotify } from "../src/contracts/activity-reviews";
+import { contextSelectionInput } from "../src/contracts/context";
 import { mfaPolicyChange,mfaExceptionCreate,mfaExceptionPatch,mfaExceptionDelete,mfaMemberQuery } from "../src/contracts/mfa-policy";
 import { ipRuleInput, ipRulePatch, ipRuleDelete, ipAccessChange, ipRuleQuery } from "../src/contracts/ip-access";
 import { integrationCreate, integrationPatch, integrationQuery, integrationToggle, integrationDeleteMany, notificationVersion, notificationHistoryQuery } from "../src/contracts/notifications";
@@ -7,6 +9,7 @@ import { subjectAccessInput, subjectSessionInput, subjectWithdrawalInput } from 
 import { shareCreateInput, shareUpdateInput, shareVersionInput, challengeInput, verificationInput } from "../src/contracts/sharing";
 import { documentPatch, documentAction, documentPublish, clauseInput, clausePatch, clauseApply, displayInput } from "../src/contracts/documents";
 import { subprocessorInput, subprocessorPatch, subprocessorNoticeInput } from "../src/contracts/subprocessors";
+import { complianceExportInput, complianceExportList, complianceExportChange } from "../src/contracts/compliance-exports";
 import { complianceCloseInput } from "../src/contracts/analytics";
 import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoReviewInput, kakaoTemplateInput, kakaoTemplatePatch } from "../src/contracts/kakao";
 import { importCreate, importPatch, importAction } from "../src/contracts/imports";
@@ -102,7 +105,7 @@ for (const resource of resources) {
 }
 schemas.ServicePatch = z.toJSONSchema(servicePatch);
 add("/context", "get", "authenticated", "현재 사용자·회사·허용 서비스·권한", undefined, "implemented");
-add("/context", "post", "active membership", "회사 또는 서비스 전환", z.object({ companyId: z.uuid().optional(), serviceId: z.uuid().optional() }).strict(), "implemented");
+add("/context", "post", "active membership", "현재 권한으로 회사 또는 서비스 하나를 전환하고 감사 기록", contextSelectionInput, "implemented");
 add("/audit-events", "get", "audit.read for company scope; current member for own activity",
   "현재 회사·서비스 범위의 서버 생성 감사 이벤트를 안전 DTO로 조회; 상세 원문·토큰 제외", undefined, "implemented");
 (paths["/audit-events"].get as Operation).parameters = [
@@ -591,9 +594,10 @@ add("/services/{id}/consent-display/{kind}", "get", "service.manage + current se
 add("/services/{id}/consent-display/{kind}", "patch", "service.manage + current service grant", "표시 문구·HTTPS 외부 주소 또는 동일 서비스 처리방침 게시 버전 저장; 최초 version=0", displayInput, "implemented");
 add("/services/{id}/subprocessors", "get", "service.manage + current service grant", "현재 서비스의 재위탁 수신자 목록. 암호문 제외", undefined, "implemented");
 add("/services/{id}/subprocessors", "post", "service.manage + current service grant", "재위탁 수신자 등록. 같은 이메일 중복과 보관 수신자 재등록 거부", subprocessorInput, "implemented", "201");
+add("/services/{id}/subprocessors/{subId}", "get", "service.manage + current service grant", "현재 재위탁 수신자 상세와 version 조회", undefined, "implemented");
 add("/services/{id}/subprocessors/{subId}", "patch", "service.manage + current service grant", "재위탁 수신자 수정·보관·복원. version 충돌 검사", subprocessorPatch, "implemented");
 add("/services/{id}/subprocessor-notices", "get", "service.manage + current service grant", "재위탁 안내 발송 이력. 본문 암호문 제외", undefined, "implemented");
-add("/services/{id}/subprocessor-notices", "post", "service.manage + current service grant", "재위탁 안내를 로컬 메일 대기열에 기록. 같은 수신자·제목·본문 재발송 거부", subprocessorNoticeInput, "implemented", "201");
+add("/services/{id}/subprocessor-notices", "post", "service.manage + current service grant", "확인한 수신자 version으로 재위탁 안내를 메일 대기열에 기록. 주소 변경 충돌과 같은 수신자·제목·본문 재발송 거부", subprocessorNoticeInput, "implemented", "201");
 schemas.DocumentInput = z.toJSONSchema(documentInput); schemas.ClauseInput = z.toJSONSchema(clauseInput); schemas.ServiceConsentDisplayInput = z.toJSONSchema(displayInput);
 schemas.DocumentRecord = z.toJSONSchema(documentInput.extend({ id: z.uuid(), version: z.number().int().positive(), draftRevision: z.number().int().positive(),
   status: z.enum(["draft", "published", "private", "archived"]), serviceName: z.string(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(),
@@ -749,9 +753,18 @@ add("/kakao/templates/{id}/submit", "post", "message.manage + current service", 
 add("/kakao/templates/{id}/review", "get", "message.manage + current service", "저장된 심사 상태. providerMatched는 공급자 대조 전 false", undefined, "implemented");
 add("/kakao/templates/{id}/send", "post", "message.manage + current service", "미승인 템플릿 409. 승인돼도 발송 공급자 없으면 503", undefined, "implemented");
 add("/kakao/reviews", "post", "signed kakao review webhook", "서명된 채널 확인·템플릿 승인/반려. 심사 중이 아니면 반영하지 않음", kakaoReviewInput, "implemented", "202");
-add("/analytics/closes", "get", "service.read + current service grants", "저장된 월마감 집계. 없으면 close는 null. 준수 통과를 반환하지 않음", undefined, "implemented");
-add("/analytics/closes", "post", "service.read + current service grants", "한국 시간 월의 집계를 한 번 고정. 같은 범위의 재요청은 저장된 합계를 반환", complianceCloseInput, "implemented");
-add("/analytics/closes/{id}/export", "get", "service.read + current company", "마감 합계 CSV. 5,000행 상한·수식 방어. 판정은 미판정", undefined, "implemented");
+add("/analytics/closes", "get", "service.read + current service grants; company-wide: direct owner/admin", "현재 세션·정책·서비스 권한을 재검사하는 월마감 조회. 없으면 close는 null. 조회 감사 기록, 준수 통과 없음", undefined, "implemented");
+add("/analytics/closes", "post", "service.read + current service grants; company-wide: direct owner/admin", "한국 시간 월과 범위별 집계·5개 점검 근거·생성 감사를 원자적으로 저장. 법적 준수 미판정. 회사 인증 근거는 회사 전체 마감만 포함. 재요청 현재 권한 재검사와 단일 마감", complianceCloseInput, "implemented");
+add("/analytics/closes/{id}/export", "get", "service.read + current service grants; company-wide: direct owner/admin", "현재 세션·정책·서비스 권한 재검사 후 마감 CSV와 다운로드 감사. 5,000행 상한·수식 방어. 판정은 미판정", undefined, "implemented");
+add("/analytics/exports", "post", "service.read + current close scope + requester", "불변 월마감의 PDF/CSV 출력 요청. 요청 키 중복 방지, 활성5개, 24시간 만료", complianceExportInput, "implemented", "202");
+add("/analytics/exports", "get", "service.read + current close scope + requester", "선택 마감의 본인 출력 작업과 페이지. 암호문/키 제외", undefined, "implemented");
+add("/analytics/exports/{id}", "get", "service.read + current close scope + requester", "현재 권한·정책·만료 확인 후 작업 DTO", undefined, "implemented");
+add("/analytics/exports/{id}", "delete", "service.read + current close scope + requester", "version 확인 후 암호화 결과 삭제와 감사", complianceExportChange, "implemented", "204");
+add("/analytics/exports/{id}/cancel", "post", "service.read + current close scope + requester", "대기/처리 작업 취소. 늦은 worker 게시 방지", complianceExportChange, "implemented");
+add("/analytics/exports/{id}/download", "get", "service.read + current close scope + requester", "현재 권한·최종 기한·불변 원천/파일 해시 검사 후 실제 PDF/CSV. 성공 감사", undefined, "implemented");
+(paths["/analytics/exports"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{8,128}$" } }];
+(paths["/analytics/exports"].get as Operation).parameters = Object.entries(z.toJSONSchema(complianceExportList).properties ?? {}).map(([name, schema]) => ({ in: "query", name, required: name === "closeId", schema }));
+(paths["/analytics/exports/{id}/download"].get as Operation).responses = { ...errors, "200": { description: "실제 PDF 또는 BOM CSV; attachment/private no-store/nosniff; X-Export-SHA256/X-Source-SHA256", content: { "application/pdf": { schema: { type: "string", format: "binary" } }, "text/csv": { schema: { type: "string" } } } } };
 add("/analytics/dashboard", "get", "service.read + current service grants",
   "동일 DB 시점의 활성 서비스·폼·문서·현재 보유 응답·기간 내 접수/파기 집계; 종료 시각 미포함", undefined, "implemented");
 (paths["/analytics/dashboard"].get as Operation).parameters = [
@@ -977,6 +990,16 @@ add("/exports/{id}/download", "get", "submission.read + current service grant + 
 (paths["/exports"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{8,128}$" } }];
 (paths["/exports"].get as Operation).parameters = Object.entries(z.toJSONSchema(exportListQuery).properties ?? {}).map(([name, schema]) => ({ in: "query", name, required: name === "formId", schema }));
 (paths["/exports/{id}/download"].get as Operation).responses = { ...errors, "200": { description: "BOM/CRLF CSV; UTF-8; attachment/private no-store/nosniff", content: { "text/csv": { schema: { type: "string" } } } } };
+add("/activity-reviews", "get", "current member recipient; sent/company requires security.write + audit.read + service grants", "개인정보 활동 검토 받은/보낸/회사 목록: 제목·상태·기간·서비스·서버 페이지, 본문 제외", undefined, "implemented");
+add("/activity-reviews", "post", "security.write + audit.read + current service grants", "회사 개인정보 처리자의 검토 요청·암호화 메시지·감사 원자 생성; 같은 사건 열린 요청 한 건", reviewCreate, "implemented", "201");
+add("/activity-reviews/{id}", "get", "current recipient or current service review manager", "검토 상세와 권한 확인 후 복호화 메시지·현재 상태별 버튼", undefined, "implemented");
+add("/activity-reviews/{id}/actions", "post", "response: recipient; resolve/cancel: security.write + audit.read + service grants, not recipient", "version을 확인해 답변/처리완료/취소와 불변 메시지·감사를 원자 저장; 같은 키는 접수 ID만 재사용", reviewAction, "implemented");
+add("/activity-reviews/{id}/notifications", "post", "current service security.write + audit.read; not recipient", "명시적 검토 알림 접수: version·현재 수신자 검사, 상태별 한 번만 Job 생성; 발송 직전 권한/대상자/상태 재검사", reviewNotify, "implemented", "202");
+(paths["/activity-reviews"].get as Operation).parameters = Object.entries(z.toJSONSchema(reviewQuery).properties ?? {}).map(([name, schema]) => ({ in: "query", name, schema }));
+for (const path of ["/activity-reviews", "/activity-reviews/{id}/actions", "/activity-reviews/{id}/notifications"]) {
+  (paths[path].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
+  (paths[path].post as Operation).responses = { ...errors, [path.endsWith("notifications") ? "202" : path.endsWith("actions") ? "200" : "201"]: { description: "저장된 접수 식별자. 최신 상태는 상세 조회.", content: { "application/json": { schema: { type: "object", required: ["id"], properties: { id: { type: "string", format: "uuid" }, messageId: { type: "string", format: "uuid" }, jobId: { type: "string", format: "uuid" } } } } } } };
+}
 const policies = JSON.parse(await readFile("docs/planning/contracts/domain-policies.json", "utf8")) as { rules: PolicyRule[] };
 for (const [path, item] of Object.entries(paths)) {
   const matches = policies.rules.flatMap(policy => policy.prefixes

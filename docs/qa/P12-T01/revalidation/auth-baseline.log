@@ -1,0 +1,33 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/audit-auth-atomicity.test.ts (3 tests | 1 failed) 842ms
+   × audit failure after insertion rolls back the new login session and withholds its cookie 99ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/audit-auth-atomicity.test.ts > audit failure after insertion rolls back the new login session and withholds its cookie
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ tests/server/audit-auth-atomicity.test.ts:44:27
+     42|   const events = await db.auditEvent.count({ where: { actorId: userId,…
+     43|   fault.fail = true; const response = await auth.handler(req()); fault…
+     44|   expect(response.status).toBe(500);
+       |                           ^
+     45|   expect(response.headers.getSetCookie().some(c => c.startsWith("bette…
+     46|   expect(await db.session.count({ where: { userId } })).toBe(sessions);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  17:38:06
+   Duration  1.87s (tests 47%, import 35%, transform 17%)
+

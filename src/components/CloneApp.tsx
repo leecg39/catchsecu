@@ -27,7 +27,7 @@ export default function CloneApp({ path, accessReason = "general" }: { path: str
   else if (path.startsWith("/admin/notices")) page = <NoticePages path={path} />;
   else if (path.startsWith("/admin/guides")) page = <GuidePages path={path} />;
   else if (path.startsWith("/admin/support") || path.startsWith("/my-page/support")) page = <SupportPages path={path} />;
-  else if (path === "/" || path.startsWith("/dashboard") || ["/company-info", "/IE", "/security/two-factor", "/security/two-factor/setting"].includes(path)) page = <Dashboard path={path} />;
+  else if (path === "/" || path.startsWith("/dashboard") || ["/company-info", "/IE"].includes(path)) page = <Dashboard path={path} />;
   else if (path === "/my-page") page = <ManagementPages path="/my-page/info" />;
   else if (matchForms(path)) page = <FormsPages key={path} path={path} />;
   else if (matchManagement(path)) page = <ManagementPages key={path} path={path} />;

@@ -9,8 +9,8 @@ const parts = (request: Request) => new URL(request.url).pathname.split("/").sli
 const guideId = z.string().regex(/^[A-Za-z0-9-]{1,64}$/);
 async function reader(request: Request) {
   const actor = await requireActor(request.headers);
-  if (!actor.user.platformAdmin) await requireContext(request.headers);
-  return actor;
+  const context = actor.user.platformAdmin ? undefined : await requireContext(request.headers);
+  return { ...actor, context };
 }
 export const GET = route(async (request, requestId) => {
   const actor = await reader(request), path = parts(request), url = new URL(request.url);

@@ -253,3 +253,15 @@ Job.localCopyErasedAt과 payloadErasedAt 인덱스, 확정된 원문 삭제 뒤 
 ## 회사 2FA 임시 예외 (2026-10-04)
 
 MfaException은 tenantId/memberId로 회사 구성원에 연결하고 createdById도 같은 회사의 구성원을 참조한다. 사유는 암호화하며 최초 생성부터 24시간 상한·불변 scope·증가 version을 DB에서 검사한다. 마지막 인증 owner의 Membership/User 변경도 보호한다. SecurityPolicy.requireMfa를 기존 개인 2FA와 함께 집행한다.
+
+
+## 개인정보 활동 검토 (2026-10-04, 부분 구현)
+
+ActivityReview는 감사 사건·회사·서비스·처리자를 composite FK로 연결하고 requester/recipient를 같은 회사 Membership으로 제한한다. 열린 사건은 partial unique, 상태/version 전이는 trigger로 보호한다. ActivityReviewMessage는 회사/요청/작성자 FK와 암호화 본문을 가진 추가 전용 메시지이며 UPDATE/DELETE가 거부된다. AuditEvent에 nullable 회사/서비스/actor를 포함한 복합 unique를 추가했으며 기존 개인 감사 자료를 보존했다. Migration75와119모델. 화면 및 보유/파기 정책의 전체 수용은 남아 있다.
+
+2026-10-04 검토 알림: 기존 Job에 mail.activity-review.v1 형식으로 version별 유일 접수, 암호화 수신주소/발급자/대상자/전송환경을 고정했다. API/worker의 현재 권한과 마지막 기한 확인, 로컬 전달/SMTP 접수 분리를 구현했다. 모델119/migration75 유지. [알림 검증](../qa/P03-T03/revalidation/activity-mail-README.md).
+
+
+## P12-T03 월마감 출력 (2026-10-04, 진행 중)
+
+`ComplianceExportJob`은 `(tenantId,closeId)`로 불변 마감, `(tenantId,memberId,requesterId)`로 발급 구성원과 사용자에 연결한다. 형식·원천 해시·요청 키·기한은 변경 불가이며 상태 전이는 version+1을 요구한다. ready만 결과 암호문/해시를 보유한다. 만료·취소·삭제 시 암호문/해시를 제거한다. leaseOwner/leaseUntil/attempts와 동일 version을 확인해 오래된 worker 게시를 차단한다. `ComplianceClose`는 기존 자료를 보존하고 DB UPDATE/DELETE를 거부한다. migration76/model120. [검증](../qa/P12-T03/revalidation/exports/README.md).

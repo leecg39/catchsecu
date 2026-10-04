@@ -1,4 +1,5 @@
 import { Prisma, type Campaign, type CampaignDelivery } from "@/generated/prisma/client";
+import { randomUUID } from "node:crypto";
 import { type CampaignContent, type CampaignRecord, type DeliveryRecord } from "@/contracts/campaigns";
 import { normalizeMarketingContact } from "@/contracts/marketing";
 import type { Context } from "./context";
@@ -41,7 +42,7 @@ export async function campaignEvent(tx: Transaction, row: Campaign, kind: string
 export async function changeCampaign(tx: Transaction, row: Campaign, data: Prisma.CampaignUncheckedUpdateInput, kind: string, ctx?: Context, requestId?: string) {
   const saved = await tx.campaign.update({ where: { id: row.id }, data: { ...data, version: { increment: 1 } } });
   await campaignEvent(tx, saved, kind, ctx?.user.id);
-  if (ctx) await audit(tx, ctx, requestId!, "campaign." + kind, "campaign", row.id, Object.keys(data).filter(k => !/Cipher|Hash/.test(k)), row.serviceId);
+  await audit(tx, ctx ?? { tenantId: row.tenantId, user: { id: null } }, requestId ?? randomUUID(), "campaign." + kind, "campaign", row.id, Object.keys(data).filter(k => !/Cipher|Hash/.test(k)), row.serviceId);
   return saved;
 }
 export async function campaignDto(tx: Transaction, row: Campaign, detail = false): Promise<CampaignRecord> {

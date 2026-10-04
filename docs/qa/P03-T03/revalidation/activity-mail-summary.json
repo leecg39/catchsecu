@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-04",
+  "status": "in_progress",
+  "tasks": [
+    "P03-T03",
+    "P12-T01"
+  ],
+  "scope": "explicit activity-review email notification with current-authority worker checks",
+  "tests": {
+    "activityReviews": 33,
+    "newNotificationTests": 13,
+    "otherRelated": 109,
+    "failed": 0
+  },
+  "schemaChanged": false,
+  "migrations": 75,
+  "models": 119,
+  "build": "production-v15",
+  "port": 3116,
+  "restartPids": [
+    96966,
+    99341
+  ],
+  "egoSpace": 45,
+  "egoPage": "p1",
+  "db": {
+    "phase": "restart",
+    "reviewId": "b1b50846-8609-4895-b17e-31355ba02632",
+    "jobId": "ce1a2b6e-27f3-44c1-b2f4-0867ba4c56a7",
+    "jobStatus": "done",
+    "transport": "local",
+    "externalDeliveryVerified": false,
+    "version": 1,
+    "messages": 1,
+    "notificationAudits": 1,
+    "attempts": 1,
+    "mailHasNoReviewTitleOrBody": true,
+    "sha256": "2ecff005d9c9a3373160841326a147d24735db4a5f0ae2bab71a9e2649939788"
+  },
+  "verified": [
+    "explicit UI enqueue",
+    "specific local job only",
+    "UI queued to local_delivered",
+    "390px screenshot inspected; document width 390",
+    "same-build restart UI and DB hash",
+    "version/dedupe/role/recipient/transport/lease guards",
+    "late recipient expiry before local publication",
+    "production build/type/lint",
+    "OpenAPI notification 202 contract"
+  ],
+  "notVerified": [
+    "external SMTP acceptance or recipient inbox",
+    "operational backup retention",
+    "full Task acceptance"
+  ],
+  "sourceHashes": {
+    "src/contracts/activity-reviews.ts": "83d39cd383827b8311da0055507eac90ff824b142a80549bc1a0acc2c90c0445",
+    "src/server/activity-reviews.ts": "eb2252a1edd556664e9167e7e4c70341f367b09c199add569dd997542c87661b",
+    "src/server/activity-review-mail.ts": "4ed5a1792af3e009d511ec2b14b4573757fca60b5df2feaccf018bf08c96e4cf",
+    "src/server/jobs.ts": "cd324ad199a25f4814c0df234619393cbe5b3d572fe9f3e93d418390cb8a771e",
+    "src/app/api/v1/activity-reviews/[id]/notifications/route.ts": "bba2cc2e2ca222868dc6eba23b246989a1087961148feda2f10d409000af84f9",
+    "src/components/management/ActivityReviews.tsx": "a53b08cf73060002503dcda40b875021bd210da6a706b57f1489ab66023326e2",
+    "tests/server/activity-reviews.test.ts": "5b9d3a572297c0c3b9da5bb869a908e106a70a68e6da30b0c7871dcfc5adc01b"
+  },
+  "contractCheck": {
+    "paths": 285,
+    "operations": 412,
+    "policies": 37,
+    "final": "passed",
+    "initial": "derived operation matrix stale; regenerated then verified"
+  }
+}

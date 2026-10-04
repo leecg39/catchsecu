@@ -1,0 +1,12 @@
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 21ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 14.5s
+  Running TypeScript ...
+tests/server/account-current-authority.test.ts(85,32): error TS2322: Type '{ actorId: string; requestId: `${string}-${string}-${string}-${string}-${string}`; action: string; resource: string; resourceId: string; }' is not assignable to type '((Without<AuditEventCreateInput, AuditEventUncheckedCreateInput> & AuditEventUncheckedCreateInput) | (Without<...> & AuditEventCreateInput)) & object'.
+  Type '{ actorId: string; requestId: `${string}-${string}-${string}-${string}-${string}`; action: string; resource: string; resourceId: string; }' is not assignable to type 'Without<AuditEventCreateInput, AuditEventUncheckedCreateInput> & AuditEventUncheckedCreateInput & object'.
+    Property 'detail' is missing in type '{ actorId: string; requestId: `${string}-${string}-${string}-${string}-${string}`; action: string; resource: string; resourceId: string; }' but required in type 'AuditEventUncheckedCreateInput'.
+Failed to type check.
+

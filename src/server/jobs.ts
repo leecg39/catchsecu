@@ -14,6 +14,7 @@ import { senderEnvironment } from "./sender-providers";
 import { HttpError } from "./http";
 import { CAMPAIGN_MAIL_JOB_TYPES } from "@/contracts/campaigns";
 import { roleCan, roleCapabilities } from "./permissions";
+import { audit, type MailOutcomeMetadata } from "./audit";
 
 const mailSchema = z.object({ to: z.email(), subject: z.string().max(200), text: z.string().max(100000) }).strict();
 type Mail = z.infer<typeof mailSchema>;
@@ -59,7 +60,7 @@ export async function enqueueMarketingMail(mail: Mail, scope: { tenantId: string
   return result ?? { id: null, suppressed: true };
 }
 export type ClaimedJob = { campaignDeliveryId: string | null; senderId: string | null; dedupeKey: string; tenantId: string | null; id: string; type: string; payloadCipher: string; attempts: number; maxAttempts: number };
-export type JobScope = { tenantId: string; jobId: string };
+export type JobScope = { tenantId: string | null; jobId: string };
 export async function claimJob(workerId: string, scope?: JobScope): Promise<(ClaimedJob & { attemptId: string }) | undefined> {
   return db.$transaction(async tx => {
     const rows = await tx.$queryRaw<ClaimedJob[]>`
@@ -70,7 +71,7 @@ export async function claimJob(workerId: string, scope?: JobScope): Promise<(Cla
         WHERE ((status IN ('queued', 'retry') AND "dueAt" <= now())
           OR (status = 'leased' AND "leaseUntil" < now()))
           AND attempts < "maxAttempts"
-          AND (${scope?.tenantId ?? null}::text IS NULL OR ("tenantId"=${scope?.tenantId ?? null} AND id=${scope?.jobId ?? null}))
+          AND (${scope === undefined} OR ("tenantId" IS NOT DISTINCT FROM ${scope?.tenantId ?? null} AND id=${scope?.jobId ?? null}))
         ORDER BY "dueAt", id FOR UPDATE SKIP LOCKED LIMIT 1
       )
       RETURNING id, type, "payloadCipher", attempts, "maxAttempts", "tenantId", "dedupeKey", "senderId", "campaignDeliveryId"`;
@@ -82,8 +83,55 @@ export async function claimJob(workerId: string, scope?: JobScope): Promise<(Cla
     return { ...job, attemptId };
   });
 }
-async function finishAttempt(attemptId: string, outcome: string, errorCode?: string) {
-  await db.$executeRaw`UPDATE "JobAttempt" SET outcome = ${outcome}, "errorCode" = ${errorCode ?? null}, "finishedAt" = now() WHERE id = ${attemptId} AND outcome = 'leased'`;
+async function finishAttempt(attemptId: string, outcome: string, errorCode?: string, tx: Transaction = db) {
+  await tx.$executeRaw`UPDATE "JobAttempt" SET outcome = ${outcome}, "errorCode" = ${errorCode ?? null}, "finishedAt" = now() WHERE id = ${attemptId} AND outcome = 'leased'`;
+}
+type AuditJob = Pick<ClaimedJob, "id" | "tenantId" | "payloadCipher" | "type" | "attempts">;
+async function mailOutcomeAudit(tx: Transaction, job: AuditJob, requestId: string, action: string, status: MailOutcomeMetadata["status"], errorCode?: MailOutcomeMetadata["errorCode"]) {
+  let serviceId: string | undefined;
+  try {
+    const payload = decrypt<{ deliveryScope?: { tenantId: string; serviceId: string }; marketing?: { tenantId: string; serviceId: string } }>(job.payloadCipher);
+    const scope = payload.deliveryScope ?? payload.marketing;
+    if (scope?.tenantId === job.tenantId && z.uuid().safeParse(scope.serviceId).success
+      && await tx.service.count({ where: { id: scope.serviceId, tenantId: job.tenantId! } })) serviceId = scope.serviceId;
+  } catch { /* A failed encrypted payload still has a safe job-level outcome. */ }
+  await audit(tx, { tenantId: job.tenantId, user: { id: null } }, requestId, action, "job", job.id, ["status"], serviceId,
+    { status, attempt: job.attempts, transport: env.MAIL_TRANSPORT, ...(errorCode ? { errorCode } : {}) });
+}
+async function finishMailJob(job: ClaimedJob & { attemptId: string }, workerId: string, delivered: boolean | undefined) {
+  return db.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Job" WHERE id=${job.id} FOR UPDATE`;
+    const current = await tx.job.findFirst({ where: { id: job.id, status: "leased", leaseOwner: workerId,
+      attempts: job.attempts, payloadErasedAt: null, leaseUntil: { gt: new Date() } } });
+    if (!current?.leaseUntil) return false;
+    const status = delivered === undefined ? (job.attempts >= job.maxAttempts ? "dead" : "retry") : delivered ? "done" : "cancelled";
+    const errorCode = delivered === undefined ? "DELIVERY_FAILED" : delivered ? undefined : "SUPPRESSED";
+    await tx.job.update({ where: { id: job.id }, data: { status,
+      ...(delivered === undefined ? { dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)) } : { completedAt: new Date() }),
+      leaseOwner: null, leaseUntil: null, lastError: errorCode ?? null } });
+    await finishAttempt(job.attemptId, delivered === undefined ? status : delivered ? "delivered" : "suppressed", errorCode, tx);
+    await mailOutcomeAudit(tx, job, job.attemptId, delivered === undefined ? "email.failed" : delivered
+      ? env.MAIL_TRANSPORT === "local" ? "email.local_delivered" : "email.accepted" : "email.suppressed", status, errorCode);
+    if (current.leaseUntil <= new Date()) throw new Error("LEASE_EXPIRED");
+    return true;
+  });
+}
+async function retryMailReceipt(job: ClaimedJob & { attemptId: string }, workerId: string) {
+  return db.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Job" WHERE id=${job.id} FOR UPDATE`;
+    const current = await tx.job.findFirst({ where: { id: job.id, status: "leased", leaseOwner: workerId,
+      attempts: job.attempts, leaseUntil: { gt: new Date() }, payloadErasedAt: null } });
+    if (!current?.leaseUntil) return false;
+    const status = job.attempts >= job.maxAttempts ? "dead" : "retry";
+    const changed = await tx.job.updateMany({ where: { id: job.id, status: "leased", leaseOwner: workerId,
+      attempts: job.attempts, leaseUntil: { gt: new Date() }, payloadErasedAt: null }, data: { status,
+      dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "RECEIPT_PERSISTENCE_FAILED" } });
+    if (!changed.count) return false;
+    await finishAttempt(job.attemptId, status, "RECEIPT_PERSISTENCE_FAILED", tx);
+    await mailOutcomeAudit(tx, job, job.attemptId, status === "retry" ? "email.receipt_retry" : "email.receipt_failed", status, "RECEIPT_PERSISTENCE_FAILED");
+    if (current.leaseUntil <= new Date()) throw new Error("LEASE_EXPIRED");
+    return true;
+  });
 }
 async function sendMail(job: ClaimedJob, workerId: string) {
   const parsed = scopedMailSchema.parse(decrypt(job.payloadCipher)), { deliveryScope, marketing, sender, ...mail } = parsed;
@@ -199,14 +247,21 @@ export async function deliverMail(job: Pick<ClaimedJob, "id">, mail: Mail & { ht
 }
 export async function runOneJob(workerId: string, scope?: JobScope): Promise<boolean> {
   // A worker dying on its last attempt must not leave a permanent leased row.
-  await db.$executeRaw`UPDATE "JobAttempt" SET outcome = 'lease_exhausted', "errorCode" = 'LEASE_EXHAUSTED', "finishedAt" = now()
-    WHERE outcome = 'leased' AND "jobId" IN (SELECT id FROM "Job" WHERE status = 'leased' AND "leaseUntil" < now() AND attempts >= "maxAttempts"
-      AND (${scope?.tenantId ?? null}::text IS NULL OR ("tenantId"=${scope?.tenantId ?? null} AND id=${scope?.jobId ?? null})))`;
-  await db.$executeRaw`UPDATE "Job" SET status='dead', "leaseOwner"=NULL, "leaseUntil"=NULL, "lastError"='LEASE_EXHAUSTED'
-    WHERE status='leased' AND "leaseUntil" < now() AND attempts >= "maxAttempts"
-      AND (${scope?.tenantId ?? null}::text IS NULL OR ("tenantId"=${scope?.tenantId ?? null} AND id=${scope?.jobId ?? null}))`;
+  await db.$transaction(async tx => {
+    const exhausted = await tx.$queryRaw<AuditJob[]>`SELECT id,"tenantId","payloadCipher",type,attempts FROM "Job"
+      WHERE status='leased' AND "leaseUntil" < now() AND attempts >= "maxAttempts"
+      AND (${scope === undefined} OR ("tenantId" IS NOT DISTINCT FROM ${scope?.tenantId ?? null} AND id=${scope?.jobId ?? null})) FOR UPDATE`;
+    for (const job of exhausted) {
+      const attempt = await tx.jobAttempt.findFirst({ where: { jobId: job.id, outcome: "leased" }, orderBy: { createdAt: "desc" } });
+      await tx.$executeRaw`UPDATE "JobAttempt" SET outcome='lease_exhausted',"errorCode"='LEASE_EXHAUSTED',"finishedAt"=now()
+        WHERE "jobId"=${job.id} AND outcome='leased'`;
+      await tx.job.update({ where: { id: job.id }, data: { status: "dead", leaseOwner: null, leaseUntil: null, lastError: "LEASE_EXHAUSTED" } });
+      await mailOutcomeAudit(tx, job, attempt?.id ?? randomUUID(), job.type.startsWith("mail") ? "email.lease_exhausted" : "job.lease_exhausted", "dead", "LEASE_EXHAUSTED");
+    }
+  });
   const job = await claimJob(workerId, scope);
   if (!job) return false;
+  let dispatched = false;
   try {
     if (CAMPAIGN_MAIL_JOB_TYPES.includes(job.type)) {
       await (await import("./campaign-worker")).runCampaignJob(job, workerId);
@@ -215,18 +270,14 @@ export async function runOneJob(workerId: string, scope?: JobScope): Promise<boo
       await finishAttempt(job.attemptId, outcome, current?.lastError ?? undefined);
       return true;
     }
-    if (job.type !== "mail" && job.type !== SENDER_MAIL_JOB_TYPE) throw new Error("UNSUPPORTED_JOB_TYPE");
-    const delivered = await sendMail(job, workerId);
-    const finished = await db.job.updateMany({ where: { id: job.id, status: "leased", leaseOwner: workerId, attempts: job.attempts, leaseUntil: { gt: new Date() }, payloadErasedAt: null },
-      data: { status: delivered ? "done" : "cancelled", completedAt: new Date(), leaseOwner: null, leaseUntil: null, lastError: delivered ? null : "SUPPRESSED" } });
-    if (finished.count) await finishAttempt(job.attemptId, delivered ? "delivered" : "suppressed", delivered ? undefined : "SUPPRESSED");
+    if (job.type !== "mail" && job.type !== SENDER_MAIL_JOB_TYPE && job.type !== "mail.activity-review.v1") throw new Error("UNSUPPORTED_JOB_TYPE");
+    const delivered = job.type === "mail.activity-review.v1" ? await (await import("./activity-review-mail")).deliverReviewMail(job, workerId) : await sendMail(job, workerId);
+    dispatched = delivered;
+    await finishMailJob(job, workerId, delivered);
   } catch {
     // Provider errors may contain recipient addresses and credentials. Persist a safe code.
-    const finished = await db.job.updateMany({ where: { id: job.id, status: "leased", leaseOwner: workerId, attempts: job.attempts, leaseUntil: { gt: new Date() }, payloadErasedAt: null },
-      data: { status: job.attempts >= job.maxAttempts ? "dead" : "retry",
-        dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)),
-        leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } });
-    if (finished.count) await finishAttempt(job.attemptId, job.attempts >= job.maxAttempts ? "dead" : "retry", "DELIVERY_FAILED");
+    if (dispatched) await retryMailReceipt(job, workerId);
+    else await finishMailJob(job, workerId, undefined);
   }
   return true;
 }

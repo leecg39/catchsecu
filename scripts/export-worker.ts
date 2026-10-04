@@ -2,14 +2,18 @@ import { randomUUID } from "node:crypto";
 import { db } from "../src/server/db";
 import { cleanupExpiredExports, runOneExport } from "../src/server/exports";
 
+import { cleanupComplianceExports, runOneComplianceExport } from "../src/server/compliance-exports";
+
 const workerId = randomUUID(); let stopped = false;
 process.on("SIGINT", () => { stopped = true; }); process.on("SIGTERM", () => { stopped = true; });
 async function main() {
-  console.info("CSV 내보내기 전용 처리기 시작", { workerId });
+  console.info("응답·월마감 출력 처리기 시작", { workerId });
   let cleanedAt = 0;
   while (!stopped) {
-    if (Date.now() - cleanedAt >= 60000) { await cleanupExpiredExports(); cleanedAt = Date.now(); }
-    const worked = await runOneExport(workerId);
+    if (Date.now() - cleanedAt >= 60000) { await cleanupExpiredExports(); await cleanupComplianceExports(); cleanedAt = Date.now(); }
+    const complianceWorked = await runOneComplianceExport(workerId);
+    const responseWorked = await runOneExport(workerId);
+    const worked = complianceWorked || responseWorked;
     if (process.argv.includes("--once") || (!worked && process.argv.includes("--drain"))) break;
     if (!worked) await new Promise(resolve => setTimeout(resolve, 1000));
   }

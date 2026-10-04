@@ -1,0 +1,96 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:45889) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:46096) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/compliance-evidence.test.ts (11 tests | 3 failed) 4584ms
+   × 선택 서비스의 활성 목적과 유효 게시만 집계하며 중복 게시로 서비스 수를 늘리지 않는다 162ms
+   × 마감 후 원천 변경은 기존 근거·CSV·해시를 바꾸지 않고 다른 월의 새 점검에 반영한다 300ms
+   × 비동기 PDF와 CSV는 같은 저장 근거·상태를 사용하고 원천 변경을 반영하지 않는다 216ms
+(node:46217) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:46329) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/compliance-evidence.test.ts > 선택 서비스의 활성 목적과 유효 게시만 집계하며 중복 게시로 서비스 수를 늘리지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.processingPurpose.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/compliance-evidence.test.ts:41:31
+
+  38 afterAll(async () => { await db.$disconnect(); });
+  39 const close = async (id: string | undefined = serviceId, value = month) => (await closeComplianceMonth(ctx, { month: value, serviceId: id }, randomUUID())).close;
+  40 async function purpose(id = serviceId) {
+→ 41   return db.processingPurpose.create(
+Database error. Code: `23514`. Message: `catalog revision links must match`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/compliance-evidence.test.ts:59:3
+     57| });
+     58| test("선택 서비스의 활성 목적과 유효 게시만 집계하며 중복 게시로 서비스 수를 늘리지 않는다", async () => {
+     59|   await purpose(); await purpose(); await purpose(otherId);
+       |   ^
+     60|   const archived = await purpose(); await db.processingPurpose.update(…
+     61|   await publication(); await publication(); await publication(new Date…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/server/compliance-evidence.test.ts > 마감 후 원천 변경은 기존 근거·CSV·해시를 바꾸지 않고 다른 월의 새 점검에 반영한다
+PrismaClientKnownRequestError: 
+Invalid `db.processingPurpose.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/compliance-evidence.test.ts:41:31
+
+  38 afterAll(async () => { await db.$disconnect(); });
+  39 const close = async (id: string | undefined = serviceId, value = month) => (await closeComplianceMonth(ctx, { month: value, serviceId: id }, randomUUID())).close;
+  40 async function purpose(id = serviceId) {
+→ 41   return db.processingPurpose.create(
+Database error. Code: `23514`. Message: `catalog revision links must match`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/compliance-evidence.test.ts:96:3
+     94| test("마감 후 원천 변경은 기존 근거·CSV·해시를 바꾸지 않고 다른 월의 새 점검에 반영한다", async () => {
+     95|   const first = await close(), csv = await complianceCloseCsv(ctx, fir…
+     96|   await purpose(); await publication();
+       |   ^
+     97|   expect((await close()).evidence).toEqual(first.evidence);
+     98|   expect((await readComplianceClose(ctx, { month, serviceId })).close?…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/server/compliance-evidence.test.ts > 비동기 PDF와 CSV는 같은 저장 근거·상태를 사용하고 원천 변경을 반영하지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.processingPurpose.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/compliance-evidence.test.ts:41:31
+
+  38 afterAll(async () => { await db.$disconnect(); });
+  39 const close = async (id: string | undefined = serviceId, value = month) => (await closeComplianceMonth(ctx, { month: value, serviceId: id }, randomUUID())).close;
+  40 async function purpose(id = serviceId) {
+→ 41   return db.processingPurpose.create(
+Database error. Code: `23514`. Message: `catalog revision links must match`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/compliance-evidence.test.ts:128:32
+    126| });
+    127| test("비동기 PDF와 CSV는 같은 저장 근거·상태를 사용하고 원천 변경을 반영하지 않는다", async () => {
+    128|   const saved = await close(); await purpose();
+       |                                ^
+    129|   for (const format of ["pdf", "csv"] as const) {
+    130|     const job = await createComplianceExport(ctx, { closeId: saved.id,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  3 failed | 72 passed (75)
+   Start at  16:56:23
+   Duration  41.93s (tests 83%, import 15%, transform 2%)
+

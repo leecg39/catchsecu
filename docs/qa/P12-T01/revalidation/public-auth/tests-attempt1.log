@@ -1,0 +1,88 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/auth-public-audit.test.ts (19 tests | 3 failed) 4641ms
+   × signup commits the account, encrypted verification job and request-linked safe audits together 256ms
+   × auth.account_registered failure rolls back signup even when the library catches it 118ms
+   × signup failures remain rate limited outside the rolled-back account transaction 484ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > signup commits the account, encrypted verification job and request-linked safe audits together
+AssertionError: expected [ 'auth.verification_queued', …(1) ] to deeply equal ArrayContaining{…}
+
+- Expected
++ Received
+
+- ArrayContaining [
+-   "auth.account_registered",
++ [
+    "auth.verification_queued",
++   "auth.registration_requested",
+  ]
+
+ ❯ tests/server/auth-public-audit.test.ts:53:37
+     51|   const u = await db.user.findUniqueOrThrow({ where: { email } }), eve…
+     52|   expect(await db.account.count({ where: { userId: u.id } })).toBe(1);
+     53|   expect(events.map(e => e.action)).toEqual(expect.arrayContaining(["a…
+       |                                     ^
+     54|   expect(events.find(e => e.action === "auth.account_registered")).toM…
+     55|   safe(events, [email, password, (await mail("이메일 인증")).url]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > auth.account_registered failure rolls back signup even when the library catches it
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ tests/server/auth-public-audit.test.ts:59:20
+     57| test.each(["auth.account_registered", "auth.verification_queued"])("%s…
+     58|   const before = await counts(); fault.action = action; const r = awai…
+     59|   expect(r.status).toBe(500); expect(r.headers.getSetCookie()).toHaveL…
+       |                    ^
+     60| });
+     61| test("duplicate signup preserves the generic response without another …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/server/auth-public-audit.test.ts > signup failures remain rate limited outside the rolled-back account transaction
+AssertionError: expected [ 200, 200, 200, 200, 200, 429 ] to deeply equal [ 500, 500, 500, 500, 500, 429 ]
+
+- Expected
++ Received
+
+  [
+-   500,
+-   500,
+-   500,
+-   500,
+-   500,
++   200,
++   200,
++   200,
++   200,
++   200,
+    429,
+  ]
+
+ ❯ tests/server/auth-public-audit.test.ts:124:19
+    122|   fault.action = "auth.account_registered"; const results: number[] = …
+    123|   for (let i = 0; i < 6; i++) results.push((await signup()).status); f…
+    124|   expect(results).toEqual([500, 500, 500, 500, 500, 429]); expect(awai…
+       |                   ^
+    125| });
+    126| test("MFA challenge audit failure rolls back the transient session and…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  3 failed | 49 passed (52)
+   Start at  18:26:44
+   Duration  20.15s (tests 81%, import 17%, transform 2%)
+

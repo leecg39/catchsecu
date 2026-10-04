@@ -1,0 +1,101 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/download-audit.test.ts (12 tests | 8 failed) 3015ms
+   × notice rejects an account revoked after the actor snapshot without a download event 231ms
+   × guide rejects an account revoked after the actor snapshot without a download event 239ms
+   × notice rejects a session revoked after the actor snapshot without a download event 217ms
+   × guide rejects a session revoked after the actor snapshot without a download event 183ms
+   × notice rechecks platform administration for preview 182ms
+   × guide rechecks platform administration for preview 184ms
+   × notice rolls back the event when its session deadline ends during file preparation 205ms
+   × guide rolls back the event when its session deadline ends during file preparation 192ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/download-audit.test.ts > notice rejects an account revoked after the actor snapshot without a download event
+ FAIL  tests/server/download-audit.test.ts > guide rejects an account revoked after the actor snapshot without a download event
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/download-audit.test.ts:66:48
+     64| test.each(["notice", "guide"])("%s rejects an account revoked after th…
+     65|   await db.user.update({ where: { id: actor.user.id }, data: { status:…
+     66|   const r = await read(kind); expect(r.status).toBe(401); expect(await…
+       |                                                ^
+     67| });
+     68| test.each(["notice", "guide"])("%s rejects a session revoked after the…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/server/download-audit.test.ts > notice rejects a session revoked after the actor snapshot without a download event
+ FAIL  tests/server/download-audit.test.ts > guide rejects a session revoked after the actor snapshot without a download event
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/download-audit.test.ts:70:48
+     68| test.each(["notice", "guide"])("%s rejects a session revoked after the…
+     69|   await db.session.delete({ where: { id: actor.session.id } });
+     70|   const r = await read(kind); expect(r.status).toBe(401); expect(await…
+       |                                                ^
+     71| });
+     72| test.each(["notice", "guide"])("%s rechecks platform administration fo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/server/download-audit.test.ts > notice rechecks platform administration for preview
+ FAIL  tests/server/download-audit.test.ts > guide rechecks platform administration for preview
+AssertionError: expected 200 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 200
+
+ ❯ tests/server/download-audit.test.ts:74:54
+     72| test.each(["notice", "guide"])("%s rechecks platform administration fo…
+     73|   await db.user.update({ where: { id: actor.user.id }, data: { platfor…
+     74|   const r = await read(kind, true); expect(r.status).toBe(403); expect…
+       |                                                      ^
+     75| });
+     76| test.each(["notice", "guide"])("%s rolls back the event when its sessi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/server/download-audit.test.ts > notice rolls back the event when its session deadline ends during file preparation
+ FAIL  tests/server/download-audit.test.ts > guide rolls back the event when its session deadline ends during file preparation
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/download-audit.test.ts:81:20
+     79|   if (kind === "guide") await db.guide.update({ where: { id: guideId }…
+     80|   fault.expire = true; const r = await read(kind); fault.expire = fals…
+     81|   expect(r.status).toBe(401); expect(await requestEvents(r)).toHaveLen…
+       |                    ^
+     82| });
+     83| test.each(["notice", "guide"])("%s audit persistence failure cannot re…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 4 passed (12)
+   Start at  18:52:34
+   Duration  4.13s (tests 75%, import 15%, transform 9%)
+

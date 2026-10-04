@@ -1,0 +1,356 @@
+{
+  "task": "P12-T01",
+  "status": "in_progress",
+  "recordedAt": "2026-10-04T08:51:57.057519+00:00",
+  "counts": {
+    "completed": 16,
+    "in_progress": 41,
+    "planned": 15
+  },
+  "validation": {
+    "testFiles": 9,
+    "testsPassed": 130,
+    "testExitCode": 0,
+    "typecheckExitCode": 0,
+    "lintExitCode": 0,
+    "productionBuildExitCode": 0,
+    "productionBuildId": "6CLPWvRjnfu-uM9ikmIHI",
+    "contractPaths": 289,
+    "contractOperations": 418,
+    "contractPolicies": 38,
+    "openapiImplemented": 377,
+    "openapiPlanned": 41
+  },
+  "browser": {
+    "egoTaskSpace": 45,
+    "page": "p1",
+    "representativeChecks": 21,
+    "actualContextUiWrites": 3,
+    "maskedServiceCsvRows": 11,
+    "csvByteIdenticalAfterRestart": true,
+    "sessionAndSelectionEvidenceHash": "bb213455da8cc637b5579523d6fda258c0f30cacb9798ebf067f2663e3124ed4",
+    "accessEvidenceHash": "6ec87161cf0956992ccc6d0c0152dc7a1e6027334002cba27991301c4ab33056",
+    "ownQaPidHistory": [
+      65306,
+      71152,
+      73040
+    ],
+    "ownQaPort": 3127
+  },
+  "limitations": [
+    "Whole task not completed; MFA and other authentication event production/atomicity still need work",
+    "AST inventory is not full audit coverage evidence",
+    "Only documented browser cases were verified; all ten log screens not fully accepted",
+    "Email verification and privacy grant were explicit local DB fixtures",
+    "One background Prisma 500 was logged during company-selection navigation; request path and cause were not established; later direct dashboard retry was 200"
+  ],
+  "productAndTestSources": [
+    {
+      "path": "src/server/audit.ts",
+      "bytes": 1259,
+      "sha256": "06aca907bc6e4041caf491c11c88168afb3f0c84867897eca902872627f4d6ae"
+    },
+    {
+      "path": "src/server/audit-events.ts",
+      "bytes": 11640,
+      "sha256": "a4d123d71948ac07d559652abe18aa93cfed3c59ef4aadd4ffb6197a8ce769dc"
+    },
+    {
+      "path": "src/server/auth.ts",
+      "bytes": 10602,
+      "sha256": "cf72580b96c5ef9f926cfa2f748d693bf2bb890f8465ce044bd521060f425df5"
+    },
+    {
+      "path": "src/server/auth-adapter.ts",
+      "bytes": 2177,
+      "sha256": "8037ddf07f18e44d25e61d428b70c81887a7b80328e23a5834c2eb4d0fa5d0fe"
+    },
+    {
+      "path": "src/server/context-selection.ts",
+      "bytes": 4861,
+      "sha256": "02f7dbf5ff22223f4b6be425deacfb5ce94c8d12d8b6f31365007713ca0e04ed"
+    },
+    {
+      "path": "src/contracts/context.ts",
+      "bytes": 169,
+      "sha256": "cdaaa008dbac8ed5b2cd6d188411877e0f8b6c7adfaa24efb7422ea93c41ad70"
+    },
+    {
+      "path": "src/app/api/v1/context/route.ts",
+      "bytes": 879,
+      "sha256": "302dfaacea7c614f6de7ea0a84bfd80e45d5ecb5a765a93b39b1729ae44f1df8"
+    },
+    {
+      "path": "src/app/api/v1/audit-events/route.ts",
+      "bytes": 517,
+      "sha256": "4116d5a4f7e08a00f517ae4109b1c2424801c2df96dee0c3104186147c0710e0"
+    },
+    {
+      "path": "src/app/api/v1/audit-events/export/route.ts",
+      "bytes": 766,
+      "sha256": "72719c8ce451e4f4d1c133a2fef1a2312072ce7f8d3252a41864f04b3b6a2806"
+    },
+    {
+      "path": "src/app/api/v1/me/audit-events/route.ts",
+      "bytes": 490,
+      "sha256": "6e28dcc5642b94b82a4474ab24aae95b44cf65ed93f4aee023e03f06851af662"
+    },
+    {
+      "path": "src/app/api/v1/me/audit-events/export/route.ts",
+      "bytes": 628,
+      "sha256": "1579d637228503a0dcb98d645b7439cbf522cb22dfa23ee62a567b3dbfb98f51"
+    },
+    {
+      "path": "scripts/generate-openapi.ts",
+      "bytes": 135381,
+      "sha256": "1a4f5d9a8b8a6e695bae6c01fc23b697a55c797353b4c0601972b43893ca3dd1"
+    },
+    {
+      "path": "tests/server/audit-current-authority.test.ts",
+      "bytes": 10585,
+      "sha256": "f16297901a7bf48b585926dc1d0e672bea71b1913c09c74d9ded650093d0989f"
+    },
+    {
+      "path": "tests/server/audit-events.test.ts",
+      "bytes": 13342,
+      "sha256": "6593aa2cb3d122b47f795bc858af55bb5328a127972425a01282a96384dca07c"
+    },
+    {
+      "path": "tests/server/audit-auth-atomicity.test.ts",
+      "bytes": 4065,
+      "sha256": "c6e3e9a3a3535202617cd8ee06a865be46fa4d745dbc84bb316fd9b783c867d1"
+    },
+    {
+      "path": "tests/server/context-audit.test.ts",
+      "bytes": 9828,
+      "sha256": "eee66827f64d363bc9b92a785cc099acd805d0e0eb430b252278d576634ce5ec"
+    },
+    {
+      "path": "tests/server/auth-session-gate.test.ts",
+      "bytes": 7219,
+      "sha256": "9255c8e62d22fd8102ec84aca3d62b1fd170e23721ad08fe2a82d2e7f674e270"
+    },
+    {
+      "path": "tests/server/password-policy.test.ts",
+      "bytes": 25564,
+      "sha256": "1f6da471a93d2d01226d4bbcf1b52220ed85a14651ede51f813d3555bee52c34"
+    },
+    {
+      "path": "tests/server/account-current-authority.test.ts",
+      "bytes": 6251,
+      "sha256": "ba5f61c5a8152c73baa5d881029e5593a374971ca16c984ce8e82f54ae2e7d7e"
+    },
+    {
+      "path": "tests/server/mfa-policy.test.ts",
+      "bytes": 17173,
+      "sha256": "135f3511c0811056e7f7c8e91f855cd098c084420ee2cede63b4f3ae9a359964"
+    },
+    {
+      "path": "tests/server/expert-current-authority.test.ts",
+      "bytes": 6178,
+      "sha256": "a3a83a3c408e26b6d47c9de57958afc29cf8ecc2cf3e5d33112a1f75e9195910"
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "docs/qa/P12-T01/revalidation/README.md",
+      "bytes": 9117,
+      "sha256": "a33cf9b7c9f8248aaabe8f6018b528bd96ff4f15deaf849f87ebbde928323cd6"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/auth-baseline.log",
+      "bytes": 1243,
+      "sha256": "8eab8d2242e0546a83fb8e07e618a3cf077ba6cc34724cff90dc16fa96525a63"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/auth-tests.log",
+      "bytes": 503,
+      "sha256": "ffcc1ff56630b6af19c8628278f5caf7d9309157d0e33cc86d884c30a287afef"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/baseline.log",
+      "bytes": 39849,
+      "sha256": "15c3b1ef96f44fa83c3ef6e4e3c6625937e926e74b6ffe6286d590c2522f49c7"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/browser-results.json",
+      "bytes": 2483,
+      "sha256": "d85aa090c2fe94531f419b83370295f0eb076061945618d020203303fd106b86"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/build-attempt1.log",
+      "bytes": 583,
+      "sha256": "08636c4908a71ebbe1b72450a6d52c83d6906cbd58f0e1bce6074b6db348ff41"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/build-auth-context-attempt1.log",
+      "bytes": 343,
+      "sha256": "04cadf8c70849137490b8b2b2b9939e1b04f441921e7f013d1efa5bcb1e26577"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/build-auth-context-attempt2.log",
+      "bytes": 1746,
+      "sha256": "4b18556821edec855273aade9df21acc5db7eb48096786e3b9b16fc444910206"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/build-auth-context.log",
+      "bytes": 4838,
+      "sha256": "af5448bc28d82b556497a195199f9eddc7d882efb0087e1c8820fb7ac8a27230"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/build-final.log",
+      "bytes": 4838,
+      "sha256": "b2eabef748f2996d9f89648e6d4c981cdee97f51fe5310c66d400447a9d03377"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/context-access-v27.png",
+      "bytes": 121983,
+      "sha256": "83a1eade6aeda5f7ec606f5100dca9103df0526f738f5edd96b1dff03b3ee280"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/context-tests.log",
+      "bytes": 1084,
+      "sha256": "1685145eb0461b6fd28e80dd73ba3fd61dd35a3e66f026a5169cba36a3b66f31"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/contracts-final.log",
+      "bytes": 230,
+      "sha256": "e767ac54d8d59f6b7352c18aa2c8ae779a6dada82645fc8c77e540e4a971d107"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/contracts-generated.log",
+      "bytes": 19,
+      "sha256": "c8a59c88c65ca20383cb6b709d75f03769aab718ad6de6cdcd208855180adf63"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/database-auth-context-restarted.json",
+      "bytes": 4218,
+      "sha256": "d63616d2cf65d9a999cecc4f35f5fecf7a664ac97a5327b1d2aea28f6eb4a80d"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/database-auth-context.json",
+      "bytes": 4218,
+      "sha256": "d63616d2cf65d9a999cecc4f35f5fecf7a664ac97a5327b1d2aea28f6eb4a80d"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/database-new-process.json",
+      "bytes": 3283,
+      "sha256": "5ff961317f786b3c7b14ddba37b8ccafc936454cfd59d941feed69e2bc24bc9b"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/database.json",
+      "bytes": 3283,
+      "sha256": "5ff961317f786b3c7b14ddba37b8ccafc936454cfd59d941feed69e2bc24bc9b"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/event-producers.json",
+      "bytes": 61385,
+      "sha256": "5396911e787fd660eda1efec102ceab089e2c867319c5b7e88c7f5f6dfef8ca2"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/evidence-check.json",
+      "bytes": 1653,
+      "sha256": "87f78f4a75e2dc0c56151c7d592a735242dbf8c8a19994fb64de02468a83ba1f"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/lint-auth-context.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/lint-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/mobile.json",
+      "bytes": 59,
+      "sha256": "56c5a6314e2fb9eb5f17c07041bd34f6bf3ee3fb028f6c5ed8df9ca155cf2753"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/new-process.json",
+      "bytes": 2483,
+      "sha256": "99f9c23ed5c61d66c807d6441889c5cbe8c3dc0f09b38ff988181509473ddfd8"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/owner-service.csv",
+      "bytes": 2042,
+      "sha256": "b808b1e98c491c1f019dd8eb27cafbabbb655122215eecc6963b4a3aa4f5f323"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/owner-service.png",
+      "bytes": 111660,
+      "sha256": "5d2f564f9eedccd8bfe5c5bc75ed81721bf29db406a8610748e7b8cbe6cf8b29"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/plan-final.log",
+      "bytes": 423,
+      "sha256": "fd05ae072f231c1616dedc681bbd999439f394f6efccd2561a6126221940ba52"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/privacy-mobile.png",
+      "bytes": 48592,
+      "sha256": "85bff1954a0ecf78839f71660a8a34f6bcce79e9f25cd2bb43b6866c10dbb67f"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/privacy-new-process.csv",
+      "bytes": 1580,
+      "sha256": "bf162c122926f321b9af34466de7c9ea7f4ba21bcb91f07279f11021c81b89e8"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/privacy-restarted-v27.csv",
+      "bytes": 1580,
+      "sha256": "bf162c122926f321b9af34466de7c9ea7f4ba21bcb91f07279f11021c81b89e8"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/privacy-service.csv",
+      "bytes": 1580,
+      "sha256": "bf162c122926f321b9af34466de7c9ea7f4ba21bcb91f07279f11021c81b89e8"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/privacy-service.png",
+      "bytes": 151843,
+      "sha256": "a23d43ff3c224d78b5df0e4e2f60248c79d4b0a356f0289cf00a608c52485810"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/restart-audit.json",
+      "bytes": 530,
+      "sha256": "19efe27a4027484c7155bb5a163cb7e28da294c2f1d1f0c96e7e1836884b60d7"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/restart-final.json",
+      "bytes": 1113,
+      "sha256": "d1e0147bbdc31b5e51e321e3930319b052f7b12269bf094f3e64932daa794262"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/setup.json",
+      "bytes": 2526,
+      "sha256": "01326aca5db80772861619fbd32fe3c29d7761297e51e40900b76507328a3055"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/tests-attempt1.log",
+      "bytes": 3732,
+      "sha256": "c70663faa4ca2e1c00638732d1017fb458115fed929a452756757a4d6e2cdc4f"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/tests-auth-context-final.log",
+      "bytes": 1955,
+      "sha256": "2bac7ce1e52df53f58be800c69c087c67009957b3535fa079d98d1482418ca40"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/tests-final.log",
+      "bytes": 794,
+      "sha256": "58d8d9f06441ed0fa9752fdfdf336d4c187ab446b8eb6a5c9c60a2a530c209b0"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/typecheck-auth-context.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/qa/P12-T01/revalidation/typecheck-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

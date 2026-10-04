@@ -84,7 +84,7 @@ export function ExpertAssignmentsAdmin() {
           <div className="mg-flex" key="actions"><button className="cs-link" onClick={() => { setEditor(item); setError(""); }}>
             {item.status === "active" ? "수정" : "다시 배정"}</button>
             {item.status === "active" && <button className="cs-link" onClick={() => { setRevoke(item); setError(""); }}>회수</button>}</div>,
-        ] }))} total={list.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage}
+        ] }))} total={list.data?.total ?? 0} page={list.data?.page ?? page} pageSize={pageSize} onPage={setPage}
         onPageSize={size => { setPageSize(size); setPage(1); }} loading={list.loading} error={list.error?.message} />
     </Panel>
     {editor && <Modal title={editor === "new" ? "전문가 배정" : "전문가 배정 변경"} onClose={() => { if (!editorBusy) setEditor(undefined); }}>

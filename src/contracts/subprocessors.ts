@@ -11,6 +11,7 @@ export const subprocessorPatch = subprocessorInput.extend({
 }).strict();
 export const subprocessorNoticeInput = z.object({
   subprocessorId: z.uuid(),
+  recipientVersion: z.number().int().positive(),
   subject: z.string().trim().min(1).max(200),
   body: z.string().trim().min(1).max(20000),
 }).strict();
@@ -19,6 +20,7 @@ export type SubprocessorRecord = {
   status: "active" | "archived"; version: number; createdAt: string;
 };
 export type SubprocessorNoticeRecord = {
-  id: string; subprocessorId: string; name: string; email: string; subject: string;
-  status: "queued" | "sent" | "suppressed"; createdAt: string;
+  id: string; subprocessorId: string; name: string | null; email: string | null; subject: string;
+  status: "queued" | "processing" | "retry" | "processed" | "failed" | "suppressed" | "unknown"; createdAt: string;
+  completedAt?: string | null;
 };

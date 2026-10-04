@@ -1,0 +1,49 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 미완료 기능 검증"(45): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    anchor "캐치시큐 로그인" [ref=1163, loc=css:a[aria-label="캐치시큐 로그인"], url=http://localhost:3106/login]
+      image
+    container
+      form
+        textbox "이메일" [ref=1164, loc=css:input[name="email"]]
+          text "이메일을 입력해주세요"
+        container
+          textbox "비밀번호" [ref=1165, loc=css:input[name="password"]]
+            text "비밀번호"
+          button "비밀번호 표시 전환" [ref=1166, loc=css:button[aria-label="비밀번호 표시 전환"]]
+            text "◉"
+        anchor [ref=1167, loc=href:/password-change-email?returnTo=%2Fdashboard, url=http://localhost:3106/password-change-email?returnTo=%2Fdashboard]
+          text "비밀번호를 잊으셨나요?"
+        button [ref=1168]
+          text "로그인"
+        container
+          checkbox [ref=1169, loc=css:input[name="remember"]]
+          text "이메일 기억하기"
+      container
+        text "아직 계정이 없으신가요?"
+        anchor [ref=1170, loc=href:/signup?returnTo=%2Fdashboard, url=http://localhost:3106/signup?returnTo=%2Fdashboard]
+          text "회원가입"
+      text "or"
+      anchor [ref=1171, loc=href:/login/oauth2, url=http://localhost:3106/login/oauth2]
+        image
+        text "구글 계정 로그인"
+      anchor [ref=1172, loc=href:/login/saml, url=http://localhost:3106/login/saml]
+        image
+        text "MS 계정 로그인"
+    container
+      anchor [ref=1173, loc=href:/infoOwner/find, url=http://localhost:3106/infoOwner/find]
+        text "캐치폼 동의 이력을 조회하고 싶어요"
+        text "›"
+      anchor [ref=1174, loc=href:/shared-privacy/verify, url=http://localhost:3106/shared-privacy/verify]
+        text "공유받은 외부 개인정보를 조회하고 싶어요"
+        text "›"
+    container
+      paragraph
+        text ""개인정보 전담부서가 생긴 느낌이에요! 회사 서비스에 딱 맞는 서류를 자동으로 만들어주니까 정말 편리해요.""
+      container
+        image
+        text "스파크플러스"
+      container
+        button "스파크플러스 후기" [ref=1175, loc=css:button[aria-label="스파크플러스 후기"]]
+        button "이벤터스 후기" [ref=1176, loc=css:button[aria-label="이벤터스 후기"]]
+        button "모니모니(썸원) 후기" [ref=1177, loc=css:button[aria-label="모니모니(썸원) 후기"]]

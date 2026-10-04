@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-04",
+  "task": "P11-T02",
+  "status": "in_progress",
+  "fixes": [
+    "MFA routes now reach ManagementPages instead of Dashboard",
+    "search input uses draft state and explicit submit",
+    "table uses existing scroll wrapper"
+  ],
+  "checks": {
+    "focused": "인증 구성원 검색",
+    "searchRows": 1,
+    "resetRows": 2,
+    "settings": true,
+    "overview": true,
+    "reload": true,
+    "size": {
+      "innerWidth": 390,
+      "scrollWidth": 390,
+      "tableScrollWidth": 569,
+      "tableClientWidth": 308
+    }
+  },
+  "database": {
+    "members": 2,
+    "enrolled": 0,
+    "requireMfa": false,
+    "policyVersion": 1
+  },
+  "tests": {
+    "files": 2,
+    "passed": 37,
+    "failed": 0
+  },
+  "build": "production-v18",
+  "typecheck": "passed",
+  "lint": "passed",
+  "port": 3119,
+  "pid": 14510,
+  "sourceHashes": {
+    "src/components/CloneApp.tsx": "9eb1463fe7dfb6a726567a62e8207dbf55868d83a061b9237bbfb788625c7f38",
+    "src/components/management/MfaPolicy.tsx": "3fe4840af8b0ecdef287ee605f316762e65797f0311dcd706ecfe6ab40ae77fe"
+  },
+  "limitations": [
+    "No MFA policy or exception mutation in this UI check",
+    "No assertion of full P11-T02 acceptance",
+    "Mobile v17 initially expanded to609px; final v18 checked against configured390px"
+  ],
+  "harnessNotes": [
+    "Initial fill verification found replaced DOM node; subsequent snapshot showed text entered, and a single-key check independently proved focus moved to BODY.",
+    "A documentation generation heredoc encoding error was corrected by smaller UTF-8 scripts; no source changes lost."
+  ]
+}

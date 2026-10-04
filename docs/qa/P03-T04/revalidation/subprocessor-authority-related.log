@@ -1,0 +1,48 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:50564) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:50800) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:51035) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:51380) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:51469) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/subprocessor-authority.test.ts (23 tests | 1 failed) 5212ms
+   × 발송 재전송은 주소 변경 뒤에도 추가 발송 없이 원래 접수 결과를 반환하고 페이로드 삭제 후에는 거부한다 338ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/subprocessor-authority.test.ts > 발송 재전송은 주소 변경 뒤에도 추가 발송 없이 원래 접수 결과를 반환하고 페이로드 삭제 후에는 거부한다
+PrismaClientKnownRequestError: 
+Invalid `db.job.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/subprocessor-authority.test.ts:112:16
+
+  109 expect((await sendSubprocessorNoticeRequest(ctx,serviceId,input,key,randomUUID())).body).toMatchObject({id:first.body.id,email:person.email});
+  110 expect(await counts()).toEqual(before);
+  111 const notice=await db.subprocessorNotice.findUniqueOrThrow({where:{id:first.body.id}});
+→ 112 await db.job.update(
+Database error. Code: `23514`. Message: `erased jobs cannot run`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/subprocessor-authority.test.ts:112:3
+    110|   expect(await counts()).toEqual(before);
+    111|   const notice=await db.subprocessorNotice.findUniqueOrThrow({where:{i…
+    112|   await db.job.update({where:{id:notice.jobId!},data:{payloadErasedAt:…
+       |   ^
+    113|   await expect(sendSubprocessorNoticeRequest(ctx,serviceId,input,key,r…
+    114|   expect(await counts()).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 74 passed (75)
+   Start at  15:40:51
+   Duration  45.92s (tests 89%, import 9%, transform 2%)
+

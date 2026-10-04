@@ -1,0 +1,46 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:81008) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/password-policy.test.ts (22 tests | 1 failed) 21306ms
+   ❯ password policy, expiry and credential transactions (22)
+     × password attempts remain rate limited after transaction rollback 433ms
+(node:81418) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:81636) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:81682) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:81775) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:81845) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/password-policy.test.ts > password policy, expiry and credential transactions > password attempts remain rate limited after transaction rollback
+AssertionError: expected 429 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 429
+
+ ❯ tests/server/password-policy.test.ts:226:102
+    225|   test("password attempts remain rate limited after transaction rollba…
+    226|     const statuses: number[] = [];
+    227|     for (let index = 0; index < 10; index++) statuses.push((await chan…
+       |                                                                   ^
+    228|     expect(statuses.slice(0, 3)).toEqual([400, 400, 400]);
+    229|     expect(statuses.slice(3)).toEqual(Array(7).fill(429));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 10 passed (11)
+      Tests  1 failed | 162 passed (163)
+   Start at  18:07:35
+   Duration  82.40s (tests 89%, import 10%, transform 1%)
+

@@ -1,0 +1,41 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:71720) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/activity-reviews.test.ts (20 tests | 1 failed) 8075ms
+   × 답변 전 처리 완료와 취소 후 답변을 거부한다 334ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/activity-reviews.test.ts > 답변 전 처리 완료와 취소 후 답변을 거부한다
+AssertionError: promise resolved "{ status: 201, …(1) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "id": "e2286e50-0665-441b-b55f-e85eac4f1c47",
++   },
++   "status": 201,
+  }
+
+ ❯ tests/server/activity-reviews.test.ts:97:24
+     95|  await actOnActivityReview(actors.owner,id,{version:1,action:"cancel",…
+     96|  await expect(actOnActivityReview(actors.recipient,id,{version:2,actio…
+     97|  await expect(create()).rejects.toMatchObject({status:403});
+       |                        ^
+     98| });
+     99| test("서비스 보관 후 변경과 성공 캐시 재사용을 거부한다",async()=>{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 19 passed (20)
+   Start at  15:54:36
+   Duration  8.79s (tests 93%, import 4%, transform 3%)
+

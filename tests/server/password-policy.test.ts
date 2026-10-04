@@ -223,8 +223,12 @@ describe("password policy, expiry and credential transactions", () => {
     }
   });
   test("password attempts remain rate limited after transaction rollback", async () => {
-    for (let index = 0; index < 10; index++) expect((await change(replacement, "incorrect")).status).toBe(400);
+    const statuses: number[] = [];
+    for (let index = 0; index < 10; index++) statuses.push((await change(replacement, "incorrect")).status);
+    expect(statuses.slice(0, 3)).toEqual([400, 400, 400]);
+    expect(statuses.slice(3)).toEqual(Array(7).fill(429));
     expect((await change()).status).toBe(429); expect(await checkPassword(password)).toBe(true);
+    expect(await db.apiRateLimit.findUnique({ where: { key: "password-mutation:" + person.id } })).toMatchObject({ count: 11 });
   });
   test("expiry blocks company APIs and appears in context while recovery and policy status remain accessible", async () => {
     await expire();

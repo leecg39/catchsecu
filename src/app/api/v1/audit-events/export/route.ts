@@ -1,9 +1,10 @@
 import { requireContext } from "@/server/context";
 import { auditEventQuery, exportAuditEvents } from "@/server/audit-events";
 import { rateLimit, route } from "@/server/http";
+import { requestQuery } from "@/server/request-query";
 
 export const GET = route(async (request, requestId) => {
-  const input = auditEventQuery.parse(Object.fromEntries(new URL(request.url).searchParams));
+  const input = auditEventQuery.parse(requestQuery(request));
   const ctx = await requireContext(request.headers, input.scope === "company" ? "audit.read" : undefined);
   await rateLimit("audit-export:" + ctx.user.id, 10);
   return new Response(await exportAuditEvents(ctx, input, requestId), { headers: {

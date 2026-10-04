@@ -72,10 +72,11 @@ describe("회사 격리 감사 이벤트 조회", () => {
       item.actorName === null && item.resourceId === null)).toBe(true);
     expect(JSON.stringify(limitedBody)).not.toContain("never-return-this-token");
     expect(JSON.stringify(limitedBody)).not.toContain("secret@example.test");
+    const expectedTotal = await db.auditEvent.count({ where: { tenantId: companyA } });
     const full = await list(request("/audit-events", "GET", adminCookie));
     expect(full.status).toBe(200);
     const fullBody = await full.json();
-    expect(fullBody.total).toBe(8);
+    expect(fullBody.total).toBe(expectedTotal);
     expect(fullBody.items.some((item: { id: string; actorName: string | null }) =>
       item.id === eventInfo && item.actorName === "audit-admin")).toBe(true);
     expect(fullBody.items.find((item: { id: string }) => item.id === eventService).resourceId).toBeNull();
@@ -167,5 +168,20 @@ describe("회사 격리 감사 이벤트 조회", () => {
     expect(response.status).toBe(413);
     expect(response.headers.get("content-type")).toContain("application/json");
     expect(await db.auditEvent.count({ where: { requestId: response.headers.get("x-request-id")! } })).toBe(0);
+  });
+  test.each([
+    { kind: "authority", actions: ["mfa_policy.updated", "mfa_exception.created", "ip_access.updated", "ip_rule.created", "policy.updated"] },
+    { kind: "info", actions: ["consent_receipt.pdf_downloaded"] },
+  ])("$kind includes its security/receipt producers with matching masked list and CSV", async ({ kind, actions }) => {
+    const ids = [];
+    for (const action of actions) ids.push((await event(companyA, action, serviceA1, adminId, 0)).id);
+    const query = "?kind=" + kind + "&serviceId=" + serviceA1 + "&pageSize=100";
+    const r = await list(request("/audit-events" + query, "GET", privacyCookie)); expect(r.status).toBe(200);
+    const data = await r.json(); expect(data.items.map((row: { id: string }) => row.id).sort()).toEqual(ids.sort());
+    expect(data.items.every((row: { resourceId: string | null; actorName: string | null }) => row.resourceId === null && row.actorName === null)).toBe(true);
+    const exported = await exportCsv(request("/audit-events/export" + query, "GET", privacyCookie)); expect(exported.status).toBe(200);
+    const csv = parse(await exported.text(), { bom: true }) as string[][];
+    expect(csv.slice(1).map(row => row[0]).sort()).toEqual(ids.sort());
+    expect(JSON.stringify(csv)).not.toContain("never-return-this-token");
   });
 });

@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Keep QA builds separate from the files used by a running local server.
+  distDir: process.env.CATCHSECU_BUILD_DIR || ".next",
+  typescript: { tsconfigPath: process.env.CATCHSECU_TSCONFIG || "tsconfig.json" },
   devIndicators: false,
   skipProxyUrlNormalize: true,
   async headers() {

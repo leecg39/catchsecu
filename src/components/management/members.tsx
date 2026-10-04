@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useApplication } from "../ApplicationContext";
 import { RemoteTable } from "../RemoteTable";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
-import { api, errorText, useResource } from "@/lib/api";
+import { api, ApiError, errorText, useResource } from "@/lib/api";
 import { invitationStatuses, memberStatuses, roleLabels, type InvitationRecord, type MemberRecord, type MemberRole } from "@/contracts/members";
 import type { Paged } from "@/contracts/forms";
 import type { AccessRequestList, AccessRequestRecord } from "@/contracts/access-requests";
@@ -56,10 +56,11 @@ function RequestsReview() {
   </>;
 }
 
-function MemberFields({ member, done, onBusy }: { member?: MemberRecord; done: () => void; onBusy: (busy: boolean) => void }) {
+function MemberFields({ member, done, onBusy, onReload }: { member?: MemberRecord; done: () => void; onBusy: (busy: boolean) => void; onReload: (member: MemberRecord) => void }) {
   const app = useApplication(), [role, setRole] = useState<MemberRole>(member?.role ?? "viewer");
   const [serviceIds, setServiceIds] = useState(member?.grants.map(grant => grant.serviceId) ?? (app.data?.serviceId ? [app.data.serviceId] : []));
   const [status, setStatus] = useState(member?.status ?? "active"), [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  const [conflict, setConflict] = useState(false);
   const key = useRef<string | null>(null);
   const lock = useRef(false);
   const services = [
@@ -76,7 +77,17 @@ function MemberFields({ member, done, onBusy }: { member?: MemberRecord; done: (
       await api(member ? "/members/" + member.id : "/invitations", { method: member ? "PATCH" : "POST",
         headers: { "Idempotency-Key": key.current }, body: JSON.stringify({ role, serviceIds, ...(member ? { version: member.version, status } : { email: String(fields.get("email")).trim() }) }) });
       done();
-    } catch (error) { setError(errorText(error)); } finally { lock.current = false; setBusy(false); onBusy(false); }
+    } catch (error) {
+      setError(errorText(error));
+      setConflict(error instanceof ApiError && error.code === "VERSION_CONFLICT");
+    } finally { lock.current = false; setBusy(false); onBusy(false); }
+  }
+  async function reloadMember() {
+    if (!member || lock.current) return;
+    lock.current = true; setBusy(true); onBusy(true);
+    try { onReload(await api<MemberRecord>("/members/" + member.id)); }
+    catch (cause) { setError(errorText(cause)); }
+    finally { lock.current = false; setBusy(false); onBusy(false); }
   }
   return <form className="member-fields" onSubmit={submit}>
     {member ? <p><strong>{member.user.name}</strong><br />{member.user.email}</p> :
@@ -92,7 +103,9 @@ function MemberFields({ member, done, onBusy }: { member?: MemberRecord; done: (
     {role === "admin" && <p className="cs-muted">관리자는 새로 생성되는 서비스를 포함해 모든 서비스를 관리합니다. 선택한 서비스는 기본 접근 정보로 저장됩니다.</p>}
     {member && role !== "admin" && !serviceIds.length && <p className="cs-muted">회사 구성원 상태는 유지하고 모든 서비스 접근 권한을 회수합니다.</p>}
     {error && <p role="alert" className="auth-error">{error}</p>}
-    <ActionButton disabled={busy || (!member && !app.data?.services.length)}>{busy ? "처리 중…" : member ? "변경 저장" : "초대 보내기"}</ActionButton>
+    {member && conflict && <div><p className="cs-muted">다른 곳에서 변경한 정보를 불러오면 아직 저장하지 않은 입력이 최신 정보로 바뀝니다.</p>
+      <button type="button" className="cs-link" disabled={busy} onClick={reloadMember}>최신 정보 다시 불러오기</button></div>}
+    <ActionButton disabled={busy || conflict || (!member && !app.data?.services.length)}>{busy ? "처리 중…" : member ? "변경 저장" : "초대 보내기"}</ActionButton>
   </form>;
 }
 export function LiveMembers({ authority = false }: { authority?: boolean }) {
@@ -131,15 +144,22 @@ export function LiveMembers({ authority = false }: { authority?: boolean }) {
           <div className="mg-flex" key="actions">{manageable && member.status !== "revoked" && <><button className="cs-link" onClick={() => setEditor(member)}>권한 수정</button>
             <button className="cs-link" onClick={() => { setError(""); setAction({ kind: "remove", member }); }}>제외</button></>}
             {!self && member.accessKind !== "expert" && member.role !== "owner" && member.status === "active" && app.data?.company?.role === "owner" && <button className="cs-link" onClick={() => { setError(""); setAction({ kind: "transfer", member }); }}>소유권 이전</button>}</div>] };
-      })} total={members.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={members.loading} error={members.error?.message} /> :
+      })} total={members.data?.total ?? 0} page={members.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={members.loading} error={members.error?.message} /> :
         <RemoteTable columns={["이메일", "역할", "상태", "만료일", "관리"]} rows={(invitations.data?.items ?? []).map(invitation => ({ id: invitation.id, cells: [
           invitation.email, roleLabels[invitation.role], invitationStatuses[invitation.status], new Date(invitation.expiresAt).toLocaleString("ko-KR"),
           <div className="mg-flex" key="actions">{["pending", "expired"].includes(invitation.status) && (app.data?.company?.role === "owner" || invitation.role !== "billing") && <>
             <button className="cs-link" onClick={() => { setError(""); setInvitationAction({ kind: "resend", invitation }); }}>재발송</button>
             <button className="cs-link" onClick={() => { setError(""); setInvitationAction({ kind: "revoke", invitation }); }}>초대 취소</button></>}</div>] }))}
-          total={invitations.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={invitations.loading} error={invitations.error?.message} />}
+          total={invitations.data?.total ?? 0} page={invitations.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={invitations.loading} error={invitations.error?.message} />}
     </Panel><RequestsReview/>{editor && <Modal title={editor === "invite" ? "구성원 초대" : "구성원 권한 수정"} onClose={() => { if (!editorBusy) setEditor(undefined); }}>
-      <MemberFields member={editor === "invite" ? undefined : editor} onBusy={setEditorBusy} done={() => { setNotice(editor === "invite" ? "초대 메일 전송을 요청했습니다." : "구성원 정보를 저장했습니다."); setEditor(undefined); refresh(); }} /></Modal>}
+      <MemberFields key={editor === "invite" ? "invite" : editor.id + ":" + editor.version} member={editor === "invite" ? undefined : editor} onBusy={setEditorBusy}
+        onReload={current => {
+          refresh();
+          if (current.status === "revoked" || current.role === "owner" || current.accessKind === "expert" ||
+            (app.data?.company?.role !== "owner" && current.role === "billing")) {
+            setEditor(undefined); setNotice("구성원 상태가 변경되었습니다. 최신 목록을 확인해주세요.");
+          } else setEditor(current);
+        }} done={() => { setNotice(editor === "invite" ? "초대 메일 전송을 요청했습니다." : "구성원 정보를 저장했습니다."); setEditor(undefined); refresh(); }} /></Modal>}
     {action && <Modal title={action.kind === "remove" ? "구성원 제외" : "소유권 이전"} onClose={() => { if (!busy) setAction(undefined); }}>
       <form className="member-fields" onSubmit={event => { event.preventDefault(); const password = String(new FormData(event.currentTarget).get("password") ?? "");
         void execute(async () => { await api("/members/" + action.member.id + (action.kind === "transfer" ? "/transfer" : ""), {

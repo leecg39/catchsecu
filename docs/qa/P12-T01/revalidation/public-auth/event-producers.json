@@ -1,0 +1,1938 @@
+{
+  "date": "2026-10-04",
+  "task": "P12-T01",
+  "method": "TypeScript AST audit and auth-mail helper call-site inventory; call presence alone does not prove atomicity or complete event coverage. SQL triggers are mapped separately.",
+  "filesScanned": 238,
+  "callSites": 208,
+  "filesWithCalls": 64,
+  "rootClientWrites": [
+    {
+      "path": "src/server/notice-attachments.ts",
+      "line": 72,
+      "function": "downloadNoticeAttachment",
+      "callee": "db.auditEvent.create",
+      "actionExpression": "\"notice.attachment_downloaded\"",
+      "sourceSha256": "a1b692436aaa223093243b5ce303ce60e87bb8d64f56f58172e6bf5cf093addc",
+      "rootClientWrite": true
+    },
+    {
+      "path": "src/server/guides.ts",
+      "line": 131,
+      "function": "downloadGuide",
+      "callee": "db.auditEvent.create",
+      "actionExpression": "\"guide.downloaded\"",
+      "sourceSha256": "ff62568b930ab03241f5d9b63c082d64e3c2596580c9c0312b339a82c34794f2",
+      "rootClientWrite": true
+    }
+  ],
+  "resolvedGaps": [
+    {
+      "path": "src/server/auth.ts",
+      "resolution": "Guarded signup, signed email confirmation, recovery/verification queues, rejected login and MFA challenge/OTP; 26 focused tests plus 264 related regressions and actual signed-link UI"
+    },
+    {
+      "path": "src/server/auth-adapter.ts",
+      "resolution": "As-is library transaction preserves audited adapter overrides; creation/confirmation and final proof expiry are atomic with events"
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "resolution": "Safe request audits distinguish anonymous raw-email input from proved MFA actor; inactive reset request deletes only its newly-created proofs"
+    }
+  ],
+  "nextVerifiedGaps": [
+    {
+      "path": "prisma/migrations/20261002133000_utc_timestamps/migration.sql",
+      "issue": "Credential trigger deletes all sessions directly and records password.created/changed with an independent UUID; actual UI reset removed the previous session without a matching session.ended event. Password mutation request correlation and per-session termination coverage remain."
+    },
+    {
+      "path": "src/server/notice-attachments.ts",
+      "issue": "Root-client attachment download audit must be checked against current access and final deadlines in its business transaction"
+    },
+    {
+      "path": "src/server/guides.ts",
+      "issue": "Root-client guide download audit needs request-by-request current access and atomicity proof"
+    },
+    {
+      "path": "src/components/management/AuditLogs.tsx",
+      "issue": "All 10 log routes still need final kind/filter/role/empty/error acceptance. Current public-auth scope proves only own activity."
+    },
+    {
+      "path": "src/server/auth.ts",
+      "issue": "Queued auth mail is proven; worker/provider delivery and other enabled auth endpoint producers are not covered by this scope"
+    }
+  ],
+  "producers": [
+    {
+      "path": "src/server/kakao.ts",
+      "line": 32,
+      "function": "createKakaoChannel",
+      "callee": "audit",
+      "actionExpression": "kakao.channel_created",
+      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/kakao.ts",
+      "line": 44,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "kakao.channel_updated",
+      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/kakao.ts",
+      "line": 68,
+      "function": "createKakaoTemplate",
+      "callee": "audit",
+      "actionExpression": "kakao.template_created",
+      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/kakao.ts",
+      "line": 78,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "kakao.template_updated",
+      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/kakao.ts",
+      "line": 90,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "kakao.template_submitted",
+      "sourceSha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notice-attachments.ts",
+      "line": 55,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"notice.attachment_added\"",
+      "sourceSha256": "a1b692436aaa223093243b5ce303ce60e87bb8d64f56f58172e6bf5cf093addc",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notice-attachments.ts",
+      "line": 72,
+      "function": "downloadNoticeAttachment",
+      "callee": "db.auditEvent.create",
+      "actionExpression": "\"notice.attachment_downloaded\"",
+      "sourceSha256": "a1b692436aaa223093243b5ce303ce60e87bb8d64f56f58172e6bf5cf093addc",
+      "rootClientWrite": true
+    },
+    {
+      "path": "src/server/notice-attachments.ts",
+      "line": 104,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"notice.attachment_removed\"",
+      "sourceSha256": "a1b692436aaa223093243b5ce303ce60e87bb8d64f56f58172e6bf5cf093addc",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/exports.ts",
+      "line": 22,
+      "function": "event",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": null,
+      "sourceSha256": "8e5d2ceec923b7e2ecfb2abef6894fc9e2b085d2bd11e92933f8ead3288a8af8",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/import-worker.ts",
+      "line": 14,
+      "function": "event",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": null,
+      "sourceSha256": "7a8f56ca0a3ee04282984f873ebc6d437b9d12e0e1d6e8402a8de056ee82211a",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth.ts",
+      "line": 32,
+      "function": "sendResetPassword",
+      "callee": "enqueueAuthMail",
+      "actionExpression": "auth.password_reset_queued",
+      "sourceSha256": "ed0fde147e6c490548d5f7b8c4604cca2664c01dd56f512b43ef6964d5f0dee8",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth.ts",
+      "line": 38,
+      "function": "sendVerificationEmail",
+      "callee": "enqueueAuthMail",
+      "actionExpression": "auth.verification_queued",
+      "sourceSha256": "ed0fde147e6c490548d5f7b8c4604cca2664c01dd56f512b43ef6964d5f0dee8",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth.ts",
+      "line": 66,
+      "function": "sendOTP",
+      "callee": "enqueueAuthMail",
+      "actionExpression": "auth.factor_code_queued",
+      "sourceSha256": "ed0fde147e6c490548d5f7b8c4604cca2664c01dd56f512b43ef6964d5f0dee8",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth.ts",
+      "line": 146,
+      "function": "before",
+      "callee": "authAudit",
+      "actionExpression": "auth.sessions_revoked_for_mfa",
+      "sourceSha256": "ed0fde147e6c490548d5f7b8c4604cca2664c01dd56f512b43ef6964d5f0dee8",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/sharing.ts",
+      "line": 139,
+      "function": "createShare",
+      "callee": "audit",
+      "actionExpression": "share.created",
+      "sourceSha256": "f7912b0337390584e46803503f9bbf2e727bf70ddf579345fa601883920e44d9",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/sharing.ts",
+      "line": 167,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "f7912b0337390584e46803503f9bbf2e727bf70ddf579345fa601883920e44d9",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/consent-receipts.ts",
+      "line": 90,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "consent_receipt.pdf_downloaded",
+      "sourceSha256": "8fd52962540ba0c9d10b4fc5e5d373512a14dfc2dc8cf82486f2bc5616741a00",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/files.ts",
+      "line": 25,
+      "function": "fileAudit",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": null,
+      "sourceSha256": "506dfcd59a78b27485de8e90681e8d2300088ebd05e731208fc74785b714c36f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/files.ts",
+      "line": 178,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "file.renamed",
+      "sourceSha256": "506dfcd59a78b27485de8e90681e8d2300088ebd05e731208fc74785b714c36f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/guides.ts",
+      "line": 44,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"guide.created\"",
+      "sourceSha256": "ff62568b930ab03241f5d9b63c082d64e3c2596580c9c0312b339a82c34794f2",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/guides.ts",
+      "line": 63,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"guide.updated\"",
+      "sourceSha256": "ff62568b930ab03241f5d9b63c082d64e3c2596580c9c0312b339a82c34794f2",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/guides.ts",
+      "line": 91,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"guide.file_replaced\"",
+      "sourceSha256": "ff62568b930ab03241f5d9b63c082d64e3c2596580c9c0312b339a82c34794f2",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/guides.ts",
+      "line": 111,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"guide.archived\"",
+      "sourceSha256": "ff62568b930ab03241f5d9b63c082d64e3c2596580c9c0312b339a82c34794f2",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/guides.ts",
+      "line": 131,
+      "function": "downloadGuide",
+      "callee": "db.auditEvent.create",
+      "actionExpression": "\"guide.downloaded\"",
+      "sourceSha256": "ff62568b930ab03241f5d9b63c082d64e3c2596580c9c0312b339a82c34794f2",
+      "rootClientWrite": true
+    },
+    {
+      "path": "src/server/password-deferral.ts",
+      "line": 49,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "password.deferred",
+      "sourceSha256": "c891fd7a422438b46fc34e0904d16c9dca6c58116ce8e9c1a603956b56e85bf7",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/verification.ts",
+      "line": 60,
+      "function": "createVerificationIntegration",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "af4aaebbd248c74cb738168dd021262b6ee49631ae6196f04e2447620d36eeb3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/verification.ts",
+      "line": 81,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "af4aaebbd248c74cb738168dd021262b6ee49631ae6196f04e2447620d36eeb3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/verification.ts",
+      "line": 94,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "af4aaebbd248c74cb738168dd021262b6ee49631ae6196f04e2447620d36eeb3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/payments.ts",
+      "line": 28,
+      "function": "createPaymentOrder",
+      "callee": "audit",
+      "actionExpression": "billing.order_created",
+      "sourceSha256": "68b1705540a055374474ffa4d6f34f47622208a4a99c72a84f50febb86eb3825",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/viewer.ts",
+      "line": 24,
+      "function": "viewerAudit",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": null,
+      "sourceSha256": "9772728bf5ca4d60107a9358c38ee3a77b8479c21e1a1feb894ba57cd5476e86",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/audit.ts",
+      "line": 6,
+      "function": "audit",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": null,
+      "sourceSha256": "38e3ab79ea28195861f62658e9b2e74db110b5a3dee2f8b47612f62a99bd2898",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/audit.ts",
+      "line": 17,
+      "function": "auditAccess",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": null,
+      "sourceSha256": "38e3ab79ea28195861f62658e9b2e74db110b5a3dee2f8b47612f62a99bd2898",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/submission-management.ts",
+      "line": 49,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "submission.viewed",
+      "sourceSha256": "2521203a54451e20244b3b63604d25dc80d086e52519fe149487d2c4a49d43ab",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/submission-management.ts",
+      "line": 101,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "submission.corrected",
+      "sourceSha256": "2521203a54451e20244b3b63604d25dc80d086e52519fe149487d2c4a49d43ab",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/submission-management.ts",
+      "line": 125,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "2521203a54451e20244b3b63604d25dc80d086e52519fe149487d2c4a49d43ab",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/submission-management.ts",
+      "line": 134,
+      "function": "createNote",
+      "callee": "audit",
+      "actionExpression": "submission.note_created",
+      "sourceSha256": "2521203a54451e20244b3b63604d25dc80d086e52519fe149487d2c4a49d43ab",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/submission-management.ts",
+      "line": 149,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "2521203a54451e20244b3b63604d25dc80d086e52519fe149487d2c4a49d43ab",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/marketing.ts",
+      "line": 100,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/marketing.ts",
+      "line": 117,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "marketing.viewed",
+      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/marketing.ts",
+      "line": 129,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "marketing.sources_viewed",
+      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/marketing.ts",
+      "line": 170,
+      "function": "createMarketing",
+      "callee": "audit",
+      "actionExpression": "marketing.granted",
+      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/marketing.ts",
+      "line": 216,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "marketing.exclusion_changed",
+      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/marketing.ts",
+      "line": 240,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/marketing.ts",
+      "line": 268,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "marketing.summary_viewed",
+      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/marketing.ts",
+      "line": 294,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "marketing.summary_viewed",
+      "sourceSha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/mfa-policy.ts",
+      "line": 55,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "mfa_policy.updated",
+      "sourceSha256": "396865d993efad2e3ecc4603d9d36b1130f9c744d9d780a72674650ec934f969",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/mfa-policy.ts",
+      "line": 67,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "mfa_exception.created",
+      "sourceSha256": "396865d993efad2e3ecc4603d9d36b1130f9c744d9d780a72674650ec934f969",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/mfa-policy.ts",
+      "line": 80,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "mfa_exception.updated",
+      "sourceSha256": "396865d993efad2e3ecc4603d9d36b1130f9c744d9d780a72674650ec934f969",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/mfa-policy.ts",
+      "line": 90,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "mfa_exception.deleted",
+      "sourceSha256": "396865d993efad2e3ecc4603d9d36b1130f9c744d9d780a72674650ec934f969",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/approvals.ts",
+      "line": 48,
+      "function": "requestApproval",
+      "callee": "audit",
+      "actionExpression": "approval.requested",
+      "sourceSha256": "435ff4e5220a8f36d60334211f3d860416dc59165d4ce56a1129beb9faac02ce",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/approvals.ts",
+      "line": 119,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "435ff4e5220a8f36d60334211f3d860416dc59165d4ce56a1129beb9faac02ce",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/members.ts",
+      "line": 95,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "member.updated",
+      "sourceSha256": "6e82ca48f00a7af0c7998f8190f0569fc404d9d8b734697141685cc78a581fd1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/members.ts",
+      "line": 112,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "member.removed",
+      "sourceSha256": "6e82ca48f00a7af0c7998f8190f0569fc404d9d8b734697141685cc78a581fd1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/members.ts",
+      "line": 126,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "company.ownership_transferred",
+      "sourceSha256": "6e82ca48f00a7af0c7998f8190f0569fc404d9d8b734697141685cc78a581fd1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/members.ts",
+      "line": 173,
+      "function": "createInvitation",
+      "callee": "audit",
+      "actionExpression": "invitation.created",
+      "sourceSha256": "6e82ca48f00a7af0c7998f8190f0569fc404d9d8b734697141685cc78a581fd1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/members.ts",
+      "line": 212,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "6e82ca48f00a7af0c7998f8190f0569fc404d9d8b734697141685cc78a581fd1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/members.ts",
+      "line": 258,
+      "function": "acceptInvitation",
+      "callee": "audit",
+      "actionExpression": "invitation.accepted",
+      "sourceSha256": "6e82ca48f00a7af0c7998f8190f0569fc404d9d8b734697141685cc78a581fd1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/campaign-files.ts",
+      "line": 28,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "campaign.file_initialized",
+      "sourceSha256": "856460be236d59b020eff611373a0eb563bb7f3b3b087a555ca88c9c24772bbd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/fixed-urls.ts",
+      "line": 63,
+      "function": "createFixedUrl",
+      "callee": "audit",
+      "actionExpression": "fixed_url.created",
+      "sourceSha256": "0173058fb0be5562203b56a776bd802639c1e1b74f1cdc5761fbb0afa1bcd093",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/fixed-urls.ts",
+      "line": 86,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "fixed_url.updated",
+      "sourceSha256": "0173058fb0be5562203b56a776bd802639c1e1b74f1cdc5761fbb0afa1bcd093",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/fixed-urls.ts",
+      "line": 95,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "fixed_url.revoked",
+      "sourceSha256": "0173058fb0be5562203b56a776bd802639c1e1b74f1cdc5761fbb0afa1bcd093",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-adapter.ts",
+      "line": 56,
+      "function": "create",
+      "callee": "authAudit",
+      "actionExpression": "auth.account_registered",
+      "sourceSha256": "f127be4a88391c8af541b6b464bcaae5ec6f4c5e98dfe29a5f272a516077646b",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-adapter.ts",
+      "line": 81,
+      "function": "anonymous",
+      "callee": "authAudit",
+      "actionExpression": "session.created",
+      "sourceSha256": "f127be4a88391c8af541b6b464bcaae5ec6f4c5e98dfe29a5f272a516077646b",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-adapter.ts",
+      "line": 101,
+      "function": "anonymous",
+      "callee": "authAudit",
+      "actionExpression": "auth.email_verified",
+      "sourceSha256": "f127be4a88391c8af541b6b464bcaae5ec6f4c5e98dfe29a5f272a516077646b",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-adapter.ts",
+      "line": 112,
+      "function": "anonymous",
+      "callee": "authAudit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "f127be4a88391c8af541b6b464bcaae5ec6f4c5e98dfe29a5f272a516077646b",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/access-requests.ts",
+      "line": 63,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "access_request.created",
+      "sourceSha256": "548ca3b7a0af515dabb211c6dac93b5bd758311586d8a14dd0518b5ad303c94a",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/access-requests.ts",
+      "line": 91,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "548ca3b7a0af515dabb211c6dac93b5bd758311586d8a14dd0518b5ad303c94a",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/access-requests.ts",
+      "line": 103,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "access_request.cancelled",
+      "sourceSha256": "548ca3b7a0af515dabb211c6dac93b5bd758311586d8a14dd0518b5ad303c94a",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 71,
+      "function": "createDocument",
+      "callee": "audit",
+      "actionExpression": "document.created",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 91,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "document.draft_updated",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 155,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "document.published",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 172,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 185,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "document.link_revoked",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 231,
+      "function": "createClause",
+      "callee": "audit",
+      "actionExpression": "clause.created",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 243,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "clause.updated",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 251,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 260,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "document.clause_applied",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/documents.ts",
+      "line": 320,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "service.consent_display_updated",
+      "sourceSha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/context-selection.ts",
+      "line": 49,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "context.company_selected",
+      "sourceSha256": "02f7dbf5ff22223f4b6be425deacfb5ce94c8d12d8b6f31365007713ca0e04ed",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/context-selection.ts",
+      "line": 64,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "context.service_selected",
+      "sourceSha256": "02f7dbf5ff22223f4b6be425deacfb5ce94c8d12d8b6f31365007713ca0e04ed",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subscriptions.ts",
+      "line": 77,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"billing.purchase.requested\"",
+      "sourceSha256": "f6de9b8a5bddc7245d48e13611fa55e9b8dcbda3a5baad22513c9403f6d99eae",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subscriptions.ts",
+      "line": 92,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"billing.purchase.cancelled\"",
+      "sourceSha256": "f6de9b8a5bddc7245d48e13611fa55e9b8dcbda3a5baad22513c9403f6d99eae",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subscriptions.ts",
+      "line": 116,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"billing.trial.cancel_scheduled\"",
+      "sourceSha256": "f6de9b8a5bddc7245d48e13611fa55e9b8dcbda3a5baad22513c9403f6d99eae",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subscriptions.ts",
+      "line": 135,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"billing.trial.cancel_revoked\"",
+      "sourceSha256": "f6de9b8a5bddc7245d48e13611fa55e9b8dcbda3a5baad22513c9403f6d99eae",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "line": 57,
+      "function": "authAudit",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "line": 67,
+      "function": "authRequestAudit",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "line": 86,
+      "function": "anonymous",
+      "callee": "authRequestAudit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "line": 98,
+      "function": "removeAuthSessions",
+      "callee": "authAudit",
+      "actionExpression": "session.ended",
+      "sourceSha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "line": 156,
+      "function": "anonymous",
+      "callee": "authAudit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "line": 161,
+      "function": "anonymous",
+      "callee": "authAudit",
+      "actionExpression": "auth.factor_challenged",
+      "sourceSha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "line": 162,
+      "function": "anonymous",
+      "callee": "authRequestAudit",
+      "actionExpression": "auth.login_rejected",
+      "sourceSha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/auth-mutations.ts",
+      "line": 167,
+      "function": "anonymous",
+      "callee": "authRequestAudit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/support-tickets.ts",
+      "line": 57,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "c517cb46f241a357d2bef7462874e07242cbaa051e333749361dff78258150bd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/support-tickets.ts",
+      "line": 58,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.createMany",
+      "actionExpression": null,
+      "sourceSha256": "c517cb46f241a357d2bef7462874e07242cbaa051e333749361dff78258150bd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/support-tickets.ts",
+      "line": 72,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "c517cb46f241a357d2bef7462874e07242cbaa051e333749361dff78258150bd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/support-tickets.ts",
+      "line": 84,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "c517cb46f241a357d2bef7462874e07242cbaa051e333749361dff78258150bd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/support-tickets.ts",
+      "line": 103,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "c517cb46f241a357d2bef7462874e07242cbaa051e333749361dff78258150bd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/support-tickets.ts",
+      "line": 120,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "c517cb46f241a357d2bef7462874e07242cbaa051e333749361dff78258150bd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/support-tickets.ts",
+      "line": 140,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "c517cb46f241a357d2bef7462874e07242cbaa051e333749361dff78258150bd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/support-tickets.ts",
+      "line": 157,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "c517cb46f241a357d2bef7462874e07242cbaa051e333749361dff78258150bd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/destruction.ts",
+      "line": 125,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "b408d42a29adf6e1802ca874a64fdde757cd4a7aab914ddb1a71653848bc90a1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/destruction.ts",
+      "line": 149,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "submission.retention_changed",
+      "sourceSha256": "b408d42a29adf6e1802ca874a64fdde757cd4a7aab914ddb1a71653848bc90a1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/destruction.ts",
+      "line": 162,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "destruction.certificate_viewed",
+      "sourceSha256": "b408d42a29adf6e1802ca874a64fdde757cd4a7aab914ddb1a71653848bc90a1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 90,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "import.created",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 110,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "import.list_viewed",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 118,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "import.viewed",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 156,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "import.inspected",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 167,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "import.configured",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 185,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "import.validated",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 204,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 219,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "import.cleaned",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 238,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "import.previewed",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/imports.ts",
+      "line": 247,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "import.errors_downloaded",
+      "sourceSha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/file-download.ts",
+      "line": 32,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "file.viewed",
+      "sourceSha256": "10e0d63516de97899cda7b6752407715fc53109546d251023e0fec1cb9000945",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/file-download.ts",
+      "line": 47,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "file.downloaded",
+      "sourceSha256": "10e0d63516de97899cda7b6752407715fc53109546d251023e0fec1cb9000945",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/file-download.ts",
+      "line": 67,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "file.list_viewed",
+      "sourceSha256": "10e0d63516de97899cda7b6752407715fc53109546d251023e0fec1cb9000945",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/campaigns.ts",
+      "line": 30,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "campaign.created",
+      "sourceSha256": "156a1c493c3a9509cfe8e341d3da87c014487e1995ca5326e158128a97bea3f3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/campaigns.ts",
+      "line": 43,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "campaign.list_viewed",
+      "sourceSha256": "156a1c493c3a9509cfe8e341d3da87c014487e1995ca5326e158128a97bea3f3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/campaigns.ts",
+      "line": 49,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "campaign.viewed",
+      "sourceSha256": "156a1c493c3a9509cfe8e341d3da87c014487e1995ca5326e158128a97bea3f3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/campaigns.ts",
+      "line": 116,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "156a1c493c3a9509cfe8e341d3da87c014487e1995ca5326e158128a97bea3f3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/campaigns.ts",
+      "line": 128,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "campaign.sources_viewed",
+      "sourceSha256": "156a1c493c3a9509cfe8e341d3da87c014487e1995ca5326e158128a97bea3f3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/campaigns.ts",
+      "line": 151,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "campaign.previewed",
+      "sourceSha256": "156a1c493c3a9509cfe8e341d3da87c014487e1995ca5326e158128a97bea3f3",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/audit-events.ts",
+      "line": 64,
+      "function": "anonymous",
+      "callee": "auditAccess",
+      "actionExpression": "audit.viewed",
+      "sourceSha256": "a4d123d71948ac07d559652abe18aa93cfed3c59ef4aadd4ffb6197a8ce769dc",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/audit-events.ts",
+      "line": 78,
+      "function": "anonymous",
+      "callee": "auditAccess",
+      "actionExpression": "audit.exported",
+      "sourceSha256": "a4d123d71948ac07d559652abe18aa93cfed3c59ef4aadd4ffb6197a8ce769dc",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/audit-events.ts",
+      "line": 151,
+      "function": "anonymous",
+      "callee": "auditAccess",
+      "actionExpression": "audit.viewed",
+      "sourceSha256": "a4d123d71948ac07d559652abe18aa93cfed3c59ef4aadd4ffb6197a8ce769dc",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/audit-events.ts",
+      "line": 170,
+      "function": "anonymous",
+      "callee": "auditAccess",
+      "actionExpression": "audit.exported",
+      "sourceSha256": "a4d123d71948ac07d559652abe18aa93cfed3c59ef4aadd4ffb6197a8ce769dc",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/expert-assignments.ts",
+      "line": 125,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "43aa584944e4a53021082a5e210fd170208e7cbddd4dba6dc2148a6cab23b86e",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/expert-assignments.ts",
+      "line": 148,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "expert.updated",
+      "sourceSha256": "43aa584944e4a53021082a5e210fd170208e7cbddd4dba6dc2148a6cab23b86e",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/expert-assignments.ts",
+      "line": 169,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "expert.revoked",
+      "sourceSha256": "43aa584944e4a53021082a5e210fd170208e7cbddd4dba6dc2148a6cab23b86e",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/expert-assignments.ts",
+      "line": 188,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"expert.expired\"",
+      "sourceSha256": "43aa584944e4a53021082a5e210fd170208e7cbddd4dba6dc2148a6cab23b86e",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notices.ts",
+      "line": 53,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"notice.created\"",
+      "sourceSha256": "bc146cd4945cbaff1e53c21594ac513e19009910e675d06b9f6a2649aa5f8683",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notices.ts",
+      "line": 73,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"notice.updated\"",
+      "sourceSha256": "bc146cd4945cbaff1e53c21594ac513e19009910e675d06b9f6a2649aa5f8683",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notices.ts",
+      "line": 91,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"notice.archived\"",
+      "sourceSha256": "bc146cd4945cbaff1e53c21594ac513e19009910e675d06b9f6a2649aa5f8683",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/templates.ts",
+      "line": 83,
+      "function": "createTemplate",
+      "callee": "audit",
+      "actionExpression": "template.created",
+      "sourceSha256": "e747108ae1547be34eddb2f1dee53e01864c157fb00bed0ec464e38975572cff",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/templates.ts",
+      "line": 96,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "template.updated",
+      "sourceSha256": "e747108ae1547be34eddb2f1dee53e01864c157fb00bed0ec464e38975572cff",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/templates.ts",
+      "line": 106,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "template.deleted",
+      "sourceSha256": "e747108ae1547be34eddb2f1dee53e01864c157fb00bed0ec464e38975572cff",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/templates.ts",
+      "line": 115,
+      "function": "useTemplate",
+      "callee": "audit",
+      "actionExpression": "template.used",
+      "sourceSha256": "e747108ae1547be34eddb2f1dee53e01864c157fb00bed0ec464e38975572cff",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/forms.ts",
+      "line": 161,
+      "function": "createForm",
+      "callee": "audit",
+      "actionExpression": "form.created",
+      "sourceSha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/forms.ts",
+      "line": 188,
+      "function": "updateFormDraft",
+      "callee": "audit",
+      "actionExpression": "form.draft_updated",
+      "sourceSha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/forms.ts",
+      "line": 230,
+      "function": "publishForm",
+      "callee": "audit",
+      "actionExpression": "form.published",
+      "sourceSha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/forms.ts",
+      "line": 250,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "form.retention_designated",
+      "sourceSha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/forms.ts",
+      "line": 264,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "form.archived",
+      "sourceSha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/forms.ts",
+      "line": 314,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "form.purged",
+      "sourceSha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/forms.ts",
+      "line": 322,
+      "function": "copyForm",
+      "callee": "audit",
+      "actionExpression": "form.copied",
+      "sourceSha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/forms.ts",
+      "line": 335,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/account-closure.ts",
+      "line": 63,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"account.closed\"",
+      "sourceSha256": "a90c4501153bd744d079c87f361b182e634a415379096ded593a3b0ee0686f30",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/senders.ts",
+      "line": 49,
+      "function": "change",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "ae9a1670f78e9d1087b4aaef0f9cd66bb1214af8516b78a85df01cb299b432ad",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/senders.ts",
+      "line": 89,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "sender.list_viewed",
+      "sourceSha256": "ae9a1670f78e9d1087b4aaef0f9cd66bb1214af8516b78a85df01cb299b432ad",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/senders.ts",
+      "line": 106,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "sender.viewed",
+      "sourceSha256": "ae9a1670f78e9d1087b4aaef0f9cd66bb1214af8516b78a85df01cb299b432ad",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/senders.ts",
+      "line": 115,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "sender.created",
+      "sourceSha256": "ae9a1670f78e9d1087b4aaef0f9cd66bb1214af8516b78a85df01cb299b432ad",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/senders.ts",
+      "line": 140,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "sender.cleanup_requested",
+      "sourceSha256": "ae9a1670f78e9d1087b4aaef0f9cd66bb1214af8516b78a85df01cb299b432ad",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/senders.ts",
+      "line": 280,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "sender.evidence_initialized",
+      "sourceSha256": "ae9a1670f78e9d1087b4aaef0f9cd66bb1214af8516b78a85df01cb299b432ad",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/message-templates.ts",
+      "line": 27,
+      "function": "snapshot",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "e57f0291c587308cdec3eea49edd3d312ca504d8c37b7852287d80b07d38a3dd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/message-templates.ts",
+      "line": 54,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "message_template.list_viewed",
+      "sourceSha256": "e57f0291c587308cdec3eea49edd3d312ca504d8c37b7852287d80b07d38a3dd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/message-templates.ts",
+      "line": 61,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "message_template.viewed",
+      "sourceSha256": "e57f0291c587308cdec3eea49edd3d312ca504d8c37b7852287d80b07d38a3dd",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/file-bindings.ts",
+      "line": 35,
+      "function": "attachPublicFiles",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"file.attached\"",
+      "sourceSha256": "42600d1c791725b2db67b5a163535c1c6ae0ca76b51fa183534200c2244fd258",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/file-bindings.ts",
+      "line": 47,
+      "function": "attachCorrectionFiles",
+      "callee": "audit",
+      "actionExpression": "file.attachment_corrected",
+      "sourceSha256": "42600d1c791725b2db67b5a163535c1c6ae0ca76b51fa183534200c2244fd258",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/submission-export.ts",
+      "line": 30,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"submission.exported\"",
+      "sourceSha256": "0168806a05e70ea1138db0b37c313048ace248eb8f134c0681ac8f1b384ebc8b",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/ip-access.ts",
+      "line": 69,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "ip_rule.created",
+      "sourceSha256": "569de0451131038bbe6d89d0414532b8db2e69440703af590b228371419af653",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/ip-access.ts",
+      "line": 85,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "ip_rule.updated",
+      "sourceSha256": "569de0451131038bbe6d89d0414532b8db2e69440703af590b228371419af653",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/ip-access.ts",
+      "line": 97,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "ip_rule.deleted",
+      "sourceSha256": "569de0451131038bbe6d89d0414532b8db2e69440703af590b228371419af653",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/ip-access.ts",
+      "line": 113,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "ip_access.updated",
+      "sourceSha256": "569de0451131038bbe6d89d0414532b8db2e69440703af590b228371419af653",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subjects.ts",
+      "line": 35,
+      "function": "audit",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": null,
+      "sourceSha256": "97fc724faf519b2fdb00349a50bb9e845034e384d125c6fa7ea815f432e5a12d",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subjects.ts",
+      "line": 52,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "subject.access_requested",
+      "sourceSha256": "97fc724faf519b2fdb00349a50bb9e845034e384d125c6fa7ea815f432e5a12d",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subjects.ts",
+      "line": 112,
+      "function": "subjectConsents",
+      "callee": "audit",
+      "actionExpression": "subject.consents_viewed",
+      "sourceSha256": "97fc724faf519b2fdb00349a50bb9e845034e384d125c6fa7ea815f432e5a12d",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subjects.ts",
+      "line": 126,
+      "function": "subjectEvents",
+      "callee": "audit",
+      "actionExpression": "subject.events_viewed",
+      "sourceSha256": "97fc724faf519b2fdb00349a50bb9e845034e384d125c6fa7ea815f432e5a12d",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subjects.ts",
+      "line": 150,
+      "function": "requestWithdrawal",
+      "callee": "audit",
+      "actionExpression": "subject.withdrawal_requested",
+      "sourceSha256": "97fc724faf519b2fdb00349a50bb9e845034e384d125c6fa7ea815f432e5a12d",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subjects.ts",
+      "line": 175,
+      "function": "subjectWithdrawal",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "97fc724faf519b2fdb00349a50bb9e845034e384d125c6fa7ea815f432e5a12d",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/document-pdf.ts",
+      "line": 34,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "document.pdf_downloaded",
+      "sourceSha256": "85cb22811131d253662fb30923ecd0110c4d4d0ed3bc4b923a2aff9a95ce77d6",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/security-policy.ts",
+      "line": 73,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "da6d4d48fa1ba043f931d1fa565f04f573aa04745feb2e2463a8bf4aea3ce3f5",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notifications.ts",
+      "line": 63,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "integration.created",
+      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notifications.ts",
+      "line": 105,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "integration.updated",
+      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notifications.ts",
+      "line": 115,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notifications.ts",
+      "line": 130,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "integration.deleted",
+      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notifications.ts",
+      "line": 145,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "integration.test_requested",
+      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/notifications.ts",
+      "line": 192,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "integration.retry_requested",
+      "sourceSha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/compliance-exports.ts",
+      "line": 32,
+      "function": "event",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "326aba4f40974d0419b99da06182e134ba28a898edb3f6a40a494b8a00eab081",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/analytics.ts",
+      "line": 35,
+      "function": "dashboardAnalyticsInTransaction",
+      "callee": "audit",
+      "actionExpression": "analytics.dashboard_viewed",
+      "sourceSha256": "a89c0562a4d1ca7a90ca295d884a5ac2abc5c9577f8b2dee202856061d811b34",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/analytics.ts",
+      "line": 72,
+      "function": "dashboardAnalyticsInTransaction",
+      "callee": "audit",
+      "actionExpression": "analytics.dashboard_viewed",
+      "sourceSha256": "a89c0562a4d1ca7a90ca295d884a5ac2abc5c9577f8b2dee202856061d811b34",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/company-management.ts",
+      "line": 80,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "company.closure_requested",
+      "sourceSha256": "3f5123c770ede19f35d315694f342b73825d59fe7d1425925ee5194d235a9b26",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/company-management.ts",
+      "line": 89,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "company.closure_cancelled",
+      "sourceSha256": "3f5123c770ede19f35d315694f342b73825d59fe7d1425925ee5194d235a9b26",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/company-management.ts",
+      "line": 137,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "company.business_file_uploaded",
+      "sourceSha256": "3f5123c770ede19f35d315694f342b73825d59fe7d1425925ee5194d235a9b26",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/company-management.ts",
+      "line": 151,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "company.business_file_removed",
+      "sourceSha256": "3f5123c770ede19f35d315694f342b73825d59fe7d1425925ee5194d235a9b26",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/company-management.ts",
+      "line": 164,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "company.business_file_downloaded",
+      "sourceSha256": "3f5123c770ede19f35d315694f342b73825d59fe7d1425925ee5194d235a9b26",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/destruction-worker.ts",
+      "line": 12,
+      "function": "systemAudit",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": null,
+      "sourceSha256": "d54767c5e2a876a771ae0cb6849c1b4d1a6c872036deb6ceb89114d511cd751c",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subprocessors.ts",
+      "line": 64,
+      "function": "createSubprocessor",
+      "callee": "audit",
+      "actionExpression": "subprocessor.created",
+      "sourceSha256": "4ef69d35b60788ec2fc77b803505b3ff1053698f423fdb7d9f75ad0339cf8c00",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subprocessors.ts",
+      "line": 80,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "subprocessor.updated",
+      "sourceSha256": "4ef69d35b60788ec2fc77b803505b3ff1053698f423fdb7d9f75ad0339cf8c00",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/subprocessors.ts",
+      "line": 123,
+      "function": "sendSubprocessorNotice",
+      "callee": "audit",
+      "actionExpression": "subprocessor.notice_queued",
+      "sourceSha256": "4ef69d35b60788ec2fc77b803505b3ff1053698f423fdb7d9f75ad0339cf8c00",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/submissions.ts",
+      "line": 82,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"submission.created\"",
+      "sourceSha256": "0c9fdcdee6e2b2a97a3e0f73fa15e69cbfd82027861e30e07219360165b3e3d0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/submissions.ts",
+      "line": 103,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "submission.list_viewed",
+      "sourceSha256": "0c9fdcdee6e2b2a97a3e0f73fa15e69cbfd82027861e30e07219360165b3e3d0",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/compliance-close.ts",
+      "line": 83,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "compliance.viewed",
+      "sourceSha256": "80f4a6d898e2122f3efc9a6bb7a2ed700ad34970e144bbf0ea3ada61537d3861",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/compliance-close.ts",
+      "line": 99,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "compliance.viewed",
+      "sourceSha256": "80f4a6d898e2122f3efc9a6bb7a2ed700ad34970e144bbf0ea3ada61537d3861",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/compliance-close.ts",
+      "line": 113,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "compliance.closed",
+      "sourceSha256": "80f4a6d898e2122f3efc9a6bb7a2ed700ad34970e144bbf0ea3ada61537d3861",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/compliance-close.ts",
+      "line": 132,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "compliance.exported",
+      "sourceSha256": "80f4a6d898e2122f3efc9a6bb7a2ed700ad34970e144bbf0ea3ada61537d3861",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/email-feedback.ts",
+      "line": 69,
+      "function": "storeFeedback",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"email.\" + input.kind",
+      "sourceSha256": "ad53e713c6672c3aea3d7e10d87a4c890e182bd1c06ef44fdca732ad636fb8d4",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/email-feedback.ts",
+      "line": 124,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "email.suppressions_viewed",
+      "sourceSha256": "ad53e713c6672c3aea3d7e10d87a4c890e182bd1c06ef44fdca732ad636fb8d4",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/activity-reviews.ts",
+      "line": 103,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "activity_review.requested",
+      "sourceSha256": "eb2252a1edd556664e9167e7e4c70341f367b09c199add569dd997542c87661b",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/activity-reviews.ts",
+      "line": 124,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "eb2252a1edd556664e9167e7e4c70341f367b09c199add569dd997542c87661b",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/activity-reviews.ts",
+      "line": 139,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "activity_review.notification_requested",
+      "sourceSha256": "eb2252a1edd556664e9167e7e4c70341f367b09c199add569dd997542c87661b",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/processing-catalog.ts",
+      "line": 77,
+      "function": "revision",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "5a94247a4079a7eaededbb46a31a4f9a9a1d7eb163ebed6017a052d6f9bdea5f",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/server/campaign-common.ts",
+      "line": 44,
+      "function": "changeCampaign",
+      "callee": "audit",
+      "actionExpression": "dynamic/local helper",
+      "sourceSha256": "e6ded6852c28b0296005e7e85b2f3c5abe751909ef33ae47bc4c905c0299e8e1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/app/api/v1/companies/[id]/route.ts",
+      "line": 21,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "company.updated",
+      "sourceSha256": "50dcb8e7660d5bc002c73923e7e1069d285147126692c4b3a1e428d015be153d",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/app/api/v1/companies/route.ts",
+      "line": 29,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"company.created\"",
+      "sourceSha256": "91d7ab4b6238d93476c1cb1eb96bd0f7e29966a6cbb6a32cd860c2f3e3a16036",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/app/api/v1/services/route.ts",
+      "line": 26,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "service.created",
+      "sourceSha256": "171b8854587e31dc3940b46497dc2da1eec8d1a14519dfd715e12c5205b1921d",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/app/api/v1/services/[id]/route.ts",
+      "line": 27,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "service.updated",
+      "sourceSha256": "4fb5cdf5eedc936aca1349b76c76bba72e252c477b21a8c9d56119b07cf367f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/app/api/v1/services/[id]/route.ts",
+      "line": 43,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "service.archived",
+      "sourceSha256": "4fb5cdf5eedc936aca1349b76c76bba72e252c477b21a8c9d56119b07cf367f1",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/app/api/v1/me/route.ts",
+      "line": 28,
+      "function": "anonymous",
+      "callee": "audit",
+      "actionExpression": "profile.updated",
+      "sourceSha256": "7b2ce923e39cd5670bbff913b5a5b52703fdc9e24cc447d4b4a61b9ebfccaea7",
+      "rootClientWrite": false
+    },
+    {
+      "path": "src/app/api/v1/me/sessions/[id]/route.ts",
+      "line": 15,
+      "function": "anonymous",
+      "callee": "tx.auditEvent.create",
+      "actionExpression": "\"session.revoked\"",
+      "sourceSha256": "c40172cb4500b3f7a5da6786fca213b9b9c2a6d2c0a2167c47f0934decef56fe",
+      "rootClientWrite": false
+    }
+  ]
+}

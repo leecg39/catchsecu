@@ -1,0 +1,170 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+stderr | tests/server/credential-audit.test.ts > password.changed trigger failure rolls back credentials, proofs and all session deletion
+# SERVER_ERROR:  PrismaClientKnownRequestError: 
+Invalid `prisma.account.updateMany()` invocation:
+
+
+Database error. Code: `P0001`. Message: `synthetic credential audit failure`
+    at vn.handleRequestError (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:65:8643)
+    at vn.handleAndLogRequestError (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:65:7932)
+    at vn.request (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:65:7639)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at a (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:99:6935)
+    at Object.updateMany (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@better-auth/prisma-adapter/dist/index.mjs:321:20)
+    at Object.updateMany (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@better-auth/core/dist/db/adapter/factory.mjs:532:25)
+    at updateManyWithHooks (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-auth/dist/db/with-hooks.mjs:99:69)
+    at Object.updatePassword (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-auth/dist/db/internal-adapter.mjs:628:4)
+    at file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-auth/dist/api/routes/password.mjs:167:7 {
+  code: 'P2039',
+  meta: {
+    modelName: 'Account',
+    driverAdapterError: DriverAdapterError: synthetic credential audit failure
+        at PgTransaction.onError (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@prisma/adapter-pg/dist/index.mjs:666:11)
+        at PgTransaction.performIO (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@prisma/adapter-pg/dist/index.mjs:661:12)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at PgTransaction.executeRaw (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@prisma/adapter-pg/dist/index.mjs:634:13)
+        at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:70205
+        at e.run (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:11:69220)
+        at execute (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:57:815)
+        at yr.request (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:58:2425)
+        at Object.singleLoader (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:65:6920) {
+      cause: [Object]
+    }
+  },
+  clientVersion: '7.10.0'
+}
+
+ ❯ tests/server/credential-audit.test.ts (7 tests | 6 failed) 3183ms
+   × signup password.created shares the registration HTTP request ID 402ms
+   × reset records every revoked session and password change under its HTTP request ID 401ms
+   × change correlates ended sessions and the rotated session without duplicating termination 579ms
+   × password.changed trigger failure rolls back credentials, proofs and all session deletion 491ms
+   × session.ended trigger failure rolls back credentials, proofs and all session deletion 340ms
+   × direct credential writes use one fallback UUID for the credential event and session termination 279ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/credential-audit.test.ts > signup password.created shares the registration HTTP request ID
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/credential-audit.test.ts:46:102
+     44| test("signup password.created shares the registration HTTP request ID"…
+     45|   const r = await call("/sign-up/email", { email: randomUUID() + "@cre…
+     46|   expect(r.status).toBe(200); expect((await events(r)).filter(e => e.a…
+       |                                                                                                      ^
+     47| });
+     48| test("reset records every revoked session and password change under it…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/server/credential-audit.test.ts > reset records every revoked session and password change under its HTTP request ID
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/credential-audit.test.ts:51:91
+     49|   await login(); const before = await sessionIds(), token = await proo…
+     50|   const r = await call("/reset-password", { token, newPassword: replac…
+     51|   const rows = await events(r); expect(rows.filter(e => e.action === "…
+       |                                                                                           ^
+     52|   expect(rows.filter(e => e.action === "session.ended").map(e => e.res…
+     53|   expect(await sessionIds()).toEqual([]); safe(rows, [token]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/server/credential-audit.test.ts > change correlates ended sessions and the rotated session without duplicating termination
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/credential-audit.test.ts:58:91
+     56|   await login(); const before = await sessionIds();
+     57|   const r = await call("/change-password", { currentPassword: password…
+     58|   const rows = await events(r); expect(rows.filter(e => e.action === "…
+       |                                                                                           ^
+     59|   expect(rows.filter(e => e.action === "session.ended").map(e => e.res…
+     60|   expect(rows.filter(e => e.action === "session.created")).toHaveLengt…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/server/credential-audit.test.ts > password.changed trigger failure rolls back credentials, proofs and all session deletion
+AssertionError: expected [] to have a length of 2 but got +0
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ tests/server/credential-audit.test.ts:70:75
+     68|   await db.user.update({ where: { id: userId }, data: { name: "자격 증명 감…
+     69|   const retry = await call("/reset-password", { token, newPassword: re…
+     70|   expect((await events(retry)).filter(e => e.action === "session.ended…
+       |                                                                           ^
+     71| });
+     72| test("direct credential writes use one fallback UUID for the credentia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/server/credential-audit.test.ts > session.ended trigger failure rolls back credentials, proofs and all session deletion
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ tests/server/credential-audit.test.ts:65:98
+     63|   await login(); const token = await proof(), before = await sessionId…
+     64|   await db.user.update({ where: { id: userId }, data: { name: "fail:" …
+     65|   const r = await call("/reset-password", { token, newPassword: replac…
+       |                                                                                                  ^
+     66|   expect((await account()).password === prior.password).toBe(true); ex…
+     67|   expect(await db.verification.count({ where: { value: userId } })).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/server/credential-audit.test.ts > direct credential writes use one fallback UUID for the credential event and session termination
+AssertionError: expected [] to deeply equal [ Array(1) ]
+
+- Expected
++ Received
+
+- [
+-   "d9c4b41e-05c1-4dba-8331-c1d12720bb88",
+- ]
++ []
+
+ ❯ tests/server/credential-audit.test.ts:77:142
+     75|   const changed = await db.auditEvent.findFirstOrThrow({ where: { acto…
+     76|   const rows = await db.auditEvent.findMany({ where: { requestId: chan…
+     77|   expect(changed.requestId).toMatch(/^[0-9a-f-]{36}$/); expect(rows.fi…
+       |                                                                                                                                              ^
+     78| });
+     79| test("replaying a consumed reset proof creates no second change or ter…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 1 passed (7)
+   Start at  18:48:22
+   Duration  4.34s (tests 75%, import 17%, transform 8%)
+

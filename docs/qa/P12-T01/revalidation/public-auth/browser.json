@@ -1,0 +1,61 @@
+{
+  "taskSpaceId": 45,
+  "page": "p1",
+  "cases": [
+    {
+      "phase": "signup",
+      "path": "/api/v1/auth/sign-up/email",
+      "status": 200,
+      "requestId": "5d238cd9-f7e7-4e77-8f3a-2a43ecc0fc44"
+    },
+    {
+      "phase": "resend",
+      "path": "/api/v1/auth/send-verification-email",
+      "status": 200,
+      "requestId": "75dc9fa6-a653-40fc-ae3c-45b92ce2ce07"
+    },
+    {
+      "phase": "login",
+      "path": "/api/v1/auth/sign-in/email",
+      "status": 401,
+      "requestId": "c1cc56e1-bed5-4487-9563-749cfa8a3a2d"
+    },
+    {
+      "phase": "login",
+      "path": "/api/v1/auth/sign-in/email",
+      "status": 200,
+      "requestId": "fec3ea48-59e1-4d01-8139-d66bca05f6ca"
+    },
+    {
+      "phase": "reset-request",
+      "path": "/api/v1/auth/request-password-reset",
+      "status": 200,
+      "requestId": "acaa7d7d-3a4b-4b23-9c9e-cb3ea2e8648a"
+    },
+    {
+      "phase": "reset-password",
+      "path": "/api/v1/auth/reset-password",
+      "status": 200,
+      "requestId": "7700e63b-feb3-4c78-8220-bf50c624fb58"
+    },
+    {
+      "phase": "old-password",
+      "path": "/api/v1/auth/sign-in/email",
+      "status": 401,
+      "requestId": "fb51fd42-16b9-404d-a94f-37f0f0bdb5bc"
+    },
+    {
+      "phase": "replacement-login",
+      "path": "/api/v1/auth/sign-in/email",
+      "status": 200,
+      "requestId": "f8a952a5-16ef-455b-82f8-53face164f09"
+    },
+    {
+      "phase": "logout",
+      "path": "/api/v1/auth/sign-out",
+      "status": 200,
+      "requestId": "85d0c593-8d4c-4b0b-9360-e7332cba31ba"
+    }
+  ],
+  "observerNote": "첫 잘못된 비밀번호 요청은 응답 이후 단계명을 읽던 관찰 코드 때문에 login으로 표기됨. 상태 401과 requestId는 그대로 보존했고 이후 관찰 코드는 요청 시작 시 단계명을 저장함."
+}
