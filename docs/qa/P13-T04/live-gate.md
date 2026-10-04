@@ -37,3 +37,7 @@ dev 앱 :3100에서 03-route-matrix.csv의 파라미터 없는 **141개 정적 �
 
 - 토큰 경로(`/projects/:token`·`/url/:token`·`/document/*`·`/infoOwner/*`)의 실제 토큰 fixture 렌더는 개별 게이트(P04/P05/P06) 브라우저 실측으로 대체 검증됨 — 이번 스윕은 셸+API 경계만.
 - 새로고침·뒤로가기·1440/768/390 전수·캡처 목록은 여전히 미수행.
+
+## 토큰 경로 실제 fixture (2026-10-04 추가)
+
+- `/url/:token`: API로 고정 URL 생성(`qa-gate-url`, 201) → 공개 `resolve` 200(익명 동일)·페이지 200 → 회수 204 후 resolve **410**. 테스트 후 회수 정리 완료.
