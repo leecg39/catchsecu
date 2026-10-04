@@ -12,3 +12,11 @@ dev 앱 :3100 + catchsecu_dev 실측. [기존 발신자 증거](../senders/READM
 ## 미수용
 
 - 실제 DNS TXT·이메일 인증코드 수신·증빙 파일 심사는 로컬 환경 한계 — 외부 게이트.
+
+## 실제 외부 이메일 인증 (2026-10-04 추가)
+
+`MAIL_TRANSPORT=smtp`+Hostinger SMTP로 발신자 이메일 인증의 실제 외부 왕복을 실증했다:
+
+- 발신자 생성 → request-email → 워커 실발송 → **IMAP 수신함에서 인증번호 631883 수신**(DKIM/SPF/DMARC pass) → confirm-email 코드 일치 → email 증빙 `verified`(live, 90일)
+- local/live 환경 바인딩: local 증빙을 live 워커가 거부(`VERIFICATION_ENVIRONMENT`)
+- 미해결: DNS 증빙 대기 — soverin.cloud NS가 Cloudflare라 Hostinger 존 편집이 공인 DNS에 반영되지 않음. Cloudflare TXT 추가 후 `check` 호출로 발신자 verified 완성 가능.
