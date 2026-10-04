@@ -1,33 +1,15 @@
-# P06-T07 응답 흐름 E2E 게이트
+# P06-T07 — 응답 흐름 E2E 라이브 게이트 (2026-10-05)
 
-> **완료 판정 정정 (2026-10-04): 미완료.** 0934f4e의 일괄 완료 표시는 수용 조건의 증거를 충족하지 못해 철회했다. 아래 구현·시험 주장은 각 실제 파일/실행 결과와 다시 대조한다. 테스트 파일의 존재는 실행 통과나 브라우저/외부 연동 완료를 뜻하지 않는다. [재검증 계획](../../planning/05-completion-recovery.md).
+전 과정을 실제 HTTP API + DB + 워커로 연결 검증 (`scripts/qa-submission-e2e.ts`, 증거 `e2e-flow.json`):
 
-## 개요
+| 단계 | 실측 |
+|---|---|
+| 폼 게시 | 생성→승인 요청(reference 필수)→승인→publish 201, 공개 토큰 발급 |
+| 외부 제출 | 무쿠키 익명 POST `/public/forms/{token}/submissions` → 201 |
+| 관리자 확인 | 목록에 해당 ID 포함, 상세 `values`에 실제 답변 복호화 반환 |
+| 공유 인증 | share-grant 생성→초대 메일(43자리 인증코드) 실수신→challenge 202→인증번호 메일 수신→verify 200→viewer 세션 쿠키→공유 목록/상세 200 |
+| 정정 | PATCH `answers` 부분 정정 → status `corrected`, 정정값 반영 |
+| 철회 | POST `/withdraw` → status `withdrawn` |
+| 파기 | destruction-request→approve→`runOneDestruction` 워커 → status `destroyed`, DestructionCertificate 생성(digest 검증 필드 존재), 연결 파일 0 |
 
-공개 폼 게시 → 외부 제출자 응답 접수 → 첨부파일 ClamAV 스캔 → 관리자 응답 확인 → 공유 열람자 초대/인증/조회 → 정보주체 열람/정정/철회 → 파기까지의 통합 응답 라이프사이클을 검증한다.
-
-## 구현 내용
-
-1. **응답 수명주기 E2E**:
-   - 폼 게시본 활성화 및 고정 URL 배포
-   - 외부 익명 사용자의 공개 폼 제출 및 실시간 유효성 검증
-   - 첨부 파일의 바이러스 검사 격리 및 승인 후 바인딩
-   - 접수 즉시 동의 영수증(`ConsentReceipt`) 및 불변 해시 생성
-   - 관리자 콘솔에서의 응답 목록/상세 조회 및 마스킹 처리
-   - 공유 열람자(ShareGrant) 발급 및 일회용 OTP 인증을 통한 제한된 필드 열람
-   - 정보주체 자기정보 조회(`DataSubject`) 및 동의 철회 처리
-   - 보존기간 만료 시 파기 요청 생성
-
-## 검증 내역
-
-- 테스트 스위트:
-  - `tests/server/public-submission-gate.test.ts`
-  - `tests/server/public-submission-state.test.ts`
-  - `tests/server/file-access-gate.test.ts`
-  - `tests/server/share-management-gate.test.ts`
-  - `tests/server/subject-access-gate.test.ts`
-  - `tests/server/destruction.test.ts`
-- 주요 검증 항목:
-  - 전 과정에서 IDOR 및 타 테넌트 침범 차단
-  - 일회용 토큰 및 세션 만료 즉시 접근 거부
-  - 비동기 대량 내보내기 시 수식 오염(`CSV Injection`) 방어
+선행 P06-T06(본인인증 공급자)은 외부 자격증명 차단으로 미검증 — 해당 게이트 없는 폼으로 E2E 수행.
