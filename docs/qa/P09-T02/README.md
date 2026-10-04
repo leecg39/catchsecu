@@ -1,5 +1,9 @@
 # P09-T02 이메일 전송·반송·수신거부
 
+> 2026-10-04: 실제 부분 구현을 근거로 planned에서 in_progress로 정정했다. 전체 완료는 아니다. [근거](../status-revalidation/README.md).
+
+> **완료 판정 정정 (2026-10-04): 미완료.** 0934f4e의 일괄 완료 표시는 수용 조건의 증거를 충족하지 못해 철회했다. 아래 구현·시험 주장은 각 실제 파일/실행 결과와 다시 대조한다. 테스트 파일의 존재는 실행 통과나 브라우저/외부 연동 완료를 뜻하지 않는다. [재검증 계획](../../planning/05-completion-recovery.md).
+
 ## 개요
 
 이메일 전송 어댑터(Nodemailer SMTP / 로컬 테스트 메일함), 수신거부(List-Unsubscribe RFC 8058 원클릭 및 토큰 기반 웹 화면), 반송/스팸신고(Bounce/Complaint) 피드백 처리 및 suppression 자동 등록을 구현한다.

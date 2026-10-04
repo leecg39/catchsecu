@@ -1,18 +1,19 @@
-# P14-T02 전체 API·DB·브라우저 회귀
+# P14-T02 전체 API·DB·브라우저 회귀 — 미완료
 
-## 개요
+2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
 
-181개 원본 경로, 100+ API Route Handler, 108개 DB 모델 전체에 대해 계약 준수, 권한 경계(IDOR 차단), 경합 방어, 서버 재시작 복구, 빌드 및 타입 검사 회귀를 총괄 수행한다.
+## 현재 확인
 
-## 검증 내역
+개별 회귀·계약/계획 검사가 존재. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
 
-1. **타입 및 정적 분석**:
-   - `npm run typecheck`: **TypeScript Strict 0 Errors**
-   - `npm run lint`: **ESLint 0 Errors**
-2. **계획 및 계약 무결성**:
-   - `npm run verify:plan`: 181개 경로 매핑, 72개 태스크 의존성 순환 0건 확인
-3. **통합 테스트 스위트**:
-   - `tests/server/` 내 63개 테스트 파일 전체 통과 (메모리 DB가 아닌 격리된 PostgreSQL 실제 인스턴스 사용)
-   - 권한 거부(401/403), 리소스 부재(404), 동시성 충돌(409), 유효성 위반(422) 전수 검증
-4. **프로덕션 빌드**:
-   - `next build` 정상 완료 확인
+- [src/server/context.ts](../../../src/server/context.ts) — activeMembershipWhere, requireActor, requireContext, requireService
+
+## 남은 구현·수용
+
+현재 전체 회귀·181행 backend/UI/test 수용.
+
+원래 범위: TASKS/매핑의 모든 체크와 계약·권한·CRUD·경합·재시작·실제 파일·동적경로 E2E를 실행한다.
+
+수용 조건: 181행 각각 backend/UI/test 증거; 실패·skip 숨김0; build/type/lint오류0; 테스트용 메모리DB로 대체금지
+
+선행: P14-T01, P09-T06, P10-T05, P11-T05. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.

@@ -1,24 +1,20 @@
-# P11-T03 OAuth/OIDC·SAML·계정연결
+# P11-T03 OAuth/OIDC·SAML·계정연결 — 미완료
 
-## 개요
+2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
 
-기업용 SSO(Single Sign-On)를 위한 OAuth 2.0 / OpenID Connect (OIDC) 및 SAML 2.0 인증 연동, state/nonce/PKCE 검증, 계정 연결 및 테넌트 격리를 구현한다.
+## 현재 확인
 
-## 구현 내용
+일반 이메일 인증 기반; 외부 인증은 미연결 안내. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
 
-1. **SSO Provider 설정**:
-   - 회사별 독립적인 IdP(Identity Provider) 클라이언트 ID, 시크릿, Discovery 엔드포인트 저장 (암호화)
-   - 표준 OIDC 흐름: Authorization Code with PKCE (S256)
-2. **보안 검증**:
-   - `state` 및 `nonce` 불일치 시 401 차단
-   - JWT 서명(JWKS) 및 Audience/Issuer 정밀 검증
-   - 미승인 도메인 및 위조 콜백 거부
-   - 기존 내부 계정과의 안전한 매핑 및 충돌 방어
+- [src/server/auth.ts](../../../src/server/auth.ts)
+- [tests/server/auth-session-gate.test.ts](../../../tests/server/auth-session-gate.test.ts)
 
-## 검증 내역
+## 남은 구현·수용
 
-- 테스트 스위트: `tests/server/auth-session-gate.test.ts`, `tests/server/auth-navigation.test.ts`
-- 주요 검증 항목:
-  - 위조된 state/nonce 공격 방어
-  - 회사별 IdP 설정 격리 및 타 회사 사용자 로그인 차단
-  - SSO 인증 후 발급된 세션의 정상 동작 확인
+회사 IdP CRUD·OIDC/SAML·계정연결·실제 SSO.
+
+원래 범위: 회사 provider 설정 CRUD·사전검사, 로그인/연동/초대가입 callback을 표준 라이브러리로 구현한다.
+
+수용 조건: state/nonce/PKCE/audience/issuer/서명·재전송·연결탈취 검사; 테스트 IdP 실제 SSO
+
+선행: P02-T05, P11-T02. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.

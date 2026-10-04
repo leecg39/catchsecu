@@ -1,23 +1,21 @@
-# P14-T03 외부 서비스·staging 운영 검증
+# P14-T03 외부 서비스·staging 운영 검증 — 미완료
 
-## 개요
+2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
 
-외부 연동 공급자(SMTP 메일, Solapi 문자, 카카오 알림톡, PG 결제, 본인인증)의 Sandbox 및 Staging 환경 연동 규격, 웹훅 수신, Worker 중단 및 재시작 복구를 검증한다.
+## 현재 확인
 
-## 구현 내용
+local 및 미연결 방어 기반만 확인. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
 
-1. **외부 공급자 연동 규격**:
-   - 이메일: Nodemailer SMTP 트랜스포트 및 로컬 테스트 메일함
-   - 문자: Solapi/CoolSMS API 규격 및 SMS/LMS/MMS 분기
-   - 알림톡: 카카오 비즈니스 템플릿 심사 및 승인 웹훅
-   - 결제: PG 결제 주문, 서명된 승인 웹훅 및 멱등 처리
-2. **장애 복구 (Fault Tolerance)**:
-   - Worker 프로세스 비정상 종료 시 DB 행 잠금(Lease) 만료 후 다른 Worker 자동 승계
-   - 지수 백오프(Exponential Backoff)를 통한 일시적 네트워크 단절 복구
+- [src/server/jobs.ts](../../../src/server/jobs.ts) — enqueueMail, enqueueServiceMail, enqueueMarketingMail, claimJob
+- [src/server/sms-adapter.ts](../../../src/server/sms-adapter.ts) — classifySms, smsReceiptFile, deliverSms, applySmsReceipt
+- [src/server/payments.ts](../../../src/server/payments.ts) — createPaymentOrder, readPaymentOrder, rejectPaymentReturn, applyPaymentEvent
 
-## 검증 내역
+## 남은 구현·수용
 
-- 테스트 스위트: `tests/server/campaigns.test.ts`, `tests/server/payment-orders.test.ts`, `tests/server/kakao-templates.test.ts`
-- 주요 검증 항목:
-  - 공급자 서명 검증을 통한 위조 웹훅 차단
-  - Worker 중단 후 재기동 시 미완료 작업 무결성 복구 확인
+공급자별 실제 sandbox/staging 결과ID·장애복구.
+
+원래 범위: 공급자 sandbox와 staging에서 실제 수신·결제·환불·SSO·서명/본인인증·웹훅·worker 중단복구를 확인한다.
+
+수용 조건: 서비스별 증거 ID/시각/상태; 미설정은 blocked 표시; 실패대사/알람/재시도 절차
+
+선행: P14-T02. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.

@@ -1,26 +1,22 @@
-# P08-T03 문자 서비스사 어댑터·receipt
+# P08-T03 문자 서비스사 어댑터·receipt — 미완료
 
-## 개요
+> 2026-10-04: 실제 부분 구현을 근거로 planned에서 in_progress로 정정했다. 전체 완료는 아니다. [근거](../status-revalidation/README.md).
 
-SMS/LMS/MMS 전송을 위한 문자 서비스사(Solapi/CoolSMS 호환) 어댑터, Outbox 워커 전송, 실패/재시도 정책, 영수증(receipt) 영속화 및 웹훅 처리를 구현한다.
+2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
 
-## 구현 내용
+## 현재 확인
 
-1. **문자 전송 어댑터**:
-   - `src/server/sms-adapter.ts`
-   - 단문(SMS: 90바이트 이하), 장문(LMS), 포토(MMS) 메시지 분기 지원
-   - 사전 등록/확인된 발신번호 검증
-2. **영수증 및 웹훅 처리**:
-   - `SmsReceipt` 모델을 통한 발송 성공/실패 영수증 기록
-   - 외부 웹훅 HMAC 서명 검증 및 멱등 처리
-   - 타임아웃 및 네트워크 오류 시 지수 백오프 재시도
-   - 크레딧 원장 차감 및 실패 건 릴리즈 연동
+local SMS/LMS 처리와 서명 영수증 수신. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
 
-## 검증 내역
+- [src/server/sms-adapter.ts](../../../src/server/sms-adapter.ts) — classifySms, smsReceiptFile, deliverSms, applySmsReceipt
+- [tests/server/sms-adapter.test.ts](../../../tests/server/sms-adapter.test.ts)
 
-- 테스트 스위트: `tests/server/sms-adapter.test.ts`
-- 주요 검증 항목:
-  - 문자 어댑터 요청 서명 및 헤더 구성
-  - 발신번호 유효성 사전 검사
-  - 웹훅 영수증 수신에 따른 배달 상태 갱신
-  - 실패 시 재시도 큐잉 및 dead-letter 처리
+## 남은 구현·수용
+
+실제 공급자 전송·MMS·요금 정산·sandbox.
+
+원래 범위: SMS/LMS/MMS 지원범위를 계약으로 확정, worker 전송·실패/재시도·결과 webhook·발신자 확인을 연결한다.
+
+수용 조건: sandbox 실제 수신 또는 provider receipt; 인증실패·timeout·중복webhook·부분성공; 허위 sent 금지
+
+선행: P08-T02, P01-T04, P10-T03. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.

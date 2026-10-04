@@ -1,24 +1,22 @@
-# P10-T04 해지·환불·청구서·마감
+# P10-T04 해지·환불·청구서·마감 — 미완료
 
-## 개요
+> 2026-10-04: 실제 부분 구현을 근거로 planned에서 in_progress로 정정했다. 전체 완료는 아니다. [근거](../status-revalidation/README.md).
 
-구독 해지 및 유예일 계산, 결제 취소/환불(부분 환불/전체 환불), 청구서 PDF 생성, 월마감 대사 및 정산 조정을 구현한다.
+2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
 
-## 구현 내용
+## 현재 확인
 
-1. **환불 및 해지 정책**:
-   - 원 결제 금액을 초과하는 환불 누계 원천 차단
-   - 중복 환불 재시도 시 멱등 처리
-   - 구독 해지 시 즉시 종료가 아닌 현재 결제 주기의 만료일(`effectiveDate`)까지 서비스 유지
-2. **청구서 및 마감 대사**:
-   - 결제 건별 청구서 PDF 자동 렌더링 및 다운로드
-   - PG 결제 내역과 내부 원장(`Ledger`) 간 일치성 대사
-   - 월별 마감 스냅샷 기록 및 마감 후 변조 방지
+체험 종료 예약/철회만 부분 구현. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
 
-## 검증 내역
+- [src/server/subscriptions.ts](../../../src/server/subscriptions.ts) — plans, subscriptions, entitlement, assetOverview
+- [tests/server/subscriptions.test.ts](../../../tests/server/subscriptions.test.ts)
 
-- 테스트 스위트: `tests/server/ledger.test.ts`, `tests/server/payment-orders.test.ts`, `tests/server/subscriptions.test.ts`
-- 주요 검증 항목:
-  - 초과 환불 시도 거부
-  - 환불 시 크레딧 원장의 정확한 차변/대변 롤백
-  - 청구서 PDF 생성 및 해시 검증
+## 남은 구현·수용
+
+유료 해지·부분/전체환불·청구서PDF·PG대사.
+
+원래 범위: 부분/전체환불·해지 effective date·취소사유·청구서 PDF·월마감·조정을 구현한다.
+
+수용 조건: 환불누계 초과 거부; PG와 DB 대사; refund retry 중복0; 마감후 정정 이벤트
+
+선행: P10-T03, P01-T03. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.

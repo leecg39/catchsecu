@@ -1,25 +1,23 @@
-# P10-T01 상품·가격·할당량·구독
+# P10-T01 상품·가격·할당량·구독 — 미완료
 
-## 개요
+> 2026-10-04: 실제 부분 구현을 근거로 planned에서 in_progress로 정정했다. 전체 완료는 아니다. [근거](../status-revalidation/README.md).
 
-SaaS 요금제 플랜(Plan) 버전 관리, 구독(Subscription) 주기(월/연), 기능/할당량 한도 검사(Entitlement Check) 및 무료 체험 정책을 구현한다.
+2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
 
-## 구현 내용
+## 현재 확인
 
-1. **플랜 및 구독 엔진**:
-   - `BillingPlan`, `BillingPlanVersion`, `BillingSubscription` 모델
-   - 서버 가격 변조 원천 차단 (클라이언트 입력 가격 불인정, 활성 플랜 버전의 DB 가격 강제)
-   - 기능별 한도(사용자 좌석 수, 폼 생성 수, 파일 저장 용량 등) 실시간 체크
-2. **구독 수명주기**:
-   - 무료 체험(Trial) 시작, 만료, 연장, 정규 플랜 전환
-   - 구독 변경/해지 예약 및 청구 기간 경계 처리
-   - 과거 청구 내역에 대한 가격 불변성 보장
+상품 버전·체험·대기 구매·할당량 검사. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
 
-## 검증 내역
+- [src/server/subscriptions.ts](../../../src/server/subscriptions.ts) — plans, subscriptions, entitlement, assetOverview
+- [src/server/entitlements.ts](../../../src/server/entitlements.ts) — assertQuota
+- [tests/server/subscriptions.test.ts](../../../tests/server/subscriptions.test.ts)
 
-- 테스트 스위트: `tests/server/subscriptions.test.ts`
-- 주요 검증 항목:
-  - 가격 변조 시도 원천 차단
-  - 플랜 버전 변경 후에도 기존 구독 청구 금액 유지
-  - 좌석 수 및 할당량 초과 시 402/403 차단
-  - 무료 체험 종료 후 유료 전환/차단 상태 전이
+## 남은 구현·수용
+
+유료 구독 활성/변경/주기 청구 전체.
+
+원래 범위: Plan 버전·요금·한도, 월/연 구독·시작/변경/해지 예약과 서버 entitlement 검사를 구현한다.
+
+수용 조건: 서버가격 변조 차단; 제한/무제한 seed; 한도경합·기간경계·변경가격 과거청구 불변
+
+선행: P03-T01, P01-T02. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.

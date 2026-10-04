@@ -1,0 +1,4705 @@
+{
+  "date": "2026-10-04",
+  "method": "57-task source/QA inventory; no new completion claims or blanket test claims",
+  "summary": {
+    "completed": 16,
+    "in_progress": 41,
+    "planned": 15
+  },
+  "promotedFromPlannedToInProgress": [
+    "P05-T03",
+    "P05-T04",
+    "P08-T02",
+    "P08-T03",
+    "P08-T04",
+    "P09-T01",
+    "P09-T02",
+    "P09-T03",
+    "P09-T05",
+    "P10-T01",
+    "P10-T02",
+    "P10-T03",
+    "P10-T04",
+    "P10-T05",
+    "P11-T01",
+    "P12-T01",
+    "P12-T02",
+    "P12-T03",
+    "P13-T01",
+    "P13-T02",
+    "P13-T03"
+  ],
+  "entries": [
+    {
+      "id": "P03-T02",
+      "title": "구성원·초대·권한·전문가",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "초대·재전송·수락·취소, 역할/서비스별 권한 변경, 탈퇴/정지, 전문가 회사 배정을 구현한다.",
+      "acceptance": "다른 이메일 초대수락 거부; 마지막 owner 제거 차단; 권한 회수 직후 API 차단",
+      "dependencies": [
+        "P03-T01",
+        "P01-T04"
+      ],
+      "present": "구성원·초대·전문가 배정과 현재 권한 검사",
+      "remaining": "추가 회사·역할·별도 브라우저와 전체 수용 대조",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/members.ts",
+          "sha256": "6e82ca48f00a7af0c7998f8190f0569fc404d9d8b734697141685cc78a581fd1",
+          "symbols": [
+            {
+              "name": "listMembers",
+              "line": 55
+            },
+            {
+              "name": "getMember",
+              "line": 67
+            },
+            {
+              "name": "updateMember",
+              "line": 75
+            },
+            {
+              "name": "removeMember",
+              "line": 101
+            },
+            {
+              "name": "transferOwnership",
+              "line": 116
+            },
+            {
+              "name": "listInvitations",
+              "line": 139
+            },
+            {
+              "name": "createInvitation",
+              "line": 160
+            },
+            {
+              "name": "createInvitationRequest",
+              "line": 177
+            }
+          ]
+        },
+        {
+          "path": "src/server/expert-assignments.ts",
+          "sha256": "43aa584944e4a53021082a5e210fd170208e7cbddd4dba6dc2148a6cab23b86e",
+          "symbols": [
+            {
+              "name": "listExpertAssignments",
+              "line": 61
+            },
+            {
+              "name": "getExpertAssignment",
+              "line": 76
+            },
+            {
+              "name": "expertOptions",
+              "line": 86
+            },
+            {
+              "name": "createExpertAssignment",
+              "line": 97
+            },
+            {
+              "name": "updateExpertAssignment",
+              "line": 132
+            },
+            {
+              "name": "revokeExpertAssignment",
+              "line": 155
+            },
+            {
+              "name": "expireExpertAssignments",
+              "line": 173
+            }
+          ]
+        },
+        {
+          "path": "tests/server/member-management-gate.test.ts",
+          "sha256": "e1c42b120e105b91c5836e8e9cd82fe436d990e9a17fd8144fa8fbcab01b99e4",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/expert-current-authority.test.ts",
+          "sha256": "a3a83a3c408e26b6d47c9de57958afc29cf8ecc2cf3e5d33112a1f75e9195910",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P03-T03",
+      "title": "프로필·계정 탈퇴·활동",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "프로필 서버 저장, 보안설정 연결, 계정탈퇴 요청·소유권 인계·세션폐기·이력 연결을 구현한다.",
+      "acceptance": "재시작 후 프로필 유지; owner 인계 전 탈퇴 실패; 탈퇴 후 세션 및 토큰 거부",
+      "dependencies": [
+        "P03-T02"
+      ],
+      "present": "프로필·탈퇴·검토 UI/API와 명시적 로컬 알림",
+      "remaining": "검토 보유 정책·외부 인증·전체 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/account-closure.ts",
+          "sha256": "a90c4501153bd744d079c87f361b182e634a415379096ded593a3b0ee0686f30",
+          "symbols": [
+            {
+              "name": "accountClosureStatus",
+              "line": 11
+            },
+            {
+              "name": "closeAccount",
+              "line": 24
+            }
+          ]
+        },
+        {
+          "path": "src/server/activity-reviews.ts",
+          "sha256": "eb2252a1edd556664e9167e7e4c70341f367b09c199add569dd997542c87661b",
+          "symbols": [
+            {
+              "name": "listActivityReviews",
+              "line": 51
+            },
+            {
+              "name": "readActivityReview",
+              "line": 65
+            },
+            {
+              "name": "createActivityReview",
+              "line": 78
+            },
+            {
+              "name": "actOnActivityReview",
+              "line": 114
+            },
+            {
+              "name": "notifyActivityReview",
+              "line": 131
+            }
+          ]
+        },
+        {
+          "path": "src/server/activity-review-mail.ts",
+          "sha256": "4ed5a1792af3e009d511ec2b14b4573757fca60b5df2feaccf018bf08c96e4cf",
+          "symbols": [
+            {
+              "name": "lockReviewRecipient",
+              "line": 13
+            },
+            {
+              "name": "recipientCurrent",
+              "line": 22
+            },
+            {
+              "name": "enqueueReviewMail",
+              "line": 25
+            },
+            {
+              "name": "deliverReviewMail",
+              "line": 31
+            }
+          ]
+        },
+        {
+          "path": "tests/server/account-current-authority.test.ts",
+          "sha256": "ba5f61c5a8152c73baa5d881029e5593a374971ca16c984ce8e82f54ae2e7d7e",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/activity-reviews.test.ts",
+          "sha256": "5b9d3a572297c0c3b9da5bb869a908e106a70a68e6da30b0c7871dcfc5adc01b",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P03-T04",
+      "title": "서비스 표시 동의·재위탁",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "서비스 내 동의서 표시 두 유형, 외부 URL·문서 버전 연결, 재위탁 수신자와 공지 요청을 구현한다.",
+      "acceptance": "탭별 입력 분리·복원; 잘못된 URL/타서비스 문서 거부; 발송 이력 추적",
+      "dependencies": [
+        "P03-T01",
+        "P05-T02",
+        "P09-T02"
+      ],
+      "present": "재위탁 수신자·발송 및 두 유형 동의 표시",
+      "remaining": "외부 이메일·선행 문서/메일 전체 게이트",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/subprocessors.ts",
+          "sha256": "4ef69d35b60788ec2fc77b803505b3ff1053698f423fdb7d9f75ad0339cf8c00",
+          "symbols": [
+            {
+              "name": "listSubprocessors",
+              "line": 36
+            },
+            {
+              "name": "getSubprocessor",
+              "line": 47
+            },
+            {
+              "name": "createSubprocessor",
+              "line": 56
+            },
+            {
+              "name": "updateSubprocessor",
+              "line": 68
+            },
+            {
+              "name": "listSubprocessorNotices",
+              "line": 85
+            },
+            {
+              "name": "sendSubprocessorNotice",
+              "line": 108
+            },
+            {
+              "name": "createSubprocessorRequest",
+              "line": 129
+            },
+            {
+              "name": "sendSubprocessorNoticeRequest",
+              "line": 142
+            }
+          ]
+        },
+        {
+          "path": "src/server/documents.ts",
+          "sha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+          "symbols": [
+            {
+              "name": "lockDocumentService",
+              "line": 30
+            },
+            {
+              "name": "createDocument",
+              "line": 67
+            },
+            {
+              "name": "listDocuments",
+              "line": 74
+            },
+            {
+              "name": "readDocument",
+              "line": 83
+            },
+            {
+              "name": "updateDocument",
+              "line": 84
+            },
+            {
+              "name": "canonicalDocument",
+              "line": 103
+            },
+            {
+              "name": "renderDocument",
+              "line": 109
+            },
+            {
+              "name": "previewDocument",
+              "line": 138
+            }
+          ]
+        },
+        {
+          "path": "tests/server/subprocessor-authority.test.ts",
+          "sha256": "a9b7b711bc1c4e251774ae6365e3a3ef39271269c758693d1aa41f84cdacd396",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/consent-display-authority.test.ts",
+          "sha256": "e385a2662cfce0b1a2369f3a0807ef6e42d0128e15ce9fafd0792d89cd72b33c",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P03-T05",
+      "title": "관리 페이지 CRUD 게이트",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "각 폼·목록의 검색/정렬/페이지/선택삭제/오류/경합/권한을 확인하고 하드코딩 회사·담당자 표시를 교체한다.",
+      "acceptance": "회사A/B·서비스2개 E2E; 브라우저와 DB 조회 일치; UI 전체 변경분 캡처",
+      "dependencies": [
+        "P03-T03",
+        "P03-T04"
+      ],
+      "present": "구성 영역의 코드와 개별 시험",
+      "remaining": "두 회사·두 서비스 전체 관리 UI 통합 시나리오",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/company-management.ts",
+          "sha256": "3f5123c770ede19f35d315694f342b73825d59fe7d1425925ee5194d235a9b26",
+          "symbols": [
+            {
+              "name": "businessFileDto",
+              "line": 17
+            },
+            {
+              "name": "companyDto",
+              "line": 21
+            },
+            {
+              "name": "getCompany",
+              "line": 30
+            },
+            {
+              "name": "listCompanies",
+              "line": 35
+            },
+            {
+              "name": "requestCompanyClosure",
+              "line": 73
+            },
+            {
+              "name": "cancelCompanyClosure",
+              "line": 83
+            },
+            {
+              "name": "finishBusinessFileDeletion",
+              "line": 92
+            },
+            {
+              "name": "cleanupBusinessFiles",
+              "line": 103
+            }
+          ]
+        },
+        {
+          "path": "src/server/service-management.ts",
+          "sha256": "16a88e140e9b50af5c02a6b33be654132a337fc71bd32de4bfc994ca35c5688a",
+          "symbols": [
+            {
+              "name": "assertServiceArchivable",
+              "line": 3
+            }
+          ]
+        },
+        {
+          "path": "src/server/members.ts",
+          "sha256": "6e82ca48f00a7af0c7998f8190f0569fc404d9d8b734697141685cc78a581fd1",
+          "symbols": [
+            {
+              "name": "listMembers",
+              "line": 55
+            },
+            {
+              "name": "getMember",
+              "line": 67
+            },
+            {
+              "name": "updateMember",
+              "line": 75
+            },
+            {
+              "name": "removeMember",
+              "line": 101
+            },
+            {
+              "name": "transferOwnership",
+              "line": 116
+            },
+            {
+              "name": "listInvitations",
+              "line": 139
+            },
+            {
+              "name": "createInvitation",
+              "line": 160
+            },
+            {
+              "name": "createInvitationRequest",
+              "line": 177
+            }
+          ]
+        },
+        {
+          "path": "tests/server/company-management.test.ts",
+          "sha256": "1cd68c7fb57ed1bacaab7f3ba5d1062c51d7667876659f76a7b5a883656d1e57",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/member-management-gate.test.ts",
+          "sha256": "e1c42b120e105b91c5836e8e9cd82fe436d990e9a17fd8144fa8fbcab01b99e4",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P04-T01",
+      "title": "폼·버전·질문·템플릿 CRUD",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "Form/Version/Question/Option, 템플릿 복제·등록·편집·삭제, 즐겨찾기·정렬·검색 API를 구현한다.",
+      "acceptance": "다양한 질문·선택지·분기·필수 검증; 게시버전 직접수정 거부; 복제 ID 독립",
+      "dependencies": [
+        "P03-T01"
+      ],
+      "present": "폼·버전·질문·템플릿 CRUD",
+      "remaining": "전체 질문 유형 UI와 현재 권한·원본 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/forms.ts",
+          "sha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+          "symbols": [
+            {
+              "name": "contentDto",
+              "line": 36
+            },
+            {
+              "name": "formDto",
+              "line": 52
+            },
+            {
+              "name": "fingerprint",
+              "line": 70
+            },
+            {
+              "name": "lockCurrentForm",
+              "line": 92
+            },
+            {
+              "name": "requireForm",
+              "line": 122
+            },
+            {
+              "name": "readForm",
+              "line": 129
+            },
+            {
+              "name": "createForm",
+              "line": 155
+            },
+            {
+              "name": "updateForm",
+              "line": 167
+            }
+          ]
+        },
+        {
+          "path": "src/server/templates.ts",
+          "sha256": "e747108ae1547be34eddb2f1dee53e01864c157fb00bed0ec464e38975572cff",
+          "symbols": [
+            {
+              "name": "getTemplate",
+              "line": 56
+            },
+            {
+              "name": "listTemplates",
+              "line": 59
+            },
+            {
+              "name": "createTemplate",
+              "line": 78
+            },
+            {
+              "name": "updateTemplate",
+              "line": 86
+            },
+            {
+              "name": "deleteTemplate",
+              "line": 100
+            },
+            {
+              "name": "useTemplate",
+              "line": 109
+            }
+          ]
+        },
+        {
+          "path": "tests/server/form-crud-gate.test.ts",
+          "sha256": "0c0cb49f40df9264d6649c9f0b04e111f9128fbb1de47ab428dd49946ca84fdb",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/question-rules.test.ts",
+          "sha256": "753e3d27d2eda4b542cb7f47a6c30d5f21c903cf5987846468337aba6cf6d425",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P04-T02",
+      "title": "단계별 편집기 서버 저장",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "생성/basic-frame/v3/recipient/agreement/set/setting/share를 formId+version으로 연결한다. 임시저장·자동저장·충돌/복구를 구현한다.",
+      "acceptance": "앞뒤 이동·새로고침·다른 기기 복원; 동시에 수정하면409·재로드 안내; 제목만 복제하는 템플릿 제거",
+      "dependencies": [
+        "P04-T01",
+        "P05-T01"
+      ],
+      "present": "초안 저장·충돌·복구",
+      "remaining": "새 기기 복원·단계별 화면 전체 확인",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/forms.ts",
+          "sha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+          "symbols": [
+            {
+              "name": "contentDto",
+              "line": 36
+            },
+            {
+              "name": "formDto",
+              "line": 52
+            },
+            {
+              "name": "fingerprint",
+              "line": 70
+            },
+            {
+              "name": "lockCurrentForm",
+              "line": 92
+            },
+            {
+              "name": "requireForm",
+              "line": 122
+            },
+            {
+              "name": "readForm",
+              "line": 129
+            },
+            {
+              "name": "createForm",
+              "line": 155
+            },
+            {
+              "name": "updateForm",
+              "line": 167
+            }
+          ]
+        },
+        {
+          "path": "src/server/form-cache.ts",
+          "sha256": "9db04a430a256aba0eafcea8bd435742875cd1b4b3992861da36eec0507c2a5a",
+          "symbols": [
+            {
+              "name": "invalidateFormCache",
+              "line": 4
+            }
+          ]
+        },
+        {
+          "path": "tests/server/form-draft-save.test.ts",
+          "sha256": "672dac48aa2fc0fee218bea360d439c6e8db647f93d6977c56de4fda09f055b0",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/form-draft-state.test.ts",
+          "sha256": "2b3f9f92d267dc1abab3cbee7bd73fed929b17432e0e3b93cd332fa5f3cd4778",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P04-T03",
+      "title": "승인·게시·중단·고정URL",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "권한과 정책에 따른 승인요청/반려/승인, 게시 토큰·만료·응답한도, 고정URL CRUD·연결변경을 구현한다.",
+      "acceptance": "승인전 공개 불가; 고정URL 변경과 구버전응답 보존; 만료/회수/한도 경합 검사",
+      "dependencies": [
+        "P04-T02",
+        "P11-T01"
+      ],
+      "present": "승인·게시·고정 URL 상태 처리",
+      "remaining": "원본·UI와 선행 보안 정책 완료",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/approvals.ts",
+          "sha256": "435ff4e5220a8f36d60334211f3d860416dc59165d4ce56a1129beb9faac02ce",
+          "symbols": [
+            {
+              "name": "approvalDto",
+              "line": 21
+            },
+            {
+              "name": "requestApproval",
+              "line": 29
+            },
+            {
+              "name": "approvalForForm",
+              "line": 51
+            },
+            {
+              "name": "getApproval",
+              "line": 76
+            },
+            {
+              "name": "listApprovals",
+              "line": 88
+            },
+            {
+              "name": "decideApproval",
+              "line": 102
+            }
+          ]
+        },
+        {
+          "path": "src/server/fixed-urls.ts",
+          "sha256": "0173058fb0be5562203b56a776bd802639c1e1b74f1cdc5761fbb0afa1bcd093",
+          "symbols": [
+            {
+              "name": "fixedUrlDto",
+              "line": 21
+            },
+            {
+              "name": "requireFixedUrl",
+              "line": 32
+            },
+            {
+              "name": "listFixedUrls",
+              "line": 39
+            },
+            {
+              "name": "createFixedUrl",
+              "line": 59
+            },
+            {
+              "name": "updateFixedUrl",
+              "line": 79
+            },
+            {
+              "name": "revokeFixedUrl",
+              "line": 90
+            },
+            {
+              "name": "resolveFixedUrl",
+              "line": 98
+            }
+          ]
+        },
+        {
+          "path": "src/server/public-publication.ts",
+          "sha256": "599a4b65169b0af465c572bbf00a779768eb57ddbbcb6ef110139eaeac4f034c",
+          "symbols": [
+            {
+              "name": "lockPublicPublication",
+              "line": 6
+            }
+          ]
+        },
+        {
+          "path": "tests/server/form-publication-state.test.ts",
+          "sha256": "98b4f098980381b379c928d8422cef73924abbd5e2ba09c76b54cad69fd044ae",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/publication-access-gate.test.ts",
+          "sha256": "4474c0554378b74949abaab84df298ccdbb6dd61413a5ff78f1e01e2b8af3e85",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P04-T04",
+      "title": "폼 목록·상세·삭제 화면",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "서버 필터·즐겨찾기·상태전환·복제·미리보기·보관·삭제/파기 요청 UI를 연결한다.",
+      "acceptance": "신규/편집 혼동0; 2페이지 검색·빈페이지 범위보정; 참조중 삭제 불가 안내",
+      "dependencies": [
+        "P04-T03"
+      ],
+      "present": "목록·보관·삭제 관련 API",
+      "remaining": "최신 화면의 필터·페이지·참조 삭제 전체 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/forms.ts",
+          "sha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+          "symbols": [
+            {
+              "name": "contentDto",
+              "line": 36
+            },
+            {
+              "name": "formDto",
+              "line": 52
+            },
+            {
+              "name": "fingerprint",
+              "line": 70
+            },
+            {
+              "name": "lockCurrentForm",
+              "line": 92
+            },
+            {
+              "name": "requireForm",
+              "line": 122
+            },
+            {
+              "name": "readForm",
+              "line": 129
+            },
+            {
+              "name": "createForm",
+              "line": 155
+            },
+            {
+              "name": "updateForm",
+              "line": 167
+            }
+          ]
+        },
+        {
+          "path": "tests/server/form-list-deletion.test.ts",
+          "sha256": "6499fc5d419c6dafc5dc487ea4b4142e8852fbdcf416d3c3b0faae2e0ebf05c4",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P04-T05",
+      "title": "폼 모듈 전체 게이트",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "생성→템플릿→동의→승인→게시→공유→수정새버전→중단까지 원천 DB로 확인한다.",
+      "acceptance": "모든 질문 유형/분기·서비스권한·동시수정·재시작 E2E; localStorage 도메인 의존0",
+      "dependencies": [
+        "P04-T04",
+        "P06-T02"
+      ],
+      "present": "폼 통합 서버 흐름과 경합 시험",
+      "remaining": "실제 브라우저 전체 단계·선행 게이트",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/forms.ts",
+          "sha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+          "symbols": [
+            {
+              "name": "contentDto",
+              "line": 36
+            },
+            {
+              "name": "formDto",
+              "line": 52
+            },
+            {
+              "name": "fingerprint",
+              "line": 70
+            },
+            {
+              "name": "lockCurrentForm",
+              "line": 92
+            },
+            {
+              "name": "requireForm",
+              "line": 122
+            },
+            {
+              "name": "readForm",
+              "line": 129
+            },
+            {
+              "name": "createForm",
+              "line": 155
+            },
+            {
+              "name": "updateForm",
+              "line": 167
+            }
+          ]
+        },
+        {
+          "path": "src/server/approvals.ts",
+          "sha256": "435ff4e5220a8f36d60334211f3d860416dc59165d4ce56a1129beb9faac02ce",
+          "symbols": [
+            {
+              "name": "approvalDto",
+              "line": 21
+            },
+            {
+              "name": "requestApproval",
+              "line": 29
+            },
+            {
+              "name": "approvalForForm",
+              "line": 51
+            },
+            {
+              "name": "getApproval",
+              "line": 76
+            },
+            {
+              "name": "listApprovals",
+              "line": 88
+            },
+            {
+              "name": "decideApproval",
+              "line": 102
+            }
+          ]
+        },
+        {
+          "path": "src/server/consent-receipts.ts",
+          "sha256": "8fd52962540ba0c9d10b4fc5e5d373512a14dfc2dc8cf82486f2bc5616741a00",
+          "symbols": [
+            {
+              "name": "validateDocumentConsents",
+              "line": 14
+            },
+            {
+              "name": "renderConsentEvidence",
+              "line": 35
+            },
+            {
+              "name": "preflightConsentReceipt",
+              "line": 52
+            },
+            {
+              "name": "createConsentReceipt",
+              "line": 58
+            },
+            {
+              "name": "readConsentEvidence",
+              "line": 71
+            },
+            {
+              "name": "privateConsentReceiptPdf",
+              "line": 79
+            }
+          ]
+        },
+        {
+          "path": "tests/server/form-module-flow.test.ts",
+          "sha256": "3625980cb3279311665822829588986aecc69929fddb29ce16958ef860de2585",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/form-module-concurrency.test.ts",
+          "sha256": "0657762d803e5be1674b0b7625dddd7c5cc3895c38a496c351ad3755fcff2d1a",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P05-T01",
+      "title": "처리 목적·항목·제공/수탁자 모델 CRUD",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "수집 목적·개인정보 유형·보유기간·제3자 제공·국외이전·수탁자 구조와 입력검증을 구현한다.",
+      "acceptance": "국가/항목/목적 필수 규칙·기간 타입·중복·타회사 참조 검사; UI별 저장 복원",
+      "dependencies": [
+        "P03-T01"
+      ],
+      "present": "목적·항목·제공자/수탁자 구조와 CRUD",
+      "remaining": "최신 UI 저장·원본 대조·전체 검증",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/processing-catalog.ts",
+          "sha256": "5a94247a4079a7eaededbb46a31a4f9a9a1d7eb163ebed6017a052d6f9bdea5f",
+          "symbols": [
+            {
+              "name": "lockCatalogService",
+              "line": 33
+            },
+            {
+              "name": "listCatalog",
+              "line": 49
+            },
+            {
+              "name": "readCatalog",
+              "line": 69
+            },
+            {
+              "name": "createPurpose",
+              "line": 88
+            },
+            {
+              "name": "createRecipient",
+              "line": 95
+            },
+            {
+              "name": "updatePurpose",
+              "line": 100
+            },
+            {
+              "name": "updateRecipient",
+              "line": 113
+            },
+            {
+              "name": "changeCatalogStatus",
+              "line": 123
+            }
+          ]
+        },
+        {
+          "path": "tests/server/processing-catalog.test.ts",
+          "sha256": "fb344e9c6a289f806d55af6019f428877f0843e92cbf2859c3a45d10892d9387",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/catalog-access-gate.test.ts",
+          "sha256": "b274e3c6dc111c224fa15094390f589cf6c9ce81ce55ceeddfd0c31affcf0c4d",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P05-T02",
+      "title": "동의서·처리방침 버전·게시",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "문서 생성/편집/문구 템플릿/미리보기/게시/개정/비공개/보관과 service consent 연결을 구현한다.",
+      "acceptance": "초안 CRUD; 이전동의 문구 고정; 게시 버전 비교·잘못된 HTML 무해화",
+      "dependencies": [
+        "P05-T01"
+      ],
+      "present": "문서 버전·문구·게시·폼 연결",
+      "remaining": "원본·모바일·최신 버튼 전체 검증",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/documents.ts",
+          "sha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+          "symbols": [
+            {
+              "name": "lockDocumentService",
+              "line": 30
+            },
+            {
+              "name": "createDocument",
+              "line": 67
+            },
+            {
+              "name": "listDocuments",
+              "line": 74
+            },
+            {
+              "name": "readDocument",
+              "line": 83
+            },
+            {
+              "name": "updateDocument",
+              "line": 84
+            },
+            {
+              "name": "canonicalDocument",
+              "line": 103
+            },
+            {
+              "name": "renderDocument",
+              "line": 109
+            },
+            {
+              "name": "previewDocument",
+              "line": 138
+            }
+          ]
+        },
+        {
+          "path": "src/server/form-documents.ts",
+          "sha256": "d0c27ce347f676cc267387a7a5c5c8ae0eeaa10c181c8ca71f8f9db1b577568a",
+          "symbols": [
+            {
+              "name": "consentBundle",
+              "line": 13
+            },
+            {
+              "name": "bindingMaximumRetention",
+              "line": 26
+            },
+            {
+              "name": "formDocumentOptions",
+              "line": 35
+            },
+            {
+              "name": "validateDocumentSelections",
+              "line": 66
+            },
+            {
+              "name": "writeFormConsent",
+              "line": 81
+            },
+            {
+              "name": "validateFormDocuments",
+              "line": 92
+            }
+          ]
+        },
+        {
+          "path": "tests/server/documents.test.ts",
+          "sha256": "135d124052a0de1b711d87d5b40c973467caf3e5bbb27bf2c40a5987e3a13944",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/document-access-gate.test.ts",
+          "sha256": "ca5ff674d5f892411e47e498b66b8e8fd842bba38fa82714fe61c23376d76ca6",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P05-T03",
+      "title": "공개 문서·안내 경로",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "document P/C/OC와 services별 category/recipient/oversea/resident 조회를 확정된 계약에 연결한다.",
+      "acceptance": "정상·만료·회수 token; 공개가능 필드만 반환; 각 agree 파라미터 무효값 거부",
+      "dependencies": [
+        "P05-T02",
+        "P00-T03"
+      ],
+      "present": "공개 서비스 문서 필터·토큰 조회",
+      "remaining": "P/C/OC·모든 안내 경로의 정상/오류 UI",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/public-service-documents.ts",
+          "sha256": "cd576da2b27e0b9f517474ef0d0e32c0af6bbb6065249c2b95b7bffa620b9a14",
+          "symbols": [
+            {
+              "name": "listPublicServiceDocuments",
+              "line": 19
+            }
+          ]
+        },
+        {
+          "path": "src/server/documents.ts",
+          "sha256": "b9c50e9efe5f75f22328a88d1f095389f5dfa315d4872873db5ab4d06f478520",
+          "symbols": [
+            {
+              "name": "lockDocumentService",
+              "line": 30
+            },
+            {
+              "name": "createDocument",
+              "line": 67
+            },
+            {
+              "name": "listDocuments",
+              "line": 74
+            },
+            {
+              "name": "readDocument",
+              "line": 83
+            },
+            {
+              "name": "updateDocument",
+              "line": 84
+            },
+            {
+              "name": "canonicalDocument",
+              "line": 103
+            },
+            {
+              "name": "renderDocument",
+              "line": 109
+            },
+            {
+              "name": "previewDocument",
+              "line": 138
+            }
+          ]
+        },
+        {
+          "path": "tests/server/public-service-documents.test.ts",
+          "sha256": "8fddf15f016abefb7ed7c370f27f781adba06597e9d77b7a674b79233a7d6e8f",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P05-T04",
+      "title": "문서 PDF·내보내기·검증",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "서버 문서 렌더링과 버전별 PDF 다운로드, 폼 동의 영수증과 연결한다.",
+      "acceptance": "다운로드 실제 파일·한글·버전 일치; 무권한 금지; 동의 당시 PDF/본문 해시 재현",
+      "dependencies": [
+        "P05-T03",
+        "P01-T03"
+      ],
+      "present": "실제 PDF 렌더링·버전/동의 증거",
+      "remaining": "전체 다운로드 UI·선행 공개 문서 게이트",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/document-pdf.ts",
+          "sha256": "85cb22811131d253662fb30923ecd0110c4d4d0ed3bc4b923a2aff9a95ce77d6",
+          "symbols": [
+            {
+              "name": "privateDocumentPdf",
+              "line": 26
+            },
+            {
+              "name": "publicDocumentPdf",
+              "line": 38
+            }
+          ]
+        },
+        {
+          "path": "src/server/consent-receipts.ts",
+          "sha256": "8fd52962540ba0c9d10b4fc5e5d373512a14dfc2dc8cf82486f2bc5616741a00",
+          "symbols": [
+            {
+              "name": "validateDocumentConsents",
+              "line": 14
+            },
+            {
+              "name": "renderConsentEvidence",
+              "line": 35
+            },
+            {
+              "name": "preflightConsentReceipt",
+              "line": 52
+            },
+            {
+              "name": "createConsentReceipt",
+              "line": 58
+            },
+            {
+              "name": "readConsentEvidence",
+              "line": 71
+            },
+            {
+              "name": "privateConsentReceiptPdf",
+              "line": 79
+            }
+          ]
+        },
+        {
+          "path": "tests/server/document-pdf.test.ts",
+          "sha256": "4f52b6202b267c90805b79f8497fb8d716e56fda82578941d74d252ff8af123f",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/form-documents.test.ts",
+          "sha256": "1452f387ee15ba2e8c7ef5a543f12b035641bebebf0e7d851c6e10c48646795f",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P06-T01",
+      "title": "공개 폼 로딩·안전한 제출",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "서버에서 공개 버전과 허용 질문만 제공하고 타입/필수/분기·동의·한도·중복을 검증하여 응답/영수증을 함께 저장한다.",
+      "acceptance": "필드변조·타버전 질문·미동의·마감·중복 요청 거부; 동시 제출 한도 초과0",
+      "dependencies": [
+        "P04-T03",
+        "P05-T02"
+      ],
+      "present": "공개 제출·질문/동의/한도 검증",
+      "remaining": "외부 인증·최신 공개 폼 브라우저 전체 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/submissions.ts",
+          "sha256": "0c9fdcdee6e2b2a97a3e0f73fa15e69cbfd82027861e30e07219360165b3e3d0",
+          "symbols": [
+            {
+              "name": "activePublication",
+              "line": 25
+            },
+            {
+              "name": "publicForm",
+              "line": 36
+            },
+            {
+              "name": "submitForm",
+              "line": 52
+            },
+            {
+              "name": "listSubmissions",
+              "line": 91
+            }
+          ]
+        },
+        {
+          "path": "src/server/answer-validation.ts",
+          "sha256": "f2269f95d66a2943af3a0d884f037d19e58aef27e631afc791f50ac0fcd54aa9",
+          "symbols": [
+            {
+              "name": "validateAnswers",
+              "line": 12
+            }
+          ]
+        },
+        {
+          "path": "tests/server/public-submission-gate.test.ts",
+          "sha256": "cf729fedd37eb5f4d2895688f3101d05c7f05f8483119e0ecf0a3a57d5759482",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/public-submission-state.test.ts",
+          "sha256": "8080b31b5e0668d65991e1fb512bbd183db6072c19e96eac69ec9039408531c1",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P06-T02",
+      "title": "응답 목록·상세·정정·철회",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "서비스/form별 응답 조회·검색·마스킹·상세·정정이력·철회·파기 요청, 담당자 메모·내보내기를 구현한다.",
+      "acceptance": "새 브라우저 관리자에 응답 표시; 정정 원본 이력 보존; 역할별 필드 접근 차이",
+      "dependencies": [
+        "P06-T01",
+        "P02-T03"
+      ],
+      "present": "응답 조회·정정·메모·비동기 CSV",
+      "remaining": "새 브라우저 전체 역할·파일/보유 수명주기",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/submission-management.ts",
+          "sha256": "2521203a54451e20244b3b63604d25dc80d086e52519fe149487d2c4a49d43ab",
+          "symbols": [
+            {
+              "name": "getSubmission",
+              "line": 37
+            },
+            {
+              "name": "correctSubmission",
+              "line": 69
+            },
+            {
+              "name": "changeSubmission",
+              "line": 105
+            },
+            {
+              "name": "createNote",
+              "line": 130
+            },
+            {
+              "name": "mutateNote",
+              "line": 137
+            }
+          ]
+        },
+        {
+          "path": "src/server/exports.ts",
+          "sha256": "8e5d2ceec923b7e2ecfb2abef6894fc9e2b085d2bd11e92933f8ead3288a8af8",
+          "symbols": [
+            {
+              "name": "exportDto",
+              "line": 15
+            },
+            {
+              "name": "clearExport",
+              "line": 25
+            },
+            {
+              "name": "createExport",
+              "line": 40
+            },
+            {
+              "name": "listExports",
+              "line": 58
+            },
+            {
+              "name": "getExport",
+              "line": 67
+            },
+            {
+              "name": "changeExport",
+              "line": 70
+            },
+            {
+              "name": "downloadExport",
+              "line": 80
+            },
+            {
+              "name": "claimExport",
+              "line": 123
+            }
+          ]
+        },
+        {
+          "path": "tests/server/submission-export.test.ts",
+          "sha256": "d62059ec82e16f21ea91ddd4d77fbfeb854402b6a6f589bcf04cd422e504f369",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/async-export.test.ts",
+          "sha256": "0de1d9a9231e12f3e2cec17342326e382fbe54d64c175f811b7de8c2ee4d6e6e",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P06-T03",
+      "title": "첨부 파일 실저장·열람",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "질문 파일 업로드/연결/검사/비공개 다운로드와 file-view 네 경로를 응답·공유권한에 연결한다.",
+      "acceptance": "실제 파일 byte/hash 동일; 다른 questionId/customerId/fileId 조합 거부; 만료 URL 차단",
+      "dependencies": [
+        "P06-T01",
+        "P01-T03"
+      ],
+      "present": "파일 저장·검사·권한별 다운로드",
+      "remaining": "네 동적 file-view 경로와 외부 저장소 전체 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/files.ts",
+          "sha256": "506dfcd59a78b27485de8e90681e8d2300088ebd05e731208fc74785b714c36f",
+          "symbols": [
+            {
+              "name": "reserveQuota",
+              "line": 17
+            },
+            {
+              "name": "fileData",
+              "line": 28
+            },
+            {
+              "name": "initPublicUpload",
+              "line": 33
+            },
+            {
+              "name": "initMemberUpload",
+              "line": 53
+            },
+            {
+              "name": "getUpload",
+              "line": 84
+            },
+            {
+              "name": "uploadContent",
+              "line": 87
+            },
+            {
+              "name": "completeUpload",
+              "line": 100
+            },
+            {
+              "name": "finishFileDeletion",
+              "line": 131
+            }
+          ]
+        },
+        {
+          "path": "src/server/file-download.ts",
+          "sha256": "10e0d63516de97899cda7b6752407715fc53109546d251023e0fec1cb9000945",
+          "symbols": [
+            {
+              "name": "readFile",
+              "line": 14
+            },
+            {
+              "name": "fileMetadata",
+              "line": 40
+            },
+            {
+              "name": "downloadFile",
+              "line": 43
+            },
+            {
+              "name": "listSubmissionFiles",
+              "line": 57
+            }
+          ]
+        },
+        {
+          "path": "tests/server/files.test.ts",
+          "sha256": "1688e805101eb36d4052b624e30fa02285997d8f9efd21929413e3dadad0da1b",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/file-access-gate.test.ts",
+          "sha256": "db1888cdb08e1e6af90c02141bc3f36b7fbe88c963608ccc5abdd469ac25006e",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P06-T04",
+      "title": "공유 열람자 CRUD·인증",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "ShareGrant 생성/범위수정/만료/회수·초대, 이메일 인증과 ViewerSession, 읽기 로그를 구현한다.",
+      "acceptance": "초대받은 사람만 지정 필드 조회; 권한회수 즉시 세션 무효; 공유 파일 우회 차단",
+      "dependencies": [
+        "P06-T02",
+        "P09-T02"
+      ],
+      "present": "공유 범위·회수·이메일 확인·열람",
+      "remaining": "외부 메일·운영 보존·전체 공유 UI",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/sharing.ts",
+          "sha256": "f7912b0337390584e46803503f9bbf2e727bf70ddf579345fa601883920e44d9",
+          "symbols": [
+            {
+              "name": "shareDto",
+              "line": 20
+            },
+            {
+              "name": "lockShareForm",
+              "line": 28
+            },
+            {
+              "name": "shareOptions",
+              "line": 86
+            },
+            {
+              "name": "listShares",
+              "line": 98
+            },
+            {
+              "name": "getShare",
+              "line": 112
+            },
+            {
+              "name": "createShareRequest",
+              "line": 116
+            },
+            {
+              "name": "createShare",
+              "line": 130
+            },
+            {
+              "name": "changeShare",
+              "line": 145
+            }
+          ]
+        },
+        {
+          "path": "src/server/viewer.ts",
+          "sha256": "9772728bf5ca4d60107a9358c38ee3a77b8479c21e1a1feb894ba57cd5476e86",
+          "symbols": [
+            {
+              "name": "viewerCookie",
+              "line": 16
+            },
+            {
+              "name": "setViewerCookie",
+              "line": 20
+            },
+            {
+              "name": "viewerAudit",
+              "line": 23
+            },
+            {
+              "name": "startViewerChallenge",
+              "line": 45
+            },
+            {
+              "name": "verifyViewerChallenge",
+              "line": 66
+            },
+            {
+              "name": "withViewer",
+              "line": 92
+            },
+            {
+              "name": "viewerInfo",
+              "line": 119
+            },
+            {
+              "name": "logoutViewer",
+              "line": 123
+            }
+          ]
+        },
+        {
+          "path": "tests/server/sharing.test.ts",
+          "sha256": "4f816fcdf8f60ffbed304c7184cc177061847af227c5c34d5b7cc6f784aebb8a",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/share-management-gate.test.ts",
+          "sha256": "b978da795c0215a7537af70b7872eeb03d0b475e9d440d338d2a99745d15691c",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P06-T05",
+      "title": "정보주체 조회·동의 철회",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "이름/이메일 요청과 일회용 본인확인 세션, agree/action history·철회 신청·완료/중단 상태를 구현한다.",
+      "acceptance": "계정 존재 추측 불가 공통응답; 다른 사람 토큰 거부; 철회가 다음 발송 suppression에 반영",
+      "dependencies": [
+        "P06-T02",
+        "P02-T02"
+      ],
+      "present": "정보주체 확인·조회·철회",
+      "remaining": "전체 브라우저 및 외부 메일 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/subjects.ts",
+          "sha256": "97fc724faf519b2fdb00349a50bb9e845034e384d125c6fa7ea815f432e5a12d",
+          "symbols": [
+            {
+              "name": "subjectCookie",
+              "line": 16
+            },
+            {
+              "name": "setSubjectCookie",
+              "line": 20
+            },
+            {
+              "name": "requestSubjectAccess",
+              "line": 37
+            },
+            {
+              "name": "createSubjectSession",
+              "line": 56
+            },
+            {
+              "name": "withSubject",
+              "line": 75
+            },
+            {
+              "name": "logoutSubject",
+              "line": 90
+            },
+            {
+              "name": "subjectConsents",
+              "line": 105
+            },
+            {
+              "name": "subjectEvents",
+              "line": 118
+            }
+          ]
+        },
+        {
+          "path": "src/server/subject-scope.ts",
+          "sha256": "a9a13ec18d9fdc205960079f9162d195ca7e9b174a1f895a655f3fba8e76a211",
+          "symbols": [
+            {
+              "name": "lockSubjectScopes",
+              "line": 8
+            }
+          ]
+        },
+        {
+          "path": "tests/server/subjects.test.ts",
+          "sha256": "ae82942590e17557f59f13a8ffe944f80107c25f89f45f3ba831978451b3c203",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/subject-access-gate.test.ts",
+          "sha256": "b6e084040e0e119496f7ffb80873bedae53d808ef1ca7ebe8b80e6ec2b9ecd47",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P06-T06",
+      "title": "본인인증·전자서명",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "외부 검증 어댑터, challenge/callback·증거 hash/영수증을 폼 제출과 연결한다. 서비스사 미설정은 명확한 대기상태로 처리한다.",
+      "acceptance": "서명위조·중복callback 거부; 실제 sandbox 검증 없으면 완료 체크 금지",
+      "dependencies": [
+        "P06-T01",
+        "P01-T04"
+      ],
+      "present": "설정 CRUD·미연결 준비 상태",
+      "remaining": "실제 challenge/callback·전자서명·공급자 sandbox",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/verification.ts",
+          "sha256": "af4aaebbd248c74cb738168dd021262b6ee49631ae6196f04e2447620d36eeb3",
+          "symbols": [
+            {
+              "name": "lockVerificationContext",
+              "line": 10
+            },
+            {
+              "name": "getVerificationState",
+              "line": 45
+            },
+            {
+              "name": "createVerificationIntegration",
+              "line": 53
+            },
+            {
+              "name": "replayVerificationIntegration",
+              "line": 63
+            },
+            {
+              "name": "updateVerificationIntegration",
+              "line": 69
+            },
+            {
+              "name": "deleteVerificationIntegration",
+              "line": 86
+            }
+          ]
+        },
+        {
+          "path": "tests/server/verification-configuration.test.ts",
+          "sha256": "08bba624cf634634dd0dd3ea78b3f4818dcb42810d2e91d97e0c34014c1ff466",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P06-T07",
+      "title": "응답 흐름 E2E 게이트",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "폼 게시→외부 브라우저 제출→관리자 확인→공유 인증→정정/철회→파기까지 검사한다.",
+      "acceptance": "모든 동적 URL에 실제fixture ID 사용; token 유출 검사; 새로고침/재시작/파일 검증",
+      "dependencies": [
+        "P06-T03",
+        "P06-T04",
+        "P06-T05",
+        "P06-T06",
+        "P07-T03"
+      ],
+      "present": "구성 영역의 서버 및 개별 시험",
+      "remaining": "실제 외부 제출→공유→철회→파기 통합 E2E",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/submissions.ts",
+          "sha256": "0c9fdcdee6e2b2a97a3e0f73fa15e69cbfd82027861e30e07219360165b3e3d0",
+          "symbols": [
+            {
+              "name": "activePublication",
+              "line": 25
+            },
+            {
+              "name": "publicForm",
+              "line": 36
+            },
+            {
+              "name": "submitForm",
+              "line": 52
+            },
+            {
+              "name": "listSubmissions",
+              "line": 91
+            }
+          ]
+        },
+        {
+          "path": "src/server/sharing.ts",
+          "sha256": "f7912b0337390584e46803503f9bbf2e727bf70ddf579345fa601883920e44d9",
+          "symbols": [
+            {
+              "name": "shareDto",
+              "line": 20
+            },
+            {
+              "name": "lockShareForm",
+              "line": 28
+            },
+            {
+              "name": "shareOptions",
+              "line": 86
+            },
+            {
+              "name": "listShares",
+              "line": 98
+            },
+            {
+              "name": "getShare",
+              "line": 112
+            },
+            {
+              "name": "createShareRequest",
+              "line": 116
+            },
+            {
+              "name": "createShare",
+              "line": 130
+            },
+            {
+              "name": "changeShare",
+              "line": 145
+            }
+          ]
+        },
+        {
+          "path": "src/server/destruction.ts",
+          "sha256": "b408d42a29adf6e1802ca874a64fdde757cd4a7aab914ddb1a71653848bc90a1",
+          "symbols": [
+            {
+              "name": "requestDto",
+              "line": 15
+            },
+            {
+              "name": "certificateDigest",
+              "line": 27
+            },
+            {
+              "name": "certificateDto",
+              "line": 32
+            },
+            {
+              "name": "destructionRequestQuery",
+              "line": 37
+            },
+            {
+              "name": "listDestructions",
+              "line": 49
+            },
+            {
+              "name": "createDestruction",
+              "line": 76
+            },
+            {
+              "name": "decideDestruction",
+              "line": 89
+            },
+            {
+              "name": "changeRetention",
+              "line": 130
+            }
+          ]
+        },
+        {
+          "path": "tests/server/public-submission-gate.test.ts",
+          "sha256": "cf729fedd37eb5f4d2895688f3101d05c7f05f8483119e0ecf0a3a57d5759482",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/share-management-gate.test.ts",
+          "sha256": "b978da795c0215a7537af70b7872eeb03d0b475e9d440d338d2a99745d15691c",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P07-T01",
+      "title": "개인정보 CSV import",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "파일 등록→컬럼 매핑→타입/중복/동의근거 검증→preview→반영→실패행 다운로드를 구현한다.",
+      "acceptance": "인코딩·큰파일·빈행·중복·부분실패·재실행 중복0; 원본파일 보존정책; CSV 수식 무해화",
+      "dependencies": [
+        "P06-T01",
+        "P05-T01",
+        "P01-T04"
+      ],
+      "present": "CSV 매핑·적재·실패행·재시도",
+      "remaining": "원본/최신 UI·운영 보존·전체 게이트",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/imports.ts",
+          "sha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+          "symbols": [
+            {
+              "name": "importRequestQuery",
+              "line": 21
+            },
+            {
+              "name": "emptyImportQuery",
+              "line": 29
+            },
+            {
+              "name": "importDto",
+              "line": 32
+            },
+            {
+              "name": "lockImport",
+              "line": 60
+            },
+            {
+              "name": "requireImportAlive",
+              "line": 70
+            },
+            {
+              "name": "createImport",
+              "line": 78
+            },
+            {
+              "name": "listImports",
+              "line": 101
+            },
+            {
+              "name": "getImport",
+              "line": 115
+            }
+          ]
+        },
+        {
+          "path": "src/server/import-worker.ts",
+          "sha256": "7a8f56ca0a3ee04282984f873ebc6d437b9d12e0e1d6e8402a8de056ee82211a",
+          "symbols": [
+            {
+              "name": "claimImport",
+              "line": 18
+            },
+            {
+              "name": "runOneImport",
+              "line": 55
+            },
+            {
+              "name": "cleanupExpiredImports",
+              "line": 138
+            }
+          ]
+        },
+        {
+          "path": "tests/server/imports.test.ts",
+          "sha256": "6ceeead9ae58500f2b8c8d9988a2130a35c4e78ea0d5fcd16a0b05fc143b8692",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P07-T02",
+      "title": "마케팅 동의·차단 목록",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "채널별 수신동의/철회 CRUD 상태전이, 일괄 처리·검색·내보내기, 이메일/문자 suppression 연결을 구현한다.",
+      "acceptance": "다른 서비스 동의 섞이지 않음; 대량철회 멱등; 발송 직전 거부 목록 확인",
+      "dependencies": [
+        "P06-T05"
+      ],
+      "present": "동의·차단·일괄 철회·전송 전 검사",
+      "remaining": "실제 공급자·현재 UI·복구/선행 게이트",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/marketing.ts",
+          "sha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+          "symbols": [
+            {
+              "name": "marketingContactHash",
+              "line": 17
+            },
+            {
+              "name": "lockMarketingContact",
+              "line": 21
+            },
+            {
+              "name": "marketingDenial",
+              "line": 44
+            },
+            {
+              "name": "listMarketing",
+              "line": 87
+            },
+            {
+              "name": "readMarketing",
+              "line": 116
+            },
+            {
+              "name": "marketingSources",
+              "line": 120
+            },
+            {
+              "name": "grantMarketing",
+              "line": 139
+            },
+            {
+              "name": "createMarketing",
+              "line": 166
+            }
+          ]
+        },
+        {
+          "path": "src/server/suppression.ts",
+          "sha256": "3d899a45305d4d799fd1eab12f4ff80d4e6af8959fb633e1b96ad2174d6f93e3",
+          "symbols": [
+            {
+              "name": "contactEmailHash",
+              "line": 4
+            },
+            {
+              "name": "lockDelivery",
+              "line": 6
+            },
+            {
+              "name": "isSuppressed",
+              "line": 9
+            },
+            {
+              "name": "suppressSubmission",
+              "line": 14
+            }
+          ]
+        },
+        {
+          "path": "src/server/email-feedback.ts",
+          "sha256": "ad53e713c6672c3aea3d7e10d87a4c890e182bd1c06ef44fdca732ad636fb8d4",
+          "symbols": [
+            {
+              "name": "limitedEmailBody",
+              "line": 17
+            },
+            {
+              "name": "softBounceJobs",
+              "line": 49
+            },
+            {
+              "name": "acceptEmailRelay",
+              "line": 73
+            },
+            {
+              "name": "readUnsubscribe",
+              "line": 92
+            },
+            {
+              "name": "confirmUnsubscribe",
+              "line": 98
+            },
+            {
+              "name": "feedbackSummary",
+              "line": 107
+            },
+            {
+              "name": "listEmailSuppressions",
+              "line": 112
+            }
+          ]
+        },
+        {
+          "path": "tests/server/marketing.test.ts",
+          "sha256": "12c949833622928a979a57c72f6d50cff2a70cc0977cb56d8c591b91a7603f0b",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P07-T03",
+      "title": "보존·파기 Worker·증명서",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "정책 기반 파기일 계산·승인/보류·예약취소·DB/파일 파기·재시도·증명서를 구현한다.",
+      "acceptance": "가상시계 만료; legalHold 우선; 파일삭제 실패 재처리; 원문 제거 후 최소증거만 잔존",
+      "dependencies": [
+        "P06-T03",
+        "P01-T04",
+        "P11-T01"
+      ],
+      "present": "파기 요청·작업·파일 제거·증명서",
+      "remaining": "운영 복원 후 재파기·최신 UI·선행 게이트",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/destruction.ts",
+          "sha256": "b408d42a29adf6e1802ca874a64fdde757cd4a7aab914ddb1a71653848bc90a1",
+          "symbols": [
+            {
+              "name": "requestDto",
+              "line": 15
+            },
+            {
+              "name": "certificateDigest",
+              "line": 27
+            },
+            {
+              "name": "certificateDto",
+              "line": 32
+            },
+            {
+              "name": "destructionRequestQuery",
+              "line": 37
+            },
+            {
+              "name": "listDestructions",
+              "line": 49
+            },
+            {
+              "name": "createDestruction",
+              "line": 76
+            },
+            {
+              "name": "decideDestruction",
+              "line": 89
+            },
+            {
+              "name": "changeRetention",
+              "line": 130
+            }
+          ]
+        },
+        {
+          "path": "src/server/destruction-worker.ts",
+          "sha256": "d54767c5e2a876a771ae0cb6849c1b4d1a6c872036deb6ceb89114d511cd751c",
+          "symbols": [
+            {
+              "name": "enqueueExpiredSubmissions",
+              "line": 14
+            },
+            {
+              "name": "claimDestruction",
+              "line": 46
+            },
+            {
+              "name": "runOneDestruction",
+              "line": 104
+            }
+          ]
+        },
+        {
+          "path": "tests/server/destruction.test.ts",
+          "sha256": "abab613199569a8e8fdf180e2fc31a6474c3431e0a36292f3a039be34575eb3b",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/retention-designation.test.ts",
+          "sha256": "cb157837bd0d72f4b7ab6efd1129462b044ede2a0934f6fa2f59a49c275aa31c",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P07-T04",
+      "title": "개인정보 수명주기 게이트",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "업로드→검색→동의 변경→보존 변경→파기→감사 추적을 검사한다.",
+      "acceptance": "영속 DB·파일 삭제 증거; 보관/백업 복원 후 재파기 절차 포함; 2회사 격리",
+      "dependencies": [
+        "P07-T01",
+        "P07-T02",
+        "P07-T03"
+      ],
+      "present": "구성 영역의 구현과 개별 시험",
+      "remaining": "백업복원·재파기를 포함한 두 회사 수명주기 E2E",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/imports.ts",
+          "sha256": "879ae1540864b51bf606a0486aad1c2f5acd3c9bb565fb03a16d48ff06d091f1",
+          "symbols": [
+            {
+              "name": "importRequestQuery",
+              "line": 21
+            },
+            {
+              "name": "emptyImportQuery",
+              "line": 29
+            },
+            {
+              "name": "importDto",
+              "line": 32
+            },
+            {
+              "name": "lockImport",
+              "line": 60
+            },
+            {
+              "name": "requireImportAlive",
+              "line": 70
+            },
+            {
+              "name": "createImport",
+              "line": 78
+            },
+            {
+              "name": "listImports",
+              "line": 101
+            },
+            {
+              "name": "getImport",
+              "line": 115
+            }
+          ]
+        },
+        {
+          "path": "src/server/destruction-worker.ts",
+          "sha256": "d54767c5e2a876a771ae0cb6849c1b4d1a6c872036deb6ceb89114d511cd751c",
+          "symbols": [
+            {
+              "name": "enqueueExpiredSubmissions",
+              "line": 14
+            },
+            {
+              "name": "claimDestruction",
+              "line": 46
+            },
+            {
+              "name": "runOneDestruction",
+              "line": 104
+            }
+          ]
+        },
+        {
+          "path": "tests/server/imports.test.ts",
+          "sha256": "6ceeead9ae58500f2b8c8d9988a2130a35c4e78ea0d5fcd16a0b05fc143b8692",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/destruction.test.ts",
+          "sha256": "abab613199569a8e8fdf180e2fc31a6474c3431e0a36292f3a039be34575eb3b",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P08-T01",
+      "title": "발신번호·주소 CRUD와 확인",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "발신자 등록/검색/편집/확인/재인증/비활성/삭제, 번호증빙 파일과 도메인 상태를 구현한다.",
+      "acceptance": "인증대기 발신 불가; 만료 재확인; 사용중 삭제 규칙; 재시작 후 목록 유지",
+      "dependencies": [
+        "P03-T01",
+        "P01-T03"
+      ],
+      "present": "발신자·증빙·이메일/DNS 확인 기반",
+      "remaining": "실제 문자 공급자 확인과 전 채널 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/senders.ts",
+          "sha256": "ae9a1670f78e9d1087b4aaef0f9cd66bb1214af8516b78a85df01cb299b432ad",
+          "symbols": [
+            {
+              "name": "listSenders",
+              "line": 78
+            },
+            {
+              "name": "readSender",
+              "line": 105
+            },
+            {
+              "name": "createSender",
+              "line": 109
+            },
+            {
+              "name": "cleanupSenderCopies",
+              "line": 128
+            },
+            {
+              "name": "retrySenderCleanup",
+              "line": 137
+            },
+            {
+              "name": "updateSender",
+              "line": 153
+            },
+            {
+              "name": "senderAction",
+              "line": 168
+            },
+            {
+              "name": "startEmailVerification",
+              "line": 199
+            }
+          ]
+        },
+        {
+          "path": "src/server/sender-providers.ts",
+          "sha256": "0f677f9bddb16a7a52e4fa9fd7204e095c669f7aa961451a76dc99186bb91687",
+          "symbols": [
+            {
+              "name": "senderEnvironment",
+              "line": 7
+            },
+            {
+              "name": "senderEmailDomain",
+              "line": 8
+            },
+            {
+              "name": "emailTransportDenial",
+              "line": 17
+            },
+            {
+              "name": "verifySenderDns",
+              "line": 24
+            },
+            {
+              "name": "solapiConfigured",
+              "line": 37
+            },
+            {
+              "name": "verifySolapiSender",
+              "line": 38
+            }
+          ]
+        },
+        {
+          "path": "tests/server/senders.test.ts",
+          "sha256": "aa8b718dc850bddfcd4e272ca58ae45072ea7056c36da057b510d829bec5b3cf",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P08-T02",
+      "title": "발송 캠페인·수신자·예약",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "직접입력/폼응답 대상 선택·검증·미리보기·초안 CRUD·즉시/예약·취소·비용예측을 구현한다.",
+      "acceptance": "잘못된 번호/주소·수신거부·중복 제거; draft편집만 가능; 예약변경 충돌 검사",
+      "dependencies": [
+        "P08-T01",
+        "P07-T02"
+      ],
+      "present": "초안·대상자·미리보기·예약/취소",
+      "remaining": "실제 문자 비용/발송·전체 UI 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/campaigns.ts",
+          "sha256": "156a1c493c3a9509cfe8e341d3da87c014487e1995ca5326e158128a97bea3f3",
+          "symbols": [
+            {
+              "name": "createCampaign",
+              "line": 24
+            },
+            {
+              "name": "listCampaigns",
+              "line": 34
+            },
+            {
+              "name": "readCampaign",
+              "line": 47
+            },
+            {
+              "name": "updateCampaign",
+              "line": 51
+            },
+            {
+              "name": "deleteCampaign",
+              "line": 59
+            },
+            {
+              "name": "replaceCampaignRecipients",
+              "line": 80
+            },
+            {
+              "name": "listCampaignDeliveries",
+              "line": 109
+            },
+            {
+              "name": "listCampaignSources",
+              "line": 120
+            }
+          ]
+        },
+        {
+          "path": "src/server/campaign-scheduling.ts",
+          "sha256": "c9be6e2b0dc02ddb2d245d91df77d4627d524d6d6cc71512f4806de142547aa8",
+          "symbols": [
+            {
+              "name": "scheduleCampaign",
+              "line": 34
+            },
+            {
+              "name": "rescheduleCampaign",
+              "line": 54
+            },
+            {
+              "name": "cancelCampaign",
+              "line": 67
+            },
+            {
+              "name": "archiveCampaign",
+              "line": 82
+            },
+            {
+              "name": "retryCampaign",
+              "line": 90
+            }
+          ]
+        },
+        {
+          "path": "tests/server/campaigns.test.ts",
+          "sha256": "cf0f0f386eaebe65b6823c642f38d3efcc7df8eb783406182b5ed4b769de364b",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P08-T03",
+      "title": "문자 서비스사 어댑터·receipt",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "SMS/LMS/MMS 지원범위를 계약으로 확정, worker 전송·실패/재시도·결과 webhook·발신자 확인을 연결한다.",
+      "acceptance": "sandbox 실제 수신 또는 provider receipt; 인증실패·timeout·중복webhook·부분성공; 허위 sent 금지",
+      "dependencies": [
+        "P08-T02",
+        "P01-T04",
+        "P10-T03"
+      ],
+      "present": "local SMS/LMS 처리와 서명 영수증 수신",
+      "remaining": "실제 공급자 전송·MMS·요금 정산·sandbox",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/sms-adapter.ts",
+          "sha256": "61012e2ae07a7bbd1d9e091b2c52c2335b3b4a85adc89a469e5a0a3a7ad4c899",
+          "symbols": [
+            {
+              "name": "classifySms",
+              "line": 16
+            },
+            {
+              "name": "smsReceiptFile",
+              "line": 20
+            },
+            {
+              "name": "deliverSms",
+              "line": 24
+            },
+            {
+              "name": "applySmsReceipt",
+              "line": 38
+            }
+          ]
+        },
+        {
+          "path": "tests/server/sms-adapter.test.ts",
+          "sha256": "f2b026baeec410a0059a5ef290d3ee6a239251c56b83b424edeecb91d68a7723",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P08-T04",
+      "title": "발송 목록·예약·상세·재처리 화면",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "서버 pagination과 기간/상태/발신자 필터, 수신자별 성공실패·예약취소·실패 재처리·다운로드를 연결한다.",
+      "acceptance": "같은 delivery 이중 발송0; 실제상태 반영; 권한거부·비용한도·예약취소 E2E",
+      "dependencies": [
+        "P08-T03",
+        "P09-T02"
+      ],
+      "present": "발송 결과 페이지·예약·재처리 기반",
+      "remaining": "문자/메일 외부 결과·비용 한도·전체 UI",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/campaigns.ts",
+          "sha256": "156a1c493c3a9509cfe8e341d3da87c014487e1995ca5326e158128a97bea3f3",
+          "symbols": [
+            {
+              "name": "createCampaign",
+              "line": 24
+            },
+            {
+              "name": "listCampaigns",
+              "line": 34
+            },
+            {
+              "name": "readCampaign",
+              "line": 47
+            },
+            {
+              "name": "updateCampaign",
+              "line": 51
+            },
+            {
+              "name": "deleteCampaign",
+              "line": 59
+            },
+            {
+              "name": "replaceCampaignRecipients",
+              "line": 80
+            },
+            {
+              "name": "listCampaignDeliveries",
+              "line": 109
+            },
+            {
+              "name": "listCampaignSources",
+              "line": 120
+            }
+          ]
+        },
+        {
+          "path": "src/server/campaign-scheduling.ts",
+          "sha256": "c9be6e2b0dc02ddb2d245d91df77d4627d524d6d6cc71512f4806de142547aa8",
+          "symbols": [
+            {
+              "name": "scheduleCampaign",
+              "line": 34
+            },
+            {
+              "name": "rescheduleCampaign",
+              "line": 54
+            },
+            {
+              "name": "cancelCampaign",
+              "line": 67
+            },
+            {
+              "name": "archiveCampaign",
+              "line": 82
+            },
+            {
+              "name": "retryCampaign",
+              "line": 90
+            }
+          ]
+        },
+        {
+          "path": "tests/server/campaigns.test.ts",
+          "sha256": "cf0f0f386eaebe65b6823c642f38d3efcc7df8eb783406182b5ed4b769de364b",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P09-T01",
+      "title": "이메일 작성·템플릿·발신 도메인",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "HTML/텍스트 미리보기, 첨부·변수 검증, 발신도메인 확인 상태·발송 정책을 서버에 연결한다.",
+      "acceptance": "sanitize·미확정변수 차단; 업로드 권한; 도메인 미확인 차단; draft CRUD",
+      "dependencies": [
+        "P08-T02"
+      ],
+      "present": "본문 정제·템플릿·변수·첨부 검증",
+      "remaining": "실제 발신 도메인/메일과 전체 UI 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/message-content.ts",
+          "sha256": "d9bc962cab3a45de379cf83c4f0ca4690a8e75cdaba09176ae97b56179d15f4c",
+          "symbols": [
+            {
+              "name": "sanitizeMessageHtml",
+              "line": 6
+            },
+            {
+              "name": "normalizeMessageContent",
+              "line": 27
+            },
+            {
+              "name": "renderMessageContent",
+              "line": 38
+            }
+          ]
+        },
+        {
+          "path": "src/server/message-templates.ts",
+          "sha256": "e57f0291c587308cdec3eea49edd3d312ca504d8c37b7852287d80b07d38a3dd",
+          "symbols": [
+            {
+              "name": "createMessageTemplate",
+              "line": 41
+            },
+            {
+              "name": "listMessageTemplates",
+              "line": 49
+            },
+            {
+              "name": "readMessageTemplate",
+              "line": 58
+            },
+            {
+              "name": "updateMessageTemplate",
+              "line": 71
+            },
+            {
+              "name": "changeMessageTemplate",
+              "line": 78
+            },
+            {
+              "name": "applyMessageTemplate",
+              "line": 91
+            }
+          ]
+        },
+        {
+          "path": "src/server/campaign-files.ts",
+          "sha256": "856460be236d59b020eff611373a0eb563bb7f3b3b087a555ca88c9c24772bbd",
+          "symbols": [
+            {
+              "name": "initCampaignFile",
+              "line": 19
+            },
+            {
+              "name": "changeCampaignFile",
+              "line": 32
+            },
+            {
+              "name": "readCampaignAttachments",
+              "line": 52
+            },
+            {
+              "name": "markCampaignFilesForDeletion",
+              "line": 71
+            }
+          ]
+        },
+        {
+          "path": "tests/server/message-content.test.ts",
+          "sha256": "f048615514b32163409afc67f9d60d438338514af8e23f5ff8a71c466eb2b532",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P09-T02",
+      "title": "이메일 전송·반송·수신거부",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "개발 테스트메일함과 운영 어댑터, 반송/complaint/수신거부 webhook·억제 규칙을 구현한다.",
+      "acceptance": "실제 테스트함에서 메일/첨부 확인; unsubscribe 재사용/위조 검사; 정책 기준 경계값·중복event",
+      "dependencies": [
+        "P09-T01",
+        "P01-T04"
+      ],
+      "present": "local/SMTP 전송 및 반송·수신거부 코드",
+      "remaining": "외부 테스트함/첨부·실제 공급자 피드백",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/jobs.ts",
+          "sha256": "cd324ad199a25f4814c0df234619393cbe5b3d572fe9f3e93d418390cb8a771e",
+          "symbols": [
+            {
+              "name": "enqueueMail",
+              "line": 22
+            },
+            {
+              "name": "enqueueServiceMail",
+              "line": 36
+            },
+            {
+              "name": "enqueueMarketingMail",
+              "line": 47
+            },
+            {
+              "name": "claimJob",
+              "line": 63
+            },
+            {
+              "name": "deliverMail",
+              "line": 172
+            },
+            {
+              "name": "runOneJob",
+              "line": 200
+            }
+          ]
+        },
+        {
+          "path": "src/server/email-feedback.ts",
+          "sha256": "ad53e713c6672c3aea3d7e10d87a4c890e182bd1c06ef44fdca732ad636fb8d4",
+          "symbols": [
+            {
+              "name": "limitedEmailBody",
+              "line": 17
+            },
+            {
+              "name": "softBounceJobs",
+              "line": 49
+            },
+            {
+              "name": "acceptEmailRelay",
+              "line": 73
+            },
+            {
+              "name": "readUnsubscribe",
+              "line": 92
+            },
+            {
+              "name": "confirmUnsubscribe",
+              "line": 98
+            },
+            {
+              "name": "feedbackSummary",
+              "line": 107
+            },
+            {
+              "name": "listEmailSuppressions",
+              "line": 112
+            }
+          ]
+        },
+        {
+          "path": "src/server/campaign-worker.ts",
+          "sha256": "15753db866710ccf5408304b2618fa5a74b0aee6825761c6211d317b2e93201d",
+          "symbols": [
+            {
+              "name": "runCampaignJob",
+              "line": 59
+            },
+            {
+              "name": "cleanupCampaigns",
+              "line": 109
+            }
+          ]
+        },
+        {
+          "path": "tests/server/campaigns.test.ts",
+          "sha256": "cf0f0f386eaebe65b6823c642f38d3efcc7df8eb783406182b5ed4b769de364b",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P09-T03",
+      "title": "알림톡 채널·템플릿 CRUD/심사",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "채널 등록·인증, 템플릿 작성/변수/버튼/심사요청/반려수정/삭제, playground preview를 구현한다.",
+      "acceptance": "승인 안 된 템플릿 발송 거부; 변경 후 재심사; provider 상태와 DB 일치",
+      "dependencies": [
+        "P08-T01"
+      ],
+      "present": "채널/템플릿 CRUD·심사 상태·서명 콜백",
+      "remaining": "실제 채널 인증·심사 공급자 상태 일치",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/kakao.ts",
+          "sha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+          "symbols": [
+            {
+              "name": "listKakaoChannels",
+              "line": 20
+            },
+            {
+              "name": "createKakaoChannel",
+              "line": 27
+            },
+            {
+              "name": "updateKakaoChannel",
+              "line": 35
+            },
+            {
+              "name": "requestKakaoChannelVerification",
+              "line": 48
+            },
+            {
+              "name": "listKakaoTemplates",
+              "line": 54
+            },
+            {
+              "name": "createKakaoTemplate",
+              "line": 61
+            },
+            {
+              "name": "updateKakaoTemplate",
+              "line": 71
+            },
+            {
+              "name": "submitKakaoTemplate",
+              "line": 82
+            }
+          ]
+        },
+        {
+          "path": "tests/server/kakao-templates.test.ts",
+          "sha256": "cbde76e55b0a53edf056eccf8f4bec0d5cae1008d67c242320cac74d0de757b1",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P09-T04",
+      "title": "알림톡 발송·수신 결과",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "승인 템플릿과 수신자, 예약·취소·발송내역·실패 대체발송 정책을 공통 캠페인에 연결한다.",
+      "acceptance": "공급자 sandbox 실제 결과; 변수 누락/거부/부분실패; 대체발송 중복/요금 검증",
+      "dependencies": [
+        "P09-T03",
+        "P08-T03"
+      ],
+      "present": "미승인/미연결 발송 거부 경계만 존재",
+      "remaining": "실제 알림톡 발송·예약·대체 SMS·과금 전체",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/kakao.ts",
+          "sha256": "fd27aeb99529292e2173bbee3ac0c75849bf0469d1d782a636675611c5b4eb62",
+          "symbols": [
+            {
+              "name": "listKakaoChannels",
+              "line": 20
+            },
+            {
+              "name": "createKakaoChannel",
+              "line": 27
+            },
+            {
+              "name": "updateKakaoChannel",
+              "line": 35
+            },
+            {
+              "name": "requestKakaoChannelVerification",
+              "line": 48
+            },
+            {
+              "name": "listKakaoTemplates",
+              "line": 54
+            },
+            {
+              "name": "createKakaoTemplate",
+              "line": 61
+            },
+            {
+              "name": "updateKakaoTemplate",
+              "line": 71
+            },
+            {
+              "name": "submitKakaoTemplate",
+              "line": 82
+            }
+          ]
+        },
+        {
+          "path": "tests/server/kakao-templates.test.ts",
+          "sha256": "cbde76e55b0a53edf056eccf8f4bec0d5cae1008d67c242320cac74d0de757b1",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P09-T05",
+      "title": "Slack·Teams 알림 CRUD",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "이벤트/대상 필터·사용여부·URL 저장/교체/삭제·테스트 전송·발송 이력을 구현한다.",
+      "acceptance": "웹훅 URL SSRF·내부IP·리디렉션 차단; disabled 전송0; 실패 재시도; 허용된 테스트채널 수신",
+      "dependencies": [
+        "P06-T02",
+        "P01-T04"
+      ],
+      "present": "연결 CRUD·필터·재시도·SSRF 방어",
+      "remaining": "허용된 실제 Slack/Teams 테스트채널 수신",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/notifications.ts",
+          "sha256": "8d88abe468b0c6f5bc9ef64175a94dbcd7fc2fd5b1667b4b1d882505c7ed9f2f",
+          "symbols": [
+            {
+              "name": "notificationScope",
+              "line": 17
+            },
+            {
+              "name": "createIntegration",
+              "line": 53
+            },
+            {
+              "name": "integrationOptions",
+              "line": 67
+            },
+            {
+              "name": "listIntegrations",
+              "line": 77
+            },
+            {
+              "name": "readIntegration",
+              "line": 88
+            },
+            {
+              "name": "cancelNotifications",
+              "line": 89
+            },
+            {
+              "name": "updateIntegration",
+              "line": 97
+            },
+            {
+              "name": "toggleIntegration",
+              "line": 109
+            }
+          ]
+        },
+        {
+          "path": "src/server/notification-worker.ts",
+          "sha256": "5ecd880db2464329e691f13b10db9a566dc0932cdf06884d9307bfdef389db38",
+          "symbols": [
+            {
+              "name": "recoverNotifications",
+              "line": 11
+            },
+            {
+              "name": "claimNotification",
+              "line": 23
+            },
+            {
+              "name": "notificationAttemptResult",
+              "line": 41
+            },
+            {
+              "name": "processNotification",
+              "line": 54
+            },
+            {
+              "name": "runOneNotification",
+              "line": 86
+            }
+          ]
+        },
+        {
+          "path": "src/server/notification-transport.ts",
+          "sha256": "e7202a37e67a15f0e55a941d166e9860a0c195e8f2be5d8d47a2b843d101aec1",
+          "symbols": [
+            {
+              "name": "notificationEndpoint",
+              "line": 11
+            },
+            {
+              "name": "publicNotificationAddress",
+              "line": 34
+            },
+            {
+              "name": "notificationPayload",
+              "line": 39
+            },
+            {
+              "name": "deliverNotification",
+              "line": 56
+            }
+          ]
+        },
+        {
+          "path": "tests/server/notifications.test.ts",
+          "sha256": "e92edf8a099112408d744195862e7bf59d0a2a2b300b14dca27bbabb6b3105f0",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P09-T06",
+      "title": "메시지 통합 게이트",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "문자·이메일·카카오·알림 각각 성공/실패/예약취소/수신거부/재시작 시나리오를 실행한다.",
+      "acceptance": "provider-contract 시험과 외부sandbox 시험 별도 증거; 미연결 채널은 완료 금지",
+      "dependencies": [
+        "P08-T04",
+        "P09-T02",
+        "P09-T04",
+        "P09-T05"
+      ],
+      "present": "채널별 부분 구현·개별 시험",
+      "remaining": "모든 공급자 통합 성공/실패/취소·외부 결과",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/campaign-worker.ts",
+          "sha256": "15753db866710ccf5408304b2618fa5a74b0aee6825761c6211d317b2e93201d",
+          "symbols": [
+            {
+              "name": "runCampaignJob",
+              "line": 59
+            },
+            {
+              "name": "cleanupCampaigns",
+              "line": 109
+            }
+          ]
+        },
+        {
+          "path": "src/server/notification-worker.ts",
+          "sha256": "5ecd880db2464329e691f13b10db9a566dc0932cdf06884d9307bfdef389db38",
+          "symbols": [
+            {
+              "name": "recoverNotifications",
+              "line": 11
+            },
+            {
+              "name": "claimNotification",
+              "line": 23
+            },
+            {
+              "name": "notificationAttemptResult",
+              "line": 41
+            },
+            {
+              "name": "processNotification",
+              "line": 54
+            },
+            {
+              "name": "runOneNotification",
+              "line": 86
+            }
+          ]
+        },
+        {
+          "path": "src/server/sms-adapter.ts",
+          "sha256": "61012e2ae07a7bbd1d9e091b2c52c2335b3b4a85adc89a469e5a0a3a7ad4c899",
+          "symbols": [
+            {
+              "name": "classifySms",
+              "line": 16
+            },
+            {
+              "name": "smsReceiptFile",
+              "line": 20
+            },
+            {
+              "name": "deliverSms",
+              "line": 24
+            },
+            {
+              "name": "applySmsReceipt",
+              "line": 38
+            }
+          ]
+        },
+        {
+          "path": "tests/server/campaigns.test.ts",
+          "sha256": "cf0f0f386eaebe65b6823c642f38d3efcc7df8eb783406182b5ed4b769de364b",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/notifications.test.ts",
+          "sha256": "e92edf8a099112408d744195862e7bf59d0a2a2b300b14dca27bbabb6b3105f0",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P10-T01",
+      "title": "상품·가격·할당량·구독",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "Plan 버전·요금·한도, 월/연 구독·시작/변경/해지 예약과 서버 entitlement 검사를 구현한다.",
+      "acceptance": "서버가격 변조 차단; 제한/무제한 seed; 한도경합·기간경계·변경가격 과거청구 불변",
+      "dependencies": [
+        "P03-T01",
+        "P01-T02"
+      ],
+      "present": "상품 버전·체험·대기 구매·할당량 검사",
+      "remaining": "유료 구독 활성/변경/주기 청구 전체",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/subscriptions.ts",
+          "sha256": "f6de9b8a5bddc7245d48e13611fa55e9b8dcbda3a5baad22513c9403f6d99eae",
+          "symbols": [
+            {
+              "name": "plans",
+              "line": 11
+            },
+            {
+              "name": "subscriptions",
+              "line": 31
+            },
+            {
+              "name": "entitlement",
+              "line": 36
+            },
+            {
+              "name": "assetOverview",
+              "line": 52
+            },
+            {
+              "name": "requestPurchase",
+              "line": 64
+            },
+            {
+              "name": "cancelPurchase",
+              "line": 82
+            },
+            {
+              "name": "scheduleTrialCancellation",
+              "line": 98
+            },
+            {
+              "name": "undoTrialCancellation",
+              "line": 122
+            }
+          ]
+        },
+        {
+          "path": "src/server/entitlements.ts",
+          "sha256": "ea42a5f9488e3ac6a43242d40a4a2f7a2c0d4d98babda7e2fda481bb6d580207",
+          "symbols": [
+            {
+              "name": "assertQuota",
+              "line": 6
+            }
+          ]
+        },
+        {
+          "path": "tests/server/subscriptions.test.ts",
+          "sha256": "36964a2d315f980273dda8fa395a5e8cd131a8aab5afe55e7715015f94f73ee8",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P10-T02",
+      "title": "결제수단·PG 주문·인증",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "PG token 기반 결제수단 CRUD·대표수단, purchase 생성·provider 승인·서명 검증 webhook을 구현한다.",
+      "acceptance": "success URL 위조로 paid 불가; 카드원문 저장0; callback 중복/순서역전; sandbox 승인",
+      "dependencies": [
+        "P10-T01",
+        "P01-T04"
+      ],
+      "present": "주문·서명 이벤트·성공 URL 위조 거부",
+      "remaining": "PG 토큰 결제수단 CRUD·실제 승인 sandbox",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/payments.ts",
+          "sha256": "68b1705540a055374474ffa4d6f34f47622208a4a99c72a84f50febb86eb3825",
+          "symbols": [
+            {
+              "name": "createPaymentOrder",
+              "line": 21
+            },
+            {
+              "name": "readPaymentOrder",
+              "line": 31
+            },
+            {
+              "name": "rejectPaymentReturn",
+              "line": 37
+            },
+            {
+              "name": "applyPaymentEvent",
+              "line": 49
+            }
+          ]
+        },
+        {
+          "path": "tests/server/payment-orders.test.ts",
+          "sha256": "403a93bcf5c3c68f0b604cb7e206f3302c8cc07964eafc9d14b5813515876b53",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P10-T03",
+      "title": "크레딧·사용량·원장",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "충전·예약금액·차감·해제, 서비스별 사용량 집계와 균형 원장·멱등키를 구현한다.",
+      "acceptance": "동시 차감 음수 방지; 같은원천 중복차감0; 실패전송 정책 정산; 통화별 잔액 일치",
+      "dependencies": [
+        "P10-T02"
+      ],
+      "present": "잔액·균형 원장·예약/확정/해제",
+      "remaining": "실제 PG/사용량 원천·실패 정산·환불 연결",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/ledger.ts",
+          "sha256": "6257278a02e4be0d92d1f98799febb903c2dca536b20c7b1df614a4811db7f6a",
+          "symbols": [
+            {
+              "name": "postTrustedLedgerTransfer",
+              "line": 19
+            },
+            {
+              "name": "ledgerOverview",
+              "line": 38
+            }
+          ]
+        },
+        {
+          "path": "tests/server/ledger.test.ts",
+          "sha256": "c4b594fb6ad727c51e91a56d7c68b4e102632d2bdea3adae7f40e5a8c7f9b6a7",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P10-T04",
+      "title": "해지·환불·청구서·마감",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "부분/전체환불·해지 effective date·취소사유·청구서 PDF·월마감·조정을 구현한다.",
+      "acceptance": "환불누계 초과 거부; PG와 DB 대사; refund retry 중복0; 마감후 정정 이벤트",
+      "dependencies": [
+        "P10-T03",
+        "P01-T03"
+      ],
+      "present": "체험 종료 예약/철회만 부분 구현",
+      "remaining": "유료 해지·부분/전체환불·청구서PDF·PG대사",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/subscriptions.ts",
+          "sha256": "f6de9b8a5bddc7245d48e13611fa55e9b8dcbda3a5baad22513c9403f6d99eae",
+          "symbols": [
+            {
+              "name": "plans",
+              "line": 11
+            },
+            {
+              "name": "subscriptions",
+              "line": 31
+            },
+            {
+              "name": "entitlement",
+              "line": 36
+            },
+            {
+              "name": "assetOverview",
+              "line": 52
+            },
+            {
+              "name": "requestPurchase",
+              "line": 64
+            },
+            {
+              "name": "cancelPurchase",
+              "line": 82
+            },
+            {
+              "name": "scheduleTrialCancellation",
+              "line": 98
+            },
+            {
+              "name": "undoTrialCancellation",
+              "line": 122
+            }
+          ]
+        },
+        {
+          "path": "tests/server/subscriptions.test.ts",
+          "sha256": "36964a2d315f980273dda8fa395a5e8cd131a8aab5afe55e7715015f94f73ee8",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P10-T05",
+      "title": "결제 UI와 전체 게이트",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "상품/방법/결제결과/청구서/환불/사용량 17개 경로를 서버 상태에 연결한다.",
+      "acceptance": "주문→승인→한도증가→사용→환불→대사 E2E; 실패URL·다른purchaseId 노출 차단; 외부 미검증 완료금지",
+      "dependencies": [
+        "P10-T04"
+      ],
+      "present": "일부 라이선스·체험 이력·잔액 화면",
+      "remaining": "결제17경로·주문부터 환불/대사까지 E2E",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/billing-history.ts",
+          "sha256": "4e2d6c56a91c8761ec3f3aba380d62f70f9ed4728cae267283f0e31007393aa3",
+          "symbols": [
+            {
+              "name": "billingHistory",
+              "line": 15
+            }
+          ]
+        },
+        {
+          "path": "src/server/ledger.ts",
+          "sha256": "6257278a02e4be0d92d1f98799febb903c2dca536b20c7b1df614a4811db7f6a",
+          "symbols": [
+            {
+              "name": "postTrustedLedgerTransfer",
+              "line": 19
+            },
+            {
+              "name": "ledgerOverview",
+              "line": 38
+            }
+          ]
+        },
+        {
+          "path": "tests/server/subscriptions.test.ts",
+          "sha256": "36964a2d315f980273dda8fa395a5e8cd131a8aab5afe55e7715015f94f73ee8",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/ledger.test.ts",
+          "sha256": "c4b594fb6ad727c51e91a56d7c68b4e102632d2bdea3adae7f40e5a8c7f9b6a7",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P11-T01",
+      "title": "회사 보안 정책 CRUD와 집행",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "암호 변경/재사용·게시 승인·파기규칙·세션 유지시간을 저장하고 관련 서버 실행경로에 적용한다.",
+      "acceptance": "저장만 되는 설정0; 정책변경→다음요청 적용; 기존세션 처리·관리자 lockout 회피",
+      "dependencies": [
+        "P02-T05",
+        "P03-T02"
+      ],
+      "present": "정책 CRUD·비밀번호·승인/파기 집행",
+      "remaining": "모든 정책 실행 경로·기존 세션·관리자 복구 전체",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/security-policy.ts",
+          "sha256": "da6d4d48fa1ba043f931d1fa565f04f573aa04745feb2e2463a8bf4aea3ce3f5",
+          "symbols": [
+            {
+              "name": "policyDto",
+              "line": 12
+            },
+            {
+              "name": "readPolicy",
+              "line": 21
+            },
+            {
+              "name": "confirmPassword",
+              "line": 26
+            },
+            {
+              "name": "lockPolicy",
+              "line": 33
+            },
+            {
+              "name": "companyRetentionDays",
+              "line": 40
+            },
+            {
+              "name": "updatePolicy",
+              "line": 45
+            }
+          ]
+        },
+        {
+          "path": "src/server/password-policy.ts",
+          "sha256": "33c134d363894a146452710af86cd58c6874e300f065598e2e343391e55e756c",
+          "symbols": [
+            {
+              "name": "addPolicyMonths",
+              "line": 6
+            },
+            {
+              "name": "effectivePasswordRules",
+              "line": 13
+            },
+            {
+              "name": "assertNextPassword",
+              "line": 19
+            },
+            {
+              "name": "passwordState",
+              "line": 39
+            }
+          ]
+        },
+        {
+          "path": "tests/server/policy-approvals.test.ts",
+          "sha256": "7fe8179d902f363b6bb27a62cac94f91a72ed5b18f3061c6ba1193402062111b",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/password-policy.test.ts",
+          "sha256": "1f6da471a93d2d01226d4bbcf1b52220ed85a14651ede51f813d3555bee52c34",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P11-T02",
+      "title": "IP·2FA 정책과 보안 현황",
+      "previousStatus": "in_progress",
+      "currentStatus": "in_progress",
+      "scope": "CIDR CRUD·IP 검사·2FA 강제·예외 만료, 보안 체크 결과 및 개선 action을 구현한다.",
+      "acceptance": "프록시 신뢰경계·IPv4/IPv6·IP우회·마지막 복구수단·owner 예외 만료 검사",
+      "dependencies": [
+        "P11-T01"
+      ],
+      "present": "IP·2FA·예외 API/UI; MFA 라우팅·검색포커스·모바일 수정 검증",
+      "remaining": "현재 정책/예외 전체 브라우저·원본·선행 게이트",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/ip-access.ts",
+          "sha256": "569de0451131038bbe6d89d0414532b8db2e69440703af590b228371419af653",
+          "symbols": [
+            {
+              "name": "listIpRules",
+              "line": 42
+            },
+            {
+              "name": "readIpRule",
+              "line": 53
+            },
+            {
+              "name": "createIpRule",
+              "line": 60
+            },
+            {
+              "name": "updateIpRule",
+              "line": 76
+            },
+            {
+              "name": "deleteIpRule",
+              "line": 89
+            },
+            {
+              "name": "changeIpAccess",
+              "line": 101
+            }
+          ]
+        },
+        {
+          "path": "src/server/mfa-policy.ts",
+          "sha256": "396865d993efad2e3ecc4603d9d36b1130f9c744d9d780a72674650ec934f969",
+          "symbols": [
+            {
+              "name": "listMfaMembers",
+              "line": 35
+            },
+            {
+              "name": "readMfaException",
+              "line": 46
+            },
+            {
+              "name": "changeMfaPolicy",
+              "line": 49
+            },
+            {
+              "name": "createMfaException",
+              "line": 59
+            },
+            {
+              "name": "updateMfaException",
+              "line": 75
+            },
+            {
+              "name": "deleteMfaException",
+              "line": 84
+            },
+            {
+              "name": "securityStatus",
+              "line": 95
+            }
+          ]
+        },
+        {
+          "path": "tests/server/ip-access.test.ts",
+          "sha256": "0a2c327176164ced67d9189bdbc150dc3b84adf16e002a5668057ffb5c9188f7",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/mfa-policy.test.ts",
+          "sha256": "135f3511c0811056e7f7c8e91f855cd098c084420ee2cede63b4f3ae9a359964",
+          "symbols": []
+        }
+      ],
+      "runtimeEvidence": "docs/qa/P11-T02/revalidation/README.md"
+    },
+    {
+      "id": "P11-T03",
+      "title": "OAuth/OIDC·SAML·계정연결",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "회사 provider 설정 CRUD·사전검사, 로그인/연동/초대가입 callback을 표준 라이브러리로 구현한다.",
+      "acceptance": "state/nonce/PKCE/audience/issuer/서명·재전송·연결탈취 검사; 테스트 IdP 실제 SSO",
+      "dependencies": [
+        "P02-T05",
+        "P11-T02"
+      ],
+      "present": "일반 이메일 인증 기반; 외부 인증은 미연결 안내",
+      "remaining": "회사 IdP CRUD·OIDC/SAML·계정연결·실제 SSO",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/auth.ts",
+          "sha256": "b50e43aff0ebf6233f168bef98dcd6277dbb57070f8da16db0b9835fab5e8851",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/auth-session-gate.test.ts",
+          "sha256": "9255c8e62d22fd8102ec84aca3d62b1fd170e23721ad08fe2a82d2e7f674e270",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P11-T04",
+      "title": "GPKI·새올·그룹웨어 어댑터",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "계약/SDK와 조직 식별자를 확인하고 login/verified/fail/email-register 경로를 연결한다.",
+      "acceptance": "공식 sandbox/테스트환경의 성공·실패 증거; SDK/접근권 없으면 블로커 유지; 임의 성공 처리 금지",
+      "dependencies": [
+        "P11-T03"
+      ],
+      "present": "다른 본인확인 설정과 미연결 화면만 있음",
+      "remaining": "GPKI/새올/그룹웨어 공식 SDK·기관 인증 전체",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/verification.ts",
+          "sha256": "af4aaebbd248c74cb738168dd021262b6ee49631ae6196f04e2447620d36eeb3",
+          "symbols": [
+            {
+              "name": "lockVerificationContext",
+              "line": 10
+            },
+            {
+              "name": "getVerificationState",
+              "line": 45
+            },
+            {
+              "name": "createVerificationIntegration",
+              "line": 53
+            },
+            {
+              "name": "replayVerificationIntegration",
+              "line": 63
+            },
+            {
+              "name": "updateVerificationIntegration",
+              "line": 69
+            },
+            {
+              "name": "deleteVerificationIntegration",
+              "line": 86
+            }
+          ]
+        },
+        {
+          "path": "tests/server/verification-configuration.test.ts",
+          "sha256": "08bba624cf634634dd0dd3ea78b3f4818dcb42810d2e91d97e0c34014c1ff466",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P11-T05",
+      "title": "보안 모듈 게이트",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "정책→로그인→IP→2FA→SSO→계정 회수→감사까지 통합 검사한다.",
+      "acceptance": "실제권한/반복공격·만료·회수·탈퇴 테스트; 비밀 관리/키 회전; critical/high 미해결0",
+      "dependencies": [
+        "P11-T02",
+        "P11-T03",
+        "P11-T04"
+      ],
+      "present": "개별 인증/IP/MFA 방어 코드와 시험",
+      "remaining": "실제 SSO/기관 인증·키 회전·전체 보안 감사",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/auth.ts",
+          "sha256": "b50e43aff0ebf6233f168bef98dcd6277dbb57070f8da16db0b9835fab5e8851",
+          "symbols": []
+        },
+        {
+          "path": "src/server/ip-enforcement.ts",
+          "sha256": "d56f5307ac28610932e29dd9e51fc0204fa2981bbe1c6dfaa10c0909d4cbf410",
+          "symbols": [
+            {
+              "name": "assertCompanyIp",
+              "line": 4
+            }
+          ]
+        },
+        {
+          "path": "src/server/mfa-enforcement.ts",
+          "sha256": "10dc3bcee33647c81e0508351dc780ccc260d372b395522aad5b6df593dd6da7",
+          "symbols": [
+            {
+              "name": "mfaState",
+              "line": 3
+            },
+            {
+              "name": "assertCompanyMfa",
+              "line": 9
+            }
+          ]
+        },
+        {
+          "path": "tests/server/auth-session-gate.test.ts",
+          "sha256": "9255c8e62d22fd8102ec84aca3d62b1fd170e23721ad08fe2a82d2e7f674e270",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/ip-access.test.ts",
+          "sha256": "0a2c327176164ced67d9189bdbc150dc3b84adf16e002a5668057ffb5c9188f7",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/mfa-policy.test.ts",
+          "sha256": "135f3511c0811056e7f7c8e91f855cd098c084420ee2cede63b4f3ae9a359964",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P12-T01",
+      "title": "감사 이벤트 수집·조회",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "모든 변경·민감 열람·발송·권한·인증·파기에서 audit 이벤트를 생성한다. 각 로그 화면은 전용 필터/안전 DTO를 사용한다.",
+      "acceptance": "변경과 event 원자성; 일반사용자 U/D 불가; 역할별 마스킹·필드/회사 격리",
+      "dependencies": [
+        "P01-T02",
+        "P02-T03"
+      ],
+      "present": "현재 권한·조회/CSV·열람 감사·선택·MFA/로그아웃/회수·가입/서명 확인/복구 요청/거절/이메일 코드 감사 원자성·실제 UI/DB/재시작",
+      "remaining": "비밀번호 변경의 개별 세션 종료·요청 상관, 나머지 변경/민감 열람/발송/권한/파기 생산 경로의 전체 매핑·원자성과 로그10개 화면의 전체 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/audit-events.ts",
+          "sha256": "a4d123d71948ac07d559652abe18aa93cfed3c59ef4aadd4ffb6197a8ce769dc",
+          "symbols": [
+            {
+              "name": "listOwnAuditEvents",
+              "line": 56
+            },
+            {
+              "name": "exportOwnAuditEvents",
+              "line": 70
+            },
+            {
+              "name": "listAuditEvents",
+              "line": 142
+            },
+            {
+              "name": "exportAuditEvents",
+              "line": 157
+            }
+          ]
+        },
+        {
+          "path": "src/server/audit.ts",
+          "sha256": "38e3ab79ea28195861f62658e9b2e74db110b5a3dee2f8b47612f62a99bd2898",
+          "symbols": [
+            {
+              "name": "audit",
+              "line": 3
+            },
+            {
+              "name": "auditAccess",
+              "line": 14
+            }
+          ]
+        },
+        {
+          "path": "src/server/activity-reviews.ts",
+          "sha256": "eb2252a1edd556664e9167e7e4c70341f367b09c199add569dd997542c87661b",
+          "symbols": [
+            {
+              "name": "listActivityReviews",
+              "line": 51
+            },
+            {
+              "name": "readActivityReview",
+              "line": 65
+            },
+            {
+              "name": "createActivityReview",
+              "line": 78
+            },
+            {
+              "name": "actOnActivityReview",
+              "line": 114
+            },
+            {
+              "name": "notifyActivityReview",
+              "line": 131
+            }
+          ]
+        },
+        {
+          "path": "tests/server/audit-events.test.ts",
+          "sha256": "6593aa2cb3d122b47f795bc858af55bb5328a127972425a01282a96384dca07c",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/activity-reviews.test.ts",
+          "sha256": "5b9d3a572297c0c3b9da5bb869a908e106a70a68e6da30b0c7871dcfc5adc01b",
+          "symbols": []
+        },
+        {
+          "path": "src/server/auth-adapter.ts",
+          "sha256": "f127be4a88391c8af541b6b464bcaae5ec6f4c5e98dfe29a5f272a516077646b",
+          "symbols": [
+            {
+              "name": "auditedAuthAdapter",
+              "line": 8
+            }
+          ]
+        },
+        {
+          "path": "src/server/auth.ts",
+          "sha256": "ed0fde147e6c490548d5f7b8c4604cca2664c01dd56f512b43ef6964d5f0dee8",
+          "symbols": []
+        },
+        {
+          "path": "src/server/context-selection.ts",
+          "sha256": "02f7dbf5ff22223f4b6be425deacfb5ce94c8d12d8b6f31365007713ca0e04ed",
+          "symbols": [
+            {
+              "name": "selectCompany",
+              "line": 16
+            },
+            {
+              "name": "selectService",
+              "line": 55
+            }
+          ]
+        },
+        {
+          "path": "src/contracts/context.ts",
+          "sha256": "cdaaa008dbac8ed5b2cd6d188411877e0f8b6c7adfaa24efb7422ea93c41ad70",
+          "symbols": []
+        },
+        {
+          "path": "src/app/api/v1/context/route.ts",
+          "sha256": "302dfaacea7c614f6de7ea0a84bfd80e45d5ecb5a765a93b39b1729ae44f1df8",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/audit-current-authority.test.ts",
+          "sha256": "f16297901a7bf48b585926dc1d0e672bea71b1913c09c74d9ded650093d0989f",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/audit-auth-atomicity.test.ts",
+          "sha256": "c6e3e9a3a3535202617cd8ee06a865be46fa4d745dbc84bb316fd9b783c867d1",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/context-audit.test.ts",
+          "sha256": "eee66827f64d363bc9b92a785cc099acd805d0e0eb430b252278d576634ce5ec",
+          "symbols": []
+        },
+        {
+          "path": "src/server/auth-mutation-scope.ts",
+          "sha256": "00a6bc9c132bdc2d3f9c163f303f13dca9cc2c2aab023d2f9c22a102dcdfabff",
+          "symbols": []
+        },
+        {
+          "path": "src/server/auth-mutations.ts",
+          "sha256": "edd0cfae84ff328ddb3b6fcec0c88031e3d01fd1a9e6e960f276c16c593c7d31",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/auth-mutations-audit.test.ts",
+          "sha256": "aeb397db861b66a1621d930632cc60c9009a5f2f0d57a7660f02db7c0a0ba208",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/password-policy.test.ts",
+          "sha256": "068bd6f743c2deb39396de11401869b394a68e26473d560ddbcc532521f50868",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/auth-public-audit.test.ts",
+          "symbols": [],
+          "sha256": "c52cd6d39428af3130a33033146967aa48e37e2f1452f3d274b6bee587c86688"
+        },
+        {
+          "path": "src/server/credential-lock.ts",
+          "symbols": [],
+          "sha256": "d2f1f3115ab3b525b2ee3591eeef93b0f3130a212d4776e47726b55a1d17d778"
+        },
+        {
+          "path": "src/server/credential-scope.ts",
+          "symbols": [],
+          "sha256": "de115209ed11431f5ffd9186caefe76fa24af3ac5a5309f07c4691582c7b6d36"
+        },
+        {
+          "path": "prisma/migrations/20261002133000_utc_timestamps/migration.sql",
+          "symbols": [],
+          "sha256": "0a15996e62acaf1717b93e4f96d34e7f0642401f4bc70cfeea46607dd7aba1ed"
+        }
+      ],
+      "partialEvidence": "docs/qa/P12-T01/revalidation/public-auth/README.md",
+      "lastRevalidatedAt": "2026-10-04T09:46:16.202834+00:00"
+    },
+    {
+      "id": "P12-T02",
+      "title": "집계·대시보드·서비스별 상세",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "응답/동의/수신거부/서비스/라이선스/원장 원천에서 통계를 계산하고 날짜/서비스 필터·스냅샷을 구현한다.",
+      "acceptance": "seed 기대값과 SQL 집계 일치; 정정·철회·파기 반영; 현재0·기간경계·재집계 비교",
+      "dependencies": [
+        "P06-T02",
+        "P07-T02",
+        "P10-T03"
+      ],
+      "present": "원천 집계·기간/서비스 필터",
+      "remaining": "원장/라이선스 전체 원천·재집계·전체 화면",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/analytics.ts",
+          "sha256": "311b8f0b30d8c68ea0900908df8fe1aeed36e75bc221f816cee54ff5c30429f9",
+          "symbols": [
+            {
+              "name": "dashboardAnalytics",
+              "line": 13
+            }
+          ]
+        },
+        {
+          "path": "src/server/marketing.ts",
+          "sha256": "290d6a24752f5279965c04c918bf4f65bf3adce4d63bab300308dd77b9e28b0f",
+          "symbols": [
+            {
+              "name": "marketingContactHash",
+              "line": 17
+            },
+            {
+              "name": "lockMarketingContact",
+              "line": 21
+            },
+            {
+              "name": "marketingDenial",
+              "line": 44
+            },
+            {
+              "name": "listMarketing",
+              "line": 87
+            },
+            {
+              "name": "readMarketing",
+              "line": 116
+            },
+            {
+              "name": "marketingSources",
+              "line": 120
+            },
+            {
+              "name": "grantMarketing",
+              "line": 139
+            },
+            {
+              "name": "createMarketing",
+              "line": 166
+            }
+          ]
+        },
+        {
+          "path": "tests/server/analytics.test.ts",
+          "sha256": "74abc14d50818b66ff21b3ca0cd257da1cde18f82b92118975cd3dbcf1a8e2ba",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/marketing.test.ts",
+          "sha256": "12c949833622928a979a57c72f6d50cff2a70cc0977cb56d8c591b91a7603f0b",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P12-T03",
+      "title": "준수 보고·월마감·출력",
+      "previousStatus": "planned",
+      "currentStatus": "completed",
+      "scope": "증거가 있는 준수 점검, 월별 마감 snapshot, 필터 적용 export·PDF/CSV 작업과 만료 파일을 구현한다.",
+      "acceptance": "근거없는 준수 통과 금지; 같은필터 동일합계; 다운로드 제한·CSV수식 무해화",
+      "dependencies": [
+        "P12-T01",
+        "P12-T02",
+        "P07-T03"
+      ],
+      "present": "5개 근거·불변 월마감·PDF/CSV·만료·현재권한/원자성·중복query422. 관련80개·v25빌드/타입/lint·실제Ego/파일/SQL/새프로세스 검증",
+      "remaining": "해당 Task 원래 수용 충족. 선행 전체·외부·전체 출시 상태는 각 Task에서 유지.",
+      "complete": true,
+      "reviewMethod": "requirement-by-requirement acceptance with source, PostgreSQL, production HTTP, actual browser/file/SQL and new-process evidence",
+      "sources": [
+        {
+          "path": "src/server/compliance-close.ts",
+          "sha256": "80f4a6d898e2122f3efc9a6bb7a2ed700ad34970e144bbf0ea3ada61537d3861",
+          "symbols": [
+            {
+              "name": "complianceSnapshot",
+              "line": 38
+            },
+            {
+              "name": "authorizeComplianceClose",
+              "line": 66
+            },
+            {
+              "name": "readComplianceClose",
+              "line": 78
+            },
+            {
+              "name": "closeComplianceMonth",
+              "line": 88
+            },
+            {
+              "name": "complianceCloseCsv",
+              "line": 126
+            },
+            {
+              "name": "renderComplianceCsv",
+              "line": 138
+            }
+          ]
+        },
+        {
+          "path": "tests/server/compliance-close.test.ts",
+          "sha256": "91e29eb470b0c3eaec22edf160a33bbe58e92783c4f082edd6fa62a4a183e3b7",
+          "symbols": []
+        },
+        {
+          "path": "src/server/compliance-exports.ts",
+          "sha256": "326aba4f40974d0419b99da06182e134ba28a898edb3f6a40a494b8a00eab081",
+          "symbols": [
+            {
+              "name": "createComplianceExport",
+              "line": 48
+            },
+            {
+              "name": "listComplianceExports",
+              "line": 70
+            },
+            {
+              "name": "getComplianceExport",
+              "line": 79
+            },
+            {
+              "name": "changeComplianceExport",
+              "line": 82
+            },
+            {
+              "name": "downloadComplianceExport",
+              "line": 92
+            },
+            {
+              "name": "claimComplianceExport",
+              "line": 128
+            },
+            {
+              "name": "processComplianceExport",
+              "line": 142
+            },
+            {
+              "name": "runOneComplianceExport",
+              "line": 184
+            },
+            {
+              "name": "cleanupComplianceExports",
+              "line": 198
+            }
+          ]
+        },
+        {
+          "path": "src/contracts/compliance-exports.ts",
+          "sha256": "25e53bf0808323a19590110e8ee11164e0e2723c32b99da8d206ffbbd1ffe7bd",
+          "symbols": []
+        },
+        {
+          "path": "src/components/ComplianceExports.tsx",
+          "sha256": "fb9eaaeffc2480a030d0877a62bfd410110c0b74c4631621c6930ea7889ad487",
+          "symbols": [
+            {
+              "name": "ComplianceExports",
+              "line": 8
+            }
+          ]
+        },
+        {
+          "path": "tests/server/compliance-exports.test.ts",
+          "sha256": "33554111442bc19ffc2534cc8529c370edf9d7997664a2b673d17203e6d270f9",
+          "symbols": []
+        },
+        {
+          "path": "prisma/migrations/20261005080000_compliance_exports/migration.sql",
+          "sha256": "ec8047a40346db0e4ee60b6b5fac5da458d513641f5e4bc2988e0cc322a23dba",
+          "symbols": []
+        },
+        {
+          "path": "src/server/compliance-evidence.ts",
+          "sha256": "52f7a459ab5ceaae8cfd1546964d56502ce64c8559bcf77cfda12b830cb9f50c",
+          "symbols": [
+            {
+              "name": "complianceEvidenceHash",
+              "line": 5
+            },
+            {
+              "name": "collectComplianceEvidence",
+              "line": 11
+            }
+          ]
+        },
+        {
+          "path": "src/contracts/compliance-evidence.ts",
+          "sha256": "549470cd1f3c22ac3e865819f0e1c9b6f3ed1a69abf415433e3efeb87bf5f4f1",
+          "symbols": [
+            {
+              "name": "complianceEvidenceChecks",
+              "line": 19
+            }
+          ]
+        },
+        {
+          "path": "src/contracts/analytics.ts",
+          "sha256": "fc1a13cb85b043b8533acdc0bff3cff6f61c5a92e190019ad4c83e1b1e381ca2",
+          "symbols": []
+        },
+        {
+          "path": "src/components/StatisticsPages.tsx",
+          "sha256": "6a167724d9af70d63298e88919c31530e6a512e320d1059e07aa98828e7926de",
+          "symbols": [
+            {
+              "name": "PrivacyStatistics",
+              "line": 19
+            },
+            {
+              "name": "CompliancePage",
+              "line": 66
+            }
+          ]
+        },
+        {
+          "path": "tests/server/compliance-evidence.test.ts",
+          "sha256": "0c4122bfb48c27e13213e42efcf30b5dacb095126b71d0e7431873931d757cbb",
+          "symbols": []
+        },
+        {
+          "path": "src/app/api/v1/analytics/closes/route.ts",
+          "sha256": "a1269919b0b5459fb1696a6a0c8b0ac10560aef03dff5d53c3f094c6c1ba4671",
+          "symbols": []
+        },
+        {
+          "path": "src/app/api/v1/analytics/exports/route.ts",
+          "sha256": "2f75ee1aa65f51c73c46ec4f8dff60724df4bc694e33b7f2a77966d421cfc160",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/compliance-lifecycle.test.ts",
+          "sha256": "d2da3711b9a4120a2842308f4abc6d9cd1af1977c81105e2c6a1ec5ae4613726",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/compliance-close-authority.test.ts",
+          "sha256": "dc5f6c8cc6f1e5ffb30f7f96bc9d497039227b1345b69811b9f3ef4b655f0fa9",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/analytics.test.ts",
+          "sha256": "74abc14d50818b66ff21b3ca0cd257da1cde18f82b92118975cd3dbcf1a8e2ba",
+          "symbols": []
+        }
+      ],
+      "followupEvidence": "docs/qa/P12-T03/completion.md"
+    },
+    {
+      "id": "P12-T04",
+      "title": "로그·통계 게이트",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "모든 로그 경로와 서비스별 동적 대시보드를 실제 이벤트로 검증한다.",
+      "acceptance": "존재하지 않는 serviceId·다른회사 거부; 0/1/11/100개 pagination; 대량조회 plan/index 확인",
+      "dependencies": [
+        "P12-T03",
+        "P11-T05"
+      ],
+      "present": "개별 로그·통계 구현과 시험",
+      "remaining": "전 경로·0/1/11/100행·대량 쿼리 계획 검증",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/audit-events.ts",
+          "sha256": "82a27b0528b68a425a61ca50921933ae0f4c2fc0f164746b884a6cfa8e284e3e",
+          "symbols": [
+            {
+              "name": "listOwnAuditEvents",
+              "line": 52
+            },
+            {
+              "name": "exportOwnAuditEvents",
+              "line": 65
+            },
+            {
+              "name": "listAuditEvents",
+              "line": 128
+            },
+            {
+              "name": "exportAuditEvents",
+              "line": 138
+            }
+          ]
+        },
+        {
+          "path": "src/server/analytics.ts",
+          "sha256": "311b8f0b30d8c68ea0900908df8fe1aeed36e75bc221f816cee54ff5c30429f9",
+          "symbols": [
+            {
+              "name": "dashboardAnalytics",
+              "line": 13
+            }
+          ]
+        },
+        {
+          "path": "tests/server/audit-events.test.ts",
+          "sha256": "2a2b761efe90470cf5610ea4f44fd8a335287c3bd7a4d1d124fe51865c2bcd9a",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/analytics.test.ts",
+          "sha256": "74abc14d50818b66ff21b3ca0cd257da1cde18f82b92118975cd3dbcf1a8e2ba",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P13-T01",
+      "title": "공지·가이드·문의 서버 CRUD",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "시스템 운영자용 생성/수정/미리보기/게시/정렬/삭제와 사용자 목록/상세·PDF 다운로드·개선제안을 구현한다.",
+      "acceptance": "운영자만 공통자료 수정; 일반회원403; HTML sanitize; 공지삭제 링크/검색/첨부 일관성",
+      "dependencies": [
+        "P02-T03",
+        "P01-T03"
+      ],
+      "present": "공지·가이드·문의 CRUD와 첨부",
+      "remaining": "원본 첨부/문의 대조·역할별 새 브라우저 E2E",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/notices.ts",
+          "sha256": "bc146cd4945cbaff1e53c21594ac513e19009910e675d06b9f6a2649aa5f8683",
+          "symbols": [
+            {
+              "name": "listNotices",
+              "line": 25
+            },
+            {
+              "name": "readNotice",
+              "line": 40
+            },
+            {
+              "name": "createNotice",
+              "line": 47
+            },
+            {
+              "name": "updateNotice",
+              "line": 58
+            },
+            {
+              "name": "archiveNotice",
+              "line": 78
+            }
+          ]
+        },
+        {
+          "path": "src/server/guides.ts",
+          "sha256": "ff62568b930ab03241f5d9b63c082d64e3c2596580c9c0312b339a82c34794f2",
+          "symbols": [
+            {
+              "name": "listGuides",
+              "line": 22
+            },
+            {
+              "name": "readGuide",
+              "line": 34
+            },
+            {
+              "name": "createGuide",
+              "line": 40
+            },
+            {
+              "name": "updateGuide",
+              "line": 49
+            },
+            {
+              "name": "replaceGuideFile",
+              "line": 68
+            },
+            {
+              "name": "archiveGuide",
+              "line": 99
+            },
+            {
+              "name": "downloadGuide",
+              "line": 117
+            }
+          ]
+        },
+        {
+          "path": "src/server/support-tickets.ts",
+          "sha256": "c517cb46f241a357d2bef7462874e07242cbaa051e333749361dff78258150bd",
+          "symbols": [
+            {
+              "name": "listSupportTickets",
+              "line": 45
+            },
+            {
+              "name": "readSupportTicket",
+              "line": 66
+            },
+            {
+              "name": "createSupportTicket",
+              "line": 77
+            },
+            {
+              "name": "updateSupportTicket",
+              "line": 90
+            },
+            {
+              "name": "replySupportTicket",
+              "line": 108
+            },
+            {
+              "name": "changeSupportTicketState",
+              "line": 125
+            },
+            {
+              "name": "archiveSupportTicket",
+              "line": 145
+            }
+          ]
+        },
+        {
+          "path": "tests/server/notices.test.ts",
+          "sha256": "5c08a92b3a2b6b8501ea614deda92ca65cef1b7c0c988f39fbfe2f1bd86845e8",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/guides.test.ts",
+          "sha256": "7379833c50d199e16bacf589f04d1e40125b3b66717bbb7177953d7d87782cf9",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/support-tickets.test.ts",
+          "sha256": "22d22ef0de617497bcad3fb85408feef80fe11a0107c47cf339149d46f164607",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P13-T02",
+      "title": "시스템·빈상태·접근오류 연결",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "/, /IE, /loading, /service/none, /company-info, /expert/select-company 등 시스템 경로를 실제 인증/회사 상태에 연결한다.",
+      "acceptance": "리디렉션 루프0; GET 로그아웃 부작용 제거; 빈권한→정당한 요청흐름; 오류후 재시도",
+      "dependencies": [
+        "P03-T02",
+        "P13-T01"
+      ],
+      "present": "빈 권한 요청·회사 선택·오류/로딩 연결",
+      "remaining": "원본 전문가 경로·모든 리디렉션/재시도 UI",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/access-requests.ts",
+          "sha256": "548ca3b7a0af515dabb211c6dac93b5bd758311586d8a14dd0518b5ad303c94a",
+          "symbols": [
+            {
+              "name": "listAccessRequests",
+              "line": 30
+            },
+            {
+              "name": "createAccessRequest",
+              "line": 49
+            },
+            {
+              "name": "decideAccessRequest",
+              "line": 67
+            },
+            {
+              "name": "cancelAccessRequest",
+              "line": 95
+            }
+          ]
+        },
+        {
+          "path": "src/server/expert-assignments.ts",
+          "sha256": "43aa584944e4a53021082a5e210fd170208e7cbddd4dba6dc2148a6cab23b86e",
+          "symbols": [
+            {
+              "name": "listExpertAssignments",
+              "line": 61
+            },
+            {
+              "name": "getExpertAssignment",
+              "line": 76
+            },
+            {
+              "name": "expertOptions",
+              "line": 86
+            },
+            {
+              "name": "createExpertAssignment",
+              "line": 97
+            },
+            {
+              "name": "updateExpertAssignment",
+              "line": 132
+            },
+            {
+              "name": "revokeExpertAssignment",
+              "line": 155
+            },
+            {
+              "name": "expireExpertAssignments",
+              "line": 173
+            }
+          ]
+        },
+        {
+          "path": "tests/server/access-requests.test.ts",
+          "sha256": "ff346277618cd97bfa8e1a7a73acc602f3c136ac40f3424abf053ed5cbc2d62c",
+          "symbols": []
+        },
+        {
+          "path": "tests/server/auth-navigation.test.ts",
+          "sha256": "023ab7a7d38aa53708a5d0f9d4f161244bd3fb6ae90a451207084fcc271bf3fc",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P13-T03",
+      "title": "내비게이션·모달·캐시 일관성",
+      "previousStatus": "planned",
+      "currentStatus": "in_progress",
+      "scope": "메뉴·헤더·MY·서비스 전환·권한에 맞는 action, 공통 Table/Form 상태와 서버 cache invalidation을 연결한다.",
+      "acceptance": "모든 visible action이 실제API/이동에 연결; loading·empty·validation·conflict·forbidden·retry·disabled 확인",
+      "dependencies": [
+        "P04-T04",
+        "P08-T04",
+        "P10-T05",
+        "P13-T02"
+      ],
+      "present": "회사/서비스 전환·메뉴·MY·모달 기반",
+      "remaining": "모든 visible action 실동작·권한/오류/캐시 전수",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/context.ts",
+          "sha256": "9ab98eca0702acc602541829516265a23b379faf4bc63da9433fd8c1ebee6e54",
+          "symbols": [
+            {
+              "name": "activeMembershipWhere",
+              "line": 11
+            },
+            {
+              "name": "requireActor",
+              "line": 18
+            },
+            {
+              "name": "requireContext",
+              "line": 28
+            },
+            {
+              "name": "requireService",
+              "line": 57
+            },
+            {
+              "name": "serviceScope",
+              "line": 70
+            },
+            {
+              "name": "contextDto",
+              "line": 80
+            }
+          ]
+        },
+        {
+          "path": "tests/server/auth-navigation.test.ts",
+          "sha256": "023ab7a7d38aa53708a5d0f9d4f161244bd3fb6ae90a451207084fcc271bf3fc",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P13-T04",
+      "title": "전 페이지 화면 게이트",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "181개 라우트와 추가 관리화면의 직접URL/새로고침/브라우저뒤로/모바일을 검증한다.",
+      "acceptance": "모든 동적fixture 경로 1개 이상 정상/오류; 1440/768/390 주요화면 및 전페이지 레이아웃; 캡처/증거목록",
+      "dependencies": [
+        "P13-T03",
+        "P12-T04"
+      ],
+      "present": "181경로 매핑·공통 디스패처 기반",
+      "remaining": "전 경로 동적 fixture·1440/768/390·뒤로가기 증거",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/context.ts",
+          "sha256": "9ab98eca0702acc602541829516265a23b379faf4bc63da9433fd8c1ebee6e54",
+          "symbols": [
+            {
+              "name": "activeMembershipWhere",
+              "line": 11
+            },
+            {
+              "name": "requireActor",
+              "line": 18
+            },
+            {
+              "name": "requireContext",
+              "line": 28
+            },
+            {
+              "name": "requireService",
+              "line": 57
+            },
+            {
+              "name": "serviceScope",
+              "line": 70
+            },
+            {
+              "name": "contextDto",
+              "line": 80
+            }
+          ]
+        },
+        {
+          "path": "tests/server/auth-navigation.test.ts",
+          "sha256": "023ab7a7d38aa53708a5d0f9d4f161244bd3fb6ae90a451207084fcc271bf3fc",
+          "symbols": []
+        }
+      ]
+    },
+    {
+      "id": "P14-T01",
+      "title": "로컬 데이터 이전·가짜 상태 제거",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "기존 localStorage 폼/응답/회사/프로필/동의설정의 export→dry-run→import, 중복키/회사귀속을 구현한다. 도메인 저장은 모두 DB로 전환한다.",
+      "acceptance": "이관전후 개수/필드 검증; 잘못된자료 격리; 원본백업 유지; 비밀번호/임의token 이관0",
+      "dependencies": [
+        "P13-T04"
+      ],
+      "present": "주요 도메인은 DB 사용; 구형 미사용 localStorage 파일 잔존",
+      "remaining": "export→dry-run→import 및 원본 보존·격리 이관 구현",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/forms.ts",
+          "sha256": "7374b2a96f2fb1aea7f2d944f3cabb4da18aac6c8279a4c5359baf1c5f077ad0",
+          "symbols": [
+            {
+              "name": "contentDto",
+              "line": 36
+            },
+            {
+              "name": "formDto",
+              "line": 52
+            },
+            {
+              "name": "fingerprint",
+              "line": 70
+            },
+            {
+              "name": "lockCurrentForm",
+              "line": 92
+            },
+            {
+              "name": "requireForm",
+              "line": 122
+            },
+            {
+              "name": "readForm",
+              "line": 129
+            },
+            {
+              "name": "createForm",
+              "line": 155
+            },
+            {
+              "name": "updateForm",
+              "line": 167
+            }
+          ]
+        },
+        {
+          "path": "src/server/company-management.ts",
+          "sha256": "3f5123c770ede19f35d315694f342b73825d59fe7d1425925ee5194d235a9b26",
+          "symbols": [
+            {
+              "name": "businessFileDto",
+              "line": 17
+            },
+            {
+              "name": "companyDto",
+              "line": 21
+            },
+            {
+              "name": "getCompany",
+              "line": 30
+            },
+            {
+              "name": "listCompanies",
+              "line": 35
+            },
+            {
+              "name": "requestCompanyClosure",
+              "line": 73
+            },
+            {
+              "name": "cancelCompanyClosure",
+              "line": 83
+            },
+            {
+              "name": "finishBusinessFileDeletion",
+              "line": 92
+            },
+            {
+              "name": "cleanupBusinessFiles",
+              "line": 103
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P14-T02",
+      "title": "전체 API·DB·브라우저 회귀",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "TASKS/매핑의 모든 체크와 계약·권한·CRUD·경합·재시작·실제 파일·동적경로 E2E를 실행한다.",
+      "acceptance": "181행 각각 backend/UI/test 증거; 실패·skip 숨김0; build/type/lint오류0; 테스트용 메모리DB로 대체금지",
+      "dependencies": [
+        "P14-T01",
+        "P09-T06",
+        "P10-T05",
+        "P11-T05"
+      ],
+      "present": "개별 회귀·계약/계획 검사가 존재",
+      "remaining": "현재 전체 회귀·181행 backend/UI/test 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/context.ts",
+          "sha256": "9ab98eca0702acc602541829516265a23b379faf4bc63da9433fd8c1ebee6e54",
+          "symbols": [
+            {
+              "name": "activeMembershipWhere",
+              "line": 11
+            },
+            {
+              "name": "requireActor",
+              "line": 18
+            },
+            {
+              "name": "requireContext",
+              "line": 28
+            },
+            {
+              "name": "requireService",
+              "line": 57
+            },
+            {
+              "name": "serviceScope",
+              "line": 70
+            },
+            {
+              "name": "contextDto",
+              "line": 80
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P14-T03",
+      "title": "외부 서비스·staging 운영 검증",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "공급자 sandbox와 staging에서 실제 수신·결제·환불·SSO·서명/본인인증·웹훅·worker 중단복구를 확인한다.",
+      "acceptance": "서비스별 증거 ID/시각/상태; 미설정은 blocked 표시; 실패대사/알람/재시도 절차",
+      "dependencies": [
+        "P14-T02"
+      ],
+      "present": "local 및 미연결 방어 기반만 확인",
+      "remaining": "공급자별 실제 sandbox/staging 결과ID·장애복구",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/jobs.ts",
+          "sha256": "cd324ad199a25f4814c0df234619393cbe5b3d572fe9f3e93d418390cb8a771e",
+          "symbols": [
+            {
+              "name": "enqueueMail",
+              "line": 22
+            },
+            {
+              "name": "enqueueServiceMail",
+              "line": 36
+            },
+            {
+              "name": "enqueueMarketingMail",
+              "line": 47
+            },
+            {
+              "name": "claimJob",
+              "line": 63
+            },
+            {
+              "name": "deliverMail",
+              "line": 172
+            },
+            {
+              "name": "runOneJob",
+              "line": 200
+            }
+          ]
+        },
+        {
+          "path": "src/server/sms-adapter.ts",
+          "sha256": "61012e2ae07a7bbd1d9e091b2c52c2335b3b4a85adc89a469e5a0a3a7ad4c899",
+          "symbols": [
+            {
+              "name": "classifySms",
+              "line": 16
+            },
+            {
+              "name": "smsReceiptFile",
+              "line": 20
+            },
+            {
+              "name": "deliverSms",
+              "line": 24
+            },
+            {
+              "name": "applySmsReceipt",
+              "line": 38
+            }
+          ]
+        },
+        {
+          "path": "src/server/payments.ts",
+          "sha256": "68b1705540a055374474ffa4d6f34f47622208a4a99c72a84f50febb86eb3825",
+          "symbols": [
+            {
+              "name": "createPaymentOrder",
+              "line": 21
+            },
+            {
+              "name": "readPaymentOrder",
+              "line": 31
+            },
+            {
+              "name": "rejectPaymentReturn",
+              "line": 37
+            },
+            {
+              "name": "applyPaymentEvent",
+              "line": 49
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P14-T04",
+      "title": "마이그레이션·백업·복구·운영 문서",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "빈환경 설치, 업데이트/복구 리허설, DB와 객체저장소 백업·복원·재파기, 비밀/키 회전·보관 정책을 문서화하고 실행한다.",
+      "acceptance": "별도환경 백업복원 성공; 기존 schema 업그레이드; worker 재기동; 복구 후 권한/파기 일관성",
+      "dependencies": [
+        "P14-T02"
+      ],
+      "present": "migration/부분 shadow 설치 증거 존재",
+      "remaining": "별도환경 DB/객체 백업복구·재파기·키 회전 실증",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": [
+        {
+          "path": "src/server/db.ts",
+          "sha256": "ae25758abbeac24e6205675461aad02a63d998c528dfc877bbb1f132cfaf3fb2",
+          "symbols": []
+        },
+        {
+          "path": "src/server/file-storage.ts",
+          "sha256": "c170df25a5ef48b73cea4470895768185244ec6d690461f955baed5f102c3da7",
+          "symbols": [
+            {
+              "name": "storageObjectName",
+              "line": 16
+            },
+            {
+              "name": "encryptStoredObject",
+              "line": 20
+            },
+            {
+              "name": "decryptStoredObject",
+              "line": 28
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P14-T05",
+      "title": "최종 수용·릴리스 보고",
+      "previousStatus": "planned",
+      "currentStatus": "planned",
+      "scope": "모든 Task/evidence와 미해결 항목을 대조하고 CHANGELOG/릴리스노트/운영설명/최종 매핑을 작성한다.",
+      "acceptance": "전 Task 체크·외부검증 완료·critical/high미해결0·무근거 완성 주장0; 미충족 있으면 전체 완료금지",
+      "dependencies": [
+        "P14-T03",
+        "P14-T04"
+      ],
+      "present": "최종 완료 선언 철회와 근거 재검토 중",
+      "remaining": "모든 Task·외부·복구·보안·릴리스 수용",
+      "complete": false,
+      "reviewMethod": "source mapping and requirement comparison; tests not rerun by this inventory",
+      "sources": []
+    }
+  ]
+}

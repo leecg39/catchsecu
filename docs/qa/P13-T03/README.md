@@ -1,23 +1,22 @@
-# P13-T03 내비게이션·모달·캐시 일관성
+# P13-T03 내비게이션·모달·캐시 일관성 — 미완료
 
-## 개요
+> 2026-10-04: 실제 부분 구현을 근거로 planned에서 in_progress로 정정했다. 전체 완료는 아니다. [근거](../status-revalidation/README.md).
 
-좌측 사이드바 11개 메뉴 섹션, 상단 헤더의 회사 전환기, 서비스 선택기, 사용자 프로필 팝오버, 공통 모달 및 클라이언트/서버 캐시 무효화 일관성을 검증한다.
+2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
 
-## 구현 내용
+## 현재 확인
 
-1. **내비게이션 및 액션 연동**:
-   - `AppShell.tsx` 사이드바 아코디언 메뉴 및 라우트 이동
-   - 권한(`capabilities`)에 따른 메뉴/버튼 노출/비활성화 처리
-   - 회사 전환 시 `/api/v1/context` 호출 및 전체 상태 재동기화
-2. **상태 관리 및 일관성**:
-   - `useResource` 커스텀 훅의 자동 AbortController 및 `reload()`를 통한 신선한 데이터 유지
-   - 폼 생성 모달, 서비스 개선 제안 모달 등 주요 모달 동작
+회사/서비스 전환·메뉴·MY·모달 기반. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
 
-## 검증 내역
+- [src/server/context.ts](../../../src/server/context.ts) — activeMembershipWhere, requireActor, requireContext, requireService
+- [tests/server/auth-navigation.test.ts](../../../tests/server/auth-navigation.test.ts)
 
-- 테스트 스위트: `tests/server/auth-navigation.test.ts`, `tests/server/platform.test.ts`
-- 주요 검증 항목:
-  - 활성 액션 클릭 시 유효한 API 호출 및 응답 반영
-  - 로딩, 빈 상태(Empty), 유효성 에러, 충돌(409), 권한 부족(403) 시 올바른 UI 피드백 노출
-  - 캐시 불일치로 인한 오작동 방지
+## 남은 구현·수용
+
+모든 visible action 실동작·권한/오류/캐시 전수.
+
+원래 범위: 메뉴·헤더·MY·서비스 전환·권한에 맞는 action, 공통 Table/Form 상태와 서버 cache invalidation을 연결한다.
+
+수용 조건: 모든 visible action이 실제API/이동에 연결; loading·empty·validation·conflict·forbidden·retry·disabled 확인
+
+선행: P04-T04, P08-T04, P10-T05, P13-T02. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.

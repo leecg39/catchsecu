@@ -2,3 +2,21 @@
 {"event":"ready","port":3100,"hostname":"127.0.0.1","trustedProxyNetworks":0,"clientIp":"socket-with-signed-attestation"}
 (node:30204) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
+⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `prisma.membership.findFirst()` invocation:
+
+
+The column `SecurityPolicy.ipRestriction` does not exist in the current database.
+    at async (src/server/auth.ts:99:35)
+    at async o (src/server/context.ts:19:19) {
+  code: 'P2022',
+  meta: {
+    modelName: 'Membership',
+    driverAdapterError: Error [DriverAdapterError]: ColumnNotFound
+        at ignore-listed frames {
+      [cause]: [Object]
+    }
+  },
+  clientVersion: '7.10.0',
+  digest: '424083167'
+}

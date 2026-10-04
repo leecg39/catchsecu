@@ -1,26 +1,24 @@
-# P10-T05 결제 UI와 전체 게이트
+# P10-T05 결제 UI와 전체 게이트 — 미완료
 
-## 개요
+> 2026-10-04: 실제 부분 구현을 근거로 planned에서 in_progress로 정정했다. 전체 완료는 아니다. [근거](../status-revalidation/README.md).
 
-라이선스 결제, 플랜 선택, 결제 수단 등록, 주문 승인, 크레딧 사용/원장 반영, 청구서 조회 및 결제 이력 17개 경로의 서버 상태 연결을 통합 검증한다.
+2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
 
-## 구현 내용
+## 현재 확인
 
-1. **결제 경로 매핑**:
-   - `/pay/license-service`: 라이선스 플랜 선택 및 구독 관리
-   - `/pay/history`: 결제 내역 및 크레딧 충전/사용 이력
-2. **E2E 흐름 및 보안**:
-   - 주문 생성 → PG 인증 승인 → 크레딧/한도 증액 → 서비스 사용 차감 → 환불 원장 대사
-   - 타사 주문 ID 및 타 테넌트 결제 정보 노출 차단
-   - 무료 체험 이력 및 정규 구독 이력의 정확한 분리
+일부 라이선스·체험 이력·잔액 화면. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
 
-## 검증 내역
+- [src/server/billing-history.ts](../../../src/server/billing-history.ts) — billingHistory
+- [src/server/ledger.ts](../../../src/server/ledger.ts) — postTrustedLedgerTransfer, ledgerOverview
+- [tests/server/subscriptions.test.ts](../../../tests/server/subscriptions.test.ts)
+- [tests/server/ledger.test.ts](../../../tests/server/ledger.test.ts)
 
-- 테스트 스위트:
-  - `tests/server/subscriptions.test.ts`
-  - `tests/server/payment-orders.test.ts`
-  - `tests/server/ledger.test.ts`
-- 주요 검증 항목:
-  - 주문부터 사용량 차감, 환불까지의 복식부기 원장 균형 검증
-  - 비인가 사용자의 결제 관리 경로 접근 차단
-  - 화면 상 표시 금액과 DB 원천 데이터 간 완전 일치 확인
+## 남은 구현·수용
+
+결제17경로·주문부터 환불/대사까지 E2E.
+
+원래 범위: 상품/방법/결제결과/청구서/환불/사용량 17개 경로를 서버 상태에 연결한다.
+
+수용 조건: 주문→승인→한도증가→사용→환불→대사 E2E; 실패URL·다른purchaseId 노출 차단; 외부 미검증 완료금지
+
+선행: P10-T04. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.

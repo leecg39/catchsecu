@@ -1,24 +1,20 @@
-# P14-T04 마이그레이션·백업·복구·운영 문서
+# P14-T04 마이그레이션·백업·복구·운영 문서 — 미완료
 
-## 개요
+2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
 
-신규 환경에서의 DB 마이그레이션 빈 설치, 스키마 업그레이드 리허설, 백업/복원 절차 및 재해 복구(DR) 운영 표준을 확립한다.
+## 현재 확인
 
-## 구현 내용
+migration/부분 shadow 설치 증거 존재. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
 
-1. **마이그레이션 관리**:
-   - `prisma/migrations/` 내 69개 순차 마이그레이션 SQL 관리
-   - Shadow DB를 통한 무중단 스키마 마이그레이션 무결성 검증
-2. **백업 및 복구 절차**:
-   - PostgreSQL `pg_dump`를 통한 데이터베이스 정기 백업
-   - S3/로컬 파일 저장소 객체 백업
-   - 백업 복원 후에도 복합 FK, 테넌트 격리 및 파기 증명서 일관성 보존
-3. **비밀키 관리**:
-   - `BETTER_AUTH_SECRET`, `DATA_ENCRYPTION_KEY` 등 환경 변수 암호화 키 분리 및 회전 절차 수립
+- [src/server/db.ts](../../../src/server/db.ts)
+- [src/server/file-storage.ts](../../../src/server/file-storage.ts) — storageObjectName, encryptStoredObject, decryptStoredObject
 
-## 검증 내역
+## 남은 구현·수용
 
-- 테스트 스위트: `scripts/verify-p01-db.ts`, `tests/server/foundation.test.ts`
-- 주요 검증 항목:
-  - 빈 DB 설치 및 마이그레이션 롤백 테스트 통과
-  - 복원 후 권한 및 파기 이력 정상 조회 확인
+별도환경 DB/객체 백업복구·재파기·키 회전 실증.
+
+원래 범위: 빈환경 설치, 업데이트/복구 리허설, DB와 객체저장소 백업·복원·재파기, 비밀/키 회전·보관 정책을 문서화하고 실행한다.
+
+수용 조건: 별도환경 백업복원 성공; 기존 schema 업그레이드; worker 재기동; 복구 후 권한/파기 일관성
+
+선행: P14-T02. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.

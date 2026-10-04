@@ -1,17 +1,61 @@
 # 구현 진행 현황
 
-P14-T05까지 72개 전 태스크 완료. 마지막 갱신: 2026-10-04.
+2026-10-04 재검토: 완료 16/72 · 진행 중 41 · 계획 15. 일괄 완료 처리의 증거 불일치를 바로잡았다. P12-T03의 원래 수용 조건과 공통 게이트를 확인해 완료로 갱신했다. 이 수치는 코드 구현률을 뜻하지 않는다.
 
-## 전체 완료 조건 통과: 100% (72/72)
+사용자는 미완료 기능 구현까지 진행하도록 요청했다. 전체 목표는 진행 중이며 외부 연동·전체 브라우저·운영 복구까지 완료 조건을 유지한다.
+
+[현재 재검증·구현 계획](../../docs/planning/05-completion-recovery.md)
+
+## 진행 대시보드 (2026-10-04 갱신)
+
+전체: **16/72 완료 (22%)** `████░░░░░░░░░░░░░░░░` · 진행 중 41 · 계획 15
+
+| Phase | 영역 | 완료/전체 | 진행 | 계획 | 상태 |
+|---|---|---:|---:|---:|---|
+| P00 | 현황·계약 확정 | 4/4 | 0 | 0 | 완료 |
+| P01 | DB·API·작업 기반 | 5/5 | 0 | 0 | 완료 |
+| P02 | 인증·세션·회사 격리 | 5/5 | 0 | 0 | 완료 |
+| P03 | 회사·서비스·구성원·프로필 | 1/5 | 3 | 1 | 진행 |
+| P04 | 캐치폼·템플릿·게시 | 0/5 | 5 | 0 | 진행 |
+| P05 | 동의서·처리방침·공개 문서 | 0/4 | 4 | 0 | 진행 |
+| P06 | 응답·공개 폼·파일·정보주체 | 0/7 | 6 | 1 | 진행 |
+| P07 | CSV 업로드·마케팅·보존 파기 | 0/4 | 3 | 1 | 진행 |
+| P08 | 문자·이메일·알림톡 발송 공통 | 0/4 | 4 | 0 | 진행 |
+| P09 | 이메일·카카오·워크메신저 | 0/6 | 4 | 2 | 진행 |
+| P10 | 라이선스·결제·원장 | 0/5 | 5 | 0 | 진행 |
+| P11 | 보안 정책·SSO·조직 인증 | 0/5 | 2 | 3 | 진행 |
+| P12 | 감사·통계·준수 보고 | 1/4 | 2 | 1 | 진행 |
+| P13 | 공지·도움말·시스템 화면 | 0/4 | 3 | 1 | 진행 |
+| P14 | 데이터 이전·통합·출시 검증 | 0/5 | 0 | 5 | 계획 |
+
+- 완료 조건: 각 Task 수용 조건 + 공통 게이트(통합·E2E·외부연동·운영복구 증거, lint/type/build 통과) — TASKS.md "공통 완료 조건"
+- 외부 자격증명 의존: blockers.md B02~B07 (문자·이메일·카카오·PG·IdP·본인인증·Slack/Teams 채널)
+
 
 | 마일스톤 | 완료/전체 | 상태 |
 |---|---:|---|
 | M1 | 14/14 | 완료 |
-| M2 | 14/14 | 완료 |
-| M3 | 11/11 | 완료 |
-| M4 | 15/15 | 완료 |
-| M5 | 13/13 | 완료 |
-| M6 | 5/5 | 완료 |
+| M2 | 1/14 | 미완료 |
+| M3 | 0/11 | 미완료 |
+| M4 | 0/15 | 미완료 |
+| M5 | 1/13 | 미완료 |
+| M6 | 0/5 | 미완료 |
+
+## 최신 보완
+
+가입·서명된 이메일 확인·복구 요청·거절된 로그인·MFA challenge/이메일 코드의 감사 원자성을 보완했다. 관련14파일264개(신규26개)·v29 빌드/타입/린트와 실제 UI9개·본인 활동 CSV5행·독립 DB20이벤트·재시작 동일 해시를 확인했다. 비밀번호 변경 시 세션 종료 기록, 나머지 생산 경로와 로그10개 화면 전체 수용은 남아 P12-T01은 진행 중이다. [증거](../../docs/qa/P12-T01/revalidation/public-auth/README.md). 한 Task씩 순차 구현하며 공식16/72와 goal active를 유지한다.
+
+P03-T03 계정 폐쇄·본인 활동/CSV·기기 관리의 현재 세션과 최종 기한을 보완했다. 관련 36개·production 빌드/타입·린트 통과. 실제 owner 탈퇴 차단·기기 회수401·필터 CSV1행·시험 계정 폐쇄·세션/로그인401과 독립 DB/재시작 해시를 대조했다. [증거](../../docs/qa/P03-T03/revalidation/account-README.md). 개인정보 활동 검토 workflow/SSO·선행 게이트가 남아 공식15/72를 유지한다.
+
+
+P03-T03 프로필의 현재 세션/이메일 인증·최종 기한 검사와 동시 편집 재조회/재저장을 보완했다. 관련 62개, production 빌드/타입·린트 및 실제 화면 충돌→최신 조회→version 4 저장, 재시작/재로그인·독립 DB 해시·390px 표시를 통과했다. P03-T02 소유권 이전·재초대·잘못된 이메일/재사용 거부와 업무 해시 재시작도 확인했다. [프로필 증거](../../docs/qa/P03-T03/revalidation/README.md). 전체 목표는 미완료다.
+
+
+P03-T02 구성원·초대 수락·전문가 운영자의 현재 권한/세션과 기한 롤백, 재요청·페이지 및 동시 편집 복구를 보완했다. 전문가 생성/변경/선택/운영 화면 거부/회수는 최신 production UI와 독립 DB를 대조했다. 관련 PostgreSQL 110개, 타입/린트, production 빌드와 일부 Ego/독립 DB 대조를 확인했다. [범위와 남은 조건](../../docs/qa/P03-T02/revalidation/README.md). 전체 Task 완료로 집계하지 않는다.
+
+## 이전 구현·검증 기록
+
+아래 내용은 각 실행 당시의 기록이다. 일시 정지·브라우저 제어·다음 작업에 관한 문장은 현재 지시나 현재 프로세스 상태가 아니다. 현재 실행 상태는 위 계획과 최신 실행 증거를 따른다.
 
 ## 현재 작업
 
@@ -88,3 +132,48 @@ P00-T04는 181개 주소를 owner 세션에서 HTTP 200으로 확인했다. P01-
 2026-10-03 재개 검증: 가입·로컬 인증 메일·TOTP·이메일 코드·복구코드·암호 재설정을 실제 Ego 화면과 독립 DB로 확인했다. 별도 두 브라우저의 A/B 회사 격리와 모든 보호 API 미인증 차단, 전체 회귀 439건·타입·린트·production build가 통과했다. 정식 완료는 14/72다.
 
 P03-T01 검증: 사업자등록증 실제 검사·바이트 다운로드·교체·삭제, 청구 담당자, 소유자 폐쇄 요청·취소, 회사/서비스 선택과 재로그인, 서비스 보관·복원·참조 409를 실제 브라우저와 DB에서 확인했다. 전체 31파일·453개·타입·린트 오류 0·production build와 shadow migration 52개가 통과했다. 정식 완료는 15/72다.
+
+
+2026-10-04 재검증 후속: P03-T04 발송 이력의 실제 작업 상태·발송 당시 주소·서버 페이지 수정. 관련3파일41개·타입/빌드/린트와 Ego 등록/요청/상태/52행/서비스격리/390px, 독립DB/재시작 해시 일치. 상태 완료15·진행21·계획36, 전체 goal active. 외부 메일은 미검증. 다음은 P03-T04 수신자 관리 UI/100건 이후 선택과 동의 표시·권한/기한/재요청 경계, P03-T03 개인정보 활동 검토 workflow. 현재 server3107 PID11553·buildv6·Ego45/p1. [상세](../../docs/qa/P03-T04/revalidation/README.md).
+
+
+2026-10-04 후속 progress: P03-T04 수신자 관리 UI/상세GET/필수 recipientVersion 검사, 등록·수정·보관·복원·검색·서버페이지·103번째 선택·동시 수정4→5→6과 발송주소6→7 충돌 복구. 관련44개·최종v8 빌드/타입/린트·Ego/독립DB·새프로세스 해시 일치. 모바일 도구 모음 overflow를 수정해390px에서 재검증. [증거](../../docs/qa/P03-T04/revalidation/recipient-README.md). 전체 완료15·진행21·계획36, goal active. 현재 QA3109 PID27649 exec68689/buildv8, Ego45/p1 desktop1440. 이전QA3107/3108 종료, 사용자3100 유지. 다음 P03-T04 동의 표시 UI/권한·기한·재요청 경계; 개인정보 활동 검토 workflow와 외부 sandbox/운영복구 전체 목표 유지.
+
+
+2026-10-04 후속 progress: P03-T04 동의 표시 현재 권한/정책·최종 기한 및 게시 만료 롤백, UI 충돌/오류 재시도. baseline6실패→신규8/관련52통과, 최종v10 빌드·린트·Ego UI/390px/독립DB 설정3행 감사5건/새프로세스 해시 일치. [증거](../../docs/qa/P03-T04/revalidation/display-README.md). 완료15·진행21·계획36, goal active. 현재QA3111 PID45099 exec41774 buildv10, Ego45/p1 desktop1440x1000. 자체3109/3110종료, 사용자3100보존. 다음 재위탁 current authority/deadline/replay와 documentOptions·개인정보 활동 검토 흐름, 전체 원래 범위 계속.
+
+
+2026-10-04 progress: P03-T04 재위탁6함수 현재권한/최종기한, 등록/발송 POST의 재요청 현재상태·삭제된PII 보호 구현. baseline17실패→신규23통과; 관련다른4파일52통과. 최초 확대75중1실패는 실행대기Job삭제fixture제약, 취소후삭제로수정해신규23재통과. v11빌드/린트·EgoHTTP8회+재시작1회·DB수신자v3보관/notice1/Job1queued/audit4/key2hash일치. [증거](../../docs/qa/P03-T04/revalidation/subprocessor-authority-README.md). 현재QA3112 PID53819 exec29432/buildv11, Ego45/p1B이력desktop. 이전3111종료/사용자3100유지. B는이제보관수신자1/notice1, A103/53유지. 다음 documentOptions 현재정책/기한, 개인정보 활동 검토workflow, 전체57개/외부/운영원범위유지. 완료15·진행21·계획36, goal active.
+
+
+2026-10-04 progress: documentOptions 현재회사/정책/최종기한 및 조회중 게시만료 선택지제외. 신규4실패→관련5파일60통과, v12빌드/린트·Ego A/B HTTP200/문서격리/token비노출/설정유지. [증거](../../docs/qa/P03-T04/revalidation/options-authority-README.md). 개인정보 활동 검토 원본은 빈목록+잘못된접근뿐이며 현코드빈배열. [독립구현명세](../../docs/planning/06-privacy-activity-review.md) 작성, 업무모델/API/UI는다음구현. 현재QA3113 PID59056 exec72823/buildv12 Ego45/p1A수집desktop. 이전3112종료 사용자3100유지. 완료15·진행21·계획36 goalactive 전체범위유지.
+
+
+2026-10-04 progress: 개인정보 활동 검토 모델2/API4 신규구현, migration75/model119. AuditEvent회사서비스처리자↔Review대상자 compositeFK, 메시지암호화/불변, 열린사건unique, 상태/version/현재권한/기한/재요청검사. 신규20통과+기존3파일21통과, 보완FK1pass19skip별도. 초기fixturefail과잘못된test기대수정복구기록보존. shadow75설치/74→75/실패복구, dev74checksum/6업무tablehash보존. v13빌드/타입/린트/OpenAPI284/411op/37policy. EgoHTTP11(두QA사용자, syntheticQA감사)→resolvedv3/messages3/audit3/key3, PID72656→74637동일빌드restart해시52d17079...24e. [증거](../../docs/qa/P03-T03/revalidation/activity-README.md). UI는아직빈배열: 다음ActivityReviews컴포넌트/처리로그요청버튼/목록상세답변완료충돌모바일/실제두사용자UI. 알림·보유정책·전체원범위남음. 현재QA3114 PID74637 exec75937/v13 Ego45/p1owner로그인 검토이력기존빈화면, 사용자3100보존. fixture .local/recovery-activity.json, 기존resolved자료보존하고새키요청가능. 완료15·진행21·계획36 goalactive.
+
+
+2026-10-04 progress: 개인정보 활동 검토 ActivityReviews UI/처리로그 요청 연결. 실제 두 사용자 요청·답변·종결 및 두 번째 요청 HTTP 경합→UI409/초안보존/재조회/취소, 14건 페이지(11개 합성 DB행)/검색/상태/서비스/온라인복구·390px 확인. v14빌드/타입/린트 통과. UI2건 각각version3/message3/audit3/key3, 거부초안미저장, PID82384→89929 동일빌드 재시작 DB해시579cbf3c...1047일치와 화면 확인. [증거](../../docs/qa/P03-T03/revalidation/activity-ui-README.md). 현재QA3115 PID89929 exec77645/v14 Ego45/p1 owner 완료상세 desktop1440. 이전자체3114종료·사용자3100보존. 다음명시적알림·보유정책 및 전체57개 원래게이트. 완료15·진행21·계획36 goalactive.
+
+
+2026-10-04 progress: 개인정보 활동 검토 명시적 알림 POST notifications202/Job유형mail.activity-review.v1/현재권한·수신자·상태·환경·lease 검사worker/상태UI 구현. 신규13포함33+기존다른109통과, v15빌드/타입/린트·OpenAPI285/412/37. Ego합성페이지01알림→해당Job만local처리→UI로컬완료·390px. DBjob1/attempt1/audit1/검토v1message1보존, PID96966→99341재시작해시2ecff005...9788·UI일치. [증거](../../docs/qa/P03-T03/revalidation/activity-mail-README.md). 현재QA3116 PID99341 exec42192/v15 Ego45/p1 owner합성페이지01상세desktop. 이전자체3115종료 사용자3100유지. 다음회사별검토보유정책/승인된파기, 실제SMTP미검증·전체원범위유지. 완료15·진행21·계획36 goalactive. .local/activity-mail-check.ts deliver재실행금지;restart는읽기검증.
+
+
+2026-10-04 progress: 57개 소스/수용조건 대조, planned21개→in_progress 정정, 완료15·진행42·계획15. 허위/과장 QA16개 정정 및 소스해시/함수위치/남은조건57행 기록. [전체](../../docs/qa/status-revalidation/README.md). P11-T02 CloneApp MFA2경로 Dashboard가림·검색포커스BODY·모바일609px 결손을 실제Ego재현/수정. 관련37개·최종v18빌드/타입/lint·390px/DB2명일치 확인. [수정](../../docs/qa/P11-T02/revalidation/README.md). 현재QA3119 PID14510 exec77260/v18 Ego45/p1 owner MFA설정 desktop1440. 자체3116/3117/3118종료 사용자3100보존. 다음P12-T03 저장월마감 GET/CSV/기존반환 현재서비스권한·현재Context·감사원자성 회귀/수정 우선; 검토보유 및57개 전체원범위유지. goalactive.
+
+
+2026-10-04 사용자 지시: 한 Task씩 순차 구현·검증. 현재 P12-T03에 집중하고 다른 Task로 전환하지 않는다. 월마감 GET/기존POST/CSV 현재 권한 및 최종기한, 전체회사 direct owner/admin 범위, 집계+저장+감사 단일RR/동시재시도, 범위검증/조회출력감사 및 월/서비스UI 구현. 신규27+기존6=33통과·v19빌드/타입/lint·OpenAPI285/412/37·계획181/72. Ego owner회사/A 마감2행·viewer403/404·CSV4행/3행·390px·offline복구·PID31864→33589재시작 DBhash8ad213c1...f595 동일. 최초baseline은제품5/fixture7실패(보조owner누락), 최초build는ALLOW_LOCAL_MAIL누락후복구로명시. [증거](../../docs/qa/P12-T03/revalidation/README.md). 완료15·진행42·계획15, goalactive. 다음도P12-T03: 증거기반점검/PDF·CSV비동기출력·만료파일/DB불변성 및원래수용. 현재QA3120 PID33589 exec81557/buildv19, Ego45/p1 viewer A 2026-09 마감 desktop1440온라인. 자체3119/최초3120종료, 사용자3100PID30204유지. .local/compliance-ui-state.ts 읽기만. QA회사 마감회사070086c3-869f-4e87-a93e-00ff7e869ba0/Aab09639f-40a0-4b0c-a9a3-13c2cb6c7469, 2026-09 보존.
+
+
+2026-10-04 순차 P12-T03 후속: ComplianceExportJob 모델120/migration76, 월마감DB불변, PDF/CSV비동기 작업/API6+UI/24h암호문제거/worker현재issuer·lease·version·최종기한/동시요청/본인다시인증 다운로드 구현. 신규출력31+기존33=64통과, 기존async-export14통과. 최종v21빌드/타입/lint·OpenAPI289/418/38·계획181/72. shadow76빈설치/75→76/legacy보존/UPDATE·DELETE23514/실패복구, dev7tablehash및75checksum보존. EgoviewerA2026-09 PDF/CSV요청각1회readyv3, 41821바이트한글1pPDF·191바이트CSV 실제다운로드·렌더확인, 취소/삭제 및4번째합성작업futureclock으로expiry정리(실제24h대기아님), otherowner404/expired410. 모바일785넘침그리드minmax0수정후390/table308scroll747. 새3122프로세스DBjob4hash153e825a...b9cc5/PDF·CSV바이트동일. [증거](../../docs/qa/P12-T03/revalidation/exports/README.md). 공식완료15·진행42·계획15 goalactive. 다음도P12-T03증거기반점검항목·월마감연결과원래수용; 다른Task전환금지 사용자지시. 현재QA3122PID40954 exec35723 buildv21; Ego45/p1 viewer A 2026-09출력desktop1440온라인. 자체3120/3121종료 사용자3100PID30204유지. .local/compliance-export-ui.ts process/expire-fixture재실행금지(진행완료),read는읽기전용. PDFjob890196bd-a0ff-467e-b865-ebe2c02c938e/CSV429e16f6-6056-48c0-8ad5-aee2e18f9563 ready; expired0bee4bbc-88cf-4733-8307-c7187d939b66; 다른1개deleted. 초기테스트3실패는P2039기대및세션>24h예상정정으로기록. 소스·문서미커밋.
+
+2026-10-04 P12-T03 순차 후속: 5개 원천 점검 근거(v1/checkedAt/serviceIds/facts/SHA256)를 동일RR 월마감에 저장하고 UI/CSV/PDF에 연결. 예전근거없음/CSVbytes/작업sourceHash 유지. 회사인증정보는 회사전체 direct owner/admin에만 포함. 비공개/초안 게시 제외·장문 표 줄바꿈 보완. 신규13+기존64=77통과·v24빌드/타입/lint·계약289/418/38·Ego45/p1 실제viewer A와owner회사10월마감·독립SQL·PDF2쪽55042B/CSV1972B·legacyPDF동일hash·재로그인/새프로세스file/DB동일·1440/768/390 확인. [증거](../../docs/qa/P12-T03/revalidation/evidence/README.md). 완료15·진행42·계획15 유지, goalactive. 남은 것은 선행P12-T01/P12-T02/P07-T03 완료증거 및FLOW-12(응답/파기→감사/집계→마감) 전체수용 대조. 다른Task구현으로넘기전현재Task수용정리. 현재QA3125 PID51094 exec81922/buildv24, Ego45/p1 member/viewer A 2026-10 desktop1440 온라인. QA3122/3123/3124 정리, 사용자3100 PID30204 보존. 새마감 A2fc9cc20-d345-47b9-82dc-4802b24f10e0/회사cdc228e1-f239-494e-890c-95e5e5a22465, evidencehash A271c7bb5...afc0/회사ebb077f8...89fb. 신규PDFd9fb9365-a763-4315-a512-34f8eea2856b/CSV9a413872-2e0b-429f-8738-4a6e4d2c2b66. .local/compliance-evidence-ui.ts read만안전; process재실행금지. fixture .local/recovery-members.json 비밀출력금지. 최초테스트fixture제약/개정이력·catalog종류오타·PDF첫페이가정 실패 및ALLOW_LOCAL_MAIL없는build실패를보존. 커밋/푸시없음.
+
+2026-10-04 P12-T03 순차 FLOW-12 응답 분기: 신규 compliance-lifecycle.test.ts 1개 통과·타입/lint0. Ego45/p1 별도 QA회사6e093213-bd51-4b35-939d-242ae0d00c0f에서 공개응답2→target UI파기요청/승인→targetedworker완료, held원문1보존, target답변/영수증0. 현재보유2→1/파기0→1, 파기전 서비스월마감CSV bytes동일, 파기후 회사월마감1/파기1. [증거](../../docs/qa/P12-T03/revalidation/lifecycle/README.md). 공식15/42/15 유지 goalactive. 다음은 선행의 감사 누락/원장집계/운영복구가 P12-T03 보고범위에 미치는 구체적 계약 대조; 무관한 출시조건 추가금지. QA3125/v24 유지, Ego45/p1 owner 새회사 회사전체10월마감. .local/compliance-lifecycle-qa.ts prepare/collect/run 완료 재실행금지, read만안전. 이번서버재시작없음(기존evidence 재시작증거별도). 사용자3100유지, 커밋/푸시없음.
+
+2026-10-04 P12-T03 완료: [최종 수용표](../../docs/qa/P12-T03/completion.md). 중복query2개 실패재현→2routes requestQuery보완→최종6파일80개·v25빌드/타입/lint0·새productionHTTP7개·재로그인/CSV동일·DBhash5de02dd8...90b0 유지. 선행의 보고인터페이스를 대조하고 전체감사/원장/운영복구는 각원래Task의미완료로유지. 공식완료16·진행41·계획15, 전체goalactive. 다음한Task P12-T01 감사 이벤트 수집·조회. QA3126 PID58624 exec92722/buildv25 Ego45/p1 owner FLOW12서비스10월마감desktop. 사용자3100유지. .local/compliance-lifecycle-qa.ts 읽기만안전. 커밋/푸시없음.
+
+2026-10-04 순차 P12-T01 인증 변경 후속: MFA 등록·확인·해제, 복구코드 소비, 로그아웃·세션 회수·유휴 만료의 감사 원자성을 보완했다. 관련11파일163개·v28 빌드/타입/린트와 실제 UI8개·접속 CSV18행·독립 DB21이벤트·재시작 동일 해시를 확인했다. 가입·이메일 확인 등 나머지 인증/생산 경로와 로그10개 화면 전체 수용은 남아 P12-T01은 진행 중이다. [증거](../../docs/qa/P12-T01/revalidation/auth-mutations/README.md). 회사별 감사21건/최종세션0·factor0 해시b0228be6…86dd 보존, v27 기존선택·감사/접근해시도보존. 공식16/41/15·goalactive 유지. 다음도동일Task: 나머지인증매핑·공지/가이드열람원자성·로그10화면수용. QA3128 PID84928 exec86778/buildv28, Ego45/p1 로그아웃화면 desktop1440. 자체3127/최초3128정리, 사용자3100신호없음. .local/auth-mutation-ui.ts prepare 완료 재실행금지, read만안전. 커밋/푸시없음.
+
+2026-10-04 순차 P12-T01 공개 인증 후속: 가입·서명된 이메일 확인·복구 요청·거절된 로그인·MFA challenge/이메일 코드의 감사 원자성을 보완했다. 관련14파일264개(신규26개)·v29 빌드/타입/린트와 실제 UI9개·본인 활동 CSV5행·독립 DB20이벤트·재시작 동일 해시를 확인했다. 비밀번호 변경 시 세션 종료 기록, 나머지 생산 경로와 로그10개 화면 전체 수용은 남아 P12-T01은 진행 중이다. [증거](../../docs/qa/P12-T01/revalidation/public-auth/README.md). 신규 가입 사용자69a9befd-6491-4a64-857b-f0acb3d1c51d는 서명된 링크로 인증했으며 emailVerified DB fixture=false·외부전달=false·worker미실행. 최종session0/proof0·해시e36ad241…13da, v27/v28 이전 해시·증거 보존. QA3129 PID93825→4512 exec49268/buildv29, Ego45/p1 로그아웃 로그인 화면. 자체 이전3128 PID84928 정리, 사용자3100신호없음. 다음도같은Task: DB credential 트리거의 개별 세션 종료/요청 상관 ID와 공지/가이드 열람·로그10화면 수용. 커밋/푸시없음. .local/auth-public-ui.ts prepare 재실행금지, read만안전.
+
+2026-10-04 사용자 추가 지시: 현재 한 Task인 P12-T01을 끝까지 구현·검증한 뒤 커밋·origin/main 푸시하고 goal을 일시 정지한다. P12-T01이 끝나기 전이나 푸시 성공 전에는 아직 일시 정지하지 않는다. 새 Task는 시작하지 않는다. 현재 credential_audit migration77은 시험 DB에 적용하고 신규7개/관련75개 통과. 다운로드12개 보완 중이며 실제 ClamAV PID33258 exec57638을 켰다. dev migration은 아직 적용하지 않았다. v29 QA서버3129 PID4512 exec49268은 이전 빌드다.
