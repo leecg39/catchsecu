@@ -698,7 +698,7 @@
 - 작업: 메뉴·헤더·MY·서비스 전환·권한에 맞는 action, 공통 Table/Form 상태와 서버 cache invalidation을 연결한다.
 - 선행: P04-T04, P08-T04, P10-T05, P13-T02
 - 검증/완료: 모든 visible action이 실제API/이동에 연결; loading·empty·validation·conflict·forbidden·retry·disabled 확인
-- 증거: `docs/qa/P13-T03/` (구현 시 생성; 현재 없음)
+- 증거: [P13-T03 진행 중 검증](docs/qa/P13-T03/README.md). 사이드바 footer의 placeholder 모달 3개(홈페이지·처리방침·약관)를 실제 링크로 교체하고 `/legal/privacy`·`/legal/terms` 공개 문서 구현·실브라우저 확인. 전수 action 감사·캐시 일관성 증거는 미완료.
 
 ### P13-T04 — 전 페이지 화면 게이트
 

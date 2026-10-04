@@ -4,5 +4,5 @@ export function isAuthPath(path: string) {
   return authentication.some(route => path === route || path.startsWith(route + "/")) || path.startsWith("/login-") || path === "/two-step-setting";
 }
 export function isPublicPath(path: string) {
-  return isAuthPath(path) || /^\/(shared-privacy|infoOwner|projects?|url|test-projects|file-view|document|customer-use-case|services)(\/|$)/.test(path) || path === "/jap_intro";
+  return isAuthPath(path) || /^\/(shared-privacy|infoOwner|projects?|url|test-projects|file-view|document|customer-use-case|services|legal)(\/|$)/.test(path) || path === "/jap_intro";
 }

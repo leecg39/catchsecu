@@ -88,7 +88,7 @@ export function SignupOrResetForm({ signup }: { signup: boolean }) {
   return <form className="auth-recover-form" onSubmit={submit}>
     {signup && <input name="name" aria-label="이름" placeholder="이름" required maxLength={100} />}
     <input type="email" name="email" aria-label="이메일" placeholder="이메일을 입력해주세요" required />
-    {signup && <><Password /><p className="auth-note">비밀번호는 12~128자로 입력해주세요.</p><label className="auth-remember"><input type="checkbox" required />서비스 이용약관 및 개인정보 처리방침에 동의합니다.</label></>}
+    {signup && <><Password /><p className="auth-note">비밀번호는 12~128자로 입력해주세요.</p><label className="auth-remember"><input type="checkbox" required /><a href="/legal/terms" target="_blank" rel="noreferrer">서비스 이용약관</a> 및 <a href="/legal/privacy" target="_blank" rel="noreferrer">개인정보 처리방침</a>에 동의합니다.</label></>}
     <Status action={action} /><button disabled={action.pending} className="auth-primary auth-block">{action.pending ? "처리 중…" : signup ? "회원가입" : "비밀번호 재설정 메일 받기"}</button>
   </form>;
 }

@@ -15,9 +15,11 @@ import { ManagementPages, matchManagement } from "./management";
 import { ServicesPages, matchServices } from "./services";
 import { AuthPages, matchAuth } from "./auth/AuthPages";
 import { PublicPages, isExternal } from "./PublicPages";
+import { LegalPages } from "./LegalPages";
 
 export default function CloneApp({ path, accessReason = "general" }: { path: string; accessReason?: AccessDenialReason }) {
   if (matchAuth(path)) return <AuthPages key={path} path={path} />;
+  if (path.startsWith("/legal/")) return <LegalPages key={path} path={path} />;
   if (path === "/admin/expert-assignments") return <ExpertAssignmentsAdmin />;
   if (path === "/company-info") return <ApplicationProvider><AppShell><CompanyOnboarding /></AppShell></ApplicationProvider>;
   if (isExternal(path)) return <PublicPages key={path} path={path} />;

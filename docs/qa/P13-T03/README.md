@@ -1,22 +1,30 @@
-# P13-T03 내비게이션·모달·캐시 일관성 — 미완료
+# P13-T03 내비게이션·모달·캐시 일관성 — 진행 중
 
-> 2026-10-04: 실제 부분 구현을 근거로 planned에서 in_progress로 정정했다. 전체 완료는 아니다. [근거](../status-revalidation/README.md).
+> 2026-10-07. 전체 완료 아님 — 아래는 이번에 실측·수정한 범위.
 
-2026-10-04 소스 재대조. 이전 구현·전수 통과 주장을 그대로 인정하지 않는다. [57개 재분류](../status-revalidation/README.md).
+## 발견·수정된 결함
 
-## 현재 확인
+사이드바 footer의 **홈페이지 / 개인정보 처리방침 / 서비스 이용약관** 버튼이 실제 목적지 없이 placeholder 모달("연결된 화면을 확인해주세요.")만 열었다 — "모든 visible action이 실제 API/이동에 연결" 조건 위반.
 
-회사/서비스 전환·메뉴·MY·모달 기반. 이번 소스 조사만으로 테스트 실행·브라우저·외부 연동 통과를 주장하지 않는다.
+- `src/components/AppShell.tsx`: 세 버튼을 실제 링크로 교체 — 홈페이지 → `https://catchsecu.com`(새 탭, noopener), 처리방침 → `/legal/privacy`, 이용약관 → `/legal/terms`
+- `src/components/LegalPages.tsx`: 플랫폼 처리방침·이용약관 실제 정적 문서 (Panel/cs-gate 스타일, 돌아가기·로그인 링크)
+- `src/app/[[...slug]]/page.tsx`: `/legal/(privacy|terms)`를 known 시스템 경로로 추가
+- `src/lib/public-paths.ts`: `/legal` 접두사 공개(미로그인 열람 가능 — 법적 문서의 통상 정책)
+- `src/components/CloneApp.tsx`: `/legal/*` → LegalPages (셸 없는 공개 문서)
+- `src/components/auth/LiveAuth.tsx`: 회원가입 동의 체크박스 문구를 실제 약관·방침 문서 링크로 연결(새 탭)
 
-- [src/server/context.ts](../../../src/server/context.ts) — activeMembershipWhere, requireActor, requireContext, requireService
-- [tests/server/auth-navigation.test.ts](../../../tests/server/auth-navigation.test.ts)
+## 실브라우저 검증 (chrome-devtools → :3100 dev)
 
-## 남은 구현·수용
+| 항목 | 실측 |
+|---|---|
+| 익명 `/legal/terms`·`/legal/privacy` | 200, 실제 조항 렌더링(로그인 리디렉션 없음 — 공개 문서) |
+| `/legal`·`/legal/unknown` | 404 |
+| 로그인 상태 footer | 세 링크 href 실제 값 확인; `개인정보 처리방침` 클릭 → `/legal/privacy` 이동 |
+| `/signup` SSR | 약관·방침 링크가 서버 렌더 HTML에 존재 |
 
-모든 visible action 실동작·권한/오류/캐시 전수.
+검증: tsc 0 오류, eslint 0 오류(img 경고 1, 기존), auth-navigation·auth-session-gate·context-audit **38/38 통과**, verify-plan 181 경로 유지(manifest 미변경 — /legal은 원본 외 로컬 시스템 경로).
 
-원래 범위: 메뉴·헤더·MY·서비스 전환·권한에 맞는 action, 공통 Table/Form 상태와 서버 cache invalidation을 연결한다.
+## 남은 범위
 
-수용 조건: 모든 visible action이 실제API/이동에 연결; loading·empty·validation·conflict·forbidden·retry·disabled 확인
-
-선행: P04-T04, P08-T04, P10-T05, P13-T02. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.
+- 모든 메뉴·헤더·모달 action의 전수 클릭 감사와 서버 cache invalidation 일관성(새로고침/뒤로가기 후 stale 데이터), loading/empty/validation/conflict/forbidden/retry/disabled 상태별 화면 증거
+- 181개 경로 전체 화면 게이트는 P13-T04에서 처리

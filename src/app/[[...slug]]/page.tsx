@@ -27,7 +27,8 @@ export default async function Page({params,searchParams}:{params:Promise<{slug?:
   const systemExpert=path==='/admin/expert-assignments';
   const auditLog=/^\/log\/(?:service|info-monitoring|ad-monitoring|customer|member|authority|external-viewer|access-history|mail)$/.test(path);
   const selfPage=['/my-page/info','/my-page/info/edit','/my-page/delete','/my-page/activity-log'].includes(path);
-  const known=systemNotices||systemGuides||systemSupport||systemExpert||memberSupport||legacyImport||/^\/document\/view\/[A-Za-z0-9_-]{43}$/.test(path)||routes.some(r=>new RegExp('^'+r.path.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/:[^/]+/g,'[^/]+')+'/?$').test(path));
+  const legalPage=/^\/legal\/(?:privacy|terms)\/?$/.test(path);
+  const known=legalPage||systemNotices||systemGuides||systemSupport||systemExpert||memberSupport||legacyImport||/^\/document\/view\/[A-Za-z0-9_-]{43}$/.test(path)||routes.some(r=>new RegExp('^'+r.path.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/:[^/]+/g,'[^/]+')+'/?$').test(path));
   if(!known)notFound();
   if(!isPublicPath(path)) {
     try {
