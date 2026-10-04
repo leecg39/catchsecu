@@ -16,3 +16,11 @@
 - 181행 각각 backend/UI/test 매핑 표 미생성.
 - P09-T06·P10-T05·P11-T05 선행 게이트 미완료(외부 공급자 필요).
 - build는 최근 성공 증거 있으나 이번 라운드 미실행.
+
+## API 인증 경계 전수 (2026-10-04, scripts/qa-api-boundary.ts)
+
+49개 GET 라우트 전수([api-boundary-sweep.json](api-boundary-sweep.json)):
+
+- **5xx 0건** — 모든 경로가 통제된 응답.
+- 익명: `health`·`ready`만 200 공개, 나머지 **401**(인증 필요) 또는 로그인 리다이렉트.
+- owner 인증: 422는 필수 쿼리 부재(serviceId 등 계약 검증), 405는 POST 전용(orders·webhook·migration), 403은 권한 부족(expert-assignments/options) — 모두 올바른 경계.
