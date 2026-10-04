@@ -45,3 +45,14 @@ dev 앱 :3100에서 03-route-matrix.csv의 파라미터 없는 **141개 정적 �
 - `/document/P|C|OC/:token`: tokenCipher 복호 실토큰 3건 — 세 페이지 모두 200, 공개 API는 실제 스냅샷·렌더텍스트·contentHash 반환 + `X-Robots-Tag:noindex`·`Referrer-Policy:no-referrer`(scripts/qa-document-tokens.ts).
 
 - `/infoOwner/*` 정보주체 API 경계(scripts/qa-subject-boundary.ts): 무효 토큰 422, 세션 없음·위조 세션 ID 404(존재 추측 불가), 토큰별 레이트리밋 10/600s.
+
+## 동적 경로 실제 fixture 스윝 (2026-10-04 추가)
+
+`scripts/qa-dynamic-real.ts` → [dynamic-real-sweep.json](dynamic-real-sweep.json). 실제 serviceId·formId·noticeId로 14개 동적 경로 조회:
+
+- `/dashboard/:serviceId`·`/privacy-detail`·`/marketing-detail` → 200
+- `/services/:serviceId/catchforms*` 7경로(목록·수신자·해외·agree/Y) → 200
+- `/form/manage/applicant/:formId`·`:serviceId/:formId`·`log/:formId` → 200
+- `/notice/59`(실제 공지) → 200
+
+무효값 스윝(통제 오류)·실fixture 스윝(정상) 양방향 커버. `/pay/*`·`/bill/:id`·`/alimtalk/templates/:id`·`/infoOwner/*`·`/saeol/*`·`/identification/*`는 로컬 fixture 부재 또는 외부 의존 — 무효값 스윝만 적용.
