@@ -7,7 +7,7 @@ const res = await fetch(base+"/api/v1/auth/sign-in/email",{method:"POST",redirec
 const cookie = res.headers.getSetCookie().map(v=>v.split(";")[0]).join("; ");
 const {submissionId:sub, questionId:q, fileId:f} = cp;
 const out: Record<string,unknown> = {login:res.status, hasCookie:!!cookie};
-const t = async (k:string,p:string,c?:string) => { const r = await fetch(base+p,{headers:c?{cookie:c}:{},redirect:"manual"}); let j:any=null,b:any=null; try{j=await r.clone().json()}catch{}; out[k]={s:r.status, code:j?.error?.code, items:j?.items?.length ?? (j?.id?1:undefined), ct:r.headers.get("content-type")?.slice(0,30)}; };
+const t = async (k:string,p:string,c?:string) => { const r = await fetch(base+p,{headers:c?{cookie:c}:{},redirect:"manual"}); let j:{error?:{code?:string};items?:unknown[];id?:string}|null=null; try{j=await r.clone().json()}catch{}; out[k]={s:r.status, code:j?.error?.code, items:j?.items?.length ?? (j?.id?1:undefined), ct:r.headers.get("content-type")?.slice(0,30)}; };
 await t("ownerList",`/api/v1/files?submissionId=${sub}&page=1&pageSize=20`,cookie);
 await t("ownerSingle",`/api/v1/files/${f}?submissionId=${sub}&questionId=${q}`,cookie);
 await t("ownerDownload",`/api/v1/files/${f}/download?submissionId=${sub}&questionId=${q}`,cookie);

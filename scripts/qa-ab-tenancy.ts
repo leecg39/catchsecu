@@ -56,6 +56,7 @@ checks["B→B service"] = (await B("/services/" + bService)).status;
 checks["A→A service"] = (await A("/services/" + aService)).status;
 ev.crossAccess = checks;
 ev.pass = Object.values(checks).every(s => s === 404 || s === 403 || s === 200);
-ev.crossAllDenied = checks["B→A service"] === 404 && checks["B→A service PATCH"] !== 200 && checks["A→B service"] === 404 && ev.memberLists.aHasB === false && ev.memberLists.bHasA === false;
+const memberLists = ev.memberLists as { aHasB: boolean; bHasA: boolean };
+ev.crossAllDenied = checks["B→A service"] === 404 && checks["B→A service PATCH"] !== 200 && checks["A→B service"] === 404 && memberLists.aHasB === false && memberLists.bHasA === false;
 console.log(JSON.stringify(ev, null, 1));
 await writeFile("docs/qa/P03-T05/ab-tenancy.json", JSON.stringify(ev, null, 2));

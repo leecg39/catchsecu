@@ -237,6 +237,7 @@ model Company {
   subscriptions BillingSubscription[]
   creditAccounts CreditAccount[]
   ledgerTransactions LedgerTransaction[]
+  paymentMethods PaymentMethod[]
   supportTickets SupportTicket[]
   accessRequests AccessRequest[]
   expertAssignments ExpertAssignment[]
@@ -315,11 +316,32 @@ model BillingSubscription {
   @@index([tenantId, status, periodEnd])
 }
 
+model PaymentMethod {
+  id String @id @default(uuid())
+  tenantId String
+  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  tokenHash String @unique
+  tokenCipher String
+  provider String @default("local")
+  kind String
+  label String
+  isDefault Boolean @default(false)
+  status String @default("active")
+  version Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders PaymentOrder[]
+  @@unique([tenantId, id])
+  @@index([tenantId, status])
+}
+
 model PaymentOrder {
   id String @id @default(uuid())
   tenantId String
   subscriptionId String
   subscription BillingSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  methodId String?
+  method PaymentMethod? @relation(fields: [tenantId, methodId], references: [tenantId, id], onDelete: Restrict)
   amount Int
   currency String
   status String @default("pending")
@@ -329,6 +351,7 @@ model PaymentOrder {
   events PaymentEvent[]
   @@unique([tenantId, id])
   @@index([tenantId, status, createdAt])
+  @@index([tenantId, methodId])
 }
 model PaymentEvent {
   id String @id @default(uuid())

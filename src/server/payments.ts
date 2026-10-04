@@ -12,20 +12,25 @@ const providerEvent = z.object({
   eventId: z.string().trim().min(8).max(80).regex(/^[A-Za-z0-9:_-]+$/),
   outcome: z.enum(["paid", "failed"]),
 }).strict();
-export type PaymentOrderRecord = { id: string; subscriptionId: string; amount: number; currency: string; status: "pending" | "paid" | "failed"; version: number };
+export type PaymentOrderRecord = { id: string; subscriptionId: string; methodId: string | null; amount: number; currency: string; status: "pending" | "paid" | "failed"; version: number };
 
 function dto(row: PaymentOrder): PaymentOrderRecord {
-  return { id: row.id, subscriptionId: row.subscriptionId, amount: row.amount, currency: row.currency, status: row.status as PaymentOrderRecord["status"], version: row.version };
+  return { id: row.id, subscriptionId: row.subscriptionId, methodId: row.methodId, amount: row.amount, currency: row.currency, status: row.status as PaymentOrderRecord["status"], version: row.version };
 }
 function billingWrite(ctx: Context) { if (!roleCan(ctx.member.role, "billing.write")) fail(403, "FORBIDDEN", "결제를 변경할 권한이 없습니다."); }
-export async function createPaymentOrder(tx: Transaction, ctx: Context, subscriptionId: string, requestId: string) {
+export async function createPaymentOrder(tx: Transaction, ctx: Context, subscriptionId: string, requestId: string, methodId?: string) {
   billingWrite(ctx);
   const subscription = await tx.billingSubscription.findFirst({ where: { id: subscriptionId, tenantId: ctx.tenantId } });
   if (!subscription || subscription.status !== "pending" || subscription.priceKrw === null) fail(409, "ORDER_UNAVAILABLE", "결제할 수 있는 대기 구독이 없습니다.");
+  if (methodId !== undefined) {
+    const method = await tx.paymentMethod.findFirst({ where: { id: methodId, tenantId: ctx.tenantId } });
+    if (!method) fail(404, "NOT_FOUND", "결제수단을 찾을 수 없습니다.");
+    if (method.status !== "active") fail(409, "METHOD_INACTIVE", "해지된 결제수단으로는 결제할 수 없습니다.");
+  }
   const existing = await tx.paymentOrder.findFirst({ where: { tenantId: ctx.tenantId, subscriptionId, status: "pending" } });
   if (existing) return dto(existing);
-  const row = await tx.paymentOrder.create({ data: { tenantId: ctx.tenantId, subscriptionId, amount: subscription.priceKrw, currency: subscription.currency } });
-  await audit(tx, ctx, requestId, "billing.order_created", "paymentOrder", row.id, ["amount"], undefined);
+  const row = await tx.paymentOrder.create({ data: { tenantId: ctx.tenantId, subscriptionId, methodId: methodId ?? null, amount: subscription.priceKrw, currency: subscription.currency } });
+  await audit(tx, ctx, requestId, "billing.order_created", "paymentOrder", row.id, ["amount", "methodId"], undefined);
   return dto(row);
 }
 export async function readPaymentOrder(ctx: Context, id: string) {
