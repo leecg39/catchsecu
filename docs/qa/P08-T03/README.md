@@ -20,3 +20,7 @@ local SMS/LMS 처리와 서명 영수증 수신. 이번 소스 조사만으로 �
 수용 조건: sandbox 실제 수신 또는 provider receipt; 인증실패·timeout·중복webhook·부분성공; 허위 sent 금지
 
 선행: P08-T02, P01-T04, P10-T03. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.
+
+## 실제 공급자 발신번호 검증 (2026-10-04 추가)
+
+Solapi 실계정 HMAC 조회로 발신번호 ACTIVE 확인 + 미등록 번호 거부 실증(P08-T01 게이트 동일). 실제 메시지 전송·receipt webhook은 SMS_TRANSPORT 미구현으로 차단 — 구현 필요.

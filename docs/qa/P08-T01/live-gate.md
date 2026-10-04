@@ -20,3 +20,15 @@ dev 앱 :3100 + catchsecu_dev 실측. [기존 발신자 증거](../senders/READM
 - 발신자 생성 → request-email → 워커 실발송 → **IMAP 수신함에서 인증번호 631883 수신**(DKIM/SPF/DMARC pass) → confirm-email 코드 일치 → email 증빙 `verified`(live, 90일)
 - local/live 환경 바인딩: local 증빙을 live 워커가 거부(`VERIFICATION_ENVIRONMENT`)
 - 미해결: DNS 증빙 대기 — soverin.cloud NS가 Cloudflare라 Hostinger 존 편집이 공인 DNS에 반영되지 않음. Cloudflare TXT 추가 후 `check` 호출로 발신자 verified 완성 가능.
+
+## 실제 Solapi 발신번호 검증 (2026-10-04 추가)
+
+`.env.local`의 실제 SOLAPI_API_KEY/SECRET으로 `api.solapi.com/senderid/v1/numbers` HMAC 호출:
+
+- 등록 번호 `01029062908`: `check` → 공급자 ACTIVE 확인 → **sender verified**(environment=live, providerRef 기록)
+- 미등록 번호 `01000001234`: `check` → 공급자에 ACTIVE 아님 → `verified:false` · 발신자 pending 유지(적대적 경로)
+- `SOLAPI_TENANT_ID`는 회사 UUID와 바인딩 — 다른 회사는 `SMS_PROVIDER_REQUIRED` 503
+
+## 미수용
+
+- **SMS 실제 전송은 미구현**: `SMS_TRANSPORT`는 `unconfigured|local`만 지원 — 캠페인 문자 발송은 여전히 로컬 영수증. 실제 Solapi 메시지 전송·receipt webhook은 구현이 필요한 범위.
