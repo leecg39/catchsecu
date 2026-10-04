@@ -23,6 +23,10 @@
 
 로컬 production 서버와 실제 `catchsecu_dev`에서 [HTTP 실행 기록](http.txt)을 확인했다. 전문가 선택·운영 화면 GET 200, 배정 POST 201, 본인 배정 목록 GET 200, 회사 선택 POST 200, 배정 서비스만 조회 GET 200, 회수 DELETE 204, 회수 후 같은 회사 재선택 POST 404였다. 테스트에 쓰인 전문가 배정/구성원/grant는 제거했고 임시 운영자 권한을 복원했다. 재현 명령: `node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/qa-expert-assignments.ts`.
 
+## 2026-10-04 브라우저 게이트 (Chrome 실제 브라우저)
+
+[browser-gate-20261004.md](browser-gate-20261004.md). dev 서버+실제 Chrome으로 구성원 목록/초대 다이얼로그/초대 이력/권한 수정/전문가 배정 관리·390px 모바일을 확인했다. 적대적 결과 2건: 초대는 구독 좌석 한도로 차단(오류 문구 표시·DB 미생성), 권한 회수는 독립 viewer 세션의 API 응답이 즉시 3→0건으로 차단되고 복원 시 0→3으로 돌아왔다. owner 행에 관리 버튼이 없는 것도 화면에서 확인했다. "다른 이메일 초대수락 거부"는 좌석 한도로 신규 초대를 만들 수 없어 API 증거(`member-management-gate.test.ts`·`http-current.txt`)로 유지한다. 원본 배정 상태 대조와 전체 경로 게이트는 아래 기존 한계와 같다.
+
 ## 근거와 남은 게이트
 
 - 원본 [`/expert/select-company` 조사 기록](../../research/public/_expert_select-company.json)은 검색창과 배정 회사가 없는 화면만 보여준다. 배정된 회사의 실제 UX/권한 범위는 관찰되지 않았다. 현재 전문가의 서비스별 `viewer` 역할은 독립 구현의 보수적 범위이며 원본 동일성을 주장하지 않는다.

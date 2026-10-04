@@ -38,4 +38,4 @@
   - `GET /log/collect-destruction` 200 — CollectDestruction 셸(필터·검색·도구모음) 렌더, 비로그인은 `/login` 307
   - `GET /api/v1/analytics/collect-destruction` 실세션 200 — 행 3건(일자·서비스·원천·수집/파기/잔여·누적), sources 7건
   - `GET .../export` 실세션 200 — BOM(`EF BB BF`) + 원본 헤더 + CRLF 확인
-  - 1440/390 인터랙티브 확인은 브라우저 프리뷰에서 진행 가능(레이아웃은 기존 mg/cs 패턴 재사용)
+  - **Chrome 실제 브라우저 인터랙티브 확인 (2026-10-04)**: admin 세션으로 테이블 3행·합계 행·필터(서비스 선택 시 원천 드롭다운 연동 축소)·빈 상태·페이지·**엑셀 다운로드 클릭→export 200**·1440px/390px(햄버거·세로 필터·가로 스크롤) 확인
