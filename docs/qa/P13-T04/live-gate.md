@@ -13,3 +13,9 @@ dev 앱 :3100에서 03-route-matrix.csv의 파라미터 없는 **141개 정적 �
 
 - 40개 동적 경로(실제 fixture ID 필요)·새로고침·뒤로가기·1440/768/390 레이아웃·캡처 목록은 미실행 — 개별 게이트에서 일부만 검증됨.
 - viewer·다른 역할의 전수 스윕 없음(owner 기준).
+
+## viewer 전수 스윕 (결과: [viewer-sweep.json](viewer-sweep.json))
+
+- 132/141 → **200**(역할이 허용하는 화면의 셸 렌더), **5xx 0**.
+- 차단 9개는 전부 `/log/*` 계열 → `/access-not-allow?reason=role`(audit.read 없음) — 서버 측 역할 경계가 페이지 수준에서도 집행됨.
+- `/security/*`·`/set/*`은 셸 200이지만 데이터 API는 403(P11-T02 게이트 실측) — 셸/데이터 분리 설계.
