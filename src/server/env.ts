@@ -13,6 +13,7 @@ const schema = z.object({
   FILE_TENANT_QUOTA_BYTES: z.coerce.number().int().min(10485760).max(1099511627776).default(1073741824),
   LOCAL_MAIL_DIR: z.string().default(".local/mail"),
   SMS_TRANSPORT: z.enum(["unconfigured", "local", "solapi"]).default("unconfigured"),
+  MESSAGE_UNIT_COST_KRW: z.coerce.number().int().min(0).max(1000000).default(0),
   LOCAL_SMS_DIR: z.string().default(".local/sms"),
   SMS_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),
   KAKAO_REVIEW_SECRET: z.string().min(32).max(128).optional(),

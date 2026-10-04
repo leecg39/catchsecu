@@ -30,7 +30,7 @@ async function enqueue(tx: Transaction, campaign: Campaign, rows: CampaignDelive
   await tx.job.createMany({ data: rows.map(row => ({ type: campaign.mailProtocol, tenantId: row.tenantId, senderId: campaign.senderId,
     campaignDeliveryId: row.id, marketingPreferenceId: row.preferenceId, marketingSubmissionId: row.sourceSubmissionId,
     dedupeKey: "campaign:" + row.id + ":" + row.attempt, dueAt,
-    payloadCipher: encrypt({ campaignId: campaign.id, deliveryId: row.id, attempt: row.attempt, transport: campaign.channel === "sms" ? env.SMS_TRANSPORT === "solapi" ? "sms-solapi" : "sms-local" : env.MAIL_TRANSPORT }) })) });
+    payloadCipher: encrypt({ campaignId: campaign.id, deliveryId: row.id, attempt: row.attempt, transport: campaign.channel === "sms" ? env.SMS_TRANSPORT === "solapi" ? "sms-solapi" : "sms-local" : env.MAIL_TRANSPORT, ...(campaign.channel === "sms" ? { unitCost: env.MESSAGE_UNIT_COST_KRW } : {}) }) })) });
 }
 export async function scheduleCampaign(ctx: Context, id: string, input: z.infer<typeof campaignSchedule>, key: string | null, requestId: string) {
   return idempotent("campaign:schedule:" + ctx.member.id + ":" + id, key, input, async tx => {

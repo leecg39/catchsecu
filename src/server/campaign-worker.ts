@@ -14,9 +14,10 @@ import { readCampaignAttachments, markCampaignFilesForDeletion } from "./campaig
 import { finishFileDeletion } from "./files";
 import { deliverMail, type MailAttachment, type ClaimedJob } from "./jobs";
 import { deliverSms, smsReceiptFile } from "./sms-adapter";
+import { postLedgerTransfer } from "./ledger";
 import { audit } from "./audit";
 
-const jobPayload = z.object({ campaignId: z.uuid(), deliveryId: z.uuid(), attempt: z.number().int().positive(), transport: z.enum(["local", "smtp", "sms-local", "sms-solapi"]) }).strict();
+const jobPayload = z.object({ campaignId: z.uuid(), deliveryId: z.uuid(), attempt: z.number().int().positive(), transport: z.enum(["local", "smtp", "sms-local", "sms-solapi"]), unitCost: z.number().int().min(0).max(1000000).optional() }).strict();
 type Payload = z.infer<typeof jobPayload>;
 async function lockedState(tx: Transaction, job: ClaimedJob, workerId: string, payload: Payload) {
   const initial = await tx.campaignDelivery.findUnique({ where: { id: payload.deliveryId }, include: { campaign: true } });
@@ -53,6 +54,27 @@ async function finish(tx: Transaction, job: ClaimedJob, campaign: Campaign, reci
   await settleCampaign(tx, campaign);
   await deliveryAudit(tx, job, recipient, status);
 }
+/** 발송 정산. 예약은 원천키 멱등이라 재시도에서 재사용하고, 최종 상태에서만 capture/release로 정산한다. */
+function isSms(transport: string) { return transport === "sms-local" || transport === "sms-solapi"; }
+async function reserveMessage(tx: Transaction, recipient: CampaignDelivery, unitCost: number) {
+  return postLedgerTransfer(tx, { tenantId: recipient.tenantId, serviceId: recipient.serviceId, currency: "KRW", kind: "reserve", amount: BigInt(unitCost), sourceKind: "campaign_delivery", sourceId: recipient.id });
+}
+async function captureMessage(tx: Transaction, recipient: CampaignDelivery, holdId: string, unitCost: number) {
+  return postLedgerTransfer(tx, { tenantId: recipient.tenantId, serviceId: recipient.serviceId, currency: "KRW", kind: "capture", amount: BigInt(unitCost), sourceKind: "campaign_delivery", sourceId: recipient.id, reservationId: holdId });
+}
+async function releaseHeld(tx: Transaction, recipient: CampaignDelivery) {
+  const hold = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: { tenantId: recipient.tenantId, kind: "reserve", sourceKind: "campaign_delivery", sourceId: recipient.id } } });
+  if (!hold) return;
+  const settled = await tx.ledgerTransaction.findFirst({ where: { reservationId: hold.id, kind: { in: ["release", "capture"] } } });
+  if (settled) return;
+  await postLedgerTransfer(tx, { tenantId: recipient.tenantId, serviceId: recipient.serviceId, currency: "KRW", kind: "release", amount: hold.amount, sourceKind: "campaign_delivery", sourceId: recipient.id, reservationId: hold.id });
+}
+async function settleRecovered(tx: Transaction, recipient: CampaignDelivery, unitCost: number) {
+  const hold = await reserveMessage(tx, recipient, unitCost);
+  const released = await tx.ledgerTransaction.findFirst({ where: { reservationId: hold.id, kind: "release" } });
+  if (released) return;
+  await captureMessage(tx, recipient, hold.id, unitCost);
+}
 async function deliveryAudit(tx: Transaction, job: ClaimedJob, recipient: CampaignDelivery, status: string) {
   await audit(tx, { tenantId: recipient.tenantId, user: { id: null } }, job.id,
     "campaign.delivery_" + status, "campaignDelivery", recipient.id, ["status"], recipient.serviceId);
@@ -66,19 +88,25 @@ async function localReceipt(jobId: string) {
 /** Persist "sending" before I/O so an SMTP timeout or a killed process cannot cause a blind resend. */
 export async function runCampaignJob(job: ClaimedJob, workerId: string) {
   const payload = jobPayload.parse(decrypt(job.payloadCipher));
+  const unitCost = isSms(payload.transport) ? (payload.unitCost ?? env.MESSAGE_UNIT_COST_KRW) : 0;
   const prepared = await db.$transaction(async tx => {
     const state = await lockedState(tx, job, workerId, payload); if (!state) return false;
     const { campaign, recipient, reason } = state;
     if (recipient.status === "sending") {
       const receipt = payload.transport === "local" ? await localReceipt(job.id) : payload.transport === "sms-local" ? await smsReceiptFile(job.id) : payload.transport === "sms-solapi" ? (await tx.smsReceipt.findUnique({ where: { deliveryId: payload.deliveryId } }))?.createdAt ?? null : null;
       if (receipt || payload.transport === "smtp") {
+        if (receipt && isSms(payload.transport) && unitCost > 0) await settleRecovered(tx, recipient, unitCost);
         await finish(tx, job, campaign, recipient, receipt ? payload.transport === "sms-solapi" ? "accepted" : "local_delivered" : "unknown", receipt ? null : "DELIVERY_UNCERTAIN", receipt ?? undefined); return false;
       }
     }
     if (!["queued", "sending"].includes(recipient.status)) {
+      if (isSms(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient);
       await finish(tx, job, campaign, recipient, recipient.status, recipient.reason, recipient.acceptedAt ?? undefined); return false;
     }
-    if (reason) { await finish(tx, job, campaign, recipient, "cancelled", reason); return false; }
+    if (reason) {
+      if (isSms(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient);
+      await finish(tx, job, campaign, recipient, "cancelled", reason); return false;
+    }
     await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "sending", reason: null } });
     await deliveryAudit(tx, job, recipient, "sending");
     await settleCampaign(tx, campaign); return true;
@@ -87,21 +115,36 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
   await db.$transaction(async tx => {
     const state = await lockedState(tx, job, workerId, payload); if (!state) return;
     const { campaign, recipient, reason, sender, evaluated } = state;
-    if (recipient.status !== "sending") { await finish(tx, job, campaign, recipient, recipient.status, recipient.reason, recipient.acceptedAt ?? undefined); return; }
-    if (reason) { await finish(tx, job, campaign, recipient, "cancelled", reason); return; }
+    if (recipient.status !== "sending") {
+      if (isSms(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient);
+      await finish(tx, job, campaign, recipient, recipient.status, recipient.reason, recipient.acceptedAt ?? undefined); return;
+    }
+    if (reason) {
+      if (isSms(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient);
+      await finish(tx, job, campaign, recipient, "cancelled", reason); return;
+    }
     if (payload.transport === "sms-local" || payload.transport === "sms-solapi") {
       const solapi = payload.transport === "sms-solapi";
+      let hold: { id: string } | null = null;
+      if (unitCost > 0) {
+        // 계정 행을 잠근 뒤 잔액을 확인한다 — 부족하면 같은 트랜잭션에서 실패 처리할 수 있게 INSERT 예외 전에 차단.
+        const acct = await tx.$queryRaw<{ available: bigint }[]>`SELECT available FROM "CreditAccount" WHERE "tenantId"=${recipient.tenantId} AND currency='KRW' FOR UPDATE`;
+        const existing = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: { tenantId: recipient.tenantId, kind: "reserve", sourceKind: "campaign_delivery", sourceId: recipient.id } } });
+        if (!existing && (acct.length === 0 || acct[0].available < BigInt(unitCost))) { await finish(tx, job, campaign, recipient, "failed", "INSUFFICIENT_CREDIT"); return; }
+        hold = await reserveMessage(tx, recipient, unitCost);
+      }
       try {
         const sent = await deliverSms({ transport: solapi ? "solapi" : "local", jobId: job.id, to: evaluated.contact!.contact, from: decrypt<string>(sender!.addressCipher!), text: evaluated.content!.text });
         if (solapi) await tx.smsReceipt.create({ data: { tenantId: recipient.tenantId, deliveryId: recipient.id, receiptId: sent.receiptId, status: "provider_accepted" } });
       }
       catch (error) {
-        if (error instanceof HttpError && error.status === 422) { await finish(tx, job, campaign, recipient, "failed", error.code); return; }
-        if (job.attempts >= job.maxAttempts) { await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
+        if (error instanceof HttpError && error.status === 422) { if (hold) await releaseHeld(tx, recipient); await finish(tx, job, campaign, recipient, "failed", error.code); return; }
+        if (job.attempts >= job.maxAttempts) { if (hold) await releaseHeld(tx, recipient); await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
         await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "queued", reason: "DELIVERY_FAILED" } });
         await tx.job.update({ where: { id: job.id }, data: { status: "retry", dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } });
         await deliveryAudit(tx, job, recipient, "queued"); return;
       }
+      if (hold) await captureMessage(tx, recipient, hold.id, unitCost);
       await finish(tx, job, campaign, recipient, solapi ? "accepted" : "local_delivered", null, new Date()); return;
     }
     let attachments: MailAttachment[];

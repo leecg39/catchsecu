@@ -6,6 +6,7 @@ import type { Context } from "./context";
 import { fail } from "./http";
 import { audit } from "./audit";
 import { roleCan } from "./permissions";
+import { postLedgerTransfer } from "./ledger";
 
 const providerEvent = z.object({
   orderId: z.uuid(),
@@ -69,6 +70,18 @@ export async function applyPaymentEvent(raw: string, signature: string, secret: 
     await tx.paymentEvent.create({ data: { orderId: order.id, providerEventId: input.eventId, outcome: input.outcome } });
     const saved = await tx.paymentOrder.update({ where: { id: order.id }, data: { status: input.outcome, version: { increment: 1 } } });
     await audit(tx, { tenantId: order.tenantId, user: { id: null } }, requestId, "billing.payment_" + input.outcome, "paymentOrder", order.id, ["status"]);
+    if (input.outcome === "paid") {
+      // 서명된 승인만이 구독을 활성화하고 동액 크레딧을 충전한다 — 같은 트랜잭션으로 원자 커밋.
+      const subscription = await tx.billingSubscription.findUnique({ where: { id: order.subscriptionId }, include: { planVersion: true } });
+      if (subscription && subscription.status === "pending") {
+        const start = new Date(), end = new Date(start);
+        if (subscription.planVersion.cycle === "year") end.setFullYear(end.getFullYear() + 1); else end.setMonth(end.getMonth() + 1);
+        await tx.billingSubscription.update({ where: { id: subscription.id }, data: { status: "active", periodStart: start, periodEnd: end, activationSource: "payment", version: { increment: 1 },
+          events: { create: { version: subscription.version + 1, kind: "activated", detail: { orderId: order.id, amount: order.amount } } } } });
+      }
+      await postLedgerTransfer(tx, { tenantId: order.tenantId, currency: order.currency, kind: "funding",
+        amount: BigInt(order.amount), sourceKind: "pg_capture", sourceId: order.id });
+    }
     return { ...dto(saved), duplicate: false };
   });
 }

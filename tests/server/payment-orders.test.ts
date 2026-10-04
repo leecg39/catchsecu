@@ -43,8 +43,47 @@ test("성공 주소와 카드 원문으로는 결제 완료가 되지 않고 서
   const paid = JSON.stringify({ orderId: order.id, eventId: "event-paid-1", outcome: "paid" });
   await expect(applyPaymentEvent(paid, "00", secret)).rejects.toMatchObject({ status: 401 });
   expect((await applyPaymentEvent(paid, sign(paid), secret)).status).toBe("paid");
+  const activated = await db.billingSubscription.findUniqueOrThrow({ where: { id: subscription.id } });
+  expect(activated.status).toBe("active");
+  expect(activated.activationSource).toBe("payment");
+  expect(activated.periodStart).not.toBeNull();
+  expect(activated.periodEnd!.getTime() - activated.periodStart!.getTime()).toBeGreaterThan(25 * 24 * 60 * 60 * 1000);
+  const event = await db.billingSubscriptionEvent.findFirstOrThrow({ where: { subscriptionId: subscription.id, kind: "activated" } });
+  expect((event.detail as { orderId: string }).orderId).toBe(order.id);
+  const account = await db.creditAccount.findUniqueOrThrow({ where: { tenantId_currency: { tenantId: company.id, currency: "KRW" } } });
+  expect(account.available).toBe(BigInt(12000));
+  expect(account.held).toBe(BigInt(0));
+  const funding = await db.ledgerTransaction.findFirstOrThrow({ where: { tenantId: company.id, kind: "funding", sourceKind: "pg_capture", sourceId: order.id } });
+  expect(funding.amount).toBe(BigInt(12000));
+  expect(funding.currency).toBe("KRW");
   expect((await applyPaymentEvent(paid, sign(paid), secret)).duplicate).toBe(true);
+  expect(await db.ledgerTransaction.count({ where: { tenantId: company.id, kind: "funding" } })).toBe(1);
+  expect((await db.creditAccount.findUniqueOrThrow({ where: { tenantId_currency: { tenantId: company.id, currency: "KRW" } } })).available).toBe(BigInt(12000));
   const late = JSON.stringify({ orderId: order.id, eventId: "event-fail-2", outcome: "failed" });
   await expect(applyPaymentEvent(late, sign(late), secret)).rejects.toMatchObject({ status: 409 });
   expect((await db.paymentOrder.findUniqueOrThrow({ where: { id: order.id } })).status).toBe("paid");
+});
+
+test("연간 주기는 1년 기간으로 활성화되고 결제 없는 활성화는 DB가 거부한다", async () => {
+  const email = "pay-y-" + randomUUID() + "@catchsecu.test";
+  expect((await auth.handler(req("/auth/sign-up/email", "", "POST", { name: "연간", email, password }))).status).toBe(200);
+  const user = await db.user.update({ where: { email }, data: { emailVerified: true } });
+  const company = await db.company.create({ data: { name: "연간 회사", publicName: "연간", policy: { create: {} }, memberships: { create: { userId: user.id, role: "owner" } } } });
+  const plan = await db.billingPlan.create({ data: { id: "pay-y-" + randomUUID(), name: "연간" } });
+  const version = await db.billingPlanVersion.create({ data: { planId: plan.id, number: 1, cycle: "year", priceKrw: 120000, currency: "KRW", features: {}, orderable: true, effectiveFrom: new Date("2026-01-01") } });
+  const subscription = await db.billingSubscription.create({ data: { tenantId: company.id, planId: plan.id, planVersionId: version.id, status: "pending", priceKrw: 120000, currency: "KRW" } });
+  const login = await auth.handler(req("/auth/sign-in/email", "", "POST", { email, password }));
+  const cookie = login.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
+  const order = await (await createOrder(req("/billing/orders", cookie, "POST", { subscriptionId: subscription.id }, randomUUID()))).json();
+  await expect(db.billingSubscription.update({ where: { id: subscription.id },
+    data: { status: "active", activationSource: "payment", periodStart: new Date(), periodEnd: new Date(Date.now() + 30 * 24 * 3600e3), version: { increment: 1 } } })).rejects.toThrow();
+  const paid = JSON.stringify({ orderId: order.id, eventId: "event-paid-y", outcome: "paid" });
+  await applyPaymentEvent(paid, sign(paid), secret);
+  const active = await db.billingSubscription.findUniqueOrThrow({ where: { id: subscription.id } });
+  expect(active.status).toBe("active");
+  const days = (active.periodEnd!.getTime() - active.periodStart!.getTime()) / 86400e3;
+  expect(days).toBeGreaterThan(360); expect(days).toBeLessThan(370);
+  expect((await db.creditAccount.findUniqueOrThrow({ where: { tenantId_currency: { tenantId: company.id, currency: "KRW" } } })).available).toBe(BigInt(120000));
+  const early = await db.billingSubscription.update({ where: { id: subscription.id }, data: { status: "expired", version: { increment: 1 } } }).then(() => null, (e: Error) => e.message);
+  expect(early).toContain("BILLING_EARLY_EXPIRATION");
 });

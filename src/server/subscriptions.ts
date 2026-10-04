@@ -37,14 +37,14 @@ export async function entitlement(ctx: Context): Promise<EntitlementRecord> {
   billingRead(ctx);
   const now = new Date();
   const [current, services, members, subjects, forms] = await Promise.all([
-    db.billingSubscription.findFirst({ where: { tenantId: ctx.tenantId, status: "trialing", periodStart: { lte: now }, periodEnd: { gt: now },
+    db.billingSubscription.findFirst({ where: { tenantId: ctx.tenantId, status: { in: ["trialing", "active"] }, periodStart: { lte: now }, periodEnd: { gt: now },
       OR: [{ cancelAt: null }, { cancelAt: { gt: now } }] }, include: { planVersion: true }, orderBy: { periodEnd: "desc" } }),
     db.service.count({ where: { tenantId: ctx.tenantId, status: "active" } }),
     db.membership.count({ where: { tenantId: ctx.tenantId, status: "active" } }),
     db.dataSubject.count({ where: { tenantId: ctx.tenantId } }),
     db.form.count({ where: { tenantId: ctx.tenantId, status: { not: "deleted" }, sourceType: "form" } }),
   ]);
-  return { active: !!current, status: current ? "trialing" : "expired", periodEnd: current?.cancelAt?.toISOString() ?? current?.periodEnd?.toISOString() ?? null,
+  return { active: !!current, status: current?.status ?? "expired", periodEnd: current?.cancelAt?.toISOString() ?? current?.periodEnd?.toISOString() ?? null,
     limits: { services: current?.planVersion.serviceLimit ?? null, members: current?.planVersion.memberLimit ?? null,
       subjects: current?.planVersion.subjectLimit ?? null, forms: current?.planVersion.formLimit ?? null },
     usage: { services, members, subjects, forms } };

@@ -1,7 +1,7 @@
 import { Prisma } from "@/generated/prisma/client";
 import type { Context } from "./context";
 import type { LedgerOverview, LedgerQuery } from "@/contracts/ledger";
-import { db } from "./db";
+import { db, type Transaction } from "./db";
 import { fail } from "./http";
 import { roleCan } from "./permissions";
 import { audit } from "./audit";
@@ -17,25 +17,27 @@ type Transfer = {
  * PG capture; there is deliberately no public write route while P10-T02 is open.
  * PostgreSQL owns the balance check, reservation cap and paired ledger entries.
  */
-export async function postTrustedLedgerTransfer(input: Transfer) {
+export async function postLedgerTransfer(tx: Transaction, input: Transfer) {
   if (!/^[A-Z]{3}$/.test(input.currency) || input.amount <= BigInt(0) || input.amount > BigInt(1000000000000) ||
     !/^[a-z][a-z0-9_:-]{0,63}$/.test(input.sourceKind) || input.sourceId.length < 1 || input.sourceId.length > 128)
     fail(422, "INVALID_LEDGER_SOURCE", "원장 원천과 금액을 확인해주세요.");
   const key = { tenantId: input.tenantId, kind: input.kind, sourceKind: input.sourceKind, sourceId: input.sourceId };
-  return db.$transaction(async tx => {
-    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${"ledger-source:" + Object.values(key).join(":")}, 0))`;
-    const existing = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: key } });
-    if (existing) {
-      if (existing.currency !== input.currency || existing.amount !== input.amount ||
-        existing.serviceId !== (input.serviceId ?? null) || existing.reservationId !== (input.reservationId ?? null))
-        fail(409, "LEDGER_SOURCE_CONFLICT", "같은 원천에 다른 원장 내용이 사용되었습니다.");
-      return existing;
-    }
-    const row = await tx.ledgerTransaction.create({ data: { ...key, currency: input.currency, amount: input.amount,
-      serviceId: input.serviceId ?? null, reservationId: input.reservationId ?? null } });
-    await audit(tx, { tenantId: input.tenantId, user: { id: null } }, row.id, "billing.ledger_" + input.kind, "ledgerTransaction", row.id, ["balance"], input.serviceId ?? undefined);
-    return row;
-  }, { timeout: 15000 });
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${"ledger-source:" + Object.values(key).join(":")}, 0))`;
+  const existing = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: key } });
+  if (existing) {
+    if (existing.currency !== input.currency || existing.amount !== input.amount ||
+      existing.serviceId !== (input.serviceId ?? null) || existing.reservationId !== (input.reservationId ?? null))
+      fail(409, "LEDGER_SOURCE_CONFLICT", "같은 원천에 다른 원장 내용이 사용되었습니다.");
+    return existing;
+  }
+  const row = await tx.ledgerTransaction.create({ data: { ...key, currency: input.currency, amount: input.amount,
+    serviceId: input.serviceId ?? null, reservationId: input.reservationId ?? null } });
+  await audit(tx, { tenantId: input.tenantId, user: { id: null } }, row.id, "billing.ledger_" + input.kind, "ledgerTransaction", row.id, ["balance"], input.serviceId ?? undefined);
+  return row;
+}
+
+export async function postTrustedLedgerTransfer(input: Transfer) {
+  return db.$transaction(tx => postLedgerTransfer(tx, input), { timeout: 15000 });
 }
 
 export async function ledgerOverview(ctx: Context, query: LedgerQuery): Promise<LedgerOverview> {

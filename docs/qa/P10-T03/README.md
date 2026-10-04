@@ -24,3 +24,26 @@
 - PG sandbox의 **서명·승인된 실제 캡처**에서만 충전을 만들도록 결제 원천을 연결하고, 실패/중복/순서 역전·환불을 검증해야 한다. 현재 DB의 `sourceKind='pg_capture'` 값만으로 실제 PG 증명은 성립하지 않는다.
 - 이메일·문자·본인인증 등 서비스별 사용 요청/공급자 영수증을 예약·확정·실패 해제에 연결하고, 실패 전송의 정산 정책과 월별 사용량 집계를 검증해야 한다.
 - 원본 화면 대조, 결제/환불·마감 연계, 실제 외부 공급자 환경에서의 전체 E2E가 남아 있다.
+
+## 2026-10-06 추가 구현 — 서명 승인 충전과 SMS 발송 정산
+
+### 구현
+
+- `applyPaymentEvent`가 서명된 `paid` 이벤트를 받으면 한 트랜잭션에서 주문 paid 전이·대기 구독 `active` 활성화(월간 +1개월/연간 +1년 기간, `activationSource='payment'`, `activated` 이벤트)·`kind='funding'`/`sourceKind='pg_capture'`/`sourceId=주문ID` 충전을 원자 커밋한다. 성공 주소 위조·무서명 본문으로는 절대 충전되지 않는다.
+- 마이그레이션 `20261006110000_paid_activation`이 구독 `active` 상태와 `activated` 이벤트 종류를 허용하고, `pending→active`는 동액 paid 주문이 존재할 때만 허용하는 DB 트리거(`BILLING_ACTIVATION_WITHOUT_PAYMENT`)와 조기 만료 거부(`BILLING_EARLY_EXPIRATION`)를 추가했다.
+- 캠페인 스케줄링이 SMS 발송 잡 페이로드에 `unitCost`(예약 시점 `MESSAGE_UNIT_COST_KRW` 스냅샷)를 암호화 저장한다.
+- 캠페인 워커가 SMS 발송 전 `reserve`(원천키=`campaign_delivery:{deliveryId}`), 발송 수락 후 `capture`, 취소·확정 실패 시 `release`를 같은 트랜잭션에서 처리한다. `sending` 복구 시 영수증이 있으면 예약 재사용 후 확정한다. 이미 capture/release된 예약에는 재정산을 시도하지 않는다.
+- 잔액 부족은 INSERT 예외 전에 `CreditAccount FOR UPDATE` 잠금 아래 잔액을 먼저 확인해 `INSUFFICIENT_CREDIT` 실패로 기록한다(트랜잭션 중단 오염 방지).
+
+### 적대적 검증 (tests/server/billing-settlement.test.ts, payment-orders.test.ts — 5/5 통과)
+
+- 서명 paid → 구독 active·기간 설정·`activated` 이벤트·funding 12,000·가용 잔액 일치 확인. 동일 이벤트 재적용은 duplicate이며 충전이 두 번 생기지 않는다.
+- 연간 주기는 360~370일 기간으로 활성화. paid 주문 없이 `pending→active` 직접 변경은 DB가 거부하고, `active→expired` 조기 전이도 `BILLING_EARLY_EXPIRATION`으로 거부한다.
+- 문자 발송 성공: funding→reserve→capture 순서로 원장에 기록되고 capture가 예약을 참조한다. 완료 잡 재실행(리플레이)에서도 원장 3건·지출 50 유지 — 이중 차감 없음.
+- 잔액 30 < 단가 50: 발송은 `failed`/`INSUFFICIENT_CREDIT`으로 기록되고 원장은 funding만 남는다.
+- 동의 변경으로 발송 취소된 경우 기존 예약이 `release`로 반환되어 가용 잔액이 복원된다.
+
+### 여전히 남은 조건
+
+- 실제 PG sandbox의 서명 캡처에서 충전되는 것을 외부 환경에서 확인해야 한다(현재 검증은 서명된 로컬 이벤트).
+- 실패 전송의 정산 정책(공급자 수락 후 통신사 실패 등)과 월별 사용량 집계 뷰, 원본 화면 대조는 미완료다.

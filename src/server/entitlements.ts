@@ -9,7 +9,7 @@ export async function assertQuota(tx: Transaction, tenantId: string, resource: R
   // Old test fixtures use direct Company inserts. Production creation and the backfill always attach a trial.
   if (!subscriptions.length) return;
   const now = new Date();
-  const active = subscriptions.find(row => row.status === "trialing" && row.periodStart && row.periodStart <= now && row.periodEnd && row.periodEnd > now
+  const active = subscriptions.find(row => ["trialing", "active"].includes(row.status) && row.periodStart && row.periodStart <= now && row.periodEnd && row.periodEnd > now
     && (!row.cancelAt || row.cancelAt > now));
   if (!active) fail(402, "SUBSCRIPTION_REQUIRED", "이용 가능한 구독이 없습니다. 구독 정보를 확인해주세요.");
   const limit = { services: active.planVersion.serviceLimit, members: active.planVersion.memberLimit,
