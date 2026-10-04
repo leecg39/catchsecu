@@ -11,8 +11,8 @@
 | `/pay/license-service` | `GET /subscriptions`(trialing/active/pending·cancelAt 표시), `POST /subscriptions/:id/cancel·schedule-cancel·undo-cancel`(active 해지 사유 포함), `GET /ledger`(available/held), `GET /billing/methods`(목록·등록·대표지정·해지), `GET /billing/orders`(주문 목록·planName·refundedTotal), `POST /billing/orders`(pending 구독 → 주문 생성), `POST /billing/orders/:id/refunds`, `GET /billing/orders/:id/refunds`, `GET /billing/orders/:id/invoice`(청구서 PDF 링크) |
 | `/pay/history` · `/pay/usage/history` | `GET /billing-history` — 무료 체험 + 결제 주문 + 환불 행을 발생시각 역순·페이지네이션으로 반환. 월 필터는 KST 달력 기준 |
 | `/pay/service-asset` | `GET /assets` — entitlement·서비스별 사용량 |
-| `/pay/result/success` | `GET /billing/orders/:id?result=…` — URL의 result 값은 `returnResultIgnored`로만 에코되고 상태 판정에 사용되지 않음. 테넌트 불일치는 404 |
-| `/pay/result/fail` | 정적 실패 안내(서버 상태 변경 없음) |
+| `/pay/result/success[/:purchaseId]` · `/pay/credit/success/:id` · `/pay/plus/success/:id[/:type]` | `GET /billing/orders/:id?result=…` — URL의 result 값은 `returnResultIgnored`로만 에코되고 상태 판정에 사용되지 않음. 테넌트 불일치는 404 |
+| `/pay/result/fail` · `/pay/plus/fail/:code` · `/pay/cancel` | 주문ID가 있으면 `GET /billing/orders/:id`로 실제 상태를 읽어 paid/pending/failed를 구분 표시(2026-10-07 path 파라미터 연결) |
 | `/pay/method` · `/pay/billing-policy` | `/pay/license-service` 리다이렉트 |
 
 ## 검증(로컬)

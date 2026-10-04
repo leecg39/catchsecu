@@ -256,9 +256,9 @@ export function ServiceAssetPage() {
       empty="등록된 서비스가 없습니다"/></Panel></div></div>;
 }
 
-export function PaymentFailure() {
+export function PaymentFailure({ orderId: pathOrderId }: { orderId?: string } = {}) {
   const params = useSearchParams();
-  const orderId = params.get("orderId") ?? params.get("purchaseId") ?? "";
+  const orderId = pathOrderId ?? params.get("orderId") ?? params.get("purchaseId") ?? "";
   const valid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId);
   const order = useResource<PaymentOrderListItem>(valid ? `/billing/orders/${orderId}` : null);
   const status = order.data?.status;
@@ -274,9 +274,9 @@ export function PaymentFailure() {
   </div></section>;
 }
 
-export function PaymentResult() {
+export function PaymentResult({ orderId: pathOrderId }: { orderId?: string } = {}) {
   const params = useSearchParams();
-  const orderId = params.get("orderId") ?? params.get("purchaseId") ?? "";
+  const orderId = pathOrderId ?? params.get("orderId") ?? params.get("purchaseId") ?? "";
   const valid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId);
   const order = useResource<PaymentOrderListItem>(valid ? `/billing/orders/${orderId}?result=${encodeURIComponent(params.get("result") ?? "")}` : null);
   const status = order.data?.status;
