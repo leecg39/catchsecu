@@ -9,7 +9,8 @@ import { HttpError } from "./http";
 import { withEmailPolicy } from "./email-policy";
 import { lockFileIssuer } from "./file-access";
 import { senderDenial } from "./sender-access";
-import { evaluateRecipient, lockCampaign, lockCampaignConsents, settleCampaign, changeCampaign } from "./campaign-common";
+import { solapiConfigured } from "./sender-providers";
+import { evaluateRecipient, lockCampaign, lockCampaignConsents, settleCampaign, changeCampaign, normalizedTarget, type RecipientContact } from "./campaign-common";
 import { readCampaignAttachments, markCampaignFilesForDeletion } from "./campaign-files";
 import { finishFileDeletion } from "./files";
 import { deliverMail, type MailAttachment, type ClaimedJob } from "./jobs";
@@ -30,9 +31,15 @@ async function lockedState(tx: Transaction, job: ClaimedJob, workerId: string, p
     if (!(error instanceof HttpError)) throw error;
     reason = ["COMPANY_UNAVAILABLE", "SERVICE_ARCHIVED", "NOT_FOUND"].includes(error.code) ? "SERVICE_UNAVAILABLE" : "PERMISSION_REVOKED";
   }
-  const consents = await lockCampaignConsents(tx, initial.campaign, [initial.contactHash]);
-  const sender = initial.campaign.senderId
-    ? (await tx.$queryRaw`SELECT id FROM "Sender" WHERE id=${initial.campaign.senderId} FOR SHARE`, await tx.sender.findUnique({ where: { id: initial.campaign.senderId } }))
+  // 알림톡 대체발송 잡은 SMS 채널 동의와 대체발신자를 검증한다 — 원래 잡의 카카오 바인딩은 그대로 유지된다.
+  const fallbackLeg = initial.campaign.channel === "kakao" && (payload.transport === "sms-local" || payload.transport === "sms-solapi");
+  let consentHash = initial.contactHash;
+  if (fallbackLeg && !initial.erasedAt && initial.contactCipher)
+    try { consentHash = normalizedTarget("sms", decrypt<RecipientContact>(initial.contactCipher).contact).hash; } catch { /* evaluateRecipient reports the original failure */ }
+  const consents = await lockCampaignConsents(tx, { tenantId: initial.tenantId, serviceId: initial.serviceId, channel: fallbackLeg ? "sms" : initial.campaign.channel }, [consentHash]);
+  const senderId = fallbackLeg ? initial.campaign.fallbackSenderId : initial.campaign.senderId;
+  const sender = senderId
+    ? (await tx.$queryRaw`SELECT id FROM "Sender" WHERE id=${senderId} FOR SHARE`, await tx.sender.findUnique({ where: { id: senderId } }))
     : null;
   const campaign = await lockCampaign(tx, initial.campaignId);
   await tx.$queryRaw`SELECT id FROM "CampaignDelivery" WHERE id=${initial.id} FOR UPDATE`;
@@ -43,16 +50,20 @@ async function lockedState(tx: Transaction, job: ClaimedJob, workerId: string, p
   if (!["scheduled", "dispatching"].includes(campaign.status)) reason = "CANCELLED";
   if (campaign.expiresAt <= new Date() || !campaign.contentCipher || recipient.erasedAt) reason = "DATA_ERASED";
   let kakaoTemplate: { id: string; status: string; version: number; body: string; buttons: unknown; channel: { status: string } } | null = null;
-  if (campaign.channel === "kakao") {
+  if (fallbackLeg) {
+    if (!sender || sender.version !== campaign.fallbackSenderVersion || senderDenial(sender)) reason ??= "FALLBACK_UNAVAILABLE";
+  } else if (campaign.channel === "kakao") {
     kakaoTemplate = campaign.kakaoTemplateId
       ? await tx.kakaoTemplate.findFirst({ where: { id: campaign.kakaoTemplateId, tenantId: campaign.tenantId }, include: { channel: true } }) : null;
     if (!kakaoTemplate || kakaoTemplate.status !== "approved" || kakaoTemplate.channel.status !== "verified" || kakaoTemplate.version !== campaign.kakaoTemplateVersion) reason ??= "TEMPLATE_UNAVAILABLE";
   } else if (!sender || sender.version !== campaign.senderVersion || senderDenial(sender)) reason ??= "SENDER_UNAVAILABLE";
-  if (campaign.channel === "sms" ? payload.transport !== (env.SMS_TRANSPORT === "solapi" ? "sms-solapi" : env.SMS_TRANSPORT === "local" ? "sms-local" : null)
-    : campaign.channel === "kakao" ? payload.transport !== (env.KAKAO_PROVIDER === "local" ? "kakao-local" : null)
-    : payload.transport !== env.MAIL_TRANSPORT)
-    reason ??= campaign.channel === "sms" ? "SMS_PROVIDER_REQUIRED" : campaign.channel === "kakao" ? "KAKAO_PROVIDER_REQUIRED" : "SENDER_UNAVAILABLE";
-  const evaluated = await evaluateRecipient(tx, recipient, campaign, consents.get(recipient.contactHash), true);
+  const expectedTransport = fallbackLeg || campaign.channel === "sms"
+    ? env.SMS_TRANSPORT === "solapi" ? "sms-solapi" : env.SMS_TRANSPORT === "local" ? "sms-local" : null
+    : campaign.channel === "kakao" ? env.KAKAO_PROVIDER === "local" ? "kakao-local" : null
+    : env.MAIL_TRANSPORT;
+  if (payload.transport !== expectedTransport)
+    reason ??= fallbackLeg || campaign.channel === "sms" ? "SMS_PROVIDER_REQUIRED" : campaign.channel === "kakao" ? "KAKAO_PROVIDER_REQUIRED" : "SENDER_UNAVAILABLE";
+  const evaluated = await evaluateRecipient(tx, recipient, campaign, consents.get(consentHash), true, fallbackLeg ? "sms" : undefined);
   reason ??= evaluated.reason;
   return { campaign, recipient, reason, evaluated, sender, kakaoTemplate };
 }
@@ -78,24 +89,46 @@ async function deliverKakaoLocal(jobId: string, deliveryId: string, template: { 
   await mkdir(env.LOCAL_KAKAO_DIR, { recursive: true });
   await writeFile(resolve(env.LOCAL_KAKAO_DIR, jobId + ".json"), JSON.stringify({ deliveryId, templateId: template.id, to: to.contact, body, buttons: template.buttons, status: "local_delivered", at: new Date().toISOString() }));
 }
-async function reserveMessage(tx: Transaction, recipient: CampaignDelivery, unitCost: number) {
-  return postLedgerTransfer(tx, { tenantId: recipient.tenantId, serviceId: recipient.serviceId, currency: "KRW", kind: "reserve", amount: BigInt(unitCost), sourceKind: "campaign_delivery", sourceId: recipient.id });
+async function reserveMessage(tx: Transaction, recipient: CampaignDelivery, unitCost: number, source = recipient.id) {
+  return postLedgerTransfer(tx, { tenantId: recipient.tenantId, serviceId: recipient.serviceId, currency: "KRW", kind: "reserve", amount: BigInt(unitCost), sourceKind: "campaign_delivery", sourceId: source });
 }
-async function captureMessage(tx: Transaction, recipient: CampaignDelivery, holdId: string, unitCost: number) {
-  return postLedgerTransfer(tx, { tenantId: recipient.tenantId, serviceId: recipient.serviceId, currency: "KRW", kind: "capture", amount: BigInt(unitCost), sourceKind: "campaign_delivery", sourceId: recipient.id, reservationId: holdId });
+async function captureMessage(tx: Transaction, recipient: CampaignDelivery, holdId: string, unitCost: number, source = recipient.id) {
+  return postLedgerTransfer(tx, { tenantId: recipient.tenantId, serviceId: recipient.serviceId, currency: "KRW", kind: "capture", amount: BigInt(unitCost), sourceKind: "campaign_delivery", sourceId: source, reservationId: holdId });
 }
-async function releaseHeld(tx: Transaction, recipient: CampaignDelivery) {
-  const hold = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: { tenantId: recipient.tenantId, kind: "reserve", sourceKind: "campaign_delivery", sourceId: recipient.id } } });
+async function releaseHeld(tx: Transaction, recipient: CampaignDelivery, source = recipient.id) {
+  const hold = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: { tenantId: recipient.tenantId, kind: "reserve", sourceKind: "campaign_delivery", sourceId: source } } });
   if (!hold) return;
   const settled = await tx.ledgerTransaction.findFirst({ where: { reservationId: hold.id, kind: { in: ["release", "capture"] } } });
   if (settled) return;
-  await postLedgerTransfer(tx, { tenantId: recipient.tenantId, serviceId: recipient.serviceId, currency: "KRW", kind: "release", amount: hold.amount, sourceKind: "campaign_delivery", sourceId: recipient.id, reservationId: hold.id });
+  await postLedgerTransfer(tx, { tenantId: recipient.tenantId, serviceId: recipient.serviceId, currency: "KRW", kind: "release", amount: hold.amount, sourceKind: "campaign_delivery", sourceId: source, reservationId: hold.id });
 }
-async function settleRecovered(tx: Transaction, recipient: CampaignDelivery, unitCost: number) {
-  const hold = await reserveMessage(tx, recipient, unitCost);
+async function settleRecovered(tx: Transaction, recipient: CampaignDelivery, unitCost: number, source = recipient.id) {
+  const hold = await reserveMessage(tx, recipient, unitCost, source);
   const released = await tx.ledgerTransaction.findFirst({ where: { reservationId: hold.id, kind: "release" } });
   if (released) return;
-  await captureMessage(tx, recipient, hold.id, unitCost);
+  await captureMessage(tx, recipient, hold.id, unitCost, source);
+}
+/** 알림톡 최종 실패 → 문자 대체발송. SMS 동의·공급자·재시도 한도를 확인한 뒤 잡을 교체한다. */
+async function enqueueFallback(tx: Transaction, job: ClaimedJob, campaign: Campaign, recipient: CampaignDelivery, cause: string) {
+  if (!campaign.fallbackSenderId || recipient.attempt >= 5 || !recipient.contactCipher || recipient.erasedAt) return false;
+  if (env.SMS_TRANSPORT === "solapi" ? !solapiConfigured(campaign.tenantId) : env.SMS_TRANSPORT !== "local") return false;
+  const target = normalizedTarget("sms", decrypt<RecipientContact>(recipient.contactCipher).contact);
+  if (!target.valid) return false;
+  const consent = await tx.marketingPreference.findFirst({ where: { tenantId: campaign.tenantId, serviceId: campaign.serviceId, channel: "sms", contactHash: target.hash, status: "granted", contactCipher: { not: null } } });
+  if (!consent) return false;
+  const next = recipient.attempt + 1;
+  // 상태기계는 attempt 증분을 failed→queued에서만 허용한다 — 실패 기록을 남긴 뒤 재예약한다.
+  await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "failed", reason: cause } });
+  await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "queued", reason: null, attempt: next } });
+  await tx.job.create({ data: { type: campaign.mailProtocol, tenantId: campaign.tenantId, senderId: campaign.fallbackSenderId, campaignDeliveryId: recipient.id,
+    marketingPreferenceId: recipient.preferenceId, marketingSubmissionId: recipient.sourceSubmissionId,
+    dedupeKey: "campaign:" + recipient.id + ":" + next, dueAt: new Date(),
+    payloadCipher: encrypt({ campaignId: campaign.id, deliveryId: recipient.id, attempt: next, transport: env.SMS_TRANSPORT === "solapi" ? "sms-solapi" : "sms-local", unitCost: env.MESSAGE_UNIT_COST_KRW }) } });
+  await tx.job.update({ where: { id: job.id }, data: { status: "done", lastError: "KAKAO_FALLBACK:" + cause, completedAt: new Date(), leaseOwner: null, leaseUntil: null } });
+  await settleCampaign(tx, campaign);
+  await audit(tx, { tenantId: recipient.tenantId, user: { id: null } }, job.id, "campaign.delivery_fallback", "campaignDelivery", recipient.id, ["status"], recipient.serviceId);
+  await tx.jobAttempt.updateMany({ where: { jobId: job.id, attempt: job.attempts, outcome: "leased" }, data: { outcome: "retry", finishedAt: new Date() } });
+  return true;
 }
 async function deliveryAudit(tx: Transaction, job: ClaimedJob, recipient: CampaignDelivery, status: string) {
   await audit(tx, { tenantId: recipient.tenantId, user: { id: null } }, job.id,
@@ -114,19 +147,21 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
   const prepared = await db.$transaction(async tx => {
     const state = await lockedState(tx, job, workerId, payload); if (!state) return false;
     const { campaign, recipient, reason } = state;
+    // 대체발송 잡은 카카오 홀드와 분리된 원장 원천으로 정산한다.
+    const ledgerSource = payload.deliveryId + (isSms(payload.transport) && campaign.channel === "kakao" ? ":fallback" : "");
     if (recipient.status === "sending") {
       const receipt = payload.transport === "local" ? await localReceipt(job.id) : payload.transport === "sms-local" ? await smsReceiptFile(job.id) : payload.transport === "sms-solapi" ? (await tx.smsReceipt.findUnique({ where: { deliveryId: payload.deliveryId } }))?.createdAt ?? null : payload.transport === "kakao-local" ? await kakaoReceipt(job.id) : null;
       if (receipt || payload.transport === "smtp") {
-        if (receipt && isMessage(payload.transport) && unitCost > 0) await settleRecovered(tx, recipient, unitCost);
+        if (receipt && isMessage(payload.transport) && unitCost > 0) await settleRecovered(tx, recipient, unitCost, ledgerSource);
         await finish(tx, job, campaign, recipient, receipt ? payload.transport === "sms-solapi" ? "accepted" : "local_delivered" : "unknown", receipt ? null : "DELIVERY_UNCERTAIN", receipt ?? undefined); return false;
       }
     }
     if (!["queued", "sending"].includes(recipient.status)) {
-      if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient);
+      if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient, ledgerSource);
       await finish(tx, job, campaign, recipient, recipient.status, recipient.reason, recipient.acceptedAt ?? undefined); return false;
     }
     if (reason) {
-      if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient);
+      if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient, ledgerSource);
       await finish(tx, job, campaign, recipient, "cancelled", reason); return false;
     }
     await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "sending", reason: null } });
@@ -137,12 +172,13 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
   await db.$transaction(async tx => {
     const state = await lockedState(tx, job, workerId, payload); if (!state) return;
     const { campaign, recipient, reason, sender, evaluated, kakaoTemplate } = state;
+    const ledgerSource = payload.deliveryId + (isSms(payload.transport) && campaign.channel === "kakao" ? ":fallback" : "");
     if (recipient.status !== "sending") {
-      if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient);
+      if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient, ledgerSource);
       await finish(tx, job, campaign, recipient, recipient.status, recipient.reason, recipient.acceptedAt ?? undefined); return;
     }
     if (reason) {
-      if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient);
+      if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient, ledgerSource);
       await finish(tx, job, campaign, recipient, "cancelled", reason); return;
     }
     if (isKakao(payload.transport)) {
@@ -150,19 +186,19 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
       let hold: { id: string } | null = null;
       if (unitCost > 0) {
         const acct = await tx.$queryRaw<{ available: bigint }[]>`SELECT available FROM "CreditAccount" WHERE "tenantId"=${recipient.tenantId} AND currency='KRW' FOR UPDATE`;
-        const existing = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: { tenantId: recipient.tenantId, kind: "reserve", sourceKind: "campaign_delivery", sourceId: recipient.id } } });
+        const existing = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: { tenantId: recipient.tenantId, kind: "reserve", sourceKind: "campaign_delivery", sourceId: ledgerSource } } });
         if (!existing && (acct.length === 0 || acct[0].available < BigInt(unitCost))) { await finish(tx, job, campaign, recipient, "failed", "INSUFFICIENT_CREDIT"); return; }
-        hold = await reserveMessage(tx, recipient, unitCost);
+        hold = await reserveMessage(tx, recipient, unitCost, ledgerSource);
       }
       try { await deliverKakaoLocal(job.id, recipient.id, kakaoTemplate, evaluated.contact!); }
       catch (error) {
-        if (error instanceof HttpError && error.status === 422) { if (hold) await releaseHeld(tx, recipient); await finish(tx, job, campaign, recipient, "failed", error.code); return; }
-        if (job.attempts >= job.maxAttempts) { if (hold) await releaseHeld(tx, recipient); await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
+        if (error instanceof HttpError && error.status === 422) { if (hold) await releaseHeld(tx, recipient, ledgerSource); if (await enqueueFallback(tx, job, campaign, recipient, error.code)) return; await finish(tx, job, campaign, recipient, "failed", error.code); return; }
+        if (job.attempts >= job.maxAttempts) { if (hold) await releaseHeld(tx, recipient, ledgerSource); if (await enqueueFallback(tx, job, campaign, recipient, "DELIVERY_FAILED")) return; await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
         await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "queued", reason: "DELIVERY_FAILED" } });
         await tx.job.update({ where: { id: job.id }, data: { status: "retry", dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } });
         await deliveryAudit(tx, job, recipient, "queued"); return;
       }
-      if (hold) await captureMessage(tx, recipient, hold.id, unitCost);
+      if (hold) await captureMessage(tx, recipient, hold.id, unitCost, ledgerSource);
       await finish(tx, job, campaign, recipient, "local_delivered", null, new Date()); return;
     }
     if (payload.transport === "sms-local" || payload.transport === "sms-solapi") {
@@ -171,22 +207,22 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
       if (unitCost > 0) {
         // 계정 행을 잠근 뒤 잔액을 확인한다 — 부족하면 같은 트랜잭션에서 실패 처리할 수 있게 INSERT 예외 전에 차단.
         const acct = await tx.$queryRaw<{ available: bigint }[]>`SELECT available FROM "CreditAccount" WHERE "tenantId"=${recipient.tenantId} AND currency='KRW' FOR UPDATE`;
-        const existing = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: { tenantId: recipient.tenantId, kind: "reserve", sourceKind: "campaign_delivery", sourceId: recipient.id } } });
+        const existing = await tx.ledgerTransaction.findUnique({ where: { tenantId_kind_sourceKind_sourceId: { tenantId: recipient.tenantId, kind: "reserve", sourceKind: "campaign_delivery", sourceId: ledgerSource } } });
         if (!existing && (acct.length === 0 || acct[0].available < BigInt(unitCost))) { await finish(tx, job, campaign, recipient, "failed", "INSUFFICIENT_CREDIT"); return; }
-        hold = await reserveMessage(tx, recipient, unitCost);
+        hold = await reserveMessage(tx, recipient, unitCost, ledgerSource);
       }
       try {
         const sent = await deliverSms({ transport: solapi ? "solapi" : "local", jobId: job.id, to: evaluated.contact!.contact, from: decrypt<string>(sender!.addressCipher!), text: evaluated.content!.text });
         if (solapi) await tx.smsReceipt.create({ data: { tenantId: recipient.tenantId, deliveryId: recipient.id, receiptId: sent.receiptId, status: "provider_accepted" } });
       }
       catch (error) {
-        if (error instanceof HttpError && error.status === 422) { if (hold) await releaseHeld(tx, recipient); await finish(tx, job, campaign, recipient, "failed", error.code); return; }
-        if (job.attempts >= job.maxAttempts) { if (hold) await releaseHeld(tx, recipient); await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
+        if (error instanceof HttpError && error.status === 422) { if (hold) await releaseHeld(tx, recipient, ledgerSource); await finish(tx, job, campaign, recipient, "failed", error.code); return; }
+        if (job.attempts >= job.maxAttempts) { if (hold) await releaseHeld(tx, recipient, ledgerSource); await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
         await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "queued", reason: "DELIVERY_FAILED" } });
         await tx.job.update({ where: { id: job.id }, data: { status: "retry", dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } });
         await deliveryAudit(tx, job, recipient, "queued"); return;
       }
-      if (hold) await captureMessage(tx, recipient, hold.id, unitCost);
+      if (hold) await captureMessage(tx, recipient, hold.id, unitCost, ledgerSource);
       await finish(tx, job, campaign, recipient, solapi ? "accepted" : "local_delivered", null, new Date()); return;
     }
     let attachments: MailAttachment[];

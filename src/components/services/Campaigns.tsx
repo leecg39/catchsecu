@@ -59,7 +59,7 @@ function CampaignHistory({ serviceId, channel, canManage }: Scope) {
 }
 function ContentFields({ record, channel, serviceId }: { record?: CampaignRecord; channel: Channel; serviceId: string }) {
   const [search, setSearch] = useState(""), [senderId, setSenderId] = useState(record?.senderId ?? "");
-  const senders = useResource<Paged<SenderRecord>>(channel === "kakao" ? null : "/senders?" + new URLSearchParams({ serviceId, channel, pageSize: "100", search }));
+  const senders = useResource<Paged<SenderRecord>>("/senders?" + new URLSearchParams({ serviceId, channel: channel === "kakao" ? "sms" : channel, pageSize: "100", search }));
   const selected = useResource<SenderRecord>(senderId && channel !== "kakao" ? "/senders/" + senderId : null);
   const templates = useResource<{ items: KakaoTemplateRecord[] }>(channel === "kakao" ? "/kakao/templates?serviceId=" + serviceId : null);
   const [templateId, setTemplateId] = useState(record?.kakaoTemplateId ?? "");
@@ -69,6 +69,8 @@ function ContentFields({ record, channel, serviceId }: { record?: CampaignRecord
       <label>알림톡 템플릿<select className="cs-input" name="kakaoTemplateId" value={templateId} onChange={e => setTemplateId(e.target.value)}><option value="">나중에 선택</option>{templateId && !templates.data?.items.some(t => t.id === templateId) && <option value={templateId}>선택한 템플릿</option>}{templates.data?.items.map(t => <option key={t.id} value={t.id}>{t.name} · v{t.version} · {templateLabels[t.status]}</option>)}</select></label>
       {templates.error && <p role="alert">{templates.error.message}</p>}<Link className="cs-link" href="/alimtalk/templates">알림톡 템플릿 등록·심사 관리</Link>
       <p className="campaign-note">발송에는 승인된 템플릿과 확인된 채널이 필요합니다. 저장하면 현재 템플릿 버전이 고정됩니다.</p>
+      <label>실패 시 문자 대체발송<select className="cs-input" name="fallbackSenderId" defaultValue={record?.fallbackSenderId ?? ""}><option value="">사용하지 않음</option>{senders.data?.items.map(s => <option key={s.id} value={s.id}>{s.label} · {s.address} · {s.eligible ? "사용 가능" : "인증 필요"}</option>)}</select></label>
+      <p className="campaign-note">알림톡 전달이 실패하면 문자로 대체 발송합니다. 문자 채널 수신 동의가 있는 대상에게만 발송되며 문자 요금으로 정산됩니다.</p>
     </> : <>
       <label>발신자 검색<input className="cs-input" aria-label="발신자 이름 검색" value={search} onChange={e => { e.stopPropagation(); setSearch(e.target.value); }} placeholder="발신자 이름 또는 정확한 주소·번호" /></label>
       <label>발신자<select className="cs-input" name="senderId" value={senderId} onChange={e => setSenderId(e.target.value)}><option value="">나중에 선택</option>{senderId && !senders.data?.items.some(s => s.id === senderId) && <option value={senderId}>{selected.data ? selected.data.label + " · " + (selected.data.address ?? "원문 삭제") : "선택한 발신자"}</option>}{senders.data?.items.map(s => <option key={s.id} value={s.id}>{s.label} · {s.address} · {s.eligible ? "사용 가능" : "인증 필요"}</option>)}</select></label>
@@ -78,7 +80,7 @@ function ContentFields({ record, channel, serviceId }: { record?: CampaignRecord
     <MessageContentFields channel={channel} serviceId={serviceId} initial={record?.content} />{channel === "email" && <p className="campaign-note">발송할 때 서비스별 수신거부 링크가 본문 하단에 자동으로 추가됩니다.</p>}</>;
 }
 function formContent(form: HTMLFormElement) {
-  const values = new FormData(form); return { title: values.get("title"), senderId: values.get("senderId") || null, kakaoTemplateId: values.get("kakaoTemplateId") || null, content: contentFromForm(values) };
+  const values = new FormData(form); return { title: values.get("title"), senderId: values.get("senderId") || null, kakaoTemplateId: values.get("kakaoTemplateId") || null, fallbackSenderId: values.get("fallbackSenderId") || null, content: contentFromForm(values) };
 }
 function CampaignNew({ serviceId, channel, canManage, source }: Scope & { source: "direct" | "form" }) {
   const router = useRouter(), requestKey = useRequestKey(), [busy, setBusy] = useState(false), [error, setError] = useState("");

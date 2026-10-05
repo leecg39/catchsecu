@@ -980,6 +980,7 @@ model FileObject {
 }
 model Sender {
   campaigns Campaign[]
+  campaignFallbacks Campaign[] @relation("campaignFallbackSender")
   id String @id @default(uuid())
   tenantId String
   serviceId String
@@ -1960,6 +1961,9 @@ model Campaign {
   kakaoTemplateId String?
   kakaoTemplateVersion Int?
   kakaoTemplate KakaoTemplate? @relation(fields: [tenantId, kakaoTemplateId], references: [tenantId, id], onDelete: Restrict)
+  fallbackSenderId String?
+  fallbackSenderVersion Int?
+  fallbackSender Sender? @relation("campaignFallbackSender", fields: [tenantId, fallbackSenderId], references: [tenantId, id], onDelete: Restrict)
   status String @default("draft")
   scheduledAt DateTime?
   requestedAt DateTime?

@@ -26,6 +26,11 @@ async function requireTransport(tx: Transaction, row: Campaign, sender: Sender |
       ? await tx.kakaoTemplate.findFirst({ where: { id: row.kakaoTemplateId, tenantId: row.tenantId }, include: { channel: true } }) : null;
     if (!template || template.status !== "approved" || template.channel.status !== "verified" || template.version !== row.kakaoTemplateVersion)
       fail(409, "TEMPLATE_UNAVAILABLE", "승인된 알림톡 템플릿과 확인된 채널이 필요합니다. 템플릿이 수정되면 내용 저장으로 다시 연결해주세요.");
+    if (row.fallbackSenderId) {
+      const fallback = await tx.sender.findUnique({ where: { id: row.fallbackSenderId } });
+      if (!fallback || senderDenial(fallback) || !fallback.expiresAt || fallback.expiresAt <= at || fallback.version !== row.fallbackSenderVersion)
+        fail(409, "FALLBACK_UNAVAILABLE", "대체발송 발신번호의 인증·유효기간 확인이 필요합니다.");
+    }
     return;
   }
   if (row.channel === "sms") {

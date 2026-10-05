@@ -33,13 +33,25 @@ async function kakaoTemplateChoice(tx: Transaction, tenantId: string, serviceId:
   if (!template) fail(404, "TEMPLATE_NOT_FOUND", "현재 서비스의 알림톡 템플릿을 선택해주세요.");
   return { kakaoTemplateId: template.id, kakaoTemplateVersion: template.version };
 }
+/** 알림톡 실패 시 문자로 대체 발송할 발신자. SMS 채널 발신자만 허용하고 바인딩 시 버전을 고정한다. */
+async function fallbackSenderChoice(tx: Transaction, tenantId: string, serviceId: string, channel: string, id: string | null) {
+  if (channel !== "kakao") {
+    if (id) fail(422, "FALLBACK_NOT_ALLOWED", "대체발송은 알림톡 채널에서만 설정할 수 있습니다.");
+    return { fallbackSenderId: null, fallbackSenderVersion: null };
+  }
+  if (!id) return { fallbackSenderId: null, fallbackSenderVersion: null };
+  const sender = await tx.sender.findFirst({ where: { id, tenantId, serviceId, channel: "sms", status: { not: "deleted" } } });
+  if (!sender) fail(404, "SENDER_NOT_FOUND", "현재 서비스의 문자 발신번호를 선택해주세요.");
+  return { fallbackSenderId: sender.id, fallbackSenderVersion: sender.version };
+}
 export async function createCampaign(ctx: Context, input: z.infer<typeof campaignCreate>, key: string | null, requestId: string) {
   return idempotent("campaign:create:" + ctx.member.id, key, input, async tx => {
     await campaignScope(tx, ctx, input.serviceId, ["message.manage"], true);
     await senderChoice(tx, ctx.tenantId, input.serviceId, input.channel, input.senderId);
     const kakao = await kakaoTemplateChoice(tx, ctx.tenantId, input.serviceId, input.channel, input.kakaoTemplateId);
+    const fallback = await fallbackSenderChoice(tx, ctx.tenantId, input.serviceId, input.channel, input.fallbackSenderId);
     const row = await tx.campaign.create({ data: { tenantId: ctx.tenantId, serviceId: input.serviceId, creatorId: ctx.user.id, channel: input.channel, source: input.source,
-      title: input.title, contentCipher: encrypt(normalizeMessageContent(input.content, input.channel)), senderId: input.channel === "kakao" ? null : input.senderId, ...kakao, expiresAt: new Date(Date.now() + 30 * 86400000) } });
+      title: input.title, contentCipher: encrypt(normalizeMessageContent(input.content, input.channel)), senderId: input.channel === "kakao" ? null : input.senderId, ...kakao, ...fallback, expiresAt: new Date(Date.now() + 30 * 86400000) } });
     await campaignEvent(tx, row, "created", ctx.user.id); await audit(tx, ctx, requestId, "campaign.created", "campaign", row.id, [], row.serviceId);
     return { status: 201, body: { id: row.id, version: row.version } };
   }, tx => campaignScope(tx, ctx, input.serviceId, ["message.manage"], true));
@@ -66,7 +78,8 @@ export async function updateCampaign(ctx: Context, id: string, input: z.infer<ty
     await locateCampaign(tx, ctx, id, "message.manage"); const row = await lockCampaign(tx, id); campaignDraft(row, input.version);
     await senderChoice(tx, ctx.tenantId, row.serviceId, row.channel, input.senderId);
     const kakao = await kakaoTemplateChoice(tx, ctx.tenantId, row.serviceId, row.channel, input.kakaoTemplateId);
-    const saved = await changeCampaign(tx, row, { title: input.title, senderId: row.channel === "kakao" ? null : input.senderId, ...kakao, mailProtocol: CAMPAIGN_MAIL_JOB_TYPE, messageTemplateId: null, messageTemplateVersion: null, contentCipher: encrypt(normalizeMessageContent(input.content, row.channel)) }, "updated", ctx, requestId);
+    const fallback = await fallbackSenderChoice(tx, ctx.tenantId, row.serviceId, row.channel, input.fallbackSenderId);
+    const saved = await changeCampaign(tx, row, { title: input.title, senderId: row.channel === "kakao" ? null : input.senderId, ...kakao, ...fallback, mailProtocol: CAMPAIGN_MAIL_JOB_TYPE, messageTemplateId: null, messageTemplateVersion: null, contentCipher: encrypt(normalizeMessageContent(input.content, row.channel)) }, "updated", ctx, requestId);
     return { id, version: saved.version };
   });
 }

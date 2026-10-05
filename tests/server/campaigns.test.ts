@@ -47,12 +47,14 @@ import { runOneDestruction } from "@/server/destruction-worker";
 import { certificateDigest } from "@/server/destruction";
 import { localSenderDns } from "../helpers/sender-dns";
 import { POST as kakaoPost, PATCH as kakaoPatch } from "@/app/api/v1/kakao/[...segments]/route";
+import { senderAddressHash } from "@/server/senders";
+import { postTrustedLedgerTransfer } from "@/server/ledger";
 const database = new URL(env.DATABASE_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test database required");
 const origin = env.BETTER_AUTH_URL, tenant = randomUUID(), foreign = randomUUID(), service = randomUUID(), second = randomUUID(), other = randomUUID();
 const cookies: Record<string, string> = {}, members: Record<string, string> = {};
 const records = new Map<string, string>(); let dns: Awaited<ReturnType<typeof localSenderDns>>, sender: SenderRecord;
-const original = { feedback: env.EMAIL_FEEDBACK_SECRET, oneClick: env.SMTP_LIST_UNSUBSCRIBE_DKIM_SIGNED, origin: env.BETTER_AUTH_URL, dns: env.SENDER_DNS_SERVER, mail: env.MAIL_TRANSPORT, dir: env.LOCAL_MAIL_DIR, host: env.SMTP_HOST, domains: env.SMTP_SENDER_DOMAINS, kakao: env.KAKAO_PROVIDER, kakaoDir: env.LOCAL_KAKAO_DIR };
+const original = { feedback: env.EMAIL_FEEDBACK_SECRET, oneClick: env.SMTP_LIST_UNSUBSCRIBE_DKIM_SIGNED, origin: env.BETTER_AUTH_URL, dns: env.SENDER_DNS_SERVER, mail: env.MAIL_TRANSPORT, dir: env.LOCAL_MAIL_DIR, host: env.SMTP_HOST, domains: env.SMTP_SENDER_DOMAINS, kakao: env.KAKAO_PROVIDER, kakaoDir: env.LOCAL_KAKAO_DIR, sms: env.SMS_TRANSPORT, smsDir: env.LOCAL_SMS_DIR, smsCost: env.MESSAGE_UNIT_COST_KRW, kakaoCost: env.KAKAO_UNIT_COST_KRW };
 function req(path: string, method = "GET", who = "owner", input?: unknown, headers: Record<string, string> = {}) {
   return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie: cookies[who] ?? who, ...(input === undefined ? {} : { "content-type": "application/json" }), ...headers }, ...(input === undefined ? {} : { body: JSON.stringify(input) }) });
 }
@@ -91,9 +93,9 @@ beforeAll(async () => {
   dns = await localSenderDns(records); env.SENDER_DNS_SERVER = dns.server; sender = await verifiedSender();
 });
 beforeEach(async () => { await db.apiRateLimit.deleteMany(); await db.rateLimit.deleteMany(); });
-afterEach(() => { env.EMAIL_FEEDBACK_SECRET = original.feedback; env.SMTP_LIST_UNSUBSCRIBE_DKIM_SIGNED = original.oneClick; env.BETTER_AUTH_URL = original.origin; vi.restoreAllMocks(); vi.useRealTimers(); env.MAIL_TRANSPORT = original.mail; env.LOCAL_MAIL_DIR = original.dir; env.SMTP_HOST = original.host; env.SMTP_SENDER_DOMAINS = original.domains; env.SENDER_DNS_SERVER = dns.server; env.KAKAO_PROVIDER = original.kakao; env.LOCAL_KAKAO_DIR = original.kakaoDir; });
+afterEach(() => { env.EMAIL_FEEDBACK_SECRET = original.feedback; env.SMTP_LIST_UNSUBSCRIBE_DKIM_SIGNED = original.oneClick; env.BETTER_AUTH_URL = original.origin; vi.restoreAllMocks(); vi.useRealTimers(); env.MAIL_TRANSPORT = original.mail; env.LOCAL_MAIL_DIR = original.dir; env.SMTP_HOST = original.host; env.SMTP_SENDER_DOMAINS = original.domains; env.SENDER_DNS_SERVER = dns.server; env.KAKAO_PROVIDER = original.kakao; env.LOCAL_KAKAO_DIR = original.kakaoDir; env.SMS_TRANSPORT = original.sms; env.LOCAL_SMS_DIR = original.smsDir; env.MESSAGE_UNIT_COST_KRW = original.smsCost; env.KAKAO_UNIT_COST_KRW = original.kakaoCost; });
 afterAll(async () => { for (const file of await db.fileObject.findMany({ where: { tenantId: tenant, campaignId: { not: null } }, select: { storageKey: true } })) await privateFiles.remove(file.storageKey); await dns.close(); env.SENDER_DNS_SERVER = original.dns; await db.$disconnect(); });
-async function recipient(nameValue = "합성 수신자", channel: "email" | "sms" | "kakao" = "email") {
+async function recipient(nameValue = "합성 수신자", channel: "email" | "sms" | "kakao" = "email", marketingChannels: string[] = [channel]) {
   const name = randomUUID(), email = randomUUID(), phone = randomUUID(), kakao = randomUUID(), contact = "recipient-" + randomUUID() + "@campaigns.local.test";
   const form = await ok<FormRecord>(await formPost(req("/forms", "POST", "owner", { serviceId: service, title: "캠페인 근거 " + randomUUID(), content: { body: "합성", consentPurpose: "시험", consentRequired: true, retentionDays: 30, maxResponses: 20,
     questions: [{ id: name, label: "이름", type: "단문형 답변", required: true }, { id: email, label: "이메일", type: "단문형 답변", required: true }, { id: phone, label: "전화번호", type: "단문형 답변", required: true },
@@ -101,7 +103,7 @@ async function recipient(nameValue = "합성 수신자", channel: "email" | "sms
     marketing: { purpose: "소식 안내", nameQuestionId: name, emailQuestionId: email, smsQuestionId: phone, ...(channel === "kakao" ? { kakaoQuestionId: kakao } : {}) } } }, { "idempotency-key": randomUUID() })), 201);
   const pub = await ok<{ token: string }>(await formAction(req("/forms/" + form.id + "/publish", "POST", "owner", { version: form.version }, { "idempotency-key": randomUUID() })), 201);
   const sms = "010" + String(Math.floor(Math.random() * 100000000)).padStart(8, "0");
-  const sub = await ok<{ id: string }>(await publicPost(req("/public/forms/" + pub.token + "/submissions", "POST", "anonymous", { answers: { [name]: nameValue, [email]: contact, [phone]: sms, ...(channel === "kakao" ? { [kakao]: sms } : {}) }, consent: true, marketingChannels: [channel] }, { "idempotency-key": randomUUID() })), 201);
+  const sub = await ok<{ id: string }>(await publicPost(req("/public/forms/" + pub.token + "/submissions", "POST", "anonymous", { answers: { [name]: nameValue, [email]: contact, [phone]: sms, ...(channel === "kakao" ? { [kakao]: sms } : {}) }, consent: true, marketingChannels }, { "idempotency-key": randomUUID() })), 201);
   const pref = await db.marketingPreference.findFirstOrThrow({ where: { sourceSubmissionId: sub.id, channel } }); return { contact: channel === "email" ? contact : sms, pref, sub, form };
 }
 const content = { format: "text", subject: "{{name}} 님 소식", text: "{{name}} 님, {{contact}}의 신청 내용을 확인했습니다." };
@@ -426,6 +428,59 @@ describe("persistent campaign CRUD, privacy and delivery", () => {
     expect(blockedPreview.transportReady).toBe(false);
     expect((await POST(req("/campaigns/" + blocked.id + "/schedule", "POST", "owner", { version: blockedReady.version, at: null }, { "idempotency-key": randomUUID() }))).status).toBe(503);
     expect(await db.job.count({ where: { campaignDelivery: { campaignId: blocked.id } } })).toBe(0);
+  });
+  test("kakao failure falls back to a consented SMS sender once, billed at the SMS rate", async () => {
+    env.KAKAO_PROVIDER = "local"; env.LOCAL_KAKAO_DIR = ".local/catchsecu_test/kakao-fb-" + randomUUID();
+    env.SMS_TRANSPORT = "local"; env.LOCAL_SMS_DIR = ".local/catchsecu_test/sms-fb-" + randomUUID();
+    env.KAKAO_UNIT_COST_KRW = 25; env.MESSAGE_UNIT_COST_KRW = 15;
+    await postTrustedLedgerTransfer({ tenantId: tenant, currency: "KRW", kind: "funding", amount: BigInt(1000), sourceKind: "pg_capture", sourceId: randomUUID() });
+    const channel = await ok<{ id: string }>(await kakaoPost(req("/kakao/channels", "POST", "owner", { serviceId: service, name: "대체 채널", searchId: "@fb" + randomUUID().slice(0, 8) }, { "idempotency-key": randomUUID() })), 201);
+    await ok(await kakaoPost(req("/kakao/channels/" + channel.id + "/verify", "POST", "owner", {})));
+    const created = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates", "POST", "owner", { serviceId: service, channelId: channel.id, name: "쿠폰 안내", body: "#{name}님 #{coupon} 쿠폰 안내", buttons: [] }, { "idempotency-key": randomUUID() })), 201);
+    const template = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates/" + created.id + "/submit", "POST", "owner", { version: created.version })));
+    const ownerId = (await db.membership.findUniqueOrThrow({ where: { id: members.owner } })).userId;
+    const phone = "0105555" + String(Math.floor(Math.random() * 10000)).padStart(4, "0"), until = new Date(Date.now() + 90 * 86400e3);
+    const fallback = await db.$transaction(async tx => {
+      const row = await tx.sender.create({ data: { tenantId: tenant, serviceId: service, creatorId: ownerId, channel: "sms", addressHash: senderAddressHash("sms", phone), addressCipher: encrypt(phone), label: "대체 발신번호" } });
+      await tx.senderEvent.create({ data: { tenantId: tenant, senderId: row.id, version: 1, kind: "created", actorId: ownerId } });
+      await tx.senderVerification.create({ data: { tenantId: tenant, senderId: row.id, generation: 1, method: "solapi", status: "verified", attempts: 1, environment: "live", verifiedAt: new Date(), validUntil: until, expiresAt: until } });
+      const verified = await tx.sender.update({ where: { id: row.id }, data: { status: "verified", version: 2, verifiedAt: new Date(), expiresAt: until, environment: "live" } });
+      await tx.senderEvent.create({ data: { tenantId: tenant, senderId: row.id, version: 2, kind: "verified", actorId: ownerId } });
+      return verified;
+    });
+    // 채널 경계: 이메일 발신자·타사 발신자·비카카오 채널은 대체발신자가 될 수 없다
+    expect((await POST(req("/campaigns", "POST", "owner", { serviceId: service, channel: "kakao", source: "direct", title: "x", kakaoTemplateId: template.id, fallbackSenderId: sender.id, content }, { "idempotency-key": randomUUID() }))).status).toBe(404);
+    expect((await POST(req("/campaigns", "POST", "owner", { serviceId: service, channel: "sms", source: "direct", title: "x", senderId: fallback.id, fallbackSenderId: fallback.id, content }, { "idempotency-key": randomUUID() }))).status).toBe(422);
+    const draft = await ok<{ id: string }>(await POST(req("/campaigns", "POST", "owner", { serviceId: service, channel: "kakao", source: "direct", title: "대체발송 " + randomUUID(), kakaoTemplateId: template.id, fallbackSenderId: fallback.id, content }, { "idempotency-key": randomUUID() })), 201);
+    expect(await read(draft.id)).toMatchObject({ fallbackSenderId: fallback.id, fallbackSenderVersion: fallback.version });
+    // 카카오+문자 동의 수신자: 알림톡 변수 결손 → 실패 → 문자 대체발송 → 로컬 영수증
+    const target = await recipient("대체 수신자", "kakao", ["kakao", "sms"]);
+    const campaign = await schedule(await targets(await read(draft.id), [target.contact]));
+    const kakaoJob = await jobFor(campaign.id);
+    expect((await drain(kakaoJob.id)).lastError).toBe("KAKAO_FALLBACK:VARIABLE_MISSING");
+    const smsJob = await db.job.findFirstOrThrow({ where: { campaignDeliveryId: kakaoJob.campaignDeliveryId, id: { not: kakaoJob.id } } });
+    expect(decrypt(smsJob.payloadCipher)).toMatchObject({ transport: "sms-local", unitCost: 15, attempt: 2 });
+    expect(smsJob.senderId).toBe(fallback.id);
+    expect((await drain(smsJob.id)).status).toBe("done");
+    const delivery = (await deliveries(campaign.id)).items[0];
+    expect(delivery).toMatchObject({ status: "local_delivered", attempt: 2 });
+    const receipt = JSON.parse(await readFile(resolve(env.LOCAL_SMS_DIR, smsJob.id + ".json"), "utf8"));
+    expect(receipt).toMatchObject({ to: target.contact.startsWith("+82") ? target.contact : "+82" + target.contact.slice(1), from: phone, status: "local_delivered" });
+    // 정산: 카카오 홀드는 해제되고 문자 요금만 확정된다 — 대체 잡은 별도 원장 원천을 쓴다
+    const ledger = await db.ledgerTransaction.findMany({ where: { tenantId: tenant, sourceId: { in: [delivery.id, delivery.id + ":fallback"] } }, orderBy: { createdAt: "asc" } });
+    expect(ledger.map(r => [r.kind, Number(r.amount)])).toEqual([["reserve", 25], ["release", 25], ["reserve", 15], ["capture", 15]]);
+    // 종료된 카카오 잡 재실행은 stale attempt로 스코프 검사에서 거부되고 두 번째 대체 잡을 만들지 않는다
+    await expect(runCampaignJob(await db.job.findUniqueOrThrow({ where: { id: kakaoJob.id } }) as never, "fb-replay")).rejects.toThrow("CAMPAIGN_JOB_SCOPE");
+    expect(await db.job.count({ where: { campaignDeliveryId: kakaoJob.campaignDeliveryId } })).toBe(2);
+    // 문자 동의 없는 수신자: 대체발송 없이 카카오 실패로 종결
+    const noSms = await ok<{ id: string }>(await POST(req("/campaigns", "POST", "owner", { serviceId: service, channel: "kakao", source: "direct", title: "대체 없음", kakaoTemplateId: template.id, fallbackSenderId: fallback.id, content }, { "idempotency-key": randomUUID() })), 201);
+    const noSmsTarget = await recipient("문자 미동의", "kakao");
+    const noSmsCampaign = await schedule(await targets(await read(noSms.id), [noSmsTarget.contact]));
+    const noSmsJob = await jobFor(noSmsCampaign.id);
+    expect((await drain(noSmsJob.id)).status).toBe("dead");
+    const noSmsDelivery = (await deliveries(noSmsCampaign.id)).items[0];
+    expect(noSmsDelivery).toMatchObject({ status: "failed", reason: "VARIABLE_MISSING", attempt: 1 });
+    expect(await db.job.count({ where: { campaignDeliveryId: noSmsJob.campaignDeliveryId } })).toBe(1);
   });
 });
 
