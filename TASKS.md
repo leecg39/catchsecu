@@ -600,7 +600,7 @@
 - 증거: [docs/qa/P11-T01/](docs/qa/P11-T01/README.md) — 부분 증거 존재. 수용 조건 전수 충족 시 체크.
 
 - 비밀번호 정책·변경·유예 상세 검증: [검증 기록](docs/qa/password-policy/README.md).
-- 부분 구현 증거: [유한 보유 기한의 파기 정책·승인·일정 변경 집행](docs/qa/destruction/README.md). 보유 기간 미지정 폼의 사후 지정은 `designateFormRetention`+`tests/server/retention-designation.test.ts` 3/3로 검증됨(2026-10-07). 남은 것은 전체 게이트뿐.
+- 부분 구현 증거: [유한 보유 기한의 파기 정책·승인·일정 변경 집행](docs/qa/destruction/README.md). 보유 기간 미지정 폼의 사후 지정은 `designateFormRetention`+`tests/server/retention-designation.test.ts`로 검증됨. 2026-10-12 회사 정책 스위치 `allowRetentionDesignation`(원본 기본값 끄기) 추가 — 정책 꺼짐 시 지정 API 403 + 목록 권한으로 버튼 숨김, 4/4 통과. 남은 것은 전체 게이트뿐.
 
 ### P11-T02 — IP·2FA 정책과 보안 현황
 

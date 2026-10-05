@@ -241,8 +241,9 @@ export async function publishForm(tx: Transaction, ctx: Context, id: string, inp
 // 이전 제출의 원래 보유 기한은 그대로 유지되며 이후 제출부터 지정값이 적용된다.
 export async function designateFormRetention(ctx: Context, id: string, input: z.infer<typeof retentionDesignationInput>, requestId: string) {
   return db.$transaction(async tx => {
-    const { form } = await lockCurrentForm(tx, ctx, id, "form.write", true);
+    const { form, policy } = await lockCurrentForm(tx, ctx, id, "form.write", true);
     if (form.version !== input.version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    if (!policy.allowRetentionDesignation) fail(403, "RETENTION_DESIGNATION_DISABLED", "회사의 파기일정 사후 지정 정책이 꺼져 있습니다.");
     if (form.designatedRetentionDays !== null) fail(409, "RETENTION_ALREADY_SET", "이 폼에는 이미 보유 기간이 지정되어 있습니다.");
     const versions = await tx.formVersion.findMany({ where: { tenantId: ctx.tenantId, formId: id },
       include: { documentBindings: { orderBy: { order: "asc" as const }, include: { documentVersion: true } } } });
@@ -367,9 +368,11 @@ export async function listForms(ctx: Context, query: { page: number; pageSize: n
   }
   const accessible = await tx.service.findMany({ where: { ...scope, ...(currentCtx.member.accessKind === "expert" ? { status: "active" } : {}) }, select: { id: true, status: true } });
   const candidates = query.serviceId ? accessible.filter(service => service.id === query.serviceId) : accessible;
+  const policy = await tx.securityPolicy.findUnique({ where: { tenantId: ctx.tenantId }, select: { allowRetentionDesignation: true } });
   const permissions = { canCreate: candidates.some(service => service.status === "active" && memberCan(currentCtx, service.id, "form.write")),
     canImport: candidates.some(service => service.status === "active" && memberCan(currentCtx, service.id, "import.write")),
-    canViewImports: candidates.some(service => memberCan(currentCtx, service.id, "import.read")) };
+    canViewImports: candidates.some(service => memberCan(currentCtx, service.id, "import.read")),
+    canDesignateRetention: !!policy?.allowRetentionDesignation };
   const where = { tenantId: ctx.tenantId, sourceType: "form", serviceId: query.serviceId ?? { in: accessible.map(item => item.id) },
     OR: [{ title: { contains: query.search, mode: "insensitive" as const } },
       { owner: { user: { name: { contains: query.search, mode: "insensitive" as const } } } }],

@@ -15,7 +15,7 @@ export function policyDto(policy: SecurityPolicy, ctx: Context) {
     approvalRoles: policy.approvalRoles, approvalReferenceRequired: policy.approvalReferenceRequired,
     approvalRequestTemplate: policy.approvalRequestTemplate, approvalRevision: policy.approvalRevision,
     automaticDestruction: policy.automaticDestruction, allowRetentionAdjustment: policy.allowRetentionAdjustment,
-    retentionDays: policy.retentionDays,
+    allowRetentionDesignation: policy.allowRetentionDesignation, retentionDays: policy.retentionDays,
     version: policy.version, updatedAt: policy.updatedAt, canManage: ctx.member.role === "owner" };
 }
 export async function readPolicy(ctx: Context) {

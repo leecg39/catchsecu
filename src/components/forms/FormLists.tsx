@@ -72,7 +72,7 @@ function ManageForms() {
           <div key="actions" className="forms-row-actions">
             {form.actions?.preview && <button disabled={!!busy} onClick={() => setPreview(form)}>미리보기</button>}
             {form.actions?.edit && <Link className="cs-link" href={"/form/ai/create?formId=" + form.id}>편집</Link>}
-            {form.actions?.edit && form.content.retentionDays === null && <button disabled={!!busy} onClick={() => { setError(""); setDesignate(form); }}>보유 지정</button>}
+            {form.actions?.edit && form.content.retentionDays === null && result.data?.permissions.canDesignateRetention && <button disabled={!!busy} onClick={() => { setError(""); setDesignate(form); }}>보유 지정</button>}
             {form.actions?.registerTemplate && <Link className="cs-link" href={"/form/ai/create?templateEdit=new&formId=" + form.id}>템플릿 등록</Link>}
             {form.actions?.copy && <button disabled={!!busy} onClick={() => {
                 const key = copyKeys.current.get(form.id) ?? crypto.randomUUID();

@@ -6,7 +6,7 @@ import { env } from "@/server/env";
 import { requireContext } from "@/server/context";
 import { policyDefaults } from "@/contracts/security";
 import { updatePolicy } from "@/server/security-policy";
-import { POST as createForm } from "@/app/api/v1/forms/route";
+import { GET as listForms, POST as createForm } from "@/app/api/v1/forms/route";
 import { GET, PATCH, POST as formAction } from "@/app/api/v1/forms/[...segments]/route";
 import { POST as publicPost } from "@/app/api/v1/public/forms/[...segments]/route";
 
@@ -21,7 +21,7 @@ async function owner() {
   const email = "retention-" + randomUUID() + "@catchsecu.test";
   expect((await auth.handler(req("/auth/sign-up/email", "", "POST", { name: "보유 기간 검증", email, password }))).status).toBe(200);
   const user = await db.user.update({ where: { email }, data: { emailVerified: true } });
-  const company = await db.company.create({ data: { name: "보유 기간 회사", publicName: "보유 기간", policy: { create: { retentionDays: 365 } },
+  const company = await db.company.create({ data: { name: "보유 기간 회사", publicName: "보유 기간", policy: { create: { retentionDays: 365, allowRetentionDesignation: true } },
     memberships: { create: { userId: user.id, role: "owner" } }, services: { create: { name: "보유 서비스", externalName: "보유" } } }, include: { services: true, policy: true } });
   const login = await auth.handler(req("/auth/sign-in/email", "", "POST", { email, password })); expect(login.status).toBe(200);
   const cookie = login.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
@@ -79,6 +79,27 @@ test("이미 지정된 보유 기간은 사후 지정으로 바꾸지 않는다"
   const response = await PATCH(req("/forms/" + form.id + "/retention", account.cookie, "PATCH", { version: form.version, retentionDays: 90 }));
   expect(response.status).toBe(409);
   expect((await GET(req("/forms/" + form.id, account.cookie))).status).toBe(200);
+});
+
+test("사후 지정 정책이 꺼지면 지정 API와 목록 권한이 모두 차단되고 다시 켜면 허용한다", async () => {
+  const account = await owner();
+  const created = await createForm(req("/forms", account.cookie, "POST", { serviceId: account.serviceId, title: "정책 폼", content: content(null) }, randomUUID()));
+  const form = await created.json();
+  const listed = await listForms(req("/forms?serviceId=" + account.serviceId, account.cookie));
+  expect((await listed.json()).permissions.canDesignateRetention).toBe(true);
+  const ctx = await requireContext(req("/context", account.cookie).headers, "security.write");
+  const policy = await db.securityPolicy.findUniqueOrThrow({ where: { tenantId: account.company.id } });
+  await updatePolicy(ctx, policy.version, { ...policyDefaults, allowRetentionDesignation: false }, randomUUID());
+  const denied = await PATCH(req("/forms/" + form.id + "/retention", account.cookie, "PATCH", { version: form.version, retentionDays: 90 }));
+  expect(denied.status).toBe(403);
+  expect((await denied.json()).error?.code).toBe("RETENTION_DESIGNATION_DISABLED");
+  const listedOff = await listForms(req("/forms?serviceId=" + account.serviceId, account.cookie));
+  expect((await listedOff.json()).permissions.canDesignateRetention).toBe(false);
+  const updated = await db.securityPolicy.findUniqueOrThrow({ where: { tenantId: account.company.id } });
+  await updatePolicy(ctx, updated.version, { ...policyDefaults, allowRetentionDesignation: true }, randomUUID());
+  const allowed = await PATCH(req("/forms/" + form.id + "/retention", account.cookie, "PATCH", { version: form.version, retentionDays: 90 }));
+  expect(allowed.status).toBe(200);
+  expect((await db.form.findUniqueOrThrow({ where: { id: form.id } })).designatedRetentionDays).toBe(90);
 });
 
 test("회사 기본 보유 기간을 바꾸면 미지정 폼의 진행 중 승인을 무효화한다", async () => {

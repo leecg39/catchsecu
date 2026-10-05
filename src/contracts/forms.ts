@@ -10,7 +10,7 @@ export type FormContent = z.infer<typeof formContentSchema>;
 export type Question = FormContent["questions"][number];
 export type FormActions = { preview: boolean; responses: boolean; edit: boolean; copy: boolean; registerTemplate: boolean;
   publish: boolean; share: boolean; pause: boolean; resume: boolean; archive: boolean; checkDeletion: boolean };
-export type FormListPermissions = { canCreate: boolean; canImport: boolean; canViewImports: boolean };
+export type FormListPermissions = { canCreate: boolean; canImport: boolean; canViewImports: boolean; canDesignateRetention: boolean };
 export type FormRecord = {
   id: string; serviceId: string; serviceName: string; ownerName: string;
   sourceType?: "form" | "import";
