@@ -5,7 +5,7 @@ import { env } from "@/server/env";
 import { auth } from "@/server/auth";
 import { POST as createForm } from "@/app/api/v1/forms/route";
 import { POST as formAction } from "@/app/api/v1/forms/[...segments]/route";
-import { POST as publicPost } from "@/app/api/v1/public/forms/[...segments]/route";
+import { GET as publicGet, POST as publicPost } from "@/app/api/v1/public/forms/[...segments]/route";
 import { POST as localProvider } from "@/app/api/v1/public/verify/local/route";
 import { POST as integrationPost, PATCH as integrationPatch } from "@/app/api/v1/services/[id]/verification/route";
 import { cleanupVerification } from "@/server/verification-flow";
@@ -35,9 +35,9 @@ async function fixture(verify = true) {
   return { company, serviceId: company.services[0].id, cookie, content, form, question };
 }
 type Fixture = Awaited<ReturnType<typeof fixture>>;
-async function configureIntegration(f: Fixture, status: "pending" | "enabled" | "disabled" = "enabled", provider = "local", environment = "sandbox") {
+async function configureIntegration(f: Fixture, status: "pending" | "enabled" | "disabled" = "enabled", provider: string | null = "local", environment = "sandbox", signatureProvider: string | null = null) {
   const res = await integrationPost(req(`/services/${f.serviceId}/verification`, "POST",
-    { identityProvider: provider, signatureProvider: null, environment, status }, f.cookie));
+    { identityProvider: provider, signatureProvider, environment, status }, f.cookie));
   return res;
 }
 async function publish(f: Fixture) {
@@ -182,4 +182,54 @@ test("enabled 연동 상태와 sandbox 실측 여부가 readiness에 반영된�
   expect(await db.verificationAttempt.count({ where: { serviceId: f.serviceId, status: "verified" } })).toBe(0);
   await verifiedReceipt(token);
   expect(await db.verificationAttempt.count({ where: { serviceId: f.serviceId, status: "verified" } })).toBe(1);
+});
+
+test("signature kind: signatureProvider만 있어도 게시·challenge·소비되고 영수증 kind가 기록된다", async () => {
+  const f = await fixture(true);
+  // 서명 공급자만 설정된 연동도 게시·challenge를 허용한다
+  expect((await configureIntegration(f, "enabled", null, "sandbox", "local")).status).toBe(201);
+  const row = await db.verificationIntegration.findUniqueOrThrow({ where: { tenantId_serviceId: { tenantId: f.company.id, serviceId: f.serviceId } } });
+  expect(row.signatureProvider).toBe("local");
+  const published = await publish(f); expect(published.status).toBe(201);
+  const { token } = await published.json();
+  // 공개 응답이 사용 가능한 kind를 노출한다
+  const formRes = await publicGet(req("/public/forms/" + token)); expect(formRes.status).toBe(200);
+  const formBody = await formRes.json();
+  expect(formBody.verification?.kinds).toEqual(["signature"]);
+  // signature challenge → provider → callback → 영수증 소비
+  const ch = await challenge(token, "signature"); expect(ch.status).toBe(201);
+  const c = await ch.json(); expect(c.kind).toBe("signature");
+  const { res, assertion } = await providerAnswer(c.attemptId, c.nonce); expect(res.status).toBe(200);
+  const cb = await callback(token, assertion); expect(cb.status).toBe(200);
+  const proof = await cb.json();
+  const submitted = await submit(token, f.question, { attemptId: proof.attemptId, receipt: proof.receipt });
+  expect(submitted.status).toBe(201);
+  const attempt = await db.verificationAttempt.findUniqueOrThrow({ where: { id: proof.attemptId } });
+  expect(attempt.kind).toBe("signature");
+  expect(attempt.status).toBe("consumed");
+  const receipt = await db.verificationReceipt.findUniqueOrThrow({ where: { attemptId: proof.attemptId } });
+  expect(receipt.kind).toBe("signature");
+});
+
+test("설정되지 않은 kind의 challenge는 거부되고 위조 signature 콜백도 차단된다", async () => {
+  const f = await fixture(true);
+  // signatureProvider 미설정 → signature challenge 503, identity challenge 201
+  expect((await configureIntegration(f, "enabled")).status).toBe(201);
+  const published = await publish(f); expect(published.status).toBe(201);
+  const { token } = await published.json();
+  const denied = await challenge(token, "signature");
+  expect(denied.status).toBe(503);
+  const identity = await challenge(token, "identity"); expect(identity.status).toBe(201);
+  const c = await identity.json();
+  // 위조 콜백(subject 변조)은 거부되고 포렌식 이벤트만 남는다 — 어서션 MAC이 kind·subject를 포함한다
+  const { assertion } = await providerAnswer(c.attemptId, c.nonce);
+  expect((await callback(token, { ...assertion, subject: { name: "변조자", birthDate: "2000-01-01" } })).status).toBe(403);
+  expect(await db.verificationEvent.count({ where: { attemptId: c.attemptId, signatureValid: false } })).toBe(1);
+  // signature kind용 영수증은 다른 attempt에 재사용할 수 없다(attemptId에 귀속)
+  const sig = await fixture(true);
+  expect((await configureIntegration(sig, "enabled", null, "sandbox", "local")).status).toBe(201);
+  const sp = await publish(sig); const st = (await sp.json()).token;
+  const sch = await challenge(st, "signature"); const sc = await sch.json();
+  const sa = await providerAnswer(sc.attemptId, sc.nonce);
+  expect((await callback(st, sa.assertion)).status).toBe(200);
 });

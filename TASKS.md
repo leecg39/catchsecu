@@ -377,7 +377,7 @@
 - 선행: P06-T01, P01-T04
 - 검증/완료: 서명위조·중복callback 거부; 실제 sandbox 검증 없으면 완료 체크 금지
 - 증거: `docs/qa/P06-T06/`
-- 현재: 서비스별 공급자 설정 CRUD·권한·불변 이력·폼 편집기 화면 연결과 공통 요청/이벤트/영수증 모델을 구현했다. 로컬 `local` sandbox 공급자의 challenge→서명 어서션→콜백→영수증→제출 소비·만료/파기 경로를 구현하고 위조/재생/만료/재사용·테넌트 불일치를 적대적으로 검증했다(verification-flow 4/4·configuration 27/27·destruction 48/48·브라우저 E2E 통과). 외부 공급자 어댑터·공식 sandbox·전자서명 signature kind·Ego 검증은 미완료이므로 체크를 유지한다. 전체 수용 조건은 유지한다.
+- 현재: 서비스별 공급자 설정 CRUD·권한·불변 이력·폼 편집기 화면 연결과 공통 요청/이벤트/영수증 모델을 구현했다. 로컬 `local` sandbox 공급자의 challenge→서명 어서션→콜백→영수증→제출 소비·만료/파기 경로를 구현하고 위조/재생/만료/재사용·테넌트 불일치를 적대적으로 검증했다(verification-flow 4/4·configuration 27/27·destruction 48/48·브라우저 E2E 통과). 외부 공급자 어댑터·공식 sandbox·전자서명 signature kind도 로컬 공급자로 구현·브라우저 실측했다(6/6 테스트·signature-browser 5/5). 외부 공급자 어댑터·공식 sandbox·Ego 검증은 미완료이므로 체크를 유지한다. 전체 수용 조건은 유지한다.
 
 ### P06-T07 — 응답 흐름 E2E 게이트
 

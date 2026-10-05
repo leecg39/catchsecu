@@ -47,17 +47,29 @@ export async function publicForm(token: string) {
       content.retentionDays = policy.retentionDays;
     }
   }
+  // 검증 요구 폼에는 사용 가능한 공급자 kind만 노출한다(공급자 식별자는 내부 정보).
+  let verification: { kinds: ("identity" | "signature")[] } | undefined;
+  if (content.verify) {
+    const integration = await db.verificationIntegration.findUnique({
+      where: { tenantId_serviceId: { tenantId: publication.tenantId, serviceId: publication.form.serviceId } } });
+    const kinds: ("identity" | "signature")[] = [];
+    if (integration?.status === "enabled") {
+      if (integration.identityProvider === "local" && integration.environment === "sandbox") kinds.push("identity");
+      if (integration.signatureProvider === "local" && integration.environment === "sandbox") kinds.push("signature");
+    }
+    verification = { kinds };
+  }
   return { title: publication.formVersion.title, content, consentBundle: consentBundle(publication.formVersion),
-    closed: publication.responseCount >= publication.maxResponses, expiresAt: publication.expiresAt };
+    closed: publication.responseCount >= publication.maxResponses, expiresAt: publication.expiresAt, verification };
 }
 export async function submitForm(token: string, input: z.infer<typeof submissionInput>, key: string | null, requestId: string) {
   const publication = await activePublication(token);
   if (publication.formVersion.verify && !input.verification) {
     const integration = await db.verificationIntegration.findUnique({
       where: { tenantId_serviceId: { tenantId: publication.tenantId, serviceId: publication.form.serviceId } } });
-    if (!integration || integration.status !== "enabled" || !integration.identityProvider)
-      fail(503, "IDENTITY_PROVIDER_REQUIRED", "본인인증 공급자 확인이 필요합니다.");
-    fail(422, "VERIFICATION_REQUIRED", "본인인증 영수증이 필요합니다.");
+    if (!integration || integration.status !== "enabled" || !(integration.identityProvider || integration.signatureProvider))
+      fail(503, "IDENTITY_PROVIDER_REQUIRED", "본인인증·전자서명 공급자 확인이 필요합니다.");
+    fail(422, "VERIFICATION_REQUIRED", "본인인증·전자서명 영수증이 필요합니다.");
   }
   const questions = publication.formVersion.questions;
   validateDocumentConsents(publication.formVersion, input.documentConsents);

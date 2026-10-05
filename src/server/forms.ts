@@ -214,10 +214,11 @@ export async function publishForm(tx: Transaction, ctx: Context, id: string, inp
   await validateFormDocuments(tx, ctx, form.serviceId, draft);
   if (content.verify) {
     const integration = await tx.verificationIntegration.findUnique({ where: { tenantId_serviceId: { tenantId: ctx.tenantId, serviceId: form.serviceId } } });
-    if (!integration || integration.status !== "enabled" || !integration.identityProvider)
-      fail(503, "IDENTITY_PROVIDER_REQUIRED", "본인인증 연동을 사용으로 전환한 뒤 게시할 수 있습니다.");
-    if (integration.identityProvider !== "local" || integration.environment !== "sandbox")
-      fail(503, "PROVIDER_ADAPTER_REQUIRED", "외부 본인인증 공급자 어댑터가 없어 게시할 수 없습니다. local sandbox 공급자만 사용할 수 있습니다.");
+    const providers = [integration?.identityProvider, integration?.signatureProvider].filter(Boolean);
+    if (!integration || integration.status !== "enabled" || !providers.length)
+      fail(503, "IDENTITY_PROVIDER_REQUIRED", "본인인증·전자서명 연동을 사용으로 전환한 뒤 게시할 수 있습니다.");
+    if (providers.some(provider => provider !== "local") || integration.environment !== "sandbox")
+      fail(503, "PROVIDER_ADAPTER_REQUIRED", "외부 검증 공급자 어댑터가 없어 게시할 수 없습니다. local sandbox 공급자만 사용할 수 있습니다.");
   }
   if (content.questions.some(question => question.type === "파일 업로드")) await requireFileScanner();
   if (input.expiresAt && new Date(input.expiresAt).getTime() <= Date.now()) fail(422, "INVALID_EXPIRY", "만료일은 현재보다 이후여야 합니다.");

@@ -63,7 +63,6 @@ export async function issueVerificationChallenge(token: string, kind: "identity"
   const publication = await verificationPublication(token);
   const version = publication.formVersion;
   if (!version.verify) fail(422, "VERIFICATION_NOT_REQUIRED", "이 캐치폼은 본인인증을 요구하지 않습니다.");
-  if (kind === "signature") fail(503, "SIGNATURE_ADAPTER_REQUIRED", "전자서명 검증은 아직 지원하지 않습니다.");
   const integration = await db.verificationIntegration.findUnique({ where: { tenantId_serviceId: { tenantId: publication.tenantId, serviceId: publication.form.serviceId } } });
   usableProvider(integration, kind);
   const nonce = opaqueToken();

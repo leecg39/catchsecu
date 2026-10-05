@@ -11,7 +11,8 @@ import { uploadFile, type UploadCache } from "@/lib/file-upload";
 import { PublicSubmissionSession } from "@/lib/public-submission";
 import type { SubmissionReceipt } from "@/contracts/public-forms";
 
-type PublicFormData = { consentBundle?: FormConsentBundle; title: string; content: FormContent; closed: boolean; expiresAt: string | null; token?: string };
+type VerificationKind = "identity" | "signature";
+type PublicFormData = { consentBundle?: FormConsentBundle; title: string; content: FormContent; closed: boolean; expiresAt: string | null; token?: string; verification?: { kinds: VerificationKind[] } };
 export function PublicForm({ path }: { path: string }) {
   const value = path.split("/")[2], alias = path.startsWith("/url/");
   const resource = useResource<PublicFormData>(value ? (alias ? "/public/urls/" : "/public/forms/") + encodeURIComponent(value) : null);
@@ -21,17 +22,25 @@ export function PublicForm({ path }: { path: string }) {
     <p className="public-powered">powered by Catchsecu</p>
   </Panel></div>;
 }
-type VerificationProof = { attemptId: string; receipt: string; name: string };
-function IdentityVerification({ token, onDone }: { token: string; onDone: (proof: VerificationProof) => void }) {
+type VerificationProof = { attemptId: string; receipt: string; name: string; kind: VerificationKind };
+const verificationLabels: Record<VerificationKind, { title: string; hint: string; action: string; busy: string; done: string }> = {
+  identity: { title: "본인인증", hint: "이 캐치폼은 본인인증이 필요합니다. 이름과 생년월일을 입력해 테스트 공급자 인증을 완료해주세요.", action: "인증하기", busy: "인증 중…", done: "본인인증을 완료했습니다." },
+  signature: { title: "전자서명", hint: "이 캐치폼은 전자서명이 필요합니다. 이름과 생년월일을 입력하면 서명자를 확인하고 문서 내용에 서명합니다.", action: "서명하기", busy: "서명 중…", done: "전자서명을 완료했습니다." },
+};
+function IdentityVerification({ token, kinds, onDone }: { token: string; kinds: VerificationKind[]; onDone: (proof: VerificationProof) => void }) {
+  const [kind, setKind] = useState<VerificationKind>(kinds[0] ?? "identity");
+  return <VerificationStep key={kind} token={token} kind={kind} kinds={kinds} onKind={setKind} onDone={onDone} />;
+}
+function VerificationStep({ token, kind, kinds, onKind, onDone }: { token: string; kind: VerificationKind; kinds: VerificationKind[]; onKind: (kind: VerificationKind) => void; onDone: (proof: VerificationProof) => void }) {
   const [challenge, setChallenge] = useState<{ attemptId: string; nonce: string } | null>(null);
   const [error, setError] = useState(""), [busy, setBusy] = useState(false);
   useEffect(() => {
     let cancelled = false;
-    api<{ attemptId: string; nonce: string }>("/public/forms/" + token + "/verification", { method: "POST", body: JSON.stringify({ kind: "identity" }) })
+    api<{ attemptId: string; nonce: string }>("/public/forms/" + token + "/verification", { method: "POST", body: JSON.stringify({ kind }) })
       .then(value => { if (!cancelled) setChallenge(value); })
       .catch(cause => { if (!cancelled) setError(errorText(cause)); });
     return () => { cancelled = true; };
-  }, [token]);
+  }, [token, kind]);
   async function verify() {
     if (busy || !challenge) return;
     setBusy(true); setError("");
@@ -42,16 +51,20 @@ function IdentityVerification({ token, onDone }: { token: string; onDone: (proof
       const assertion = await api<Record<string, unknown>>("/public/verify/local", { method: "POST",
         body: JSON.stringify({ attemptId: challenge.attemptId, nonce: challenge.nonce, subject }) });
       const proof = await api<VerificationProof>("/public/forms/" + token + "/verification-callback", { method: "POST", body: JSON.stringify(assertion) });
-      onDone({ ...proof, name: subject.name });
+      onDone({ ...proof, name: subject.name, kind });
     } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
   }
-  return <section className="public-consent"><h2>본인인증</h2>
-    <p>이 캐치폼은 본인인증이 필요합니다. 이름과 생년월일을 입력해 테스트 공급자 인증을 완료해주세요.</p>
+  const labels = verificationLabels[kind];
+  return <section className="public-consent"><h2>{labels.title}</h2>
+    <p>{labels.hint}</p>
+    {kinds.length > 1 && <div className="cs-row" role="group" aria-label="검증 방법 선택">
+      {kinds.map(option => <button key={option} type="button" className={"cs-button" + (option === kind ? " cs-button-primary" : "")} disabled={busy} onClick={() => onKind(option)}>{verificationLabels[option].title}</button>)}
+    </div>}
     {challenge ? <div className="cs-stack">
       <label className="cs-row">이름<input className="cs-input" id="verifyName" required maxLength={100} autoComplete="name" /></label>
       <label className="cs-row">생년월일<input className="cs-input" id="verifyBirth" required placeholder="1990-01-01" pattern="\d{4}-\d{2}-\d{2}" /></label>
       {error && <p role="alert">{error}</p>}
-      <ActionButton type="button" disabled={busy} onClick={verify}>{busy ? "인증 중…" : "인증하기"}</ActionButton>
+      <ActionButton type="button" disabled={busy} onClick={verify}>{busy ? labels.busy : labels.action}</ActionButton>
     </div> : error ? <p role="alert">{error}</p> : <p role="status">인증 요청을 준비하고 있습니다.</p>}
   </section>;
 }
@@ -124,8 +137,8 @@ function ResponseForm({ data, token }: { data: PublicFormData; token: string }) 
         {content.marketing.smsQuestionId && <label className="cs-row"><input name="marketingChannels" type="checkbox" value="sms" />[선택] 문자 광고성 정보 수신에 동의합니다.</label>}
       </section>}</fieldset>
     {content.verify && <fieldset className="public-response-fields" disabled={busy || pending}>
-      {verification ? <section className="public-consent"><h2>본인인증</h2><p role="status">본인인증을 완료했습니다. ({verification.name})</p></section>
-        : <IdentityVerification key={token} token={token} onDone={proof => setVerification(proof)} />}
+      {verification ? <section className="public-consent"><h2>{verificationLabels[verification.kind].title}</h2><p role="status">{verificationLabels[verification.kind].done} ({verification.name})</p></section>
+        : <IdentityVerification key={token} token={token} kinds={data.verification?.kinds?.length ? data.verification.kinds : ["identity"]} onDone={proof => setVerification(proof)} />}
     </fieldset>}
     {uploadStatus && <p role="status">{uploadStatus}</p>}
     {error && <p role="alert">{error}</p>}

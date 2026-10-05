@@ -93,7 +93,7 @@ prepare/finish/database를 동시에 실행하지 않는다. PostgreSQL 통합 �
 - `VerificationReceipt_evidence_check`의 `environment='production'` 전용 조건을 sandbox 포함으로 완화(local 공급자 영수증은 sandbox). attempt↔revision↔receipt 정합성은 `verification_receipt_guard`가 유지한다.
 - `migrate deploy`로 빈 DB에 전량 적용 확인(재현성), 4개 로컬 DB의 `_prisma_migrations` 체크섬을 동기화했다.
 
-### 적대적 검증 (`tests/server/verification-flow.test.ts`, 4/4)
+### 적대적 검증 (`tests/server/verification-flow.test.ts`, 6/6)
 
 challenge 발급→공급자 서명→콜백→영수증 소비→제출 201 전체 경로. 위조 subject 콜백 403+rejected 이벤트 보존+attempt pending 유지, 탈취 nonce 403, 동일 어서션 재생 409, 영수증 토큰 위조 403, 타 테넌트/게시 귀속 불일치 404, 재사용 409(attempt consumed), 만료 410+워커 expired 전이, 미사용 연동 503, 외부 공급자·production enabled 422, verify=false 폼의 challenge 422·영수증 첨부 422. 문서 바인딩 해시 변경 시 재인증 요구 409.
 회귀: `verification-configuration` 27/27(합성 픽스처를 enabled 승격으로 갱신), `destruction` 48/48(파기 시 영수증·이벤트·시도 연쇄 삭제 유지), `public-submission-*`·`form-publication-state`·`publication-access-gate` 39/39.
@@ -105,5 +105,5 @@ dev 서버에서 verify 폼 게시→공개 URL 접근→challenge 자동 발급
 ### 미완료 조건 (체크박스 유지)
 
 - 실제 외부 공급자 어댑터(PASS/이니시스 등)와 공식 sandbox 검증 — 외부 인증이 필요해 이번 범위에서 제외.
-- 전자서명 `signature` kind — challenge는 503(SIGNATURE_ADAPTER_REQUIRED)으로 명시 차단한다.
+- ~~전자서명 `signature` kind~~ — **2026-10-05 구현·실측.** `signatureProvider`가 설정된 서비스는 kind=signature challenge→서명 어서션→콜백→영수증(kind=signature 기록)→제출 소비가 동작한다. 공개 폼 응답의 `verification.kinds`가 설정된 공급자를 노출하고 공개 화면은 두 방법을 버튼으로 선택하게 한다. 미설정 kind의 challenge는 503, 외부 서명 공급자는 여전히 게시·enabled 불가. 브라우저 실측 `scripts/qa-signature-flow.ts` 5/5([signature-browser.json](signature-browser.json), [서명 단계](states/signature-step.png), [제출 완료](states/signature-submitted.png)).
 - production 환경 공급자 — `enabled`를 sandbox+local로 제한해 production 어댑터 부재를 드러낸다.
