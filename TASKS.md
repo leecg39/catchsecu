@@ -698,7 +698,7 @@
 - 작업: 메뉴·헤더·MY·서비스 전환·권한에 맞는 action, 공통 Table/Form 상태와 서버 cache invalidation을 연결한다.
 - 선행: P04-T04, P08-T04, P10-T05, P13-T02
 - 검증/완료: 모든 visible action이 실제API/이동에 연결; loading·empty·validation·conflict·forbidden·retry·disabled 확인
-- 증거: [P13-T03 진행 중 검증](docs/qa/P13-T03/README.md). 사이드바 footer의 placeholder 모달 3개(홈페이지·처리방침·약관)를 실제 링크로 교체하고 `/legal/privacy`·`/legal/terms` 공개 문서 구현·실브라우저 확인. 전수 action 감사·캐시 일관성 증거는 미완료.
+- 증거: [P13-T03 진행 중 검증](docs/qa/P13-T03/README.md). 사이드바 footer의 placeholder 모달 3개를 실제 링크로 교체하고 `/legal/privacy`·`/legal/terms` 공개 문서 구현. 전수 action 감사 스윕 완료(169 경로·버튼 1,792개·클릭 468 — `/alimtalk/direct`·`/alimtalk/catchform` 404 링크와 신규 폼 `다음으로` 무응답 실버그 2건 수정, 나머지 dead 80건은 상태가드 no-op·활성 탭 등 수동 실측 오탐으로 분류). 원본 서비스 화면 대조는 외부 접근 불가로 미완료.
 
 ### P13-T04 — 전 페이지 화면 게이트
 

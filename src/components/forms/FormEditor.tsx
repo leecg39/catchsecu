@@ -62,7 +62,7 @@ function Editor({ initial, initialTemplate, templateMode, path, services }: { in
     setError(""); setMessage("");
     if (!templateMode) {
       movingNext.current = next;
-      const result = await draft.save();
+      const result = await draft.save(!draft.record);
       if (result && next) { router.push("/form/ai/recipient?formId=" + result.id); return; }
       movingNext.current = false;
       return;
