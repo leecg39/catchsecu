@@ -3,12 +3,13 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import { ApiError, api, errorText, useResource } from "@/lib/api";
-import { reviewAction, reviewCreate, reviewStatuses, type ReviewDetail, type ReviewList, type ReviewRecord } from "@/contracts/activity-reviews";
+import { reviewAction, reviewCreate, reviewDestruction, reviewStatuses, type ReviewDetail, type ReviewList, type ReviewRecord } from "@/contracts/activity-reviews";
 import type { AuditEventRecord } from "@/contracts/audit-events";
 import { useApplication, type Application } from "../ApplicationContext";
 import { ActionButton, EmptyState, Modal, PageHeading, Panel } from "../shared";
 
 const statuses: Record<ReviewRecord["status"], string> = { requested: "답변 대기", responded: "답변 도착", resolved: "처리 완료", cancelled: "요청 취소" };
+const destructionStatuses: Record<ReviewRecord["destructionStatus"], string> = { none: "파기 일정 없음", awaiting: "파기 승인 대기", kept: "보존 처리", destroyed: "메시지 파기 완료" };
 const notificationStatuses: Record<string, string> = { queued: "발송 대기", leased: "발송 처리 중", retry: "재시도 대기", dead: "발송 실패", cancelled: "발송 취소", local_delivered: "로컬 시험 전달 완료", accepted: "메일 서버 접수 완료", expired: "발송 자료 보관 종료" };
 const messageKinds: Record<string, string> = { request: "검토 요청", response: "대상자 답변", resolve: "처리 완료", cancel: "요청 취소" };
 function problem(cause: unknown) { return cause instanceof TypeError ? "연결 상태를 확인한 후 다시 시도해주세요." : errorText(cause); }
@@ -69,10 +70,11 @@ function ReviewWorkspace({ app, initialId }: { app: Application; initialId: stri
     </form>{error && <p role="alert">{error}</p>}
       <div className="activity-review-toolbar"><span>전체 {result.data?.total ?? 0}건</span><ActionButton secondary onClick={result.reload}>검토 이력 새로고침</ActionButton></div>
       {result.loading && <p role="status">검토 이력을 불러오는 중입니다.</p>}{result.error && <p role="alert">{problem(result.error)}</p>}
-      {result.data && <><div className="cs-table-wrap"><table className="cs-table"><thead><tr>{["#", "수신일시", "발신자", "내용", "구분", "대상자", "상태", "메시지"].map(label => <th key={label}>{label}</th>)}</tr></thead><tbody>
+      {result.data && <><div className="cs-table-wrap"><table className="cs-table"><thead><tr>{["#", "수신일시", "발신자", "내용", "구분", "대상자", "상태", "보유·파기", "메시지"].map(label => <th key={label}>{label}</th>)}</tr></thead><tbody>
         {result.data.items.length ? result.data.items.map((row, index) => <tr key={row.id}><td>{(currentPage - 1) * size + index + 1}</td><td>{when(row.createdAt)}</td><td>{row.requesterName}</td>
           <td><button className="cs-link" onClick={() => setSelected(row.id)}>{row.title}</button><small className="activity-review-service">{row.serviceName}</small></td><td>{row.action}</td><td>{row.recipientName}</td><td>{statuses[row.status]}</td>
-          <td><button className="cs-link" aria-label={row.title + " 메시지 확인"} onClick={() => setSelected(row.id)}>메시지 확인</button></td></tr>) : <tr><td colSpan={8}><EmptyState text="조건에 맞는 검토 요청이 없습니다." /></td></tr>}
+          <td>{row.destructionStatus !== "none" ? <span className="svc-badge">{destructionStatuses[row.destructionStatus]}</span> : row.retentionUntil ? <small>보유 ~{new Date(row.retentionUntil).toLocaleDateString("ko-KR")}</small> : "—"}</td>
+          <td><button className="cs-link" aria-label={row.title + " 메시지 확인"} onClick={() => setSelected(row.id)}>메시지 확인</button></td></tr>) : <tr><td colSpan={9}><EmptyState text="조건에 맞는 검토 요청이 없습니다." /></td></tr>}
       </tbody></table></div><nav className="cs-pagination" aria-label="검토 이력 페이지"><select aria-label="검토 페이지당 행 수" value={size} onChange={e => { setSize(Number(e.target.value)); setPage(1); }}>{[10, 20, 50, 100].map(n => <option key={n}>{n}</option>)}</select>
         <div><button aria-label="검토 이전 페이지" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>‹</button><span>{currentPage} / {pages}</span><button aria-label="검토 다음 페이지" disabled={currentPage >= pages} onClick={() => setPage(currentPage + 1)}>›</button></div></nav></>}
     </Panel>{selected && <ReviewDialog id={selected} onClose={() => setSelected("")} onChanged={result.reload} />}
@@ -108,7 +110,26 @@ function ReviewConversation({ row, onBusy, onReload, onChanged }: { row: ReviewD
     } catch (cause) { setError(problem(cause)); setConflict(cause instanceof ApiError && cause.status === 409); }
     finally { lock.current = false; setBusy(false); onBusy(false); }
   }
+  const [deciding, setDeciding] = useState<"destroy" | "keep" | "">(""), destructionKey = useRef("");
+  async function decide(action: "destroy" | "keep") {
+    if (lock.current || conflict) return; lock.current = true; setBusy(true); onBusy(true); setError("");
+    try {
+      const parsed = reviewDestruction.safeParse({ version: row.version, action }); if (!parsed.success) throw new Error(parsed.error.issues.map(i => i.message).join(" "));
+      destructionKey.current ||= crypto.randomUUID();
+      await api("/activity-reviews/" + row.id + "/destruction", { method: "POST", headers: { "Idempotency-Key": destructionKey.current }, body: JSON.stringify(parsed.data) });
+      setDeciding(""); onChanged();
+    } catch (cause) { setError(problem(cause)); setConflict(cause instanceof ApiError && cause.status === 409); }
+    finally { lock.current = false; setBusy(false); onBusy(false); }
+  }
   return <div className="activity-review-fields"><h3>{row.title}</h3><p>{row.serviceName} · {row.action}</p><p>요청자 {row.requesterName} · 대상자 {row.recipientName}</p><p role="status">{statuses[row.status]} · 버전 {row.version}</p>
+    {row.status === "resolved" || row.status === "cancelled" ? <p role="status">{destructionStatuses[row.destructionStatus]}{row.retentionUntil ? ` · 보유 기한 ${new Date(row.retentionUntil).toLocaleString("ko-KR")}` : ""}</p> : null}
+    {row.destructionStatus === "destroyed" && <p className="mg-muted">검토 메시지 원문은 삭제되었습니다. 검토 이력과 감사 기록은 보존됩니다.</p>}
+    {row.canDecideDestruction && <div><p>보유 기한이 지났습니다. 파기를 승인하면 메시지 원문이 삭제되고 되돌릴 수 없습니다. 보존을 선택하면 이 검토는 더 이상 파기 대상이 되지 않습니다.</p>
+      {deciding ? <div className="mg-flex"><p role="status">{deciding === "destroy" ? "메시지 원문을 파기합니다. 계속하시겠습니까?" : "이 검토를 보존 처리합니다. 계속하시겠습니까?"}</p>
+        <ActionButton type="button" disabled={busy} onClick={() => void decide(deciding)}>{busy ? "처리 중…" : deciding === "destroy" ? "파기 승인 확정" : "보존 처리 확정"}</ActionButton>
+        <ActionButton type="button" secondary disabled={busy} onClick={() => setDeciding("")}>취소</ActionButton></div>
+      : <div className="mg-flex"><ActionButton type="button" disabled={busy || conflict} onClick={() => setDeciding("destroy")}>메시지 파기 승인</ActionButton>
+        <ActionButton type="button" secondary disabled={busy || conflict} onClick={() => setDeciding("keep")}>보존 처리</ActionButton></div>}</div>}
     {row.notification && <div><p role="status">이메일 알림: {notificationStatuses[row.notification.status] ?? "상태 확인 필요"}</p><small>{when(row.notification.createdAt)} 요청 · 외부 수신 완료를 뜻하지 않습니다.</small><ActionButton type="button" secondary disabled={busy} onClick={onReload}>알림 상태 새로고침</ActionButton></div>}
     {row.canNotify && <div><p>대상자의 등록 이메일로 확인 안내만 보냅니다. 검토 제목과 본문은 메일에 포함하지 않습니다.</p><ActionButton type="button" secondary disabled={busy || conflict} onClick={notify}>{busy ? "처리 중…" : "이메일 알림 요청"}</ActionButton></div>}
     <ol className="activity-review-messages">{row.messages.map(m => <li key={m.id}><strong>{messageKinds[m.kind] ?? m.kind} · {m.authorName}</strong><time dateTime={m.createdAt}>{when(m.createdAt)}</time><p>{m.body}</p></li>)}</ol>

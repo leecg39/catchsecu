@@ -489,6 +489,7 @@ model Membership {
   reviewedAccess AccessRequest[] @relation("AccessReviewer")
   requestedActivityReviews ActivityReview[] @relation("ActivityRequester")
   receivedActivityReviews ActivityReview[] @relation("ActivityRecipient")
+  destroyedActivityReviews ActivityReview[] @relation("ActivityReviewDestroyer")
   activityReviewMessages ActivityReviewMessage[]
   @@unique([tenantId, expertAssignmentId, userId])
   @@unique([tenantId, id, userId])
@@ -794,6 +795,7 @@ model SecurityPolicy {
   automaticDestruction Boolean @default(false)
   allowRetentionAdjustment Boolean @default(false)
   allowRetentionDesignation Boolean @default(false)
+  activityReviewRetentionDays Int?
   version         Int      @default(1)
   updatedAt       DateTime @updatedAt
 }
@@ -2367,6 +2369,11 @@ model ActivityReview {
   title String
   status String @default("requested")
   version Int @default(1)
+  retentionUntil DateTime?
+  destructionStatus String @default("none")
+  destroyedAt DateTime?
+  destroyApproverId String?
+  destroyApprover Membership? @relation("ActivityReviewDestroyer", fields: [tenantId, destroyApproverId], references: [tenantId, id], onDelete: Restrict)
   respondedAt DateTime?
   closedAt DateTime?
   createdAt DateTime @default(now())
@@ -2376,6 +2383,7 @@ model ActivityReview {
   @@index([tenantId, recipientId, status, createdAt, id])
   @@index([tenantId, requesterId, status, createdAt, id])
   @@index([tenantId, serviceId, status, createdAt, id])
+  @@index([destructionStatus, retentionUntil])
 }
 model ActivityReviewMessage {
   id String @id @default(uuid())

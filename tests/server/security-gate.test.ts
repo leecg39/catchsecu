@@ -37,7 +37,7 @@ async function signup(email: string, role: string) {
 }
 const settingKeys = ["minPassword", "passwordMonths", "passwordReuse", "passwordDeferral", "sessionMinutes",
   "requireMfa", "requireApproval", "approvalRoles", "approvalReferenceRequired", "approvalRequestTemplate",
-  "automaticDestruction", "allowRetentionAdjustment", "allowRetentionDesignation", "retentionDays"] as const;
+  "automaticDestruction", "allowRetentionAdjustment", "allowRetentionDesignation", "retentionDays", "activityReviewRetentionDays"] as const;
 async function patchPolicy(overrides: Record<string, unknown>, cookie = ownerCookie, pass = password) {
   const current = await (await policyGet(request("/security/policy", "GET", cookie))).json();
   const settings = Object.fromEntries(settingKeys.map(k => [k, current[k]]));

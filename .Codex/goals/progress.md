@@ -43,6 +43,8 @@
 
 ## 최신 보완
 
+P03-T03의 개인정보 활동 검토에 회사별 보유 기한·승인된 파기를 연결했다. SecurityPolicy.activityReviewRetentionDays, ActivityReview retentionUntil/destructionStatus/destroyedAt/destroyApproverId(관리자 composite FK)와 상태·전이·메시지 삭제 방어 트리거(migration 2개), 종결 시 정책 스냅샷·승인 대기 sweep·파기/보존 결정 API·정책 변경 재계산 백필을 구현했다. 종결 경로는 Policy→Review 잠금 순서로 정책 변경과 직렬화한다(ABBA 데드락 방지). UI에 정책 기한 필드와 검토 목록 보유·파기 배지·상세 2단계 파기 승인 버튼을 연결했다. 신규 PostgreSQL 8개·관련 75개·전체 97파일 1333개·타입/린트/production 빌드·계약 검증이 통과했다. [증거](../../docs/qa/P03-T03/revalidation/activity-retention-README.md). 실제 외부 발송과 전체 브라우저 게이트가 남아 공식 17/72를 유지한다.
+
 P12-T01의 감사 생산·원자성·원장 U/D 차단·안전 조회를 완료했다. 최종 관련13파일162개·빌드/타입/린트·계약/계획, 실제10종류 로그 화면·CSV·독립 DB·새 프로세스를 검증했다. 전체 회귀1246/1247의 관측 실패1개는 보존하고 해당6개를 별도 환경에서 통과했다. [완료 근거](../../docs/qa/P12-T01/completion/README.md). 공식17/72이며 이번 커밋·푸시 성공 후 사용자 요청대로 일시 정지한다. 다음 Task는 시작하지 않는다.
 
 P03-T03 계정 폐쇄·본인 활동/CSV·기기 관리의 현재 세션과 최종 기한을 보완했다. 관련 36개·production 빌드/타입·린트 통과. 실제 owner 탈퇴 차단·기기 회수401·필터 CSV1행·시험 계정 폐쇄·세션/로그인401과 독립 DB/재시작 해시를 대조했다. [증거](../../docs/qa/P03-T03/revalidation/account-README.md). 개인정보 활동 검토 workflow/SSO·선행 게이트가 남아 공식15/72를 유지한다.

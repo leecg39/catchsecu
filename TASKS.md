@@ -205,7 +205,7 @@
 - 작업: 프로필 서버 저장, 보안설정 연결, 계정탈퇴 요청·소유권 인계·세션폐기·이력 연결을 구현한다.
 - 선행: P03-T02
 - 검증/완료: 재시작 후 프로필 유지; owner 인계 전 탈퇴 실패; 탈퇴 후 세션 및 토큰 거부
-- 증거: [P03-T03 진행 중 검증](docs/qa/P03-T03/README.md). 프로필·본인 활동·소유권 인계·계정 폐쇄·세션/인증 회수 API와 화면을 구현했다. 실제 PostgreSQL·production HTTP·서버 재시작을 검증했다. 개인정보 활동 검토 모델/API도 [부분 구현](docs/qa/P03-T03/revalidation/activity-README.md)했고 [UI 요청·답변·종결·충돌·페이지·모바일·재시작](docs/qa/P03-T03/revalidation/activity-ui-README.md)도 확인했다. [명시적 이메일 알림과 로컬 전달](docs/qa/P03-T03/revalidation/activity-mail-README.md)도 구현·검증했다. 실제 외부 전달·보유 정책과 전체 브라우저 게이트는 남아 있다.
+- 증거: [P03-T03 진행 중 검증](docs/qa/P03-T03/README.md). 프로필·본인 활동·소유권 인계·계정 폐쇄·세션/인증 회수 API와 화면을 구현했다. 실제 PostgreSQL·production HTTP·서버 재시작을 검증했다. 개인정보 활동 검토 모델/API도 [부분 구현](docs/qa/P03-T03/revalidation/activity-README.md)했고 [UI 요청·답변·종결·충돌·페이지·모바일·재시작](docs/qa/P03-T03/revalidation/activity-ui-README.md)도 확인했다. [명시적 이메일 알림과 로컬 전달](docs/qa/P03-T03/revalidation/activity-mail-README.md)도 구현·검증했다. [회사별 보유 기한·승인된 파기](docs/qa/P03-T03/revalidation/activity-retention-README.md)도 구현·검증했다. 실제 외부 전달과 전체 브라우저 게이트는 남아 있다.
 
 ### P03-T04 — 서비스 표시 동의·재위탁
 

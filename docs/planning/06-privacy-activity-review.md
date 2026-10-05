@@ -35,6 +35,6 @@
 
 ## 다음 실행의 시작점
 
-문서 선택 목록 보완은 `docs/qa/P03-T04/revalidation/options-authority-*`에 기록한다. 업무 모델2개와 API4개를 구현하고 신규20개·관련다른21개·migration75개·실제HTTP/재시작을 검증했다. [모델/API 증거](../qa/P03-T03/revalidation/activity-README.md). [UI 후속 검증](../qa/P03-T03/revalidation/activity-ui-README.md)에서 요청·답변·종결·충돌·페이지·390px·DB/재시작을 확인했다. [명시적 이메일 알림](../qa/P03-T03/revalidation/activity-mail-README.md)과 로컬 전달까지 구현·검증했다. 실제 외부 전달과 보유 정책은 남아 있다. 기존 AuditEvent에는 tenantId가 nullable이므로 감사 대상 composite FK를 추가할 때 기존 개인 감사 기록도 유지해야 한다. 보관 자료나 계정 폐쇄 데이터에 destructive migration을 사용하지 않는다.
+문서 선택 목록 보완은 `docs/qa/P03-T04/revalidation/options-authority-*`에 기록한다. 업무 모델2개와 API4개를 구현하고 신규20개·관련다른21개·migration75개·실제HTTP/재시작을 검증했다. [모델/API 증거](../qa/P03-T03/revalidation/activity-README.md). [UI 후속 검증](../qa/P03-T03/revalidation/activity-ui-README.md)에서 요청·답변·종결·충돌·페이지·390px·DB/재시작을 확인했다. [명시적 이메일 알림](../qa/P03-T03/revalidation/activity-mail-README.md)과 로컬 전달까지 구현·검증했다. [회사별 보유 기한과 승인된 파기](../qa/P03-T03/revalidation/activity-retention-README.md)도 구현·검증했다: 종결 시 정책 기한을 스냅샷하고 기한 경과 후 파기 승인 대기·승인 시 메시지 원문만 트랜잭션으로 삭제하며 검토 이력과 감사는 보존한다. 실제 외부 전달은 남아 있다. 기존 AuditEvent에는 tenantId가 nullable이므로 감사 대상 composite FK를 추가할 때 기존 개인 감사 기록도 유지해야 한다. 보관 자료나 계정 폐쇄 데이터에 destructive migration을 사용하지 않는다.
 
-현재 권한 정책상 전문가 역할은 viewer만 허용되어 보안 담당자로 생성/종결할 수 없다. 전문가 대상자의 본인 답변은 허용하며 배정 만료를 검사한다. 모델/API와 앱 내 이력 UI를 구현했고 이메일 알림 접수/worker/상태 UI도 구현했다. 외부 SMTP는 미검증이며 회사별 보유/승인된 파기 정책이 다음 구현이다. 기간을 임의로 추정하지 않는다.
+현재 권한 정책상 전문가 역할은 viewer만 허용되어 보안 담당자로 생성/종결할 수 없다. 전문가 대상자의 본인 답변은 허용하며 배정 만료를 검사한다. 모델/API와 앱 내 이력 UI를 구현했고 이메일 알림 접수/worker/상태 UI도 구현했다. 외부 SMTP는 미검증이며 다음 후보는 전체 브라우저 게이트·외부 발송이다. 기간을 임의로 추정하지 않는다.

@@ -9,6 +9,7 @@ import { cleanupExpiredFiles } from "../src/server/files";
 import { cleanupNoticeAttachments } from "../src/server/notice-attachments";
 import { cleanupBusinessFiles } from "../src/server/company-management";
 import { enqueueExpiredSubmissions, runOneDestruction } from "../src/server/destruction-worker";
+import { sweepActivityReviewRetention } from "../src/server/activity-reviews";
 import { expireIdempotencyResponses } from "../src/server/idempotency";
 
 import { cleanupExpiredImports, runOneImport } from "../src/server/import-worker";
@@ -46,7 +47,8 @@ async function main() {
       const expiredTrials = await expireTrials();
       const expiredExperts = await expireExpertAssignments();
       const destruction = await enqueueExpiredSubmissions();
-      if (expired.count || destruction.created || expiredTrials || expiredExperts) console.info("보유 기한 처리", { expiredCaches: expired.count, requests: destruction.created, expiredTrials, expiredExperts });
+      const reviewRetention = await sweepActivityReviewRetention();
+      if (expired.count || destruction.created || expiredTrials || expiredExperts || reviewRetention.pending) console.info("보유 기한 처리", { expiredCaches: expired.count, requests: destruction.created, expiredTrials, expiredExperts, reviewPending: reviewRetention.pending });
       cleanedAt = Date.now();
     }
     const destroyed = await runOneDestruction(workerId);

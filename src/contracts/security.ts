@@ -15,6 +15,7 @@ export const policySettings = z.object({
   allowRetentionAdjustment: z.boolean(),
   allowRetentionDesignation: z.boolean(),
   retentionDays: z.number().int().min(1).max(36500),
+  activityReviewRetentionDays: z.number().int().min(1).max(36500).nullable(),
 }).strict();
 export const policyPatch = policySettings.extend({ tenantId: z.uuid(), version: z.number().int().positive(), password: z.string().min(1).max(128) });
 export const policyReset = z.object({ tenantId: z.uuid(), version: z.number().int().positive(), password: z.string().min(1).max(128) }).strict();
@@ -23,6 +24,7 @@ export const policyDefaults: z.infer<typeof policySettings> = {
   sessionMinutes: 30, requireMfa: false, requireApproval: false,
   approvalRoles: ["owner"], approvalReferenceRequired: false, approvalRequestTemplate: "",
   automaticDestruction: false, allowRetentionAdjustment: false, allowRetentionDesignation: false, retentionDays: 365,
+  activityReviewRetentionDays: null,
 };
 export type PolicyRecord = z.infer<typeof policySettings> & { tenantId: string; version: number; passwordRevision: number; approvalRevision: number; updatedAt: string; canManage: boolean };
 export const approvalRequestInput = z.object({

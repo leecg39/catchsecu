@@ -16,6 +16,7 @@ export function policyDto(policy: SecurityPolicy, ctx: Context) {
     approvalRequestTemplate: policy.approvalRequestTemplate, approvalRevision: policy.approvalRevision,
     automaticDestruction: policy.automaticDestruction, allowRetentionAdjustment: policy.allowRetentionAdjustment,
     allowRetentionDesignation: policy.allowRetentionDesignation, retentionDays: policy.retentionDays,
+    activityReviewRetentionDays: policy.activityReviewRetentionDays,
     version: policy.version, updatedAt: policy.updatedAt, canManage: ctx.member.role === "owner" };
 }
 export async function readPolicy(ctx: Context) {
@@ -67,6 +68,21 @@ export async function updatePolicy(ctx: Context, version: number, settings: z.in
       await tx.approvalRequest.updateMany({ where: { tenantId: ctx.tenantId, status: { in: ["pending", "approved"] } },
         data: { status: "superseded", version: { increment: 1 } } });
       await tx.form.updateMany({ where: { tenantId: ctx.tenantId, status: "pendingApproval" }, data: { status: "draft", version: { increment: 1 } } });
+    }
+    if (settings.activityReviewRetentionDays !== current.activityReviewRetentionDays) {
+      // 종결된 검토의 남은 기한은 새 정책으로 다시 계산한다. 보존·파기 확정 행과 진행 중 검토는 건드리지 않는다.
+      await tx.$queryRaw`SELECT id FROM "ActivityReview" WHERE "tenantId" = ${ctx.tenantId} ORDER BY id FOR UPDATE`;
+      if (settings.activityReviewRetentionDays === null) {
+        await tx.$executeRaw`UPDATE "ActivityReview" SET "retentionUntil"=NULL,"destructionStatus"='none',"version"="version"+1,"updatedAt"=CURRENT_TIMESTAMP
+          WHERE "tenantId"=${ctx.tenantId} AND "destructionStatus" IN ('none','awaiting') AND ("retentionUntil" IS NOT NULL OR "destructionStatus"='awaiting')`;
+      } else {
+        await tx.$executeRaw`UPDATE "ActivityReview" SET
+            "destructionStatus"=CASE WHEN "destructionStatus"='awaiting' AND "closedAt"+(${settings.activityReviewRetentionDays} * INTERVAL '1 day')>CURRENT_TIMESTAMP THEN 'none' ELSE "destructionStatus" END,
+            "retentionUntil"="closedAt"+(${settings.activityReviewRetentionDays} * INTERVAL '1 day'),
+            "version"="version"+1,"updatedAt"=CURRENT_TIMESTAMP
+          WHERE "tenantId"=${ctx.tenantId} AND "closedAt" IS NOT NULL AND "destructionStatus" IN ('none','awaiting')
+            AND "retentionUntil" IS DISTINCT FROM "closedAt"+(${settings.activityReviewRetentionDays} * INTERVAL '1 day')`;
+      }
     }
     const saved = await tx.securityPolicy.update({ where: { tenantId: ctx.tenantId },
       data: { ...settings, version: { increment: 1 }, passwordRevision: { increment: passwordChanged ? 1 : 0 }, approvalRevision: { increment: approvalChanged || retentionChanged ? 1 : 0 } } });

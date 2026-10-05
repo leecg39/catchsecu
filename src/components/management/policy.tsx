@@ -27,7 +27,8 @@ function PolicyForm({ initial }: { initial: PolicyRecord }) {
     try {
       const settings = policySettings.parse({ minPassword: policy.minPassword, passwordMonths: policy.passwordMonths, passwordReuse: policy.passwordReuse, passwordDeferral: policy.passwordDeferral, sessionMinutes: policy.sessionMinutes, requireMfa: policy.requireMfa, requireApproval: policy.requireApproval,
         approvalRoles: policy.approvalRoles, approvalReferenceRequired: policy.approvalReferenceRequired, approvalRequestTemplate: policy.approvalRequestTemplate,
-        automaticDestruction: policy.automaticDestruction, allowRetentionAdjustment: policy.allowRetentionAdjustment, allowRetentionDesignation: policy.allowRetentionDesignation, retentionDays: policy.retentionDays });
+        automaticDestruction: policy.automaticDestruction, allowRetentionAdjustment: policy.allowRetentionAdjustment, allowRetentionDesignation: policy.allowRetentionDesignation, retentionDays: policy.retentionDays,
+        activityReviewRetentionDays: policy.activityReviewRetentionDays });
       const saved = await api<PolicyRecord>("/security/policy", { method: confirm === "reset" ? "DELETE" : "PATCH",
         body: JSON.stringify({ ...(confirm === "reset" ? {} : settings), tenantId: policy.tenantId, version: policy.version, password }) });
       setPolicy(saved); setBaseline(saved); setConfirm(undefined); setNotice(confirm === "reset" ? "기본 정책을 적용했습니다." : "정책을 저장했습니다. 다음 요청부터 적용됩니다.");
@@ -80,12 +81,18 @@ function PolicyForm({ initial }: { initial: PolicyRecord }) {
           <p>이미 동의받은 원래 보유 기한 이내에서만 조정할 수 있습니다.</p>
           <h3>파기일정 사후 지정</h3><label className="member-check"><input type="checkbox" checked={policy.allowRetentionDesignation} onChange={event => change({ allowRetentionDesignation: event.target.checked })} />보유 기간을 지정하지 않은 캐치폼의 파기 일정을 나중에 지정할 수 있습니다.</label>
           <p>끄면 보유 기간 미지정 폼의 사후 지정이 차단되며 목록의 보유 지정 버튼도 숨겨집니다. 이미 지정된 값은 바뀌지 않습니다.</p>
+          <h3>개인정보 활동 검토 이력</h3>
+          <label className="member-check"><input type="checkbox" checked={policy.activityReviewRetentionDays !== null} onChange={event => change({ activityReviewRetentionDays: event.target.checked ? 365 : null })} />종결된 검토에 보유 기한을 적용하고 기한 경과 후 메시지 원문을 파기합니다.</label>
+          {policy.activityReviewRetentionDays !== null &&
+            <label>보유 기간 (일)<input className="cs-input mg-time" aria-label="활동 검토 보유 기간" type="number" min={1} max={36500}
+              value={policy.activityReviewRetentionDays} onChange={event => change({ activityReviewRetentionDays: Number(event.target.value) })} /></label>}
+          <p className="mg-muted">처리 완료 또는 취소된 검토에 적용합니다. 기한이 지나면 보안 담당자의 파기 승인 대기 상태가 되고, 승인 시 메시지 원문만 삭제되며 검토 이력과 감사 기록은 유지됩니다. 기간을 바꾸면 이미 종결된 검토의 남은 기한도 새 기간으로 다시 계산되고, 끄면 파기 일정이 해제됩니다. 보존하거나 이미 파기한 검토는 바뀌지 않습니다.</p>
           <Link className="cs-link" href="/log/destruction-schedule">파기 일정과 승인 요청</Link>
           <p className="mg-muted">삭제가 시작된 뒤에는 예약 취소나 보존 조치를 적용할 수 없습니다.</p></>}
       </fieldset><p role="status">{notice}</p><p className="mg-muted">정책 버전 {policy.version} · {new Date(policy.updatedAt).toLocaleString("ko-KR")}</p>
     </Panel>{confirm && <Modal title={confirm === "reset" ? "보안 정책 기본값 복원" : "보안 정책 저장"} onClose={() => { if (!busy) setConfirm(undefined); }}>
       <form className="mg-fields" onSubmit={event => { event.preventDefault(); void save(String(new FormData(event.currentTarget).get("password"))); }}>
-        {confirm === "reset" && <p>비밀번호 변경 주기 3개월, 현재 비밀번호 재사용 금지, 변경 유예 없음, 최소 12자, 세션 30분, 2단계 인증 선택, 게시 승인 선택, 자동 파기 끄기, 파기일자 변경·사후 지정 끄기, 회사 기본 보유 기간 365일로 되돌립니다. 진행 중인 승인 요청도 무효화될 수 있습니다.</p>}
+        {confirm === "reset" && <p>비밀번호 변경 주기 3개월, 현재 비밀번호 재사용 금지, 변경 유예 없음, 최소 12자, 세션 30분, 2단계 인증 선택, 게시 승인 선택, 자동 파기 끄기, 파기일자 변경·사후 지정 끄기, 회사 기본 보유 기간 365일, 활동 검토 보유 기한 해제로 되돌립니다. 진행 중인 승인 요청도 무효화될 수 있습니다.</p>}
         <label><span>현재 비밀번호</span><input className="cs-input" type="password" name="password" aria-label="현재 비밀번호" required maxLength={128} autoComplete="current-password" /></label>
         {error && <p role="alert">{error}</p>}<ActionButton disabled={busy}>{busy ? "적용 중…" : "정책 적용"}</ActionButton>
       </form></Modal>}</>;

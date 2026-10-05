@@ -8641,6 +8641,18 @@
                     "minimum": 1,
                     "maximum": 36500
                   },
+                  "activityReviewRetentionDays": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 36500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "tenantId": {
                     "type": "string",
                     "format": "uuid",
@@ -8672,6 +8684,7 @@
                   "allowRetentionAdjustment",
                   "allowRetentionDesignation",
                   "retentionDays",
+                  "activityReviewRetentionDays",
                   "tenantId",
                   "version",
                   "password"
@@ -68089,6 +68102,206 @@
                 },
                 "required": [
                   "version"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-origin-check": "exact configured application Origin",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            }
+          }
+        ],
+        "x-contract-policy": "activity-review"
+      }
+    },
+    "/activity-reviews/{id}/destruction": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "summary": "보유 기한 경과로 승인 대기 중인 종결 검토의 파기/보존 결정: version 확인·메시지 원문만 원자 삭제·검토 이력과 감사는 유지",
+        "x-permission": "security.write + audit.read + current service grants, not recipient",
+        "x-implementation": "implemented",
+        "responses": {
+          "200": {
+            "description": "저장된 접수 식별자. 최신 상태는 상세 조회.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "messageId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "jobId": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 형식 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "로그인 필요",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 또는 Origin 거부",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "현재 회사 범위에 없는 항목",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "버전·중복·상태 전이 충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "회수·만료된 항목",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "요청·파일 크기 초과",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "지원하지 않는 전송 형식",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "필드 검증 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "요청 제한",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 미설정 또는 일시 장애",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "destroy",
+                      "keep"
+                    ]
+                  }
+                },
+                "required": [
+                  "version",
+                  "action"
                 ],
                 "additionalProperties": false
               }

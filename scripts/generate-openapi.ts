@@ -1,4 +1,4 @@
-import { reviewCreate, reviewAction, reviewQuery, reviewNotify } from "../src/contracts/activity-reviews";
+import { reviewCreate, reviewAction, reviewQuery, reviewNotify, reviewDestruction } from "../src/contracts/activity-reviews";
 import { contextSelectionInput } from "../src/contracts/context";
 import { mfaPolicyChange,mfaExceptionCreate,mfaExceptionPatch,mfaExceptionDelete,mfaMemberQuery } from "../src/contracts/mfa-policy";
 import { ipRuleInput, ipRulePatch, ipRuleDelete, ipAccessChange, ipRuleQuery } from "../src/contracts/ip-access";
@@ -995,10 +995,11 @@ add("/activity-reviews", "post", "security.write + audit.read + current service 
 add("/activity-reviews/{id}", "get", "current recipient or current service review manager", "검토 상세와 권한 확인 후 복호화 메시지·현재 상태별 버튼", undefined, "implemented");
 add("/activity-reviews/{id}/actions", "post", "response: recipient; resolve/cancel: security.write + audit.read + service grants, not recipient", "version을 확인해 답변/처리완료/취소와 불변 메시지·감사를 원자 저장; 같은 키는 접수 ID만 재사용", reviewAction, "implemented");
 add("/activity-reviews/{id}/notifications", "post", "current service security.write + audit.read; not recipient", "명시적 검토 알림 접수: version·현재 수신자 검사, 상태별 한 번만 Job 생성; 발송 직전 권한/대상자/상태 재검사", reviewNotify, "implemented", "202");
+add("/activity-reviews/{id}/destruction", "post", "security.write + audit.read + current service grants, not recipient", "보유 기한 경과로 승인 대기 중인 종결 검토의 파기/보존 결정: version 확인·메시지 원문만 원자 삭제·검토 이력과 감사는 유지", reviewDestruction, "implemented");
 (paths["/activity-reviews"].get as Operation).parameters = Object.entries(z.toJSONSchema(reviewQuery).properties ?? {}).map(([name, schema]) => ({ in: "query", name, schema }));
-for (const path of ["/activity-reviews", "/activity-reviews/{id}/actions", "/activity-reviews/{id}/notifications"]) {
+for (const path of ["/activity-reviews", "/activity-reviews/{id}/actions", "/activity-reviews/{id}/notifications", "/activity-reviews/{id}/destruction"]) {
   (paths[path].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
-  (paths[path].post as Operation).responses = { ...errors, [path.endsWith("notifications") ? "202" : path.endsWith("actions") ? "200" : "201"]: { description: "저장된 접수 식별자. 최신 상태는 상세 조회.", content: { "application/json": { schema: { type: "object", required: ["id"], properties: { id: { type: "string", format: "uuid" }, messageId: { type: "string", format: "uuid" }, jobId: { type: "string", format: "uuid" } } } } } } };
+  (paths[path].post as Operation).responses = { ...errors, [path.endsWith("notifications") ? "202" : path === "/activity-reviews" ? "201" : "200"]: { description: "저장된 접수 식별자. 최신 상태는 상세 조회.", content: { "application/json": { schema: { type: "object", required: ["id"], properties: { id: { type: "string", format: "uuid" }, messageId: { type: "string", format: "uuid" }, jobId: { type: "string", format: "uuid" } } } } } } };
 }
 const policies = JSON.parse(await readFile("docs/planning/contracts/domain-policies.json", "utf8")) as { rules: PolicyRule[] };
 for (const [path, item] of Object.entries(paths)) {

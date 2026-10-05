@@ -1,6 +1,7 @@
+import { randomUUID } from "node:crypto";
 import type { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
-import { reviewAction, reviewCreate, reviewQuery, reviewNotify, type ReviewDetail, type ReviewRecord } from "@/contracts/activity-reviews";
+import { reviewAction, reviewCreate, reviewDestruction, reviewQuery, reviewNotify, type ReviewDetail, type ReviewRecord } from "@/contracts/activity-reviews";
 import { db, type Transaction } from "./db";
 import { activeMembershipWhere, type Context } from "./context";
 import { lockServiceActor } from "./service-actor";
@@ -29,7 +30,8 @@ function managedScope(actor: Actor): Prisma.ServiceWhereInput {
 }
 function dto(row: Row): ReviewRecord {
   return { id: row.id, serviceId: row.serviceId, serviceName: row.service.name, auditEventId: row.auditEventId, action: row.auditEvent.action, title: row.title,
-    status: row.status as ReviewRecord["status"], version: row.version, requesterName: row.requester.user.name, recipientName: row.recipient.user.name,
+    status: row.status as ReviewRecord["status"], version: row.version, destructionStatus: row.destructionStatus as ReviewRecord["destructionStatus"],
+    retentionUntil: row.retentionUntil?.toISOString() ?? null, requesterName: row.requester.user.name, recipientName: row.recipient.user.name,
     createdAt: row.createdAt.toISOString(), respondedAt: row.respondedAt?.toISOString() ?? null, closedAt: row.closedAt?.toISOString() ?? null };
 }
 async function locate(tx: Transaction, ctx: Context, actor: Actor, id: string, write = false) {
@@ -71,6 +73,7 @@ export async function readActivityReview(ctx: Context, id: string): Promise<Revi
       canNotify: row.status === "requested" && row.recipientId !== actor.member.id && manages(actor, row.serviceId) && row.service.status === "active" && !notification,
       notification: notification ? { status: notification.payloadErasedAt ? "expired" : notification.status === "done" ? (decrypt<{ transport: string }>(notification.payloadCipher).transport === "local" ? "local_delivered" : "accepted") : notification.status, createdAt: notification.createdAt.toISOString(), completedAt: notification.completedAt?.toISOString() ?? null } : null, canRespond: row.status === "requested" && row.recipientId === actor.member.id && row.service.status === "active",
       canClose: active(row.status) && row.recipientId !== actor.member.id && manages(actor, row.serviceId) && row.service.status === "active",
+      canDecideDestruction: row.destructionStatus === "awaiting" && manages(actor, row.serviceId) && row.service.status === "active",
       messages: messages.map(m => ({ id: m.id, kind: m.kind, authorName: m.author.user.name, body: decrypt<string>(m.bodyCipher), createdAt: m.createdAt.toISOString() })) };
     assertFileDeadlines(actor.deadlines); return result;
   });
@@ -114,12 +117,20 @@ export async function createActivityReview(ctx: Context, input: z.infer<typeof r
 export async function actOnActivityReview(ctx: Context, id: string, input: z.infer<typeof reviewAction>, key: string | null, requestId: string) {
   let actor: Actor;
   return idempotent("activity-review:action:" + ctx.tenantId + ":" + ctx.member.id + ":" + id, key, input, async tx => {
-    actor = await lockServiceActor(tx, ctx, "service.read"); const row = await locate(tx, ctx, actor, id, true);
+    actor = await lockServiceActor(tx, ctx, "service.read");
+    const now = new Date(), status = input.action === "response" ? "responded" : input.action === "resolve" ? "resolved" : "cancelled";
+    // updatePolicy와 같은 순서로 정책을 먼저 잠가 종결 스냅샷이 정책 변경과 직렬화되게 한다.
+    let retentionUntil: Date | null = null;
+    if (status !== "responded") {
+      await tx.$queryRaw`SELECT "tenantId" FROM "SecurityPolicy" WHERE "tenantId"=${ctx.tenantId} FOR SHARE`;
+      const policy = await tx.securityPolicy.findUnique({ where: { tenantId: ctx.tenantId }, select: { activityReviewRetentionDays: true } });
+      if (policy?.activityReviewRetentionDays) retentionUntil = new Date(now.getTime() + policy.activityReviewRetentionDays * 86400000);
+    }
+    const row = await locate(tx, ctx, actor, id, true);
     allowAction(actor, row, input.action); requireVersion(input, row);
     if (input.action === "response" ? row.status !== "requested" : input.action === "resolve" ? row.status !== "responded" : !active(row.status))
       fail(409, "INVALID_REVIEW_TRANSITION", "현재 상태에서는 처리할 수 없습니다. 최신 검토 이력을 확인해주세요.");
-    const now = new Date(), status = input.action === "response" ? "responded" : input.action === "resolve" ? "resolved" : "cancelled";
-    await tx.activityReview.update({ where: { id }, data: { status, version: { increment: 1 }, ...(input.action === "response" ? { respondedAt: now } : { closedAt: now }) } });
+    await tx.activityReview.update({ where: { id }, data: { status, version: { increment: 1 }, ...(input.action === "response" ? { respondedAt: now } : { closedAt: now, retentionUntil }) } });
     const message = await tx.activityReviewMessage.create({ data: { tenantId: ctx.tenantId, reviewId: id, authorId: actor.member.id, kind: input.action, bodyCipher: encrypt(input.message) } });
     await audit(tx, ctx, requestId, "activity_review." + status, "activityReview", id, ["message", "status"], row.serviceId);
     return { status: 200, body: { id, messageId: message.id } };
@@ -145,4 +156,59 @@ export async function notifyActivityReview(ctx: Context, id: string, input: z.in
     const recipient = await lockReviewRecipient(tx, ctx.tenantId, row.recipientId, row.recipientUserId); expiresAt = recipient.expiresAt;
     return cached;
   }, async () => { assertFileDeadlines(actor.deadlines); recipientCurrent(expiresAt); });
+}
+
+export async function decideActivityReviewDestruction(ctx: Context, id: string, input: z.infer<typeof reviewDestruction>, key: string | null, requestId: string) {
+  let actor: Actor;
+  return idempotent("activity-review:destruction:" + ctx.tenantId + ":" + ctx.member.id + ":" + id, key, input, async tx => {
+    actor = await lockServiceActor(tx, ctx, "service.read");
+    const row = await locate(tx, ctx, actor, id, true);
+    if (!manages(actor, row.serviceId)) fail(403, "REVIEW_FORBIDDEN", "해당 서비스의 보안 담당자가 처리해야 합니다.");
+    requireVersion(input, row);
+    if (row.destructionStatus !== "awaiting") fail(409, "INVALID_DESTRUCTION_TRANSITION", "파기 승인 대기 중인 종결 검토만 처리할 수 있습니다.");
+    if (input.action === "keep") {
+      await tx.activityReview.update({ where: { id }, data: { destructionStatus: "kept", version: { increment: 1 } } });
+      await audit(tx, ctx, requestId, "activity_review.destruction_kept", "activityReview", id, ["destructionStatus"], row.serviceId);
+    } else {
+      await tx.$queryRaw`SELECT set_config('app.activity_review_destroy', 'on', true)`;
+      const removed = await tx.activityReviewMessage.deleteMany({ where: { tenantId: ctx.tenantId, reviewId: id } });
+      await tx.activityReview.update({ where: { id }, data: { destructionStatus: "destroyed", destroyedAt: new Date(), destroyApproverId: actor.member.id, version: { increment: 1 } } });
+      await audit(tx, ctx, requestId, "activity_review.destroyed", "activityReview", id, ["destructionStatus", `messages:${removed.count}`], row.serviceId);
+    }
+    return { status: 200, body: { id } };
+  }, async tx => { actor = await lockServiceActor(tx, ctx, "service.read"); }, async (tx, cached) => {
+    const row = await locate(tx, ctx, actor, id, true);
+    if (!manages(actor, row.serviceId)) fail(403, "REVIEW_FORBIDDEN", "해당 서비스의 보안 담당자가 처리해야 합니다.");
+    return cached;
+  }, async () => { assertFileDeadlines(actor.deadlines); });
+}
+
+const closedReview = (status: string) => ["resolved", "cancelled"].includes(status);
+async function systemReviewAudit(tx: Transaction, tenantId: string, serviceId: string, reviewId: string, action: string) {
+  await tx.auditEvent.create({ data: { tenantId, serviceId, resource: "activityReview", resourceId: reviewId, action, requestId: randomUUID(), detail: {} } });
+}
+export async function sweepActivityReviewRetention(now = new Date(), limit = 50) {
+  const candidates = await db.$queryRaw<{ id: string; tenantId: string }[]>`
+    SELECT id,"tenantId" FROM "ActivityReview" WHERE "destructionStatus"='none' AND "retentionUntil" IS NOT NULL AND "retentionUntil"<=${now} AND "status" IN ('resolved','cancelled') ORDER BY "retentionUntil",id LIMIT ${limit}`;
+  let pending = 0;
+  for (const candidate of candidates) {
+    const marked = await db.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${candidate.tenantId} FOR SHARE`;
+      await tx.$queryRaw`SELECT "tenantId" FROM "SecurityPolicy" WHERE "tenantId"=${candidate.tenantId} FOR SHARE`;
+      const locked = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM "ActivityReview" WHERE id=${candidate.id} AND "tenantId"=${candidate.tenantId} FOR UPDATE SKIP LOCKED`;
+      if (!locked.length) return false;
+      const row = await tx.activityReview.findUniqueOrThrow({ where: { id: candidate.id } });
+      if (row.destructionStatus !== "none" || !row.retentionUntil || row.retentionUntil > now || !closedReview(row.status)) return false;
+      const policy = await tx.securityPolicy.findUnique({ where: { tenantId: row.tenantId }, select: { activityReviewRetentionDays: true } });
+      if (!policy || policy.activityReviewRetentionDays === null) {
+        await tx.activityReview.update({ where: { id: row.id }, data: { retentionUntil: null, version: { increment: 1 } } });
+        return false;
+      }
+      await tx.activityReview.update({ where: { id: row.id }, data: { destructionStatus: "awaiting", version: { increment: 1 } } });
+      await systemReviewAudit(tx, row.tenantId, row.serviceId, row.id, "activity_review.destruction_pending");
+      return true;
+    });
+    if (marked) pending++;
+  }
+  return { pending };
 }
