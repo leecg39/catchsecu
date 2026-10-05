@@ -44,3 +44,7 @@
 
 - SSO 단계는 P11-T03 로컬 RSA IdP 검증을 참조(이 체인 미포함), GPKI/새올(P11-T04)은 외부 자격증명 대기
 - 비밀 관리/키 회전 정책, OWASP critical/high=0 감사, 전체 선행 게이트 미완료로 체크박스 유지
+
+## 보안 감사 (2026-10-05)
+
+[security-audit-20261005.md](security-audit-20261005.md): 런타임 critical/high 미해결 0. 에러 로그 비밀 유출 실버그 발견·수정(fcc778d), npm audit의 high 9건은 dev 전용 ReDoS로 추적. 키 회전은 P14-T04 실증(1345셀 전수·구키 폐기)과 교차 연결. 실제 IdP/PG 경계는 외부 자격 증명 대기로 blocked.
