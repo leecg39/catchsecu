@@ -6,12 +6,14 @@ import type { Application } from "./ApplicationContext";
 import type { AccessRequestList, AccessRequestRecord } from "@/contracts/access-requests";
 import { accessStatusLabels } from "@/contracts/access-requests";
 import { ActionButton, Panel } from "./shared";
+import { useConfirm } from "./ux/confirm";
 
 export function ServiceAccessPage() {
   const context = useResource<Application>("/context");
   const requests = useResource<AccessRequestList>(context.data?.company ? "/access-requests?scope=mine&pageSize=50" : null);
   const [serviceId, setServiceId] = useState(""), [reason, setReason] = useState("");
   const [error, setError] = useState(""), [notice, setNotice] = useState(""), [busy, setBusy] = useState(false);
+  const ask = useConfirm();
   const options = requests.data?.availableServices ?? [];
   const expert = !!context.data?.company && context.data.memberships.some(item =>
     item.tenantId === context.data?.company?.id && item.accessKind === "expert");
@@ -25,6 +27,7 @@ export function ServiceAccessPage() {
     } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
   }
   async function cancel(item: AccessRequestRecord) {
+    if (!await ask({ title: "서비스 접근 요청 취소", message: "보낸 접근 요청을 취소합니다. 필요하면 다시 요청할 수 있습니다.", confirmLabel: "요청 취소", cancelLabel: "닫기" })) return;
     setError(""); setNotice(""); setBusy(true);
     try {
       await api("/access-requests/" + item.id, { method: "DELETE", headers: { "If-Match": String(item.version) } });

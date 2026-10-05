@@ -5,6 +5,7 @@ import { api, errorText, useResource } from "@/lib/api";
 import type { SsoProviderRecord } from "@/contracts/sso";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, EmptyState, Modal, PageHeading, Panel } from "../shared";
+import { useConfirm } from "../ux/confirm";
 
 type ListResponse = { items: SsoProviderRecord[] };
 
@@ -18,6 +19,7 @@ function SsoContent({ settings }: { settings: boolean }) {
   const canManage = !!app.data?.capabilities.includes("security.write");
   const [edit, setEdit] = useState<SsoProviderRecord | null | undefined>(settings ? null : undefined);
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [notice, setNotice] = useState("");
+  const ask = useConfirm();
   const result = useResource<ListResponse>("/security/sso");
   const items = result.data?.items;
 
@@ -33,8 +35,8 @@ function SsoContent({ settings }: { settings: boolean }) {
   const preflight = (row: SsoProviderRecord) => run(
     () => api("/security/sso/" + row.id + "/preflight", { method: "POST" }),
     "사전검사를 다시 실행했습니다.");
-  const remove = (row: SsoProviderRecord) => {
-    if (!window.confirm(`"${row.name}" SSO 연결을 삭제할까요? 이 설정으로 로그인할 수 없게 됩니다.`)) return;
+  const remove = async (row: SsoProviderRecord) => {
+    if (!await ask({ title: "SSO 연결 삭제", message: `“${row.name}” SSO 연결을 삭제합니다. 이 설정으로는 더 이상 로그인할 수 없습니다.`, confirmLabel: "삭제" })) return;
     void run(() => api("/security/sso/" + row.id, { method: "DELETE", body: JSON.stringify({ version: row.version }) }), "SSO 연결을 삭제했습니다.");
   };
 
@@ -67,7 +69,7 @@ function SsoContent({ settings }: { settings: boolean }) {
                     title={!row.enabled && !row.preflightOk ? "사전검사를 먼저 통과해야 합니다" : undefined}
                     onClick={() => void toggle(row)}>{row.enabled ? "사용 안 함" : "사용"}</ActionButton>
                   <ActionButton secondary disabled={busy} onClick={() => setEdit(row)}>수정</ActionButton>
-                  <ActionButton secondary disabled={busy} onClick={() => remove(row)}>삭제</ActionButton>
+                  <ActionButton secondary disabled={busy} onClick={() => void remove(row)}>삭제</ActionButton>
                 </div></td>}
               </tr>)}
             </tbody></table></div>

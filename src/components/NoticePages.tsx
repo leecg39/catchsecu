@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { api, errorText, useResource } from "@/lib/api";
 import type { NoticeListResponse, NoticeRecord } from "@/contracts/notices";
 import { ActionButton, EmptyState, PageHeading, Panel } from "./shared";
+import { useConfirm } from "./ux/confirm";
 
 const date = (value: string | null) => value ? new Date(value).toLocaleString("ko-KR", {
   timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
@@ -97,6 +98,7 @@ function NoticeForm({ initial, onSaved }: { initial?: NoticeRecord; onSaved: () 
   const [bodyHtml, setBodyHtml] = useState(initial?.bodyHtml ?? ""), [sortOrder, setSortOrder] = useState(initial?.sortOrder ?? 1000);
   const [files, setFiles] = useState<PendingAttachment[]>([]);
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const ask = useConfirm();
   async function save(status?: "draft" | "published") {
     setBusy(true); setError("");
     try {
@@ -124,6 +126,8 @@ function NoticeForm({ initial, onSaved }: { initial?: NoticeRecord; onSaved: () 
   }
   async function removeAttachment(id: string) {
     if (!draft) return;
+    const name = draft.attachments.find(file => file.id === id)?.fileName ?? "첨부파일";
+    if (!await ask({ title: "첨부파일 삭제", message: `“${name}” 첨부파일을 공지에서 삭제합니다.`, confirmLabel: "삭제" })) return;
     setBusy(true); setError("");
     try {
       await api(`/notices/${draft.id}/attachments/${id}`, { method: "DELETE", headers: { "If-Match": String(draft.version) } });

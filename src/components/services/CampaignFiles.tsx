@@ -4,10 +4,12 @@ import { api, errorText } from "@/lib/api";
 import type { CampaignRecord } from "@/contracts/campaigns";
 import { FILE_ACCEPT, type FileInfo } from "@/contracts/files";
 import { ActionButton, Panel } from "../shared";
+import { useConfirm } from "../ux/confirm";
 const statuses: Record<string, string> = { pending: "업로드 대기", uploaded: "검사 필요", ready: "첨부 연결 대기", attached: "검사·연결 완료", rejected: "검사 거부", deleting: "실제 파일 삭제 중" };
 export function CampaignFiles({ record: r, editable, onChanged, onBusy }: { record: CampaignRecord; editable: boolean; onChanged: () => void; onBusy: (value: boolean) => void }) {
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [progress, setProgress] = useState("");
   const pending = useRef<{ signature: string; key: string; file?: FileInfo }>(null);
+  const ask = useConfirm();
   function working(value: boolean) { setBusy(value); onBusy(value); }
   async function attach(fileId: string) { await api("/campaigns/" + r.id + "/files/" + fileId + "/attach", { method: "POST", body: JSON.stringify({ version: r.version }) }); }
   async function upload(file: File) {
@@ -27,7 +29,9 @@ export function CampaignFiles({ record: r, editable, onChanged, onBusy }: { reco
     } catch (error) { setError(errorText(error)); setProgress(""); } finally { working(false); }
   }
   async function action(file: FileInfo, remove: boolean) {
-    if (busy) return; working(true); setError("");
+    if (busy) return;
+    if (remove && !await ask({ title: "첨부파일 삭제", message: `“${file.name}” 첨부파일을 이 발송에서 삭제합니다.`, confirmLabel: "삭제" })) return;
+    working(true); setError("");
     try {
       if (remove) { const result = await api<{ cleanupPending: boolean }>("/campaigns/" + r.id + "/files/" + file.id, { method: "DELETE", body: JSON.stringify({ version: r.version }) }); setProgress(result.cleanupPending ? "접근을 차단했고 실제 파일 삭제를 재처리 중입니다." : "첨부 원문을 삭제했습니다."); }
       else { if (file.status === "uploaded") await api("/uploads/" + file.id + "/complete", { method: "POST" }); await attach(file.id); }

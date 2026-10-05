@@ -5,6 +5,7 @@ import { senderEventLabels, senderStatuses, type SenderPage, type SenderRecord }
 import type { FileInfo } from "@/contracts/files";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
+import { useConfirm } from "../ux/confirm";
 import { RemoteTable } from "../RemoteTable";
 import "./senders.css";
 const when = (v: string | null) => v ? new Date(v).toLocaleString("ko-KR") : "—";
@@ -82,6 +83,7 @@ function SenderDetail({ id, onClose, onChanged }: { id: string; onClose: () => v
 function SenderEvidence({ record: r, canWrite, onChanged }: { record: SenderRecord; canWrite: boolean; onChanged: () => void }) {
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [progress, setProgress] = useState("");
   const pending = useRef<{ key: string; signature: string; file?: FileInfo } | null>(null);
+  const ask = useConfirm();
   async function upload(file: File) {
     if (busy) return; setBusy(true); setError(""); setProgress("파일을 준비하고 있습니다.");
     try { if (!file.size || file.size > 10485760 || !["application/pdf", "image/png", "image/jpeg"].includes(file.type)) throw new Error("10MB 이하의 PDF·PNG·JPEG 파일을 선택해주세요.");
@@ -97,7 +99,9 @@ function SenderEvidence({ record: r, canWrite, onChanged }: { record: SenderReco
     } catch (e) { setError(errorText(e)); setProgress(""); } finally { setBusy(false); }
   }
   async function remove(file: FileInfo | NonNullable<SenderRecord["evidence"]>[number]) {
-    if (busy) return; setBusy(true); setError(""); try { const result = await api<{ cleanupPending: boolean }>("/senders/" + r.id + "/evidence/" + file.id, { method: "DELETE", body: JSON.stringify({ version: r.version }) }); setProgress(result.cleanupPending ? "파일 삭제를 다시 처리 중입니다." : "증빙 원문을 삭제했습니다."); onChanged(); } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
+    if (busy) return;
+    if (!await ask({ title: "증빙 원문 삭제", message: `“${file.name}” 증빙 원문을 삭제합니다. 삭제한 원문은 복구할 수 없습니다.`, confirmLabel: "삭제" })) return;
+    setBusy(true); setError(""); try { const result = await api<{ cleanupPending: boolean }>("/senders/" + r.id + "/evidence/" + file.id, { method: "DELETE", body: JSON.stringify({ version: r.version }) }); setProgress(result.cleanupPending ? "파일 삭제를 다시 처리 중입니다." : "증빙 원문을 삭제했습니다."); onChanged(); } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
   }
   async function attach(fileId: string) {
     if (busy) return; setBusy(true); setError("");

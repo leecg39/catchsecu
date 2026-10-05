@@ -5,6 +5,7 @@ import { api, errorText, useResource } from "@/lib/api";
 import type { IpRulePage, IpRuleRecord } from "@/contracts/ip-access";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
+import { useConfirm } from "../ux/confirm";
 export function IpAccess({ settings=false }: {settings?:boolean}) {
   const app=useApplication();return <IpAccessContent key={(app.data?.company?.id??"none")+":"+(app.data?.company?.role??"")} settings={settings}/>;
 }
@@ -14,8 +15,9 @@ function IpAccessContent({ settings=false }: {settings?:boolean}) {
   const [field,direction]=sort.split(":");
   const query=new URLSearchParams({search,status:filter,page:String(page),sort:field,direction});
   const result=useResource<IpRulePage>("/security/ip-rules?"+query),policy=result.data?.policy;
+  const ask=useConfirm();
   async function remove(row:IpRuleRecord) {
-    if(!window.confirm("이 IP 규칙을 삭제할까요?")) return; setBusy(true);setError("");setNotice("");
+    if(!await ask({title:"IP 규칙 삭제",message:<><p>“{row.cidr}” 규칙을 삭제합니다.</p><p>접근 제한이 켜져 있으면 이 범위에서의 접속이 차단될 수 있습니다.</p></>,confirmLabel:"삭제"})) return; setBusy(true);setError("");setNotice("");
     try { await api("/security/ip-rules/"+row.id,{method:"DELETE",body:JSON.stringify({tenantId:row.tenantId,version:row.version})});setNotice("IP 규칙을 삭제했습니다.");result.reload(); }
     catch(cause){setError(errorText(cause));}finally{setBusy(false);}
   }

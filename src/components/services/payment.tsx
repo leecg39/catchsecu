@@ -10,6 +10,7 @@ import type { PaymentMethodRecord } from "@/contracts/payment-methods";
 import type { PaymentOrderListItem } from "@/server/payments";
 import type { RefundRecord } from "@/contracts/billing-settlement";
 import { ActionButton, DataTable, PageHeading, Panel } from "../shared";
+import { useConfirm } from "../ux/confirm";
 import { Tabs } from "./ui";
 import { ServiceGate } from "./gates";
 
@@ -124,6 +125,7 @@ export function LicenseManagement() {
 
 function PaymentMethodsPanel({ methods }: { methods: ReturnType<typeof useResource<PaymentMethodRecord[]>> }) {
   const [busy, setBusy] = useState(false), [notice, setNotice] = useState("");
+  const ask = useConfirm();
   async function act(path: string, init: RequestInit, done: string) {
     setBusy(true); setNotice("");
     try { await api(path, { ...init, headers: { "Idempotency-Key": crypto.randomUUID(), "content-type": "application/json", ...(init.headers ?? {}) } }); setNotice(done); methods.reload(); }
@@ -139,7 +141,10 @@ function PaymentMethodsPanel({ methods }: { methods: ReturnType<typeof useResour
       {m.status === "revoked" && <span className="svc-badge">해지됨</span>}
       {m.status === "active" && <>
         {!m.isDefault && <ActionButton type="button" secondary disabled={busy} onClick={() => act(`/billing/methods/${m.id}`, { method: "PATCH", body: JSON.stringify({ version: m.version, setDefault: true }) }, "대표 결제수단으로 변경했습니다.")}>대표로 지정</ActionButton>}
-        <ActionButton type="button" secondary disabled={busy} onClick={() => act(`/billing/methods/${m.id}`, { method: "DELETE", body: JSON.stringify({ version: m.version }) }, "결제수단을 해지했습니다.")}>해지</ActionButton>
+        <ActionButton type="button" secondary disabled={busy} onClick={async () => {
+          if (await ask({ title: "결제수단 해지", message: `“${m.label}” 결제수단을 해지합니다. 해지하면 이 결제수단으로 결제할 수 없습니다.`, confirmLabel: "해지" }))
+            void act(`/billing/methods/${m.id}`, { method: "DELETE", body: JSON.stringify({ version: m.version }) }, "결제수단을 해지했습니다.");
+        }}>해지</ActionButton>
       </>}
     </li>)}</ul> : <p className="svc-muted">등록된 결제수단이 없습니다.</p>)}
     <form className="svc-trial-cancel" onSubmit={event => {

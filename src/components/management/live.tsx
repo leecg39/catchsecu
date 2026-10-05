@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { api, ApiError, useResource, errorText } from "@/lib/api";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
+import { useConfirm } from "../ux/confirm";
 type Service = { id: string; name: string; externalName: string; description: string; type: string; status: string; version: number; createdAt: string };
 type Company = { id: string; name: string; publicName: string; address: string; phone: string; website: string; businessNo: string; billingEmail: string; billingContactName: string; billingContactPhone: string; version: number;
   closureRequestedAt: string | null; closureReason?: string | null; businessFile?: { id: string; name: string; size: number } | null };
@@ -130,8 +131,9 @@ function ProfileForm({ initial }: { initial: Profile }) {
 function Sessions() {
   const result = useResource<{ items: { id: string; current: boolean; userAgent: string | null; updatedAt: string }[] }>("/me/sessions");
   const [error, setError] = useState(""), [busy, setBusy] = useState("");
+  const ask = useConfirm();
   return <Panel title="로그인한 기기"><ErrorNote error={result.error?.message || error} />{result.data?.items.map(session => <div className="mg-toolbar" key={session.id}><div><strong>{session.current ? "현재 기기" : "다른 기기"}</strong><p>{session.userAgent || "기기 정보 없음"}</p><small>{new Date(session.updatedAt).toLocaleString("ko-KR")}</small></div>
-    {!session.current && <ActionButton secondary disabled={!!busy} onClick={async () => { setBusy(session.id); setError(""); try { await api("/me/sessions/" + session.id, { method: "DELETE" }); result.reload(); } catch (error) { setError(errorText(error)); } finally { setBusy(""); } }}>로그인 해제</ActionButton>}</div>)}</Panel>;
+    {!session.current && <ActionButton secondary disabled={!!busy} onClick={async () => { if (!await ask({ title: "다른 기기 로그인 해제", message: "선택한 기기의 로그인을 해제합니다. 그 기기에서 작성 중인 내용은 저장되지 않을 수 있습니다.", confirmLabel: "로그인 해제" })) return; setBusy(session.id); setError(""); try { await api("/me/sessions/" + session.id, { method: "DELETE" }); result.reload(); } catch (error) { setError(errorText(error)); } finally { setBusy(""); } }}>로그인 해제</ActionButton>}</div>)}</Panel>;
 }
 export function LiveProfile({ edit = false }: { edit?: boolean }) {
   const app = useApplication();

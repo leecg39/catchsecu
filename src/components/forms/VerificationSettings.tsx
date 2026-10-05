@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import { ApiError, api, errorText, useResource } from "@/lib/api";
 import { verificationCreate, type VerificationState } from "@/contracts/verification";
+import { useConfirm } from "../ux/confirm";
 
 export function VerificationSettings({ serviceId }: { serviceId: string }) {
   const resource = useResource<VerificationState>(serviceId ? `/services/${serviceId}/verification` : null);
@@ -23,6 +24,7 @@ export function VerificationSettings({ serviceId }: { serviceId: string }) {
 }
 function Configuration({ serviceId, state, done }: { serviceId: string; state: VerificationState; done: (text: string) => void }) {
   const row = state.integration, exists = !!row && row.status !== "deleted";
+  const ask = useConfirm();
   const [identityProvider, setIdentity] = useState(exists ? row.identityProvider ?? "" : "");
   const [signatureProvider, setSignature] = useState(exists ? row.signatureProvider ?? "" : "");
   const [environment, setEnvironment] = useState<"sandbox" | "production">(exists ? row.environment : "sandbox");
@@ -46,7 +48,9 @@ function Configuration({ serviceId, state, done }: { serviceId: string; state: V
     } finally { setBusy(false); }
   }
   async function remove() {
-    if (busy || !exists) return; setBusy(true); setError("");
+    if (busy || !exists) return;
+    if (!await ask({ title: "본인인증 연동 설정 삭제", message: "이 서비스의 본인인증·전자서명 연동 설정을 삭제합니다. 변경 이력은 보관됩니다.", confirmLabel: "삭제" })) return;
+    setBusy(true); setError("");
     try { await api(path, { method: "DELETE", headers: { "If-Match": String(row!.version) } }); done("연동 설정을 삭제했습니다. 변경 이력은 보관됩니다."); }
     catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
   }

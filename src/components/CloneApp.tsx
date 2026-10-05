@@ -17,10 +17,11 @@ import { AuthPages, matchAuth } from "./auth/AuthPages";
 import { PublicPages, isExternal } from "./PublicPages";
 import { LegalPages } from "./LegalPages";
 import { ToastProvider } from "./ux/toast";
+import { ConfirmProvider } from "./ux/confirm";
 
 type CloneAppProps = { path: string; accessReason?: AccessDenialReason };
 export default function CloneApp(props: CloneAppProps) {
-  return <ToastProvider><CloneRoutes {...props} /></ToastProvider>;
+  return <ToastProvider><ConfirmProvider><CloneRoutes {...props} /></ConfirmProvider></ToastProvider>;
 }
 
 function CloneRoutes({ path, accessReason = "general" }: CloneAppProps) {
