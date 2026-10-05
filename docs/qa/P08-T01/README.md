@@ -46,3 +46,18 @@ P08-T01 발신자 CRUD·확인·증빙·정리 재시도와 현재 권한/기한
 [검증 요약](verification.json), [재시작 뒤 HTTP](http-finish.json), [실제 사본 삭제](runtime-http.json). 테스트 입력 826개와 빌드 입력 681개는 최종 코드와 같다. 완료된 업무 발송 메일은 별도 마케팅 보존 정책을 따르며, 이 검증에서 삭제한 사본은 발신자 확인 메일과 번호 증빙이다.
 
 이전 QA 8개 잠금 파일은 시작 바이트로 복원했다. 이전 자체 manifest의 불일치 2개는 시작부터 있던 값으로 보존했다. 전역 처리기는 실행하지 않았고 자기 합성 회사의 특정 Job만 처리했다. 전체 린트는 오류 0·기존 경고 21개다. 적용 SQL의 마지막 빈 줄 경고는 기존 migration 체크섬 보존 때문에 유지했다.
+
+## 브라우저 발신 주소 등록 실측 (2026-10-05 추가)
+
+`node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/qa-sender-ui.ts` — 6/6 통과.
+
+| 단계 | 결과 |
+|---|---|
+| `/mail/number` 발신 주소 관리 목록 렌더 | 통과 — 실제 서비스 컨텍스트에서 목록·필터 표시 |
+| "발신 주소 등록" 버튼 권한 제어 | 통과 — owner에게 표시, viewer에 비표시 |
+| 등록 모달 열림 | 통과 |
+| 이름·주소 입력 후 등록 → 목록 즉시 반영 | 통과 — 새 레이블이 테이블에 표시됨 |
+| viewer 쓰기 차단 | 통과 — 등록 버튼 0개 |
+| 페이지 JS 오류 | 0건 |
+
+증거: [브라우저 결과](sender-browser.json), [생성 후 화면](states/sender-created.png), [viewer 화면](states/sender-viewer.png). 발신번호(sms) 채널은 같은 컴포넌트(`SenderManagement email={false}`)를 공유하며 실제 SMS 공급자 인증은 외부 의존으로 유지된다.
