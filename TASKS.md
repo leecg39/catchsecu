@@ -718,7 +718,7 @@
 - 작업: 기존 localStorage 폼/응답/회사/프로필/동의설정의 export→dry-run→import, 중복키/회사귀속을 구현한다. 도메인 저장은 모두 DB로 전환한다.
 - 선행: P13-T04
 - 검증/완료: 이관전후 개수/필드 검증; 잘못된자료 격리; 원본백업 유지; 비밀번호/임의token 이관0
-- 증거: `docs/qa/P14-T01/` (구현 시 생성; 현재 없음)
+- 증거: [P14-T01 이관 도구 구현·라이브 검증](docs/qa/P14-T01/README.md). `POST /migration/legacy`(dry-run/커밋·비밀필드 거부·격리)과 `/my-page/legacy-import` 화면, 테스트 8/8·브라우저 실측 완료. 선행 P13-T04 게이트 미충족으로 체크 유지
 
 ### P14-T02 — 전체 API·DB·브라우저 회귀
 

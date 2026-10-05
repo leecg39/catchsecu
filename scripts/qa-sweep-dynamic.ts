@@ -3,7 +3,6 @@ import { chromium } from "playwright";
 import { db } from "../src/server/db";
 import { readFile, writeFile } from "node:fs/promises";
 import { env } from "../src/server/env";
-import { tokenHash } from "../src/server/crypto";
 
 const base = new URL(env.BETTER_AUTH_URL).origin;
 const outDir = "docs/qa/P13-T04";
@@ -12,8 +11,6 @@ const pw = JSON.parse(await readFile(".local/catchsecu_dev-accounts.json", "utf8
 // 실제 fixture 조회
 const order = await db.paymentOrder.findFirst({ select: { id: true } });
 const purchaseId = order?.id ?? "00000000-0000-4000-8000-000000000000";
-// 공개 문서 토큰: 게시된 문서 버전의 공개 토큰
-const docVersion = await db.documentVersion.findFirst({ where: { status: "published" }, select: { publicTokenHash: true } }).catch(() => null);
 const formToken = "YUgHbqxTfvt2o2gSkugVVJbLc8V9Zt24OkVhLrRs04w"; // 방금 게시한 검증 폼
 const infoOwner = "A".repeat(43);
 const routes: [string, string][] = [

@@ -68,7 +68,7 @@ export function route(handler: Handler, externalAuthentication?: "signed-webhook
         if (error.code === "P2034") { status = 409; code = "CONCURRENT_CHANGE"; message = "동시 변경이 발생했습니다. 다시 시도해주세요."; }
       }
       if (status === 500) console.error(JSON.stringify({ requestId, code, kind: error instanceof Error ? error.name : "UnknownError",
-        stack: error instanceof Error ? error.stack?.split("\n").slice(0, 8).join(" | ") : undefined }));
+        stack: error instanceof Error ? error.stack?.split("\n").slice(1, 8).join(" | ") : undefined }));
       return Response.json({ error: { code, message, fieldErrors, requestId } }, {
         status, headers: { "X-Request-Id": requestId, "Cache-Control": "private, no-store", ...(status === 429 ? { "Retry-After": "60" } : {}) },
       });
