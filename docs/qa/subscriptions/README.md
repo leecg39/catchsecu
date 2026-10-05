@@ -38,3 +38,13 @@ Ego 화면: [월 상품과 대기 요청](catalog-pending.png), [구독·체험]
 ## 남은 수용 조건
 
 P10-T01은 연간 실제 가격과 무제한/제한 상품 정책 확인, 유료 시작·변경·해지 예약, 가격 개정 시 과거 청구 불변 검증, 전체 기간 경계·한도 경합을 요구한다. PG sandbox·서명 승인 및 실제 거래는 P10-T02에 속한다. 지금의 `pending`은 결제 성공이나 이용 권한이 아니다. 관련 원본 근거는 [조사 JSON](../../research/services/pay__membership__detail.json)과 [공식 상품 안내](https://www.catchsecu.com/price)다.
+
+## 2026-10-13 추가 — 무제한 한도·가격 개정 불변 검증
+
+`tests/server/subscriptions.test.ts`에 적대적 검증을 추가했다(11/11 통과).
+
+- **무제한(null) 한도**: `serviceLimit/memberLimit/subjectLimit/formLimit`이 모두 NULL인 활성 구독 회사에서 네 자원 모두 `assertQuota`가 통과하고, 유한 시드 한도(10)를 넘는 12개 서비스 생성 후에도 거부되지 않는다.
+- **대기 구독 무력성**: `pending` 구독만 있는 회사는 `assertQuota`가 402 `SUBSCRIPTION_REQUIRED`로 거부한다.
+- **가격 개정 과거 청구 불변**: 같은 플랜에 더 비싼 v2(150,000원·유한 한도)를 발행해도 대기 구독은 v1(77,000원)에 고정되고, 서명 `paid` 이벤트 활성화 후에도 구독 `priceKrw`·주문 `amount`·원장 `funding` 모두 77,000원을 유지한다. API로 만든 주문도 요청이 아니라 핀 가격에서 금액을 뽑는다(`created.amount=77000`).
+
+남은 조건: 연간 실제 가격 원본 확인, 실제 PG 승인 거래(P10-T02), 유료 변경/해지 예약의 원본 대조.

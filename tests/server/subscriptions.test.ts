@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { beforeAll, afterAll, describe, expect, test } from "vitest";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
@@ -11,6 +11,9 @@ import { GET as getSubscriptions, POST as postSubscription } from "@/app/api/v1/
 import { GET as getBillingHistory } from "@/app/api/v1/billing-history/route";
 import { GET as getLedger } from "@/app/api/v1/ledger/route";
 import { POST as postService } from "@/app/api/v1/services/route";
+import { POST as createOrder } from "@/app/api/v1/billing/orders/route";
+import { GET as invoice } from "@/app/api/v1/billing/orders/[id]/invoice/route";
+import { applyPaymentEvent } from "@/server/payments";
 import { assertQuota } from "@/server/entitlements";
 import { expireTrials } from "@/server/subscription-worker";
 import { subjectHashes } from "@/server/subject-identity";
@@ -202,6 +205,39 @@ describe("subscription and catalog boundary", () => {
     expect(pair.map(r => r.status).sort()).toEqual([201, 409]);
     const overview = await answer<BillingOverview>(await getSubscriptions(req("/subscriptions")));
     expect(overview.entitlement.usage.services).toBe(10);
+  });
+  test("무제한 한도는 자원 생성을 막지 않고 가격 개정은 기존 청구를 바꾸지 않는다", async () => {
+    const tenantId = randomUUID(), secret = "sub-limit-secret-0123456789";
+    await db.company.create({ data: { id: tenantId, name: "무제한 회사", publicName: "무제한" } });
+    const plan = await db.billingPlan.create({ data: { id: "unlimited-" + randomUUID(), name: "무제한 상품" } });
+    // v1: 무제한 한도 77,000원 — v2: 유한 한도 150,000원을 나중에 발행한다
+    const v1 = await db.billingPlanVersion.create({ data: { planId: plan.id, number: 1, cycle: "month", priceKrw: 77000, currency: "KRW",
+      serviceLimit: null, memberLimit: null, subjectLimit: null, formLimit: null, features: {}, orderable: true, effectiveFrom: new Date("2026-01-01") } });
+    const pending = await db.billingSubscription.create({ data: { tenantId, planId: plan.id, planVersionId: v1.id, status: "pending",
+      priceKrw: 77000, currency: "KRW", events: { create: { version: 1, kind: "purchase_requested", detail: {} } } } });
+    // 대기 구독은 권한을 주지 않는다 — 결제 전 생성이 거부된다
+    await expect(db.$transaction(tx => assertQuota(tx, tenantId, "services"))).rejects.toMatchObject({ status: 402 });
+    // 같은 플랜에 더 비싼 신버전을 발행해도 대기 중인 청구는 v1 가격에 고정된다
+    await db.billingPlanVersion.create({ data: { planId: plan.id, number: 2, cycle: "month", priceKrw: 150000, currency: "KRW",
+      serviceLimit: 1, memberLimit: 1, subjectLimit: 1, formLimit: 1, features: {}, orderable: true, effectiveFrom: new Date("2026-06-01") } });
+    expect((await db.billingSubscription.findUniqueOrThrow({ where: { id: pending.id } }))).toMatchObject({ priceKrw: 77000, planVersionId: v1.id });
+    const order = await db.paymentOrder.create({ data: { tenantId, subscriptionId: pending.id, amount: 77000, currency: "KRW", status: "pending" } });
+    const paid = JSON.stringify({ orderId: order.id, eventId: "ev-unlim-" + randomUUID().slice(0, 8), outcome: "paid" });
+    await applyPaymentEvent(paid, createHmac("sha256", secret).update(paid).digest("hex"), secret);
+    const settled = await db.billingSubscription.findUniqueOrThrow({ where: { id: pending.id } });
+    expect(settled).toMatchObject({ status: "active", priceKrw: 77000, planVersionId: v1.id });
+    expect((await db.ledgerTransaction.findFirstOrThrow({ where: { tenantId, kind: "funding", sourceId: order.id } })).amount).toBe(BigInt(77000));
+    // 서버가 주문 금액을 대기 구독의 핀 가격에서 뽑는다 — API 경로로도 확인한다
+    const ownerSub = await db.billingSubscription.create({ data: { tenantId: companies.owner, planId: plan.id, planVersionId: v1.id,
+      status: "pending", priceKrw: 77000, currency: "KRW", events: { create: { version: 1, kind: "purchase_requested", detail: {} } } } });
+    const created = await answer<{ id: string; amount: number }>(await createOrder(req("/billing/orders", "POST", "owner",
+      { subscriptionId: ownerSub.id }, { "idempotency-key": randomUUID() })), 201);
+    expect(created.amount).toBe(77000);
+    // 활성화된 무제한 구독은 네 자원 모두 한도 없이 허용한다 — 유한 시드 한도(10)를 넘겨 검증한다
+    for (const resource of ["services", "members", "subjects", "forms"] as const)
+      await db.$transaction(tx => assertQuota(tx, tenantId, resource));
+    for (let i = 0; i < 12; i++) await db.service.create({ data: { tenantId, name: "무제한 서비스 " + i, externalName: "s" + i } });
+    await db.$transaction(tx => assertQuota(tx, tenantId, "services"));
   });
   test("expired trial never grants an entitlement", async () => {
     const expired = randomUUID(), start = new Date(Date.now() - 8 * 86400000);
