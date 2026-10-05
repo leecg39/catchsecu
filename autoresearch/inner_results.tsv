@@ -1,1 +1,7 @@
 iter	commit	hypothesis	total	error	dom	form	visual	decision	note
+0	dfbb68b	baseline	68.45	100	72	1.82	100	baseline	2회 측정 동일(68.45), sort.numberDesc는 원래 순서가 내림차순이라 통과
+1	c8dcabf	전역 토스트 알림(aria-live·자동 닫힘·호버 일시정지)	74.73	100	88	10.91	100	keep	liveRegion 0→1(전 경로), toast 프로브 1.0
+2	de9c7ff	모달 포커스 관리(초기 포커스·Tab 트랩·포커스 복귀·스크롤 잠금·최상위 Esc)	77.00	100	88	20	100	keep	modalFocus 0→1, 공용 Modal 1곳 수정으로 전 대화상자 적용
+3	75bbda6	접근성 확인 대화상자(alertdialog·취소 우선 포커스) — native confirm 2곳 대체 + 즉시 실행 파괴 작업 7곳 보호	79.27	100	88	29.09	100	keep	confirmDialog 0→1, nativeDialogs 1→0
+4	033254d	미저장 변경 이탈 경고(beforeunload + Link onNavigate) — 정책·회사·서비스·프로필 폼	81.55	100	88	38.18	100	keep	unsavedGuard 0→1 (차단·계속 편집·나가기 4단계)
+5	033254d	명령 팔레트(Ctrl/⌘+K) — 전 메봐+추가 경로 검색, 초성 매칭, combobox/listbox ARIA	83.82	100	88	47.27	100	keep	palette 0→1(open·focus·results·navigate 4/4)
