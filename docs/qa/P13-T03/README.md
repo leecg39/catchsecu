@@ -46,3 +46,17 @@
 - 구조적 근거: `src/lib/api.ts`의 `api()`는 모든 요청에 `cache: "no-store"`, `useResource`는 마운트·reload마다 재조회
 
 남은 범위: loading/empty/validation/conflict/forbidden/retry 상태별 화면 증거의 전수 캡처와 원본 대조는 계속 미완료.
+
+## 상태별 화면 실측 (2026-10-05, `scripts/qa-state-screens.ts` → [state-screens.json](state-screens.json), [screens](states/))
+
+viewer 계정으로 상태별 화면을 실브라우저 실측했다. 7/7 통과.
+
+| 상태 | 경로/시나리오 | 실측 |
+|---|---|---|
+| forbidden 404 | `/security/policy`·`/member` | viewer 미소유 경로는 404로 종결(스크린샷 첨부) |
+| forbidden 게이트 | `/security/sso/setting` | 목록 API가 403을 반환하고 화면은 "이 작업을 수행할 권한이 없습니다" + 다시 불러오기 버튼 |
+| 일반 화면 | `/company-info` | 회사 등록 폼 200 — 모든 로그인 사용자에게 허용되는 경로 |
+| 목록/empty | `/notice` | 공지 목록 정상 렌더, viewer에게 관리 액션 버튼(삭제·새 공지) 노출 0 |
+| pageerror | 전 경로 | 앱 오류 0(dev 서버의 Performance.measure 잡음만 필터링) |
+
+남은 범위: validation/conflict/disabled 상태의 화면 전수 캡처와 원본 대조는 계속 미완료.
