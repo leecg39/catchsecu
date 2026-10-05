@@ -89,10 +89,31 @@
 
 결과: `10/10` 체크 통과(run `fb5c8631`). SIGKILL 종료 코드는 `null`(signal 사망)로 기대값과 일치.
 
+## 파기 워커 프로세스 재기동(mid-flight SIGKILL, 2026-10-06 실측)
+
+`scripts/qa-destruction-restart.ts` — mail 외 두 번째 작업군으로 파기 워커의 프로세스 수준 재기동을 실증했다.
+픽스처는 전부 실제 API 경로로 생성: 폼 게시 → 공개 제출 → `POST /submissions/{id}/destruction-request` → `POST /destruction-requests/{id}/approve` → `scheduled` 8건.
+
+| 항목 | 실측 |
+|------|------|
+| 잡 큐 | DestructionRequest 8건 scheduled (실제 승인 경로) |
+| 중도 kill | 처리 도중 SIGKILL(exit=null) — kill 시점 `completed:3, scheduled:4, running:1` |
+| 유효 고아 리스 존중 | drain 재기동 워커가 dead-worker 소유 유효 리스 잡을 회수하지 않음(`running`, owner 유지) |
+| 나머지 drain | 재기동 워커가 7건 완료 — Submission `destroyed`, Answer 0건, DestructionCertificate 7건 발급 |
+| 고아 리스 회수 | 리스 만료 후 재기동 → 회수·재실행 → `completed`, `attempts=2` |
+| 잔류 | 미종결 요청 0건 |
+
+결과: `10/10` 체크 통과([destruction-restart.json](./destruction-restart.json)).
+
+검증 중 발견·정정한 사실:
+- dev 환경 상주 `scripts/worker.ts` 프로세스가 승인 즉시 잡을 선점해 합성 픽스처와 경합 — 상주 워커 중지 후 재실행, 검증 종료 후 재기동해 환경 복원.
+- 합성 고아 잡은 첫 claim의 부수효과(`submission.status=destroying`)까지 재현해야 실제 mid-flight와 동치 — 누락 시 회수 워커가 `DESTRUCTION_STATE`로 retry하는 것을 실측 후 픽스처 정정.
+- `DestructionRequest_guard` 트리거가 `completed→running` 역전과 version 미증분 UPDATE를 거부(23514) — 불변성 경계가 DB 수준에서 강제됨을 부수 확인.
+
 ## 한계(솔직한 잔여)
 
 - 로컬 디스크 스토리지만 검증 — S3/외부 객체저장소 미검증.
 - pg_dump 논리 백업만 — WAL 증분·PITR·MVCC 시점복구 미검증.
-- worker 재기동은 로컬 mail 작업군으로 검증 — campaign/import/export/destruction 각 워커의 중도 kill은 해당 유닛의 lease·영수증 테스트로 커버되며 별도 프로세스 실증은 미수행.
+- worker 재기동은 mail·destruction 두 작업군으로 실증 — campaign/import/export 각 워커의 프로세스 수준 중도 kill은 해당 유닛의 lease·재시도 테스트로 커버되며 별도 실증은 미수행.
 
 관련: [scripts/qa-restore-enqueue.ts](../../../scripts/qa-restore-enqueue.ts), [scripts/qa-restore-destroy.ts](../../../scripts/qa-restore-destroy.ts), [src/server/destruction-worker.ts](../../../src/server/destruction-worker.ts)

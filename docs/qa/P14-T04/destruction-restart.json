@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-06",
+  "script": "scripts/qa-destruction-restart.ts",
+  "command": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/qa-destruction-restart.ts",
+  "environment": "local dev DB (catchsecu), real API + real worker processes",
+  "summary": { "total": 10, "failed": 0 },
+  "checks": [
+    { "check": "destruction-jobs-enqueued", "ok": true, "detail": "8/8 — 실제 폼 게시→제출→파기 요청→승인 API로 DestructionRequest 8건 생성(scheduled)" },
+    { "check": "orphan-lease", "ok": true, "detail": "job[0]을 죽은 워커 소유 유효 리스(running, leaseUntil=+5m, startedAt·submission=destroying 재현)로 전환" },
+    { "check": "sigkill-mid-flight", "ok": true, "detail": "워커 처리 도중 SIGKILL(exit=null) — kill 시점 completed:3, scheduled:4, running:1" },
+    { "check": "orphan-lease-respected", "ok": true, "detail": "drain 워커가 유효 고아 리스를 가로채지 않음 — status=running, owner=dead-destr-1f1eaec4 유지" },
+    { "check": "others-drained", "ok": true, "detail": "재기동 워커(--drain)가 나머지 7건 전부 완료" },
+    { "check": "submissions-destroyed", "ok": true, "detail": "7개 Submission status=destroyed" },
+    { "check": "answers-erased", "ok": true, "detail": "Answer 행 0건 — 실삭제 확인" },
+    { "check": "certificates-issued", "ok": true, "detail": "DestructionCertificate 7건 발급" },
+    { "check": "orphan-reclaimed", "ok": true, "detail": "리스 만료 후 재기동 워커가 회수 → status=completed, attempts=2" },
+    { "check": "no-stuck", "ok": true, "detail": "미종결(running/scheduled/retry/pending) 요청 0건" }
+  ],
+  "notes": [
+    "검증 중 dev 환경에 상주 worker.ts 프로세스 3개가 잡을 선점하는 레이스를 발견 — 중지 후 재실행, 종료 후 워커 재기동으로 환경 복원",
+    "합성 고아 잡은 claim-시점 부수효과(submission→destroying)까지 재현해야 실제 mid-flight 상태와 동치 — 초기 픽스처 누락 시 회수 워커가 DESTRUCTION_STATE로 retry하는 것을 실측하고 픽스처 정정",
+    "DestructionRequest 트리거가 completed→running 역전·버전 미증분 UPDATE를 거부하는 것도 함께 확인(23514 immutable destruction binding / destruction already started)"
+  ],
+  "externalRemaining": [
+    "S3/외부 객체저장소 미검증 (로컬 디스크 스토리지만)",
+    "WAL 증분·PITR·MVCC 시점복구 미검증",
+    "프로덕션 워커 인프라(큐·스케줄러) 미검증"
+  ]
+}
