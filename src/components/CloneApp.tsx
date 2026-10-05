@@ -18,10 +18,11 @@ import { PublicPages, isExternal } from "./PublicPages";
 import { LegalPages } from "./LegalPages";
 import { ToastProvider } from "./ux/toast";
 import { ConfirmProvider } from "./ux/confirm";
+import { NavigationGuardProvider } from "./ux/navigation-guard";
 
 type CloneAppProps = { path: string; accessReason?: AccessDenialReason };
 export default function CloneApp(props: CloneAppProps) {
-  return <ToastProvider><ConfirmProvider><CloneRoutes {...props} /></ConfirmProvider></ToastProvider>;
+  return <ToastProvider><ConfirmProvider><NavigationGuardProvider><CloneRoutes {...props} /></NavigationGuardProvider></ConfirmProvider></ToastProvider>;
 }
 
 function CloneRoutes({ path, accessReason = "general" }: CloneAppProps) {

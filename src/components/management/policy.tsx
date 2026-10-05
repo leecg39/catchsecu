@@ -4,7 +4,9 @@ import Link from "next/link";
 import { PageHeading, Panel, ActionButton, Modal } from "../shared";
 import { api, errorText, useResource } from "@/lib/api";
 import { policySettings, type PolicyRecord } from "@/contracts/security";
+import { useUnsavedChanges } from "../ux/navigation-guard";
 
+const settingKeys = Object.keys(policySettings.shape) as (keyof typeof policySettings.shape)[];
 const tabs = ["비밀번호 변경", "비밀번호 재사용", "세션 유지시간", "2단계 인증", "캐치폼 사용 승인", "파기일자 설정"];
 export function Policy() {
   const result = useResource<PolicyRecord>("/security/policy");
@@ -16,6 +18,9 @@ export function Policy() {
 function PolicyForm({ initial }: { initial: PolicyRecord }) {
   const [policy, setPolicy] = useState(initial), [tab, setTab] = useState(0), [confirm, setConfirm] = useState<"save" | "reset">();
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [notice, setNotice] = useState("");
+  const [baseline, setBaseline] = useState(initial);
+  useUnsavedChanges(policy.canManage && settingKeys.some(key => JSON.stringify(policy[key]) !== JSON.stringify(baseline[key])),
+    "저장하지 않은 보안 정책 변경 사항이 있습니다. 이 화면을 나가면 변경 내용이 적용되지 않습니다.");
   const change = (value: Partial<PolicyRecord>) => { setPolicy(current => ({ ...current, ...value })); setNotice(""); };
   async function save(password: string) {
     if (busy) return; setBusy(true); setError("");
@@ -25,7 +30,7 @@ function PolicyForm({ initial }: { initial: PolicyRecord }) {
         automaticDestruction: policy.automaticDestruction, allowRetentionAdjustment: policy.allowRetentionAdjustment, allowRetentionDesignation: policy.allowRetentionDesignation, retentionDays: policy.retentionDays });
       const saved = await api<PolicyRecord>("/security/policy", { method: confirm === "reset" ? "DELETE" : "PATCH",
         body: JSON.stringify({ ...(confirm === "reset" ? {} : settings), tenantId: policy.tenantId, version: policy.version, password }) });
-      setPolicy(saved); setConfirm(undefined); setNotice(confirm === "reset" ? "기본 정책을 적용했습니다." : "정책을 저장했습니다. 다음 요청부터 적용됩니다.");
+      setPolicy(saved); setBaseline(saved); setConfirm(undefined); setNotice(confirm === "reset" ? "기본 정책을 적용했습니다." : "정책을 저장했습니다. 다음 요청부터 적용됩니다.");
     } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
   }
   return <><div className="mg-tabs" role="tablist" aria-label="보안 정책">{tabs.map((name, index) =>

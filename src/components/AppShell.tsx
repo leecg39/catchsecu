@@ -1,6 +1,6 @@
 "use client";
 import {useRef,useState,type ReactNode} from 'react';
-import Link from 'next/link';
+import {GuardedLink as Link} from './ux/navigation-guard';
 import {usePathname,useRouter} from 'next/navigation';
 import {useApplication} from './ApplicationContext';
 import {api,errorText} from '@/lib/api';

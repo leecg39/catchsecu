@@ -6,6 +6,7 @@ import { api, ApiError, useResource, errorText } from "@/lib/api";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
 import { useConfirm } from "../ux/confirm";
+import { useUnsavedChanges } from "../ux/navigation-guard";
 type Service = { id: string; name: string; externalName: string; description: string; type: string; status: string; version: number; createdAt: string };
 type Company = { id: string; name: string; publicName: string; address: string; phone: string; website: string; businessNo: string; billingEmail: string; billingContactName: string; billingContactPhone: string; version: number;
   closureRequestedAt: string | null; closureReason?: string | null; businessFile?: { id: string; name: string; size: number } | null };
@@ -35,6 +36,7 @@ export function LiveServices() {
 const blankService = { name: "", externalName: "", description: "", type: "website" };
 function ServiceForm({ initial }: { initial?: Service }) {
   const [data, setData] = useState(initial ?? blankService), [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  useUnsavedChanges(JSON.stringify(data) !== JSON.stringify(initial ?? blankService));
   const app = useApplication(), router = useRouter();
   async function submit(event: FormEvent) {
     event.preventDefault(); setBusy(true); setError("");
@@ -59,6 +61,8 @@ const companyFields = [["name", "회사명"], ["publicName", "외부 공개 회�
 function CompanyForm({ initial, onboarding = false }: { initial?: Company; onboarding?: boolean }) {
   const [data, setData] = useState(initial ?? { name: "", publicName: "", address: "", phone: "", website: "", businessNo: "", billingEmail: "", billingContactName: "", billingContactPhone: "" });
   const [error, setError] = useState(""), [busy, setBusy] = useState(false), router = useRouter(), app = useApplication();
+  const [original] = useState(data);
+  useUnsavedChanges(JSON.stringify(data) !== JSON.stringify(original));
   return <form className="mg-fields" onSubmit={async event => {
     event.preventDefault(); setBusy(true); setError("");
     try {
@@ -104,13 +108,14 @@ export function CompanyOnboarding() {
 }
 function ProfileForm({ initial }: { initial: Profile }) {
   const [data, setData] = useState(initial), [error, setError] = useState(""), [busy, setBusy] = useState(false);
-  const [conflict, setConflict] = useState(false);
+  const [conflict, setConflict] = useState(false), [original, setOriginal] = useState(initial);
+  useUnsavedChanges(JSON.stringify(data) !== JSON.stringify(original));
   const lock = useRef(false);
   const app = useApplication(), router = useRouter();
   async function reloadProfile() {
     if (lock.current) return;
     lock.current = true; setBusy(true); setError("");
-    try { setData(await api<Profile>("/me")); setConflict(false); }
+    try { const latest = await api<Profile>("/me"); setData(latest); setOriginal(latest); setConflict(false); }
     catch (cause) { setError(errorText(cause)); }
     finally { lock.current = false; setBusy(false); }
   }
