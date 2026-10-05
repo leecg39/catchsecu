@@ -60,3 +60,11 @@ viewer 계정으로 상태별 화면을 실브라우저 실측했다. 7/7 통과
 | pageerror | 전 경로 | 앱 오류 0(dev 서버의 Performance.measure 잡음만 필터링) |
 
 남은 범위: validation/conflict/disabled 상태의 화면 전수 캡처와 원본 대조는 계속 미완료.
+
+## conflict 상태 실측 (2026-10-05, `scripts/qa-conflict-state.ts` → [conflict-state.json](conflict-state.json))
+
+같은 프로필 편집 화면을 두 탭에서 열어 stale version 저장 경합을 유발했다. [스크린샷](states/conflict-profile.png):
+
+- 탭 A 저장 → `PATCH /me` 성공, DB의 name 즉시 갱신 확인
+- 탭 B(구 version) 저장 → 409 `VERSION_CONFLICT` → 화면에 "다른 곳에서 변경한 프로필…" 안내 + **최신 프로필 다시 불러오기** 버튼 + 저장 버튼 비활성(conflict 해소 전 재전송 차단)
+- 시험 후 원래 이름으로 복구
