@@ -17,9 +17,11 @@ export type RefundRecord = {
   id: string; orderId: string; amount: number; currency: string; reason: string;
   status: "requested" | "refunded" | "rejected"; version: number; createdAt: string;
 };
+export type ServiceUsageEntry = { serviceId: string; serviceName: string | null; captured: string; released: string };
 export type MonthCloseRecord = {
   month: string; currency: string; closed: boolean; closedAt: string | null;
   totals: { funded: string; refunded: string; reservedNet: string; captured: string; released: string };
+  services: ServiceUsageEntry[];
   postCloseAdjustments: number;
 };
 export type RefundRequest = z.infer<typeof refundRequest>;

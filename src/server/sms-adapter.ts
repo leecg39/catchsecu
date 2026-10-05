@@ -5,6 +5,7 @@ import { z } from "zod";
 import { db } from "./db";
 import { env } from "./env";
 import { fail } from "./http";
+import { postLedgerTransfer } from "./ledger";
 
 const receiptBody = z.object({
   deliveryId: z.uuid(),
@@ -73,8 +74,19 @@ export async function applySmsReceipt(raw: string, signature: string, secret: st
     }
     await tx.smsReceipt.create({ data: { tenantId: delivery.tenantId, deliveryId: delivery.id, receiptId: input.receiptId, status } });
     const deliveryStatus = status === "provider_accepted" ? "accepted" : status;
+    // unknown은 종결 상태다 — 수신 결과는 원장만 정산하고 발송 상태는 다시 열지 않는다.
     if (["queued", "sending", "local_delivered"].includes(delivery.status) && (deliveryStatus !== "accepted" || delivery.preferenceId)) {
       await tx.campaignDelivery.update({ where: { id: delivery.id }, data: { status: deliveryStatus, reason: deliveryStatus === "accepted" ? null : input.outcome.toUpperCase(), ...(deliveryStatus === "accepted" ? { acceptedAt: new Date() } : {}) } });
+    }
+    // 공급자 결과는 미정산 발송 예약을 종결한다 — 접수 확인만 청구하고 실패·미확인은 환불한다.
+    const holds = await tx.ledgerTransaction.findMany({ where: { tenantId: delivery.tenantId, kind: "reserve", sourceKind: "campaign_delivery",
+      OR: [{ sourceId: delivery.id }, { sourceId: delivery.id + ":fallback" }] } });
+    for (const hold of holds) {
+      const settled = await tx.ledgerTransaction.findFirst({ where: { reservationId: hold.id, kind: { in: ["release", "capture"] } } });
+      if (settled) continue;
+      await postLedgerTransfer(tx, { tenantId: delivery.tenantId, serviceId: delivery.serviceId, currency: hold.currency,
+        kind: status === "provider_accepted" ? "capture" : "release", amount: hold.amount,
+        sourceKind: "campaign_delivery", sourceId: hold.sourceId, reservationId: hold.id });
     }
     return { deliveryId: delivery.id, receiptId: input.receiptId, status, duplicate: false };
   });

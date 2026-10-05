@@ -1,4 +1,6 @@
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHmac } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { afterAll, beforeEach, expect, test } from "vitest";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
@@ -15,7 +17,7 @@ import { POST as publicPost } from "@/app/api/v1/public/forms/[...segments]/rout
 
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
-const password = "Settlement!123", saved = { sms: env.SMS_TRANSPORT, cost: env.MESSAGE_UNIT_COST_KRW };
+const password = "Settlement!123", saved = { sms: env.SMS_TRANSPORT, cost: env.MESSAGE_UNIT_COST_KRW, sKey: env.SOLAPI_API_KEY, sSecret: env.SOLAPI_API_SECRET, sTenant: env.SOLAPI_TENANT_ID };
 function req(path: string, cookie = "", method = "GET", input?: unknown, key?: string) {
   return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie, ...(input === undefined ? {} : { "content-type": "application/json" }), ...(key ? { "idempotency-key": key } : {}) }, ...(input === undefined ? {} : { body: JSON.stringify(input) }) });
 }
@@ -24,7 +26,7 @@ beforeEach(async () => {
   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "Job" CASCADE');
   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
 });
-afterAll(async () => { env.SMS_TRANSPORT = saved.sms; env.MESSAGE_UNIT_COST_KRW = saved.cost; await db.$disconnect(); });
+afterAll(async () => { env.SMS_TRANSPORT = saved.sms; env.MESSAGE_UNIT_COST_KRW = saved.cost; env.SOLAPI_API_KEY = saved.sKey; env.SOLAPI_API_SECRET = saved.sSecret; env.SOLAPI_TENANT_ID = saved.sTenant; await db.$disconnect(); });
 
 async function fixture() {
   const email = "settle-" + randomUUID() + "@catchsecu.test";
@@ -70,11 +72,12 @@ async function campaign(fx: Awaited<ReturnType<typeof fixture>>, cost = env.MESS
   await ok(await POST(req("/campaigns/" + created.id + "/schedule", fx.cookie, "POST", { version: current.version, at: null }, randomUUID())), 202);
   return created.id;
 }
-async function drain(campaignId: string) {
+async function drain(tenantId: string, campaignId: string) {
+  const target = await db.job.findFirstOrThrow({ where: { campaignDelivery: { campaignId } }, orderBy: { createdAt: "desc" } });
   for (let i = 0; i < 30; i++) {
-    await runOneJob("settle-" + randomUUID());
-    const job = await db.job.findFirst({ where: { campaignDelivery: { campaignId } }, orderBy: { createdAt: "desc" } });
-    if (job && ["done", "cancelled", "dead"].includes(job.status)) return job;
+    await runOneJob("settle-" + randomUUID(), { tenantId, jobId: target.id });
+    const job = await db.job.findUniqueOrThrow({ where: { id: target.id } });
+    if (["done", "cancelled", "dead"].includes(job.status)) return job;
   }
   throw new Error("campaign job did not finish");
 }
@@ -86,7 +89,7 @@ test("문자 발송은 예약·확정으로 정산되고 재실행해도 이중 
   await postTrustedLedgerTransfer({ tenantId: fx.company.id, currency: "KRW", kind: "funding", amount: BigInt(120), sourceKind: "pg_capture", sourceId: randomUUID() });
   const campaignId = await campaign(fx);
   const delivery = await db.campaignDelivery.findFirstOrThrow({ where: { campaignId } });
-  await drain(campaignId);
+  await drain(fx.company.id, campaignId);
   expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: delivery.id } })).status).toBe("local_delivered");
   const rows = await ledger(fx.company.id), kinds = rows.map(r => r.kind);
   expect(kinds).toEqual(["funding", "reserve", "capture"]);
@@ -106,7 +109,7 @@ test("잔액 부족은 INSUFFICIENT_CREDIT 실패로 기록되고 원장을 오�
   await postTrustedLedgerTransfer({ tenantId: fx.company.id, currency: "KRW", kind: "funding", amount: BigInt(30), sourceKind: "pg_capture", sourceId: randomUUID() });
   const campaignId = await campaign(fx);
   const delivery = await db.campaignDelivery.findFirstOrThrow({ where: { campaignId } });
-  await drain(campaignId);
+  await drain(fx.company.id, campaignId);
   const row = await db.campaignDelivery.findUniqueOrThrow({ where: { id: delivery.id } });
   expect(row.status).toBe("failed"); expect(row.reason).toBe("INSUFFICIENT_CREDIT");
   const rows = await ledger(fx.company.id);
@@ -125,7 +128,7 @@ test("동의 철회로 취소된 발송은 예약 크레딧을 반환한다", as
     const bumped = await tx.marketingPreference.update({ where: { id: fx.pref.id }, data: { version: { increment: 1 } } });
     await tx.marketingEvent.create({ data: { tenantId: fx.company.id, preferenceId: fx.pref.id, kind: "source_corrected", version: bumped.version } });
   });
-  await drain(campaignId);
+  await drain(fx.company.id, campaignId);
   const row = await db.campaignDelivery.findUniqueOrThrow({ where: { id: delivery.id } });
   expect(row.status).toBe("cancelled");
   const rows = await ledger(fx.company.id), kinds = rows.map(r => r.kind);
@@ -151,7 +154,7 @@ test("예약된 문자 캠페인 취소는 미발송분을 취소하고 발송�
   await ok(await POST(req("/campaigns/" + created.id + "/schedule", fx.cookie, "POST", { version: current.version, at: null }, randomUUID())), 202);
   // 첫 잡만 실제 발송까지 완료한다
   const first = await db.job.findFirstOrThrow({ where: { campaignDelivery: { campaignId: created.id }, status: "queued" }, orderBy: { createdAt: "asc" } });
-  for (let i = 0; i < 30; i++) { await runOneJob("settle-" + randomUUID()); const row = await db.job.findUniqueOrThrow({ where: { id: first.id } }); if (["done", "cancelled", "dead"].includes(row.status)) break; }
+  await runOneJob("settle-" + randomUUID(), { tenantId: fx.company.id, jobId: first.id });
   expect((await db.job.findUniqueOrThrow({ where: { id: first.id } })).status).toBe("done");
   const latest = await ok<{ version: number }>(await GET(req("/campaigns/" + created.id, fx.cookie)));
   const cancelled = await ok<{ cancelled: number; accepted: number }>(await POST(req("/campaigns/" + created.id + "/cancel", fx.cookie, "POST", { version: latest.version }, randomUUID())));
@@ -165,8 +168,133 @@ test("예약된 문자 캠페인 취소는 미발송분을 취소하고 발송�
   expect(kinds).toEqual(["funding", "reserve", "capture"]);
   const acc = await account(fx.company.id);
   expect(acc.available).toBe(BigInt(50)); expect(acc.held).toBe(BigInt(0));
-  // 취소된 잡은 재실행돼도 발송되지 않는다
-  await runOneJob("settle-" + randomUUID());
+  // 취소된 잡은 재실행돼도 발송되지 않는다 — 해당 잡을 직접 claim해도 변하지 않는다
+  await runOneJob("settle-" + randomUUID(), { tenantId: fx.company.id, jobId: leftover.id });
   expect((await db.job.findUniqueOrThrow({ where: { id: leftover.id } })).status).toBe("cancelled");
   expect((await ledger(fx.company.id)).length).toBe(3);
+});
+
+const webhookSecret = "settle-webhook-secret-0123456789";
+const signReceipt = (body: string) => createHmac("sha256", webhookSecret).update(body).digest("hex");
+async function smsReceipt(deliveryId: string, outcome: "accepted" | "failed" | "timeout") {
+  const { applySmsReceipt } = await import("@/server/sms-adapter");
+  const body = JSON.stringify({ deliveryId, receiptId: "rcpt-" + randomUUID(), outcome });
+  return applySmsReceipt(body, signReceipt(body), webhookSecret);
+}
+// 발송 중 크래시를 재현한다 — delivery는 sending, 예약 홀드만 남고 finish가 안 끝난 상태.
+async function crashedSend(fx: Awaited<ReturnType<typeof fixture>>) {
+  const campaignId = await campaign(fx);
+  const delivery = await db.campaignDelivery.findFirstOrThrow({ where: { campaignId } });
+  await db.campaignDelivery.update({ where: { id: delivery.id }, data: { status: "sending" } });
+  await postTrustedLedgerTransfer({ tenantId: fx.company.id, serviceId: fx.service.id, currency: "KRW", kind: "reserve", amount: BigInt(50), sourceKind: "campaign_delivery", sourceId: delivery.id });
+  return { campaignId, delivery };
+}
+const holdsOf = (tenantId: string, deliveryId: string) => db.ledgerTransaction.findMany({ where: { tenantId, sourceId: deliveryId } });
+
+test("공급자 수신 결과는 미정산 발송 예약을 접수는 청구·거부와 미확인은 환불로 정산한다", async () => {
+  const fx = await fixture();
+  await postTrustedLedgerTransfer({ tenantId: fx.company.id, currency: "KRW", kind: "funding", amount: BigInt(300), sourceKind: "pg_capture", sourceId: randomUUID() });
+  // 접수 → 청구 유지
+  const a = await crashedSend(fx);
+  await smsReceipt(a.delivery.id, "accepted");
+  expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: a.delivery.id } })).status).toBe("accepted");
+  expect((await holdsOf(fx.company.id, a.delivery.id)).map(r => r.kind)).toEqual(["reserve", "capture"]);
+  // 거부 → 환불
+  const b = await crashedSend(fx);
+  await smsReceipt(b.delivery.id, "failed");
+  expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: b.delivery.id } })).status).toBe("failed");
+  expect((await holdsOf(fx.company.id, b.delivery.id)).map(r => r.kind)).toEqual(["reserve", "release"]);
+  // 미확인(timeout) → 환불
+  const c = await crashedSend(fx);
+  await smsReceipt(c.delivery.id, "timeout");
+  expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: c.delivery.id } })).status).toBe("unknown");
+  expect((await holdsOf(fx.company.id, c.delivery.id)).map(r => r.kind)).toEqual(["reserve", "release"]);
+  // unknown은 종결 상태라 상태는 바뀌지 않지만 원장은 정산된다
+  const d = await crashedSend(fx);
+  await db.campaignDelivery.update({ where: { id: d.delivery.id }, data: { status: "unknown", reason: "DELIVERY_UNCERTAIN" } });
+  await smsReceipt(d.delivery.id, "accepted");
+  expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: d.delivery.id } })).status).toBe("unknown");
+  expect((await holdsOf(fx.company.id, d.delivery.id)).map(r => r.kind)).toEqual(["reserve", "capture"]);
+  const acc = await account(fx.company.id);
+  expect(acc.available).toBe(BigInt(200)); expect(acc.held).toBe(BigInt(0));
+});
+
+test("solapi 영수증 부재 복구는 재전송하지 않고 webhook 대사가 정산한다", async () => {
+  const fx = await fixture();
+  env.SMS_TRANSPORT = "solapi"; env.SOLAPI_API_KEY = "test-solapi-key"; env.SOLAPI_API_SECRET = "test-solapi-secret-0123"; env.SOLAPI_TENANT_ID = fx.company.id;
+  await postTrustedLedgerTransfer({ tenantId: fx.company.id, currency: "KRW", kind: "funding", amount: BigInt(100), sourceKind: "pg_capture", sourceId: randomUUID() });
+  const calls: string[] = [], realFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: unknown) => { calls.push(String(url)); return new Response("{}", { status: 500 }); }) as typeof fetch;
+  try {
+    const { campaignId, delivery } = await crashedSend(fx);
+    const job = await db.job.findFirstOrThrow({ where: { campaignDelivery: { campaignId } } });
+    expect(job.status).toBe("queued");
+    await runOneJob("settle-" + randomUUID(), { tenantId: fx.company.id, jobId: job.id });
+    // 공급자 수신 여부를 모르므로 재전송하지 않는다 — 잡은 죽고 발송 상태는 unknown으로 보존
+    expect(calls.filter(u => u.includes("solapi.com"))).toEqual([]);
+    const done = await db.job.findUniqueOrThrow({ where: { id: job.id } });
+    expect(done.status + ":" + (done.lastError ?? "")).toBe("dead:DELIVERY_UNCERTAIN");
+    const row = await db.campaignDelivery.findUniqueOrThrow({ where: { id: delivery.id } });
+    expect(row.status).toBe("unknown"); expect(row.reason).toBe("DELIVERY_UNCERTAIN");
+    // webhook이 올 때까지 예약은 보류한다
+    let acc = await account(fx.company.id);
+    expect(acc.available).toBe(BigInt(50)); expect(acc.held).toBe(BigInt(50));
+    // 뒤늦게 온 접수 결과가 보류를 청구로 정산한다 — 발송 상태는 종결된 unknown을 유지
+    await smsReceipt(delivery.id, "accepted");
+    acc = await account(fx.company.id);
+    expect(acc.available).toBe(BigInt(50)); expect(acc.held).toBe(BigInt(0));
+    expect((await holdsOf(fx.company.id, delivery.id)).map(r => r.kind)).toEqual(["reserve", "capture"]);
+    expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: delivery.id } })).status).toBe("unknown");
+  } finally { globalThis.fetch = realFetch; }
+});
+
+test("끊긴 발송 잡의 수리는 영수증으로 정산하고 미전송분은 환불한다", async () => {
+  const fx = await fixture();
+  await postTrustedLedgerTransfer({ tenantId: fx.company.id, currency: "KRW", kind: "funding", amount: BigInt(100), sourceKind: "pg_capture", sourceId: randomUUID() });
+  const { cleanupCampaigns } = await import("@/server/campaign-worker");
+  // 영수증이 남은 크래시 → 접수로 정산
+  const a = await crashedSend(fx);
+  const jobA = await db.job.findFirstOrThrow({ where: { campaignDelivery: { campaignId: a.campaignId } } });
+  await db.job.update({ where: { id: jobA.id }, data: { status: "dead" } });
+  await mkdir(env.LOCAL_SMS_DIR, { recursive: true });
+  await writeFile(resolve(env.LOCAL_SMS_DIR, jobA.id + ".json"), JSON.stringify({ jobId: jobA.id, status: "local_delivered" }));
+  // 영수증이 없는 크래시 → 로컬 전송은 미전송이 확실하므로 환불
+  const b = await crashedSend(fx);
+  const jobB = await db.job.findFirstOrThrow({ where: { campaignDelivery: { campaignId: b.campaignId } } });
+  await db.job.update({ where: { id: jobB.id }, data: { status: "dead" } });
+  await cleanupCampaigns();
+  expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: a.delivery.id } })).status).toBe("local_delivered");
+  expect((await holdsOf(fx.company.id, a.delivery.id)).map(r => r.kind)).toEqual(["reserve", "capture"]);
+  const rowB = await db.campaignDelivery.findUniqueOrThrow({ where: { id: b.delivery.id } });
+  expect(rowB.status).toBe("unknown"); expect(rowB.reason).toBe("DELIVERY_UNCERTAIN");
+  expect((await holdsOf(fx.company.id, b.delivery.id)).map(r => r.kind)).toEqual(["reserve", "release"]);
+  const acc = await account(fx.company.id);
+  expect(acc.available).toBe(BigInt(50)); expect(acc.held).toBe(BigInt(0));
+});
+
+test("월별 사용량은 서비스별로 집계되고 마감 스냅샷에 보존된다", async () => {
+  const fx = await fixture();
+  await postTrustedLedgerTransfer({ tenantId: fx.company.id, currency: "KRW", kind: "funding", amount: BigInt(200), sourceKind: "pg_capture", sourceId: randomUUID() });
+  const campaignId = await campaign(fx);
+  const delivery = await db.campaignDelivery.findFirstOrThrow({ where: { campaignId } });
+  await drain(fx.company.id, campaignId);
+  expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: delivery.id } })).status).toBe("local_delivered");
+  // 두 번째 서비스의 사용량을 섞는다
+  const other = await db.service.create({ data: { tenantId: fx.company.id, name: "두번째 서비스", externalName: "두번째" } });
+  await postTrustedLedgerTransfer({ tenantId: fx.company.id, serviceId: other.id, currency: "KRW", kind: "reserve", amount: BigInt(30), sourceKind: "campaign_delivery", sourceId: randomUUID() });
+  const released = await db.ledgerTransaction.findFirstOrThrow({ where: { tenantId: fx.company.id, kind: "reserve", serviceId: other.id } });
+  await postTrustedLedgerTransfer({ tenantId: fx.company.id, serviceId: other.id, currency: "KRW", kind: "release", amount: BigInt(30), sourceKind: "campaign_delivery", sourceId: randomUUID(), reservationId: released.id });
+  const { GET: closingGet } = await import("@/app/api/v1/billing/closing/route");
+  const month = new Date().toISOString().slice(0, 7);
+  const live = await ok<{ services: { serviceId: string; captured: string; released: string }[] }>(await closingGet(req("/billing/closing?month=" + month, fx.cookie)));
+  const first = live.services.find(s => s.serviceId === fx.service.id), second = live.services.find(s => s.serviceId === other.id);
+  expect(first).toMatchObject({ serviceId: fx.service.id, serviceName: "정산 서비스", captured: "50", released: "0" });
+  expect(second).toMatchObject({ serviceId: other.id, captured: "0", released: "30" });
+  // 이미 마감된 월의 스냅샷도 같은 구조로 읽힌다
+  const { POST: closingPost } = await import("@/app/api/v1/billing/closing/route");
+  const past = "2026-09";
+  const closed = await ok<{ services: unknown[] }>(await closingPost(req("/billing/closing", fx.cookie, "POST", { month: past, currency: "KRW" }, randomUUID())), 201);
+  expect(closed.services).toEqual([]);
+  const reread = await ok<{ closed: boolean; services: unknown[] }>(await closingGet(req("/billing/closing?month=" + past, fx.cookie)));
+  expect(reread).toMatchObject({ closed: true, services: [] });
 });

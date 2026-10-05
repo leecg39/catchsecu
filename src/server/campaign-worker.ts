@@ -150,10 +150,18 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
     // 대체발송 잡은 카카오 홀드와 분리된 원장 원천으로 정산한다.
     const ledgerSource = payload.deliveryId + (isSms(payload.transport) && campaign.channel === "kakao" ? ":fallback" : "");
     if (recipient.status === "sending") {
-      const receipt = payload.transport === "local" ? await localReceipt(job.id) : payload.transport === "sms-local" ? await smsReceiptFile(job.id) : payload.transport === "sms-solapi" ? (await tx.smsReceipt.findUnique({ where: { deliveryId: payload.deliveryId } }))?.createdAt ?? null : payload.transport === "kakao-local" ? await kakaoReceipt(job.id) : null;
-      if (receipt || payload.transport === "smtp") {
+      const solapi = payload.transport === "sms-solapi";
+      const smsRow = solapi ? await tx.smsReceipt.findUnique({ where: { deliveryId: payload.deliveryId } }) : null;
+      const receipt = payload.transport === "local" ? await localReceipt(job.id) : payload.transport === "sms-local" ? await smsReceiptFile(job.id) : solapi ? smsRow?.createdAt ?? null : payload.transport === "kakao-local" ? await kakaoReceipt(job.id) : null;
+      // 공급자가 거부·미확인으로 답한 건은 접수가 아니다 — 홀드를 환불하고 종결한다.
+      if (smsRow && smsRow.status !== "provider_accepted") {
+        if (unitCost > 0) await releaseHeld(tx, recipient, ledgerSource);
+        await finish(tx, job, campaign, recipient, smsRow.status === "failed" ? "failed" : "unknown", smsRow.status === "failed" ? "DELIVERY_FAILED" : "DELIVERY_UNCERTAIN"); return false;
+      }
+      if (receipt || payload.transport === "smtp" || solapi) {
         if (receipt && isMessage(payload.transport) && unitCost > 0) await settleRecovered(tx, recipient, unitCost, ledgerSource);
-        await finish(tx, job, campaign, recipient, receipt ? payload.transport === "sms-solapi" ? "accepted" : "local_delivered" : "unknown", receipt ? null : "DELIVERY_UNCERTAIN", receipt ?? undefined); return false;
+        // solapi는 영수증 부재만으로 재전송하면 공급자 중복 발송 위험이 있다 — unknown으로 두고 webhook 대사가 정산한다.
+        await finish(tx, job, campaign, recipient, receipt ? solapi ? "accepted" : "local_delivered" : "unknown", receipt ? null : "DELIVERY_UNCERTAIN", receipt ?? undefined); return false;
       }
     }
     if (!["queued", "sending"].includes(recipient.status)) {
@@ -278,9 +286,21 @@ export async function cleanupCampaigns() {
     await tx.$queryRaw`SELECT id FROM "Job" WHERE id=${job.id} FOR UPDATE`;
     const current = await tx.job.findUniqueOrThrow({ where: { id: job.id } });
     if (!["dead", "cancelled"].includes(current.status) || current.dedupeKey !== "campaign:" + row.id + ":" + row.attempt) return;
-    const transport = (() => { try { return jobPayload.parse(decrypt(current.payloadCipher)).transport; } catch { return null; } })();
-    const receipt = transport === "sms-local" ? await smsReceiptFile(job.id) : transport === "sms-solapi" ? (await tx.smsReceipt.findUnique({ where: { deliveryId: row.id } }))?.createdAt ?? null : transport === "kakao-local" ? await kakaoReceipt(job.id) : await localReceipt(job.id);
-    const status = receipt && row.status === "sending" ? transport === "sms-solapi" ? "accepted" : "local_delivered" : row.status === "sending" ? "unknown" : job.status === "cancelled" ? "cancelled" : "failed";
+    const parsed = (() => { try { return jobPayload.parse(decrypt(current.payloadCipher)); } catch { return null; } })();
+    const transport = parsed?.transport ?? null;
+    const unitCost = parsed && isMessage(parsed.transport) ? (parsed.unitCost ?? (isKakao(parsed.transport) ? env.KAKAO_UNIT_COST_KRW : env.MESSAGE_UNIT_COST_KRW)) : 0;
+    const ledgerSource = row.id + (transport && isSms(transport) && campaign.channel === "kakao" ? ":fallback" : "");
+    const smsRow = transport === "sms-solapi" ? await tx.smsReceipt.findUnique({ where: { deliveryId: row.id } }) : null;
+    const receipt = transport === "sms-local" ? await smsReceiptFile(job.id) : transport === "sms-solapi" ? smsRow?.createdAt ?? null : transport === "kakao-local" ? await kakaoReceipt(job.id) : transport ? await localReceipt(job.id) : null;
+    const status = smsRow && smsRow.status !== "provider_accepted" ? smsRow.status === "failed" ? "failed" : "unknown"
+      : receipt && row.status === "sending" ? transport === "sms-solapi" ? "accepted" : "local_delivered"
+      : row.status === "sending" ? "unknown" : job.status === "cancelled" ? "cancelled" : "failed";
+    // 복구 정산: 공급자가 접수를 확인한 건만 청구하고, 거부·미확인·미전송은 홀드를 풀어 잔액이 새지 않게 한다.
+    // solapi 영수증 부재는 webhook이 뒤늦게 올 수 있으므로 보류를 유지한다.
+    if (unitCost > 0) {
+      if (status === "accepted" || status === "local_delivered") await settleRecovered(tx, row, unitCost, ledgerSource);
+      else if (!(transport === "sms-solapi" && status === "unknown")) await releaseHeld(tx, row, ledgerSource);
+    }
     await finish(tx, job, campaign, row, status, receipt ? null : status === "unknown" ? "DELIVERY_UNCERTAIN" : "DELIVERY_FAILED", receipt ?? undefined);
   });
   const candidates = await db.campaign.findMany({ where: { status: { in: ["scheduled", "dispatching"] }, recipients: { none: { status: { in: ["queued", "sending"] } } } }, take: 100, select: { id: true } });

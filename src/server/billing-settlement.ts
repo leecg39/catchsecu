@@ -73,30 +73,47 @@ export async function invoicePdf(ctx: Context, orderId: string) {
 }
 
 type KindTotals = { funded: bigint; refunded: bigint; reservedNet: bigint; captured: bigint; released: bigint };
-async function monthTotals(tx: Transaction, ctx: Context, month: string, currency: string, before?: Date): Promise<KindTotals> {
+type ServiceUsageTotals = { captured: bigint; released: bigint };
+async function monthTotals(tx: Transaction, ctx: Context, month: string, currency: string, before?: Date): Promise<{ totals: KindTotals; byService: Map<string, ServiceUsageTotals> }> {
   const start = new Date(month + "-01T00:00:00Z"), end = new Date(start);
   end.setUTCMonth(end.getUTCMonth() + 1);
   const rows = await tx.ledgerTransaction.findMany({ where: { tenantId: ctx.tenantId, currency,
-    createdAt: { gte: start, lt: end, ...(before ? { lt: before } : {}) } }, select: { kind: true, amount: true } });
+    createdAt: { gte: start, lt: end, ...(before ? { lt: before } : {}) } }, select: { kind: true, amount: true, serviceId: true } });
   const totals: KindTotals = { funded: BigInt(0), refunded: BigInt(0), reservedNet: BigInt(0), captured: BigInt(0), released: BigInt(0) };
+  const byService = new Map<string, ServiceUsageTotals>();
   for (const row of rows) {
     if (row.kind === "funding") totals.funded += row.amount;
     else if (row.kind === "refund") totals.refunded += row.amount;
     else if (row.kind === "reserve") totals.reservedNet += row.amount;
     else if (row.kind === "capture") { totals.captured += row.amount; totals.reservedNet -= row.amount; }
     else if (row.kind === "release") { totals.released += row.amount; totals.reservedNet -= row.amount; }
+    if (row.serviceId && (row.kind === "capture" || row.kind === "release")) {
+      const entry = byService.get(row.serviceId) ?? { captured: BigInt(0), released: BigInt(0) };
+      if (row.kind === "capture") entry.captured += row.amount; else entry.released += row.amount;
+      byService.set(row.serviceId, entry);
+    }
   }
-  return totals;
+  return { totals, byService };
 }
 const totalsJson = (t: KindTotals) => ({ funded: t.funded.toString(), refunded: t.refunded.toString(),
   reservedNet: t.reservedNet.toString(), captured: t.captured.toString(), released: t.released.toString() });
+async function serviceUsageJson(tx: Transaction, ctx: Context, byService: Map<string, ServiceUsageTotals>) {
+  const services = await tx.service.findMany({ where: { tenantId: ctx.tenantId, id: { in: [...byService.keys()] } }, select: { id: true, name: true } });
+  const names = new Map(services.map(service => [service.id, service.name]));
+  return [...byService.entries()].sort(([a], [b]) => a.localeCompare(b))
+    .map(([serviceId, usage]) => ({ serviceId, serviceName: names.get(serviceId) ?? null,
+      captured: usage.captured.toString(), released: usage.released.toString() }));
+}
 
 export async function readMonthClose(ctx: Context, month: string, currency: string): Promise<MonthCloseRecord> {
   billingRead(ctx);
   const close = await db.billingMonthClose.findUnique({ where: { tenantId_month_currency: { tenantId: ctx.tenantId, month, currency } } });
-  const live = await db.$transaction(tx => monthTotals(tx, ctx, month, currency));
+  const live = await db.$transaction(async tx => {
+    const result = await monthTotals(tx, ctx, month, currency);
+    return { totals: totalsJson(result.totals), services: await serviceUsageJson(tx, ctx, result.byService) };
+  });
   if (!close)
-    return { month, currency, closed: false, closedAt: null, totals: totalsJson(live), postCloseAdjustments: 0 };
+    return { month, currency, closed: false, closedAt: null, totals: live.totals, services: live.services, postCloseAdjustments: 0 };
   // 사후 정정 = 닫힌 월에 귀속하지만 마감 시각 이후에 기록된 거래. 원장은 불변이라 기록 시각은 감사 이벤트로 본다.
   const monthStart = new Date(month + "-01T00:00:00Z"), monthEnd = new Date(monthStart); monthEnd.setUTCMonth(monthEnd.getUTCMonth() + 1);
   const counted = await db.$queryRaw<{ n: bigint }[]>`
@@ -105,8 +122,10 @@ export async function readMonthClose(ctx: Context, month: string, currency: stri
     WHERE t."tenantId" = ${ctx.tenantId} AND t.currency = ${currency}
       AND t."createdAt" >= ${monthStart} AND t."createdAt" < ${monthEnd}
       AND a."createdAt" > ${close.closedAt}`;
+  const stored = close.totals as MonthCloseRecord["totals"] & { services?: MonthCloseRecord["services"] };
+  const { services: storedServices, ...storedTotals } = stored;
   return { month, currency, closed: true, closedAt: close.closedAt.toISOString(),
-    totals: close.totals as MonthCloseRecord["totals"], postCloseAdjustments: Number(counted[0]?.n ?? 0) };
+    totals: storedTotals, services: storedServices ?? [], postCloseAdjustments: Number(counted[0]?.n ?? 0) };
 }
 
 export async function closeMonth(ctx: Context, month: string, currency: string, key: string | null, requestId: string) {
@@ -115,10 +134,16 @@ export async function closeMonth(ctx: Context, month: string, currency: string, 
   if (month >= current) fail(422, "MONTH_NOT_CLOSED_YET", "지난달까지만 마감할 수 있습니다.");
   return idempotent("billing:close:" + ctx.tenantId + ":" + month + ":" + currency, key, { month, currency }, async tx => {
     const existing = await tx.billingMonthClose.findUnique({ where: { tenantId_month_currency: { tenantId: ctx.tenantId, month, currency } } });
-    if (existing) return { status: 200, body: { month, currency, closed: true, closedAt: existing.closedAt.toISOString(), totals: existing.totals, postCloseAdjustments: 0 } };
-    const totals = totalsJson(await monthTotals(tx, ctx, month, currency));
+    if (existing) {
+      const prior = existing.totals as MonthCloseRecord["totals"] & { services?: MonthCloseRecord["services"] };
+      const { services: priorServices, ...priorTotals } = prior;
+      return { status: 200, body: { month, currency, closed: true, closedAt: existing.closedAt.toISOString(), totals: priorTotals, services: priorServices ?? [], postCloseAdjustments: 0 } };
+    }
+    const result = await monthTotals(tx, ctx, month, currency);
+    const totals = { ...totalsJson(result.totals), services: await serviceUsageJson(tx, ctx, result.byService) };
     const row = await tx.billingMonthClose.create({ data: { tenantId: ctx.tenantId, month, currency, totals, closedBy: ctx.member.id } });
     await audit(tx, ctx, requestId, "billing.month_closed", "billingMonthClose", row.id, []);
-    return { status: 201, body: { month, currency, closed: true, closedAt: row.closedAt.toISOString(), totals, postCloseAdjustments: 0 } };
+    const { services, ...kindTotals } = totals;
+    return { status: 201, body: { month, currency, closed: true, closedAt: row.closedAt.toISOString(), totals: kindTotals, services, postCloseAdjustments: 0 } };
   });
 }

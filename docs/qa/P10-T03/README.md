@@ -47,3 +47,26 @@
 
 - 실제 PG sandbox의 서명 캡처에서 충전되는 것을 외부 환경에서 확인해야 한다(현재 검증은 서명된 로컬 이벤트).
 - 실패 전송의 정산 정책(공급자 수락 후 통신사 실패 등)과 월별 사용량 집계 뷰, 원본 화면 대조는 미완료다.
+
+## 2026-10-13 추가 구현 — 수신 결과 정산·크래시 복구·서비스별 월 집계
+
+### 발견된 결함과 수정
+
+- `applySmsReceipt`(공급자 webhook)은 영수증만 기록하고 미정산 `reserve`를 정산하지 않았다 — 워커 크래시 후 `unknown`으로 종결된 발송의 홀드가 영구 `held`로 샜다. 이제 수신 결과가 미정산 예약을 종결한다: `accepted`→`capture`, `failed`·`timeout`→`release`(원천키 `campaign_delivery:{deliveryId}`·`:fallback`, `reservationId` 역참조로 이미 정산된 홀드는 건너뛴다). `unknown`은 DB 생명주기상 종결 상태라 상태는 유지하고 원장만 정산한다.
+- `sms-solapi` 복구 경로가 영수증 부재 시 재전송으로 떨어져 공급자 수락~finish 사이 크래시에서 문자를 중복 발송할 수 있었다. 이제 영수증 없는 `sending` solapi 발송은 `unknown`+`DELIVERY_UNCERTAIN`으로 보존하고 잡을 `dead`로 마감해 webhook 대사가 정산한다.
+- `cleanupCampaigns` 고아 잡 수리가 원장을 건드리지 않아 `sending` 복구 건의 홀드가 그대로 남았다. 이제 수리 결과별로 정산한다: 영수증 확인 발송은 `capture`(예약 재사용), 실패·미확인·미전송은 `release`. 단 `sms-solapi` 영수증 부재만은 webhook이 올 수 있으므로 홀드를 보류한다.
+- 월마감 `MonthCloseRecord`에 `services[]`(serviceId·serviceName·captured·released)를 추가했다. 라이브 조회는 당월 원장을 서비스별로 집계하고, `closeMonth`는 집계 결과를 `totals.services`에 스냅샷한다. 마감 월 재조회는 재계산 없이 스냅샷을 반환하고, 서비스 없는 원장 거래는 집계에서 제외된다.
+
+### 적대적 검증 (tests/server/billing-settlement.test.ts — 8/8 통과)
+
+- 수신 결과 정산: accepted→`accepted`+`capture`, failed→`failed`+`release`, timeout→`unknown`+`release`, 기존 `unknown` 발송에 늦은 accepted webhook → 상태는 `unknown` 유지·원장만 `capture` 정산.
+- solapi 무영수증 크래시 복구: `solapi.com` 외부 호출 0회·잡 `dead:DELIVERY_UNCERTAIN`·발송 `unknown`·홀드 보류 → 뒤늦은 webhook이 `capture`로 정산.
+- 로컬 전송 크래시 수리: 영수증 파일이 있으면 `local_delivered`+`capture`, 없으면 재전송 없이 `unknown`+`release`.
+- 캠페인 취소 E2E: 발송 완료 1건은 `reserve`+`capture`, 미발송 1건은 `cancelled`(잡도 취소·원장 기록 없음), 취소된 잡 직접 재claim해도 변화 없음.
+- 서비스별 월 집계: 두 서비스의 capture/release가 각각 집계되고, 마감 생성·재조회가 스냅샷 `services`를 반환한다.
+- claim 순서 의존 제거: `runOneJob`을 `{tenantId, jobId}`로 스코핑해 병렬/순차 실행 모두 결정적이다.
+
+### 여전히 남은 조건
+
+- 실제 PG sandbox의 서명 캡처·환불과 Solapi 실환경 수신 결과(실제 webhook 서명·재시도)는 외부 자격 증명이 필요하다.
+- 원본 화면 대조·전체 게이트는 미완료다.
