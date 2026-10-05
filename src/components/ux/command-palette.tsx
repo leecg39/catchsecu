@@ -67,7 +67,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
         {!results.length && <li className="ux-palette-empty" role="option" aria-selected="false" aria-disabled="true">“{query}”와 일치하는 화면이 없습니다</li>}
       </ul>
       <footer className="ux-palette-hints">
-        <span><kbd>↑</kbd><kbd>↓</kbd> 선택</span><span><kbd>↵</kbd> 이동</span><span><kbd>esc</kbd> 닫기</span>
+        <span><kbd>↑</kbd><kbd>↓</kbd> 선택</span><span><kbd>↵</kbd> 이동</span><span><kbd>?</kbd> 단축키 안내</span>
       </footer>
     </section>
   </div>;
