@@ -193,7 +193,7 @@ test("조회 전용 서비스의 목록·상세 작업과 생성/업로드 메�
   const row=await (await GET(req("/forms/"+f.form.id,f.editor.cookie))).json();
   expect(row.actions).toMatchObject({ preview:true,responses:false,edit:false,copy:false,registerTemplate:false,share:false,pause:false,resume:false,archive:false,checkDeletion:false });
   const page=await (await list(req("/forms?serviceId="+f.serviceId,f.editor.cookie))).json();
-  expect(page.items[0].actions).toEqual(row.actions); expect(page.permissions).toEqual({ canCreate:false,canImport:false,canViewImports:false });
+  expect(page.items[0].actions).toEqual(row.actions); expect(page.permissions).toEqual({ canCreate:false,canImport:false,canViewImports:false,canDesignateRetention:false });
   expect((await action(req("/forms/"+f.form.id+"/copy",f.editor.cookie,"POST",{},randomUUID()))).status).toBe(403);
 });
 test("게시 전용 grant는 초안의 게시만 안내하고 저장 권한을 요구하지 않는다",async () => {
@@ -238,10 +238,10 @@ test("서비스별 생성/업로드 권한과 보관 상태를 목록 메타데�
   await db.serviceGrant.update({ where:{ id:f.grant.id },data:{ capabilities:["form.read"] } });
   await db.serviceGrant.create({ data:{ tenantId:f.company.id,memberId:f.editor.member.id,serviceId:second.id,capabilities:["form.read","form.write","import.read","import.write"] } });
   const get=async (serviceId?:string) => (await list(req("/forms"+(serviceId ? "?serviceId="+serviceId:""),f.editor.cookie))).json();
-  expect((await get(f.serviceId)).permissions).toEqual({ canCreate:false,canImport:false,canViewImports:false });
-  expect((await get(second.id)).permissions).toEqual({ canCreate:true,canImport:true,canViewImports:true }); expect((await get()).permissions.canCreate).toBe(true);
+  expect((await get(f.serviceId)).permissions).toEqual({ canCreate:false,canImport:false,canViewImports:false,canDesignateRetention:false });
+  expect((await get(second.id)).permissions).toEqual({ canCreate:true,canImport:true,canViewImports:true,canDesignateRetention:false }); expect((await get()).permissions.canCreate).toBe(true);
   await db.service.update({ where:{ id:second.id },data:{ status:"archived" } });
-  expect((await get(second.id)).permissions).toEqual({ canCreate:false,canImport:false,canViewImports:true }); expect((await get()).permissions.canCreate).toBe(false);
+  expect((await get(second.id)).permissions).toEqual({ canCreate:false,canImport:false,canViewImports:true,canDesignateRetention:false }); expect((await get()).permissions.canCreate).toBe(false);
 });
 test("응답 링크는 현재 역할·서비스 submission.read 권한이 모두 있을 때만 안내한다",async () => {
   const f=await fixture(); await db.membership.update({ where:{ id:f.editor.member.id },data:{ role:"privacy" } });
