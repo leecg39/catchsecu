@@ -15,7 +15,7 @@ import { POST as contentPreview } from "@/app/api/v1/message-content/preview/rou
 import type { MessageTemplateRecord } from "@/contracts/message-templates";
 import { randomUUID } from "node:crypto";
 import { Resolver } from "node:dns/promises";
-import { readFile, access, stat } from "node:fs/promises";
+import { readFile, readdir, access, stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import nodemailer from "nodemailer";
@@ -115,6 +115,19 @@ async function create(extra: object = {}) {
 async function targets(c: CampaignRecord, contacts: string[]) { await ok(await POST(req("/campaigns/" + c.id + "/recipients", "POST", "owner", { mode: "direct", version: c.version, contacts }))); return read(c.id); }
 async function schedule(c: CampaignRecord, extra: object = {}, who = "owner", key = randomUUID()) {
   await ok(await POST(req("/campaigns/" + c.id + "/schedule", "POST", who, { version: c.version, at: null, ...extra }, { "idempotency-key": key })), 202); return read(c.id);
+}
+async function verifiedSmsSender(label: string) {
+  const ownerId = (await db.membership.findUniqueOrThrow({ where: { id: members.owner } })).userId;
+  const phone = "0105555" + String(Math.floor(Math.random() * 10000)).padStart(4, "0"), until = new Date(Date.now() + 90 * 86400e3);
+  const sender = await db.$transaction(async tx => {
+    const row = await tx.sender.create({ data: { tenantId: tenant, serviceId: service, creatorId: ownerId, channel: "sms", addressHash: senderAddressHash("sms", phone), addressCipher: encrypt(phone), label } });
+    await tx.senderEvent.create({ data: { tenantId: tenant, senderId: row.id, version: 1, kind: "created", actorId: ownerId } });
+    await tx.senderVerification.create({ data: { tenantId: tenant, senderId: row.id, generation: 1, method: "solapi", status: "verified", attempts: 1, environment: "live", verifiedAt: new Date(), validUntil: until, expiresAt: until } });
+    const verified = await tx.sender.update({ where: { id: row.id }, data: { status: "verified", version: 2, verifiedAt: new Date(), expiresAt: until, environment: "live" } });
+    await tx.senderEvent.create({ data: { tenantId: tenant, senderId: row.id, version: 2, kind: "verified", actorId: ownerId } });
+    return verified;
+  });
+  return { sender, phone };
 }
 async function jobFor(id: string) { return db.job.findFirstOrThrow({ where: { campaignDelivery: { campaignId: id } }, orderBy: { createdAt: "desc" } }); }
 async function drain(id: string) {
@@ -438,16 +451,7 @@ describe("persistent campaign CRUD, privacy and delivery", () => {
     await ok(await kakaoPost(req("/kakao/channels/" + channel.id + "/verify", "POST", "owner", {})));
     const created = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates", "POST", "owner", { serviceId: service, channelId: channel.id, name: "쿠폰 안내", body: "#{name}님 #{coupon} 쿠폰 안내", buttons: [] }, { "idempotency-key": randomUUID() })), 201);
     const template = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates/" + created.id + "/submit", "POST", "owner", { version: created.version })));
-    const ownerId = (await db.membership.findUniqueOrThrow({ where: { id: members.owner } })).userId;
-    const phone = "0105555" + String(Math.floor(Math.random() * 10000)).padStart(4, "0"), until = new Date(Date.now() + 90 * 86400e3);
-    const fallback = await db.$transaction(async tx => {
-      const row = await tx.sender.create({ data: { tenantId: tenant, serviceId: service, creatorId: ownerId, channel: "sms", addressHash: senderAddressHash("sms", phone), addressCipher: encrypt(phone), label: "대체 발신번호" } });
-      await tx.senderEvent.create({ data: { tenantId: tenant, senderId: row.id, version: 1, kind: "created", actorId: ownerId } });
-      await tx.senderVerification.create({ data: { tenantId: tenant, senderId: row.id, generation: 1, method: "solapi", status: "verified", attempts: 1, environment: "live", verifiedAt: new Date(), validUntil: until, expiresAt: until } });
-      const verified = await tx.sender.update({ where: { id: row.id }, data: { status: "verified", version: 2, verifiedAt: new Date(), expiresAt: until, environment: "live" } });
-      await tx.senderEvent.create({ data: { tenantId: tenant, senderId: row.id, version: 2, kind: "verified", actorId: ownerId } });
-      return verified;
-    });
+    const { sender: fallback, phone } = await verifiedSmsSender("대체 발신번호");
     // 채널 경계: 이메일 발신자·타사 발신자·비카카오 채널은 대체발신자가 될 수 없다
     expect((await POST(req("/campaigns", "POST", "owner", { serviceId: service, channel: "kakao", source: "direct", title: "x", kakaoTemplateId: template.id, fallbackSenderId: sender.id, content }, { "idempotency-key": randomUUID() }))).status).toBe(404);
     expect((await POST(req("/campaigns", "POST", "owner", { serviceId: service, channel: "sms", source: "direct", title: "x", senderId: fallback.id, fallbackSenderId: fallback.id, content }, { "idempotency-key": randomUUID() }))).status).toBe(422);
@@ -481,6 +485,32 @@ describe("persistent campaign CRUD, privacy and delivery", () => {
     const noSmsDelivery = (await deliveries(noSmsCampaign.id)).items[0];
     expect(noSmsDelivery).toMatchObject({ status: "failed", reason: "VARIABLE_MISSING", attempt: 1 });
     expect(await db.job.count({ where: { campaignDeliveryId: noSmsJob.campaignDeliveryId } })).toBe(1);
+  });
+  test("SMS direct targets exclude invalid numbers, honor pre-dispatch withdrawal and bill only delivered sends", async () => {
+    env.SMS_TRANSPORT = "local"; env.LOCAL_SMS_DIR = ".local/catchsecu_test/sms-direct-" + randomUUID(); env.MESSAGE_UNIT_COST_KRW = 15;
+    await postTrustedLedgerTransfer({ tenantId: tenant, currency: "KRW", kind: "funding", amount: BigInt(1000), sourceKind: "pg_capture", sourceId: randomUUID() });
+    const { sender: smsSender } = await verifiedSmsSender("문자 발신번호");
+    const good = await recipient("문자 정상", "sms"), withdrawn = await recipient("문자 철회", "sms");
+    const draft = await ok<{ id: string }>(await POST(req("/campaigns", "POST", "owner", { serviceId: service, channel: "sms", source: "direct", title: "문자 대상 " + randomUUID(), senderId: smsSender.id, content }, { "idempotency-key": randomUUID() })), 201);
+    // 잘못된 번호는 예약 시점 평가에서 제외된다
+    let campaign = await targets(await read(draft.id), [good.contact, withdrawn.contact, "not-a-number", "010-12"]);
+    const preview = await ok<CampaignPreview>(await POST(req("/campaigns/" + campaign.id + "/preview", "POST", "owner", { version: campaign.version })));
+    expect(preview).toMatchObject({ total: 4, eligible: 2, excluded: 2 });
+    expect(preview.items.filter(i => i.reason !== null).map(i => i.reason)).toEqual(["INVALID_CONTACT", "INVALID_CONTACT"]);
+    // 제외 확인 없이 예약하면 409, 명시 확인 후에만 진행된다
+    expect((await POST(req("/campaigns/" + campaign.id + "/schedule", "POST", "owner", { version: campaign.version, at: null }, { "idempotency-key": randomUUID() }))).status).toBe(409);
+    campaign = await schedule(campaign, { excludeInvalid: true });
+    expect(await db.job.count({ where: { campaignDelivery: { campaignId: campaign.id } } })).toBe(2);
+    // 발송 직전 문자 동의 철회 → 해당 수신자는 cancelled, 다른 수신자만 실제 발송·과금된다
+    const late = await db.marketingPreference.findUniqueOrThrow({ where: { id: withdrawn.pref.id } });
+    await ok(await marketingPost(req("/marketing/preferences/withdrawals", "POST", "owner", { serviceId: service, items: [{ id: late.id, version: late.version }] })));
+    for (const job of await db.job.findMany({ where: { campaignDelivery: { campaignId: campaign.id } } })) await drain(job.id);
+    const rows = (await deliveries(campaign.id)).items;
+    expect(rows.map(r => r.status).sort()).toEqual(["cancelled", "excluded", "excluded", "local_delivered"]);
+    expect(rows.find(r => r.status === "cancelled")?.reason).toBe("CONSENT_CHANGED");
+    expect(await read(campaign.id)).toMatchObject({ status: "partial_failed" });
+    expect(await db.ledgerTransaction.count({ where: { tenantId: tenant, kind: "capture", sourceId: { in: rows.map(r => r.id) } } })).toBe(1);
+    expect(await readdir(env.LOCAL_SMS_DIR)).toHaveLength(1);
   });
 });
 

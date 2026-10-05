@@ -32,3 +32,8 @@
   - 수신거부 대상자 및 중복 대상자 자동 필터링
   - 예약 발송 등록 후 발송 전 취소 성공 확인
   - 발송 실행 시 테넌트 격리 및 서비스 grant 권한 확인
+
+## SMS 직접 대상 적대적 실측 추가 (2026-10-12, campaigns.test.ts 60/60)
+
+- 신규 "SMS direct targets exclude invalid numbers, honor pre-dispatch withdrawal and bill only delivered sends": 직접 입력 4건 중 `not-a-number`·`010-12` 2건은 미리보기 `INVALID_CONTACT`로 제외, 제외 확인 없는 예약은 409 `RECIPIENT_REVIEW_REQUIRED` → `excludeInvalid` 확인 후 2건만 잡 생성 → 발송 직전 문자 동의 철회는 `cancelled/CONSENT_CHANGED`로 차단 → 1건만 `local_delivered`·SMS 영수증 1개·capture 1건, 캠페인 `partial_failed` 정산.
+- 커버 조건: 잘못된 번호 필터링(SMS)·수신거부 실시간 차단·제외 확인 게이트·부분 정산. 남은 것은 Solapi sandbox 실제 결과 대사.
