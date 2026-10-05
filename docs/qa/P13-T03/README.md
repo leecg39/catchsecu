@@ -68,3 +68,19 @@ viewer 계정으로 상태별 화면을 실브라우저 실측했다. 7/7 통과
 - 탭 A 저장 → `PATCH /me` 성공, DB의 name 즉시 갱신 확인
 - 탭 B(구 version) 저장 → 409 `VERSION_CONFLICT` → 화면에 "다른 곳에서 변경한 프로필…" 안내 + **최신 프로필 다시 불러오기** 버튼 + 저장 버튼 비활성(conflict 해소 전 재전송 차단)
 - 시험 후 원래 이름으로 복구
+
+## loading·validation·disabled·error·retry 실측 (2026-10-05, `scripts/qa-ui-states.ts` → [ui-states.json](ui-states.json))
+
+`/mail/number` 발신 주소 관리 화면에서 네트워크 주입(`page.route`)으로 상태를 유발했다. 5/5 통과.
+
+| 상태 | 유발 방법 | 실측 |
+|---|---|---|
+| loading | 목록 API 1.5초 지연 | `role="status"` "불러오는 중입니다." 표시 ([loading-senders.png](states/loading-senders.png)) |
+| validation | 등록 모달에 잘못된 이메일 제출 | `role="alert"` "입력 내용을 확인해주세요." 표시 ([validation-sender.png](states/validation-sender.png)) |
+| disabled/busy | 등록 API 지연 중 제출 버튼 | `disabled` 속성 + "등록 중…" 라벨 — 이중 제출 차단 ([disabled-busy.png](states/disabled-busy.png)) |
+| error | 목록 API를 arm 동안 전부 500 응답 | `role="alert"` 오류 메시지가 테이블에 표시 ([error-retry.png](states/error-retry.png)) — AbortError는 `useResource`가 의도적으로 무시(내비게이션 취소), 실제 실패만 오류 상태가 됨 |
+| retry | arm 해제 후 새로고침/reload | 목록 정상 복구 — stale 오류 잔류 없음 |
+
+주의: React strict-mode 이중 마운트로 첫 실패만 유발하면 두 번째 요청이 성공해 오류가 덮인다 — error 상태 실측은 지속 실패 구간이 필요하다(스크립트에 반영).
+
+남은 범위: empty 상태는 [P12-T02 빈 테넌트 실측](../P12-T02/)과 P14-T01 빈 계정 경로에서 부분 확인. 원본 대조와 전 경로 상태 전수 캡처는 계속 미완료.
