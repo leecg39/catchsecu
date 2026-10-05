@@ -28,3 +28,21 @@
 
 - 모든 메뉴·헤더·모달 action의 전수 클릭 감사와 서버 cache invalidation 일관성(새로고침/뒤로가기 후 stale 데이터), loading/empty/validation/conflict/forbidden/retry/disabled 상태별 화면 증거
 - 181개 경로 전체 화면 게이트는 P13-T04에서 처리
+
+## 전수 action 감사 + 캐시 일관성 (2026-10-05)
+
+**정적 감사** — `src/components/**/*.tsx`의 모든 `<button>`을 태그 끝까지 파싱해 핸들러(`onClick`/`type=submit`/`formAction`) 유무를 검사했다(중괄호 중첩 인식). `href="#"`·`javascript:void`·빈 onClick·`alert(` 0건.
+
+핸들러 없는 `<button>` 16건 전부 의도된 비액션으로 확인:
+- `shared.tsx` `ActionButton` — `{...props}`로 호출측 onClick 전달(조합 연결)
+- `shared.tsx` `DataTable` 현재 페이지 `<button className="active">` — 페이지 인디케이터
+- `auth/LiveAuth.tsx` 7건 — 부모 `<form onSubmit>`의 기본 submit 버튼
+- `services/kakao.tsx` 7건 — Infotalk 미리보기 목업의 표시 전용 버튼
+
+**캐시 일관성 실측** — `scripts/qa-cache-consistency.ts` + [cache-consistency.json](cache-consistency.json) 3/3:
+- 서버에서 서비스 externalName을 직접 변경 → 브라우저 새로고침에 새 값 반영
+- 다른 화면 이동 → 뒤로가기 → 최신값 유지(bfcache·SPA 캐시 stale 없음)
+- 값 원복 → 새로고침 시 원복값 반영(읽기 캐시 없음 재확인)
+- 구조적 근거: `src/lib/api.ts`의 `api()`는 모든 요청에 `cache: "no-store"`, `useResource`는 마운트·reload마다 재조회
+
+남은 범위: loading/empty/validation/conflict/forbidden/retry 상태별 화면 증거의 전수 캡처와 원본 대조는 계속 미완료.
