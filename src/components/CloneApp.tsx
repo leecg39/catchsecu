@@ -16,8 +16,14 @@ import { ServicesPages, matchServices } from "./services";
 import { AuthPages, matchAuth } from "./auth/AuthPages";
 import { PublicPages, isExternal } from "./PublicPages";
 import { LegalPages } from "./LegalPages";
+import { ToastProvider } from "./ux/toast";
 
-export default function CloneApp({ path, accessReason = "general" }: { path: string; accessReason?: AccessDenialReason }) {
+type CloneAppProps = { path: string; accessReason?: AccessDenialReason };
+export default function CloneApp(props: CloneAppProps) {
+  return <ToastProvider><CloneRoutes {...props} /></ToastProvider>;
+}
+
+function CloneRoutes({ path, accessReason = "general" }: CloneAppProps) {
   if (matchAuth(path)) return <AuthPages key={path} path={path} />;
   if (path.startsWith("/legal/")) return <LegalPages key={path} path={path} />;
   if (path === "/admin/expert-assignments") return <ExpertAssignmentsAdmin />;

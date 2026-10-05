@@ -1,0 +1,11 @@
+.ux-toasts{position:fixed;right:24px;bottom:24px;z-index:300;display:flex;flex-direction:column;align-items:flex-end;gap:8px;width:min(380px,calc(100vw - 32px));pointer-events:none}
+.ux-toast{pointer-events:auto;display:flex;align-items:flex-start;gap:10px;width:100%;padding:12px 12px 12px 14px;border-radius:8px;background:#202327;color:#fff;box-shadow:0 8px 24px rgba(9,30,66,.24);animation:ux-toast-in .18s ease-out}
+.ux-toast p{flex:1;margin:0;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+.ux-toast.error{background:#b42318}
+.ux-toast-icon{flex:none;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-top:1px;border-radius:50%;background:#12b76a;color:#fff;font-size:12px;font-weight:700}
+.ux-toast.error .ux-toast-icon{background:#fff;color:#b42318}
+.ux-toast.info .ux-toast-icon{background:#6558ff}
+.ux-toast button{flex:none;min-width:24px;min-height:24px;border:0;border-radius:4px;background:transparent;color:inherit;font-size:18px;line-height:1;opacity:.8}
+.ux-toast button:hover{opacity:1;background:rgba(255,255,255,.12)}
+@keyframes ux-toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:600px){.ux-toasts{right:16px;left:16px;bottom:16px;width:auto;align-items:stretch}}

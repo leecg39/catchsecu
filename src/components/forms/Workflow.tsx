@@ -10,6 +10,7 @@ import "./sharing.css";
 import { SubmissionDetail } from "./SubmissionDetail";
 import { ConsentDisplay, ConsentDocuments, FormDocumentsEditor } from "./ConsentDocuments";
 import { ApprovalPanel } from "./Approvals";
+import { useToast } from "../ux/toast";
 import { useApplication } from "../ApplicationContext";
 import { api, errorText, useResource } from "@/lib/api";
 import type { FormRecord, FormContent, FormActions, Paged, SubmissionRecord } from "@/contracts/forms";
@@ -105,6 +106,7 @@ function Settings({ initial, path }: { initial: FormRecord; path: string }) {
   const draft = useFormDraft(initial, draftValue(initial), !share && !!canWrite && initial.status !== "archived");
   const form = draft.record ?? initial, content = draft.value.content;
   const [message, setMessage] = useState(""), [error, setError] = useState(""), [transitioning, setTransitioning] = useState(false);
+  const toast = useToast();
   const busy = transitioning || draft.saving;
   const [publicationSession] = useState(() => new FormPublicationSession({ read: id => api<FormRecord>("/forms/" + id),
     publish: (id, version, key) => api("/forms/" + id + "/publish", { method: "POST", body: JSON.stringify({ version }), headers: { "Idempotency-Key": key } }) }));
@@ -152,8 +154,8 @@ function Settings({ initial, path }: { initial: FormRecord; path: string }) {
     <h2>{form.title}</h2>{share ? <>
       {publicPath ? <><p>{form.published ? "캐치폼이 게시되었습니다." : "공개가 일시 중지된 캐치폼입니다."}</p>{permissions?.responses && <Link className="cs-link" href={"/form/manage/applicant/" + form.id}>응답 정보 보기</Link>}
         <div className="forms-actions"><Link className="cs-button" href={publicPath} target="_blank" rel="noopener noreferrer">응답폼 열기</Link>
-          <ActionButton secondary onClick={async () => { try { await navigator.clipboard.writeText(url); setMessage("응답폼 URL을 복사했습니다."); }
-            catch { setMessage("아래 주소를 선택하여 복사해주세요."); } }}>URL 복사</ActionButton></div>
+          <ActionButton secondary onClick={async () => { try { await navigator.clipboard.writeText(url); toast("응답폼 URL을 복사했습니다."); }
+            catch { toast("자동 복사를 할 수 없습니다. 아래 주소를 선택하여 복사해주세요.", "error"); } }}>URL 복사</ActionButton></div>
         <input className="cs-input" aria-label="응답폼 URL" readOnly value={url} onFocus={event => event.target.select()} />
         {form.hasDraft && <p>게시하지 않은 수정 내용이 있습니다.</p>}</> : <p>게시된 링크가 없거나 링크를 확인할 권한이 없습니다.</p>}
     </> : <fieldset disabled={transitioning || form.status === "archived" || !canWrite} className="forms-settings-fields">{setting ? <>
