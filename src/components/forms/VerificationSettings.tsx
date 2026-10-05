@@ -26,7 +26,7 @@ function Configuration({ serviceId, state, done }: { serviceId: string; state: V
   const [identityProvider, setIdentity] = useState(exists ? row.identityProvider ?? "" : "");
   const [signatureProvider, setSignature] = useState(exists ? row.signatureProvider ?? "" : "");
   const [environment, setEnvironment] = useState<"sandbox" | "production">(exists ? row.environment : "sandbox");
-  const [status, setStatus] = useState<"pending" | "disabled">(row?.status === "disabled" ? "disabled" : "pending");
+  const [status, setStatus] = useState<"pending" | "enabled" | "disabled">(row?.status === "disabled" ? "disabled" : row?.status === "enabled" ? "enabled" : "pending");
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
   const pending = useRef<{ body: string; key: string } | null>(null);
   const path = `/services/${serviceId}/verification`;
@@ -57,8 +57,9 @@ function Configuration({ serviceId, state, done }: { serviceId: string; state: V
     <p className="forms-muted">식별자는 영문 소문자·숫자·밑줄·하이픈으로 입력해주세요. 비밀 키와 URL은 입력하지 마세요.</p>
     <label>연동 환경<select className="cs-input" value={environment} disabled={busy} onChange={event => setEnvironment(event.target.value as "sandbox" | "production")}>
       <option value="sandbox">테스트 (sandbox)</option><option value="production">운영 (production)</option></select></label>
-    <label>연동 설정 상태<select className="cs-input" value={status} disabled={busy} onChange={event => setStatus(event.target.value as "pending" | "disabled")}>
-      <option value="pending">공급자 연결 대기</option><option value="disabled">사용 중지</option></select></label>
+    <label>연동 설정 상태<select className="cs-input" value={status} disabled={busy} onChange={event => setStatus(event.target.value as "pending" | "enabled" | "disabled")}>
+      <option value="pending">공급자 연결 대기</option><option value="enabled">사용 (sandbox의 local 공급자만)</option><option value="disabled">사용 중지</option></select></label>
+    <p className="forms-muted">본인인증 사용 폼을 게시하려면 연동이 사용 상태여야 합니다. 외부 공급자와 운영 환경은 아직 전환할 수 없습니다.</p>
     {error && <p role="alert">{error}</p>}
     <div className="forms-actions"><button type="button" className="cs-button cs-button-primary" disabled={busy} onClick={save}>{busy ? "처리 중…" : exists ? "연동 설정 저장" : "연동 설정 등록"}</button>
       {exists && <button type="button" className="cs-button" disabled={busy} onClick={remove}>연동 설정 삭제</button>}

@@ -125,6 +125,15 @@ async function syntheticVerification(submissionId: string, kind: "identity" | "s
     await ok(await createVerification(req("/services/" + service + "/verification", "POST", "owner", {
       identityProvider: "qa_identity", signatureProvider: "qa_signature", environment: "production", status: "pending",
     }, { "idempotency-key": randomUUID() })), 201);
+    // 과거 외부 공급자로 검증된 응답을 재현한다 — 앱 계층은 외부 공급자의 enabled를 막지만
+    // 이 픽스처는 파기 증거의 DB 무결성만 검증하므로 트랜잭션으로 설정을 승격한다.
+    await db.$transaction(async tx => {
+      const current = await tx.verificationIntegration.findUniqueOrThrow({ where: { tenantId_serviceId: { tenantId: tenant, serviceId: service } } });
+      await tx.verificationIntegration.update({ where: { id: current.id }, data: { status: "enabled", version: { increment: 1 } } });
+      await tx.verificationIntegrationRevision.create({ data: { tenantId: tenant, serviceId: service, integrationId: current.id,
+        version: current.version + 1, identityProvider: current.identityProvider, signatureProvider: current.signatureProvider,
+        environment: current.environment, status: "enabled" } });
+    });
     configuration = await db.verificationIntegration.findUniqueOrThrow({ where: { tenantId_serviceId: { tenantId: tenant, serviceId: service } } });
   }
   const sub = await db.submission.findUniqueOrThrow({ where: { id: submissionId }, include: { formVersion: true } });

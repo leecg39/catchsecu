@@ -71,3 +71,39 @@ ALLOW_LOCAL_MAIL=1 "$qa_node" node_modules/next/dist/bin/next start --port 3100
 ```
 
 prepare/finish/database를 동시에 실행하지 않는다. PostgreSQL 통합 검사는 localhost/catchsecu_test를 강제하며 그 DB만 초기화한다. HTTP 검사는 localhost/catchsecu_dev에 독립 합성 자료를 만든다. prepare를 새로 실행하면 새 합성 계정/회사를 사용한다. 기존 사용자 관리자 자격증명은 바꾸지 않는다.
+
+## 2026-10-05 — 로컬 sandbox 공급자 실구현
+
+`local` 공급자는 서버 내장 sandbox 어댑터다. 외부 IdP와 같은 challenge→서명 어서션→콜백→영수증→제출 소비 경로를 로컬에서 실제로 구동한다.
+
+### 구현
+
+- `POST /api/v1/public/forms/{token}/verification` — challenge 발급. `FormVersion.verify`·연동 `enabled`·`local`+`sandbox`를 확인하고 nonce 해시·문서 해시를 바인딩한 attempt(pending, 10분 TTL)를 생성한다.
+- `POST /api/v1/public/verify/local` — 내장 공급자. nonce를 재검증하고 HMAC-SHA256으로 어서션에 서명한다.
+- `POST /api/v1/public/forms/{token}/verification-callback` — 어서션 서명·nonce·만료를 검증한다. 위조도 불변 `VerificationEvent`(rejected)로 남기고 attempt는 pending으로 유지한다. 정상이면 attempt→verified, 이벤트·영수증(proofHash=event.bodyHash)을 같은 트랜잭션에 기록한다.
+- 제출은 `verification:{attemptId,receipt}`를 요구한다. 제출 tx 안에서 영수증의 테넌트/서비스/게시/폼버전 귀속·만료·문서 해시를 검증하고 `submissionId` NULL→값 조건부 갱신으로 한 번만 소비한다(동시 경합은 한 건만 성공). 소비 시 attempt→consumed.
+- 연동 설정은 `enabled` 상태를 추가했다. `enabled`는 앱 계층에서 `local`+`sandbox` 조합만 허용한다(외부 공급자·production → 422 PROVIDER_ADAPTER_REQUIRED). `pending`/`disabled`는 challenge·게시를 503으로 차단한다.
+- 워커는 만료 pending attempt를 `expired`로 전이한다. verified/consumed 시도의 provider 원문은 증거이므로 CHECK가 잠그고, 파기 워커가 영수증 삭제(DELETE 트리거가 이벤트·시도 연쇄 삭제)로 함께 제거해 파기 증명서에 건수를 남긴다.
+- 공개 폼 UI는 `verify` 폼에서 본인인증 섹션을 렌더하고 인증 전까지 제출 버튼을 비활성화한다(중첩 form 제거 — HTML 파서가 중첩 form을 버려 인증 버튼이 외부 폼을 제출하던 결함 수정).
+
+### DB 상태 기계 정합 (`20261008000000_verification_enabled`)
+
+- `VerificationIntegration`/Revision status CHECK에 `enabled` 추가.
+- `verification_attempt_guard`의 "사용 가능한 설정" 조건을 `pending`→`enabled`로 정정. attempt INSERT·verified/consumed 전이는 enabled 설정에서만 가능하다.
+- `VerificationReceipt_evidence_check`의 `environment='production'` 전용 조건을 sandbox 포함으로 완화(local 공급자 영수증은 sandbox). attempt↔revision↔receipt 정합성은 `verification_receipt_guard`가 유지한다.
+- `migrate deploy`로 빈 DB에 전량 적용 확인(재현성), 4개 로컬 DB의 `_prisma_migrations` 체크섬을 동기화했다.
+
+### 적대적 검증 (`tests/server/verification-flow.test.ts`, 4/4)
+
+challenge 발급→공급자 서명→콜백→영수증 소비→제출 201 전체 경로. 위조 subject 콜백 403+rejected 이벤트 보존+attempt pending 유지, 탈취 nonce 403, 동일 어서션 재생 409, 영수증 토큰 위조 403, 타 테넌트/게시 귀속 불일치 404, 재사용 409(attempt consumed), 만료 410+워커 expired 전이, 미사용 연동 503, 외부 공급자·production enabled 422, verify=false 폼의 challenge 422·영수증 첨부 422. 문서 바인딩 해시 변경 시 재인증 요구 409.
+회귀: `verification-configuration` 27/27(합성 픽스처를 enabled 승격으로 갱신), `destruction` 48/48(파기 시 영수증·이벤트·시도 연쇄 삭제 유지), `public-submission-*`·`form-publication-state`·`publication-access-gate` 39/39.
+
+### 브라우저 실측 (`scripts/qa-verify-browser.ts`)
+
+dev 서버에서 verify 폼 게시→공개 URL 접근→challenge 자동 발급→이름/생년월일 입력→`local` 어서션→콜백→"본인인증을 완료했습니다" 표시→제출 버튼 활성화→제출 완료·접수 번호 발급까지 확인했다.
+
+### 미완료 조건 (체크박스 유지)
+
+- 실제 외부 공급자 어댑터(PASS/이니시스 등)와 공식 sandbox 검증 — 외부 인증이 필요해 이번 범위에서 제외.
+- 전자서명 `signature` kind — challenge는 503(SIGNATURE_ADAPTER_REQUIRED)으로 명시 차단한다.
+- production 환경 공급자 — `enabled`를 sandbox+local로 제한해 production 어댑터 부재를 드러낸다.

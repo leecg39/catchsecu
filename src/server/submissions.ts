@@ -21,6 +21,7 @@ import { contentDto, versionInclude } from "./forms";
 import { companyRetentionDays } from "./security-policy";
 import { submissionInput } from "@/contracts/domains";
 import { lockPublicPublication } from "./public-publication";
+import { consumeVerificationReceipt } from "./verification-flow";
 
 export async function activePublication(token: string) {
   if (!/^[A-Za-z0-9_-]{43}$/.test(token)) fail(404, "NOT_FOUND", "공개 폼을 찾을 수 없습니다.");
@@ -51,7 +52,13 @@ export async function publicForm(token: string) {
 }
 export async function submitForm(token: string, input: z.infer<typeof submissionInput>, key: string | null, requestId: string) {
   const publication = await activePublication(token);
-  if (publication.formVersion.verify) fail(503, "IDENTITY_PROVIDER_REQUIRED", "본인인증 공급자 확인이 필요합니다.");
+  if (publication.formVersion.verify && !input.verification) {
+    const integration = await db.verificationIntegration.findUnique({
+      where: { tenantId_serviceId: { tenantId: publication.tenantId, serviceId: publication.form.serviceId } } });
+    if (!integration || integration.status !== "enabled" || !integration.identityProvider)
+      fail(503, "IDENTITY_PROVIDER_REQUIRED", "본인인증 공급자 확인이 필요합니다.");
+    fail(422, "VERIFICATION_REQUIRED", "본인인증 영수증이 필요합니다.");
+  }
   const questions = publication.formVersion.questions;
   validateDocumentConsents(publication.formVersion, input.documentConsents);
   const answers = validateAnswers(questions, input.answers);
@@ -76,6 +83,7 @@ export async function submitForm(token: string, input: z.infer<typeof submission
         submissionId: submission.id,
         valueType: question.type, valueCipher: encrypt(answers[question.stableKey]),
       })) });
+    await consumeVerificationReceipt(tx, live, live.formVersion, input.verification, submission.id, requestId);
     await bindSubmissionSubject(tx, submission.id, live.form.serviceId, questions, answers);
     await collectMarketing(tx, submission, live.form.serviceId, publication.formVersion.marketing, input.marketingChannels ?? [], requestId);
     await createConsentReceipt(tx, publication.formVersion, submission.id, input.consent, input.documentConsents ?? [], retentionDays);

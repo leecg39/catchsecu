@@ -69,7 +69,7 @@ record("orphan-lease-created", true, `job ${jobIds[0]} leased by ${deadWorker} f
 const run1 = spawnWorker(false);
 await waitFor(async () => {
   const counts = await jobCounts();
-  return (counts.find(c => c.status === "done")?.n ?? 0n) >= BigInt(Math.floor(N / 2));
+  return (counts.find(c => c.status === "done")?.n ?? BigInt(0)) >= BigInt(Math.floor(N / 2));
 }, 30000, "half of jobs done");
 run1.child.kill("SIGKILL");
 const code1 = await run1.exited;

@@ -1,5 +1,5 @@
 import type { VerificationIntegration } from "@/generated/prisma/client";
-import type { VerificationConfiguration, VerificationState } from "@/contracts/verification";
+import type { VerificationConfiguration, VerificationState, VerificationStatus } from "@/contracts/verification";
 import type { Context } from "./context";
 import { db, type Transaction } from "./db";
 import { audit } from "./audit";
@@ -17,20 +17,33 @@ async function lockConfiguration(tx: Transaction, tenantId: string, serviceId: s
   else await tx.$queryRaw`SELECT id FROM "VerificationIntegration" WHERE "tenantId"=${tenantId} AND "serviceId"=${serviceId} FOR SHARE`;
   return tx.verificationIntegration.findUnique({ where: { tenantId_serviceId: { tenantId, serviceId } } });
 }
+// local sandbox 공급자만 enabled를 허용한다. 외부 공급자는 어댑터가 없으므로 pending까지.
+export function assertActivationAllowed(input: { identityProvider: string | null; signatureProvider: string | null; environment: string; status: string }) {
+  if (input.status !== "enabled") return;
+  const providers = [input.identityProvider, input.signatureProvider].filter(Boolean) as string[];
+  if (input.environment !== "sandbox" || providers.some(provider => provider !== "local"))
+    fail(422, "PROVIDER_ADAPTER_REQUIRED", "운영 환경·외부 공급자는 아직 어댑터가 없어 사용으로 전환할 수 없습니다. local sandbox 공급자만 사용할 수 있습니다.");
+}
 async function state(tx: Transaction, ctx: Context, serviceId: string, row: VerificationIntegration | null): Promise<VerificationState> {
   const member = await tx.membership.findUniqueOrThrow({ where: { id: ctx.member.id }, include: { grants: true } });
   const canManage = roleCan(member.role, "integration.manage") && (["owner", "admin"].includes(member.role) ||
     member.grants.some(grant => grant.serviceId === serviceId && grant.capabilities.includes("integration.manage")));
   const history = row ? await tx.verificationIntegrationRevision.findMany({ where: { tenantId: ctx.tenantId, serviceId, integrationId: row.id }, orderBy: { version: "desc" }, take: 20 }) : [];
-  const reason = !row || row.status === "deleted" ? "NOT_CONFIGURED" : row.status === "disabled" ? "DISABLED" : "PROVIDER_ADAPTER_REQUIRED";
-  const messages = { NOT_CONFIGURED: "공급자 설정을 등록해주세요.", DISABLED: "본인인증·전자서명 연동을 사용 중지했습니다.",
-    PROVIDER_ADAPTER_REQUIRED: "공급자 연결과 sandbox 검증이 필요합니다. 인증을 사용하는 폼은 아직 게시할 수 없습니다." };
+  const adaptersReady = !!row && row.environment === "sandbox" &&
+    [row.identityProvider, row.signatureProvider].filter(Boolean).every(provider => provider === "local");
+  const reason = !row || row.status === "deleted" ? "NOT_CONFIGURED" : row.status === "disabled" ? "DISABLED" :
+    row.status === "enabled" && adaptersReady ? "READY" : "PROVIDER_ADAPTER_REQUIRED";
+  const sandboxVerified = !!row && !!await tx.verificationAttempt.count({ where: { tenantId: ctx.tenantId, serviceId,
+    integrationId: row.id, integrationVersion: row.version, environment: "sandbox", status: "verified" } });
+  const messages = { READY: "local sandbox 공급자가 사용 중입니다. 본인인증 폼을 게시할 수 있습니다.",
+    NOT_CONFIGURED: "공급자 설정을 등록해주세요.", DISABLED: "본인인증·전자서명 연동을 사용 중지했습니다.",
+    PROVIDER_ADAPTER_REQUIRED: "외부 공급자는 아직 연결할 수 없습니다. sandbox의 local 공급자만 사용으로 전환할 수 있습니다." };
   return { integration: row ? { id: row.id, identityProvider: row.identityProvider, signatureProvider: row.signatureProvider,
-    environment: row.environment as "sandbox" | "production", status: row.status as "pending" | "disabled" | "deleted", version: row.version,
+    environment: row.environment as "sandbox" | "production", status: row.status as VerificationStatus, version: row.version,
     createdAt: row.createdAt.toISOString(), updatedAt: row.updatedAt.toISOString() } : null,
-    readiness: { ready: false, reason, message: messages[reason], sandboxVerified: false }, permissions: { canManage },
+    readiness: { ready: reason === "READY", reason, message: messages[reason], sandboxVerified }, permissions: { canManage },
     history: history.map(item => ({ version: item.version, identityProvider: item.identityProvider, signatureProvider: item.signatureProvider,
-      environment: item.environment as "sandbox" | "production", status: item.status as "pending" | "disabled" | "deleted", createdAt: item.createdAt.toISOString() })) };
+      environment: item.environment as "sandbox" | "production", status: item.status as VerificationStatus, createdAt: item.createdAt.toISOString() })) };
 }
 async function recordRevision(tx: Transaction, row: VerificationIntegration) {
   await tx.verificationIntegrationRevision.create({ data: { tenantId: row.tenantId, serviceId: row.serviceId, integrationId: row.id,
@@ -54,6 +67,7 @@ export async function createVerificationIntegration(ctx: Context, serviceId: str
   const deadline = await lockVerificationContext(tx, ctx, serviceId, true);
   const current = await lockConfiguration(tx, ctx.tenantId, serviceId, true);
   if (current && current.status !== "deleted") fail(409, "ALREADY_EXISTS", "이미 연동 설정이 있습니다. 최신 설정을 불러와 수정해주세요.");
+  assertActivationAllowed(input);
   const row = current ? await tx.verificationIntegration.update({ where: { id: current.id }, data: { ...input, version: { increment: 1 } } }) :
     await tx.verificationIntegration.create({ data: { tenantId: ctx.tenantId, serviceId, ...input } });
   await recordRevision(tx, row);
@@ -72,6 +86,7 @@ export async function updateVerificationIntegration(ctx: Context, serviceId: str
     if (!current || current.status === "deleted") fail(404, "NOT_FOUND", "연동 설정을 찾을 수 없습니다.");
     requireVersion(input, current);
     const configuration = { identityProvider: input.identityProvider, signatureProvider: input.signatureProvider, environment: input.environment, status: input.status };
+    assertActivationAllowed(configuration);
     const changed = (Object.keys(configuration) as (keyof VerificationConfiguration)[]).filter(key => current[key] !== configuration[key]);
     let row = current;
     if (changed.length) {

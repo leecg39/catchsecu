@@ -99,7 +99,8 @@ export async function lockFileSubmission(tx: Transaction, tenantId: string, id: 
 }
 export async function lockFilePublication(tx: Transaction, id: string, write = false) {
   const row = await lockPublicPublication(tx, id, write);
-  if (row.formVersion.verify) fail(503, "IDENTITY_PROVIDER_REQUIRED", "본인인증 공급자 확인이 필요합니다.");
+  // 본인인증 강제는 제출 경로(submitForm → consumeVerificationReceipt)에서 영수증 소비로 검사한다.
+  // 업로드·열람은 인증 전에도 가능해야 하므로 여기서 차단하지 않는다.
   if (row.responseCount >= row.maxResponses) fail(409, "RESPONSE_LIMIT_REACHED", "응답 접수가 마감되었습니다.");
   return row;
 }

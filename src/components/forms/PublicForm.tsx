@@ -21,8 +21,43 @@ export function PublicForm({ path }: { path: string }) {
     <p className="public-powered">powered by Catchsecu</p>
   </Panel></div>;
 }
+type VerificationProof = { attemptId: string; receipt: string; name: string };
+function IdentityVerification({ token, onDone }: { token: string; onDone: (proof: VerificationProof) => void }) {
+  const [challenge, setChallenge] = useState<{ attemptId: string; nonce: string } | null>(null);
+  const [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    api<{ attemptId: string; nonce: string }>("/public/forms/" + token + "/verification", { method: "POST", body: JSON.stringify({ kind: "identity" }) })
+      .then(value => { if (!cancelled) setChallenge(value); })
+      .catch(cause => { if (!cancelled) setError(errorText(cause)); });
+    return () => { cancelled = true; };
+  }, [token]);
+  async function verify() {
+    if (busy || !challenge) return;
+    setBusy(true); setError("");
+    const name = (document.getElementById("verifyName") as HTMLInputElement | null)?.value.trim() ?? "";
+    const birthDate = (document.getElementById("verifyBirth") as HTMLInputElement | null)?.value ?? "";
+    const subject = { name, birthDate };
+    try {
+      const assertion = await api<Record<string, unknown>>("/public/verify/local", { method: "POST",
+        body: JSON.stringify({ attemptId: challenge.attemptId, nonce: challenge.nonce, subject }) });
+      const proof = await api<VerificationProof>("/public/forms/" + token + "/verification-callback", { method: "POST", body: JSON.stringify(assertion) });
+      onDone({ ...proof, name: subject.name });
+    } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
+  }
+  return <section className="public-consent"><h2>본인인증</h2>
+    <p>이 캐치폼은 본인인증이 필요합니다. 이름과 생년월일을 입력해 테스트 공급자 인증을 완료해주세요.</p>
+    {challenge ? <div className="cs-stack">
+      <label className="cs-row">이름<input className="cs-input" id="verifyName" required maxLength={100} autoComplete="name" /></label>
+      <label className="cs-row">생년월일<input className="cs-input" id="verifyBirth" required placeholder="1990-01-01" pattern="\d{4}-\d{2}-\d{2}" /></label>
+      {error && <p role="alert">{error}</p>}
+      <ActionButton type="button" disabled={busy} onClick={verify}>{busy ? "인증 중…" : "인증하기"}</ActionButton>
+    </div> : error ? <p role="alert">{error}</p> : <p role="status">인증 요청을 준비하고 있습니다.</p>}
+  </section>;
+}
 function ResponseForm({ data, token }: { data: PublicFormData; token: string }) {
   const [receipt, setReceipt] = useState<SubmissionReceipt>(), [error, setError] = useState(""), [busy, setBusy] = useState(false), [pending, setPending] = useState(false);
+  const [verification, setVerification] = useState<VerificationProof | null>(null);
   const session = useRef<PublicSubmissionSession | null>(null), content = data.content;
   session.current ??= new PublicSubmissionSession({ send: (payload, key) => api("/public/forms/" + token + "/submissions", { method: "POST", body: payload, headers: { "Idempotency-Key": key } }) });
   const uploadCache = useRef<UploadCache>(new Map()), [uploadStatus, setUploadStatus] = useState("");
@@ -62,7 +97,8 @@ function ResponseForm({ data, token }: { data: PublicFormData; token: string }) 
       }
       answers[question.id] = values[question.id] ?? emptyAnswer(question.type);
     }
-    const payload = JSON.stringify({ answers, marketingChannels: formData.getAll("marketingChannels").map(String), consent: formData.get("consent") === "on", documentConsents: formData.getAll("documentConsents").map(String), attachments });
+    const payload = JSON.stringify({ answers, marketingChannels: formData.getAll("marketingChannels").map(String), consent: formData.get("consent") === "on", documentConsents: formData.getAll("documentConsents").map(String), attachments,
+      ...(verification ? { verification: { attemptId: verification.attemptId, receipt: verification.receipt } } : {}) });
       setUploadStatus("응답을 제출하고 있습니다.");
       setReceipt(await session.current!.submit(payload));
     } catch (cause) { setError(errorText(cause)); } finally { setPending(session.current!.hasPending); setBusy(false); setUploadStatus(""); }
@@ -87,9 +123,13 @@ function ResponseForm({ data, token }: { data: PublicFormData; token: string }) 
         {content.marketing.emailQuestionId && <label className="cs-row"><input name="marketingChannels" type="checkbox" value="email" />[선택] 이메일 광고성 정보 수신에 동의합니다.</label>}
         {content.marketing.smsQuestionId && <label className="cs-row"><input name="marketingChannels" type="checkbox" value="sms" />[선택] 문자 광고성 정보 수신에 동의합니다.</label>}
       </section>}</fieldset>
+    {content.verify && <fieldset className="public-response-fields" disabled={busy || pending}>
+      {verification ? <section className="public-consent"><h2>본인인증</h2><p role="status">본인인증을 완료했습니다. ({verification.name})</p></section>
+        : <IdentityVerification key={token} token={token} onDone={proof => setVerification(proof)} />}
+    </fieldset>}
     {uploadStatus && <p role="status">{uploadStatus}</p>}
     {error && <p role="alert">{error}</p>}
     {pending && !busy && <p role="status">접수 여부를 확인할 수 없습니다. 입력 내용과 첨부를 유지하고 같은 요청으로 결과를 다시 확인해주세요.</p>}
-    <ActionButton disabled={busy}>{busy ? "제출 중…" : pending ? "같은 요청으로 결과 확인" : "제출하기"}</ActionButton>
+    <ActionButton disabled={busy || (!!content.verify && !verification)}>{busy ? "제출 중…" : pending ? "같은 요청으로 결과 확인" : "제출하기"}</ActionButton>
   </form>;
 }

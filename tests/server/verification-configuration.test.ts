@@ -43,14 +43,27 @@ async function fixture() {
 }
 type Fixture = Awaited<ReturnType<typeof fixture>>;
 async function create(f: Fixture, value: unknown = configuration, key = randomUUID()) { return ok(await POST(req(f.path, f.owner.cookie, "POST", value, { "Idempotency-Key": key })), 201); }
+// 앱 계층은 외부 공급자의 enabled를 막지만, 합성 픽스처는 과거 검증 상태를 재현해야 하므로
+// 트랜잭션으로 설정을 enabled로 승격한다(리비전 정합 유지).
+async function promote(integrationId: string) {
+  await db.$transaction(async tx => {
+    const current = await tx.verificationIntegration.findUniqueOrThrow({ where: { id: integrationId } });
+    await tx.verificationIntegration.update({ where: { id: current.id }, data: { status: "enabled", version: { increment: 1 } } });
+    await tx.verificationIntegrationRevision.create({ data: { tenantId: current.tenantId, serviceId: current.serviceId, integrationId: current.id,
+      version: current.version + 1, identityProvider: current.identityProvider, signatureProvider: current.signatureProvider,
+      environment: current.environment, status: "enabled" } });
+  });
+  return db.verificationIntegration.findUniqueOrThrow({ where: { id: integrationId } });
+}
 async function attempt(f: Fixture, environment: "sandbox" | "production" = "sandbox") {
-  const integration = await create(f, { ...configuration, environment });
+  const created = await create(f, { ...configuration, environment });
+  const integration = await promote(created.integration!.id);
   const form = await db.form.create({ data: { tenantId: f.company.id, serviceId: f.serviceId, ownerId: f.owner.user.id, title: "Synthetic proof model" } });
   const version = await db.formVersion.create({ data: { tenantId: f.company.id, formId: form.id, number: 1, title: "Synthetic", status: "published" } });
   const token = randomUUID();
   const publication = await db.publication.create({ data: { tenantId: f.company.id, formId: form.id, formVersionId: version.id, tokenHash: tokenHash(token), tokenCipher: encrypt(token), maxResponses: 10 } });
-  const row = await db.verificationAttempt.create({ data: { tenantId: f.company.id, serviceId: f.serviceId, integrationId: integration.integration!.id,
-    integrationVersion: integration.integration!.version, formId: form.id, formVersionId: version.id, publicationId: publication.id, kind: "signature", environment,
+  const row = await db.verificationAttempt.create({ data: { tenantId: f.company.id, serviceId: f.serviceId, integrationId: integration.id,
+    integrationVersion: integration.version, formId: form.id, formVersionId: version.id, publicationId: publication.id, kind: "signature", environment,
     browserNonceHash: tokenHash(randomUUID()), requestHash: tokenHash(randomUUID()), documentHash: tokenHash("synthetic document"), expiresAt: new Date(Date.now() + 60000) } });
   return { integration, form, version, publication, row };
 }
@@ -165,9 +178,9 @@ test("session expiry during native configuration lock rejects stale read after t
 });
 test("configuration mutation cancels pending attempts and a restored configuration cannot resurrect the old generation", async () => {
   const f = await fixture(), a = await attempt(f);
-  await ok(await PATCH(req(f.path, f.owner.cookie, "PATCH", { ...configuration, status: "disabled", version: 1 })));
+  await ok(await PATCH(req(f.path, f.owner.cookie, "PATCH", { ...configuration, status: "disabled", version: a.integration.version })));
   expect((await db.verificationAttempt.findUniqueOrThrow({ where: { id: a.row.id } })).status).toBe("cancelled");
-  expect((await db.verificationIntegrationRevision.findMany({ orderBy: { version: "asc" } })).map(item => item.status)).toEqual(["pending", "disabled"]);
+  expect((await db.verificationIntegrationRevision.findMany({ orderBy: { version: "asc" } })).map(item => item.status)).toEqual(["pending", "enabled", "disabled"]);
   await expect(db.verificationAttempt.create({ data: { ...a.row, id: randomUUID() } })).rejects.toBeTruthy();
 });
 test("native revision guard rejects edits, deletion and configuration snapshot mismatches", async () => {
@@ -184,9 +197,12 @@ test("native attempts reject cross-service form and publication/version mismatch
   await expect(db.verificationAttempt.create({ data: { ...a.row, id: randomUUID(), formVersionId: otherVersion.id } })).rejects.toMatchObject({ code: "P2003" });
   await sqlRejected('UPDATE "VerificationAttempt" SET "documentHash"=$1, version=2 WHERE id=$2', [tokenHash("changed"), a.row.id], "23514");
 });
-test("synthetic database evidence rejects sandbox receipts, forged event facts and reused event IDs", async () => {
+test("synthetic database evidence accepts sandbox receipts and still rejects forged event facts and reused event IDs", async () => {
+  // local 공급자는 sandbox에서만 동작하므로 영수증 environment 제약은 sandbox도 허용한다(20261008000000).
+  // 위조 이벤트 사실·재사용 eventId·이벤트 불변성은 그대로 강제된다.
   const f = await fixture(), a = await syntheticEvidence(f, "sandbox");
-  await expect(db.verificationReceipt.create({ data: a.receipt })).rejects.toBeTruthy();
+  const sandboxReceipt = await db.verificationReceipt.create({ data: a.receipt });
+  expect(sandboxReceipt.environment).toBe("sandbox");
   await expect(db.verificationEvent.create({ data: { ...a.event, id: randomUUID() } })).rejects.toMatchObject({ code: "P2002" });
   await expect(db.verificationEvent.create({ data: { ...a.event, id: randomUUID(), providerEventHash: tokenHash(randomUUID()), signatureValid: false } })).rejects.toBeTruthy();
   await sqlRejected('UPDATE "VerificationEvent" SET "bodyHash"=$1 WHERE id=$2', [tokenHash("changed"), a.event.id], "23514");

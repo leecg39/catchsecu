@@ -1,6 +1,8 @@
 import { route, json, body, fail, rateLimit } from "@/server/http";
 import { publicForm, submitForm } from "@/server/submissions";
 import { submissionInput } from "@/contracts/domains";
+import { verificationCallbackInput, verificationChallengeInput } from "@/contracts/verification";
+import { completeVerification, issueVerificationChallenge } from "@/server/verification-flow";
 import { tokenHash } from "@/server/crypto";
 import { publicUploadInput } from "@/contracts/files";
 import { initPublicUpload } from "@/server/files";
@@ -21,6 +23,15 @@ export const POST = route(async (request, requestId) => {
     await rateLimit("public:upload:" + tokenHash(token), 30);
     const result = await initPublicUpload(token, await body(request, publicUploadInput), request.headers.get("idempotency-key"), requestId);
     return json(result.body, result.status);
+  }
+  if (action === "verification") {
+    await rateLimit("public:verify:" + tokenHash(token), 30);
+    const input = await body(request, verificationChallengeInput);
+    return json(await issueVerificationChallenge(token, input.kind, requestId), 201);
+  }
+  if (action === "verification-callback") {
+    await rateLimit("public:verify-callback:" + tokenHash(token), 30);
+    return json(await completeVerification(token, await body(request, verificationCallbackInput), requestId));
   }
   if (action !== "submissions") fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   await rateLimit("public:submit:" + tokenHash(token), 120);

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { checkSubjectQuestions } from "./subjects";
 import { questionSchema, answersSchema, validateQuestionDefinitions } from "./questions";
 import { formDocumentSelections } from "./form-documents";
+import { submissionVerification } from "./verification";
 
 export { questionSchema } from "./questions";
 export const formContentSchema = z.object({
@@ -28,6 +29,7 @@ export const submissionInput = z.object({
   consent: z.boolean(), marketingConsent: z.boolean().optional(),
   documentConsents: z.array(z.uuid()).max(10).refine(value => new Set(value).size === value.length, "동의 항목이 중복되었습니다.").optional(),
   attachments: z.record(z.uuid(), z.object({ fileId: z.uuid(), token: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict()).optional(),
+  verification: submissionVerification.optional(),
 }).strict();
 export const fileInput = z.object({
   name: z.string().trim().min(1).max(200)

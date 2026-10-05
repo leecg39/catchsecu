@@ -17,6 +17,7 @@ import { cleanupSubjectAccess } from "../src/server/subjects";
 import { expireTrials } from "../src/server/subscription-worker";
 import { expireExpertAssignments } from "../src/server/expert-assignments";
 import { cleanupExpiredExports, runOneExport } from "../src/server/exports";
+import { cleanupVerification } from "../src/server/verification-flow";
 
 const workerId = randomUUID();
 let stopped = false;
@@ -40,6 +41,8 @@ async function main() {
       const businessCleanup = await cleanupBusinessFiles();
       if (businessCleanup.deleted || businessCleanup.retry) console.info("사업자등록증 정리", businessCleanup);
       const expired = await expireIdempotencyResponses();
+      const verification = await cleanupVerification();
+      if (verification.expired) console.info("인증 요청 정리", verification);
       const expiredTrials = await expireTrials();
       const expiredExperts = await expireExpertAssignments();
       const destruction = await enqueueExpiredSubmissions();
