@@ -20,6 +20,7 @@ const schema = z.object({
   LOCAL_SMS_DIR: z.string().default(".local/sms"),
   SMS_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),
   KAKAO_PROVIDER: z.enum(["unconfigured", "local"]).default("unconfigured"),
+  KAKAO_UNIT_COST_KRW: z.coerce.number().int().min(0).max(1000000).default(0),
   LOCAL_KAKAO_DIR: z.string().default(".local/kakao"),
   KAKAO_REVIEW_SECRET: z.string().min(32).max(128).optional(),
   PAYMENT_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),

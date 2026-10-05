@@ -49,14 +49,14 @@ export async function campaignDto(tx: Transaction, row: Campaign, detail = false
   const grouped = await tx.campaignDelivery.groupBy({ by: ["status"], where: { campaignId: row.id }, _count: true });
   const counts = Object.fromEntries(grouped.map(g => [g.status, g._count]));
   const creator = await tx.membership.findUniqueOrThrow({ where: { tenantId_userId: { tenantId: row.tenantId, userId: row.creatorId } }, select: { user: { select: { name: true } } } });
-  return { id: row.id, serviceId: row.serviceId, channel: row.channel as "email" | "sms", source: row.source as "direct" | "form", title: row.title, content: detail && row.contentCipher && row.expiresAt > new Date() ? decrypt<CampaignContent>(row.contentCipher) : null,
+  return { id: row.id, serviceId: row.serviceId, channel: row.channel as CampaignRecord["channel"], source: row.source as "direct" | "form", title: row.title, content: detail && row.contentCipher && row.expiresAt > new Date() ? decrypt<CampaignContent>(row.contentCipher) : null,
     files: detail && row.expiresAt > new Date() && row.status !== "deleted" ? (await tx.fileObject.findMany({ where: { campaignId: row.id, status: { not: "deleted" } }, orderBy: { createdAt: "asc" } })).map(fileInfo) : [],
-    status: row.expiresAt <= new Date() ? "expired" : row.status, senderId: row.senderId, senderVersion: row.senderVersion, messageTemplateId: row.messageTemplateId, messageTemplateVersion: row.messageTemplateVersion, version: row.version,
+    status: row.expiresAt <= new Date() ? "expired" : row.status, senderId: row.senderId, senderVersion: row.senderVersion, kakaoTemplateId: row.kakaoTemplateId, kakaoTemplateVersion: row.kakaoTemplateVersion, messageTemplateId: row.messageTemplateId, messageTemplateVersion: row.messageTemplateVersion, version: row.version,
     scheduledAt: row.scheduledAt?.toISOString() ?? null, requestedAt: row.requestedAt?.toISOString() ?? null, completedAt: row.completedAt?.toISOString() ?? null, archivedAt: row.archivedAt?.toISOString() ?? null,
     expiresAt: row.expiresAt.toISOString(), createdAt: row.createdAt.toISOString(), updatedAt: row.updatedAt.toISOString(), creator: creator.user.name, total: grouped.reduce((n, g) => n + g._count, 0), counts,
     ...(detail ? { events: (await tx.campaignEvent.findMany({ where: { campaignId: row.id }, orderBy: { version: "desc" }, take: 100 })).map(e => ({ version: e.version, kind: e.kind, createdAt: e.createdAt.toISOString() })) } : {}) };
 }
-export function normalizedTarget(channel: "email" | "sms", input: string) {
+export function normalizedTarget(channel: "email" | "sms" | "kakao", input: string) {
   try { const contact = normalizeMarketingContact(channel, input); return { contact, hash: marketingContactHash(channel, contact), valid: true }; }
   catch { return { contact: input.trim(), hash: tokenHash("campaign-invalid:" + channel + ":" + input.trim()), valid: false }; }
 }
@@ -74,7 +74,7 @@ export async function lockCampaignConsents(tx: Transaction, row: Pick<Campaign, 
 export const renderCampaign = renderMessageContent;
 export async function evaluateRecipient(tx: Transaction, row: CampaignDelivery, campaign: Campaign, consent?: Consent, snapshot = false) {
   if (row.erasedAt || !row.contactCipher) return { reason: "DATA_ERASED", contact: null, consent: null, content: null };
-  const stored = decrypt<RecipientContact>(row.contactCipher), target = normalizedTarget(campaign.channel as "email" | "sms", stored.contact);
+  const stored = decrypt<RecipientContact>(row.contactCipher), target = normalizedTarget(campaign.channel as "email" | "sms" | "kakao", stored.contact);
   if (!target.valid) return { reason: "INVALID_CONTACT", contact: stored, consent: null, content: null };
   if (!consent?.contactCipher) return { reason: "CONSENT_REQUIRED", contact: stored, consent: null, content: null };
   if (snapshot && (row.preferenceId !== consent.id || row.preferenceVersion !== consent.version || row.sourceSubmissionId !== consent.sourceSubmissionId))

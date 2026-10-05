@@ -19,7 +19,15 @@ function validateTime(row: Campaign, at: string | null) {
   if (date >= row.expiresAt) fail(422, "SCHEDULE_EXPIRED", "캠페인 보관 기한 이전으로 예약해주세요.");
   return date;
 }
-function requireTransport(row: Campaign, sender: Sender | null, at: Date, snapshot = false) {
+async function requireTransport(tx: Transaction, row: Campaign, sender: Sender | null, at: Date, snapshot = false) {
+  if (row.channel === "kakao") {
+    if (env.KAKAO_PROVIDER !== "local") fail(503, "KAKAO_PROVIDER_REQUIRED", "알림톡 발송 공급자를 연결한 뒤 발송할 수 있습니다.");
+    const template = row.kakaoTemplateId
+      ? await tx.kakaoTemplate.findFirst({ where: { id: row.kakaoTemplateId, tenantId: row.tenantId }, include: { channel: true } }) : null;
+    if (!template || template.status !== "approved" || template.channel.status !== "verified" || template.version !== row.kakaoTemplateVersion)
+      fail(409, "TEMPLATE_UNAVAILABLE", "승인된 알림톡 템플릿과 확인된 채널이 필요합니다. 템플릿이 수정되면 내용 저장으로 다시 연결해주세요.");
+    return;
+  }
   if (row.channel === "sms") {
     if (env.SMS_TRANSPORT === "solapi" ? !solapiConfigured(row.tenantId) : env.SMS_TRANSPORT !== "local") fail(503, "SMS_PROVIDER_REQUIRED", "문자 전송·요금 공급자를 연결한 뒤 발송할 수 있습니다.");
   } else if (env.MAIL_TRANSPORT !== "local" && !env.SMTP_HOST) fail(503, "SMTP_REQUIRED", "SMTP 연결 설정이 필요합니다.");
@@ -30,12 +38,12 @@ async function enqueue(tx: Transaction, campaign: Campaign, rows: CampaignDelive
   await tx.job.createMany({ data: rows.map(row => ({ type: campaign.mailProtocol, tenantId: row.tenantId, senderId: campaign.senderId,
     campaignDeliveryId: row.id, marketingPreferenceId: row.preferenceId, marketingSubmissionId: row.sourceSubmissionId,
     dedupeKey: "campaign:" + row.id + ":" + row.attempt, dueAt,
-    payloadCipher: encrypt({ campaignId: campaign.id, deliveryId: row.id, attempt: row.attempt, transport: campaign.channel === "sms" ? env.SMS_TRANSPORT === "solapi" ? "sms-solapi" : "sms-local" : env.MAIL_TRANSPORT, ...(campaign.channel === "sms" ? { unitCost: env.MESSAGE_UNIT_COST_KRW } : {}) }) })) });
+    payloadCipher: encrypt({ campaignId: campaign.id, deliveryId: row.id, attempt: row.attempt, transport: campaign.channel === "sms" ? env.SMS_TRANSPORT === "solapi" ? "sms-solapi" : "sms-local" : campaign.channel === "kakao" ? "kakao-local" : env.MAIL_TRANSPORT, ...(campaign.channel === "sms" ? { unitCost: env.MESSAGE_UNIT_COST_KRW } : {}), ...(campaign.channel === "kakao" ? { unitCost: env.KAKAO_UNIT_COST_KRW } : {}) }) })) });
 }
 export async function scheduleCampaign(ctx: Context, id: string, input: z.infer<typeof campaignSchedule>, key: string | null, requestId: string) {
   return idempotent("campaign:schedule:" + ctx.member.id + ":" + id, key, input, async tx => {
     const { row, sender, evaluations } = await prepareCampaign(tx, ctx, id, input.version, "message.send");
-    campaignDraft(row, input.version); const attachments = await readCampaignAttachments(tx, row, false); const dueAt = validateTime(row, input.at); requireTransport(row, sender, dueAt);
+    campaignDraft(row, input.version); const attachments = await readCampaignAttachments(tx, row, false); const dueAt = validateTime(row, input.at); await requireTransport(tx, row, sender, dueAt);
     const checked = evaluations.map(e => ({ ...e, reason: e.reason ?? (e.consent!.sourceSubmission.retentionUntil <= dueAt ? "SOURCE_UNAVAILABLE" : null) }));
     const eligible = checked.filter(e => !e.reason);
     if (!eligible.length) fail(422, "NO_ELIGIBLE_RECIPIENTS", "발송 가능한 수신자가 없습니다.");
@@ -47,7 +55,7 @@ export async function scheduleCampaign(ctx: Context, id: string, input: z.infer<
         { ...recipientBinding(item.consent), contactCipher: encrypt(item.contact), status: "queued", reason: null, attempt: { increment: 1 } } });
       if (!item.reason) pending.push(saved);
     }
-    const saved = await changeCampaign(tx, row, { attachmentSnapshot: attachments.snapshot, mailProtocol: CAMPAIGN_MAIL_JOB_TYPE, status: "scheduled", requesterId: ctx.user.id, requestedAt: new Date(), scheduledAt: dueAt, senderVersion: sender!.version }, "scheduled", ctx, requestId);
+    const saved = await changeCampaign(tx, row, { attachmentSnapshot: attachments.snapshot, mailProtocol: CAMPAIGN_MAIL_JOB_TYPE, status: "scheduled", requesterId: ctx.user.id, requestedAt: new Date(), scheduledAt: dueAt, senderVersion: sender?.version ?? null }, "scheduled", ctx, requestId);
     await enqueue(tx, saved, pending, dueAt);
     return { status: 202, body: { id, version: saved.version, queued: pending.length, excluded: checked.length - pending.length } };
   }, async tx => { await locateCampaign(tx, ctx, id, "message.send"); });
@@ -58,7 +66,7 @@ export async function rescheduleCampaign(ctx: Context, id: string, input: z.infe
     if (row.status !== "scheduled" || row.archivedAt || evaluations.some(e => !["queued", "excluded", "cancelled"].includes(e.row.status)))
       fail(409, "RESCHEDULE_UNAVAILABLE", "처리가 시작되기 전 예약만 변경할 수 있습니다.");
     await readCampaignAttachments(tx, row);
-    const dueAt = validateTime(row, input.at); requireTransport(row, sender, dueAt, true);
+    const dueAt = validateTime(row, input.at); await requireTransport(tx, row, sender, dueAt, true);
     const pending = evaluations.filter(e => e.row.status === "queued");
     if (!pending.length || pending.some(e => e.reason || e.consent!.sourceSubmission.retentionUntil <= dueAt)) fail(409, "RECIPIENT_CHANGED", "수신 근거가 변경되었습니다. 예약을 취소하고 대상을 다시 확인해주세요.");
     await tx.job.updateMany({ where: { campaignDeliveryId: { in: pending.map(e => e.row.id) }, status: { in: ["queued", "retry", "leased"] } }, data: { dueAt, status: "queued", leaseOwner: null, leaseUntil: null } });
@@ -93,7 +101,7 @@ export async function retryCampaign(ctx: Context, id: string, input: z.infer<typ
     const { row, sender, evaluations } = await prepareCampaign(tx, ctx, id, input.version, "message.send");
     if (!["failed", "partial_failed"].includes(row.status) || row.archivedAt) fail(409, "RETRY_UNAVAILABLE", "보관하지 않은 실패 건만 다시 요청할 수 있습니다.");
     await readCampaignAttachments(tx, row);
-    const at = new Date(); requireTransport(row, sender, at, true);
+    const at = new Date(); await requireTransport(tx, row, sender, at, true);
     const ids = [...new Set(input.ids)], selected = evaluations.filter(e => ids.includes(e.row.id));
     if (selected.length !== ids.length) fail(404, "TARGET_NOT_FOUND", "수신자를 찾을 수 없습니다.");
     if (selected.some(e => e.row.status !== "failed" || e.reason || e.row.attempt >= 5)) fail(409, "RETRY_UNAVAILABLE", "동일한 동의·발신자를 유지한 실패 건만 최대 5회 요청할 수 있습니다. 접수 여부가 불확실한 건은 재전송할 수 없습니다.");

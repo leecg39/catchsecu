@@ -25,7 +25,7 @@ export const formInput = z.object({
 }).strict();
 export const submissionInput = z.object({
   answers: answersSchema,
-  marketingChannels: z.array(marketingChannel).max(2).refine(v => new Set(v).size === v.length).optional(),
+  marketingChannels: z.array(marketingChannel).max(3).refine(v => new Set(v).size === v.length).optional(),
   consent: z.boolean(), marketingConsent: z.boolean().optional(),
   documentConsents: z.array(z.uuid()).max(10).refine(value => new Set(value).size === value.length, "동의 항목이 중복되었습니다.").optional(),
   attachments: z.record(z.uuid(), z.object({ fileId: z.uuid(), token: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict()).optional(),
@@ -50,7 +50,7 @@ export { documentInput } from "./documents";
 export function validateFormForPublish(content: z.infer<typeof formContentSchema>) {
   checkSubjectQuestions(content.questions, true);
   validateMarketingConfig(content.marketing, content.questions);
-  validateQuestionDefinitions(content.questions, true, content.marketing ? [content.marketing.nameQuestionId, content.marketing.emailQuestionId, content.marketing.smsQuestionId].filter((id): id is string => !!id) : []);
+  validateQuestionDefinitions(content.questions, true, content.marketing ? [content.marketing.nameQuestionId, content.marketing.emailQuestionId, content.marketing.smsQuestionId, content.marketing.kakaoQuestionId].filter((id): id is string => !!id) : []);
   const ids = new Set<string>();
   for (const question of content.questions) {
     if (ids.has(question.id)) throw new Error("질문 ID가 중복되었습니다.");

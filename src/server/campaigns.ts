@@ -18,15 +18,28 @@ import { normalizeMessageContent } from "./message-content";
 const iso = (value: Date) => value.toISOString();
 async function senderChoice(tx: Transaction, tenantId: string, serviceId: string, channel: string, id: string | null) {
   if (!id) return;
+  if (channel === "kakao") fail(422, "SENDER_NOT_ALLOWED", "알림톡은 발신자 대신 승인된 템플릿을 사용합니다.");
   const sender = await tx.sender.findFirst({ where: { id, tenantId, serviceId, channel, status: { not: "deleted" } } });
   if (!sender) fail(404, "SENDER_NOT_FOUND", "현재 서비스의 발신자를 선택해주세요.");
+}
+/** 알림톡 캠페인의 템플릿 바인딩. 바인딩 시점의 템플릿 버전을 함께 저장해 이후 수정은 재바인딩을 요구한다. */
+async function kakaoTemplateChoice(tx: Transaction, tenantId: string, serviceId: string, channel: string, id: string | null) {
+  if (channel !== "kakao") {
+    if (id) fail(422, "TEMPLATE_NOT_ALLOWED", "알림톡 템플릿은 알림톡 채널에서만 선택할 수 있습니다.");
+    return { kakaoTemplateId: null, kakaoTemplateVersion: null };
+  }
+  if (!id) return { kakaoTemplateId: null, kakaoTemplateVersion: null };
+  const template = await tx.kakaoTemplate.findFirst({ where: { id, tenantId, serviceId, status: { not: "archived" } } });
+  if (!template) fail(404, "TEMPLATE_NOT_FOUND", "현재 서비스의 알림톡 템플릿을 선택해주세요.");
+  return { kakaoTemplateId: template.id, kakaoTemplateVersion: template.version };
 }
 export async function createCampaign(ctx: Context, input: z.infer<typeof campaignCreate>, key: string | null, requestId: string) {
   return idempotent("campaign:create:" + ctx.member.id, key, input, async tx => {
     await campaignScope(tx, ctx, input.serviceId, ["message.manage"], true);
     await senderChoice(tx, ctx.tenantId, input.serviceId, input.channel, input.senderId);
+    const kakao = await kakaoTemplateChoice(tx, ctx.tenantId, input.serviceId, input.channel, input.kakaoTemplateId);
     const row = await tx.campaign.create({ data: { tenantId: ctx.tenantId, serviceId: input.serviceId, creatorId: ctx.user.id, channel: input.channel, source: input.source,
-      title: input.title, contentCipher: encrypt(normalizeMessageContent(input.content, input.channel)), senderId: input.senderId, expiresAt: new Date(Date.now() + 30 * 86400000) } });
+      title: input.title, contentCipher: encrypt(normalizeMessageContent(input.content, input.channel)), senderId: input.channel === "kakao" ? null : input.senderId, ...kakao, expiresAt: new Date(Date.now() + 30 * 86400000) } });
     await campaignEvent(tx, row, "created", ctx.user.id); await audit(tx, ctx, requestId, "campaign.created", "campaign", row.id, [], row.serviceId);
     return { status: 201, body: { id: row.id, version: row.version } };
   }, tx => campaignScope(tx, ctx, input.serviceId, ["message.manage"], true));
@@ -52,7 +65,8 @@ export async function updateCampaign(ctx: Context, id: string, input: z.infer<ty
   return db.$transaction(async tx => {
     await locateCampaign(tx, ctx, id, "message.manage"); const row = await lockCampaign(tx, id); campaignDraft(row, input.version);
     await senderChoice(tx, ctx.tenantId, row.serviceId, row.channel, input.senderId);
-    const saved = await changeCampaign(tx, row, { title: input.title, senderId: input.senderId, mailProtocol: CAMPAIGN_MAIL_JOB_TYPE, messageTemplateId: null, messageTemplateVersion: null, contentCipher: encrypt(normalizeMessageContent(input.content, row.channel)) }, "updated", ctx, requestId);
+    const kakao = await kakaoTemplateChoice(tx, ctx.tenantId, row.serviceId, row.channel, input.kakaoTemplateId);
+    const saved = await changeCampaign(tx, row, { title: input.title, senderId: row.channel === "kakao" ? null : input.senderId, ...kakao, mailProtocol: CAMPAIGN_MAIL_JOB_TYPE, messageTemplateId: null, messageTemplateVersion: null, contentCipher: encrypt(normalizeMessageContent(input.content, row.channel)) }, "updated", ctx, requestId);
     return { id, version: saved.version };
   });
 }
@@ -146,8 +160,16 @@ export async function previewCampaign(ctx: Context, id: string, version: number,
     const { row, sender, evaluations } = await prepareCampaign(tx, ctx, id, version);
     let attachmentReason: string | null = null;
     try { await readCampaignAttachments(tx, row, row.status !== "draft"); } catch (error) { attachmentReason = error instanceof HttpError ? error.message : "첨부파일을 읽을 수 없습니다. 파일을 다시 확인해주세요."; }
-    const senderReason = sender ? senderDenial(sender) : "발신자를 선택해주세요.";
-    const transportReason = row.channel === "sms" ? "문자 전송·요금 공급자를 연결한 뒤 발송할 수 있습니다." : env.MAIL_TRANSPORT !== "local" && !env.SMTP_HOST ? "SMTP 연결 설정이 필요합니다." : null;
+    const kakaoTemplate = row.channel === "kakao" && row.kakaoTemplateId
+      ? await tx.kakaoTemplate.findFirst({ where: { id: row.kakaoTemplateId, tenantId: row.tenantId }, include: { channel: true } }) : null;
+    const senderReason = row.channel === "kakao"
+      ? !kakaoTemplate ? "알림톡 템플릿을 선택해주세요."
+        : kakaoTemplate.status !== "approved" || kakaoTemplate.channel.status !== "verified" ? "승인된 알림톡 템플릿과 확인된 채널이 필요합니다."
+        : kakaoTemplate.version !== row.kakaoTemplateVersion ? "템플릿이 수정되었습니다. 내용 저장으로 다시 연결해주세요." : null
+      : sender ? senderDenial(sender) : "발신자를 선택해주세요.";
+    const transportReason = row.channel === "sms" ? "문자 전송·요금 공급자를 연결한 뒤 발송할 수 있습니다."
+      : row.channel === "kakao" ? (env.KAKAO_PROVIDER !== "local" ? "알림톡 발송 공급자를 연결한 뒤 발송할 수 있습니다." : null)
+      : env.MAIL_TRANSPORT !== "local" && !env.SMTP_HOST ? "SMTP 연결 설정이 필요합니다." : null;
     await audit(tx, ctx, requestId, "campaign.previewed", "campaign", id, [], row.serviceId);
     const sample = evaluations.find(e => !e.reason)?.content ?? null, content = decrypt<CampaignContent>(row.contentCipher!);
     return { campaignId: id, version: row.version, total: evaluations.length, eligible: evaluations.filter(e => !e.reason).length, excluded: evaluations.filter(e => e.reason).length,

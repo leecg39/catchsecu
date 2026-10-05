@@ -132,9 +132,10 @@ function ResponseForm({ data, token }: { data: PublicFormData; token: string }) 
         <p>{content.consentRequired ? data.consentBundle?.display?.requiredText : data.consentBundle?.display?.optionalText}</p>
         <label className="cs-row"><input type="checkbox" name="consent" required={content.consentRequired} />{content.consentRequired ? "[필수]" : "[선택]"} 개인정보 수집·이용에 동의합니다.</label>
       </section><ConsentDocuments bundle={data.consentBundle} selectable />
-      {content.marketing && <section className="public-consent"><h2>광고성 정보 수신동의 (선택)</h2><p><strong>마케팅 목적</strong><br />{content.marketing.purpose}</p><p>보유 및 이용 기간: 제출일로부터 {content.retentionDays}일 · 철회하면 발송이 중지됩니다.</p><p>동의하지 않아도 응답을 제출할 수 있습니다. 이메일과 문자를 각각 선택해주세요.</p>
+      {content.marketing && <section className="public-consent"><h2>광고성 정보 수신동의 (선택)</h2><p><strong>마케팅 목적</strong><br />{content.marketing.purpose}</p><p>보유 및 이용 기간: 제출일로부터 {content.retentionDays}일 · 철회하면 발송이 중지됩니다.</p><p>동의하지 않아도 응답을 제출할 수 있습니다. 채널을 각각 선택해주세요.</p>
         {content.marketing.emailQuestionId && <label className="cs-row"><input name="marketingChannels" type="checkbox" value="email" />[선택] 이메일 광고성 정보 수신에 동의합니다.</label>}
         {content.marketing.smsQuestionId && <label className="cs-row"><input name="marketingChannels" type="checkbox" value="sms" />[선택] 문자 광고성 정보 수신에 동의합니다.</label>}
+        {content.marketing.kakaoQuestionId && <label className="cs-row"><input name="marketingChannels" type="checkbox" value="kakao" />[선택] 알림톡 광고성 정보 수신에 동의합니다.</label>}
       </section>}</fieldset>
     {content.verify && <fieldset className="public-response-fields" disabled={busy || pending}>
       {verification ? <section className="public-consent"><h2>{verificationLabels[verification.kind].title}</h2><p role="status">{verificationLabels[verification.kind].done} ({verification.name})</p></section>

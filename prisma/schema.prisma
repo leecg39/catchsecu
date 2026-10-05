@@ -1912,6 +1912,7 @@ model KakaoTemplate {
   serviceId String
   channelId String
   channel KakaoChannel @relation(fields: [tenantId, channelId], references: [tenantId, id], onDelete: Restrict)
+  campaigns Campaign[]
   name String
   body String
   buttons Json
@@ -1956,6 +1957,9 @@ model Campaign {
   senderId String?
   sender Sender? @relation(fields: [tenantId, serviceId, senderId], references: [tenantId, serviceId, id], onDelete: Restrict)
   senderVersion Int?
+  kakaoTemplateId String?
+  kakaoTemplateVersion Int?
+  kakaoTemplate KakaoTemplate? @relation(fields: [tenantId, kakaoTemplateId], references: [tenantId, id], onDelete: Restrict)
   status String @default("draft")
   scheduledAt DateTime?
   requestedAt DateTime?

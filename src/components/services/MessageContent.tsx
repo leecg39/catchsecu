@@ -13,7 +13,7 @@ export function contentFromForm(values: FormData): MessageContent {
   const subject = String(values.get("subject") ?? ""), text = String(values.get("text") ?? "");
   return values.get("format") === "html" ? { format: "html", subject, text, html: String(values.get("html") ?? "") } : { format: "text", subject, text };
 }
-export function MessageContentFields({ channel, serviceId, initial }: { channel: "email" | "sms"; serviceId: string; initial?: MessageContent | null }) {
+export function MessageContentFields({ channel, serviceId, initial }: { channel: "email" | "sms" | "kakao"; serviceId: string; initial?: MessageContent | null }) {
   const [format, setFormat] = useState(initial?.format ?? "text"), [subject, setSubject] = useState(initial?.subject ?? ""), [text, setText] = useState(initial?.text ?? ""), [html, setHtml] = useState(initial?.format === "html" ? initial.html : "");
   const [preview, setPreview] = useState<{ content: MessageContent; sample: MessageContent | null; sanitized: boolean }>(), [busy, setBusy] = useState(false), [error, setError] = useState("");
   const content: MessageContent = format === "html" ? { format, subject, text, html } : { format, subject, text };

@@ -18,8 +18,9 @@ export async function eraseMarketingJobs(tx: Transaction, filter: { marketingSub
   return rows.length;
 }
 async function removeLocalCopy(id: string) {
-  try { await unlink(resolve(env.LOCAL_MAIL_DIR, id + ".json")); }
-  catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+  for (const dir of [env.LOCAL_MAIL_DIR, env.LOCAL_SMS_DIR, env.LOCAL_KAKAO_DIR])
+    try { await unlink(resolve(dir, id + ".json")); }
+    catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
 }
 /** SQL erasure commits first. A failed filesystem removal remains a durable, retryable record. */
 export async function cleanupMarketingLocalCopies(scope?: { tenantId: string; preferenceIds?: string[]; jobIds?: string[] }) {

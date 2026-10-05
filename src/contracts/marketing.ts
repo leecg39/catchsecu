@@ -1,15 +1,15 @@
 import { z } from "zod";
 import { normalizeSubjectEmail, normalizeSubjectName } from "./subjects";
-export const marketingChannel = z.enum(["email", "sms"]);
+export const marketingChannel = z.enum(["email", "sms", "kakao"]);
 export type MarketingChannel = z.infer<typeof marketingChannel>;
 export const marketingConfig = z.object({
   purpose: z.string().trim().min(1).max(3000), nameQuestionId: z.uuid(),
-  emailQuestionId: z.uuid().optional(), smsQuestionId: z.uuid().optional(),
-}).strict().refine(v => !!v.emailQuestionId || !!v.smsQuestionId, "하나 이상의 연락 채널을 선택해주세요.");
+  emailQuestionId: z.uuid().optional(), smsQuestionId: z.uuid().optional(), kakaoQuestionId: z.uuid().optional(),
+}).strict().refine(v => !!v.emailQuestionId || !!v.smsQuestionId || !!v.kakaoQuestionId, "하나 이상의 연락 채널을 선택해주세요.");
 export type MarketingConfig = z.infer<typeof marketingConfig>;
 export function validateMarketingConfig(config: MarketingConfig | null | undefined, questions: { id: string; type: string }[]) {
   if (!config) return;
-  const ids = [config.nameQuestionId, config.emailQuestionId, config.smsQuestionId].filter((v): v is string => !!v);
+  const ids = [config.nameQuestionId, config.emailQuestionId, config.smsQuestionId, config.kakaoQuestionId].filter((v): v is string => !!v);
   if (new Set(ids).size !== ids.length || ids.some(id => !questions.some(q => q.id === id && ["단문형 답변", "장문형 답변"].includes(q.type))))
     throw new Error("마케팅 이름과 연락처를 서로 다른 텍스트 질문에 지정해주세요.");
 }

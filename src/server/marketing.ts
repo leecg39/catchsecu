@@ -15,7 +15,7 @@ import { idempotent } from "./idempotency";
 import { analyticsPeriod } from "./analytics-period";
 
 export function marketingContactHash(channel: MarketingChannel, contact: string) {
-  return tokenHash((channel === "email" ? "subject:email:" : "marketing:sms:") + normalizeMarketingContact(channel, contact));
+  return tokenHash((channel === "email" ? "subject:email:" : "marketing:" + channel + ":") + normalizeMarketingContact(channel, contact));
 }
 const nameHash = (name: string) => tokenHash("subject:name:" + normalizeMarketingName(name));
 export async function lockMarketingContact(tx: Transaction, row: Pick<MarketingPreference, "tenantId" | "serviceId" | "channel" | "contactHash">) {
@@ -200,7 +200,7 @@ export async function collectMarketing(tx: Transaction, source: { id: string; te
   if (!channels.length) return;
   const config: MarketingConfig = marketingConfig.parse(raw);
   for (const channel of [...channels].sort()) {
-    const contactQuestionId = channel === "email" ? config.emailQuestionId : config.smsQuestionId;
+    const contactQuestionId = channel === "email" ? config.emailQuestionId : channel === "sms" ? config.smsQuestionId : config.kakaoQuestionId;
     if (!contactQuestionId) fail(422, "MARKETING_CHANNEL", "선택한 채널의 마케팅 동의 항목이 없습니다.");
     const result = await grantMarketing(tx, { tenantId: source.tenantId, serviceId, submissionId: source.id, channel, nameQuestionId: config.nameQuestionId, contactQuestionId,
       grantedAt: new Date(), purpose: config.purpose, reference: "공개 폼의 채널별 선택 동의", sourceKind: "form" });

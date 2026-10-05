@@ -5,7 +5,7 @@ import { body, json, rateLimit, route } from "@/server/http";
 import { db } from "@/server/db";
 import { campaignScope } from "@/server/campaign-common";
 import { normalizeMessageContent, renderMessageContent } from "@/server/message-content";
-const input = z.object({ serviceId: z.uuid(), channel: z.enum(["email", "sms"]), content: messageContent }).strict();
+const input = z.object({ serviceId: z.uuid(), channel: z.enum(["email", "sms", "kakao"]), content: messageContent }).strict();
 export const POST = route(async request => {
   const ctx = await requireContext(request.headers, "message.manage"), value = await body(request, input);
   await rateLimit("message-content:preview:" + ctx.member.id, 30);

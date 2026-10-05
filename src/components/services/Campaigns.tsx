@@ -6,6 +6,7 @@ import { api, errorText, useResource } from "@/lib/api";
 import { campaignStatuses, deliveryStatuses, deliveryReasons, type CampaignRecord, type CampaignPreview, type DeliveryRecord } from "@/contracts/campaigns";
 import type { Paged } from "@/contracts/forms";
 import type { SenderRecord } from "@/contracts/senders";
+import type { KakaoTemplateRecord } from "@/contracts/kakao";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
 import { RemoteTable } from "../RemoteTable";
@@ -15,23 +16,24 @@ import { CampaignFiles } from "./CampaignFiles";
 import { MessageContentFields, SavedMessage, contentFromForm } from "./MessageContent";
 import { MessageTemplateLibrary } from "./MessageTemplates";
 import "./campaigns.css";
-type Channel = "email" | "sms";
+type Channel = "email" | "sms" | "kakao";
 const when = (v: string | null) => v ? new Date(v).toLocaleString("ko-KR") : "—";
-const base = (channel: Channel) => channel === "email" ? "/mail" : "/sms";
+const base = (channel: Channel) => channel === "email" ? "/mail" : channel === "sms" ? "/sms" : "/alimtalk";
+const channelNames: Record<Channel, string> = { email: "이메일", sms: "문자", kakao: "알림톡" };
 const recordPath = (r: CampaignRecord) => base(r.channel) + (r.source === "form" ? "/catchform" : "/direct") + "?campaignId=" + r.id;
 const eventLabels: Record<string, string> = { created: "초안 생성", updated: "내용 변경", recipients_replaced: "대상 변경", scheduled: "발송 요청", rescheduled: "예약 변경", dispatching: "처리 시작", settled: "처리 종료", cancelled: "발송 취소", retry_requested: "실패 건 재처리 요청", archived: "보관", unarchived: "보관 해제", deleted: "초안 삭제", expired: "원문 보관 종료", template_applied: "템플릿 적용", file_attached: "첨부 연결", file_removed: "첨부 삭제" };
 function useRequestKey() {
   const current = useRef<{ signature: string; key: string } | null>(null);
   return (signature: string) => { if (current.current?.signature !== signature) current.current = { signature, key: crypto.randomUUID() }; return current.current.key; };
 }
-export function CampaignPage({ email, source = "direct", history = false }: { email: boolean; source?: "direct" | "form"; history?: boolean }) {
-  const app = useApplication(), params = useSearchParams(), id = params.get("campaignId"), templateView = params.get("view") === "templates", suppressionView = email && params.get("view") === "suppression", channel = email ? "email" : "sms";
+export function CampaignPage({ channel, source = "direct", history = false }: { channel: Channel; source?: "direct" | "form"; history?: boolean }) {
+  const app = useApplication(), params = useSearchParams(), id = params.get("campaignId"), templateView = params.get("view") === "templates" && channel !== "kakao", suppressionView = channel === "email" && params.get("view") === "suppression";
   if (!app.data) return <Panel><p role="status">회사 정보를 불러오는 중입니다.</p></Panel>;
   if (!app.data.capabilities.includes("message.read")) return <Panel><p role="alert">발송 내역을 조회할 권한이 없습니다.</p></Panel>;
   if (!app.data.serviceId) return <Panel><p>서비스를 선택해주세요.</p></Panel>;
-  const scope = { serviceId: app.data.serviceId, channel: channel as Channel, canManage: app.data.capabilities.includes("message.manage"), canSend: app.data.capabilities.includes("message.send"), canTargets: app.data.capabilities.includes("marketing.read") };
+  const scope = { serviceId: app.data.serviceId, channel, canManage: app.data.capabilities.includes("message.manage"), canSend: app.data.capabilities.includes("message.send"), canTargets: app.data.capabilities.includes("marketing.read") };
   if (suppressionView) return <div className="campaign-page" key={scope.serviceId}><EmailSuppressions serviceId={scope.serviceId} canReadContacts={scope.canTargets} /></div>;
-  return <div className="campaign-page" key={scope.serviceId + channel + source + (id ?? "") + templateView}>{templateView ? <><PageHeading title="메시지 템플릿 관리" /><Link className="cs-link" href={base(scope.channel) + "/history"}>발송 내역으로</Link><MessageTemplateLibrary {...scope} /></> : <>{email && <Link className="cs-link" href="/mail/history?view=suppression">이메일 발송 차단</Link>}<Link className="cs-link" href={base(scope.channel) + "/history?view=templates"}>메시지 템플릿 관리</Link>{id ? <CampaignDetail id={id} {...scope} /> : history ? <CampaignHistory {...scope} /> : <CampaignNew {...scope} source={source} />}</>}</div>;
+  return <div className="campaign-page" key={scope.serviceId + channel + source + (id ?? "") + templateView}>{templateView ? <><PageHeading title="메시지 템플릿 관리" /><Link className="cs-link" href={base(scope.channel) + "/history"}>발송 내역으로</Link><MessageTemplateLibrary {...scope} channel={scope.channel === "kakao" ? "sms" : scope.channel} /></> : <>{channel === "email" && <Link className="cs-link" href="/mail/history?view=suppression">이메일 발송 차단</Link>}{channel !== "kakao" && <Link className="cs-link" href={base(scope.channel) + "/history?view=templates"}>메시지 템플릿 관리</Link>}{channel === "kakao" && <Link className="cs-link" href="/alimtalk/templates">알림톡 템플릿 관리</Link>}{id ? <CampaignDetail id={id} {...scope} /> : history ? <CampaignHistory {...scope} /> : <CampaignNew {...scope} source={source} />}</>}</div>;
 }
 type Scope = { serviceId: string; channel: Channel; canManage: boolean; canSend: boolean; canTargets: boolean };
 function CampaignHistory({ serviceId, channel, canManage }: Scope) {
@@ -41,7 +43,7 @@ function CampaignHistory({ serviceId, channel, canManage }: Scope) {
   if (from) params.set("from", new Date(from + "T00:00:00").toISOString());
   if (to) params.set("to", new Date(to + "T23:59:59.999").toISOString());
   const result = useResource<Paged<CampaignRecord>>("/campaigns?" + params);
-  return <><PageHeading title={channel === "email" ? "이메일 발송 내역" : "문자 발송 내역"}><p>초안부터 예약, 수신자별 처리 결과까지 확인합니다.</p></PageHeading>
+  return <><PageHeading title={channelNames[channel] + " 발송 내역"}><p>초안부터 예약, 수신자별 처리 결과까지 확인합니다.</p></PageHeading>
     <Panel><div className="campaign-toolbar"><h2>발송 목록</h2>{canManage && <div className="campaign-actions"><Link className="cs-button" href={base(channel) + "/direct"}>직접 입력 작성</Link><Link className="cs-button secondary" href={base(channel) + "/catchform"}>수집 자료에서 작성</Link></div>}</div>
       <form className="campaign-filters" onSubmit={e => { e.preventDefault(); setSearch(query); setPage(1); }}>
         <input className="cs-input" aria-label="캠페인 제목 검색" placeholder="캠페인 제목" value={query} onChange={e => setQuery(e.target.value)} maxLength={200} />
@@ -57,22 +59,31 @@ function CampaignHistory({ serviceId, channel, canManage }: Scope) {
 }
 function ContentFields({ record, channel, serviceId }: { record?: CampaignRecord; channel: Channel; serviceId: string }) {
   const [search, setSearch] = useState(""), [senderId, setSenderId] = useState(record?.senderId ?? "");
-  const senders = useResource<Paged<SenderRecord>>("/senders?" + new URLSearchParams({ serviceId, channel, pageSize: "100", search }));
-  const selected = useResource<SenderRecord>(senderId ? "/senders/" + senderId : null);
+  const senders = useResource<Paged<SenderRecord>>(channel === "kakao" ? null : "/senders?" + new URLSearchParams({ serviceId, channel, pageSize: "100", search }));
+  const selected = useResource<SenderRecord>(senderId && channel !== "kakao" ? "/senders/" + senderId : null);
+  const templates = useResource<{ items: KakaoTemplateRecord[] }>(channel === "kakao" ? "/kakao/templates?serviceId=" + serviceId : null);
+  const [templateId, setTemplateId] = useState(record?.kakaoTemplateId ?? "");
+  const templateLabels: Record<KakaoTemplateRecord["status"], string> = { draft: "초안", submitted: "심사 중", rejected: "반려", approved: "승인", archived: "보관" };
   return <><label>캠페인 이름<input className="cs-input" name="title" maxLength={200} required defaultValue={record?.title} placeholder="내역에서 구분할 이름" /></label>
-    <label>발신자 검색<input className="cs-input" aria-label="발신자 이름 검색" value={search} onChange={e => { e.stopPropagation(); setSearch(e.target.value); }} placeholder="발신자 이름 또는 정확한 주소·번호" /></label>
-    <label>발신자<select className="cs-input" name="senderId" value={senderId} onChange={e => setSenderId(e.target.value)}><option value="">나중에 선택</option>{senderId && !senders.data?.items.some(s => s.id === senderId) && <option value={senderId}>{selected.data ? selected.data.label + " · " + (selected.data.address ?? "원문 삭제") : "선택한 발신자"}</option>}{senders.data?.items.map(s => <option key={s.id} value={s.id}>{s.label} · {s.address} · {s.eligible ? "사용 가능" : "인증 필요"}</option>)}</select></label>
-    {(senders.data?.total ?? 0) > 100 && <p className="campaign-note">검색 결과 중 100개를 표시합니다. 검색어를 입력해 발신자를 찾으세요.</p>}
-    {senders.error && <p role="alert">{senders.error.message}</p>}<Link className="cs-link" href={base(channel) + "/number"}>발신자 등록·인증 관리</Link>
+    {channel === "kakao" ? <>
+      <label>알림톡 템플릿<select className="cs-input" name="kakaoTemplateId" value={templateId} onChange={e => setTemplateId(e.target.value)}><option value="">나중에 선택</option>{templateId && !templates.data?.items.some(t => t.id === templateId) && <option value={templateId}>선택한 템플릿</option>}{templates.data?.items.map(t => <option key={t.id} value={t.id}>{t.name} · v{t.version} · {templateLabels[t.status]}</option>)}</select></label>
+      {templates.error && <p role="alert">{templates.error.message}</p>}<Link className="cs-link" href="/alimtalk/templates">알림톡 템플릿 등록·심사 관리</Link>
+      <p className="campaign-note">발송에는 승인된 템플릿과 확인된 채널이 필요합니다. 저장하면 현재 템플릿 버전이 고정됩니다.</p>
+    </> : <>
+      <label>발신자 검색<input className="cs-input" aria-label="발신자 이름 검색" value={search} onChange={e => { e.stopPropagation(); setSearch(e.target.value); }} placeholder="발신자 이름 또는 정확한 주소·번호" /></label>
+      <label>발신자<select className="cs-input" name="senderId" value={senderId} onChange={e => setSenderId(e.target.value)}><option value="">나중에 선택</option>{senderId && !senders.data?.items.some(s => s.id === senderId) && <option value={senderId}>{selected.data ? selected.data.label + " · " + (selected.data.address ?? "원문 삭제") : "선택한 발신자"}</option>}{senders.data?.items.map(s => <option key={s.id} value={s.id}>{s.label} · {s.address} · {s.eligible ? "사용 가능" : "인증 필요"}</option>)}</select></label>
+      {(senders.data?.total ?? 0) > 100 && <p className="campaign-note">검색 결과 중 100개를 표시합니다. 검색어를 입력해 발신자를 찾으세요.</p>}
+      {senders.error && <p role="alert">{senders.error.message}</p>}<Link className="cs-link" href={base(channel) + "/number"}>발신자 등록·인증 관리</Link>
+    </>}
     <MessageContentFields channel={channel} serviceId={serviceId} initial={record?.content} />{channel === "email" && <p className="campaign-note">발송할 때 서비스별 수신거부 링크가 본문 하단에 자동으로 추가됩니다.</p>}</>;
 }
 function formContent(form: HTMLFormElement) {
-  const values = new FormData(form); return { title: values.get("title"), senderId: values.get("senderId") || null, content: contentFromForm(values) };
+  const values = new FormData(form); return { title: values.get("title"), senderId: values.get("senderId") || null, kakaoTemplateId: values.get("kakaoTemplateId") || null, content: contentFromForm(values) };
 }
 function CampaignNew({ serviceId, channel, canManage, source }: Scope & { source: "direct" | "form" }) {
   const router = useRouter(), requestKey = useRequestKey(), [busy, setBusy] = useState(false), [error, setError] = useState("");
   if (!canManage) return <Panel><p role="alert">캠페인을 작성할 권한이 없습니다.</p></Panel>;
-  return <><PageHeading title={channel === "email" ? "이메일 보내기" : "문자 보내기"}><p>{source === "form" ? "수집 자료의 동의 대상 선택" : "연락처 직접 입력·CSV"} · 내용 저장 후 수신자를 선택합니다.</p></PageHeading>
+  return <><PageHeading title={channelNames[channel] + " 보내기"}><p>{source === "form" ? "수집 자료의 동의 대상 선택" : "연락처 직접 입력·CSV"} · 내용 저장 후 수신자를 선택합니다.</p></PageHeading>
     <Panel title="1. 내용 작성"><form className="campaign-fields" onSubmit={async e => { e.preventDefault(); if (busy) return; const input = { serviceId, channel, source, ...formContent(e.currentTarget) }; setBusy(true); setError("");
       try { const saved = await api<{ id: string }>("/campaigns", { method: "POST", headers: { "Idempotency-Key": requestKey(JSON.stringify(input)) }, body: JSON.stringify(input) }); router.push(base(channel) + (source === "form" ? "/catchform" : "/direct") + "?campaignId=" + saved.id); }
       catch (error) { setError(errorText(error)); setBusy(false); } }}>
@@ -101,10 +112,10 @@ function CampaignBody({ record: r, refresh, canManage, canSend, canTargets, ...s
   return <><PageHeading title={r.title || "삭제된 초안"}><p>{campaignStatuses[r.status]} · 생성 {when(r.createdAt)} · 원문 보관 종료 {when(r.expiresAt)}</p></PageHeading>
     <div className="campaign-toolbar"><Link className="cs-link" href={base(r.channel) + "/history"}>발송 내역으로</Link><ActionButton secondary onClick={refresh} disabled={busy}>최신 상태 불러오기</ActionButton></div>
     {error && <p className="campaign-alert" role="alert">{error} 변경 충돌이면 최신 상태를 불러온 뒤 다시 확인해주세요.</p>}
-    <Panel title={draft ? "1. 내용 작성" : "발송 내용"}>{draft && canManage && <ActionButton secondary disabled={busy || dirtyContent || dirtyTargets} onClick={() => setShowTemplates(true)}>템플릿에서 내용 적용</ActionButton>}{r.messageTemplateId && <p className="campaign-note">템플릿 버전 {r.messageTemplateVersion}의 내용 사본입니다.</p>}{draft && canManage ? <form className="campaign-fields" onChange={() => { setDirtyContent(true); setPreview(undefined); }} onSubmit={e => { e.preventDefault(); change("", formContent(e.currentTarget), "PATCH"); }}><fieldset className="campaign-fields" disabled={busy}><ContentFields record={r} channel={r.channel} serviceId={r.serviceId} /><ActionButton secondary>내용 저장</ActionButton></fieldset></form> :
+    <Panel title={draft ? "1. 내용 작성" : "발송 내용"}>{draft && canManage && r.channel !== "kakao" && <ActionButton secondary disabled={busy || dirtyContent || dirtyTargets} onClick={() => setShowTemplates(true)}>템플릿에서 내용 적용</ActionButton>}{r.messageTemplateId && <p className="campaign-note">템플릿 버전 {r.messageTemplateVersion}의 내용 사본입니다.</p>}{draft && canManage ? <form className="campaign-fields" onChange={() => { setDirtyContent(true); setPreview(undefined); }} onSubmit={e => { e.preventDefault(); change("", formContent(e.currentTarget), "PATCH"); }}><fieldset className="campaign-fields" disabled={busy}><ContentFields record={r} channel={r.channel} serviceId={r.serviceId} /><ActionButton secondary>내용 저장</ActionButton></fieldset></form> :
       r.content ? <SavedMessage content={r.content} /> : <p>보관된 원문이 없습니다.</p>}</Panel>
     {r.channel === "email" && r.content && <CampaignFiles record={r} editable={draft && canManage && !dirtyContent && !dirtyTargets} onChanged={refresh} onBusy={value => { setBusy(value); if (value) setPreview(undefined); }} />}
-    {showTemplates && <Modal title="템플릿에서 내용 적용" onClose={() => setShowTemplates(false)}><MessageTemplateLibrary serviceId={r.serviceId} channel={r.channel} canManage={false} onApply={async (templateId, templateVersion) => { setBusy(true); try { await api("/campaigns/" + r.id + "/apply-template", { method: "POST", body: JSON.stringify({ version: r.version, templateId, templateVersion }) }); setShowTemplates(false); refresh(); } finally { setBusy(false); } }} /></Modal>}
+    {showTemplates && r.channel !== "kakao" && <Modal title="템플릿에서 내용 적용" onClose={() => setShowTemplates(false)}><MessageTemplateLibrary serviceId={r.serviceId} channel={r.channel} canManage={false} onApply={async (templateId, templateVersion) => { setBusy(true); try { await api("/campaigns/" + r.id + "/apply-template", { method: "POST", body: JSON.stringify({ version: r.version, templateId, templateVersion }) }); setShowTemplates(false); refresh(); } finally { setBusy(false); } }} /></Modal>}
     {draft && canManage && canTargets && <TargetsEditor record={r} busy={busy} onDirty={() => { setDirtyTargets(true); setPreview(undefined); }} onApply={input => change("recipients", input)} />}
     {canTargets && <RecipientResults record={r} canRetry={canSend && !r.archivedAt && ["failed", "partial_failed"].includes(r.status)} busy={busy} onRetry={ids => change("retry", { ids })} />}
     {draft && canManage && canTargets && <Panel title="3. 확인 후 발송"><div className="campaign-fields">
@@ -128,6 +139,7 @@ function CampaignBody({ record: r, refresh, canManage, canSend, canTargets, ...s
     <Panel title="변경 이력"><ol className="campaign-events">{r.events?.map(e => <li key={e.version}>{eventLabels[e.kind] ?? e.kind}<small>v{e.version} · {when(e.createdAt)}</small></li>)}</ol></Panel>
     {confirm && <Modal title={confirm === "delete" ? "초안 삭제" : "발송 취소"} onClose={() => { if (!busy) setConfirm(undefined); }}><div className="campaign-fields"><p>{confirm === "delete" ? "초안 내용·수신자 사본·첨부파일 원문을 삭제합니다." : "아직 전달되지 않은 예약을 취소합니다. 이미 접수된 메시지는 회수되지 않습니다."}</p><div className="campaign-actions"><ActionButton secondary disabled={busy} onClick={() => setConfirm(undefined)}>돌아가기</ActionButton><ActionButton disabled={busy} onClick={() => change(confirm === "delete" ? "" : "cancel", {}, confirm === "delete" ? "DELETE" : "POST")}>확인</ActionButton></div>{error && <p role="alert">{error}</p>}</div></Modal>}
     {scope.channel === "sms" && <p className="campaign-note">문자 전송·단가·잔액 공급자 연결 전에는 초안과 수신자 관리만 사용할 수 있습니다.</p>}
+    {scope.channel === "kakao" && <p className="campaign-note">알림톡은 승인된 템플릿과 확인된 채널이 필요합니다. 템플릿 내용이 수정되면 내용 저장으로 다시 연결해야 발송할 수 있습니다.</p>}
   </>;
 }
 type Source = { id: string; name: string; contact: string; sourceTitle: string; status: string; excluded: boolean; retentionUntil: string };

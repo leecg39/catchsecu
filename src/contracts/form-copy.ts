@@ -12,6 +12,7 @@ export function cloneFormContent(original: FormContent): FormContent {
     content.marketing.nameQuestionId = ids.get(content.marketing.nameQuestionId)!;
     if (content.marketing.emailQuestionId) content.marketing.emailQuestionId = ids.get(content.marketing.emailQuestionId)!;
     if (content.marketing.smsQuestionId) content.marketing.smsQuestionId = ids.get(content.marketing.smsQuestionId)!;
+    if (content.marketing.kakaoQuestionId) content.marketing.kakaoQuestionId = ids.get(content.marketing.kakaoQuestionId)!;
   }
   return content;
 }
