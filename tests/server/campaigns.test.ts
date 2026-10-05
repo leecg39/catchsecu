@@ -224,6 +224,17 @@ describe("persistent campaign CRUD, privacy and delivery", () => {
     const job = await jobFor(campaign.id); expect((await drain(job.id)).status).toBe("cancelled");
     expect((await deliveries(campaign.id)).items[0].reason).toBe("CONSENT_CHANGED"); await expect(access(resolve(env.LOCAL_MAIL_DIR, job.id + ".json"))).rejects.toThrow();
   });
+  test("mixed outcomes settle the campaign as partial_failed with per-recipient truth", async () => {
+    const first = await recipient(), second = await recipient();
+    const campaign = await targets(await create(), [first.contact, second.contact]); await schedule(campaign);
+    await ok(await marketingPost(req("/marketing/preferences/withdrawals", "POST", "owner", { serviceId: service, items: [{ id: second.pref.id, version: second.pref.version }] })));
+    const jobs = await db.job.findMany({ where: { campaignDelivery: { campaignId: campaign.id } } }); expect(jobs.length).toBe(2);
+    for (const job of jobs) await drain(job.id);
+    const rows = (await deliveries(campaign.id)).items.sort((a, b) => a.status.localeCompare(b.status));
+    expect(rows.map(row => row.status).sort()).toEqual(["cancelled", "local_delivered"]);
+    expect(rows.find(row => row.status === "cancelled")?.reason).toBe("CONSENT_CHANGED");
+    const final = await read(campaign.id); expect(final.status).toBe("partial_failed");
+  });
   test("re-including a contact cannot silently replace the scheduled consent version", async () => {
     const { target, campaign } = await ready(); await schedule(campaign);
     await ok(await marketingPatch(req("/marketing/preferences/" + target.pref.id, "PATCH", "owner", { version: 1, excluded: true })));

@@ -24,3 +24,13 @@ local SMS/LMS 처리와 서명 영수증 수신. 이번 소스 조사만으로 �
 ## 실제 공급자 발신번호 검증 (2026-10-04 추가)
 
 Solapi 실계정 HMAC 조회로 발신번호 ACTIVE 확인 + 미등록 번호 거부 실증(P08-T01 게이트 동일). 실제 메시지 전송·receipt webhook은 SMS_TRANSPORT 미구현으로 차단 — 구현 필요.
+
+## 부분성공(혼합 결과) 실측 (2026-10-06 추가)
+
+수신자별 독립 Job(`campaign:{deliveryId}:{attempt}`)으로 1건 성공·1건 철회 취소가 동시에 존재하는 캠페인을 실측했다 — `tests/server/campaigns.test.ts` "mixed outcomes settle the campaign as partial_failed with per-recipient truth":
+
+- 2수신자 캠페인 schedule → Job 2건 생성
+- 두 번째 수신자 동의 철회 후 drain → `cancelled`/`CONSENT_CHANGED`, 첫 번째 → `local_delivered` + 실제 mail 파일
+- 최종 캠페인 상태 `partial_failed` (`settleCampaign`의 good+bad 혼합 집계 경로 실증), 파일 57/57 통과
+
+SMS 채널의 부분성공은 동일한 per-delivery·settle 경로를 타지만 실제 sms-solapi 전송 부분성공은 외부 sandbox 미검증으로 유지한다.
