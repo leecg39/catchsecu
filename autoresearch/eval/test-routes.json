@@ -1,0 +1,40 @@
+{
+  "base": "http://localhost:3100",
+  "account": "owner@catchsecu.local.test",
+  "viewports": [
+    { "name": "desktop", "width": 1440, "height": 900 },
+    { "name": "mobile", "width": 390, "height": 844 }
+  ],
+  "routes": [
+    { "path": "/dashboard", "name": "대시보드" },
+    { "path": "/form/manage", "name": "캐치폼·업로드 목록" },
+    { "path": "/form/fixed-url", "name": "고정URL 관리" },
+    { "path": "/set/company/policy", "name": "회사 보안 정책 관리" },
+    { "path": "/security/ip", "name": "IP 접근 관리" },
+    { "path": "/set/member", "name": "구성원 관리" },
+    { "path": "/log/info-monitoring", "name": "개인정보 처리로그" },
+    { "path": "/sms/history", "name": "문자 발송 내역" },
+    { "path": "/pay/history", "name": "자산 및 결제 내역" },
+    { "path": "/my-page", "name": "마이페이지" }
+  ],
+  "probes": {
+    "palette": { "route": "/dashboard", "query": "파기", "expectPath": "destruction" },
+    "shortcuts": { "route": "/dashboard", "heading": "단축키" },
+    "modalFocus": { "route": "/dashboard", "opener": "button.shell-service", "tabs": 12 },
+    "confirmDialog": { "route": "/security/ip", "cidrPrefix": "198.51.100." },
+    "unsavedGuard": { "route": "/set/company/policy", "field": "비밀번호 변경 주기", "leaveTo": "/dashboard" },
+    "toast": { "route": "/form/ai/share", "button": "URL 복사", "text": "복사" },
+    "copy": { "route": "/form/fixed-url" },
+    "qr": { "route": "/form/fixed-url", "minSize": 120 },
+    "sort": { "route": "/dashboard", "panel": "캐치폼 응답 순위", "textColumn": "캐치폼", "numberColumn": "현재 보유 응답" },
+    "breadcrumb": { "pages": [
+      { "route": "/form/fixed-url", "group": "개인정보 수집/관리", "current": "고정URL 관리" },
+      { "route": "/set/company/policy", "group": "관리", "current": "회사 보안 정책 관리" }
+    ] },
+    "skipLink": { "route": "/dashboard", "text": "본문" }
+  },
+  "global": {
+    "focusVisible": { "route": "/security/ip", "tabs": 16, "minContrast": 3 },
+    "reducedMotion": { "route": "/dashboard", "selector": ".cs-button", "maxSeconds": 0.01 }
+  }
+}
