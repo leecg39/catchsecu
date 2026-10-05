@@ -46,3 +46,15 @@ Node 24에서 `npm run dev`, 또는 빌드 후 `npm start`를 사용한다. 실�
 공식 완료는 15/72, 상태는 완료 15·진행 20·계획 37이며 전체 goal은 active다.
 
 2026-10-04 후속: MFA 화면을 가리던 대시보드 분기와 검색 포커스·모바일 표 넘침을 수정했다. [실제 화면/37개/최종 빌드 근거](revalidation/README.md). 전체 Task는 진행 중이다.
+
+## IP 접근 관리 브라우저 실측 (2026-10-05, `scripts/qa-ip-access.ts` → [ip-access-browser.json](ip-access-browser.json))
+
+owner/viewer 계정으로 `/security/ip`를 실브라우저 실측했다. 10/10 통과.
+
+- 목록 화면: 정책 카드(접근 제한 사용 여부)·현재 접속 IP·검색/필터 렌더 ([screenshot](states/ip-list-owner.png))
+- 규칙 생성: `POST /security/ip-rules`는 `idempotency-key` 필수 — 헤더 포함 시 201, 잘못된 CIDR(`999.999.999.999/99`)은 422
+- 목록 반영: 생성 후 새로고침에 `203.0.113.0/24` 행 표시, 삭제 204
+- viewer: 쓰기 POST 403, 목록은 읽기/게이트로 종결 ([screenshot](states/ip-list-viewer.png))
+- pageerror 0
+
+남은 범위: 원본 대조·Ego 세션·선행 전체 게이트는 계속 미완료.
