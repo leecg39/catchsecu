@@ -21,8 +21,22 @@ P03-T03의 개인정보 활동 검토에 회사별 보유 기한과 승인된 �
 - 회귀 `activity-reviews` 33 + 관련 정책/보안 suite 통과. 명령과 로그: 아래 산출물.
 - tsc/eslint/production build 통과(eslint 신규 경고 0).
 
+## 브라우저 검증(catchsecu_dev, dev 서버 3100, Playwright Chromium)
+
+`scripts/qa-activity-review-retention.ts`가 실제 화면으로 전체 체인을 확인(결과 `activity-retention-browser.json` 7단계 전부 통과):
+
+1. `policy-ui-save`: `/set/company/policy` 탭5에서 체크+1일 입력→비밀번호 확인→PATCH 200→DB `activityReviewRetentionDays=1` 반영.
+2. `retention-snapshot`: API로 요청→답변→처리 완료 후 `retentionUntil=closedAt+1일` 스냅샷 확인. 정책 저장 시 기존 종결 검토 4건이 백필로 기한을 얻은 것도 함께 확인(첫 실행 sweep `pending=4`).
+3. `sweep-awaiting`: 기한을 과거로 조정 후 서버 sweep → `destructionStatus=awaiting`.
+4. `list-badge`/`detail-awaiting`: 목록 `보유·파기` 열에 `파기 승인 대기` 배지, 상세에 보유 기한·되돌림 불가 경고·승인 버튼 노출.
+5. `destroy-approved`: `메시지 파기 승인`→`파기 승인 확정` 2단계 → `destroyed`, 메시지 0건, `destroyedAt`·승인자 기록, 상세 배지 `메시지 파기 완료`.
+6. `mobile-no-extra-overflow`: 390px에서 신규 UI 추가 오버플로 없음(공통 헤더 `MY` 배지의 기존 sitewide 402px 오버플로는 본 변경과 무관 — 대시보드 동일 값).
+
+스크린샷 `states/retention-*.png` 6장: 정책 필드·승인 대기 목록·상세 경고·확인 버튼·파기 완료·모바일.
+
 ## 산출물
 
 - `activity-retention-tests.log`, `activity-retention-related.log`, `activity-retention-suite.log`
 - `activity-retention-typecheck.log`, `activity-retention-lint.log`, `activity-retention-build.log`
 - `activity-retention-migrations.log`
+- `activity-retention-browser.json`, `states/retention-*.png`
