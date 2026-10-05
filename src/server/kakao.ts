@@ -1,9 +1,12 @@
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import type { z } from "zod";
 import type { KakaoChannel, KakaoTemplate } from "@/generated/prisma/client";
 import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoReviewInput, kakaoTemplateInput, kakaoTemplatePatch, kakaoVariables, type KakaoChannelRecord, type KakaoTemplateRecord } from "@/contracts/kakao";
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
+import { env } from "./env";
 import { fail } from "./http";
 import { audit } from "./audit";
 import { lockFormService } from "./form-access";
@@ -45,11 +48,20 @@ export async function updateKakaoChannel(ctx: Context, id: string, input: z.infe
     return channelDto(row);
   });
 }
-export async function requestKakaoChannelVerification(ctx: Context, id: string) {
+const LOCAL_REVIEW_SECRET = "local-kakao-review-secret-000000000000";
+// 로컬 공급자는 심사 콜백을 내부에서 서명해 실제 webhook 경로(applyKakaoReview)를 그대로 통과시킨다.
+async function localReview(input: z.infer<typeof kakaoReviewInput>, requestId: string) {
+  const raw = JSON.stringify(input), secret = env.KAKAO_REVIEW_SECRET ?? LOCAL_REVIEW_SECRET;
+  return applyKakaoReview(raw, createHmac("sha256", secret).update(raw).digest("hex"), secret, requestId);
+}
+export async function requestKakaoChannelVerification(ctx: Context, id: string, requestId: string = randomUUID()) {
   const row = await db.kakaoChannel.findFirst({ where: { id, tenantId: ctx.tenantId } });
   if (!row) fail(404, "NOT_FOUND", "카카오 채널을 찾을 수 없습니다.");
   await db.$transaction(tx => lockService(tx, ctx, row.serviceId));
-  fail(503, "KAKAO_PROVIDER_REQUIRED", "카카오 채널 확인 공급자를 연결한 뒤에 인증할 수 있습니다.");
+  if (env.KAKAO_PROVIDER !== "local") fail(503, "KAKAO_PROVIDER_REQUIRED", "카카오 채널 확인 공급자를 연결한 뒤에 인증할 수 있습니다.");
+  if (row.status === "archived") fail(409, "CHANNEL_ARCHIVED", "보관된 채널은 인증할 수 없습니다.");
+  if (row.status === "verified") fail(409, "ALREADY_VERIFIED", "이미 확인된 채널입니다.");
+  return localReview({ kind: "channel", id: row.id, outcome: "verified", note: "로컬 공급자 확인" }, requestId);
 }
 export async function listKakaoTemplates(ctx: Context, serviceId: string) {
   return db.$transaction(async tx => {
@@ -80,7 +92,7 @@ export async function updateKakaoTemplate(ctx: Context, id: string, input: z.inf
   });
 }
 export async function submitKakaoTemplate(ctx: Context, id: string, version: number, requestId: string) {
-  return db.$transaction(async tx => {
+  const submitted = await db.$transaction(async tx => {
     const current = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!current) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
     await lockService(tx, ctx, current.serviceId);
@@ -88,14 +100,22 @@ export async function submitKakaoTemplate(ctx: Context, id: string, version: num
     if (!["draft", "rejected"].includes(current.status)) fail(409, "REVIEW_UNAVAILABLE", "초안이거나 반려된 템플릿만 심사 요청할 수 있습니다.");
     const row = await tx.kakaoTemplate.update({ where: { id }, data: { status: "submitted", reviewNote: "", version: { increment: 1 } } });
     await audit(tx, ctx, requestId, "kakao.template_submitted", "kakaoTemplate", id, ["status"], current.serviceId);
-    return templateDto(row);
+    return { row: templateDto(row), serviceId: current.serviceId, body: current.body };
   });
+  // 로컬 공급자는 심사를 즉시 확정한다 — 본문의 `#반려` 표지는 반려를 재현하는 적대적 테스트 훅이다.
+  if (env.KAKAO_PROVIDER === "local") {
+    const rejected = submitted.body.includes("#반려");
+    return templateDto(await db.kakaoTemplate.findUniqueOrThrow({ where: { id: (await localReview(
+      { kind: "template", id, outcome: rejected ? "rejected" : "approved", note: rejected ? "로컬 심사: 반려 표지" : "로컬 심사: 승인" }, requestId)).id } }));
+  }
+  return submitted.row;
 }
 export async function readKakaoReview(ctx: Context, id: string) {
   const row = await db.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
   if (!row) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
   await db.$transaction(tx => lockService(tx, ctx, row.serviceId));
-  return { id: row.id, status: row.status, reviewNote: row.reviewNote, providerMatched: false };
+  return { id: row.id, status: row.status, reviewNote: row.reviewNote,
+    providerMatched: env.KAKAO_PROVIDER === "local" && ["approved", "rejected"].includes(row.status) };
 }
 export function previewKakaoTemplate(input: z.infer<typeof kakaoPreviewInput>) {
   const names = kakaoVariables(input.body);
@@ -104,12 +124,18 @@ export function previewKakaoTemplate(input: z.infer<typeof kakaoPreviewInput>) {
   const text = input.body.replaceAll(/#\{([A-Za-z0-9_]{1,30})\}/g, (_, name: string) => input.values[name]);
   return { text, buttons: input.buttons, stored: false };
 }
-export async function assertKakaoTemplateSendable(ctx: Context, id: string) {
+export async function sendKakaoTemplate(ctx: Context, id: string) {
   const row = await db.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId }, include: { channel: true } });
   if (!row) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
   await db.$transaction(tx => lockService(tx, ctx, row.serviceId));
   if (row.status !== "approved" || row.channel.status !== "verified") fail(409, "TEMPLATE_NOT_APPROVED", "승인된 템플릿과 확인된 채널만 발송할 수 있습니다.");
-  fail(503, "KAKAO_PROVIDER_REQUIRED", "알림톡 발송 공급자를 연결한 뒤에 발송할 수 있습니다.");
+  if (env.KAKAO_PROVIDER !== "local") fail(503, "KAKAO_PROVIDER_REQUIRED", "알림톡 발송 공급자를 연결한 뒤에 발송할 수 있습니다.");
+  // 로컬 공급자 발송 — sms-local과 같은 방식으로 영수증 파일만 남긴다.
+  await mkdir(env.LOCAL_KAKAO_DIR, { recursive: true });
+  const receipt = { templateId: row.id, channelId: row.channelId, searchId: row.channel.searchId, body: row.body,
+    buttons: row.buttons, status: "local_delivered", at: new Date().toISOString() };
+  await writeFile(resolve(env.LOCAL_KAKAO_DIR, row.id + ".json"), JSON.stringify(receipt));
+  return { ...templateDto(row), status: "local_delivered" as const, receiptId: "local-kakao:" + row.id };
 }
 function signaturesMatch(secret: string, body: string, signature: string) {
   const expected = createHmac("sha256", secret).update(body).digest("hex");

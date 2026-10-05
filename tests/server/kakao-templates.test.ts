@@ -1,4 +1,6 @@
 import { createHmac, randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { afterAll, beforeEach, expect, test } from "vitest";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
@@ -49,4 +51,39 @@ test("승인되지 않은 알림톡은 발송하지 않고 수정하면 심사�
   expect((await edited.json()).status).toBe("draft");
   expect((await create(req("/kakao/templates/" + template.id + "/send", cookie, "POST", {}))).status).toBe(409);
   expect((await read(req("/kakao/templates?serviceId=" + serviceId, cookie))).status).toBe(200);
+});
+
+test("로컬 공급자는 채널 확인·심사·발송을 영수증과 함께 완료하고 반려 표지를 반려한다", async () => {
+  const saved = { provider: env.KAKAO_PROVIDER, dir: env.LOCAL_KAKAO_DIR };
+  env.KAKAO_PROVIDER = "local"; env.LOCAL_KAKAO_DIR = ".local/catchsecu_test/kakao-" + randomUUID();
+  try {
+    const email = "kakao-local-" + randomUUID() + "@catchsecu.test";
+    expect((await auth.handler(req("/auth/sign-up/email", "", "POST", { name: "알림톡", email, password }))).status).toBe(200);
+    const user = await db.user.update({ where: { email }, data: { emailVerified: true } });
+    const company = await db.company.create({ data: { name: "로컬 알림톡", publicName: "로컬", policy: { create: {} }, memberships: { create: { userId: user.id, role: "owner" } }, services: { create: { name: "로컬 서비스", externalName: "로컬" } } }, include: { services: true } });
+    const login = await auth.handler(req("/auth/sign-in/email", "", "POST", { email, password }));
+    const cookie = login.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
+    const serviceId = company.services[0].id;
+    const channel = await (await create(req("/kakao/channels", cookie, "POST", { serviceId, name: "안내", searchId: "@local" }, randomUUID()))).json();
+    const verified = await create(req("/kakao/channels/" + channel.id + "/verify", cookie, "POST", {}));
+    expect(verified.status).toBe(200);
+    expect((await verified.json()).status).toBe("verified");
+    expect((await create(req("/kakao/channels/" + channel.id + "/verify", cookie, "POST", {}))).status).toBe(409);
+    const template = await (await create(req("/kakao/templates", cookie, "POST", { serviceId, channelId: channel.id, name: "접수", body: "#{name}님 안내", buttons: [] }, randomUUID()))).json();
+    const submitted = await create(req("/kakao/templates/" + template.id + "/submit", cookie, "POST", { version: template.version }));
+    expect((await submitted.json()).status).toBe("approved");
+    expect(((await (await read(req("/kakao/templates/" + template.id + "/review?serviceId=" + serviceId, cookie))).json()).providerMatched)).toBe(true);
+    const sent = await create(req("/kakao/templates/" + template.id + "/send", cookie, "POST", {}));
+    expect(sent.status).toBe(200);
+    const delivery = await sent.json();
+    expect(delivery.status).toBe("local_delivered");
+    expect(delivery.receiptId).toBe("local-kakao:" + template.id);
+    const receipt = JSON.parse(await readFile(resolve(env.LOCAL_KAKAO_DIR, template.id + ".json"), "utf8"));
+    expect(receipt).toMatchObject({ templateId: template.id, channelId: channel.id, status: "local_delivered" });
+    const rejected = await (await create(req("/kakao/templates", cookie, "POST", { serviceId, channelId: channel.id, name: "반려", body: "#반려 마커", buttons: [] }, randomUUID()))).json();
+    const rejectedSubmit = await create(req("/kakao/templates/" + rejected.id + "/submit", cookie, "POST", { version: rejected.version }));
+    expect((await rejectedSubmit.json()).status).toBe("rejected");
+    expect((await db.kakaoTemplate.findUniqueOrThrow({ where: { id: rejected.id } })).reviewNote).toContain("반려");
+    expect((await create(req("/kakao/templates/" + rejected.id + "/send", cookie, "POST", {}))).status).toBe(409);
+  } finally { env.KAKAO_PROVIDER = saved.provider; env.LOCAL_KAKAO_DIR = saved.dir; }
 });

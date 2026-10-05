@@ -3,7 +3,7 @@ import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoTemplateI
 import { requireContext } from "@/server/context";
 import { body, fail, json, route } from "@/server/http";
 import { idempotent } from "@/server/idempotency";
-import { assertKakaoTemplateSendable, createKakaoChannel, createKakaoTemplate, listKakaoChannels, listKakaoTemplates, previewKakaoTemplate, readKakaoReview, requestKakaoChannelVerification, submitKakaoTemplate, updateKakaoChannel, updateKakaoTemplate } from "@/server/kakao";
+import { createKakaoChannel, createKakaoTemplate, listKakaoChannels, listKakaoTemplates, previewKakaoTemplate, readKakaoReview, requestKakaoChannelVerification, sendKakaoTemplate, submitKakaoTemplate, updateKakaoChannel, updateKakaoTemplate } from "@/server/kakao";
 
 const versionInput = z.object({ version: z.number().int().positive() }).strict();
 function segments(request: Request) { return new URL(request.url).pathname.split("/").slice(4); }
@@ -27,7 +27,7 @@ export const POST = route(async (request, requestId) => {
     });
     return json(result.body, result.status);
   }
-  if (first === "channels" && id && action === "verify") return json(await requestKakaoChannelVerification(ctx, z.uuid().parse(id)));
+  if (first === "channels" && id && action === "verify") return json(await requestKakaoChannelVerification(ctx, z.uuid().parse(id), requestId));
   if (first === "templates" && id === "preview") return json(previewKakaoTemplate(await body(request, kakaoPreviewInput)));
   if (first === "templates" && !id) {
     const input = await body(request, kakaoTemplateInput);
@@ -41,7 +41,7 @@ export const POST = route(async (request, requestId) => {
     const input = await body(request, versionInput);
     return json(await submitKakaoTemplate(ctx, z.uuid().parse(id), input.version, requestId));
   }
-  if (first === "templates" && id && action === "send") return json(await assertKakaoTemplateSendable(ctx, z.uuid().parse(id)));
+  if (first === "templates" && id && action === "send") return json(await sendKakaoTemplate(ctx, z.uuid().parse(id)));
   fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
 });
 export const PATCH = route(async (request, requestId) => {

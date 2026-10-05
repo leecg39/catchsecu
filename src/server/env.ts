@@ -19,6 +19,8 @@ const schema = z.object({
   MESSAGE_UNIT_COST_KRW: z.coerce.number().int().min(0).max(1000000).default(0),
   LOCAL_SMS_DIR: z.string().default(".local/sms"),
   SMS_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),
+  KAKAO_PROVIDER: z.enum(["unconfigured", "local"]).default("unconfigured"),
+  LOCAL_KAKAO_DIR: z.string().default(".local/kakao"),
   KAKAO_REVIEW_SECRET: z.string().min(32).max(128).optional(),
   PAYMENT_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),
   SMTP_HOST: z.string().optional(),
@@ -54,4 +56,7 @@ if (!result.success) {
 export const env = result.data;
 if (process.env.NODE_ENV === "production" && env.MAIL_TRANSPORT === "local" && !process.env.ALLOW_LOCAL_MAIL) {
   throw new Error("운영 환경은 SMTP 설정이 필요합니다. 로컬 미리보기만 ALLOW_LOCAL_MAIL=1을 사용하세요.");
+}
+if (process.env.NODE_ENV === "production" && env.KAKAO_PROVIDER === "local" && !process.env.ALLOW_LOCAL_KAKAO) {
+  throw new Error("운영 환경은 카카오 공급자 연결이 필요합니다. 로컬 발송은 ALLOW_LOCAL_KAKAO=1을 사용하세요.");
 }
