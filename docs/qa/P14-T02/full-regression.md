@@ -19,5 +19,7 @@
 ## 남은 범위
 
 - 181 경로별 backend/UI/test 매핑 전수 대조표는 P14-T05 매핑 보고서에서 추적
-- 빌드(`next build`) 전수 통과 증거는 아직 미기록
+- 빌드(`ALLOW_LOCAL_MAIL=1 next build`) 통과 — Next.js 16.3.8 Turbopack, 컴파일 15.9s·타입 30.6s·전 경로 수집 성공
+  - 주의: `--env-file` 인자는 워커의 NODE_OPTIONS로 전파돼 거부된다(`ERR_WORKER_INVALID_EXEC_ARGV`). 빌드는 `.env.local` 자체 로딩에 의존한다
+  - `MAIL_TRANSPORT=local` 운영 가드가 빌드 타임에도 적용됨을 확인했다 — `ALLOW_LOCAL_MAIL=1`은 로컬 미리보기 전용 해제값
 - 실패·skip 숨김 0 조건: 본 실행의 실패 1건은 수정 후 통과로 기록
