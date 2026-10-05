@@ -50,3 +50,15 @@
 | 세션 쿠키 속성 | `document.cookie`에서 세션 쿠키 비노출(HttpOnly), `sc_locale`만 가시 |
 
 남은 범위(외부/대규모): `/expert/select-company` 배정 회사 실브라우저 선택 흐름, 181개 전 경로 레이아웃 게이트(P13-T04), 원본 Catchsecu 화면 대조.
+
+## expert/select-company 브라우저 실측 (2026-10-05, `scripts/qa-expert-select.ts`)
+
+활성 배정이 없어 `scripts/qa-expert-fixture.ts`로 픽스처(신규 전문가 계정 + 회사 A 활성 배정 + viewer 멤버십/서비스 그랜트)를 만들었다. 실측 [expert-select.json](expert-select.json), 화면 [expert-select.png](expert-select.png):
+
+- 로그인 → 직접 소속 없는 전문가는 `/expert/select-company`로 이동
+- 배정 목록에 회사 A가 라디오 선택 가능 상태로 표시
+- "존재하지않는회사xyz" 검색 → "검색 결과가 없습니다" 빈 상태 → 지우면 목록 복원
+- 회사 선택 → "전문가 PLUS 시작하기" → `/dashboard` 이동, 실제 대시보드 렌더
+- 새로고침 후 컨텍스트 유지(선택 화면으로 되돌아가지 않음), 콘솔 오류 0
+
+남은 범위: 원본 대조·전 페이지 게이트(P13-T04)는 계속 미완료.
