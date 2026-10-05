@@ -27,3 +27,9 @@
   - 동일 수신자 중복 발송 0건 보장
   - 예약 취소 후 재개 불가 및 상태 전이 불변성
   - 실패 수신자 재처리 시 새 작업 고유 식별자 생성
+
+## 예약취소+정산 E2E 추가 실측 (2026-10-12, tests/server/billing-settlement.test.ts 4/4)
+
+- 신규 "예약된 문자 캠페인 취소는 미발송분을 취소하고 발송분만 정산한다": 동의 수신자 2명의 SMS 캠페인을 실제 예약 → 첫 잡만 워커로 완료(`local_delivered`, reserve+capture 50) → `/cancel` API 호출 → 미발송 1건 `cancelled`+잡 `cancelled`, 발송분만 `reserve→capture` 유지(원장 `funding,reserve,capture` 3행), 잔액 `available=50 held=0` — 취소된 잡 재실행해도 발송 0·원장 불변.
+- 비용한도(잔액 부족): 기존 "잔액 부족은 INSUFFICIENT_CREDIT 실패로 기록되고 원장을 오염시키지 않는다" — `available < unitCost` 시 INSERT 전 `failed/INSUFFICIENT_CREDIT`, 원장에 funding만 남고 held=0.
+- 남은 미수용: 실 PG 충전 기반 한도·외부 비용 검증은 외부 게이트.

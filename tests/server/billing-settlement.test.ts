@@ -58,7 +58,7 @@ async function fixture() {
   const sub = await ok<{ id: string }>(await publicPost(req("/public/forms/" + pub.token + "/submissions", "", "POST",
     { answers: { [name]: "정산 수신자", [mail]: "s-" + randomUUID() + "@settle.test", [tel]: target }, consent: true, marketingChannels: ["sms"] }, randomUUID())), 201);
   const pref = await db.marketingPreference.findFirstOrThrow({ where: { sourceSubmissionId: sub.id, channel: "sms" } });
-  return { company, service, member, cookie, sender, pref };
+  return { company, service, member, cookie, sender, pref, pub, q: { name, mail, tel } };
 }
 async function campaign(fx: Awaited<ReturnType<typeof fixture>>, cost = env.MESSAGE_UNIT_COST_KRW) {
   env.MESSAGE_UNIT_COST_KRW = cost;
@@ -132,4 +132,41 @@ test("동의 철회로 취소된 발송은 예약 크레딧을 반환한다", as
   expect(kinds).toEqual(["funding", "reserve", "release"]);
   const acc = await account(fx.company.id);
   expect(acc.available).toBe(BigInt(100)); expect(acc.held).toBe(BigInt(0));
+});
+
+test("예약된 문자 캠페인 취소는 미발송분을 취소하고 발송분만 정산한다", async () => {
+  const fx = await fixture();
+  await postTrustedLedgerTransfer({ tenantId: fx.company.id, currency: "KRW", kind: "funding", amount: BigInt(100), sourceKind: "pg_capture", sourceId: randomUUID() });
+  // 두 번째 동의 수신자를 같은 폼으로 추가한다
+  const target = "010" + String(Math.floor(Math.random() * 100000000)).padStart(8, "0");
+  const sub2 = await ok<{ id: string }>(await publicPost(req("/public/forms/" + fx.pub.token + "/submissions", "", "POST",
+    { answers: { [fx.q.name]: "두번째", [fx.q.mail]: "s2-" + randomUUID() + "@settle.test", [fx.q.tel]: target }, consent: true, marketingChannels: ["sms"] }, randomUUID())), 201);
+  const pref2 = await db.marketingPreference.findFirstOrThrow({ where: { sourceSubmissionId: sub2.id, channel: "sms" } });
+  // 캠페인을 두 수신자로 예약하고 한 건만 실제 발송한다
+  const created = await ok<{ id: string }>(await POST(req("/campaigns", fx.cookie, "POST", { serviceId: fx.service.id, channel: "sms", source: "form",
+    title: "취소 정산 " + randomUUID(), senderId: fx.sender.id, content: { format: "text", subject: "정산", text: "정산 문자" } }, randomUUID())), 201);
+  const draft = await ok<{ version: number }>(await GET(req("/campaigns/" + created.id, fx.cookie)));
+  await ok(await POST(req("/campaigns/" + created.id + "/recipients", fx.cookie, "POST", { mode: "selection", version: draft.version, preferenceIds: [fx.pref.id, pref2.id] })));
+  const current = await ok<{ version: number }>(await GET(req("/campaigns/" + created.id, fx.cookie)));
+  await ok(await POST(req("/campaigns/" + created.id + "/schedule", fx.cookie, "POST", { version: current.version, at: null }, randomUUID())), 202);
+  // 첫 잡만 실제 발송까지 완료한다
+  const first = await db.job.findFirstOrThrow({ where: { campaignDelivery: { campaignId: created.id }, status: "queued" }, orderBy: { createdAt: "asc" } });
+  for (let i = 0; i < 30; i++) { await runOneJob("settle-" + randomUUID()); const row = await db.job.findUniqueOrThrow({ where: { id: first.id } }); if (["done", "cancelled", "dead"].includes(row.status)) break; }
+  expect((await db.job.findUniqueOrThrow({ where: { id: first.id } })).status).toBe("done");
+  const latest = await ok<{ version: number }>(await GET(req("/campaigns/" + created.id, fx.cookie)));
+  const cancelled = await ok<{ cancelled: number; accepted: number }>(await POST(req("/campaigns/" + created.id + "/cancel", fx.cookie, "POST", { version: latest.version }, randomUUID())));
+  expect(cancelled).toMatchObject({ cancelled: 1, accepted: 1 });
+  // 미발송분은 잡도 취소되고 원장에 아무 기록도 남지 않는다 — 발송분만 reserve+capture 정산
+  const rows = (await db.campaignDelivery.findMany({ where: { campaignId: created.id }, orderBy: { createdAt: "asc" } }));
+  expect(rows.map(r => r.status).sort()).toEqual(["cancelled", "local_delivered"]);
+  const leftover = await db.job.findFirstOrThrow({ where: { campaignDelivery: { campaignId: created.id }, id: { not: first.id } } });
+  expect(leftover.status).toBe("cancelled");
+  const kinds = (await ledger(fx.company.id)).map(r => r.kind);
+  expect(kinds).toEqual(["funding", "reserve", "capture"]);
+  const acc = await account(fx.company.id);
+  expect(acc.available).toBe(BigInt(50)); expect(acc.held).toBe(BigInt(0));
+  // 취소된 잡은 재실행돼도 발송되지 않는다
+  await runOneJob("settle-" + randomUUID());
+  expect((await db.job.findUniqueOrThrow({ where: { id: leftover.id } })).status).toBe("cancelled");
+  expect((await ledger(fx.company.id)).length).toBe(3);
 });
