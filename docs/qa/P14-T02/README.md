@@ -17,3 +17,18 @@
 수용 조건: 181행 각각 backend/UI/test 증거; 실패·skip 숨김0; build/type/lint오류0; 테스트용 메모리DB로 대체금지
 
 선행: P14-T01, P09-T06, P10-T05, P11-T05. 공통 DB/권한/실패/브라우저/재시작/실제 파일 및 외부 검증 조건을 유지한다.
+
+## 최신 회귀 실측 (2026-10-06, signature 커밋 `04138bf` 이후)
+
+| 항목 | 결과 |
+|------|------|
+| Vitest 전체 | `vitest run` — **96/96 파일, 1314/1314 테스트 통과** (Duration 962s, `/tmp/full-suite-1006.log`) |
+| 타입 | `npx tsc --noEmit` — 오류 0 |
+| 린트 | 변경 파일 eslint — 위반 0 |
+| 빌드 | `next build` — 통과(2026-10-05 실측 유지) |
+| 대상 DB | `catchsecu_test` 실 PostgreSQL(인메모리 대체 없음) |
+| 실패·skip 숨김 | 0 — 실패 0, skip 0 |
+
+주의: 회귀 도중 별도 vitest 프로세스가 같은 테스트 DB를 동시에 TRUNCATE하면 경합으로 일시 실패한다 — 재현됨(destruction 42건 오탐 → 단독 재실행 48/48 통과). 전수 실행은 배타적으로 돌려야 한다.
+
+남는 게이트(미완료 유지): 181행 경로별 backend/UI/test 증거 매핑 전수, 선행 Task(P09-T06·P10-T05·P11-T05) 완료, 외부 sandbox 검증.

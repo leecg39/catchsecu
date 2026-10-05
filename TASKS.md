@@ -469,7 +469,7 @@
 - 작업: SMS/LMS/MMS 지원범위를 계약으로 확정, worker 전송·실패/재시도·결과 webhook·발신자 확인을 연결한다.
 - 선행: P08-T02, P01-T04, P10-T03
 - 검증/완료: sandbox 실제 수신 또는 provider receipt; 인증실패·timeout·중복webhook·부분성공; 허위 sent 금지
-- 증거: [P08-T03 Solapi 실발송](docs/qa/P08-T03/real-solapi-send.md). 실제 provider_accepted·receiptId 수신, 서명·오류 매핑·mock 검증. webhook 대사·부분성공 시나리오는 부분.
+- 증거: [P08-T03 Solapi 실발송](docs/qa/P08-T03/real-solapi-send.md). 실제 provider_accepted·receiptId 수신, 서명·오류 매핑·mock 검증. 부분성공(혼합 결과→`partial_failed`) 로컬 실측 완료([README](docs/qa/P08-T03/README.md)). webhook 대사·외부 sandbox는 미검증.
 - 부분 구현 증거: [회사별 발신번호 조회 어댑터·서명·응답 판정](docs/qa/senders/README.md). 실제 외부 조회·문자 전송·receipt는 미검증.
 
 
@@ -726,7 +726,7 @@
 - 작업: TASKS/매핑의 모든 체크와 계약·권한·CRUD·경합·재시작·실제 파일·동적경로 E2E를 실행한다.
 - 선행: P14-T01, P09-T06, P10-T05, P11-T05
 - 검증/완료: 181행 각각 backend/UI/test 증거; 실패·skip 숨김0; build/type/lint오류0; 테스트용 메모리DB로 대체금지
-- 증거: [docs/qa/P14-T02/](docs/qa/P14-T02/README.md) — 전체 회귀(1,311)·typecheck·lint·production build·verify:plan/p01-db/p01-api 실측 완료. 선행 전체 게이트 미충족으로 미완료.
+- 증거: [docs/qa/P14-T02/](docs/qa/P14-T02/README.md) — 전체 회귀(1,314)·typecheck·lint·production build·verify:plan/p01-db/p01-api 실측 완료(10-06 재측정). 선행 전체 게이트 미충족으로 미완료.
 
 ### P14-T03 — 외부 서비스·staging 운영 검증
 
@@ -738,7 +738,7 @@
 
 ### P14-T04 — 마이그레이션·백업·복구·운영 문서
 
-- [ ] P14-T04 구현·검증 완료 — 복원·재파기·키 회전(1345셀 전수)·빈DB 클린 설치(85 마이그레이션)·워커 mid-flight SIGKILL 재기동 실측 완료. S3/WAL·PITR 외부 환경 미검증으로 체크 유지
+- [ ] P14-T04 구현·검증 완료 — 복원·재파기·키 회전(1345셀 전수)·빈DB 클린 설치(85 마이그레이션)·mail+destruction 워커 mid-flight SIGKILL 재기동·고아 리스 회수 실측 완료. S3/WAL·PITR 외부 환경 미검증으로 체크 유지
 - 작업: 빈환경 설치, 업데이트/복구 리허설, DB와 객체저장소 백업·복원·재파기, 비밀/키 회전·보관 정책을 문서화하고 실행한다.
 - 선행: P14-T02
 - 검증/완료: 별도환경 백업복원 성공; 기존 schema 업그레이드; worker 재기동; 복구 후 권한/파기 일관성
