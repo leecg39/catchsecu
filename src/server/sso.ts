@@ -392,12 +392,16 @@ async function lockSsoInvitation(tx: Transaction, provider: SsoProvider, state: 
     fail(410, "INVITATION_UNAVAILABLE", "초대가 만료되었거나 이 계정의 초대가 아닙니다.");
   return invitation;
 }
-export async function completeSso(initialProvider: SsoProvider, state: SsoState, subject: SsoSubject, headers: Headers) {
+export async function completeSso(initialProvider: SsoProvider, state: SsoState, subject: SsoSubject, headers: Headers,
+  prepare?: (tx: Transaction) => Promise<void>) {
   const accountKey = subject.iss + "|" + subject.sub;
   return db.$transaction(async tx => {
     await lockSsoCompany(tx, initialProvider.tenantId, headers);
     const provider = await providerForUpdate(tx, { tenantId: initialProvider.tenantId }, initialProvider.id);
     assertSsoState(provider, state);
+    // Internal directory registration must roll back with JIT, session and audit.
+    // Run after the same company/provider locks used for access revocation.
+    if (prepare) await prepare(tx);
     const invitation = state.mode === "invite" ? await lockSsoInvitation(tx, provider, state, subject) : null;
     const linking = state.mode === "link" ? await linkActorForState(tx, provider, state, headers) : null;
     const account = await tx.account.findUnique({ where: { providerId_accountId: { providerId: "sso:" + provider.id, accountId: accountKey } } });

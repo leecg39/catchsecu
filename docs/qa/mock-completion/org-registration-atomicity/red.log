@@ -1,0 +1,122 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:67971) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+stderr | tests/server/org-auth.test.ts > 로그인 감사가 실패하면 디렉터리·티켓·JIT 계정·세션까지 모두 롤백한다
+{"requestId":"3c8792df-817f-476f-85a8-f57205a8babb","code":"INTERNAL_ERROR","kind":"Error","stack":"    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/org-auth.test.ts:212:40 |     at audit (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/vitest/dist/chunks/spy.DgMTfhrK.js:323:40) |     at __vite_ssr_import_6__.db.$transaction.timeout (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/sso.ts:462:13) |     at Proxy._transactionWithCallback (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:99:4868) |     at finishOrgLogin (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/org-auth.ts:77:18) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/api/v1/auth/org/email-register/route.ts:7:18 |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/http.ts:54:24"}
+
+ ❯ tests/server/org-auth.test.ts (10 tests | 4 failed) 5583ms
+   × 티켓 발급 후 공급자를 정지하면 이메일·버전·등록 감사가 남지 않는다 438ms
+   × 기존 계정 이메일 충돌은 등록을 롤백하고 같은 티켓으로 올바른 이메일을 재시도할 수 있다 427ms
+   × 로그인 감사가 실패하면 디렉터리·티켓·JIT 계정·세션까지 모두 롤백한다 443ms
+   × 로그인 완료 직전 티켓이 만료되면 등록 변경도 함께 롤백한다 469ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/org-auth.test.ts > 티켓 발급 후 공급자를 정지하면 이메일·버전·등록 감사가 남지 않는다
+AssertionError: expected { …(11) } to match object { emailCipher: null, version: 1 }
+(9 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "emailCipher": null,
+-   "version": 1,
++   "emailCipher": "v1.ADXkIEnkuxGPfWUN.R_etg9JFXd-8Ky3hDvyRtg.mDjbIdrRBgt3RdP-FGa4HK2SavUuYWZh",
++   "version": 2,
+  }
+
+ ❯ assertRegistrationRolledBack tests/server/org-auth.test.ts:184:6
+    182| async function assertRegistrationRolledBack(memberId: string, stateId:…
+    183|   expect(await db.virtualOrgMember.findUniqueOrThrow({ where: { id: me…
+    184|     .toMatchObject({ emailCipher: null, version: 1 });
+       |      ^
+    185|   expect(await db.ssoState.findUnique({ where: { id: stateId } })).not…
+    186|   expect(await db.auditEvent.count({ where: { action: "org_auth.email_…
+ ❯ tests/server/org-auth.test.ts:196:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/org-auth.test.ts > 기존 계정 이메일 충돌은 등록을 롤백하고 같은 티켓으로 올바른 이메일을 재시도할 수 있다
+AssertionError: expected { …(11) } to match object { emailCipher: null, version: 1 }
+(9 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "emailCipher": null,
+-   "version": 1,
++   "emailCipher": "v1.Y2qQ6TMCZ3d7OgzN.Ag7uV3QTKX_wTv_mMKb12g.gU0Zt-8vlX-sscvC-LysDEx7R4bSxzpnF5tF7j8njFzMZueuEgHsVfRCbDOUdYpWYWOeK6STlrc3",
++   "version": 2,
+  }
+
+ ❯ assertRegistrationRolledBack tests/server/org-auth.test.ts:184:6
+    182| async function assertRegistrationRolledBack(memberId: string, stateId:…
+    183|   expect(await db.virtualOrgMember.findUniqueOrThrow({ where: { id: me…
+    184|     .toMatchObject({ emailCipher: null, version: 1 });
+       |      ^
+    185|   expect(await db.ssoState.findUnique({ where: { id: stateId } })).not…
+    186|   expect(await db.auditEvent.count({ where: { action: "org_auth.email_…
+ ❯ tests/server/org-auth.test.ts:204:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/org-auth.test.ts > 로그인 감사가 실패하면 디렉터리·티켓·JIT 계정·세션까지 모두 롤백한다
+AssertionError: expected { …(11) } to match object { emailCipher: null, version: 1 }
+(9 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "emailCipher": null,
+-   "version": 1,
++   "emailCipher": "v1.fgBcDxdEO-kBaNbQ.UnXfBM_3Jv2LWGsj4EYBGw.V6ZP1ZysPAYJdhYn2Rxn-B_TOg3lhVZkBWfo2OPEyw",
++   "version": 2,
+  }
+
+ ❯ assertRegistrationRolledBack tests/server/org-auth.test.ts:184:6
+    182| async function assertRegistrationRolledBack(memberId: string, stateId:…
+    183|   expect(await db.virtualOrgMember.findUniqueOrThrow({ where: { id: me…
+    184|     .toMatchObject({ emailCipher: null, version: 1 });
+       |      ^
+    185|   expect(await db.ssoState.findUnique({ where: { id: stateId } })).not…
+    186|   expect(await db.auditEvent.count({ where: { action: "org_auth.email_…
+ ❯ tests/server/org-auth.test.ts:220:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/org-auth.test.ts > 로그인 완료 직전 티켓이 만료되면 등록 변경도 함께 롤백한다
+AssertionError: expected { …(11) } to match object { emailCipher: null, version: 1 }
+(9 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "emailCipher": null,
+-   "version": 1,
++   "emailCipher": "v1.NnoOuS2cUQmTgpnK.hcveFhJq5Zx1IQ3PXoz_wg.EtOnNKVxbadsk6LGFAsfR1dRYTGhB0l7M8qniAspdu53",
++   "version": 2,
+  }
+
+ ❯ assertRegistrationRolledBack tests/server/org-auth.test.ts:184:6
+    182| async function assertRegistrationRolledBack(memberId: string, stateId:…
+    183|   expect(await db.virtualOrgMember.findUniqueOrThrow({ where: { id: me…
+    184|     .toMatchObject({ emailCipher: null, version: 1 });
+       |      ^
+    185|   expect(await db.ssoState.findUnique({ where: { id: stateId } })).not…
+    186|   expect(await db.auditEvent.count({ where: { action: "org_auth.email_…
+ ❯ tests/server/org-auth.test.ts:238:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 6 passed (10)
+   Start at  08:51:06
+   Duration  6.38s (tests 89%, import 7%, transform 4%)
+

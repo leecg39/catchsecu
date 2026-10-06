@@ -1,0 +1,40 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:68710) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/org-auth.test.ts (13 tests | 1 failed) 8017ms
+   × 회사 접근을 회수한 뒤 ip-blocked 등록 요청은 디렉터리를 변경하지 않는다 489ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/org-auth.test.ts > 회사 접근을 회수한 뒤 ip-blocked 등록 요청은 디렉터리를 변경하지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.ipAccessPolicy.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/org-auth.test.ts:257:32
+
+  254 test.each(["closed", "ip-blocked"])("회사 접근을 회수한 뒤 %s 등록 요청은 디렉터리를 변경하지 않는다", async kind => {
+  255   const fixture = await pendingEmailRegistration();
+  256   if (kind === "closed") await db.company.update({ where: { id: fixture.company.id }, data: { status: "closed" } });
+→ 257   else await db.ipAccessPolicy.create(
+Database error. Code: `23514`. Message: `Enabled IP restriction needs an enabled rule`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/org-auth.test.ts:257:8
+    255|   const fixture = await pendingEmailRegistration();
+    256|   if (kind === "closed") await db.company.update({ where: { id: fixtur…
+    257|   else await db.ipAccessPolicy.create({ data: { tenantId: fixture.comp…
+       |        ^
+    258|   const response = await fixture.emailRegister(req("/auth/org/email-re…
+    259|     { ticket: fixture.ticket, email: "access-revoked@catchsecu.test" }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 12 passed (13)
+   Start at  08:51:55
+   Duration  8.72s (tests 93%, import 4%, transform 3%)
+

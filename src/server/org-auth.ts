@@ -144,14 +144,28 @@ export async function registerOrgEmail(input: { ticket: string; email: string },
     fail(409, "EMAIL_REGISTERED", "이미 이메일이 등록된 계정입니다. 다시 로그인해주세요.");
   if (state.nonceHash !== memberSnapshot(member))
     fail(409, "DIRECTORY_CHANGED", "디렉터리 정보가 변경되었습니다. 다시 로그인해주세요.");
-  // 동시 등록 경합은 조건부 업데이트로 한 명만 성공시킨다.
-  const claimed = await db.virtualOrgMember.updateMany({ where: { id: member.id, emailCipher: null },
-    data: { emailCipher: encrypt(input.email.toLowerCase()), version: { increment: 1 } } });
-  if (!claimed.count) fail(409, "EMAIL_REGISTERED", "이미 이메일이 등록된 계정입니다. 다시 로그인해주세요.");
-  const saved = await db.virtualOrgMember.findUniqueOrThrow({ where: { id: member.id } });
-  await audit(db, { tenantId: member.tenantId, user: { id: null } }, "org-email-register",
-    "org_auth.email_registered", "virtualOrgMember", member.id, ["emailCipher"]);
-  const consumed = await db.ssoState.deleteMany({ where: { id: state.id, expiresAt: { gt: new Date() } } });
-  if (!consumed.count) fail(401, "STATE_REPLAYED", "state가 이미 사용되었습니다.");
-  return finishOrgLogin(member.provider, state, saved, headers);
+  const email = input.email.toLowerCase();
+  const result = await completeSso(member.provider, state, {
+    sub: `${member.orgCode}:${member.employeeNo}`, iss: member.provider.issuer,
+    email, name: decrypt<string>(member.nameCipher), emailVerified: true,
+  }, headers, async tx => {
+    // Company -> provider -> directory, matching administrative removal order.
+    await tx.$queryRawUnsafe('SELECT id FROM "VirtualOrgMember" WHERE id=$1 AND "providerId"=$2 FOR UPDATE', member.id, state.providerId);
+    const current = await tx.virtualOrgMember.findUnique({ where: { id: member.id } });
+    if (!current || current.providerId !== state.providerId)
+      fail(401, "STATE_INVALID", "이메일 등록 요청이 만료되었거나 존재하지 않습니다.");
+    if (current.emailCipher)
+      fail(409, "EMAIL_REGISTERED", "이미 이메일이 등록된 계정입니다. 다시 로그인해주세요.");
+    if (state.nonceHash !== memberSnapshot(current))
+      fail(409, "DIRECTORY_CHANGED", "디렉터리 정보가 변경되었습니다. 다시 로그인해주세요.");
+    const consumed = await tx.ssoState.deleteMany({ where: { id: state.id,
+      stateHash: sha256(input.ticket), orgMemberId: current.id, expiresAt: { gt: new Date() } } });
+    if (!consumed.count) fail(401, "STATE_REPLAYED", "state가 이미 사용되었습니다.");
+    const claimed = await tx.virtualOrgMember.updateMany({ where: { id: current.id,
+      version: current.version, emailCipher: null }, data: { emailCipher: encrypt(email), version: { increment: 1 } } });
+    if (!claimed.count) fail(409, "DIRECTORY_CHANGED", "디렉터리 정보가 변경되었습니다. 다시 로그인해주세요.");
+    await audit(tx, { tenantId: current.tenantId, user: { id: null } }, "org-email-register",
+      "org_auth.email_registered", "virtualOrgMember", current.id, ["emailCipher"]);
+  });
+  return { status: "verified" as const, ...result };
 }

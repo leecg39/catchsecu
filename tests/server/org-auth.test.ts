@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeEach, expect, test } from "vitest";
+import { afterAll, beforeEach, expect, test, vi } from "vitest";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { decrypt } from "@/server/crypto";
 import { env } from "@/server/env";
+import * as auditModule from "@/server/audit";
 
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
@@ -164,4 +165,112 @@ test("테넌트 격리: 다른 회사 디렉터리·공급자에 접근할 수 �
   await db.ssoProvider.update({ where: { id: provider.id }, data: { enabled: false } });
   const { orgLogin } = await routes();
   expect((await orgLogin(req("/auth/org/login", "", "POST", loginBody()))).status).toBe(404);
+});
+
+async function pendingEmailRegistration() {
+  const owner = await ownerCookie();
+  const provider = await makeGpki(owner.cookie);
+  const { member } = await addDirectory(owner.cookie, provider.id,
+    { orgCode: "ORG-1", employeeNo: "EMP-1", name: "등록 대기", pin: "4321" });
+  const { orgLogin, emailRegister } = await routes();
+  const response = await orgLogin(req("/auth/org/login", "", "POST", loginBody()));
+  expect(response.status).toBe(200);
+  const { ticket } = await response.json();
+  const state = await db.ssoState.findFirstOrThrow({ where: { orgMemberId: member.id } });
+  return { ...owner, provider, member, state, ticket, emailRegister };
+}
+async function assertRegistrationRolledBack(memberId: string, stateId: string) {
+  expect(await db.virtualOrgMember.findUniqueOrThrow({ where: { id: memberId } }))
+    .toMatchObject({ emailCipher: null, version: 1 });
+  expect(await db.ssoState.findUnique({ where: { id: stateId } })).not.toBeNull();
+  expect(await db.auditEvent.count({ where: { action: "org_auth.email_registered", resourceId: memberId } })).toBe(0);
+}
+
+test("티켓 발급 후 공급자를 정지하면 이메일·버전·등록 감사가 남지 않는다", async () => {
+  const fixture = await pendingEmailRegistration();
+  await db.ssoProvider.update({ where: { id: fixture.provider.id }, data: { enabled: false } });
+  const response = await fixture.emailRegister(req("/auth/org/email-register", "", "POST",
+    { ticket: fixture.ticket, email: "stopped@catchsecu.test" }));
+  expect(response.status).toBe(409);
+  expect(response.headers.get("set-cookie")).toBeNull();
+  await assertRegistrationRolledBack(fixture.member.id, fixture.state.id);
+});
+
+test("기존 계정 이메일 충돌은 등록을 롤백하고 같은 티켓으로 올바른 이메일을 재시도할 수 있다", async () => {
+  const fixture = await pendingEmailRegistration();
+  const send = (email: string) => fixture.emailRegister(req("/auth/org/email-register", "", "POST", { ticket: fixture.ticket, email }));
+  const rejected = await send(fixture.user.email);
+  expect(rejected.status).toBe(409);
+  await assertRegistrationRolledBack(fixture.member.id, fixture.state.id);
+  expect((await send("corrected@catchsecu.test")).status).toBe(200);
+});
+
+test("로그인 감사가 실패하면 디렉터리·티켓·JIT 계정·세션까지 모두 롤백한다", async () => {
+  const fixture = await pendingEmailRegistration();
+  const original = auditModule.audit;
+  const spy = vi.spyOn(auditModule, "audit").mockImplementation(async (...args) => {
+    if (args[3] === "sso.login") throw new Error("TEST_LOGIN_AUDIT_FAILED");
+    return original(...args);
+  });
+  try {
+    const response = await fixture.emailRegister(req("/auth/org/email-register", "", "POST",
+      { ticket: fixture.ticket, email: "audit-rollback@catchsecu.test" }));
+    expect(response.status).toBe(500);
+    expect(response.headers.get("set-cookie")).toBeNull();
+    await assertRegistrationRolledBack(fixture.member.id, fixture.state.id);
+    expect(await db.user.findUnique({ where: { email: "audit-rollback@catchsecu.test" } })).toBeNull();
+    expect(await db.account.count({ where: { providerId: "sso:" + fixture.provider.id } })).toBe(0);
+  } finally { spy.mockRestore(); }
+});
+
+test("로그인 완료 직전 티켓이 만료되면 등록 변경도 함께 롤백한다", async () => {
+  const fixture = await pendingEmailRegistration();
+  const original = auditModule.audit;
+  vi.useFakeTimers({ toFake: ["Date"] });
+  const spy = vi.spyOn(auditModule, "audit").mockImplementation(async (...args) => {
+    await original(...args);
+    if (args[3] === "sso.login") vi.setSystemTime(new Date(fixture.state.expiresAt.getTime() + 1));
+  });
+  try {
+    const response = await fixture.emailRegister(req("/auth/org/email-register", "", "POST",
+      { ticket: fixture.ticket, email: "expired-rollback@catchsecu.test" }));
+    expect(response.status).toBe(401);
+    await assertRegistrationRolledBack(fixture.member.id, fixture.state.id);
+    expect(await db.user.findUnique({ where: { email: "expired-rollback@catchsecu.test" } })).toBeNull();
+  } finally { spy.mockRestore(); vi.useRealTimers(); }
+});
+
+test("동시 이메일 등록은 한 회차만 성공하고 계정·감사를 한 번만 만든다", async () => {
+  const fixture = await pendingEmailRegistration();
+  const responses = await Promise.all(["first@catchsecu.test", "second@catchsecu.test"].map(email =>
+    fixture.emailRegister(req("/auth/org/email-register", "", "POST", { ticket: fixture.ticket, email }))));
+  expect(responses.filter(response => response.status === 200)).toHaveLength(1);
+  expect(responses.filter(response => response.status >= 400)).toHaveLength(1);
+  expect(await db.account.count({ where: { providerId: "sso:" + fixture.provider.id } })).toBe(1);
+  expect(await db.auditEvent.count({ where: { action: "org_auth.email_registered", resourceId: fixture.member.id } })).toBe(1);
+  expect(await db.ssoState.findUnique({ where: { id: fixture.state.id } })).toBeNull();
+});
+
+test.each(["closed", "ip-blocked"])("회사 접근을 회수한 뒤 %s 등록 요청은 디렉터리를 변경하지 않는다", async kind => {
+  const fixture = await pendingEmailRegistration();
+  if (kind === "closed") await db.company.update({ where: { id: fixture.company.id }, data: { status: "closed" } });
+  else {
+    await db.ipRule.create({ data: { tenantId: fixture.company.id, cidr: "192.0.2.1/32", enabled: true } });
+    await db.ipAccessPolicy.create({ data: { tenantId: fixture.company.id, enabled: true } });
+  }
+  const response = await fixture.emailRegister(req("/auth/org/email-register", "", "POST",
+    { ticket: fixture.ticket, email: "access-revoked@catchsecu.test" }));
+  expect(response.status).toBe(403);
+  await assertRegistrationRolledBack(fixture.member.id, fixture.state.id);
+});
+
+test("티켓 발급 뒤 디렉터리 버전이 바뀌면 기존 티켓으로 등록할 수 없다", async () => {
+  const fixture = await pendingEmailRegistration();
+  await db.virtualOrgMember.update({ where: { id: fixture.member.id }, data: { version: { increment: 1 } } });
+  const response = await fixture.emailRegister(req("/auth/org/email-register", "", "POST",
+    { ticket: fixture.ticket, email: "changed@catchsecu.test" }));
+  expect(response.status).toBe(409);
+  expect(await db.virtualOrgMember.findUniqueOrThrow({ where: { id: fixture.member.id } }))
+    .toMatchObject({ emailCipher: null, version: 2 });
+  expect(await db.ssoState.findUnique({ where: { id: fixture.state.id } })).not.toBeNull();
 });
