@@ -258,3 +258,5 @@ P03-T01 검증: 사업자등록증 실제 검사·바이트 다운로드·교체
 2026-10-16 후속3(d6d5a08 푸시): P11-T05 보안 게이트 체인에 가상 SSO 단계 추가 — 가상 GPKI 등록·디렉터리 로그인·JIT·정지→세션 파기·재로그인 403·감사(security-gate.test.ts 2/2). owner 세션이 이전 단계 정책 만료로 파기되어 2FA 재로그인으로 테스트 시작. P12-T02 경로 수용·P11-T04/P10-T04 증거 연결 완료. 남은 것: 각 Task 잔여 수용 라운드·critical/high 감사·외부 자격증명 항목.
 
 2026-10-16 후속4(7a98eb5·6490e65·634ea25 푸시): 보안 감사 수행 — 인프라 표면 이상 없음, npm audit --omit=dev high 7건(shadcn CLI 경유 braces)은 devDependencies 이동으로 런타임 표면 제거 → critical/high 0 (docs/audit/audit-report-2026-10-16). OWASP 점검 이상 없음. P11-T05 잔여는 외부 IdP 수용뿐(키 회전은 P14-T04 증거로 충족, SSO 체인은 가상 어댑터로 검증). 마이그레이션 체크섬 4건 해소 반영. 전체 회귀 105파일 1,607개 통과(P14-T02 증거 재측정). 공식 완료 17/72 — 잔여 전부 외부 자격증명·원본 대조·전체 게이트 체인 차단.
+
+2026-10-06 재개: P11-T05 운영 가드가 ALLOW_LOCAL_*=false/0에도 local을 허용하는 결함 발견, 18실패 재현→31통과·지원Node24 관련40통과로 수정. 기존 analytics QA 타입/린트 오류 보완. 사용자 지정 .env.local로 SMTP 연결·인증 성공 및 SOLAPI HTTP200/ACTIVE1 확인(발송0). 기존 외부 자격증명 전부 부재 진술 정정: SSO는 local SAML1/가상GPKI6, PG local, S3 미설정. 외부 수용은 미완료 유지. 증거 docs/qa/P11-T05/production-opt-in/. 다음 가상PG 권한 경합/감사 원자성 검토 및 실제 공급자 수용.

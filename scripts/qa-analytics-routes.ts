@@ -1,7 +1,6 @@
 // P12-T02 집계·대시보드 잔여 브라우저 수용: 7개 경로의 권한·빈 상태·모바일 시나리오.
 // dev 서버(3100)+catchsecu_dev, 자격증명은 .local/recovery-members.json.
-import { chromium, type BrowserContext } from "playwright";
-import { randomUUID } from "node:crypto";
+import { chromium } from "playwright";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 import { db } from "../src/server/db";
@@ -39,16 +38,15 @@ const browser = await chromium.launch();
 
 // API 기대값 — 대시보드 집계와 화면 숫자를 대조한다.
 const dash = await (await fetch(base + "/api/v1/analytics/dashboard", { headers: { cookie: ownerCookie } })).json();
-const svcADash = await (await fetch(base + `/api/v1/analytics/dashboard?serviceId=${svcA}`, { headers: { cookie: ownerCookie } })).json();
 
 // 1) owner: /dashboard — 활성 서비스 2개와 실제 집계
 const owner = await ctx(ownerCookie);
-let page = await owner.newPage();
+const page = await owner.newPage();
 await page.goto(base + "/dashboard", { waitUntil: "domcontentloaded" });
 await page.waitForTimeout(3000);
 await page.screenshot({ path: states + "01-dashboard-owner.png" });
 let body = await text(page);
-const svcNames = f.services.map((s: { name: string }) => s.name);
+const svcNames: string[] = f.services.map((s: { name: string }) => s.name);
 record("dashboard-owner", svcNames.every(n => body.includes(n)), "services visible");
 
 // 2) owner: /dashboard/{serviceId} 상세

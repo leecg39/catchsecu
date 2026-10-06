@@ -58,12 +58,12 @@ if (!result.success) {
   throw new Error("서버 환경 설정 오류: " + result.error.issues.map(issue => issue.path.join(".")).join(", "));
 }
 export const env = result.data;
-if (process.env.NODE_ENV === "production" && env.MAIL_TRANSPORT === "local" && !process.env.ALLOW_LOCAL_MAIL) {
+if (process.env.NODE_ENV === "production" && env.MAIL_TRANSPORT === "local" && process.env.ALLOW_LOCAL_MAIL !== "1") {
   throw new Error("운영 환경은 SMTP 설정이 필요합니다. 로컬 미리보기만 ALLOW_LOCAL_MAIL=1을 사용하세요.");
 }
-if (process.env.NODE_ENV === "production" && env.KAKAO_PROVIDER === "local" && !process.env.ALLOW_LOCAL_KAKAO) {
+if (process.env.NODE_ENV === "production" && env.KAKAO_PROVIDER === "local" && process.env.ALLOW_LOCAL_KAKAO !== "1") {
   throw new Error("운영 환경은 카카오 공급자 연결이 필요합니다. 로컬 발송은 ALLOW_LOCAL_KAKAO=1을 사용하세요.");
 }
-if (process.env.NODE_ENV === "production" && env.PAYMENT_PROVIDER === "local" && !process.env.ALLOW_LOCAL_PAYMENT) {
+if (process.env.NODE_ENV === "production" && env.PAYMENT_PROVIDER === "local" && process.env.ALLOW_LOCAL_PAYMENT !== "1") {
   throw new Error("운영 환경은 결제 공급자 연결이 필요합니다. 가상 결제는 ALLOW_LOCAL_PAYMENT=1을 사용하세요.");
 }
