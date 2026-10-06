@@ -1,0 +1,48 @@
+# Mock 대체 및 내부 잔여 검증 결과
+
+2026-10-06 사용자 지시: 외부 증명을 Mock Data로 대체하고 가능한 내부 구현을 우선 완료한다. 이번 실행 결과는 **passed**이며 실제 외부 수신·SSO 공급자·운영 PITR 성공과는 별도로 기록한다.
+
+## 구현·수정
+
+- 결제 이벤트 동시 처리: 동일 승인 8개·승인/실패·환불 중복/상충·가상 PG 경합을 회사/이벤트 잠금으로 직렬화했다. 수정 전 4개 실패, 수정 후 관련22개 통과.
+- 관리자 상품: KRW/DB 정수 한도/0개 기능 한도/판매 가격/기간 검증, 현재 운영자 권한·세션 최종 기한, 동시 생성, 감사 롤백을 보완했다. 미판매·미참조 버전만 삭제하는 100번째 migration을 추가했고 모든 UPDATE 및 판매/구독 이력 삭제는 계속 금지한다. 수정 전8실패→신규13통과.
+- 보유기간 규칙: 현재권한·MFA·최종기한·생성 재요청 최신값·보관410·서비스별 변경 직렬화를 보완했다. 최초 실패4개 중 제품3개/시험fixture1개이며, 마지막owner 보호를 만족하는 인계fixture를 보완한 후 관리자+보유규칙18개 통과.
+- `verify:mock`/`verify:mock:providers` 통합 실행기: 실제 격리 PostgreSQL을 사용해 Mock 공급자·S3·계약·계획·타입·린트·production 빌드를 순차 실행하고 종료코드·실패/skip·소스해시를 기록한다. 실행 중 코드 변경은 실패로 판정한다.
+
+## 최종 검증
+
+- 서버 109파일, 1665개 통과, 실패0, skip0, todo0.
+- 최종 실행 중 소스 변경 0개.
+- 전체 타입·린트·production 빌드 통과. 린트는 기존 경고30개를 숨기지 않고 기록했다.
+- 실제 HTTP 21개 통과. 서버 재시작 후 업무 데이터 해시 일치=true, 재로그인200·보관 규칙조회200·회수된 관리자403.
+- migration 적용 4개 DB 모두 성공, 개발 상품/버전/구독/결제/잔액 데이터 해시 보존=true. 새 빈 DB100개 설치와99→100 업그레이드 확인. 파일명 접두사는 기존 migration 정렬 순서를 잇기 위한 것이며 실제 실행일은2026-10-06이다.
+- runtime npm audit 0건.
+- 계약306경로/438작업 모두 implemented, 계획181경로/72작업 검사 통과.
+
+첫 전체 실행은1646통과/1실패였다. 실행기의 KAKAO_PROVIDER=local 강제가 미설정 거부 시험과 충돌해 테스트 기본값을unconfigured로 바로잡았다. 로컬 성공 시험은 자체적으로local을 켠다. 최초 실패는[first-run](first-run/report.json)에 보존했고 수정 후 전체를 재실행했다.
+
+## 공급자별 모의 증거
+
+| 영역 | 결과 | 검증 방식 |
+|---|---|---|
+| catalog-and-retention | mock-verified | synthetic catalog/retention + live authority/atomicity |
+| idp | mock-verified | local OIDC RSA HTTP + signed SAML |
+| organization | mock-verified | virtual GPKI/Saeol/groupware directory |
+| payment | mock-verified | virtual PG + signed webhook + real PostgreSQL ledger |
+| mail | mock-verified | local mail artifact + job/feedback state |
+| sms | mock-verified | mock HTTP/HMAC provider + signed receipt |
+| kakao | mock-verified | local channel/template review and delivery |
+| notifications | mock-verified | local receipt + SSRF/failure contract |
+| identity-signature | mock-verified | local signed identity/signature callbacks |
+| recovery | mock-verified | synthetic legacy data/key rotation/destruction in PostgreSQL; not infrastructure restore |
+| s3 | mock-verified | loopback SigV4 + encrypted bytes |
+
+## 재실행·결과 위치
+
+프로젝트 지원 Node22/24에서 `npm run verify:mock` 또는 `npm run verify:mock:providers`를 실행한다. `.env.test.local`의 loopback catchsecu_test만 사용하고 테스트 데이터를 초기화하므로 동일 DB 시험과 동시에 실행하지 않는다. 실제 앱 `.env.local`과 발송 설정은 바꾸지 않았다.
+
+- [최종 실행 보고서](full/report.json) / [전체 테스트 상세](full/tests.json)
+- [작업별 근거](task-matrix.md) / [HTTP](http/result.json) / [재시작](http/restart.json) / [마이그레이션](migration-result.json)
+- [계획](../../planning/07-mock-completion.md)
+
+이번 신규 화면 재검증은 Ego56 제어권 응답 대기다. 기존 화면 증거는 해당 작업 폴더에 보존한다. 전체72개 원래 수용 체크박스는 실외부·원본·화면 전체 수용을 포함하므로 자동으로 올리지 않았다. 실제 외부 연동 없이 내부/API/Mock 시험은 계속 실행할 수 있다.

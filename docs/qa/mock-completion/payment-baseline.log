@@ -1,0 +1,102 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:34679) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/payment-concurrency.test.ts (5 tests | 4 failed) 2996ms
+   × 같은 승인 웹훅 8개가 동시에 와도 이벤트·입금은 한 번이고 나머지는 멱등 응답이다 790ms
+   × 승인과 실패 웹훅이 동시 도착하면 하나만 상태를 변경한다 682ms
+   × 환불 동시 이벤트 duplicate=false에서 정산은 한 번만 적용된다 610ms
+   × 환불 동시 이벤트 duplicate=true에서 정산은 한 번만 적용된다 446ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/payment-concurrency.test.ts > 같은 승인 웹훅 8개가 동시에 와도 이벤트·입금은 한 번이고 나머지는 멱등 응답이다
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/server/payment-concurrency.test.ts:37:56
+     35|   const body = JSON.stringify({ orderId: order.id, eventId: randomUUID…
+     36|   const results = await Promise.allSettled(Array.from({ length: 8 }, (…
+     37|   expect(results.every(r => r.status === "fulfilled")).toBe(true);
+       |                                                        ^
+     38|   expect(results.filter(r => r.status === "fulfilled" && !r.value.dupl…
+     39|   expect(await db.paymentEvent.count({ where: { orderId: order.id } })…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/payment-concurrency.test.ts > 승인과 실패 웹훅이 동시 도착하면 하나만 상태를 변경한다
+AssertionError: expected [ { status: 'fulfilled', …(1) }, …(1) ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ tests/server/payment-concurrency.test.ts:45:57
+     43|   const { order, company, subscription } = await fixture();
+     44|   const results = await Promise.allSettled(["paid", "failed"].map(outc…
+     45|   expect(results.filter(r => r.status === "fulfilled")).toHaveLength(1…
+       |                                                         ^
+     46|   expect(results.find(r => r.status === "rejected")).toMatchObject({ r…
+     47|   expect(await db.paymentEvent.count({ where: { orderId: order.id } })…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/payment-concurrency.test.ts > 환불 동시 이벤트 duplicate=false에서 정산은 한 번만 적용된다
+AssertionError: expected { status: 'rejected', …(1) } to match object { reason: { status: 409, …(1) } }
+(6 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": {
+-     "code": "OUT_OF_ORDER",
+-     "status": 409,
++   "reason": PrismaClientKnownRequestError {
++     "code": "P2039",
+    },
+  }
+
+ ❯ tests/server/payment-concurrency.test.ts:62:59
+     60|   expect(results.filter(r => r.status === "fulfilled")).toHaveLength(d…
+     61|   if (duplicate) expect(results.filter(r => r.status === "fulfilled" &…
+     62|   else expect(results.find(r => r.status === "rejected")).toMatchObjec…
+       |                                                           ^
+     63|   expect(await db.paymentEvent.count({ where: { orderId: order.id, out…
+     64|   const row = await db.paymentRefund.findUniqueOrThrow({ where: { id: …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/payment-concurrency.test.ts > 환불 동시 이벤트 duplicate=true에서 정산은 한 번만 적용된다
+AssertionError: expected [ { status: 'fulfilled', …(1) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/server/payment-concurrency.test.ts:60:57
+     58|   const second = duplicate ? first : JSON.stringify({ orderId: order.i…
+     59|   const results = await Promise.allSettled([apply(first), apply(second…
+     60|   expect(results.filter(r => r.status === "fulfilled")).toHaveLength(d…
+       |                                                         ^
+     61|   if (duplicate) expect(results.filter(r => r.status === "fulfilled" &…
+     62|   else expect(results.find(r => r.status === "rejected")).toMatchObjec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed (5)
+   Start at  14:05:24
+   Duration  4.45s (tests 70%, import 20%, transform 10%)
+

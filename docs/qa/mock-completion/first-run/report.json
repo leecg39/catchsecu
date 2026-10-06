@@ -1,0 +1,796 @@
+{
+  "checkedAt": "2026-10-06T05:07:01.851Z",
+  "mode": "full",
+  "evidenceLevel": "mock",
+  "realExternalAcceptance": false,
+  "node": "v24.19.0",
+  "gitHead": "61c3aa4a30df001da41cb053c818e24b83931100",
+  "result": "failed",
+  "steps": [
+    {
+      "id": "tests",
+      "status": "failed",
+      "code": 1,
+      "signal": null,
+      "durationMs": 1011066,
+      "log": "tests.log"
+    },
+    {
+      "id": "s3",
+      "status": "passed",
+      "code": 0,
+      "signal": null,
+      "durationMs": 380,
+      "log": "s3.log"
+    },
+    {
+      "id": "contracts",
+      "status": "passed",
+      "code": 0,
+      "signal": null,
+      "durationMs": 144,
+      "log": "contracts.log"
+    },
+    {
+      "id": "plan",
+      "status": "passed",
+      "code": 0,
+      "signal": null,
+      "durationMs": 84,
+      "log": "plan.log"
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "code": 0,
+      "signal": null,
+      "durationMs": 8469,
+      "log": "typecheck.log"
+    },
+    {
+      "id": "lint",
+      "status": "passed",
+      "code": 0,
+      "signal": null,
+      "durationMs": 21567,
+      "log": "lint.log"
+    },
+    {
+      "id": "build",
+      "status": "passed",
+      "code": 0,
+      "signal": null,
+      "durationMs": 52868,
+      "log": "build.log"
+    }
+  ],
+  "providers": [
+    {
+      "id": "idp",
+      "tasks": [
+        "P11-T03",
+        "P11-T05"
+      ],
+      "kind": "local OIDC RSA HTTP + signed SAML",
+      "files": [
+        "sso.test.ts",
+        "sso-saml.test.ts",
+        "sso-recovery.test.ts",
+        "security-gate.test.ts"
+      ],
+      "status": "mock-verified",
+      "tests": 196
+    },
+    {
+      "id": "organization",
+      "tasks": [
+        "P11-T04"
+      ],
+      "kind": "virtual GPKI/Saeol/groupware directory",
+      "files": [
+        "org-auth.test.ts"
+      ],
+      "status": "mock-verified",
+      "tests": 5
+    },
+    {
+      "id": "payment",
+      "tasks": [
+        "P10-T02",
+        "P10-T04",
+        "P10-T05"
+      ],
+      "kind": "virtual PG + signed webhook + real PostgreSQL ledger",
+      "files": [
+        "billing-virtual.test.ts",
+        "payment-orders.test.ts",
+        "payment-concurrency.test.ts",
+        "billing-refunds.test.ts",
+        "billing-settlement.test.ts"
+      ],
+      "status": "mock-verified",
+      "tests": 30
+    },
+    {
+      "id": "mail",
+      "tasks": [
+        "P09-T01",
+        "P09-T02",
+        "P09-T06"
+      ],
+      "kind": "local mail artifact + job/feedback state",
+      "files": [
+        "mail-job-audit.test.ts",
+        "message-content.test.ts",
+        "campaigns.test.ts"
+      ],
+      "status": "mock-verified",
+      "tests": 76
+    },
+    {
+      "id": "sms",
+      "tasks": [
+        "P08-T03",
+        "P09-T06"
+      ],
+      "kind": "mock HTTP/HMAC provider + signed receipt",
+      "files": [
+        "sms-adapter.test.ts"
+      ],
+      "status": "mock-verified",
+      "tests": 3
+    },
+    {
+      "id": "kakao",
+      "tasks": [
+        "P09-T03",
+        "P09-T04",
+        "P09-T06"
+      ],
+      "kind": "local channel/template review and delivery",
+      "files": [
+        "kakao-templates.test.ts"
+      ],
+      "status": "failed-or-incomplete",
+      "tests": 2
+    },
+    {
+      "id": "notifications",
+      "tasks": [
+        "P09-T05"
+      ],
+      "kind": "local receipt + SSRF/failure contract",
+      "files": [
+        "notifications.test.ts"
+      ],
+      "status": "mock-verified",
+      "tests": 25
+    },
+    {
+      "id": "identity-signature",
+      "tasks": [
+        "P06-T06"
+      ],
+      "kind": "local signed identity/signature callbacks",
+      "files": [
+        "verification-flow.test.ts",
+        "verification-configuration.test.ts"
+      ],
+      "status": "mock-verified",
+      "tests": 33
+    },
+    {
+      "id": "recovery",
+      "tasks": [
+        "P07-T04",
+        "P14-T01",
+        "P14-T04"
+      ],
+      "kind": "synthetic legacy data/key rotation/destruction in PostgreSQL; not infrastructure restore",
+      "files": [
+        "legacy-migration.test.ts",
+        "crypto-rotation.test.ts",
+        "destruction.test.ts"
+      ],
+      "status": "mock-verified",
+      "tests": 60
+    },
+    {
+      "id": "s3",
+      "tasks": [
+        "P01-T03",
+        "P06-T03",
+        "P14-T03"
+      ],
+      "kind": "loopback SigV4 + encrypted bytes",
+      "status": "mock-verified",
+      "requests": 5
+    }
+  ],
+  "limits": [
+    "Mock evidence replaces external proof for this requested run only.",
+    "No real provider delivery, original-screen fidelity, staging or WAL/PITR certification.",
+    "Uses real isolated PostgreSQL; does not replace DB with memory mocks."
+  ],
+  "tests": {
+    "passed": 1646,
+    "failed": 1,
+    "pending": 0,
+    "todo": 0,
+    "files": 107
+  },
+  "tasks": [
+    {
+      "id": "P00-T01",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P00-T01/",
+      "acceptance": "경로 181개 고유·누락0; 모든 메뉴 진입점과 정상/실패/권한 상태를 매핑; 모르는 항목 목록 작성"
+    },
+    {
+      "id": "P00-T02",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P00-T02/",
+      "acceptance": "빈 DB migration+session+Route Handler+테스트 실행; 채택/탈락 사유 ADR; 자격증명 필요 구간 분리"
+    },
+    {
+      "id": "P00-T03",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P00-T03/",
+      "acceptance": "계약마다 역할·tenant·유효성·삭제정책·금지 동작 명시; 모호한 분기에 근거 또는 결정 기록"
+    },
+    {
+      "id": "P00-T04",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P00-T04/",
+      "acceptance": "고아 경로/Task0; 실제 ID fixture로 이동 가능; mock/adapter/staging 검증 등급 분리"
+    },
+    {
+      "id": "P01-T01",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P01-T01/",
+      "acceptance": "빈 DB 설치·기존 버전 업그레이드·실패복구; FK/unique 위반·회사 교차 참조 거부"
+    },
+    {
+      "id": "P01-T02",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P01-T02/",
+      "acceptance": "201/200/204·400/401/403/404/409/422/429 계약; 같은 key 다른 payload 거부; 목록 안정정렬"
+    },
+    {
+      "id": "P01-T03",
+      "status": "completed",
+      "mockProviders": [
+        "s3"
+      ],
+      "evidence": "docs/qa/P01-T03/",
+      "acceptance": "파일 바이트 roundtrip; 위장 확장자·초과용량·타회사·경로탈출 거부; 검사 전 비공개"
+    },
+    {
+      "id": "P01-T04",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P01-T04/",
+      "acceptance": "2 worker 경쟁·중간 종료·재시작 복구; 같은 작업 중복 부작용0; 재처리 이력"
+    },
+    {
+      "id": "P01-T05",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P01-T05/",
+      "acceptance": "비밀 누락 시 명확한 오류; 로그에 PII/token 없음; fresh checkout 재현; 테스트 실패 CI 차단"
+    },
+    {
+      "id": "P02-T01",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P02-T01/",
+      "acceptance": "잘못된 암호·정지계정·세션만료·로그아웃 후 재사용 거부; 새 브라우저 실제 로그인"
+    },
+    {
+      "id": "P02-T02",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P02-T02/",
+      "acceptance": "만료/재사용/코드 오입력 거부; 복구코드 1회; 이메일 테스트함 링크로 실제 복구"
+    },
+    {
+      "id": "P02-T03",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P02-T03/",
+      "acceptance": "전역/서비스/타회사 IDOR 전수 표; UI 숨김 우회 API에도403/404; owner만 소유권 변경"
+    },
+    {
+      "id": "P02-T04",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P02-T04/",
+      "acceptance": "가입→메일검증→로그인→2FA→보호페이지→로그아웃 E2E; invalid callback 실패"
+    },
+    {
+      "id": "P02-T05",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P02-T05/",
+      "acceptance": "A/B회사 동시 브라우저 격리; 모든 보호 API 미인증 차단; session fixation/로그아웃 재사용 차단"
+    },
+    {
+      "id": "P03-T01",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P03-T01/",
+      "acceptance": "생성→검색→편집→재로그인→보관; 참조 중 서비스 삭제409; 타회사 파일 거부"
+    },
+    {
+      "id": "P03-T02",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P03-T02/",
+      "acceptance": "다른 이메일 초대수락 거부; 마지막 owner 제거 차단; 권한 회수 직후 API 차단"
+    },
+    {
+      "id": "P03-T03",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P03-T03/",
+      "acceptance": "재시작 후 프로필 유지; owner 인계 전 탈퇴 실패; 탈퇴 후 세션 및 토큰 거부"
+    },
+    {
+      "id": "P03-T04",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P03-T04/",
+      "acceptance": "탭별 입력 분리·복원; 잘못된 URL/타서비스 문서 거부; 발송 이력 추적"
+    },
+    {
+      "id": "P03-T05",
+      "status": "planned",
+      "mockProviders": [],
+      "evidence": "docs/qa/P03-T05/",
+      "acceptance": "회사A/B·서비스2개 E2E; 브라우저와 DB 조회 일치; UI 전체 변경분 캡처"
+    },
+    {
+      "id": "P04-T01",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P04-T01/",
+      "acceptance": "다양한 질문·선택지·분기·필수 검증; 게시버전 직접수정 거부; 복제 ID 독립"
+    },
+    {
+      "id": "P04-T02",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P04-T02/",
+      "acceptance": "앞뒤 이동·새로고침·다른 기기 복원; 동시에 수정하면409·재로드 안내; 제목만 복제하는 템플릿 제거"
+    },
+    {
+      "id": "P04-T03",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P04-T03/",
+      "acceptance": "승인전 공개 불가; 고정URL 변경과 구버전응답 보존; 만료/회수/한도 경합 검사"
+    },
+    {
+      "id": "P04-T04",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P04-T04/",
+      "acceptance": "신규/편집 혼동0; 2페이지 검색·빈페이지 범위보정; 참조중 삭제 불가 안내"
+    },
+    {
+      "id": "P04-T05",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P04-T05/",
+      "acceptance": "모든 질문 유형/분기·서비스권한·동시수정·재시작 E2E; localStorage 도메인 의존0"
+    },
+    {
+      "id": "P05-T01",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P05-T01/",
+      "acceptance": "국가/항목/목적 필수 규칙·기간 타입·중복·타회사 참조 검사; UI별 저장 복원"
+    },
+    {
+      "id": "P05-T02",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P05-T02/",
+      "acceptance": "초안 CRUD; 이전동의 문구 고정; 게시 버전 비교·잘못된 HTML 무해화"
+    },
+    {
+      "id": "P05-T03",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P05-T03/",
+      "acceptance": "정상·만료·회수 token; 공개가능 필드만 반환; 각 agree 파라미터 무효값 거부"
+    },
+    {
+      "id": "P05-T04",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P05-T04/",
+      "acceptance": "다운로드 실제 파일·한글·버전 일치; 무권한 금지; 동의 당시 PDF/본문 해시 재현"
+    },
+    {
+      "id": "P06-T01",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P06-T01/",
+      "acceptance": "필드변조·타버전 질문·미동의·마감·중복 요청 거부; 동시 제출 한도 초과0"
+    },
+    {
+      "id": "P06-T02",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P06-T02/",
+      "acceptance": "새 브라우저 관리자에 응답 표시; 정정 원본 이력 보존; 역할별 필드 접근 차이"
+    },
+    {
+      "id": "P06-T03",
+      "status": "in_progress",
+      "mockProviders": [
+        "s3"
+      ],
+      "evidence": "docs/qa/P06-T03/",
+      "acceptance": "실제 파일 byte/hash 동일; 다른 questionId/customerId/fileId 조합 거부; 만료 URL 차단"
+    },
+    {
+      "id": "P06-T04",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P06-T04/",
+      "acceptance": "초대받은 사람만 지정 필드 조회; 권한회수 즉시 세션 무효; 공유 파일 우회 차단"
+    },
+    {
+      "id": "P06-T05",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P06-T05/",
+      "acceptance": "계정 존재 추측 불가 공통응답; 다른 사람 토큰 거부; 철회가 다음 발송 suppression에 반영"
+    },
+    {
+      "id": "P06-T06",
+      "status": "in_progress",
+      "mockProviders": [
+        "identity-signature"
+      ],
+      "evidence": "docs/qa/P06-T06/",
+      "acceptance": "서명위조·중복callback 거부; 실제 sandbox 검증 없으면 완료 체크 금지"
+    },
+    {
+      "id": "P06-T07",
+      "status": "planned",
+      "mockProviders": [],
+      "evidence": "docs/qa/P06-T07/",
+      "acceptance": "모든 동적 URL에 실제fixture ID 사용; token 유출 검사; 새로고침/재시작/파일 검증"
+    },
+    {
+      "id": "P07-T01",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P07-T01/",
+      "acceptance": "인코딩·큰파일·빈행·중복·부분실패·재실행 중복0; 원본파일 보존정책; CSV 수식 무해화"
+    },
+    {
+      "id": "P07-T02",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P07-T02/",
+      "acceptance": "다른 서비스 동의 섞이지 않음; 대량철회 멱등; 발송 직전 거부 목록 확인"
+    },
+    {
+      "id": "P07-T03",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P07-T03/",
+      "acceptance": "가상시계 만료; legalHold 우선; 파일삭제 실패 재처리; 원문 제거 후 최소증거만 잔존"
+    },
+    {
+      "id": "P07-T04",
+      "status": "planned",
+      "mockProviders": [
+        "recovery"
+      ],
+      "evidence": "docs/qa/P07-T04/",
+      "acceptance": "영속 DB·파일 삭제 증거; 보관/백업 복원 후 재파기 절차 포함; 2회사 격리"
+    },
+    {
+      "id": "P08-T01",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P08-T01/",
+      "acceptance": "인증대기 발신 불가; 만료 재확인; 사용중 삭제 규칙; 재시작 후 목록 유지"
+    },
+    {
+      "id": "P08-T02",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P08-T02/",
+      "acceptance": "잘못된 번호/주소·수신거부·중복 제거; draft편집만 가능; 예약변경 충돌 검사"
+    },
+    {
+      "id": "P08-T03",
+      "status": "in_progress",
+      "mockProviders": [
+        "sms"
+      ],
+      "evidence": "docs/qa/P08-T03/",
+      "acceptance": "sandbox 실제 수신 또는 provider receipt; 인증실패·timeout·중복webhook·부분성공; 허위 sent 금지"
+    },
+    {
+      "id": "P08-T04",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P08-T04/",
+      "acceptance": "같은 delivery 이중 발송0; 실제상태 반영; 권한거부·비용한도·예약취소 E2E"
+    },
+    {
+      "id": "P09-T01",
+      "status": "in_progress",
+      "mockProviders": [
+        "mail"
+      ],
+      "evidence": "docs/qa/P09-T01/",
+      "acceptance": "sanitize·미확정변수 차단; 업로드 권한; 도메인 미확인 차단; draft CRUD"
+    },
+    {
+      "id": "P09-T02",
+      "status": "in_progress",
+      "mockProviders": [
+        "mail"
+      ],
+      "evidence": "docs/qa/P09-T02/",
+      "acceptance": "실제 테스트함에서 메일/첨부 확인; unsubscribe 재사용/위조 검사; 정책 기준 경계값·중복event"
+    },
+    {
+      "id": "P09-T03",
+      "status": "in_progress",
+      "mockProviders": [
+        "kakao"
+      ],
+      "evidence": "docs/qa/P09-T03/",
+      "acceptance": "승인 안 된 템플릿 발송 거부; 변경 후 재심사; provider 상태와 DB 일치"
+    },
+    {
+      "id": "P09-T04",
+      "status": "planned",
+      "mockProviders": [
+        "kakao"
+      ],
+      "evidence": "docs/qa/P09-T04/",
+      "acceptance": "공급자 sandbox 실제 결과; 변수 누락/거부/부분실패; 대체발송 중복/요금 검증"
+    },
+    {
+      "id": "P09-T05",
+      "status": "in_progress",
+      "mockProviders": [
+        "notifications"
+      ],
+      "evidence": "docs/qa/P09-T05/",
+      "acceptance": "웹훅 URL SSRF·내부IP·리디렉션 차단; disabled 전송0; 실패 재시도; 허용된 테스트채널 수신"
+    },
+    {
+      "id": "P09-T06",
+      "status": "planned",
+      "mockProviders": [
+        "mail",
+        "sms",
+        "kakao"
+      ],
+      "evidence": "docs/qa/P09-T06/",
+      "acceptance": "provider-contract 시험과 외부sandbox 시험 별도 증거; 미연결 채널은 완료 금지"
+    },
+    {
+      "id": "P10-T01",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P10-T01/",
+      "acceptance": "서버가격 변조 차단; 제한/무제한 seed; 한도경합·기간경계·변경가격 과거청구 불변"
+    },
+    {
+      "id": "P10-T02",
+      "status": "in_progress",
+      "mockProviders": [
+        "payment"
+      ],
+      "evidence": "docs/qa/P10-T02/",
+      "acceptance": "success URL 위조로 paid 불가; 카드원문 저장0; callback 중복/순서역전; sandbox 승인"
+    },
+    {
+      "id": "P10-T03",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P10-T03/",
+      "acceptance": "동시 차감 음수 방지; 같은원천 중복차감0; 실패전송 정책 정산; 통화별 잔액 일치"
+    },
+    {
+      "id": "P10-T04",
+      "status": "in_progress",
+      "mockProviders": [
+        "payment"
+      ],
+      "evidence": "docs/qa/P10-T04/",
+      "acceptance": "환불누계 초과 거부; PG와 DB 대사; refund retry 중복0; 마감후 정정 이벤트"
+    },
+    {
+      "id": "P10-T05",
+      "status": "in_progress",
+      "mockProviders": [
+        "payment"
+      ],
+      "evidence": "docs/qa/P10-T05/",
+      "acceptance": "주문→승인→한도증가→사용→환불→대사 E2E; 실패URL·다른purchaseId 노출 차단; 외부 미검증 완료금지"
+    },
+    {
+      "id": "P11-T01",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P11-T01/",
+      "acceptance": "저장만 되는 설정0; 정책변경→다음요청 적용; 기존세션 처리·관리자 lockout 회피"
+    },
+    {
+      "id": "P11-T02",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P11-T02/",
+      "acceptance": "프록시 신뢰경계·IPv4/IPv6·IP우회·마지막 복구수단·owner 예외 만료 검사"
+    },
+    {
+      "id": "P11-T03",
+      "status": "in_progress",
+      "mockProviders": [
+        "idp"
+      ],
+      "evidence": "docs/qa/P11-T03/",
+      "acceptance": "state/nonce/PKCE/audience/issuer/서명·재전송·연결탈취 검사; 테스트 IdP 실제 SSO"
+    },
+    {
+      "id": "P11-T04",
+      "status": "planned",
+      "mockProviders": [
+        "organization"
+      ],
+      "evidence": "docs/qa/P11-T04/",
+      "acceptance": "공식 sandbox/테스트환경의 성공·실패 증거; SDK/접근권 없으면 블로커 유지; 임의 성공 처리 금지"
+    },
+    {
+      "id": "P11-T05",
+      "status": "planned",
+      "mockProviders": [
+        "idp"
+      ],
+      "evidence": "docs/qa/P11-T05/",
+      "acceptance": "실제권한/반복공격·만료·회수·탈퇴 테스트; 비밀 관리/키 회전; critical/high 미해결0"
+    },
+    {
+      "id": "P12-T01",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P12-T01/completion/README.md",
+      "acceptance": "변경과 event 원자성; 일반사용자 U/D 불가; 역할별 마스킹·필드/회사 격리"
+    },
+    {
+      "id": "P12-T02",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P12-T02/",
+      "acceptance": "seed 기대값과 SQL 집계 일치; 정정·철회·파기 반영; 현재0·기간경계·재집계 비교"
+    },
+    {
+      "id": "P12-T03",
+      "status": "completed",
+      "mockProviders": [],
+      "evidence": "docs/qa/P12-T03/",
+      "acceptance": "근거없는 준수 통과 금지; 같은필터 동일합계; 다운로드 제한·CSV수식 무해화"
+    },
+    {
+      "id": "P12-T04",
+      "status": "planned",
+      "mockProviders": [],
+      "evidence": "docs/qa/P12-T04/",
+      "acceptance": "존재하지 않는 serviceId·다른회사 거부; 0/1/11/100개 pagination; 대량조회 plan/index 확인"
+    },
+    {
+      "id": "P13-T01",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P13-T01/",
+      "acceptance": "운영자만 공통자료 수정; 일반회원403; HTML sanitize; 공지삭제 링크/검색/첨부 일관성"
+    },
+    {
+      "id": "P13-T02",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P13-T02/",
+      "acceptance": "리디렉션 루프0; GET 로그아웃 부작용 제거; 빈권한→정당한 요청흐름; 오류후 재시도"
+    },
+    {
+      "id": "P13-T03",
+      "status": "in_progress",
+      "mockProviders": [],
+      "evidence": "docs/qa/P13-T03/",
+      "acceptance": "모든 visible action이 실제API/이동에 연결; loading·empty·validation·conflict·forbidden·retry·disabled 확인"
+    },
+    {
+      "id": "P13-T04",
+      "status": "planned",
+      "mockProviders": [],
+      "evidence": "docs/qa/P13-T04/",
+      "acceptance": "모든 동적fixture 경로 1개 이상 정상/오류; 1440/768/390 주요화면 및 전페이지 레이아웃; 캡처/증거목록"
+    },
+    {
+      "id": "P14-T01",
+      "status": "planned",
+      "mockProviders": [
+        "recovery"
+      ],
+      "evidence": "docs/qa/P14-T01/",
+      "acceptance": "이관전후 개수/필드 검증; 잘못된자료 격리; 원본백업 유지; 비밀번호/임의token 이관0"
+    },
+    {
+      "id": "P14-T02",
+      "status": "planned",
+      "mockProviders": [],
+      "evidence": "docs/qa/P14-T02/",
+      "acceptance": "181행 각각 backend/UI/test 증거; 실패·skip 숨김0; build/type/lint오류0; 테스트용 메모리DB로 대체금지"
+    },
+    {
+      "id": "P14-T03",
+      "status": "planned",
+      "mockProviders": [
+        "s3"
+      ],
+      "evidence": "docs/qa/P14-T03/",
+      "acceptance": "서비스별 증거 ID/시각/상태; 미설정은 blocked 표시; 실패대사/알람/재시도 절차"
+    },
+    {
+      "id": "P14-T04",
+      "status": "in_progress",
+      "mockProviders": [
+        "recovery"
+      ],
+      "evidence": "docs/qa/P14-T04/",
+      "acceptance": "별도환경 백업복원 성공; 기존 schema 업그레이드; worker 재기동; 복구 후 권한/파기 일관성"
+    },
+    {
+      "id": "P14-T05",
+      "status": "planned",
+      "mockProviders": [],
+      "evidence": "docs/qa/P14-T05/",
+      "acceptance": "전 Task 체크·외부검증 완료·critical/high미해결0·무근거 완성 주장0; 미충족 있으면 전체 완료금지"
+    }
+  ],
+  "finishedAt": "2026-10-06T05:25:16.471Z",
+  "sourceHashes": {
+    "src/server/payments.ts": "7c7c6ed36f7da140bb4dae879be940de224d62b15a0fdb7c746755c8d3f5a2fe",
+    "scripts/verify-mock.mjs": "8ca45392a6f55d4d4695b1ca5cb05fc4a4f64d8783e8f16f3cd9427d35cf5546",
+    "tests/server/sso.test.ts": "45d1432f881d380dd81bd57c1c585361558e62e55af5f37acb204751978c2273",
+    "tests/server/sso-saml.test.ts": "16b29aa7febe102b4ddd9a9c1f9a3605bfe03ca22e8514c7fec7d8524ff9ad76",
+    "tests/server/sso-recovery.test.ts": "70cb4aff990cc006661031b4381075de5c86f3ef9cf9eb742b5391cca42a5c2a",
+    "tests/server/security-gate.test.ts": "b8160f82a7d536d9ac89049ad574e7e07507bc0174bffd1dcc0252b2534440b2",
+    "tests/server/org-auth.test.ts": "44f7789047c19b80ce3ee5f3182db5a1688845df10ddca209c39723bbd339dcb",
+    "tests/server/billing-virtual.test.ts": "1d72e5a6f915017fc14e16e6ac83109fd779cfee215c88ee0fbe534d9d7d512c",
+    "tests/server/payment-orders.test.ts": "c84e46467e7b572a44eeb81a720145e0ad3753298b444cd176d5a1c659418b78",
+    "tests/server/payment-concurrency.test.ts": "9b23f3cbbc339be448364bcc91b37a70d111fcf78b7543b3afa23a34b8e8144f",
+    "tests/server/billing-refunds.test.ts": "0fcd671b6972f08743ddbe227a79490b683399a43875f051643a8621842cdb0c",
+    "tests/server/billing-settlement.test.ts": "8b6e64775430d2f5fc9c8d6eb2891ffc8d66f82724f2a59988adaef0f2261102",
+    "tests/server/mail-job-audit.test.ts": "d6daad2b49633af35516d6c1e4d7c7f4cf9e63eb78f18603e00f2e9f490e6d5e",
+    "tests/server/message-content.test.ts": "f048615514b32163409afc67f9d60d438338514af8e23f5ff8a71c466eb2b532",
+    "tests/server/campaigns.test.ts": "2a799a2e3d178612435caa8c1ade0338a35db8d3238ba965e3994a5d560f8765",
+    "tests/server/sms-adapter.test.ts": "d21b8f34f7208e8a5212f40570b106145d2669d71ef8b0742bf21507ef0ca65e",
+    "tests/server/kakao-templates.test.ts": "fd1aa00911c6a47d19bf6fa292ef29cd73a401a673ab1413001b06175751c4a2",
+    "tests/server/notifications.test.ts": "e92edf8a099112408d744195862e7bf59d0a2a2b300b14dca27bbabb6b3105f0",
+    "tests/server/verification-flow.test.ts": "609336fa716e6e4b91dbf996be9516de789c626b6648e8367e583d6c7d69c331",
+    "tests/server/verification-configuration.test.ts": "d481821d24eadc4e045a727c4dc1c3c3707cfef94e3e10e78bd3d844ce7bd7da",
+    "tests/server/legacy-migration.test.ts": "ae8c2e5b2502ac4a594ba192237c422678d37a7bf841b730ce1d2bc900203f31",
+    "tests/server/crypto-rotation.test.ts": "27a9f50d3fec9d54175c8733f7bb7f3e463222bebca16ec36879184542ecf919",
+    "tests/server/destruction.test.ts": "9c00752f89d02858da982ae4292a36582ae48f74146264b8abc2d3ca41223f8f"
+  }
+}

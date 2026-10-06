@@ -1,0 +1,315 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/admin-plans.test.ts (10 tests | 8 failed) 5510ms
+   × DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: {"currency":"USD"} 590ms
+   × DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: {"priceKrw":2147483648} 563ms
+   × DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: {"orderable":true,"priceKrw":null} 363ms
+   × 0개 한도는 유효한 비활성 기능 한도이다 311ms
+   × 현재 시점보다 과거인 종료일은 422이고 생성 전체가 롤백된다 763ms
+   × 미판매·미사용 상품 CRUD 및 버전 삭제가 가능하고 감사가 남는다 579ms
+   × 운영자 권한 회수 후 이전 actor로 상품을 변경하거나 조회할 수 없다 679ms
+   × 같은 식별자 상품 동시 생성은 하나만 성공하고 나머지는 409이다 617ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/admin-plans.test.ts > DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: {"currency":"USD"}
+ FAIL  tests/server/admin-plans.test.ts > DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: {"priceKrw":2147483648}
+ FAIL  tests/server/admin-plans.test.ts > DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: {"orderable":true,"priceKrw":null}
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/server/admin-plans.test.ts:29:61
+     27|
+     28| test.each([{ currency: "USD" }, { priceKrw: 2147483648 }, { orderable:…
+     29|   expect(adminPlanCreate.safeParse(input(version)).success).toBe(false…
+       |                                                             ^
+     30| });
+     31| test("0개 한도는 유효한 비활성 기능 한도이다", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/server/admin-plans.test.ts > 0개 한도는 유효한 비활성 기능 한도이다
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/server/admin-plans.test.ts:32:73
+     30| });
+     31| test("0개 한도는 유효한 비활성 기능 한도이다", () => {
+     32|   expect(adminPlanCreate.safeParse(input({ serviceLimit: 0 })).success…
+       |                                                                         ^
+     33| });
+     34| test("현재 시점보다 과거인 종료일은 422이고 생성 전체가 롤백된다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/server/admin-plans.test.ts > 현재 시점보다 과거인 종료일은 422이고 생성 전체가 롤백된다
+AssertionError: expected Error: 같은 번호·주기의 버전이 있습니다. { …(2) } to match object { status: 422, code: 'INVALID_PERIOD' }
+
+- Expected
++ Received
+
+- {
+-   "code": "INVALID_PERIOD",
+-   "status": 422,
++ HttpError {
++   "code": "VERSION_CONFLICT",
++   "status": 409,
+  }
+
+ ❯ tests/server/admin-plans.test.ts:36:57
+     34| test("현재 시점보다 과거인 종료일은 422이고 생성 전체가 롤백된다", async () => {
+     35|   const a = await actor(), parsed = adminPlanCreate.parse(input({ effe…
+     36|   await expect(createAdminPlan(a, parsed, randomUUID())).rejects.toMat…
+       |                                                         ^
+     37|   expect(await db.billingPlan.findUnique({ where: { id: parsed.id } })…
+     38| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/server/admin-plans.test.ts > 미판매·미사용 상품 CRUD 및 버전 삭제가 가능하고 감사가 남는다
+PrismaClientKnownRequestError: 
+Invalid `tx.billingPlanVersion.deleteMany()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/admin-plans.ts:78:33
+
+  75 if (plan._count.subscriptions) fail(409, "PLAN_IN_USE", "구독이 연결된 상품은 삭제할 수 없습니다.");
+  76 if (await tx.billingPlanVersion.count({ where: { planId: id, orderable: true } }))
+  77   fail(409, "PLAN_ORDERABLE", "주문 가능한 버전이 남아 있습니다. orderable 해제 후 삭제하세요.");
+→ 78 await tx.billingPlanVersion.deleteMany(
+Database error. Code: `P0001`. Message: `BILLING_PLAN_VERSION_IMMUTABLE`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ src/server/admin-plans.ts:78:5
+     76|     if (await tx.billingPlanVersion.count({ where: { planId: id, order…
+     77|       fail(409, "PLAN_ORDERABLE", "주문 가능한 버전이 남아 있습니다. orderable 해제 후 …
+     78|     await tx.billingPlanVersion.deleteMany({ where: { planId: id } });
+       |     ^
+     79|     await tx.billingPlan.delete({ where: { id } });
+     80|     await audit(tx, { tenantId: null, user: { id: actor.user.id } }, r…
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/src/runtime/getPrismaClient.ts:861:18
+ ❯ tests/server/admin-plans.test.ts:45:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  tests/server/admin-plans.test.ts > 운영자 권한 회수 후 이전 actor로 상품을 변경하거나 조회할 수 없다
+AssertionError: promise resolved "{ items: [ { …(6) }, { …(6) }, …(3) ] }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "createdAt": "2026-10-06T05:12:01.431Z",
++       "description": "",
++       "id": "mock-34a5c09b-1e4a-4be2-b33a-520d826b9fc2",
++       "name": "변경됨",
++       "subscriptionCount": 0,
++       "versions": [
++         {
++           "currency": "KRW",
++           "cycle": "month",
++           "effectiveFrom": "2026-10-06T05:12:01.432Z",
++           "effectiveTo": null,
++           "features": [],
++           "formLimit": null,
++           "id": "cbd596df-26b7-4ba5-b388-9871e57bc617",
++           "memberLimit": null,
++           "number": 1,
++           "orderable": false,
++           "priceKrw": 12000,
++           "serviceLimit": null,
++           "subjectLimit": null,
++         },
++       ],
++     },
++     {
++       "createdAt": "2026-10-06T05:12:02.130Z",
++       "description": "",
++       "id": "mock-03c788c4-9f9f-4818-9634-0ff2e1235a3e",
++       "name": "모의 상품",
++       "subscriptionCount": 0,
++       "versions": [
++         {
++           "currency": "KRW",
++           "cycle": "month",
++           "effectiveFrom": "2026-10-06T05:12:02.131Z",
++           "effectiveTo": null,
++           "features": [],
++           "formLimit": null,
++           "id": "d76a18bd-935e-4118-b590-fc83e533fce0",
++           "memberLimit": null,
++           "number": 1,
++           "orderable": false,
++           "priceKrw": 12000,
++           "serviceLimit": null,
++           "subjectLimit": null,
++         },
++       ],
++     },
++     {
++       "createdAt": "2026-10-06T14:11:55.814Z",
++       "description": "회사 등록 후 7일 체험",
++       "id": "trial",
++       "name": "무료 체험",
++       "subscriptionCount": 0,
++       "versions": [
++         {
++           "currency": "KRW",
++           "cycle": "trial",
++           "effectiveFrom": "2026-01-01T00:00:00.000Z",
++           "effectiveTo": null,
++           "features": {
++             "source": "company_registration",
++           },
++           "formLimit": null,
++           "id": "trial-v1",
++           "memberLimit": 10,
++           "number": 1,
++           "orderable": false,
++           "priceKrw": 0,
++           "serviceLimit": 10,
++           "subjectLimit": 1000,
++         },
++       ],
++     },
++     {
++       "createdAt": "2026-10-06T14:11:55.814Z",
++       "description": "원본 월 구독 상품",
++       "id": "privacy_lifecycle",
++       "name": "개인정보 수명 관리",
++       "subscriptionCount": 0,
++       "versions": [
++         {
++           "currency": "KRW",
++           "cycle": "month",
++           "effectiveFrom": "2026-01-01T00:00:00.000Z",
++           "effectiveTo": null,
++           "features": {
++             "source": "observed_membership_page",
++           },
++           "formLimit": null,
++           "id": "privacy-lifecycle-month-v1",
++           "memberLimit": 10,
++           "number": 1,
++           "orderable": true,
++           "priceKrw": 50000,
++           "serviceLimit": 10,
++           "subjectLimit": 1000,
++         },
++         {
++           "currency": "KRW",
++           "cycle": "year",
++           "effectiveFrom": "2026-01-01T00:00:00.000Z",
++           "effectiveTo": null,
++           "features": {
++             "priceStatus": "unverified",
++           },
++           "formLimit": null,
++           "id": "privacy-lifecycle-year-v1",
++           "memberLimit": 10,
++           "number": 1,
++           "orderable": false,
++           "priceKrw": null,
++           "serviceLimit": 10,
++           "subjectLimit": 1000,
++         },
++       ],
++     },
++     {
++       "createdAt": "2026-10-06T14:11:55.814Z",
++       "description": "원본 월 구독 상품",
++       "id": "policy_management",
++       "name": "처리방침 관리",
++       "subscriptionCount": 0,
++       "versions": [
++         {
++           "currency": "KRW",
++           "cycle": "month",
++           "effectiveFrom": "2026-01-01T00:00:00.000Z",
++           "effectiveTo": null,
++           "features": {
++             "source": "observed_membership_page",
++           },
++           "formLimit": null,
++           "id": "policy-management-month-v1",
++           "memberLimit": 5,
++           "number": 1,
++           "orderable": true,
++           "priceKrw": 50000,
++           "serviceLimit": 5,
++           "subjectLimit": 1000,
++         },
++         {
++           "currency": "KRW",
++           "cycle": "year",
++           "effectiveFrom": "2026-01-01T00:00:00.000Z",
++           "effectiveTo": null,
++           "features": {
++             "priceStatus": "unverified",
++           },
++           "formLimit": null,
++           "id": "policy-management-year-v1",
++           "memberLimit": 5,
++           "number": 1,
++           "orderable": false,
++           "priceKrw": null,
++           "serviceLimit": 5,
++           "subjectLimit": 1000,
++         },
++       ],
++     },
++   ],
+  }
+
+ ❯ tests/server/admin-plans.test.ts:54:25
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  tests/server/admin-plans.test.ts > 같은 식별자 상품 동시 생성은 하나만 성공하고 나머지는 409이다
+AssertionError: expected { status: 'rejected', …(1) } to match object { reason: { status: 409, …(1) } }
+(6 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": {
+-     "code": "PLAN_EXISTS",
+-     "status": 409,
++   "reason": PrismaClientKnownRequestError {
++     "code": "P2002",
+    },
+  }
+
+ ❯ tests/server/admin-plans.test.ts:60:54
+     58|   const results = await Promise.allSettled([createAdminPlan(a, parsed,…
+     59|   expect(results.filter(r => r.status === "fulfilled")).toHaveLength(1…
+     60|   expect(results.find(r => r.status === "rejected")).toMatchObject({ r…
+       |                                                      ^
+     61| });
+     62| test("감사 실패는 상품과 버전을 함께 롤백하고 서버 오류를 충돌로 숨기지 않는다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 2 passed (10)
+   Start at  14:11:56
+   Duration  7.10s (tests 79%, import 14%, transform 7%)
+

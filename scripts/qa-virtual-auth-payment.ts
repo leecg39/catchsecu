@@ -61,7 +61,7 @@ await page.fill('input[placeholder="예: 본사 Entra ID"]', `${tag} 가상 GPKI
 await page.screenshot({ path: states + "01-virtual-provider-form.png" });
 await page.getByRole("button", { name: /등록|저장/ }).last().click();
 await page.waitForTimeout(2500);
-let body = await page.locator("body").innerText();
+const body = await page.locator("body").innerText();
 const provider = await db.ssoProvider.findFirst({ where: { tenantId: f.companyId, protocol: "gpki", name: { startsWith: tag } } });
 record("virtual-provider-ui-create", !!provider && provider.preflightOk && body.includes("가상 GPKI"), "provider=" + provider?.id);
 

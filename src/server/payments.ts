@@ -128,11 +128,17 @@ function parsePaymentEvent(raw: string, signature: string, secret: string | unde
 }
 export async function applyPaymentEvent(raw: string, signature: string, secret: string | undefined, requestId: string = randomUUID()) {
   const input = parsePaymentEvent(raw, signature, secret);
-  return db.$transaction(tx => applyParsedPaymentEvent(tx, input, requestId));
+  return db.$transaction(tx => applyParsedPaymentEvent(tx, input, requestId), { timeout: 15000 });
 }
 async function applyParsedPaymentEvent(tx: Transaction, input: z.infer<typeof providerEvent>, requestId: string) {
-  const order = await tx.paymentOrder.findUnique({ where: { id: input.orderId } });
-  if (!order) fail(404, "NOT_FOUND", "결제 주문을 찾을 수 없습니다.");
+  const target = await tx.paymentOrder.findUnique({ where: { id: input.orderId }, select: { tenantId: true } });
+  if (!target) fail(404, "NOT_FOUND", "결제 주문을 찾을 수 없습니다.");
+  // Match billing mutations' company-first lock order, including virtual checkout.
+  // Re-read state after waiting so duplicate or competing events see committed data.
+  await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${target.tenantId} FOR UPDATE`;
+  // Provider event IDs are globally unique, including collisions across companies.
+  await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${input.eventId}, 0))::text`;
+  const order = await tx.paymentOrder.findUniqueOrThrow({ where: { id: input.orderId } });
   const existing = await tx.paymentEvent.findUnique({ where: { providerEventId: input.eventId } });
   if (existing) {
     if (existing.orderId !== order.id || existing.outcome !== input.outcome ||

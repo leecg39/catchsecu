@@ -2,12 +2,27 @@ import type { z } from "zod";
 import type { RetentionRule } from "@/generated/prisma/client";
 import { retentionRuleList } from "@/contracts/retention-rules";
 import type { retentionRuleCreate, retentionRulePatch } from "@/contracts/retention-rules";
-import { db } from "./db";
+import { db, type Transaction } from "./db";
+import { lockServiceActor } from "./service-actor";
+import { assertFileDeadlines } from "./file-access";
 import type { Context } from "./context";
 import { fail } from "./http";
 import { audit } from "./audit";
 import { idempotent } from "./idempotency";
 import { formScope, lockFormService } from "./form-access";
+
+async function withRuleAccess<T>(ctx: Context, capability: "security.read" | "security.write", operation: (tx: Transaction) => Promise<T>) {
+  return db.$transaction(async tx => {
+    const actor = await lockServiceActor(tx, ctx, capability);
+    const result = await operation(tx);
+    assertFileDeadlines(actor.deadlines);
+    return result;
+  }, { timeout: 15000 });
+}
+async function lockRuleService(tx: Transaction, ctx: Context, serviceId: string) {
+  await tx.$queryRaw`SELECT id FROM "Service" WHERE id=${serviceId} AND "tenantId"=${ctx.tenantId} FOR UPDATE`;
+  await lockFormService(tx, ctx, serviceId, "security.write");
+}
 
 function dto(row: RetentionRule) {
   return { id: row.id, serviceId: row.serviceId, retentionDays: row.retentionDays, reason: row.reason,
@@ -16,7 +31,7 @@ function dto(row: RetentionRule) {
 
 export async function listRetentionRules(ctx: Context, raw: unknown) {
   const input = retentionRuleList.parse(raw);
-  return db.$transaction(async tx => {
+  return withRuleAccess(ctx, "security.read", async tx => {
     const scope = await formScope(tx, ctx, "security.read");
     const where = { tenantId: ctx.tenantId, status: input.status, service: scope,
       ...(input.serviceId ? { serviceId: input.serviceId } : {}) };
@@ -29,7 +44,7 @@ export async function listRetentionRules(ctx: Context, raw: unknown) {
   });
 }
 export async function readRetentionRule(ctx: Context, id: string) {
-  return db.$transaction(async tx => {
+  return withRuleAccess(ctx, "security.read", async tx => {
     const row = await tx.retentionRule.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!row) fail(404, "NOT_FOUND", "보유 기간 규칙을 찾을 수 없습니다.");
     await lockFormService(tx, ctx, row.serviceId, "security.read", false);
@@ -37,8 +52,13 @@ export async function readRetentionRule(ctx: Context, id: string) {
   });
 }
 export async function createRetentionRule(ctx: Context, input: z.infer<typeof retentionRuleCreate>, key: string | null, requestId: string) {
+  let deadlines: Awaited<ReturnType<typeof lockServiceActor>>["deadlines"];
+  const authorize = async (tx: Transaction) => {
+    deadlines = (await lockServiceActor(tx, ctx, "security.write")).deadlines;
+    await lockRuleService(tx, ctx, input.serviceId);
+  };
   return idempotent("retention-rule:create:" + ctx.member.id, key, input, async tx => {
-    await lockFormService(tx, ctx, input.serviceId, "security.write");
+    await authorize(tx);
     const existing = await tx.retentionRule.findUnique({ where: { tenantId_serviceId: { tenantId: ctx.tenantId, serviceId: input.serviceId } } });
     if (existing?.status === "active") fail(409, "RULE_EXISTS", "해당 서비스의 보유 기간 규칙이 이미 있습니다.");
     try {
@@ -52,14 +72,18 @@ export async function createRetentionRule(ctx: Context, input: z.infer<typeof re
       if ((error as { code?: string }).code === "P2002") fail(409, "RULE_EXISTS", "해당 서비스의 보유 기간 규칙이 이미 있습니다.");
       throw error;
     }
-  });
+  }, authorize, async (tx, cached) => {
+    const current = await tx.retentionRule.findFirst({ where: { id: cached.id, tenantId: ctx.tenantId, serviceId: input.serviceId } });
+    if (!current || current.status !== "active") fail(410, "RULE_ARCHIVED", "기존 보유 기간 규칙은 보관되었습니다.");
+    return dto(current);
+  }, async () => { assertFileDeadlines(deadlines); });
 }
 export async function updateRetentionRule(ctx: Context, id: string, input: z.infer<typeof retentionRulePatch>, requestId: string) {
-  return db.$transaction(async tx => {
+  return withRuleAccess(ctx, "security.write", async tx => {
     const current = await tx.retentionRule.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!current) fail(404, "NOT_FOUND", "보유 기간 규칙을 찾을 수 없습니다.");
     if (current.status === "archived") fail(409, "RULE_ARCHIVED", "보관된 규칙은 변경할 수 없습니다.");
-    await lockFormService(tx, ctx, current.serviceId, "security.write");
+    await lockRuleService(tx, ctx, current.serviceId);
     const { version, ...fields } = input;
     const result = await tx.retentionRule.updateMany({ where: { id, tenantId: ctx.tenantId, version, status: "active" },
       data: { ...fields, version: { increment: 1 } } });
@@ -69,10 +93,10 @@ export async function updateRetentionRule(ctx: Context, id: string, input: z.inf
   });
 }
 export async function archiveRetentionRule(ctx: Context, id: string, version: number, requestId: string) {
-  return db.$transaction(async tx => {
+  return withRuleAccess(ctx, "security.write", async tx => {
     const current = await tx.retentionRule.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!current) fail(404, "NOT_FOUND", "보유 기간 규칙을 찾을 수 없습니다.");
-    await lockFormService(tx, ctx, current.serviceId, "security.write");
+    await lockRuleService(tx, ctx, current.serviceId);
     const result = await tx.retentionRule.updateMany({ where: { id, tenantId: ctx.tenantId, version, status: "active" },
       data: { status: "archived", version: { increment: 1 } } });
     if (!result.count) {

@@ -1,0 +1,125 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/retention-rules.test.ts (5 tests | 4 failed) 6917ms
+   × 생성 재요청은 현재 규칙을 반환하며 보관 뒤에는 410이다 3720ms
+   × 멤버 권한 회수 후 같은 생성 키의 재요청도 거부된다 620ms
+   × 현재 보안 정책의 MFA 요구는 오래된 context의 조회·수정에도 적용된다 837ms
+   × 보유기간 수정 중 세션이 만료되면 규칙과 감사가 롤백된다 809ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/retention-rules.test.ts > 생성 재요청은 현재 규칙을 반환하며 보관 뒤에는 410이다
+AssertionError: expected 30 to be 60 // Object.is equality
+
+- Expected
++ Received
+
+- 60
++ 30
+
+ ❯ tests/server/retention-rules.test.ts:39:37
+     37|   await updateRetentionRule(f.ctx, f.rule.id, { version: f.rule.versio…
+     38|   const replay = await createRetentionRule(f.ctx, f.input, f.key, rand…
+     39|   expect(replay.body.retentionDays).toBe(60);
+       |                                     ^
+     40|   expect(replay.body.version).toBe(2);
+     41|   await archiveRetentionRule(f.ctx, f.rule.id, 2, randomUUID());
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/retention-rules.test.ts > 멤버 권한 회수 후 같은 생성 키의 재요청도 거부된다
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/retention-rules.test.ts:46:23
+
+  43 });
+  44 test("멤버 권한 회수 후 같은 생성 키의 재요청도 거부된다", async () => {
+  45   const f = await setup();
+→ 46   await db.membership.update(
+Database error. Code: `23514`. Message: `LAST_OWNER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/retention-rules.test.ts:46:3
+     44| test("멤버 권한 회수 후 같은 생성 키의 재요청도 거부된다", async () => {
+     45|   const f = await setup();
+     46|   await db.membership.update({ where: { id: f.ctx.member.id }, data: {…
+       |   ^
+     47|   await expect(createRetentionRule(f.ctx, f.input, f.key, randomUUID()…
+     48| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/retention-rules.test.ts > 현재 보안 정책의 MFA 요구는 오래된 context의 조회·수정에도 적용된다
+AssertionError: promise resolved "{ items: [ { …(8) } ], total: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "createdAt": "2026-10-06T05:17:08.612Z",
++       "id": "8b98f1f6-021b-4bd4-b013-b1b5a595b8cc",
++       "reason": "모의 보유기간",
++       "retentionDays": 30,
++       "serviceId": "3469c2b7-351e-4067-85be-43c9eef2fe49",
++       "status": "active",
++       "updatedAt": "2026-10-06T05:17:08.612Z",
++       "version": 1,
++     },
++   ],
++   "page": 1,
++   "pageSize": 20,
++   "total": 1,
+  }
+
+ ❯ tests/server/retention-rules.test.ts:53:25
+     51|   await db.securityPolicy.update({ where: { tenantId: f.ctx.tenantId }…
+     52|   for (const call of [() => listRetentionRules(f.ctx, {}), () => readR…
+     53|     await expect(call()).rejects.toMatchObject({ status: 403, code: "M…
+       |                         ^
+     54| });
+     55| test("보유기간 수정 중 세션이 만료되면 규칙과 감사가 롤백된다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/retention-rules.test.ts > 보유기간 수정 중 세션이 만료되면 규칙과 감사가 롤백된다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T05:17:09.430Z",
++   "id": "4ba0e88d-a840-47ea-9f21-a9e652e47c6f",
++   "reason": "모의 보유기간",
++   "retentionDays": 90,
++   "serviceId": "91069464-1e5b-4a4c-8f0b-fdcda57269d2",
++   "status": "active",
++   "updatedAt": "2026-10-06T05:17:09.448Z",
++   "version": 2,
+  }
+
+ ❯ tests/server/retention-rules.test.ts:61:103
+     59|     if (args[3] === "retention_rule.updated") { vi.useFakeTimers({ toF…
+     60|   });
+     61|   await expect(updateRetentionRule(f.ctx, f.rule.id, { version: 1, ret…
+       |                                                                                                       ^
+     62|   expect((await db.retentionRule.findUniqueOrThrow({ where: { id: f.ru…
+     63|   expect(await db.auditEvent.count({ where: { resourceId: f.rule.id, a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed (5)
+   Start at  14:17:01
+   Duration  8.53s (tests 83%, import 11%, transform 6%)
+

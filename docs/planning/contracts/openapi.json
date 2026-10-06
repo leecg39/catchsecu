@@ -20895,7 +20895,7 @@
                           {
                             "type": "integer",
                             "minimum": 0,
-                            "maximum": 100000000000
+                            "maximum": 2147483647
                           },
                           {
                             "type": "null"
@@ -20905,13 +20905,13 @@
                       "currency": {
                         "default": "KRW",
                         "type": "string",
-                        "pattern": "^[A-Z]{3}$"
+                        "const": "KRW"
                       },
                       "serviceLimit": {
                         "anyOf": [
                           {
                             "type": "integer",
-                            "exclusiveMinimum": 0,
+                            "minimum": 0,
                             "maximum": 100000000
                           },
                           {
@@ -20923,7 +20923,7 @@
                         "anyOf": [
                           {
                             "type": "integer",
-                            "exclusiveMinimum": 0,
+                            "minimum": 0,
                             "maximum": 100000000
                           },
                           {
@@ -20935,7 +20935,7 @@
                         "anyOf": [
                           {
                             "type": "integer",
-                            "exclusiveMinimum": 0,
+                            "minimum": 0,
                             "maximum": 100000000
                           },
                           {
@@ -20947,7 +20947,7 @@
                         "anyOf": [
                           {
                             "type": "integer",
-                            "exclusiveMinimum": 0,
+                            "minimum": 0,
                             "maximum": 100000000
                           },
                           {
@@ -21301,7 +21301,7 @@
                           {
                             "type": "integer",
                             "minimum": 0,
-                            "maximum": 100000000000
+                            "maximum": 2147483647
                           },
                           {
                             "type": "null"
@@ -21311,13 +21311,13 @@
                       "currency": {
                         "default": "KRW",
                         "type": "string",
-                        "pattern": "^[A-Z]{3}$"
+                        "const": "KRW"
                       },
                       "serviceLimit": {
                         "anyOf": [
                           {
                             "type": "integer",
-                            "exclusiveMinimum": 0,
+                            "minimum": 0,
                             "maximum": 100000000
                           },
                           {
@@ -21329,7 +21329,7 @@
                         "anyOf": [
                           {
                             "type": "integer",
-                            "exclusiveMinimum": 0,
+                            "minimum": 0,
                             "maximum": 100000000
                           },
                           {
@@ -21341,7 +21341,7 @@
                         "anyOf": [
                           {
                             "type": "integer",
-                            "exclusiveMinimum": 0,
+                            "minimum": 0,
                             "maximum": 100000000
                           },
                           {
@@ -21353,7 +21353,7 @@
                         "anyOf": [
                           {
                             "type": "integer",
-                            "exclusiveMinimum": 0,
+                            "minimum": 0,
                             "maximum": 100000000
                           },
                           {
@@ -71761,7 +71761,7 @@
                   },
                   "state": {
                     "type": "string",
-                    "pattern": "^[A-Za-z0-9_-]{43}$"
+                    "pattern": "^[A-Za-z0-9_-]{32,64}$"
                   }
                 },
                 "required": [

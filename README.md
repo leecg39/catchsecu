@@ -4,7 +4,7 @@ CSV의 181개 경로를 대상으로 화면을 조사하고 독립 백엔드를 
 
 ## 실행
 
-Node 22.23.1과 PostgreSQL을 사용합니다. 최초 DB 설정은 `scripts/setup-local.py`를 사용하며, 기존 설정을 덮어쓰지 않습니다.
+Node 22 또는 24와 PostgreSQL을 사용합니다. 이번 Mock 검증은 Node 24.19.0에서 실행했습니다. 최초 DB 설정은 `scripts/setup-local.py`를 사용하며, 기존 설정을 덮어쓰지 않습니다.
 
 ```sh
 npm ci
@@ -23,11 +23,22 @@ npm run worker              # 메일·파기·만료 파일·응답 캐시 처�
 npm test                    # 별도 catchsecu_test PostgreSQL DB
 npm run typecheck
 npm run lint
-ALLOW_LOCAL_MAIL=1 npm run build
-ALLOW_LOCAL_MAIL=1 npm start -- --port 3100
+ALLOW_LOCAL_MAIL=1 ALLOW_LOCAL_PAYMENT=1 ALLOW_LOCAL_KAKAO=1 npm run build
+ALLOW_LOCAL_MAIL=1 ALLOW_LOCAL_PAYMENT=1 ALLOW_LOCAL_KAKAO=1 APP_PORT=3100 npm start
 ```
 
-실제 운영 환경은 SMTP와 비밀 설정이 필요합니다. `ALLOW_LOCAL_MAIL`은 로컬 빌드·미리보기용입니다.
+실제 운영 환경은 공급자 연결과 비밀 설정이 필요합니다. 로컬 빌드·미리보기의 `ALLOW_LOCAL_*`는 정확히 `1`일 때만 허용되며 `false`나 `0`은 허용하지 않습니다.
+
+## 외부 증명의 Mock 대체
+
+2026-10-06 요청에 따라 외부 공급자 증명을 모의 데이터·로컬 공급자 계약으로 대체하는 통합 검증 명령을 추가했습니다. 실제 PostgreSQL의 권한·세션·원장·감사는 그대로 실행합니다.
+
+```sh
+npm run verify:mock             # 전체 서버 회귀·S3·계약·타입·린트·독립 빌드
+npm run verify:mock:providers   # 공급자 경계·S3·계약 검증
+```
+
+`.env.test.local`의 로컬 `catchsecu_test`만 사용하며, 테스트 데이터가 초기화되므로 동일 DB의 다른 테스트와 동시에 실행하지 않습니다. 실제 `.env.local`과 외부 발송 설정을 바꾸지 않습니다. [최신 Mock 결과와 한계](docs/qa/mock-completion/README.md), [작업별 근거](docs/qa/mock-completion/task-matrix.md)를 확인하세요.
 
 ## 구현 및 검증
 
@@ -45,7 +56,7 @@ ALLOW_LOCAL_MAIL=1 npm start -- --port 3100
 - 한글 게시 문서 PDF 생성·버전별 파일 보존·권한/공개 링크 다운로드.
 - DB 트랜잭션, 중복 요청 방지, 수정 충돌 처리, 감사 이력, 민감값 암호화.
 
-현재 구현 범위의 **실제 DB 통합 테스트 368개**, 타입 검사·빌드, 린트 오류 0을 확인했습니다. Ego 브라우저에서 생성→게시→응답 제출→조회·정정·메모 관리와 첨부파일 제출·교체·다운로드를 조작했습니다. 합성 응답의 파기 승인→실제 삭제→증명서 다운로드까지 독립 DB·파일 저장소와 대조했습니다. 수집 근거의 생성·수정·보관·복원·이력과 2페이지 검색도 실제 화면에서 확인했습니다.
+이하 브라우저 설명은 과거 개별 검증 기록입니다. 최신 전체 시험 수·타입·린트·빌드 결과는 [Mock 통합 보고서](docs/qa/mock-completion/README.md)에 기록합니다. Ego 브라우저에서 생성→게시→응답 제출→조회·정정·메모 관리와 첨부파일 제출·교체·다운로드를 조작했습니다. 합성 응답의 파기 승인→실제 삭제→증명서 다운로드까지 독립 DB·파일 저장소와 대조했습니다. 수집 근거의 생성·수정·보관·복원·이력과 2페이지 검색도 실제 화면에서 확인했습니다.
 
 [구현 현황](docs/IMPLEMENTATION-STATUS.md) · [최근 검증 증거](docs/qa/campaigns/README.md) · [72개 실행 Task](TASKS.md)
 
@@ -55,7 +66,7 @@ ALLOW_LOCAL_MAIL=1 npm start -- --port 3100
 
 ## 남은 작업
 
-전문가 배정, 원본 공용 템플릿 전체 질문, 분기·행렬 문항, 원본 미확정 문서 경로, S3, 외부 SMTP·공유 이력 운영 보존 정책, 백업 복원 후 재파기, 발송·결제·외부 연동, IP·SSO·보유 기간 미지정 정책과 통계·공지, 전 경로 E2E가 남아 있습니다. 일부 화면은 초기 클론의 정적 또는 브라우저 데모 상태입니다.
+원본과 대조하지 못한 화면·문서 경로 및 전 페이지 브라우저 수용, 실제 운영 배포·WAL/PITR 증명은 별도 수용 항목입니다. 현재 요청의 외부 공급자 검증은 Mock으로 대체하며 실제 수신·실결제 완료로 기록하지 않습니다. 원래 72개 작업의 전체 수용 상태와 이번 Mock 검증 결과는 구분합니다.
 
 첨부파일을 받으려면 [ClamAV 실행 안내](docs/qa/files/README.md)의 검사 프로세스와 공식 정의 갱신이 필요합니다. 검사 서비스가 없거나 오래된 경우 게시·업로드를 차단합니다. 본인인증 공급자는 아직 미연결입니다. 파기 완료는 worker의 실제 삭제와 증명서 발급으로 확인합니다. 증명 범위는 현재 DB와 비공개 파일 저장소이며 백업·WAL·외부 사본은 제외합니다.
 

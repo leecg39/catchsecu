@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-const limit = z.number().int().positive().max(100000000).nullable().optional();
+const limit = z.number().int().nonnegative().max(100000000).nullable().optional();
 export const planVersionInput = z.object({
   number: z.number().int().positive().max(1000000),
   cycle: z.enum(["month", "year"]),
-  priceKrw: z.number().int().nonnegative().max(100000000000).nullable().optional(),
-  currency: z.string().regex(/^[A-Z]{3}$/).default("KRW"),
+  priceKrw: z.number().int().nonnegative().max(2147483647).nullable().optional(),
+  currency: z.literal("KRW").default("KRW"),
   serviceLimit: limit,
   memberLimit: limit,
   subjectLimit: limit,
@@ -14,7 +14,8 @@ export const planVersionInput = z.object({
   orderable: z.boolean().default(false),
   effectiveFrom: z.iso.datetime().optional(),
   effectiveTo: z.iso.datetime().nullable().optional(),
-}).strict();
+}).strict().refine(input => !input.orderable || input.priceKrw != null,
+  { path: ["priceKrw"], message: "주문 가능한 버전에는 가격이 필요합니다." });
 export const adminPlanCreate = z.object({
   id: z.string().trim().regex(/^[a-z0-9][a-z0-9-]{0,62}$/, "소문자 영숫자와 하이픈만 사용할 수 있습니다."),
   name: z.string().trim().min(1).max(100),
