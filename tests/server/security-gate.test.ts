@@ -13,6 +13,10 @@ import { GET as membersGet } from "@/app/api/v1/members/route";
 import { GET as memberGet, PATCH as memberPatch } from "@/app/api/v1/members/[...segments]/route";
 import { GET as contextGet } from "@/app/api/v1/context/route";
 import { GET as auditList } from "@/app/api/v1/audit-events/route";
+import { POST as ssoCreate } from "@/app/api/v1/security/sso/route";
+import { PATCH as ssoPatch } from "@/app/api/v1/security/sso/[id]/route";
+import { POST as dirAdd } from "@/app/api/v1/security/sso/[id]/directory/route";
+import { POST as orgLogin } from "@/app/api/v1/auth/org/login/route";
 
 const database = new URL(env.DATABASE_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname))
@@ -148,5 +152,53 @@ describe("P11-T05 보안 모듈 통합 체인", () => {
     const ipEvents = await db.auditEvent.findMany({ where: { tenantId: tenant, action: { contains: "ip" } }, select: { action: true } });
     expect(ipEvents.length).toBeGreaterThan(0);
     expect(events.total).toBeGreaterThan(0);
+  });
+
+  test("SSO(가상 어댑터) 단계: 디렉터리 로그인→JIT→구성원 정지→세션 파기→감사가 같은 체인에서 집행된다", async () => {
+    // 이전 단계에서 owner 세션이 정책 만료로 파기됐으므로 2FA 포함 재로그인으로 새 세션을 얻는다.
+    const relogin = await auth.handler(request("/auth/sign-in/email", "POST", "", { email: "sg-owner@test.local", password }));
+    const otp = await createOTP(ownerTotp, { digits: 6, period: 30 }).totp();
+    const verifiedLogin = await auth.handler(request("/auth/two-factor/verify-totp", "POST", "", { code: otp },
+      "10.8.0.5", { cookie: cookieOf(relogin) }));
+    expect(verifiedLogin.status).toBe(200);
+    const gateCookie = cookieOf(verifiedLogin);
+
+    // 1) owner가 가상 GPKI 공급자를 등록·활성화하고 디렉터리 구성원을 추가한다.
+    const created = await ssoCreate(request("/security/sso", "POST", gateCookie,
+      { protocol: "gpki", name: "게이트 가상 GPKI" }, "10.8.0.5", { "idempotency-key": randomUUID() }));
+    expect(created.status).toBe(201);
+    const provider = await created.json();
+    const enabled = await ssoPatch(request(`/security/sso/${provider.id}`, "PATCH", gateCookie, { version: provider.version, enabled: true }));
+    expect((await enabled.json()).enabled).toBe(true);
+    const member = await dirAdd(request(`/security/sso/${provider.id}/directory`, "POST", gateCookie,
+      { orgCode: "GATE-ORG", employeeNo: "EMP-7", name: "게이트 직원", email: "sg-org@test.local", pin: "4321" }, "10.8.0.5", { "idempotency-key": randomUUID() }));
+    expect(member.status).toBe(201);
+
+    // 2) 디렉터리 자격으로 로그인 → completeSso 실경로로 JIT viewer 소속+세션 발급
+    const login = await orgLogin(request("/auth/org/login", "POST", "",
+      { protocol: "gpki", orgCode: "GATE-ORG", employeeNo: "EMP-7", pin: "4321" }));
+    expect(login.status).toBe(200);
+    const orgCookie = login.headers.getSetCookie().map(c => c.split(";")[0]).join("; ");
+    const orgUser = await db.user.findUniqueOrThrow({ where: { email: "sg-org@test.local" } });
+    const orgMember = await db.membership.findFirstOrThrow({ where: { tenantId: tenant, userId: orgUser.id } });
+    expect(orgMember.role).toBe("viewer");
+    const orgCtx = await (await contextGet(request("/context", "GET", orgCookie))).json();
+    expect(orgCtx.company?.id).toBe(tenant);
+
+    // 3) owner가 JIT 구성원을 정지 → SSO 세션도 즉시 파기되고 보호 경로가 차단된다
+    const suspended = await memberPatch(request("/members/" + orgMember.id, "PATCH", gateCookie,
+      { version: orgMember.version, status: "suspended" }));
+    expect(suspended.status).toBe(200);
+    expect((await contextGet(request("/context", "GET", orgCookie))).status).toBe(401);
+
+    // 4) 디렉터리 재로그인은 자격은 통과하지만 소속 해제로 SSO_MEMBERSHIP_REQUIRED
+    const retry = await orgLogin(request("/auth/org/login", "POST", "",
+      { protocol: "gpki", orgCode: "GATE-ORG", employeeNo: "EMP-7", pin: "4321" }));
+    expect(retry.status).toBe(403);
+
+    // 5) 감사: SSO 계정 연결·구성원 상태 변경 이벤트가 남는다
+    const audit = await db.auditEvent.findMany({ where: { tenantId: tenant,
+      action: { in: ["sso.account_linked", "org_auth.failed", "member.status_changed"] } }, select: { action: true } });
+    expect(audit.map(a => a.action)).toContain("sso.account_linked");
   });
 });

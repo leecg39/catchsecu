@@ -48,3 +48,17 @@
 ## 보안 감사 (2026-10-05)
 
 [security-audit-20261005.md](security-audit-20261005.md): 런타임 critical/high 미해결 0. 에러 로그 비밀 유출 실버그 발견·수정(fcc778d), npm audit의 high 9건은 dev 전용 ReDoS로 추적. 키 회전은 P14-T04 실증(1345셀 전수·구키 폐기)과 교차 연결. 실제 IdP/PG 경계는 외부 자격 증명 대기로 blocked.
+
+## 통합 체인 SSO 단계 추가 (2026-10-16)
+
+`tests/server/security-gate.test.ts`에 **가상 조직 인증 어댑터** 경로의 체인 단계를 추가했다(2/2 통과):
+
+| 단계 | 검증 |
+|---|---|
+| 가상 GPKI 등록 | owner가 공급자 생성→활성화→디렉터리 구성원 추가(201) |
+| 디렉터리 로그인 | `POST /auth/org/login` → `completeSso` 실경로로 JIT viewer 소속·세션 발급, `/context`에 회사 바인딩 |
+| 구성원 정지 | owner PATCH suspended → SSO 세션도 즉시 파기(`/context` 401) |
+| 재로그인 차단 | 디렉터리 자격은 유효해도 소속 해제로 403 |
+| 감사 | `sso.account_linked` 등 이벤트 기록 |
+
+가상 어댑터이므로 "실제 IdP SSO" 수용에는 대체 불가 — 외부 IdP·키 회전·critical/high 감사 조건은 계속 미완료.
