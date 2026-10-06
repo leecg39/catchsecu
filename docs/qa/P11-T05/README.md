@@ -62,3 +62,9 @@
 | 감사 | `sso.account_linked` 등 이벤트 기록 |
 
 가상 어댑터이므로 "실제 IdP SSO" 수용에는 대체 불가 — 외부 IdP·키 회전·critical/high 감사 조건은 계속 미완료.
+
+## 보안 감사 critical/high 0 (2026-10-16)
+
+[docs/audit/audit-report-2026-10-16.md](../../audit/audit-report-2026-10-16.md) — 인프라 표면(env·히스토리 시크릿·하드코딩·웹훅 서명) 이상 없음, `npm audit --omit=dev`에서 발견된 high 7건(shadcn CLI 경유 braces DoS)은 devDependencies 이동으로 런타임 표면 제거 → **critical/high 미해결 0**. OWASP 점검(SQLi·XSS·CSRF·eval·세션·요청 제한) 이상 없음.
+
+잔여: 외부 IdP 실연동 수용·키 회전 라이브 리허설 — 여전히 미완료.
