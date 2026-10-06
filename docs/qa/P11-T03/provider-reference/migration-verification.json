@@ -1,0 +1,102 @@
+{
+  "at": "2026-10-06T00:17:22.738Z",
+  "migrationName": "20261014130000_sso_account_provider_reference",
+  "freshSchema": "qa_sso_ae7c0cbd6c91d81d",
+  "freshInstall": {
+    "applied": {
+      "count": 95,
+      "mismatches": []
+    },
+    "constraints": [
+      {
+        "conname": "AccountClosure_pkey"
+      },
+      {
+        "conname": "AccountClosure_time_check"
+      },
+      {
+        "conname": "AccountClosure_userId_fkey"
+      },
+      {
+        "conname": "AccountClosure_userId_key"
+      },
+      {
+        "conname": "Account_pkey"
+      },
+      {
+        "conname": "Account_ssoProviderId_fkey"
+      },
+      {
+        "conname": "Account_sso_provider_match"
+      },
+      {
+        "conname": "Account_userId_fkey"
+      }
+    ]
+  },
+  "devUpgrade": {
+    "applied": {
+      "count": 95,
+      "mismatches": [
+        {
+          "migration": "20261006100000_payment_methods",
+          "sourceChecksum": "b15e0ebcdb00335ebc73759832bd5e68e5e0a32effa47f5fac9b76ae9c313150",
+          "appliedChecksum": "5cef8112a4ea0cc5d0c21520a1c62eaf5e5af8bedcd78ec709d6632d97478ec7"
+        },
+        {
+          "migration": "20261006110000_paid_activation",
+          "sourceChecksum": "27ff73c87597b401cbedf5d945bd612b3b3dc42aa94642faffee3c25327fdcfd",
+          "appliedChecksum": "3b0a0ffc94b33e430081b98ada687e33f7b1ce03e0d281fd00569730ab6a40b0"
+        },
+        {
+          "migration": "20261006120000_refund_closing",
+          "sourceChecksum": "e55303786b64b1d9b824635f15721589601e2b09b8b2e8647734abfb66c00a10",
+          "appliedChecksum": "b2299aa3bed207ed95cdba41df757e63b346da7f9bc7b2947bdf69b3f228171b"
+        },
+        {
+          "migration": "20261007000000_sso_providers",
+          "sourceChecksum": "b16dab6c40914acd621a3c9af9d29baf685a062d24a0a672d2c3896a50f3fc6d",
+          "appliedChecksum": "c092e24933fcbe6ba2f068660101b3539d2a8d19db54019b5ded13b208d0f9fb"
+        }
+      ]
+    },
+    "existingRowsPreserved": true,
+    "fingerprints": {
+      "Company": {
+        "count": 51,
+        "sha256": "921e60585803b23cca9e401a55e33bc0684791279b8d1bbe583ff9b1c03145ed"
+      },
+      "User": {
+        "count": 62,
+        "sha256": "27e91b08e2932dc37ddef8736248b23f5bbbea9963d418505ee5081ac72b4239"
+      },
+      "Account": {
+        "count": 61,
+        "sha256": "fa754420b86a34bcf46ddee0a25c1cfab53d7a798609914303c06153787b6b96"
+      },
+      "Membership": {
+        "count": 79,
+        "sha256": "2e8adfb368f9528c79e168659ab1191470c643598e100a29724ca78d212b435f"
+      },
+      "Session": {
+        "count": 283,
+        "sha256": "9538be5047865f8b6881fd26ada075ad5da5283e6caa5bba1305ad0428337f07"
+      },
+      "SsoProvider": {
+        "count": 1,
+        "sha256": "75495eeb9cc0f1a0dd57293264e4a2bac0a5b598924ce26f0e003f9c500b345e"
+      },
+      "SsoState": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  },
+  "orphanMigrationRollbackVerified": true,
+  "legacyReferenceBackfillVerified": true,
+  "references": {
+    "sso": 2,
+    "invalid": 0
+  },
+  "allChecksumsMatch": false
+}

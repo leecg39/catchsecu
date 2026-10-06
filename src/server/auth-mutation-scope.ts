@@ -6,5 +6,6 @@ export type AuthMutationScope = {
   actorId: string | null; tenantId: string | null; lockedUsers: Set<string>;
   changed: boolean; failed: boolean;
   proofDeadline: Date | null; createdResetProofs: Set<string>;
+  ssoMfa?: import("./sso-mfa").SsoMfaAuthorization;
 };
 export const authMutationScope = new AsyncLocalStorage<AuthMutationScope>();

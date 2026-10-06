@@ -1,0 +1,4675 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/subscription-authority.test.ts (22 tests | 22 failed) 3171ms
+   × plans: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 200ms
+   × list: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 117ms
+   × entitlement: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 140ms
+   × assets: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 151ms
+   × purchase: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 191ms
+   × cancel: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 147ms
+   × schedule: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 158ms
+   × undo: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 131ms
+   × purchase: 회수된 세션으로 신규 변경을 실행하지 않는다 108ms
+   × purchase: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다 108ms
+   × cancel: 회수된 세션으로 신규 변경을 실행하지 않는다 102ms
+   × cancel: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다 105ms
+   × schedule: 회수된 세션으로 신규 변경을 실행하지 않는다 101ms
+   × schedule: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다 108ms
+   × undo: 회수된 세션으로 신규 변경을 실행하지 않는다 97ms
+   × undo: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다 103ms
+   × 성공한 구매 요청 재전송도 현재 결제 권한을 확인한다 96ms
+   × 같은 해지 예약 키에 다른 취소 사유를 넣으면 충돌한다 95ms
+   × 구매 재전송은 취소 후 최신 상태를 반환하고 구독을 다시 만들지 않는다 99ms
+   × 예약 재전송은 철회 후 최신 상태를 반환하고 다시 예약하지 않는다 109ms
+   × 같은 version 구매 취소 두 건은 하나만 성공하고 다른 건은409로 끝난다 111ms
+   × 변경 전 새 MFA 정책과 선택 회사 변경을 적용한다 111ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 22 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > plans: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다
+AssertionError: promise resolved "[ { id: 'trial', …(3) }, …(193) ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "description": "회사 등록 후 7일 체험",
+    "id": "trial",
+    "name": "무료 체험",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-05T17:07:31.641Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "901a364a-33a7-4e9d-9bff-303fb857264d",
+        "memberLimit": 2,
+        "number": 220051640,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-05T16:51:53.518Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "9b36261a-39a3-489d-85aa-347820bd1dcd",
+        "memberLimit": 2,
+        "number": 219113517,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-05T12:46:18.477Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "2552bb66-9c23-48cf-88ab-ac52249e2017",
+        "memberLimit": 2,
+        "number": 204378476,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-05T07:12:35.145Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0294301f-585a-496e-8212-65146e17feb4",
+        "memberLimit": 2,
+        "number": 184355144,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-05T06:53:55.477Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "15760430-20d2-40b1-a433-d5127e67ac03",
+        "memberLimit": 2,
+        "number": 183235475,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-05T04:54:17.774Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "183d3cc4-27ad-4066-bdbc-c87d75025064",
+        "memberLimit": 2,
+        "number": 176057774,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T23:03:46.333Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "b66fee74-2d61-4b1f-b240-9e0f67e61d23",
+        "memberLimit": 2,
+        "number": 155026332,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T20:48:10.250Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e2666ef5-7fc6-4be0-964f-0d09c0603628",
+        "memberLimit": 2,
+        "number": 146890250,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T19:48:04.857Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "29d23bbb-7f7e-4ab1-b13a-7bb8677b01b0",
+        "memberLimit": 2,
+        "number": 143284856,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T19:31:50.891Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "ce157a28-5978-4610-9c31-a2d07f59fc61",
+        "memberLimit": 2,
+        "number": 142310891,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T14:52:59.375Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "27bd4b77-6ac6-486b-9c80-62b004de4237",
+        "memberLimit": 2,
+        "number": 125579374,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T10:29:12.360Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "b8bcdc39-3387-41de-b78f-04ac7e1e5c5e",
+        "memberLimit": 2,
+        "number": 109752357,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T05:42:13.230Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0e52078d-c05f-4bd3-a28b-4c5751f368e8",
+        "memberLimit": 2,
+        "number": 92533228,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T05:24:50.777Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "499d1dab-6927-4f58-b3d8-968c16b27c32",
+        "memberLimit": 2,
+        "number": 91490776,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T05:23:13.351Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "4b4adad0-ad76-4ad8-9cfd-0fbf8b0dc0a2",
+        "memberLimit": 2,
+        "number": 91393350,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T05:20:56.505Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3ab8202e-e603-45d4-acf0-11bdd550c2ac",
+        "memberLimit": 2,
+        "number": 91256504,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-04T03:24:15.834Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3a625a90-ef1a-406a-9f45-a591145b4928",
+        "memberLimit": 2,
+        "number": 84255833,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T21:25:41.736Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "cd949f05-a3e8-4da8-a137-3432ed1480be",
+        "memberLimit": 2,
+        "number": 62741735,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T20:48:33.130Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0d7a902c-d563-45ff-a9be-48e4134d561c",
+        "memberLimit": 2,
+        "number": 60513129,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T20:34:37.175Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "2e01fb1d-74d5-4e1c-bdea-03887def97b4",
+        "memberLimit": 2,
+        "number": 59677175,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T20:01:10.938Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e42b0893-4dfc-4778-aa03-fa007ab77f95",
+        "memberLimit": 2,
+        "number": 57670938,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T19:30:42.300Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "b2a92666-0a61-40e6-8e59-63f50a082987",
+        "memberLimit": 2,
+        "number": 55842299,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T18:54:32.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f3d9a1b0-1292-4866-9764-efe6bb9efc59",
+        "memberLimit": 2,
+        "number": 53671998,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T18:41:48.603Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "839f6f0d-ec62-41ba-9396-552f2688f678",
+        "memberLimit": 2,
+        "number": 52908602,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T18:06:52.154Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5841236a-ccf5-43e2-91d4-29774703d3a3",
+        "memberLimit": 2,
+        "number": 50812153,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T17:32:40.904Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "6cd3b726-de9b-4aef-b867-9aaa3dcae7f8",
+        "memberLimit": 2,
+        "number": 48760903,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T17:07:12.064Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "933c3ab3-5900-45f3-96ab-8d1b0c2c2cd6",
+        "memberLimit": 2,
+        "number": 47232063,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T16:55:38.388Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0e92d9d6-d888-4cac-a4d4-267149fbbcdc",
+        "memberLimit": 2,
+        "number": 46538387,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T16:43:48.905Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "92e1474d-667f-49c2-ab87-a3914e5e5f1e",
+        "memberLimit": 2,
+        "number": 45828904,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T16:19:56.347Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "2f7fe82b-4eea-437b-b53e-a09e80b68466",
+        "memberLimit": 2,
+        "number": 44396346,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T15:55:11.906Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "74abe84a-4e80-4f83-a80c-1434d5c95af7",
+        "memberLimit": 2,
+        "number": 42911905,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T15:40:50.667Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3fa9fd62-5104-4a74-b770-37712319ba51",
+        "memberLimit": 2,
+        "number": 42050664,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T15:07:08.234Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "665f6007-6871-4691-a61a-87d35ba67c93",
+        "memberLimit": 2,
+        "number": 40028233,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T14:48:26.211Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "941d8293-8953-4824-90c1-10bac12183e3",
+        "memberLimit": 2,
+        "number": 38906210,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T14:34:14.568Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0ad955bd-d5c3-4346-a8ca-c1cd8d0f7d46",
+        "memberLimit": 2,
+        "number": 38054566,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T14:05:51.710Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d0c0c87c-8035-41a8-8e5f-2f85771d4c2b",
+        "memberLimit": 2,
+        "number": 36351709,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T13:42:42.401Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5487d5e4-8dea-4ee1-949b-0c3c58f144a6",
+        "memberLimit": 2,
+        "number": 34962400,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T13:34:17.143Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "eace5354-f036-4afc-9ad8-9f22d1b9d5cb",
+        "memberLimit": 2,
+        "number": 34457142,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T13:07:35.241Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f00226a2-0576-4dd9-b847-c62eb9028e66",
+        "memberLimit": 2,
+        "number": 32855240,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T12:52:01.358Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "a87e0c4a-37ce-4e83-aa3d-d4e36812be76",
+        "memberLimit": 2,
+        "number": 31921357,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T12:37:26.216Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "11823234-ee88-415b-8243-1231624ae3b2",
+        "memberLimit": 2,
+        "number": 31046215,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T12:29:08.778Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "cab43659-0dbc-45e0-956c-f450900f0e29",
+        "memberLimit": 2,
+        "number": 30548777,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T11:58:38.101Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "42876f87-073b-40da-a1d0-554da39f84cd",
+        "memberLimit": 2,
+        "number": 28718101,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T11:48:32.380Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "fc38f3f4-6c31-4369-9c28-4b39946c6c91",
+        "memberLimit": 2,
+        "number": 28112379,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T11:38:03.529Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e49275be-b3ec-418a-883d-602876d3f440",
+        "memberLimit": 2,
+        "number": 27483528,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T11:26:18.476Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3f7c4d74-2a7d-40f3-a39d-827bbdb04bdc",
+        "memberLimit": 2,
+        "number": 26778475,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T11:08:49.497Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3e4e967a-c957-4bd4-b52b-39c008870503",
+        "memberLimit": 2,
+        "number": 25729496,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T10:52:04.218Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "98eca767-f594-45a8-9ddb-f87bed493f27",
+        "memberLimit": 2,
+        "number": 24724217,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T10:31:27.689Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f634024c-2693-4965-83e4-3995d696ffc2",
+        "memberLimit": 2,
+        "number": 23487688,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T10:12:00.259Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "30e2ee52-43ac-445e-9794-4c3a7ebfb918",
+        "memberLimit": 2,
+        "number": 22320257,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:59:02.680Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "cc7b358b-eb67-4e76-b059-b8b64e5e8e35",
+        "memberLimit": 2,
+        "number": 21542678,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:54:57.123Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d116e3ad-6655-47f2-a4ba-0f65457b7928",
+        "memberLimit": 2,
+        "number": 21297122,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:52:30.868Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "c5469aa9-abd9-417c-8429-66193d45682b",
+        "memberLimit": 2,
+        "number": 21150867,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:49:25.297Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "86b8cf5f-10d5-4b27-bece-278f54097e7c",
+        "memberLimit": 2,
+        "number": 20965295,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:39:59.505Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "670440eb-7b26-40bf-9b12-f0c6d32e779e",
+        "memberLimit": 2,
+        "number": 20399504,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:39:22.359Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0b0bfe57-0eb3-4ab2-b018-b80f28019f9b",
+        "memberLimit": 2,
+        "number": 20362358,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:37:07.093Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "64abef7a-f607-4d2b-b0d3-118290b0b9cf",
+        "memberLimit": 2,
+        "number": 20227090,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:35:01.534Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "c5c37ba9-9849-41f3-9c9a-8196c6035965",
+        "memberLimit": 2,
+        "number": 20101533,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:32:48.221Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "1095f026-144d-48a1-be3f-58272fba6c9b",
+        "memberLimit": 2,
+        "number": 19968220,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:31:35.058Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "6b12fe04-edbc-4d72-93e0-db6cce13b190",
+        "memberLimit": 2,
+        "number": 19895057,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-10-03T09:31:16.147Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "a1049853-06a1-4f2c-af59-67ceb34a13d0",
+        "memberLimit": 2,
+        "number": 19876146,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "trial",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "trial-v1",
+        "memberLimit": 10,
+        "number": 1,
+        "orderable": false,
+        "priceKrw": 0,
+        "serviceLimit": 10,
+        "subjectLimit": 1000,
+      },
+    ],
+  },
+  {
+    "description": "원본 월 구독 상품",
+    "id": "privacy_lifecycle",
+    "name": "개인정보 수명 관리",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "privacy-lifecycle-month-v1",
+        "memberLimit": 10,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 50000,
+        "serviceLimit": 10,
+        "subjectLimit": 1000,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "privacy-lifecycle-year-v1",
+        "memberLimit": 10,
+        "number": 1,
+        "orderable": false,
+        "priceKrw": null,
+        "serviceLimit": 10,
+        "subjectLimit": 1000,
+      },
+    ],
+  },
+  {
+    "description": "원본 월 구독 상품",
+    "id": "policy_management",
+    "name": "처리방침 관리",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "policy-management-month-v1",
+        "memberLimit": 5,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 50000,
+        "serviceLimit": 5,
+        "subjectLimit": 1000,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "policy-management-year-v1",
+        "memberLimit": 5,
+        "number": 1,
+        "orderable": false,
+        "priceKrw": null,
+        "serviceLimit": 5,
+        "subjectLimit": 1000,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-293eeac6-0c5f-4b53-b217-10c3ee9fcc7a",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "1239500a-7f6e-487d-ba1a-9617643e780c",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-8d143bc8-022a-4678-871f-faf0ac563abe",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "54cc8d35-5592-4629-9335-7101aca83950",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-ae10aa96-76a1-42c3-af40-e1009c0b6bc7",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f1bc0bb8-3045-4af8-b2a5-0ef8adccb6cf",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "1c29cf9f-4b95-47e0-bf41-85c4f4e592c0",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T10:41:46.274Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "9e092732-6817-4df7-a797-5e95d5cf620c",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "e4727a64-fef4-4b08-8740-d7b3b63ae223",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T10:41:47.799Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "70cfa86f-2a43-4cb6-abda-710991dcc8b9",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-ec584c34-799a-4ca1-b02c-f297d6715a5e",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "062facdd-c364-4052-bd46-9bde8a970354",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "724fbc13-7654-445b-b5fd-d1849affebb2",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T10:42:59.943Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "8699f5b0-13c0-4c8b-8330-afa8b5a4dbaf",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "ff372631-0245-4c6e-827b-8ea169de329a",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T10:43:01.704Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d3243269-f7a4-4093-b274-157de887f95b",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "a1f82dfd-d5a9-497a-8e61-07dfb6235738",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T10:51:41.146Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "8f3cd7e4-0b4d-45dc-bbec-e4dfa32ecdd6",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "d596da7c-2d0f-4b2d-b4aa-29064cb52fce",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T10:51:42.746Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f5e31d2e-b908-41ac-b0b0-b2b0743640b5",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "300eaeec-027d-4528-ae74-180df093f6ed",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T14:55:05.524Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "a9646b17-fe86-4c6c-bd9e-50dc2236edea",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "570b50ba-b3bf-42f8-b384-ed4c19b5c9dc",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T14:55:05.862Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f3acf38b-b43a-4af8-bf26-9ca5b7423276",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-233fa809-e4fc-47ef-8217-611993311c4c",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "73b146b8-84c1-4cef-ba1d-2e815858fafb",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-cc253063-7900-41e4-9619-91086bc92135",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0104e750-a609-4745-be1b-613fbfe0a9c2",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-3c33b10a-a620-4683-822d-9bcbd9b51eb9",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "550f20d1-0cc9-4ef4-8b77-d2a1e2ef0319",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "d403b449-f268-4c7e-825b-afa8d46420ba",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T19:22:51.862Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "8a5b5881-b360-424b-8997-c8b593673445",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "4bd265f8-9788-435d-b3d4-c90907a02793",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T19:22:54.877Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "44a8076a-5ab7-4f02-a772-b7d9e96b4081",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-354212d3-acf5-47bb-958e-fd6b1dd1c938",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3c64fc64-393b-44af-8029-8042ee14b91e",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-18cfdfc0-52c5-4ff6-a036-c727f7c3ad11",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5b62c5c1-1591-498c-a2bb-393c57a9787f",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "68218753-57f5-40a9-aca6-74af09931382",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T19:26:25.461Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5ab9b66a-c73d-4b68-a7d1-a12c957e0555",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "8ffd2fde-b0f7-4e86-b22f-e5dcc2363bdc",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T19:26:26.261Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "be7f0c2d-d4d8-4f17-8b87-7e36bba171e7",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-72ae5669-7c35-4c1c-a030-ba0c5d275a0c",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3130d099-6f78-4e00-aa6e-8771161b38d5",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-a161aad8-b384-4f3f-907c-027766cf67d5",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "9488b524-9305-4f1c-a61f-f6607429319b",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "aa86ab50-9e1c-4537-ae09-c522ede53353",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T19:32:42.205Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "014613ac-dd61-4959-a8b7-7021c22090cb",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "5f28e89c-ac96-43f4-a67d-dbfc59030304",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T19:32:42.560Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e0c74daf-a7dd-4650-8912-35e08f95caa4",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-ddf05ba4-5d45-464d-bd32-135a524fcfb1",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "51711a62-c058-43c9-89c7-4f4512eda0e7",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "6796cf02-1896-4e8e-b007-df0bba149ae6",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T19:48:40.598Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "02701773-0661-4790-a0b2-1598e4c71a86",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "e2b3d852-f09a-4060-8be2-5266d56c982f",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T19:48:40.896Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3af9f45f-372e-4560-be52-3f69f03a8bcc",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-11bdc242-472d-4632-86e0-6d6c50bc9b66",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "2ef4032f-1318-448b-ab8e-1f7bd4c7ac93",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-00130c43-287f-4f58-80e3-3c970ed4ec42",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "7df9f97a-e01c-44bf-91bd-1166e1299707",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-a910fcdf-fa6f-47ac-910d-c954f1abf021",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "c34f7ce3-8fc2-49c0-aed0-fe513a733221",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-8ea7e90f-637e-4845-8cdf-51d7b5b3e651",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "94b8fd48-98f3-4be8-b4dc-4475bc148da8",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-06bf49b4-1175-45b7-b096-03812722a329",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d1ea29ea-716b-409c-9551-8e13afc69c0c",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-332084df-68b8-484e-a817-1d2bcb7bf491",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "56a74f75-89f2-4705-a11c-c1615dc0b228",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-82789c6a-002f-41ba-927d-94c18903c181",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "14d051bd-13dd-477f-a4c4-a5a6f0410bcb",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-c94749a7-20f7-40ad-bdcd-671d347136fd",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "51cc83db-27d2-4064-8c3c-6cdaa309b6e9",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-a7f33f5a-35f8-4427-ba25-afae3257334c",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "b11a901d-a4fe-4b5f-9a78-9e4f60f2c82d",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-f20b25ca-7d75-4bb0-895b-b77158a476eb",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "c1719b5f-c582-440b-9310-ffcb91ffa1bf",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-fe04b337-0e42-4a4c-89f3-e7dec4772cd0",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5b46624e-b54f-4755-8497-b3ef0104baaa",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "d025576c-8cb0-4528-807c-14c6144eb910",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T20:17:20.422Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "a6a105f6-b200-4404-a0a7-d0e493990412",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "6357b215-93a8-4693-919e-a5a72e9f02c9",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T20:17:20.696Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5f2a5a6a-b2a6-46fb-8678-d79655920d87",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-9d737fbf-2b50-481b-bf1b-f2ad8f79ce3c",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0c067ada-3d6a-44c5-af32-3c6f05c2b883",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-63325bc0-284c-4096-8470-91d5c57459d3",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "9b535164-cda3-4ea6-a007-9733d50229aa",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-6152b5d1-0ede-46c2-875d-71645382c2ab",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "415ba5b4-f6c1-40b1-b4ac-159d224b2c8a",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-29dc6f22-36d4-4050-9bbc-5c753036eb6a",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0870b100-19ad-4035-9810-940f2e2a1199",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-8bd99677-5ad3-41c9-993b-0f4ff4cd6d6b",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "14602e22-bed4-4b58-a9ea-0273d6d3767b",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-b8114925-0be4-4b86-a6a6-bdd0aadebc9e",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "a6eb6b03-907d-4e30-b68f-f5a83c2f9167",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-dd38de15-ae55-49b9-bfa5-dc050d09b0fc",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5677fa28-1ab8-4c9c-9032-f60ea189a02f",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-2b4f0cc3-23d9-4f32-a7b2-7b29a0b340cf",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3166c498-57e1-42e6-97da-a550f22f4050",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-ba787381-62a8-4117-8a32-404dee05b4f5",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e6e5c289-3383-4da3-aead-2adeb1aaf3e3",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-c579e2b7-b683-4b58-b69c-db1b5925caad",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "9ec78636-5b96-4993-860a-82c8ff85b98c",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-a02284d9-2d55-4774-b259-17c4fea81efe",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "ace1fdf5-684f-4493-9781-01c7686bbca6",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-737e7468-6749-454b-b92f-c0c420c3f4d7",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "08f7d49a-675f-4b26-84b3-95f41438d2ca",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-452da6ff-21e3-4dac-bbb3-38b9ce4a059c",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d07e2542-1426-4eeb-90f6-db28d3c35a3b",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-47c5d7d9-a6bf-4c82-a9da-1521e91f5128",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "eab08904-5ffb-443c-ba11-18d7246f77c2",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-5c6f99f9-cd2a-43b4-b16b-954d301c1bab",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "645431e7-9131-4f40-ad69-90816ba7abe1",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-fffd9546-e20a-4fa1-ac80-a8d641a052f9",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "01a2010b-9734-41ab-ad08-e31ec1ae3432",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-b83ff2a6-ed3f-43c6-ad16-13b5b89fb8d7",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e46e7355-54ea-42e1-ba5c-a57fabddaf91",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-9585f813-aed6-4c46-9829-838829b4c4b4",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "239f8fc1-029d-456f-8701-2f74d01d3dd5",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-23a7b2a5-15f4-410c-b065-fe26c8224db3",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e0a7e98a-f578-4831-a4ce-8bf5aba1ec52",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "9c163b80-3825-443e-a48c-860169f06831",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T20:48:53.902Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d2413781-f67e-4eca-a601-2bc25232f2d6",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "ffd76cce-3ffb-4d22-ba2b-0ca3048eedc6",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T20:48:54.220Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "b04e65c3-3c6e-4edc-8d03-444eec41a453",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-bd402ad4-2db7-42af-833d-066ff4d2ec67",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "2e41022f-a29f-4699-9897-35377135286a",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-4b8b87ca-4a7c-4628-be5d-01eb3d6cc366",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5778e2b0-1436-4bbf-b30b-7553f1e40f0b",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-6bc8617c-c354-418e-8eb3-a9e66cc755a1",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "ef7474c8-2ccf-409e-8ea1-68d48b951ec5",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-5ef7c99b-af93-4e35-b494-569c855f87dd",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "96616550-7b5a-4715-88fd-bbe9ebb15c45",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-67f137e2-1fbd-46e0-ab51-2ebc26175d1f",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "90431b52-4e59-4b19-881b-f9fa91ebf1e7",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-4a9f190f-5ecc-472b-9a23-a391df522973",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d4814dc7-297d-4b6f-90c7-e1b551dfb1e6",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-eaf67b7a-64ea-4678-ae0d-85b594de983c",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e70d8d2d-9675-4870-91b0-bbb23d92efd0",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-04452d7d-36f1-4f44-996b-b05fc1f67d90",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "a188c964-5b04-425c-b46d-a08d0e314a89",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-d1206d98-a9ff-46c8-87c0-0745fee5c2dc",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "2a26020a-da33-4211-9011-2d441df19c40",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-b84cb054-54b7-4485-8c98-8c614915e4be",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "3859a81f-d440-47a1-800c-1862feffba2c",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-20af3185-ff7f-4eda-a254-3ba5fa2ac6ad",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "1d0b7468-cf42-423f-99eb-f33071490eb2",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-b49aae3c-426c-4c7f-b001-701ba75f4854",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "c8a90178-1eaf-4193-9a77-99544913de2d",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-l-1c209af0-5d94-45dd-b4fa-4c9146251788",
+    "name": "목록 상품",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d7802193-e998-456f-bbd5-cf256136c322",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 9000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-677f5d3e-3195-4f60-9764-85c44cb5dfd1",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "8f9a8d04-a22e-486c-8de6-8a478ebdfe03",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-6f91e09c-c9bf-451a-99e3-bf34d386e06c",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "bb05967c-6091-4ca0-8ad8-76a778aee4fe",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-7838f3d9-a629-4a1f-a6fb-5dab91c07d22",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "50fc26ab-a73d-4447-8a78-db3bfdf49038",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-28d14eb6-dca7-4826-99e4-812c8ce67a59",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "19330231-f07c-4fad-9f14-94c9396013ed",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-ee1f7031-69b8-458f-80f8-148c68ddb302",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "c15c0d5c-2125-4e2a-804a-8a59301047cc",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-a988fce9-83fb-48f0-b333-ee649673eeb3",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "884a9ee2-2871-4f0a-a882-4a72f39783cf",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-9a2ca886-6819-4ed6-a4eb-6bcc5a43e4e7",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "a369d9bf-6bbb-4279-a7b0-6a1c4d9da244",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-759c2184-3e22-4db7-a9d7-b19689b08bec",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "43b98d1b-7f08-4688-8c78-8582eb31f9c6",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-l-7f581099-bc3c-4f1e-b1e6-a926655a33ab",
+    "name": "목록 상품",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "8e4ad185-447c-44b5-83d0-54462a5e857e",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 9000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "d0e37e8b-2e33-45d5-ad9b-45995da027f9",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T23:05:01.036Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "b84cd07e-2769-4240-b5de-cc2512472dc1",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "c5524f6b-9e72-47df-a3c8-3d7870f0fc3a",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-04T23:05:02.146Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d3e5c6f5-8f7a-467a-bd4f-42b985e5be6c",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-4e3a02e3-5bb7-4c25-8b18-0bd17a7e6549",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f76a9d50-a0a1-4260-bf9b-18afdc006b51",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-687c2f61-1b8e-47bd-b109-7fdf668d3f55",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "dc3d2d10-1c4f-4d9f-9aa4-e5fedae43007",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-b1fde0b9-642a-4e24-ba10-9890500dead6",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "9f7f1f1e-aa87-4674-b3d7-e3099a94ff9f",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-041e76f0-afe2-448d-9d40-8a6ebf09ad82",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "a218b585-cf71-4b7d-97e4-a75f0f0d35e2",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-d3a5a81c-27a0-4a9f-845d-c57552795711",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "423994ae-739f-4426-a236-d94145d478bc",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-3b54e7d5-cf27-45c4-9fe4-9f3955e4f73e",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e0ff517c-9ab4-4eed-b4f2-65a66180b79b",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-6389832b-533b-4825-bbcc-449a18dd8d13",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "6a840fce-6d93-4cfb-8bba-02f7bf5a7170",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-l-34807679-65ab-4625-9d39-7dd1174910a2",
+    "name": "목록 상품",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "56596911-4eee-4ce3-a728-4186547fba63",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 9000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-ffd499db-7e60-45df-9475-df6e70996842",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5b678384-87de-44ad-ae31-e4b08cedf365",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "9f300907-2910-4e48-bc7b-5bfde01dd8fe",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-05T04:53:23.068Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "045aa92e-e0d6-448d-b550-9f540e1acf75",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "17220489-4bd5-47f9-9235-7561abb00721",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-05T04:53:23.375Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "581a61a5-ef73-4ca0-ba59-ab116f44768b",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-0e54db7e-e93f-47a2-a5c4-1c9e4b585c75",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "8ff52ddb-ed4c-4af5-af0c-d0cf16ae4506",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-b0a97819-b1cd-456b-a6b5-f2b7595905b9",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "7ab034ab-3fab-466a-b13c-181526044a0b",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-0eab3cf6-2bd2-4890-a497-8fc7731e23fe",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "424fbfc2-1f18-4f95-a048-f4f49ec4c987",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-69c2f227-ed5b-4ac2-ab86-df6086ed4edb",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "ece74b30-2ef4-4667-ab43-cbe8fa5bb3c4",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-ddf2dcf2-8d32-404a-95af-aa226916d35e",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5c59aa12-d1df-43f4-a182-93e8cae5df05",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-a9b6474d-1b03-483b-91b2-ffd3bbb395fe",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5241349a-9baa-4edd-8858-87a7bb3f5328",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-11d776b8-69f8-46d5-a98c-43c4d167f283",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "cc6c5097-7259-45a9-a4b4-5aae6d1ad4c8",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-l-54b01c77-152e-4b08-86bc-5dab64b82e09",
+    "name": "목록 상품",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "0ab87ea5-b756-4d77-ac83-f64cae924657",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 9000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-e9ffc268-3c1e-4590-8d9b-86ff236f70e6",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "24dc6df8-3142-4287-89d9-73cd945c48ce",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-4a21fd46-47b9-4aaa-b0a1-b66e9e5d4b1c",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "d24edb53-f03a-4abd-903b-e5ec137b1c00",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-5b89941d-423a-4050-af47-ffc74b4bb1fb",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "7dd5f5f9-fc60-4383-9362-5602d8b30b90",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-128fcbfc-d8a8-4f96-8d81-052e4e0f2f83",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f632c742-17cf-4f8f-b009-314436486dd3",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-62f5552a-0945-4581-9c1e-eb1d75d0974f",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "ee7f3b3f-312f-4a5e-992d-dff2b5edf75c",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-b099f90a-b6ec-409d-a846-2eb726a916c8",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "36aa0c81-5ae0-4e54-95d2-af8e597fba2a",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "9445e873-4929-4928-a223-873e8aa37ecb",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-05T06:54:42.639Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "21847158-2a1b-4b0e-bc96-fb9ee429aa05",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "e5d897b2-a481-4df3-b6cc-482007249322",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-05T06:54:43.167Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "7dba6412-baac-4aa2-888b-f4c5559197a3",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-1f13dccb-f9e8-4720-bb2c-381a192fbb59",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "96585aab-1567-455e-adbf-97114a43b688",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-977878ed-ce07-4471-92dc-71a19845de09",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "510a7da7-1d87-4673-9ceb-ffe4eb209508",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-f831b4eb-a760-49a2-959e-4acb0caa7199",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "86bfe496-367e-428e-aa91-45d331f260a5",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-l-488a42b7-23e4-497a-98bd-f4056c05e745",
+    "name": "목록 상품",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "747582ba-02eb-4bda-bc42-8db9c100671b",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 9000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-5045ee7a-c592-42c5-a594-06ba03bb68d5",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "a1b63753-eaa2-4377-a87c-6cdb64365a09",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-6f159fb2-7669-476e-8cc1-efd07326a2c1",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "ea1a979b-a7fb-43bd-b169-278935700f1c",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-f6913938-b572-4cfb-8b69-8230aaf19742",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "537d1861-4b40-427f-9e17-a3fa733db995",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-059e8938-9ccc-40f9-8f39-ea5ed76448a9",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f7768e36-d688-44b2-ab59-dac821c44346",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-4acdcde7-afef-4c75-bb4b-bcc008e0abd7",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "00b9a476-1033-4959-b289-6d76469c1c4a",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "04da116e-2b96-4d1b-a5ad-92fe768c8ac1",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-05T07:13:50.180Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "129e8a70-8011-438c-8015-51de0514ae07",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "f1beaa3f-fc46-49dd-8bc4-3d690b6494aa",
+    "name": "합성 유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-10-05T07:13:50.655Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "eedb48bc-dc35-469e-97cf-021fcfa808af",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 100,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-17ddd937-98b2-42aa-839c-9d2903e54210",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "bed84ca4-c3ea-45d1-9b96-059c151c99b9",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-731a15b4-0101-42a3-8127-e12a9932a56c",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "ebafaf5f-47ae-460b-9fab-0e75f885f417",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-l-1deaf3fe-e154-4211-b0cb-33668e0081ef",
+    "name": "목록 상품",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "f9e9b6b3-cf3b-45d1-925c-c4b4612bbc53",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 9000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "plan-e7ae0ada-9036-493e-ad96-2ff9ed1af5f2",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e436810e-6365-4a79-b8be-42fb4fa54325",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-0da3048b-cb13-4335-800d-432c5ed3fb11",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e0fe8a17-11ce-4e67-af0f-fd78d16fc2f3",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-6a9426b5-82ab-4094-ab2b-b73ee2370acd",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "4d422681-8d1d-4e18-8127-25248be200a5",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-e3e9a342-095f-4a85-ae98-ab8e30059279",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "fcadc127-4aea-4efc-840e-347bebb82711",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-7774c86a-698f-4561-96fa-a405d72af57d",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "5115b517-f13c-4d6e-93da-1f207066388e",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-ba11aabf-2171-4f5c-8e72-73bfd9afa01d",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "2e00bab1-fccf-4898-b459-9fb37ae7dbd0",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "unlimited-7d09cab9-71ae-405d-8488-b45285492663",
+    "name": "무제한 상품",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-06-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": 1,
+        "id": "9eebf4ec-fd73-4c69-b842-861906336698",
+        "memberLimit": 1,
+        "number": 2,
+        "orderable": true,
+        "priceKrw": 150000,
+        "serviceLimit": 1,
+        "subjectLimit": 1,
+      },
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "8278dcb2-805d-4218-ba04-d9ee38a8a7e6",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 77000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-8158b9f6-344e-4f1a-82e3-5c5c10a683fa",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "e193d1aa-7d9a-4a92-9db7-224a28d25ded",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-y-3ef774d8-6e55-4204-9e73-fca6e03fe08b",
+    "name": "연간",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "year",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "887b9809-04a0-4040-821e-60a0708a8ef3",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 120000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "pay-l-5fb6f2c2-ff97-4e2e-bc04-a63708af85e9",
+    "name": "목록 상품",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "316a2386-3b98-45b5-a2b6-26d05bb21d6a",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 9000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-2a9c1e45-9cac-4d6d-b51a-140f1aeed35e",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "39c55619-f0f9-42a5-8f54-330a66d46d65",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "",
+    "id": "rf-dae6e02f-b11e-433b-ac76-1690f0b32296",
+    "name": "유료",
+    "versions": [
+      {
+        "currency": "KRW",
+        "cycle": "month",
+        "effectiveFrom": "2026-01-01T00:00:00.000Z",
+        "effectiveTo": null,
+        "formLimit": null,
+        "id": "4db9fd87-6de8-4c0f-a043-b8acf22acfae",
+        "memberLimit": null,
+        "number": 1,
+        "orderable": true,
+        "priceKrw": 12000,
+        "serviceLimit": null,
+        "subjectLimit": null,
+      },
+    ],
+  },
+  {
+    "description": "...
+
+ ❯ tests/server/subscription-authority.test.ts:71:42
+     69|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     70|     const before = await state();
+     71|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > list: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다
+AssertionError: promise resolved "[ { …(12) }, { …(12) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "cancelAt": "2026-10-06T03:05:42.807Z",
+    "createdAt": "2026-10-06T01:05:42.803Z",
+    "currency": "KRW",
+    "id": "249ed9f0-f90e-4940-b6c2-ca9ee508e504",
+    "periodEnd": "2026-11-05T01:05:42.805Z",
+    "periodStart": "2026-10-05T01:05:42.805Z",
+    "planId": "26c20c5b-3387-4433-95a7-37d997c5f20d",
+    "planName": "합성 구독",
+    "planVersionId": "c3da8602-3518-4c69-a999-32e60adf64a1",
+    "priceKrw": 12000,
+    "status": "active",
+    "version": 3,
+  },
+  {
+    "cancelAt": null,
+    "createdAt": "2026-10-06T01:05:42.799Z",
+    "currency": "KRW",
+    "id": "83749b4a-95bd-4008-ad73-74f29661f2a2",
+    "periodEnd": null,
+    "periodStart": null,
+    "planId": "dd38280f-fb17-4f4f-9f00-4413c8a7b42f",
+    "planName": "합성 구독",
+    "planVersionId": "a62ad21b-645d-4aaa-8a0a-8edbd0b2dc83",
+    "priceKrw": 12000,
+    "status": "pending",
+    "version": 1,
+  },
+]
+
+ ❯ tests/server/subscription-authority.test.ts:71:42
+     69|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     70|     const before = await state();
+     71|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > entitlement: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다
+AssertionError: promise resolved "{ active: true, status: 'active', …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "active": true,
++   "limits": {
++     "forms": null,
++     "members": null,
++     "services": null,
++     "subjects": null,
++   },
++   "periodEnd": "2026-10-06T03:05:42.925Z",
++   "status": "active",
++   "usage": {
++     "forms": 0,
++     "members": 2,
++     "services": 0,
++     "subjects": 0,
++   },
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:71:42
+     69|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     70|     const before = await state();
+     71|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > assets: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다
+AssertionError: promise resolved "{ entitlement: { …(5) }, services: [] }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "entitlement": {
++     "active": true,
++     "limits": {
++       "forms": null,
++       "members": null,
++       "services": null,
++       "subjects": null,
++     },
++     "periodEnd": "2026-10-06T03:05:43.083Z",
++     "status": "active",
++     "usage": {
++       "forms": 0,
++       "members": 2,
++       "services": 0,
++       "subjects": 0,
++     },
++   },
++   "services": [],
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:71:42
+     69|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     70|     const before = await state();
+     71|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > purchase: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다
+AssertionError: promise resolved "{ status: 202, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:43.288Z",
++     "currency": "KRW",
++     "id": "892cab3a-d27c-41aa-99ba-53e5f7fc371a",
++     "periodEnd": null,
++     "periodStart": null,
++     "planId": "privacy_lifecycle",
++     "planName": "개인정보 수명 관리",
++     "planVersionId": "privacy-lifecycle-month-v1",
++     "priceKrw": 50000,
++     "status": "pending",
++     "version": 1,
++   },
++   "status": 202,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:71:42
+     69|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     70|     const before = await state();
+     71|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > cancel: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:43.418Z",
++     "currency": "KRW",
++     "id": "f8063479-6960-4bee-a61b-9c8882e7c9e6",
++     "periodEnd": null,
++     "periodStart": null,
++     "planId": "5fc9b6a8-2f17-4e45-b720-b05fb0f1b847",
++     "planName": "합성 구독",
++     "planVersionId": "7e97c1d9-e652-4f97-923b-8e4d06a8fbff",
++     "priceKrw": 12000,
++     "status": "cancelled",
++     "version": 2,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:71:42
+     69|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     70|     const before = await state();
+     71|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > schedule: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": "2026-10-06T05:05:43.589Z",
++     "createdAt": "2026-10-06T01:05:43.560Z",
++     "currency": "KRW",
++     "id": "859f97a8-62d0-42c6-80a4-80b7bff4679b",
++     "periodEnd": "2026-11-05T01:05:43.579Z",
++     "periodStart": "2026-10-05T01:05:43.579Z",
++     "planId": "dae40b8c-2e4c-4cd0-9bf9-36f94f767d9a",
++     "planName": "합성 구독",
++     "planVersionId": "0090c12a-759a-4b4d-a082-ecc72af9744b",
++     "priceKrw": 12000,
++     "status": "active",
++     "version": 4,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:71:42
+     69|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     70|     const before = await state();
+     71|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > undo: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:43.712Z",
++     "currency": "KRW",
++     "id": "f793fe97-6873-46e6-bb08-4212d0892890",
++     "periodEnd": "2026-11-05T01:05:43.715Z",
++     "periodStart": "2026-10-05T01:05:43.715Z",
++     "planId": "910fcd60-f552-4e87-af37-033e85b120b0",
++     "planName": "합성 구독",
++     "planVersionId": "8659efc3-adae-4779-a5ca-05c262b21bb9",
++     "priceKrw": 12000,
++     "status": "active",
++     "version": 4,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:71:42
+     69|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     70|     const before = await state();
+     71|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > purchase: 회수된 세션으로 신규 변경을 실행하지 않는다
+AssertionError: promise resolved "{ status: 202, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:43.836Z",
++     "currency": "KRW",
++     "id": "9ff1ee48-0049-496f-b8a4-d011ee6ca1d1",
++     "periodEnd": null,
++     "periodStart": null,
++     "planId": "privacy_lifecycle",
++     "planName": "개인정보 수명 관리",
++     "planVersionId": "privacy-lifecycle-month-v1",
++     "priceKrw": 50000,
++     "status": "pending",
++     "version": 1,
++   },
++   "status": 202,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:78:42
+     76|   test(`${operation}: 회수된 세션으로 신규 변경을 실행하지 않는다`, async () => {
+     77|     await db.session.delete({ where: { id: ctx.session.id } });
+     78|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     79|   });
+     80|   test(`${operation}: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다`, async () =…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > purchase: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다
+AssertionError: promise resolved "{ status: 202, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:43.942Z",
++     "currency": "KRW",
++     "id": "a7523bb4-3542-4d6a-b8e7-79cb5718280e",
++     "periodEnd": null,
++     "periodStart": null,
++     "planId": "privacy_lifecycle",
++     "planName": "개인정보 수명 관리",
++     "planVersionId": "privacy-lifecycle-month-v1",
++     "priceKrw": 50000,
++     "status": "pending",
++     "version": 1,
++   },
++   "status": 202,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:84:42
+     82|     const before = await state();
+     83|     vi.useFakeTimers({ toFake: ["Date"] }); clock.advance = true;
+     84|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     85|     vi.useRealTimers(); expect(await state()).toEqual(before);
+     86|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > cancel: 회수된 세션으로 신규 변경을 실행하지 않는다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:44.035Z",
++     "currency": "KRW",
++     "id": "7f4433c3-b32c-4f9d-b911-2cc0437d096e",
++     "periodEnd": null,
++     "periodStart": null,
++     "planId": "ec3de0d1-9ff4-4039-8d3a-086897383c2f",
++     "planName": "합성 구독",
++     "planVersionId": "360bb16e-2d19-4047-af37-2917148a0642",
++     "priceKrw": 12000,
++     "status": "cancelled",
++     "version": 2,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:78:42
+     76|   test(`${operation}: 회수된 세션으로 신규 변경을 실행하지 않는다`, async () => {
+     77|     await db.session.delete({ where: { id: ctx.session.id } });
+     78|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     79|   });
+     80|   test(`${operation}: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다`, async () =…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > cancel: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:44.144Z",
++     "currency": "KRW",
++     "id": "275a543a-e0dd-4d1c-ac72-484d7bc104be",
++     "periodEnd": null,
++     "periodStart": null,
++     "planId": "a44c0957-8e90-4c75-b741-e756c7fefebe",
++     "planName": "합성 구독",
++     "planVersionId": "847636bb-6cb7-4c97-9074-9dd08b201c73",
++     "priceKrw": 12000,
++     "status": "cancelled",
++     "version": 2,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:84:42
+     82|     const before = await state();
+     83|     vi.useFakeTimers({ toFake: ["Date"] }); clock.advance = true;
+     84|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     85|     vi.useRealTimers(); expect(await state()).toEqual(before);
+     86|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > schedule: 회수된 세션으로 신규 변경을 실행하지 않는다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": "2026-10-06T05:05:44.252Z",
++     "createdAt": "2026-10-06T01:05:44.249Z",
++     "currency": "KRW",
++     "id": "7bb4579b-1722-4f3c-81fd-5957ca38ff03",
++     "periodEnd": "2026-11-05T01:05:44.250Z",
++     "periodStart": "2026-10-05T01:05:44.250Z",
++     "planId": "ef2d80a6-c64a-4a2c-b633-a78b6bfc8e0f",
++     "planName": "합성 구독",
++     "planVersionId": "615d9c3d-0c8e-45f5-9417-b1c244064af8",
++     "priceKrw": 12000,
++     "status": "active",
++     "version": 4,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:78:42
+     76|   test(`${operation}: 회수된 세션으로 신규 변경을 실행하지 않는다`, async () => {
+     77|     await db.session.delete({ where: { id: ctx.session.id } });
+     78|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     79|   });
+     80|   test(`${operation}: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다`, async () =…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > schedule: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": "2026-10-06T05:05:44.355Z",
++     "createdAt": "2026-10-06T01:05:44.349Z",
++     "currency": "KRW",
++     "id": "10f4de6d-a369-4d3f-83a1-c7f7aa3b84cf",
++     "periodEnd": "2026-11-05T01:05:44.351Z",
++     "periodStart": "2026-10-05T01:05:44.351Z",
++     "planId": "42536f2c-73dd-4307-81ac-67705dd8f3e4",
++     "planName": "합성 구독",
++     "planVersionId": "749f2bdd-0630-45ad-a5c6-6b6ba1acc644",
++     "priceKrw": 12000,
++     "status": "active",
++     "version": 4,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:84:42
+     82|     const before = await state();
+     83|     vi.useFakeTimers({ toFake: ["Date"] }); clock.advance = true;
+     84|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     85|     vi.useRealTimers(); expect(await state()).toEqual(before);
+     86|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > undo: 회수된 세션으로 신규 변경을 실행하지 않는다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:44.452Z",
++     "currency": "KRW",
++     "id": "5d62dce3-0b48-4799-bfb6-bac1a001ad91",
++     "periodEnd": "2026-11-05T01:05:44.454Z",
++     "periodStart": "2026-10-05T01:05:44.454Z",
++     "planId": "52523092-bf2d-4401-9f53-bb6015431b9f",
++     "planName": "합성 구독",
++     "planVersionId": "ed169d5b-c7f4-4657-a9a6-a178790bfba3",
++     "priceKrw": 12000,
++     "status": "active",
++     "version": 4,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:78:42
+     76|   test(`${operation}: 회수된 세션으로 신규 변경을 실행하지 않는다`, async () => {
+     77|     await db.session.delete({ where: { id: ctx.session.id } });
+     78|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     79|   });
+     80|   test(`${operation}: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다`, async () =…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > undo: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:44.550Z",
++     "currency": "KRW",
++     "id": "1ba857db-46c7-4404-b098-e4f2ba9a7822",
++     "periodEnd": "2026-11-05T01:05:44.553Z",
++     "periodStart": "2026-10-05T01:05:44.553Z",
++     "planId": "2d8695ca-25b3-4926-8b74-a6ceca539b9b",
++     "planName": "합성 구독",
++     "planVersionId": "158a4b61-867a-4be7-9441-baaa7d059417",
++     "priceKrw": 12000,
++     "status": "active",
++     "version": 4,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:84:42
+     82|     const before = await state();
+     83|     vi.useFakeTimers({ toFake: ["Date"] }); clock.advance = true;
+     84|     await expect(operations[operation]()).rejects.toMatchObject({ stat…
+       |                                          ^
+     85|     vi.useRealTimers(); expect(await state()).toEqual(before);
+     86|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > 성공한 구매 요청 재전송도 현재 결제 권한을 확인한다
+AssertionError: promise resolved "{ status: 202, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-06T01:05:44.655Z",
++     "currency": "KRW",
++     "id": "19f0a031-ab02-4c5d-9145-dd3b2c5fb3ce",
++     "periodEnd": null,
++     "periodStart": null,
++     "planId": "privacy_lifecycle",
++     "planName": "개인정보 수명 관리",
++     "planVersionId": "privacy-lifecycle-month-v1",
++     "priceKrw": 50000,
++     "status": "pending",
++     "version": 1,
++   },
++   "status": 202,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:97:71
+     95|   const key = randomUUID(); await requestPurchase(ctx, planVersionId, …
+     96|   await db.membership.update({ where: { id: ctx.member.id }, data: { r…
+     97|   await expect(requestPurchase(ctx, planVersionId, key, randomUUID()))…
+       |                                                                       ^
+     98| });
+     99| test("같은 해지 예약 키에 다른 취소 사유를 넣으면 충돌한다", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > 같은 해지 예약 키에 다른 취소 사유를 넣으면 충돌한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": "2026-10-06T05:05:44.748Z",
++     "createdAt": "2026-10-06T01:05:44.746Z",
++     "currency": "KRW",
++     "id": "7cd0e45a-de84-4adb-ba14-be7956ff871f",
++     "periodEnd": "2026-11-05T01:05:44.747Z",
++     "periodStart": "2026-10-05T01:05:44.747Z",
++     "planId": "e3ab425f-6ad3-4ed0-8267-8f9c00046dc5",
++     "planName": "합성 구독",
++     "planVersionId": "6085fb78-0ba8-4006-aeed-a78fe0f9c659",
++     "priceKrw": 12000,
++     "status": "active",
++     "version": 4,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:102:92
+    100|   const key = randomUUID(), at = future();
+    101|   await scheduleTrialCancellation(ctx, activeId, 3, at, key, randomUUI…
+    102|   await expect(scheduleTrialCancellation(ctx, activeId, 3, at, key, ra…
+       |                                                                                            ^
+    103|     .rejects.toMatchObject({ status: 409, code: "IDEMPOTENCY_MISMATCH"…
+    104| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > 구매 재전송은 취소 후 최신 상태를 반환하고 구독을 다시 만들지 않는다
+AssertionError: expected { …(12) } to match object { …(3) }
+(9 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "id": "a26e5513-d4ce-4431-9fc9-540377967088",
+-   "status": "cancelled",
+-   "version": 2,
++   "status": "pending",
++   "version": 1,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:109:23
+    107|   await cancelPurchase(ctx, created.body.id, created.body.version, ran…
+    108|   const before = await state(), replay = await requestPurchase(ctx, pl…
+    109|   expect(replay.body).toMatchObject({ id: created.body.id, status: "ca…
+       |                       ^
+    110|   expect(await state()).toEqual(before);
+    111| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > 예약 재전송은 철회 후 최신 상태를 반환하고 다시 예약하지 않는다
+AssertionError: expected { …(12) } to match object { …(3) }
+(9 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "cancelAt": null,
++   "cancelAt": "2026-10-06T05:05:44.949Z",
+    "id": "a7df86a9-4ebc-4605-b03a-bd757835ed0b",
+-   "version": 5,
++   "version": 4,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:118:23
+    116|   const before = await state();
+    117|   const replay = await scheduleTrialCancellation(ctx, activeId, 3, at,…
+    118|   expect(replay.body).toMatchObject({ id: activeId, cancelAt: null, ve…
+       |                       ^
+    119|   expect(await state()).toEqual(before);
+    120| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > 같은 version 구매 취소 두 건은 하나만 성공하고 다른 건은409로 끝난다
+AssertionError: expected PrismaClientKnownRequestError{ …(7) } to match object { status: 409, …(1) }
+(9 matching properties omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "code": "VERSION_CONFLICT",
+-   "status": 409,
++ PrismaClientKnownRequestError {
++   "code": "P2025",
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:125:27
+    123|   expect(results.filter(row => row.status === "fulfilled")).toHaveLeng…
+    124|   const rejected = results.find(row => row.status === "rejected") as P…
+    125|   expect(rejected.reason).toMatchObject({ status: 409, code: "VERSION_…
+       |                           ^
+    126|   expect(await db.billingSubscriptionEvent.count({ where: { subscripti…
+    127| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/22]⎯
+
+ FAIL  tests/server/subscription-authority.test.ts > 변경 전 새 MFA 정책과 선택 회사 변경을 적용한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": "2026-10-06T05:05:45.177Z",
++     "createdAt": "2026-10-06T01:05:45.169Z",
++     "currency": "KRW",
++     "id": "ea796bc8-e1fd-4a57-99ec-c232f99b8dc1",
++     "periodEnd": "2026-11-05T01:05:45.171Z",
++     "periodStart": "2026-10-05T01:05:45.171Z",
++     "planId": "7a472ee0-f314-44ad-a400-1a4c58dabfb2",
++     "planName": "합성 구독",
++     "planVersionId": "5d18a308-3d21-4faa-9271-c397ffe96d4f",
++     "priceKrw": 12000,
++     "status": "active",
++     "version": 4,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/subscription-authority.test.ts:130:38
+    128| test("변경 전 새 MFA 정책과 선택 회사 변경을 적용한다", async () => {
+    129|   await db.securityPolicy.update({ where: { tenantId: ctx.tenantId }, …
+    130|   await expect(operations.schedule()).rejects.toMatchObject({ status: …
+       |                                      ^
+    131|   await db.securityPolicy.update({ where: { tenantId: ctx.tenantId }, …
+    132|   const other = await db.company.create({ data: { name: "다른 회사", publi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/22]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  22 failed (22)
+   Start at  10:05:40
+   Duration  4.47s (tests 73%, import 17%, transform 9%)
+

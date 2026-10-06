@@ -153,12 +153,17 @@ model Session {
   activeCompanyId String?
   activeCompany   Company? @relation(fields: [activeCompanyId], references: [id], onDelete: SetNull)
   activeServiceId String?
+  ssoLinkStates SsoState[]
+  @@unique([userId, id])
   @@index([userId])
 }
 model Account {
   id                    String   @id @default(dbgenerated("gen_random_uuid()::text"))
   accountId             String
   providerId            String
+  // DB trigger derives this reference from the Better Auth providerId (sso:<id>).
+  ssoProviderId         String?
+  ssoProvider           SsoProvider? @relation(fields: [ssoProviderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   userId                String
   user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
@@ -172,6 +177,7 @@ model Account {
   updatedAt             DateTime @updatedAt
   @@index([userId])
   @@unique([providerId, accountId])
+  @@index([ssoProviderId])
 }
 model Verification {
   id         String   @id @default(dbgenerated("gen_random_uuid()::text"))
@@ -820,6 +826,8 @@ model SsoProvider {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   states       SsoState[]
+  accounts     Account[]
+  @@unique([tenantId, id])
   @@index([tenantId, enabled])
 }
 
@@ -827,13 +835,18 @@ model SsoState {
   id          String   @id @default(uuid())
   tenantId    String
   providerId  String
-  provider    SsoProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  provider    SsoProvider @relation(fields: [tenantId, providerId], references: [tenantId, id], onDelete: Cascade)
   stateHash   String   @unique
   nonceHash   String
   verifierCipher String
   mode        String
+  providerVersion Int @default(0)
+  sessionId   String?
+  linkSession Session? @relation(fields: [userId, sessionId], references: [userId, id], onDelete: Cascade)
   userId      String?
   invitationId String?
+  invitationVersion Int?
+  invitationTokenHash String?
   expiresAt   DateTime
   createdAt   DateTime @default(now())
   @@index([expiresAt])

@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   skipProxyUrlNormalize: true,
   async headers() {
-    return ["/infoOwner/:path*", "/email/unsubscribe/:path*", "/api/v1/email-unsubscribe/:path*"].map(source => ({ source, headers: [
+    return ["/oauth2/invite/:path*", "/infoOwner/:path*", "/email/unsubscribe/:path*", "/api/v1/email-unsubscribe/:path*"].map(source => ({ source, headers: [
       { key: "Referrer-Policy", value: "no-referrer" },
       { key: "X-Robots-Tag", value: "noindex, nofollow" },
       { key: "Cache-Control", value: "private, no-store" },

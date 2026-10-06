@@ -6,7 +6,7 @@ import { encrypt } from "@/server/crypto";
 import { POST as paymentWebhook } from "@/app/api/v1/billing/provider-events/route";
 import { applyKakaoReview } from "@/server/kakao";
 import { postTrustedLedgerTransfer } from "@/server/ledger";
-import { expireTrials } from "@/server/subscription-worker";
+import { expireSubscriptions } from "@/server/subscription-worker";
 import { claimNotification, notificationAttemptResult, recoverNotifications } from "@/server/notification-worker";
 
 const url = new URL(env.DATABASE_URL), secret = "isolated-audit-provider-secret-0123456789";
@@ -72,9 +72,9 @@ test("원장 감사 실패는 잔고와 쌍별 기입까지 롤백하며 동일 
 test("체험 만료 감사 실패는 만료 상태·개정·이력까지 롤백한다", async () => {
   const f = await fixture(), version = await db.billingPlanVersion.findFirstOrThrow({ where: { planId: "trial", cycle: "trial" } });
   const start = new Date(Date.now() - 8 * 86400000), row = await db.billingSubscription.create({ data: { tenantId: f.tenantId, planId: "trial", planVersionId: version.id, status: "trialing", priceKrw: 0, activationSource: "trial", periodStart: start, periodEnd: new Date(start.getTime() + 7 * 86400000) } });
-  await fault("billing.trial_expired", async () => { await expect(expireTrials()).rejects.toThrow(); });
+  await fault("billing.trial_expired", async () => { await expect(expireSubscriptions()).rejects.toThrow(); });
   expect((await db.billingSubscription.findUniqueOrThrow({ where: { id: row.id } })).status).toBe("trialing"); expect(await db.billingSubscriptionEvent.count()).toBe(0);
-  expect(await expireTrials()).toBe(1); expect(await expireTrials()).toBe(0);
+  expect(await expireSubscriptions()).toBe(1); expect(await expireSubscriptions()).toBe(0);
   expect(await db.auditEvent.count({ where: { resourceId: row.id, action: "billing.trial_expired", actorId: null } })).toBe(1);
 });
 async function notification(expired = false) {

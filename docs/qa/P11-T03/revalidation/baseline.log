@@ -1,0 +1,347 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso.test.ts (19 tests | 16 failed | 3 skipped) 7991ms
+   × P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"name":"이름 변경"} 926ms
+   × P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"scopes":"openid email"} 655ms
+   × P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"clientSecret":"new-secret"} 502ms
+   × P11 설정: 회수된 owner의 이전 Context로 list 불가 446ms
+   × P11 설정: 회수된 owner의 이전 Context로 create 불가 569ms
+   × P11 설정: 회수된 owner의 이전 Context로 update 불가 604ms
+   × P11 설정: 회수된 owner의 이전 Context로 remove 불가 342ms
+   × P11 설정: 회수된 owner의 이전 Context로 preflight 불가 363ms
+   × P11 설정: 폐기된 세션의 이전 Context로 list 불가 365ms
+   × P11 설정: 폐기된 세션의 이전 Context로 create 불가 383ms
+   × P11 설정: 폐기된 세션의 이전 Context로 update 불가 475ms
+   × P11 설정: 폐기된 세션의 이전 Context로 remove 불가 427ms
+   × P11 설정: 폐기된 세션의 이전 Context로 preflight 불가 367ms
+   × P11 설정: 같은 version 동시 변경은 하나만 성공한다 548ms
+   × P11 설정: 느린 사전검사 중 저장한 새 설정을 이전 검사 결과로 덮어쓰지 않는다 531ms
+   × P11 설정: 신규 사전검사 도중 권한이 회수되면 생성과 감사를 남기지 않는다 484ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 16 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"name":"이름 변경"}
+ FAIL  tests/server/sso.test.ts > P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"scopes":"openid email"}
+ FAIL  tests/server/sso.test.ts > P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"clientSecret":"new-secret"}
+AssertionError: expected 200 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 200
+
+ ❯ tests/server/sso.test.ts:243:29
+    241|     const response = await patchProvider(req("/security/sso/" + provid…
+    242|       { version: provider.version, enabled: true, ...patch }));
+    243|     expect(response.status).toBe(409);
+       |                             ^
+    244|     expect((await response.json()).error.code).toBe("PREFLIGHT_REQUIRE…
+    245|     expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 list 불가
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 create 불가
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 update 불가
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 remove 불가
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 preflight 불가
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:253:23
+
+  250 test.each(settingsOperations)("P11 설정: 회수된 owner의 이전 Context로 %s 불가", async operation => {
+  251   const { ctx, input, provider } = await providerSettingsFixture();
+  252   const sso = await import("@/server/sso");
+→ 253   await db.membership.update(
+Database error. Code: `23514`. Message: `LAST_OWNER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/sso.test.ts:253:3
+    251|   const { ctx, input, provider } = await providerSettingsFixture();
+    252|   const sso = await import("@/server/sso");
+    253|   await db.membership.update({ where: { id: ctx.member.id }, data: { r…
+       |   ^
+    254|   const calls = {
+    255|     list: () => sso.listSsoProviders(ctx),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 list 불가
+AssertionError: promise resolved "{ items: [ { …(16) } ] }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "authorizationUrl": "http://127.0.0.1:56471/authorize",
++       "clientId": "catchsecu",
++       "createdAt": "2026-10-05T22:42:11.132Z",
++       "enabled": false,
++       "hasCert": false,
++       "hasSecret": false,
++       "id": "83078c56-8d11-42c8-8d8c-a25c3b3bb4eb",
++       "issuer": "http://127.0.0.1:56471",
++       "jwksUrl": "http://127.0.0.1:56471/jwks.json",
++       "name": "관리 시험 IdP",
++       "preflightDetail": "",
++       "preflightOk": true,
++       "protocol": "oidc",
++       "scopes": "openid profile email",
++       "tokenUrl": "http://127.0.0.1:56471/token",
++       "version": 1,
++     },
++   ],
+  }
+
+ ❯ tests/server/sso.test.ts:276:35
+    274|     preflight: () => sso.preflightSsoProvider(ctx, provider.id, random…
+    275|   };
+    276|   await expect(calls[operation]()).rejects.toMatchObject({ status: 401…
+       |                                   ^
+    277|   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provide…
+    278| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 create 불가
+AssertionError: promise resolved "{ …(17) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "authorizationUrl": "http://127.0.0.1:56471/authorize",
++   "clientId": "catchsecu",
++   "createdAt": "2026-10-05T22:42:11.511Z",
++   "enabled": false,
++   "hasCert": false,
++   "hasSecret": false,
++   "id": "ae428ae8-b9ec-4425-844e-0d357703773a",
++   "issuer": "http://127.0.0.1:56471",
++   "jwksUrl": "http://127.0.0.1:56471/jwks.json",
++   "name": "관리 시험 IdP",
++   "preflight": {
++     "detail": "JWKS 키 1개 확인",
++     "ok": true,
++   },
++   "preflightDetail": "JWKS 키 1개 확인",
++   "preflightOk": true,
++   "protocol": "oidc",
++   "scopes": "openid profile email",
++   "tokenUrl": "http://127.0.0.1:56471/token",
++   "version": 1,
+  }
+
+ ❯ tests/server/sso.test.ts:276:35
+    274|     preflight: () => sso.preflightSsoProvider(ctx, provider.id, random…
+    275|   };
+    276|   await expect(calls[operation]()).rejects.toMatchObject({ status: 401…
+       |                                   ^
+    277|   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provide…
+    278| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 update 불가
+AssertionError: promise resolved "{ …(16) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "authorizationUrl": "http://127.0.0.1:56471/authorize",
++   "clientId": "catchsecu",
++   "createdAt": "2026-10-05T22:42:11.988Z",
++   "enabled": false,
++   "hasCert": false,
++   "hasSecret": false,
++   "id": "7db667a0-69f5-4a92-b5a3-450b073a9bb3",
++   "issuer": "http://127.0.0.1:56471",
++   "jwksUrl": "http://127.0.0.1:56471/jwks.json",
++   "name": "변조",
++   "preflightDetail": "",
++   "preflightOk": true,
++   "protocol": "oidc",
++   "scopes": "openid profile email",
++   "tokenUrl": "http://127.0.0.1:56471/token",
++   "version": 2,
+  }
+
+ ❯ tests/server/sso.test.ts:276:35
+    274|     preflight: () => sso.preflightSsoProvider(ctx, provider.id, random…
+    275|   };
+    276|   await expect(calls[operation]()).rejects.toMatchObject({ status: 401…
+       |                                   ^
+    277|   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provide…
+    278| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 remove 불가
+AssertionError: promise resolved "{ deleted: true }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "deleted": true,
+  }
+
+ ❯ tests/server/sso.test.ts:276:35
+    274|     preflight: () => sso.preflightSsoProvider(ctx, provider.id, random…
+    275|   };
+    276|   await expect(calls[operation]()).rejects.toMatchObject({ status: 401…
+       |                                   ^
+    277|   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provide…
+    278| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 preflight 불가
+AssertionError: promise resolved "{ …(17) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "authorizationUrl": "http://127.0.0.1:56471/authorize",
++   "clientId": "catchsecu",
++   "createdAt": "2026-10-05T22:42:12.782Z",
++   "enabled": false,
++   "hasCert": false,
++   "hasSecret": false,
++   "id": "b56a924f-776e-46e0-ad20-4a249747aabd",
++   "issuer": "http://127.0.0.1:56471",
++   "jwksUrl": "http://127.0.0.1:56471/jwks.json",
++   "name": "관리 시험 IdP",
++   "preflight": {
++     "detail": "JWKS 키 1개 확인",
++     "ok": true,
++   },
++   "preflightDetail": "JWKS 키 1개 확인",
++   "preflightOk": true,
++   "protocol": "oidc",
++   "scopes": "openid profile email",
++   "tokenUrl": "http://127.0.0.1:56471/token",
++   "version": 2,
+  }
+
+ ❯ tests/server/sso.test.ts:276:35
+    274|     preflight: () => sso.preflightSsoProvider(ctx, provider.id, random…
+    275|   };
+    276|   await expect(calls[operation]()).rejects.toMatchObject({ status: 401…
+       |                                   ^
+    277|   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provide…
+    278| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 같은 version 동시 변경은 하나만 성공한다
+AssertionError: expected [ { status: 'fulfilled', …(1) }, …(1) ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ tests/server/sso.test.ts:285:57
+    283|   const results = await Promise.allSettled(["A", "B"].map(name =>
+    284|     updateSsoProvider(ctx, provider.id, { version: 1, name }, randomUU…
+    285|   expect(results.filter(r => r.status === "fulfilled")).toHaveLength(1…
+       |                                                         ^
+    286|   expect(results.find(r => r.status === "rejected")).toMatchObject({ r…
+    287|   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provide…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 느린 사전검사 중 저장한 새 설정을 이전 검사 결과로 덮어쓰지 않는다
+AssertionError: expected { value: { …(17) } } to match object { error: { code: 'VERSION_CONFLICT' } }
+(18 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "error": {
+-     "code": "VERSION_CONFLICT",
++   "value": {
++     "authorizationUrl": "http://127.0.0.1:56471/authorize",
++     "clientId": "catchsecu",
++     "createdAt": "2026-10-05T22:42:13.856Z",
++     "enabled": false,
++     "hasCert": false,
++     "hasSecret": false,
++     "id": "8940a2b4-f37e-4591-bb60-d29f51591c91",
++     "issuer": "http://127.0.0.1:56471",
++     "jwksUrl": "http://127.0.0.1:56471/jwks.json",
++     "name": "새 설정",
++     "preflight": {
++       "detail": "JWKS 키 1개 확인",
++       "ok": true,
++     },
++     "preflightDetail": "JWKS 키 1개 확인",
++     "preflightOk": true,
++     "protocol": "oidc",
++     "scopes": "openid profile email",
++     "tokenUrl": "http://127.0.0.1:56471/token",
++     "version": 3,
+    },
+  }
+
+ ❯ tests/server/sso.test.ts:299:25
+    297|     await updateSsoProvider(ctx, provider.id, { version: 1, name: "새 설…
+    298|   } finally { gate.release(); }
+    299|   expect(await pending).toMatchObject({ error: { code: "VERSION_CONFLI…
+       |                         ^
+    300|   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provide…
+    301| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 신규 사전검사 도중 권한이 회수되면 생성과 감사를 남기지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:311:25
+
+  308   .then(value => ({ value }), error => ({ error }));
+  309 try {
+  310   await gate.seen;
+→ 311   await db.membership.update(
+Database error. Code: `23514`. Message: `LAST_OWNER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/sso.test.ts:311:5
+    309|   try {
+    310|     await gate.seen;
+    311|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+       |     ^
+    312|   } finally { gate.release(); }
+    313|   expect(await pending).toMatchObject({ error: { status: 403 } });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/16]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  16 failed | 3 skipped (19)
+   Start at  07:42:05
+   Duration  9.43s (tests 86%, import 9%, transform 4%)
+

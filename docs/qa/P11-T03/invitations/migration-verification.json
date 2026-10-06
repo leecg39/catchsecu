@@ -1,0 +1,91 @@
+{
+  "at": "2026-10-06T00:03:11.105Z",
+  "migrationName": "20261014120000_sso_invitation_binding",
+  "freshSchema": "qa_sso_703be8a3281c93dc",
+  "freshInstall": {
+    "applied": {
+      "count": 94,
+      "mismatches": []
+    },
+    "constraints": [
+      {
+        "conname": "SsoState_binding_check"
+      },
+      {
+        "conname": "SsoState_invitation_binding_check"
+      },
+      {
+        "conname": "SsoState_mode_check"
+      },
+      {
+        "conname": "SsoState_pkey"
+      },
+      {
+        "conname": "SsoState_stateHash_key"
+      },
+      {
+        "conname": "SsoState_tenantId_providerId_fkey"
+      },
+      {
+        "conname": "SsoState_userId_sessionId_fkey"
+      }
+    ]
+  },
+  "devUpgrade": {
+    "applied": {
+      "count": 94,
+      "mismatches": [
+        {
+          "migration": "20261006100000_payment_methods",
+          "sourceChecksum": "b15e0ebcdb00335ebc73759832bd5e68e5e0a32effa47f5fac9b76ae9c313150",
+          "appliedChecksum": "5cef8112a4ea0cc5d0c21520a1c62eaf5e5af8bedcd78ec709d6632d97478ec7"
+        },
+        {
+          "migration": "20261006110000_paid_activation",
+          "sourceChecksum": "27ff73c87597b401cbedf5d945bd612b3b3dc42aa94642faffee3c25327fdcfd",
+          "appliedChecksum": "3b0a0ffc94b33e430081b98ada687e33f7b1ce03e0d281fd00569730ab6a40b0"
+        },
+        {
+          "migration": "20261006120000_refund_closing",
+          "sourceChecksum": "e55303786b64b1d9b824635f15721589601e2b09b8b2e8647734abfb66c00a10",
+          "appliedChecksum": "b2299aa3bed207ed95cdba41df757e63b346da7f9bc7b2947bdf69b3f228171b"
+        },
+        {
+          "migration": "20261007000000_sso_providers",
+          "sourceChecksum": "b16dab6c40914acd621a3c9af9d29baf685a062d24a0a672d2c3896a50f3fc6d",
+          "appliedChecksum": "c092e24933fcbe6ba2f068660101b3539d2a8d19db54019b5ded13b208d0f9fb"
+        }
+      ]
+    },
+    "existingRowsPreserved": true,
+    "fingerprints": {
+      "Company": {
+        "count": 51,
+        "sha256": "a8be378925712045fdc400c331c277f763b399d0b93948a7573c211644a6b845"
+      },
+      "User": {
+        "count": 61,
+        "sha256": "9d37269a7171a69e0bfa12ac97e13e324661cdbdfea4c12c3059f4cce37c645b"
+      },
+      "Membership": {
+        "count": 78,
+        "sha256": "080ce060a0998ba95a923e86a3b62450522f1af046b8aa290ab4bb73ec85973e"
+      },
+      "Session": {
+        "count": 283,
+        "sha256": "eeea9b4593cf8f359d3f06afdac821ef007e69a4e44e53613e04e756a547a333"
+      },
+      "SsoProvider": {
+        "count": 1,
+        "sha256": "2d071bc274bf84832cfdb22d2dcc3a49553ca3c188e49b3045ec56c8851c7b7d"
+      },
+      "SsoState": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  },
+  "schemaOnly": true,
+  "legacyStatesRequireRestart": true,
+  "allChecksumsMatch": false
+}

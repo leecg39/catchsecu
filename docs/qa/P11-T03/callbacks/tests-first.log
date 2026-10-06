@@ -1,0 +1,63 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:78368) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso.test.ts (31 tests | 1 failed) 27583ms
+   × P11 콜백: 이미 연결된 계정도 취소된 초대를 우회할 수 없다 519ms
+(node:79043) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso-saml.test.ts (5 tests | 1 failed) 3547ms
+   × SAML 초대가입: 초대된 역할·서비스로 수락, 다른 이메일·없는 초대는 거부 518ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-saml.test.ts > SAML 초대가입: 초대된 역할·서비스로 수락, 다른 이메일·없는 초대는 거부
+AssertionError: expected 409 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 409
+
+ ❯ tests/server/sso-saml.test.ts:230:26
+    228|   const evil = await begin(cookie, provider.id, other.id);
+    229|   const evilRes = await samlRoute(postSaml(sign(samlResponse({ inRespo…
+    230|   expect(evilRes.status).toBe(410);
+       |                          ^
+    231|   expect((await db.invitation.findUniqueOrThrow({ where: { id: other.i…
+    232|   expect(url.searchParams.get("SAMLRequest")).toBeTruthy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 콜백: 이미 연결된 계정도 취소된 초대를 우회할 수 없다
+PrismaClientKnownRequestError: 
+Invalid `db.invitation.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:430:23
+
+  427 expect(started.status).toBe(302);
+  428 const authorize = await fetch(started.headers.get("location")!, { redirect: "manual" });
+  429 const callback = new URL(authorize.headers.get("location")!);
+→ 430 await db.invitation.update(
+Database error. Code: `23514`. Message: `new row for relation "Invitation" violates check constraint "Invitation_status_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/sso.test.ts:430:3
+    428|   const authorize = await fetch(started.headers.get("location")!, { re…
+    429|   const callback = new URL(authorize.headers.get("location")!);
+    430|   await db.invitation.update({ where: { id: invitation.id }, data: { s…
+       |   ^
+    431|   const response = await f.callbackRoute(req("/auth/sso/callback?" + c…
+    432|   expect(response.status).toBe(410);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 34 passed (36)
+   Start at  07:55:05
+   Duration  33.90s (tests 93%, import 5%, transform 2%)
+

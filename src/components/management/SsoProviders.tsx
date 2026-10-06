@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { api, errorText, useResource } from "@/lib/api";
+import { api, ApiError, errorText, useResource } from "@/lib/api";
 import type { SsoProviderRecord } from "@/contracts/sso";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, EmptyState, Modal, PageHeading, Panel } from "../shared";
@@ -18,6 +18,7 @@ function SsoContent({ settings }: { settings: boolean }) {
   const app = useApplication();
   const canManage = !!app.data?.capabilities.includes("security.write");
   const [edit, setEdit] = useState<SsoProviderRecord | null | undefined>(settings ? null : undefined);
+  const [reauth, setReauth] = useState(false);
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [notice, setNotice] = useState("");
   const ask = useConfirm();
   const result = useResource<ListResponse>("/security/sso");
@@ -26,27 +27,33 @@ function SsoContent({ settings }: { settings: boolean }) {
   async function run(action: () => Promise<unknown>, done: string) {
     setBusy(true); setError(""); setNotice("");
     try { await action(); setNotice(done); result.reload(); }
-    catch (cause) { setError(errorText(cause)); }
+    catch (cause) { setError(errorText(cause)); if (cause instanceof ApiError && cause.code === "SSO_REAUTH_REQUIRED") setReauth(true); }
     finally { setBusy(false); }
   }
-  const toggle = (row: SsoProviderRecord) => run(
-    () => api("/security/sso/" + row.id, { method: "PATCH", body: JSON.stringify({ version: row.version, enabled: !row.enabled }) }),
-    row.enabled ? "SSO 연결을 비활성화했습니다." : "SSO 연결을 활성화했습니다.");
+  const toggle = async (row: SsoProviderRecord) => {
+    if (row.enabled && !await ask({ title: "SSO 사용 중지", message: `“${row.name}”의 새 로그인과 진행 중 인증이 중지됩니다. 이미 로그인한 기기는 유지됩니다. 다른 로그인 수단이 없는 활성 구성원이 있으면 중지할 수 없습니다.`, confirmLabel: "사용 중지" })) return;
+    await run(() => api("/security/sso/" + row.id, { method: "PATCH", body: JSON.stringify({ version: row.version, enabled: !row.enabled }) }),
+      row.enabled ? "새 SSO 로그인을 중지했습니다. 기존 로그인은 유지됩니다." : "SSO 연결을 활성화했습니다.");
+  };
   const preflight = (row: SsoProviderRecord) => run(
     () => api("/security/sso/" + row.id + "/preflight", { method: "POST" }),
     "사전검사를 다시 실행했습니다.");
   const remove = async (row: SsoProviderRecord) => {
-    if (!await ask({ title: "SSO 연결 삭제", message: `“${row.name}” SSO 연결을 삭제합니다. 이 설정으로는 더 이상 로그인할 수 없습니다.`, confirmLabel: "삭제" })) return;
-    void run(() => api("/security/sso/" + row.id, { method: "DELETE", body: JSON.stringify({ version: row.version }) }), "SSO 연결을 삭제했습니다.");
+    if (!await ask({ title: "SSO 연결 삭제", message: `“${row.name}” SSO 설정과 연결 계정을 삭제하고, 연결된 구성원의 모든 기기 로그인을 종료합니다. 다른 로그인 수단이 없는 활성 구성원이 있으면 삭제할 수 없습니다.`, confirmLabel: "삭제" })) return;
+    void run(async () => {
+      const removed = await api<{ signedOut: boolean }>("/security/sso/" + row.id, { method: "DELETE", body: JSON.stringify({ version: row.version }) });
+      if (removed.signedOut) window.location.assign("/login");
+    }, "SSO 설정과 연결 계정을 삭제하고 관련 로그인을 종료했습니다.");
   };
 
   return <>
+    {reauth && <p className="mg-description"><Link href="/login?returnTo=%2Fsecurity%2Fsso">다시 로그인한 뒤 SSO 설정으로 돌아가기</Link></p>}
     <PageHeading title={settings ? "SSO 연결 설정" : "SSO 연결 관리"}>
       {settings
         ? <Link className="cs-button" href="/security/sso">목록 보기</Link>
         : canManage && <ActionButton disabled={busy} onClick={() => setEdit(null)}>SSO 연결 등록</ActionButton>}
     </PageHeading>
-    <p className="mg-description">OIDC 또는 SAML 공급자로 회사 구성원의 로그인을 연결합니다. 등록 후 사전검사를 통과해야 활성화할 수 있습니다.</p>
+    <p className="mg-description">OIDC 또는 SAML 공급자로 회사 구성원의 로그인을 연결합니다. 등록 후 사전검사를 통과해야 활성화할 수 있습니다. 사용 중지·인증 정보 교체는 새 로그인과 진행 중 인증에 적용되며 기존 로그인은 유지됩니다.</p>
     {error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     {result.error
       ? <Panel><p role="alert">{result.error.message}</p><ActionButton secondary onClick={result.reload}>다시 불러오기</ActionButton></Panel>
@@ -82,7 +89,6 @@ function SsoContent({ settings }: { settings: boolean }) {
 function ProviderEditor({ row, onClose, onSaved }: { row: SsoProviderRecord | null; onClose: () => void; onSaved: (message: string) => void }) {
   const [protocol, setProtocol] = useState<"oidc" | "saml">(row?.protocol ?? "oidc");
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
-  const [preflight, setPreflight] = useState<{ ok: boolean; detail: string } | null>(null);
   const key = useRef(crypto.randomUUID());
   const saml = protocol === "saml";
 
@@ -97,8 +103,9 @@ function ProviderEditor({ row, onClose, onSaved }: { row: SsoProviderRecord | nu
         if (text("scopes")) body.scopes = text("scopes");
         if (text("clientSecret")) body.clientSecret = text("clientSecret");
         if (text("idpCert")) body.idpCert = text("idpCert");
-        await api("/security/sso/" + row.id, { method: "PATCH", body: JSON.stringify(body) });
-        onSaved("SSO 연결을 수정했습니다.");
+        const saved = await api<SsoProviderRecord>("/security/sso/" + row.id, { method: "PATCH", body: JSON.stringify(body) });
+        onSaved(saved.preflightOk ? "SSO 연결을 수정했습니다."
+          : "SSO 연결을 수정했습니다. 사전검사를 통과한 뒤 사용을 활성화해주세요.");
       } else {
         const body: Record<string, unknown> = {
           protocol, name: text("name"), issuer: text("issuer"), clientId: text("clientId"),
@@ -109,8 +116,9 @@ function ProviderEditor({ row, onClose, onSaved }: { row: SsoProviderRecord | nu
         else Object.assign(body, { tokenUrl: text("tokenUrl"), jwksUrl: text("jwksUrl"), scopes: text("scopes") || "openid profile email" });
         const created = await api<SsoProviderRecord & { preflight?: { ok: boolean; detail: string } }>("/security/sso",
           { method: "POST", headers: { "Idempotency-Key": key.current }, body: JSON.stringify(body) });
-        if (created.preflight && !created.preflight.ok) setPreflight(created.preflight);
-        else { onSaved("SSO 연결을 등록했습니다."); return; }
+        onSaved(created.preflight && !created.preflight.ok
+          ? "SSO 연결은 등록되었으나 사전검사에 실패했습니다: " + created.preflight.detail + ". 목록에서 설정을 확인하고 다시 검사해주세요."
+          : "SSO 연결을 등록했습니다.");
       }
     } catch (cause) { setError(errorText(cause)); }
     finally { setBusy(false); }
@@ -119,7 +127,7 @@ function ProviderEditor({ row, onClose, onSaved }: { row: SsoProviderRecord | nu
   return <Modal title={row ? "SSO 연결 수정" : "SSO 연결 등록"} onClose={() => { if (!busy) onClose(); }}>
     <form onSubmit={e => void save(e)}>
       {error && <p role="alert">{error}</p>}
-      {preflight && <p role="alert">등록은 되었으나 사전검사에 실패했습니다: {preflight.detail}. 설정을 수정한 뒤 사전검사를 다시 실행해주세요.</p>}
+      {row && <p className="mg-description">인증서·시크릿·스코프를 변경하면 새 로그인과 진행 중 인증이 중지됩니다. 기존 로그인은 유지됩니다. 활성 구성원의 다른 로그인 수단을 먼저 준비하고, 저장 후 사전검사를 통과해 사용을 다시 활성화해주세요.</p>}
       <fieldset disabled={busy} className="policy-fields">
         {!row && <label>프로토콜<select className="cs-input" name="protocol" value={protocol}
           onChange={e => setProtocol(e.target.value as "oidc" | "saml")}>

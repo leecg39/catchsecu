@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-05T23:17:07.709Z",
+  "results": [
+    {
+      "action": "POST /auth/sign-in/email",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/two-factor/enable",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/two-factor/verify-totp",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-out",
+      "status": 200
+    },
+    {
+      "action": "GET /auth/sso/6c29dc0b-067c-4078-a880-cbc614e360d8?mode=login",
+      "status": 302
+    },
+    {
+      "action": "POST /auth/sso/saml",
+      "status": 302
+    },
+    {
+      "action": "GET /me",
+      "status": 401
+    }
+  ],
+  "mfaEnrolledThroughApi": true,
+  "sessionsBeforeFactor": 0,
+  "redirect": "/login-otp?returnTo=%2Fdashboard",
+  "browserVerified": false,
+  "externalIdpVerified": false
+}

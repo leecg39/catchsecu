@@ -1,14 +1,20 @@
 # 구현 진행 현황
 
-2026-10-04 재검토: 완료 17/72 · 진행 중 40 · 계획 15. 일괄 완료 처리의 증거 불일치를 바로잡았다. P12-T03에 이어 P12-T01의 원래 수용 조건과 공통 게이트를 확인해 완료로 갱신했다. 이 수치는 코드 구현률을 뜻하지 않는다.
+## 최신 상태: 결제 내부 보완 후 커밋·푸시 및 중단 요청
+
+2026-10-06 결제수단·주문 내부 보완: 현재 권한·세션·정책/최종 기한 검사, 대표 교체 version 갱신, 주문 재요청 최신 상태, 다른 수단 주문 충돌 및 동시 생성/해지 직렬화를 구현했다. 이름 수정 UI와 실패 입력 보존·409 최신 목록 조회를 추가했다. PostgreSQL 86개·HTTP 25개(재시작4 포함)·전체 타입·변경 린트·production 빌드·계약 300경로/431작업 검증 통과. 실제 PG/브라우저는 미완료, 공식 완료17·진행42·계획13 유지.
+
+사용자가 이번 작업까지만 마무리하고 커밋·푸시하도록 범위를 지정했다. 다음 구현은 재개 요청 후 진행한다.
+
+2026-10-06 재검토: 완료 17/72 · 진행 중 42 · 계획 13. 일괄 완료 처리의 증거 불일치를 바로잡았다. P12-T03에 이어 P12-T01의 원래 수용 조건과 공통 게이트를 확인해 완료로 갱신했다. 이 수치는 코드 구현률을 뜻하지 않는다.
 
 사용자는 미완료 기능 구현까지 진행하도록 요청했다. 전체 목표는 진행 중이며 외부 연동·전체 브라우저·운영 복구까지 완료 조건을 유지한다.
 
 [현재 재검증·구현 계획](../../docs/planning/05-completion-recovery.md)
 
-## 진행 대시보드 (2026-10-04 갱신)
+## 진행 대시보드 (2026-10-06 갱신)
 
-전체: **17/72 완료 (24%)** `████░░░░░░░░░░░░░░░░` · 진행 중 40 · 계획 15
+전체: **17/72 완료 (24%)** `████░░░░░░░░░░░░░░░░` · 진행 중 42 · 계획 13
 
 | Phase | 영역 | 완료/전체 | 진행 | 계획 | 상태 |
 |---|---|---:|---:|---:|---|
@@ -23,10 +29,10 @@
 | P08 | 문자·이메일·알림톡 발송 공통 | 0/4 | 4 | 0 | 진행 |
 | P09 | 이메일·카카오·워크메신저 | 0/6 | 4 | 2 | 진행 |
 | P10 | 라이선스·결제·원장 | 0/5 | 5 | 0 | 진행 |
-| P11 | 보안 정책·SSO·조직 인증 | 0/5 | 2 | 3 | 진행 |
+| P11 | 보안 정책·SSO·조직 인증 | 0/5 | 3 | 2 | 진행 |
 | P12 | 감사·통계·준수 보고 | 2/4 | 1 | 1 | 진행 |
 | P13 | 공지·도움말·시스템 화면 | 0/4 | 3 | 1 | 진행 |
-| P14 | 데이터 이전·통합·출시 검증 | 0/5 | 0 | 5 | 계획 |
+| P14 | 데이터 이전·통합·출시 검증 | 0/5 | 1 | 4 | 진행 |
 
 - 완료 조건: 각 Task 수용 조건 + 공통 게이트(통합·E2E·외부연동·운영복구 증거, lint/type/build 통과) — TASKS.md "공통 완료 조건"
 - 외부 자격증명 의존: blockers.md B02~B07 (문자·이메일·카카오·PG·IdP·본인인증·Slack/Teams 채널)
@@ -42,6 +48,18 @@
 | M6 | 0/5 | 미완료 |
 
 ## 최신 보완
+
+2026-10-06 구독 권한 후속: 상품/구독/한도/자산 조회와 구매·취소·예약·철회에 현재 권한·세션·정책 및 최종 기한 검사를 연결했다. 재요청은 최신 구독 상태를 반환하고 해지 사유도 요청 해시에 포함한다. 22개 실패 재현 후 최종 PostgreSQL69개·HTTP22개(재시작4 포함)·전체 타입/린트/빌드·계약 검사를 통과했다. DB migration 추가 없이96개 상태를 유지한다. [증거](../../docs/qa/P10-T04/subscription-authority/README.md). 전체17/42/13 유지.
+
+2026-10-06 내부 후속: 유료 구독 만료 워커 누락과 DB 해지일 비교 오류를 4개 실패로 재현해 수정했다. PostgreSQL 40개·실제 HTTP 10개(재시작 3개 포함), 전체 타입·최종 린트·빌드가 통과했다. 별도 SSO 테스트 타입 보완 후 39개도 통과했다. Migration 96개 새 설치/개발 DB 구조 2,826개가 일치하고 기존 결제·구독 10개 테이블과 과거 적용 기록을 보존했다. 기존 체크섬 4건은 원문 미확보로 유지한다. P14-T04를 부분 검증 근거에 따라 진행 중으로 갱신해 현재 완료 17·진행 42·계획 13이다. [유료 만료](../../docs/qa/P10-T04/expiration/README.md), [DB 대조](../../docs/qa/P14-T04/migration-drift/README.md).
+
+2026-10-06 SAML 후속: 필수 정보와 서명된 XML의 사용자 확인, 요청 크기/중복 필드, 삭제 소속 자동 재가입을 보완했다. 기존 잘못된 응답12종과 JIT 재가입을 재현했고 최종86개·실제HTTP18개(재시작3 포함)·타입/린트/빌드가 통과했다. [증거](../../docs/qa/P11-T03/saml-validation/README.md). 다음 같은P11-T03의 실패/만료/취소 화면을 연결한다. 아래 SAML 필드/JIT 미해결 표시는 이전 기록이다.
+
+2026-10-06 SSO 개인2FA: 실제 등록계정 우회 재현 후 기존 MFA 라이브러리와 암호화 바인딩·대상 회사·원래 세션·세션감사를 연결했다. SSO57개와 기존인증70개, 실제HTTP18개·PID3358→3909 대기 challenge 재시작·타입/린트/빌드 통과. [증거](../../docs/qa/P11-T03/mfa/README.md). 아래 개인2FA 미연결 기록은 수정 전이다. 다음 같은P11-T03의 SAML 필드 파싱/subject·오류 화면·재가입 정책과 원래수용을 점검한다.
+
+2026-10-06 P11-T03 콜백: 원래 세션과 회사/provider 버전, 초대, 정원, 기존 이메일 자동연결 차단을 보완했다. SSO41개와 인증/감사/MFA70개, 실제HTTP15개와 재시작3개, 타입/린트/빌드 통과. 빈 설치93개 및 기존 행 보존 확인. 개발 DB 기존 migration 체크섬4건 불일치는 미해결이다. 다음은 같은 Task의 개인2FA challenge 통합과 세션 감사 점검이다. 실제IdP 및 최신Ego UI는 미검증이며 완료17/진행41/계획14를 유지한다. [증거](../../docs/qa/P11-T03/callbacks/README.md).
+
+2026-10-06 P11-T03: 실제 SSO 설정 코드와 미완료 수용 조건을 재확인해 planned→in_progress로 정정했다. 활성화 사전검사 우회, 회수된 권한/세션, 동시 수정, 느린 검사 결과의 덮어쓰기를 차단하고 인증 설정 변경 시 재검사/재활성화와 화면 안내를 연결했다. PostgreSQL 27개·production HTTP 21개·감사 6건·동일 빌드 재시작 해시·타입/린트/빌드 통과. [증거](../../docs/qa/P11-T03/revalidation/README.md). Ego 45 공간 소실로 새 공간 생성 응답을 기다리며 최신 브라우저/실제 SaaS IdP/초대가입 게이트는 미완료다. 전체 목표 active, 공식 완료17·진행41·계획14.
 
 P03-T03의 개인정보 활동 검토에 회사별 보유 기한·승인된 파기를 연결했다. SecurityPolicy.activityReviewRetentionDays, ActivityReview retentionUntil/destructionStatus/destroyedAt/destroyApproverId(관리자 composite FK)와 상태·전이·메시지 삭제 방어 트리거(migration 2개), 종결 시 정책 스냅샷·승인 대기 sweep·파기/보존 결정 API·정책 변경 재계산 백필을 구현했다. 종결 경로는 Policy→Review 잠금 순서로 정책 변경과 직렬화한다(ABBA 데드락 방지). UI에 정책 기한 필드와 검토 목록 보유·파기 배지·상세 2단계 파기 승인 버튼을 연결했다. 신규 PostgreSQL 8개·관련 75개·전체 97파일 1333개·타입/린트/production 빌드·계약 검증이 통과했다. [증거](../../docs/qa/P03-T03/revalidation/activity-retention-README.md). 실제 외부 발송과 전체 브라우저 게이트가 남아 공식 17/72를 유지한다.
 
@@ -202,3 +220,31 @@ P03-T01 검증: 사업자등록증 실제 검사·바이트 다운로드·교체
 2026-10-13 후속(a82e5b7·8ea4ad6·d788e24 푸시): P11-T01 보유지정 회사정책 스위치(SecurityPolicy.allowRetentionDesignation 기본끔 — PATCH /forms/:id/retention 403 RETENTION_DESIGNATION_DISABLED·목록 permissions.canDesignateRetention·정책 UI 토글, migration 20261012160000, retention-designation 4/4). P10-T03 실패전송 정산 완성 — 실버그 2건 수정: ①applySmsReceipt webhook이 미정산 reserve를 정산하지 않아 unknown 발송 홀드가 영구 누수(→ accepted:capture/failed·timeout:release, reservationId 역참조 중복 정산 방지, unknown은 종결상태라 상태 보존·원장만 정산) ②sms-solapi 무영수증 크래시 복구가 재전송으로 떨어져 공급자 중복발송 위험(→ unknown+DELIVERY_UNCERTAIN+job dead로 보류, webhook 대사 정산; cleanupCampaigns 고아잡 수리도 결과별 정산·로컬 무영수증 release·solapi 무영수증 홀드 유지). 월마감 MonthCloseRecord.services[](serviceId·serviceName·captured·released) 라이브 집계+마감 스냅샷 저장·재조회 스냅샷 반환. billing-settlement 8/8 + 캠페인/sms 회귀 71/71 — runOneJob {tenantId,jobId} 스코핑으로 claim 순서 플레이크 제거. P10-T01 무제한 한도·가격개정 불변 적대적 검증(null 한도 4자원 무제한·pending 402·v2 발행 후 구독/주문/원장 구가격 유지, subscriptions 11/11). 공식 완료 17/72 유지 — 잔여 미체크는 전부 외부 공급자·원본 대조·운영 인프라·선행 전체 게이트 차단.
 
 2026-10-14 후속(d37b36d·a293f9d 푸시): P03-T03 활동 검토 보유 기한·승인된 파기 구현+브라우저 검증. SecurityPolicy.activityReviewRetentionDays(nullable 1–36500)·ActivityReview retentionUntil/destructionStatus(none|awaiting|kept|destroyed)/destroyedAt/destroyApproverId, migration 2개(2026101400/1410 — destroyed⇔필드쌍 CHECK·종결불변·none→awaiting→destroyed|kept|none 전이·메시지 DELETE는 app.activity_review_destroy 트랜잭션 플래그+awaiting 부모만). actOn 종결 시 FOR SHARE 정책 잠금 스냅샷(Policy→Review 잠금 순서로 ABBA 데드락 차단), decideActivityReviewDestruction(version·관리자·awaiting·원자 메시지 삭제·감사), sweep(회사·정책 FOR SHARE→SKIP LOCKED), updatePolicy 백필(재계산·해제·kept/destroyed 불변). API POST /activity-reviews/{id}/destruction·워커 60초 연결·UI 정책탭5+목록 보유·파기열+2단계 승인. OpenAPI 290/419/38·계약 378/41·0미매핑, 신규8+관련75+전체1333 통과·tsc/eslint/빌드0. 적대적: locate 잠금순서·부분 destroyed CHECK·migration dev/test 92 적용·보강 2차 migration. 브라우저 Playwright 7/7(정책 UI 저장→스냅샷→sweep→배지→2단계 파기→메시지0·390px 추가오버플로없음), 백필 4건 관찰. dev서버 stale Prisma client(PATCH500) 재시작 해소. [증거](docs/qa/P03-T03/revalidation/activity-retention-README.md). 공식 완료 17/72 유지 — 잔여 미체크는 외부 공급자·원본 대조·운영 인프라·선행 전체 게이트 차단.
+
+2026-10-06 목표 재개: 이전 턴은 전체72개/181경로 tasks.md를 현재17/41/14로 갱신한 문서 진전이다. 이번 턴은 SSO 콜백 실제HTTP15개, PID91086에서91702로 재시작3개, 독립DB linkedUser/providerHash/QA session0 증거를 추가했다. 최신빌드/타입/린트 및 인증/감사/MFA 회귀70개 통과. QA3157 session21009, build .local/qa-sso-callbacks-20261006-build. 이전 SSO41개 증거 유지. 다음 동일P11-T03: completeSso에서 mintSession으로 이어지는 개인2FA 미연결을 실제MFA 계정으로 재현하고 maintained plugin challenge 및 회사/provider 현재권한 바인딩을 구현한다. 코드검증 전 세션0, 성공 후 감사와 세션 생성을 검증한다. 외부IdP와 브라우저 공간 재생성 응답은 별도 대기이며 독립 구현 가능. goalactive. 사용자서버와 전역worker 변경 및 커밋/푸시 없음. 기존 migration 체크섬4건을 덮어쓰지 않았고 전체 migration audit는 실패로 유지.
+
+2026-10-06 목표 후속: 이전 턴은 콜백 HTTP18개 증거 진전이다. 이번 턴은 SSO MFA 실제 우회 실패 재현→서버/라우트/auth hook/adapter 통합→관련127개(SSO57,인증70) 및 HTTP18개 증거를 남겼다. 신규스키마없음(Verification 재사용). QA3158 PID3909 exec7856, build .local/qa-sso-mfa-20261006-build. QA원래사용자 MFAfalse/세션0 복구, 비공개 challenge 파일은 complete만 남김. 다음 SAML regex 파싱/subject·명시적 실패 UI와 소속삭제 후 JIT재가입 정책. 브라우저 공간 승인·외부IdP는 별도 대기, 독립진행가능. 기존 migration 체크섬4건 불일치 유지. 전체17/41/14, goalactive; 커밋/푸시없음. 사용자3100/전역worker 미변경.
+
+2026-10-06 목표 후속: 이전 턴은 개인MFA 우회 수정·127개/HTTP18개로 진전. 이번 턴은 SAML13종 중12종 누락/표기 우회와 연결계정 소속삭제 후 자동재가입 재현→네임스페이스DOM/검증된Assertion XML/필수SubjectConfirmation/본문제한/삭제소속거부 구현→SSO86개·HTTP15개+재시작3개·최종빌드/타입/린트. 직접xmldom0.8.15 선언 외 패키지 버전 변화없음. QA3159 PID17259 exec91146/build .local/qa-sso-saml-20261006-build. QA세션0 및 본 시험state정리, providerHash/linkedAccount 보존. 다음 동일P11-T03: callback/start 실패를 JSON으로만 끝내지 않고 안전한 오류코드로 로그인 화면·재시작 흐름에 연결. 실제Ego 공간 승인/외부IdP 별도대기. migration4건 미해결. 전체17/41/14 goalactive. 커밋/푸시없음. 사용자서버/전역worker 변경없음.
+
+2026-10-06 목표 후속: 이전 턴은 전체72개/181경로 작업 문서 갱신으로 진전. 이번 턴은 오류4개 실패재현→SSO 문서오류303·고정 안내/회사시작화면·취소state소비·IdP상세제거 구현→관련130개·HTTP15+재시작15개·타입/린트오류0(기존img경고4)·빌드 통과. [증거](../../docs/qa/P11-T03/recovery/README.md). QA3160 PID23861→24314 exec79090, build .local/qa-sso-recovery-20261006-build. QA세션0·이번state정리·providerHash/accountID유지. 다음 동일P11-T03: 현재 미연결 안내인 link/oauth2 계열과 연결계정조회/해제 API·UI·초대SSO진입을 구현한다. 실제Ego 공간응답·외부IdP 별도대기, 독립진행가능. migration4건 미해결. 전체17/41/14 goalactive; 커밋/푸시없음. 사용자3100/전역worker변경없음.
+
+2026-10-06 목표 후속: 이전 턴은 SSO 오류 화면130개/HTTP30개로 진전. 이번 턴은 본인 연결 API/UI·5분 재인증·마지막 로그인수단·일반 API우회차단·전체 세션/대기 인증 회수·원자 감사 구현. 최종147개+인증70개, HTTP13+재시작3개, 빌드/타입/린트오류0(기존img경고4), OpenAPI292/421/39·미매핑0. [증거](../../docs/qa/P11-T03/accounts/README.md). QA3161 PID32044→32765 exec41058/build .local/qa-sso-accounts-20261006-build; 기존provider/account해시유지·신규연결만해제·QA세션0. 테스트중DTO이동 캐시불일치8실패는보존·고정소스최종통과. 다음 동일P11-T03: provider삭제시고아Account·잠금방지(현재삭제는provider행만), 비활성화/인증서수명주기·초대SSO진입구현. 브라우저공간응답/외부IdP 별도대기지만독립진행가능. migration4건미해결. 전체17/41/14 goalactive, 커밋/푸시없음. 사용자3100·전역worker변경없음.
+
+2026-10-06 목표 후속: 이전 턴은 본인연결관리217개/HTTP16개로 진전. 이번 턴은 provider행만삭제하던경로에 연결계정·영향사용자세션/인증·state원자정리, 마지막로그인/5분재인증·Serializable동시삭제·감사롤백·UI영향안내 구현. 관련154개+회사간동시삭제1개, HTTP12+재시작3개, 타입/빌드·린트오류0/경고1 통과. [증거](../../docs/qa/P11-T03/provider-removal/README.md). 개발DB SSOAccount1/고아0 읽기확인. QA3162 PID40252→41074 exec44807/build .local/qa-sso-provider-removal-20261006-build. 신규QAprovider/account만삭제·기존해시보존·QA세션0. .local/qa-sso-provider-removal.json complete·최초실행재수행금지. 다음동일P11-T03: 초대토큰→SSO초대가입UI, 실제security/auth SSO계약정리와 문자열Account 참조보강 검토. 비활성화/인증서회전·브라우저/외부IdP 수용남음. Ego복구응답대기지만독립진행가능. migration4불일치유지·전체17/41/14 goalactive. 커밋/푸시없음·사용자3100/worker변경없음.
+
+2026-10-06 목표 후속: 이전 턴은 72개/181경로 tasks.md 정합성 갱신으로 진전. 이번 턴은 UUID만 초대시작302 결함 재현→token POST 조회/시작·version/hash 바인딩·초대선택 UI·역할상한·no-referrer 구현. 최종4파일186개, HTTP15+재시작5개, 타입/린트0/빌드, 계약294/423/40 통과. [증거](../../docs/qa/P11-T03/invitations/README.md). Migration94 빈설치/기존행보존·신규체크섬 일치; 기존4불일치 유지. QA3163 PID53903→54674 exec98194, build .local/qa-sso-invitations-20261006-build. 초기 QA서비스없음은 준비검사에서 중단 후 신규서비스 API생성으로 해소. 기존provider/account해시유지·소유자/새회원세션0; marker complete·HTTP 최초/재시작재실행금지. 다음 같은P11-T03: 실제 SSO경로 계약과 문자열Account 참조·비활성화/키회전 정책, 전문가배정 이력 재초대 정리 점검. Ego 복구응답/외부IdP 수용대기지만 독립진행가능. 전체17/41/14·goalactive, 커밋/푸시없음·사용자3100/worker변경없음.
+
+2026-10-06 목표 후속: 이전 턴은 외부 인증9개영역 보고서와 tasks 연결로 진전. 이번 턴은 공급자 FK/트리거/CHECK·고아 방지·참조 기반 조회/삭제·중첩PG잠금409·실제API12개계약을 구현/검증. 9파일268개 통과 후 실제 생성 응답의 preflight 계약누락 발견→공유스키마 수정·실제CRUD+계약5개 재통과. HTTP14+재시작3, 최종타입/린트/빌드 통과. [증거](../../docs/qa/P11-T03/provider-reference/README.md). Migration95 빈설치/기존7종행보존·새참조정상2개; 이전4체크섬불일치로 migration 감사명령exit1. QA3164 PID99393→191 exec29449/build .local/qa-sso-provider-reference-20261006-build. 최초실패 임시provider/API삭제·전용QA잔여세션 정리완료; 최종기존provider/account해시유지·세션0·markercomplete 최초재실행금지. 다음P11-T03: SSO 재초대의 기존ExpertAssignment 정리가 이메일 acceptInvitation의 revoke와 불일치하는지 재현/수정; 비활성화·키교체 보호정책 확인. Ego 공간복구응답/외부IdP는 별도대기. 전체17/41/14 goalactive, 커밋/푸시없음·사용자3100/전역worker미변경.
+
+2026-10-06 목표 후속: 이전 턴은 SSO 공급자 DB참조·계약/268개·HTTP17개로 진전. 이번 턴은 전문가 재초대의 active배정잔존3개재현→SSO/이메일 공유revokeInvitedExpert·회사/사용자범위·원자감사 구현. 신규7개 포함5파일174개, HTTP최종8+재시작3, 타입/린트0/빌드/계약통과. [증거](../../docs/qa/P11-T03/expert-reinvitation/README.md). HTTP처음403을404로기대한검사오류는보존; fixture중복생성없이prepared복구로DB수락/권한/감사검사 및실제SAML재로그인·범위403·replay401확인. 전용QA잔여세션1정리·최종원래owner/새member세션0. QA3165 PID12489→13575 exec67703/build .local/qa-sso-expert-reinvitation-20261006-build. markercomplete 최초/resume재실행금지, 원래provider/account해시유지. 이전QA3164종료; 사용자3100/전역worker변경없음. 다음P11-T03: 비활성화/인증서·키교체의 신규/대기인증·기존세션·마지막수단에대한현재정책을실제코드/테스트로검사하고결손만보완. Ego복구응답/외부IdP별도대기; migration4불일치유지. 전체17/41/14·goalactive, 커밋/푸시없음.
+
+2026-10-06 사용자 일정 질문/우선순위: 외부 계정·승인·실제 외부 연동 시험은 일단 대기하고 내부 구현·검증 우선. 내부 실제 작업시간24~40시간(8h/day3~5일)을 계획용 거친 추정으로 안내. 브라우저환경 사용가능 전제·추가결함변동·확정일정아님을 명시. 외부항목완료처리/전체목표축소없음.
+
+2026-10-06 목표 후속: 이전 턴은 전문가 재초대174개/HTTP11개로 진전. 이번 턴은 유일SSO의 수동중지/secret/scope변경3실패 재현→assertProviderCanStop공유·PATCH SERIALIZABLE·회사간경합·UI확인/기존세션보존 안내 구현. 전체205중203통과/기대값2실패(직렬화409코드·PEM trim), 그2개 포함핵심/계약15개 재통과. HTTP20+재시작3·타입/빌드·린트오류0 기존경고1·계약통과. [증거](../../docs/qa/P11-T03/provider-lifecycle/README.md). QA3166 PID19218→19462 exec11878/build .local/qa-sso-provider-lifecycle-20261006-build; 임시공급자/계정삭제·세션0·기존provider/account보존, markercomplete최초재실행금지. 이전3165종료·사용자3100/전역worker유지. 사용자지시: 외부계정/승인/외부실시험대기·내부우선; 실제작업24~40h 추정(확정아님, 브라우저사용전제). 다음내부업무: 기존4migration 체크섬과Git원래SQL/현재DDL/빈설치DDL 대조, 필요후속migration판단; 브라우저기존공간현재상태재확인. 전체17/41/14 goalactive, 커밋/푸시없음.
+
+2026-10-06 목표 후속: 이전 설명/시간 응답은 코드 진전이 없었으므로 현재 Git·DB를 재확인하고 내부 후속 작업을 수행했다. 신규 migration96과 유료 만료 처리·감사·기한 인덱스를 구현/검증했다. QA3167 PID29246→29592 재시작/워커 새 프로세스 재실행, 시험 세션0·전용 앱 종료. 사용자3100/상주worker는 유지(새 자동 만료 적용에는 추후 worker 재시작 필요). Ego inventory에 기존45는 없고56은 agentDelegatedToUser 상태여서 브라우저 작업은 재개하지 않았다. 외부 검증·브라우저·checksum4건은 대기하되 내부 작업 가능. 다음은 유료 구독 예약/철회의 현재 권한·동시 수정·멱등 재요청 경계를 점검한다. 전체17/42/13, goal active. 커밋/푸시 없음.
+
+2026-10-06 목표 후속: 이전 턴은 유료 만료·migration96·HTTP10개로 진전. 이번 턴은 현재 구독 권한/재요청/최종 기한을 구현하고 신규29개 포함7파일69개·HTTP18+재시작4·전체 타입/린트/빌드/계약을 검증했다. QA3168 PID36026→36381, 완료 marker .local/qa-subscription-authority.json 최초재실행 금지, 시험 세션0·전용 앱 종료. 사용자3100/상주worker 보존. 다음 내부 작업: 결제수단/결제 주문 CRUD의 현재 권한·동시 변경·재요청 및 전체 수용 조건 점검. 외부 PG/IdP·기존Ego 복구·checksum4건은 대기하되 다른 내부 작업 가능. 전체17/42/13 goal active, 커밋/푸시 없음.
+
+2026-10-06 체크포인트: 직전 SSO 설명 턴은 새 구현 없는 설명 응답이다. 현재 worktree·앞선 구독 sourcehash를 재검증했고 이번 턴은 결제 현재 권한20개 실패 재현→수정→최종86개/HTTP25개로 진전했다. QA3169 두 프로세스 종료·세션0, 외부와 브라우저 미완료 유지. 사용자 이번 작업까지만 커밋·푸시 요청에 따라 이후 작업을 중단한다. 재개 시 PG webhook 동시 이벤트/주문 상태 전이와 브라우저 이름 수정·409 입력 보존부터 확인한다.

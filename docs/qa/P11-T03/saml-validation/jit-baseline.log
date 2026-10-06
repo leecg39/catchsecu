@@ -1,0 +1,33 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso.test.ts (53 tests | 1 failed | 52 skipped) 918ms
+   × SSO JIT: 이미 연결된 계정의 삭제된 소속을 자동 복구하지 않는다 914ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso.test.ts > SSO JIT: 이미 연결된 계정의 삭제된 소속을 자동 복구하지 않는다
+AssertionError: expected 302 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 302
+
+ ❯ tests/server/sso.test.ts:655:27
+    653|   await db.membership.delete({ where: { id: member.id } });
+    654|   const callback = await f.callbackRoute(req("/auth/sso/callback?" + f…
+    655|   expect(callback.status).toBe(403);
+       |                           ^
+    656|   expect(await db.membership.count({ where: { userId: user.id, tenantI…
+    657|   expect(await db.session.count({ where: { userId: user.id } })).toBe(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 52 skipped (53)
+   Start at  08:25:01
+   Duration  2.17s (tests 44%, import 35%, transform 21%)
+

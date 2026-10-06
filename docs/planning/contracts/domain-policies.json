@@ -342,7 +342,7 @@
         "/assets"
       ],
       "scope": "현재 회사 결제 자료; 서비스 필터는 같은 tenant 서비스만.",
-      "validation": "서버 가격·통화/정수 금액·결제 출처·월/페이지·원천 멱등키 확인.",
+      "validation": "서버 가격·통화/정수 금액·결제 출처·월/페이지·원천 멱등키 확인. 구독 조회/변경/재요청은 트랜잭션에서 현재 회사·역할·세션·MFA/IP/비밀번호 정책을 재검사하고 변경 완료 시 기한을 재검사한다. 해지 사유를 멱등 해시에 포함하며 재요청은 최신 구독 상태를 반환한다.",
       "response": "구독/체험 이력·잔액/원장·청구서의 안전 DTO. 카드 원문·원천 ID 제외.",
       "deletion": "원장 거래 불변, 환불은 보정 거래; 이력은 보존 정책 준수.",
       "forbidden": "success URL만으로 paid/충전 표시, 음수 잔액·중복 차감·원장 직접 수정 금지."
@@ -362,7 +362,6 @@
       "id": "security",
       "prefixes": [
         "/security",
-        "/identity-providers",
         "/me/password-policy"
       ],
       "scope": "현재 회사 보안 정책; 사용자 암호 정책 조회는 본인 Membership.",
@@ -453,6 +452,50 @@
       "response": "안전한 상태 DTO와 실제 PDF/CSV 파일. 암호문/요청 키 제외. 미판정 유지.",
       "deletion": "24시간 만료·취소·삭제 시 암호화 결과 제거. 불변 마감은 UPDATE/DELETE 거부.",
       "forbidden": "다른 요청자 다운로드, 권한 회수 후 재요청/다운로드, stale worker 게시, 임의 준수 통과 금지."
+    },
+    {
+      "id": "self-sso-accounts",
+      "prefixes": [
+        "/me/sso-accounts"
+      ],
+      "scope": "본인과 현재 직접 소속 회사의 SSO 연결만 반환/해제. 활성 소속·현재 세션·회사 IP/MFA/암호 정책 재검사.",
+      "validation": "DELETE는 updatedAt·confirm=true와 최근 5분 로그인 확인. 비밀번호 또는 다른 활성 SSO 로그인 수단 확인. 회사/사용자 잠금으로 경합 직렬화.",
+      "response": "연결 행 ID·공급자 표시명/프로토콜·날짜·해제 가능 여부. 외부 subject·인증 토큰·비밀 설정 제외.",
+      "deletion": "본인 회사 연결 해제와 모든 본인 세션·대기 인증 회수·감사 저장을 원자 처리. 로그인 수단이 하나이면 삭제 거부.",
+      "forbidden": "다른 회사/사용자 계정 접근, 일반 unlink API 우회, 마지막 수단 제거, 감사 실패 부분 커밋 금지."
+    },
+    {
+      "id": "sso-invitations",
+      "prefixes": [
+        "/invitations/sso"
+      ],
+      "scope": "43자 초대 bearer token의 활성 회사. 로그인 세션 없이도 해당 초대의 SSO 시작만 허용한다.",
+      "validation": "같은 Origin·IP 제한·rate limit·초대 pending/만료·token hash·공급자 회사/활성/사전검사를 확인한다. 콜백은 시작 당시 초대 version/hash, 검증된 이메일, 초대자 권한/역할 상한, 서비스, 정원, 계정 충돌을 재검사한다.",
+      "response": "목록은 providers(id,name,protocol)만 반환한다. 시작은 redirect만 반환하며 초대 토큰·해시·이메일·역할·IdP 비밀은 제외한다.",
+      "deletion": "초대 재발송/취소/만료/버전 변경은 기존 인증 요청의 수락을 차단한다. 수락은 membership·grant·감사와 원자 처리하고 state는 한 번 소비한다.",
+      "forbidden": "초대 UUID만으로 시작, 다른 회사 공급자, 이전 토큰으로 수락, 이메일 자동 연결, 역할 상승, 초대 토큰의 IdP URL 전달 금지."
+    },
+    {
+      "id": "sso-management",
+      "prefixes": [
+        "/security/sso"
+      ],
+      "scope": "현재 회사의 직접 소속·security.read로 조회, 변경/검사는 직접 소속 owner만. 삭제는 로그인 후 5분 이내.",
+      "validation": "protocol별 URL/secret/cert 입력, 사전검사 전후 권한·버전 확인. 사용 중 공급자의 수동 비활성화/인증정보 변경·삭제 시 활성 연결 사용자의 대체 로그인 수단과 최신 권한 검사. SERIALIZABLE과 사용자 잠금으로 회사 간 경합 방지. 인증정보 변경은 비활성화/재검사. 실패한 사전검사는 대체 수단 유무와 무관하게 비활성화한다. 수동 비활성화/교체는 기존 세션을 유지하고 대기 인증은 version 재검사로 거부한다.",
+      "response": "items 또는 단일 공급자 안전 DTO; secret/cert는 존재 여부만. 검사 결과와 삭제 건수/signedOut을 반환한다.",
+      "deletion": "Account의 공급자 FK는 RESTRICT. 서비스 계층에서 영향 계정/세션/인증/state 및 감사를 원자 처리한 뒤 공급자 삭제. 계정 참조는 DB trigger가 providerId에서 채운다.",
+      "forbidden": "다른 회사, 전문가, owner 아닌 변경; 비밀 원문 조회; 사전검사 없는 활성화; 마지막 로그인 수단 제거; 고아 계정 생성 금지."
+    },
+    {
+      "id": "sso-authentication",
+      "prefixes": [
+        "/auth/sso"
+      ],
+      "scope": "해당 공급자의 활성 회사/IP 정책. login은 공개 시작, link는 현재 직접 구성원과 최근 로그인 필요. 초대는 별도 bearer POST 진입.",
+      "validation": "state 일회 소비·10분 기한, providerVersion, OIDC PKCE/nonce/issuer/audience/signature 또는 서명 SAML 응답/Assertion의 요청/대상/시간 확인. 현재 계정·연결세션·초대 hash/version/이메일/역할·정원 재검사.",
+      "response": "정상 302 Location/쿠키. 2FA 사용자는 factor 화면 이동, 확인 전 세션 없음. 문서 실패303 고정 오류코드, API 실패JSON. 공급자 상세 오류 비노출.",
+      "deletion": "state는 일회 소비, 회사/공급자/연결 세션 회수 시 인증 불가. 연결·초대·세션·감사는 원자 처리.",
+      "forbidden": "초대 UUID만 시작, 자동 이메일 계정 병합, 상태 재사용, 서명/발급자/대상 우회, 삭제 소속의 자동 복구, 2FA 전 세션, 임의 리디렉션 금지."
     }
   ]
 }

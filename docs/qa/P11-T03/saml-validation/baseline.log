@@ -1,0 +1,57 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:9114) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso-saml.test.ts (18 tests | 12 failed | 5 skipped) 6892ms
+   × SAML 구조: missing recipient 응답은 계정과 세션을 만들지 않는다 1054ms
+   × SAML 구조: missing status 응답은 계정과 세션을 만들지 않는다 462ms
+   × SAML 구조: missing subject identifier 응답은 계정과 세션을 만들지 않는다 445ms
+   × SAML 구조: blank subject identifier 응답은 계정과 세션을 만들지 않는다 509ms
+   × SAML 구조: missing bearer method 응답은 계정과 세션을 만들지 않는다 418ms
+   × SAML 구조: wrong confirmation method 응답은 계정과 세션을 만들지 않는다 433ms
+   × SAML 구조: missing confirmation request 응답은 계정과 세션을 만들지 않는다 812ms
+   × SAML 구조: wrong destination 응답은 계정과 세션을 만들지 않는다 425ms
+   × SAML 구조: wrong subject namespace 응답은 계정과 세션을 만들지 않는다 410ms
+   × SAML 구조: decoy recipient 응답은 계정과 세션을 만들지 않는다 494ms
+   × SAML 구조: single quoted recipient 응답은 계정과 세션을 만들지 않는다 508ms
+   × SAML 구조: spaced denial status 응답은 계정과 세션을 만들지 않는다 452ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: missing recipient 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: missing status 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: missing subject identifier 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: blank subject identifier 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: missing bearer method 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: wrong confirmation method 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: missing confirmation request 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: wrong destination 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: wrong subject namespace 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: decoy recipient 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: single quoted recipient 응답은 계정과 세션을 만들지 않는다
+ FAIL  tests/server/sso-saml.test.ts > SAML 구조: spaced denial status 응답은 계정과 세션을 만들지 않는다
+AssertionError: expected 302 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 302
+
+ ❯ tests/server/sso-saml.test.ts:277:25
+    275|   if (afterSign) encoded = Buffer.from(afterSign(Buffer.from(encoded, …
+    276|   const result = await (await routes()).samlRoute(postSaml(encoded, re…
+    277|   expect(result.status).toBe(401);
+       |                         ^
+    278|   expect(await db.account.count({ where: { providerId: "sso:" + provid…
+    279|   expect(await db.user.count({ where: { email: "sso-saml@catchsecu.tes…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  12 failed | 1 passed | 5 skipped (18)
+   Start at  08:22:00
+   Duration  8.60s (tests 82%, import 14%, transform 4%)
+

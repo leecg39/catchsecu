@@ -1,3 +1,5 @@
+import { paymentMethodCreate, paymentMethodUpdate, paymentMethodRemove } from "../src/contracts/payment-methods";
+import { ssoAccountUnlink, ssoInvitationToken, ssoInvitationStart, ssoProviderCreate, ssoProviderPatch, ssoProviderRemove, ssoProviderRecord, ssoProviderCheckedRecord, ownSsoAccounts } from "../src/contracts/sso";
 import { reviewCreate, reviewAction, reviewQuery, reviewNotify, reviewDestruction } from "../src/contracts/activity-reviews";
 import { contextSelectionInput } from "../src/contracts/context";
 import { mfaPolicyChange,mfaExceptionCreate,mfaExceptionPatch,mfaExceptionDelete,mfaMemberQuery } from "../src/contracts/mfa-policy";
@@ -132,6 +134,8 @@ add("/billing-history", "get", "billing.read", "현재 회사의 실제 무료 �
 ];
 add("/me", "get", "self", "본인 프로필 안전 DTO", undefined, "implemented");
 add("/me", "patch", "self", "프로필 수정", profilePatch, "implemented");
+add("/me/sso-accounts", "get", "self + current direct company membership", "본인 회사 SSO 목록: 토큰·외부신원 제외, 사용 가능한 공급자와 해제 가능 여부", undefined, "implemented");
+add("/me/sso-accounts/{id}", "delete", "self + current direct company membership + login within 5 minutes", "다른 활성 로그인 수단 확인 후 연결 해제·모든 본인 세션/대기 인증 회수·원자 감사", ssoAccountUnlink, "implemented");
 add("/me/sessions", "get", "self", "본인 세션 목록: token 제외", undefined, "implemented");
 add("/me/sessions/{id}", "delete", "self", "본인 세션 회수", undefined, "implemented", "204");
 add("/me/closure", "get", "self", "계정 폐쇄 조건·소유 회사·운영 권한 인계 상태", undefined, "implemented");
@@ -203,7 +207,7 @@ const domainContracts = [
   ["campaigns", "message.send", "draft delete; scheduled cancel"], ["message-templates", "message.manage", "archive"],
   ["kakao/channels", "message.manage", "disable if referenced"], ["kakao/templates", "message.manage", "draft delete; approved deactivate"],
   ["integrations", "service.manage", "disable then revoke secret"], ["security/ip-rules", "security.write", "delete with lockout protection"],
-  ["identity-providers", "security.write", "disable; last method protection"], ["admin/plans", "platform-admin", "archive; sold price immutable"],
+  ["admin/plans", "platform-admin", "archive; sold price immutable"],
   ["admin/notices", "platform-admin", "archive"], ["admin/guides", "platform-admin", "archive"], ["feedback", "self", "own draft delete"],
 ];
 // Proposed resource inputs remain explicitly marked planned until their handlers and QA exist.
@@ -231,13 +235,6 @@ const proposedInputs: Record<string, { create: z.ZodType; patch: z.ZodType }> = 
       enabled: z.boolean() }).strict(),
     patch: z.object({ version: z.number().int().positive(), cidr: z.string().trim().min(3).max(49).optional(),
       description: z.string().trim().max(200).optional(), enabled: z.boolean().optional() }).strict(),
-  },
-  "identity-providers": {
-    create: z.object({ type: z.enum(["oidc", "saml"]), issuer: z.url().max(2000), clientId: z.string().trim().min(1).max(200),
-      secretRef: z.string().trim().min(1).max(200), enabled: z.boolean() }).strict(),
-    patch: z.object({ version: z.number().int().positive(), issuer: z.url().max(2000).optional(),
-      clientId: z.string().trim().min(1).max(200).optional(), secretRef: z.string().trim().min(1).max(200).optional(),
-      enabled: z.boolean().optional() }).strict(),
   },
   "admin/plans": {
     create: z.object({ code: z.string().trim().min(1).max(100), currency: z.string().regex(/^[A-Z]{3}$/),
@@ -437,6 +434,9 @@ add("/invitations/{id}/resend", "post", "member.manage + role ceiling", "토큰 
 const tokenInput = z.object({ token: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict();
 add("/invitations/preview", "post", "verified matching email", "초대 미리보기; 토큰을 URL 조회 API에 전달하지 않음", tokenInput, "implemented");
 add("/invitations/accept", "post", "verified matching email", "초대 한 번 소비·소속/서비스 권한 생성", tokenInput, "implemented");
+add("/invitations/sso/options", "post", "valid bearer invitation + active company + allowed IP", "유효 초대의 활성 공급자 id/name/protocol만 조회", ssoInvitationToken, "implemented");
+add("/invitations/sso/start", "post", "valid bearer invitation + same-company provider + allowed IP", "초대 token hash/version을 SSO state에 바인딩하고 IdP redirect 반환; 수락은 검증된 콜백에서 수행", ssoInvitationStart, "implemented");
+
 for (const path of ["/form-templates", "/form-templates/{id}"]) delete paths[path];
 add("/templates", "get", "form.read + service grant", "공용·허용 서비스 템플릿 검색·페이지 목록", undefined, "implemented");
 add("/templates", "post", "form.write + service grant", "완전한 질문·동의·설정 템플릿 생성", templateInput, "implemented", "201");
@@ -901,14 +901,24 @@ add("/plans", "get", "billing.read + current tenant", "현재 주문 가능한 �
 add("/entitlements", "get", "billing.read + current tenant", "구독 기간과 현재 자산 한도·사용량", undefined, "implemented");
 add("/assets", "get", "billing.read + current tenant", "현재 서비스별 폼·정보주체 자산 집계", undefined, "implemented");
 add("/subscriptions", "get", "billing.read + current tenant", "회사 구독 상태와 entitlement", undefined, "implemented");
-add("/subscriptions", "post", "billing.write + current tenant", "서버 가격표에 따른 유료 구매 대기 요청; PG 승인 아님", purchaseRequest, "implemented", "201");
-add("/billing/orders", "post", "billing.write", "대기 구독의 결제 주문 생성. 금액은 서버 가격이며 카드 원문을 받지 않음", z.object({ subscriptionId: z.uuid() }).strict(), "implemented", "201");
+add("/subscriptions", "post", "billing.write + current tenant", "서버 가격표에 따른 유료 구매 대기 접수. 현재 권한·세션·정책 및 판매 기한을 재검사하며 재요청은 현재 구독 상태 반환", purchaseRequest, "implemented", "202");
+add("/billing/methods", "get", "billing.read + current tenant", "현재 권한·세션 검사 후 결제수단 목록; 비밀 제외", undefined, "implemented");
+(paths["/billing/methods"].get as Operation).parameters = [{ in: "query", name: "includeRevoked", schema: { type: "string", enum: ["true", "false"] } }];
+add("/billing/methods", "post", "billing.write + current tenant", "암호화된 PG 토큰 등록; 대표 교체 시 이전 수단 version 증가; 최종 세션 기한 검사", paymentMethodCreate, "implemented", "201");
+add("/billing/methods/{id}", "patch", "billing.write + current tenant", "이름·대표수단 수정; 현재 권한과 version 확인; 동시 변경409", paymentMethodUpdate, "implemented");
+add("/billing/methods/{id}", "delete", "billing.write + current tenant", "진행 주문 없는 수단 해지; 대표 삭제 시 승격; 최종 세션 기한 검사", paymentMethodRemove, "implemented");
+add("/billing/orders", "get", "billing.read + current tenant", "현재 회사 결제 주문 최신100개와 환불 합계", undefined, "implemented");
+add("/billing/orders", "post", "billing.write + current tenant", "현재 권한·세션을 검사하여 대기 구독 주문 생성. 서버 가격 적용. 재전송은 최신 상태 반환; 다른 수단의 기존 주문은409", z.object({ subscriptionId: z.uuid(), methodId: z.uuid().optional() }).strict(), "implemented", "201");
+(paths["/billing/orders"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
 add("/billing/orders/{id}", "get", "billing.read", "결제 상태. result=success 쿼리는 무시하고 paid로 바꾸지 않음", undefined, "implemented");
 add("/billing/orders/{id}/return", "post", "billing.write", "성공 복귀 주소는 결제를 확정하지 않음", z.object({ result: z.enum(["success", "fail"]) }).strict(), "implemented");
 add("/billing/provider-events", "post", "signed payment webhook", "서명된 결제 결과만 반영. 중복은 같은 상태, 종료 후 다른 결과는 409", z.object({ orderId: z.uuid(), eventId: z.string(), outcome: z.enum(["paid", "failed"]) }).strict(), "implemented", "202");
 add("/subscriptions/entitlement", "get", "billing.read + current tenant", "회사별 실제 entitlement", undefined, "implemented");
 for (const [action, schema] of [["cancel", cancelRequest], ["undo-cancel", cancelRequest], ["schedule-cancel", scheduleTrialCancelRequest]] as const)
-  add("/subscriptions/{id}/" + action, "post", "billing.write + current tenant", "체험/대기 구독의 " + action + " 상태 전이; 유료 PG 취소 아님", schema, "implemented");
+  add("/subscriptions/{id}/" + action, "post", "billing.write + current tenant", "무료/유료 구독의 " + action + " 전이. 현재 권한·최종 기한 검사, version 충돌409. 같은 키 재전송은 최신 상태 반환; schedule-cancel 사유도 요청 해시에 포함", schema, "implemented");
+for (const path of ["/subscriptions", "/subscriptions/{id}/cancel", "/subscriptions/{id}/schedule-cancel", "/subscriptions/{id}/undo-cancel"])
+  (paths[path].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true,
+    schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
 add("/access-requests", "get", "active member for mine; member.manage for review", "현재 회사의 본인/검토 요청·요청 가능한 서비스", undefined, "implemented");
 add("/access-requests", "post", "active member; experts excluded", "같은 회사 활성 서비스 접근 요청; 동일 대기 요청 재사용", accessRequestInput, "implemented", "201");
 add("/access-requests/{id}", "patch", "member.manage + active tenant", "본인 승인 금지·역할 상한·version 확인 후 결정", accessDecisionInput, "implemented");
@@ -1001,6 +1011,56 @@ for (const path of ["/activity-reviews", "/activity-reviews/{id}/actions", "/act
   (paths[path].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
   (paths[path].post as Operation).responses = { ...errors, [path.endsWith("notifications") ? "202" : path === "/activity-reviews" ? "201" : "200"]: { description: "저장된 접수 식별자. 최신 상태는 상세 조회.", content: { "application/json": { schema: { type: "object", required: ["id"], properties: { id: { type: "string", format: "uuid" }, messageId: { type: "string", format: "uuid" }, jobId: { type: "string", format: "uuid" } } } } } } };
 }
+// SSO contracts reflect the concrete handlers, including browser redirects and signed SAML POST.
+add("/security/sso", "get", "current direct membership + security.read", "현재 회사 SSO 공급자 목록; secret/certificate 원문 제외", undefined, "implemented");
+add("/security/sso", "post", "current direct owner + security.write", "비활성 공급자 등록 및 사전검사; 외부 검사 뒤 현재 권한 재확인", ssoProviderCreate, "implemented", "201");
+add("/security/sso/{id}", "patch", "current direct owner + security.write", "version 확인 후 변경; 사용 중 공급자의 수동 비활성화/인증정보 변경은 대체 로그인 검사·SERIALIZABLE 경합 보호. 인증정보 변경은 비활성화·사전검사 초기화. 기존 세션은 유지, 대기 인증은 version 재검사로 차단", ssoProviderPatch, "implemented");
+add("/security/sso/{id}", "delete", "current direct owner + security.write + login within 5 minutes", "대체 로그인 검사 후 공급자·연결 계정·영향 사용자 세션/대기 인증을 원자 정리", ssoProviderRemove, "implemented");
+add("/security/sso/{id}/preflight", "post", "current direct owner + security.write", "JWKS 또는 인증서 사전검사, 검사 전후 version·권한 확인; 실패하면 비활성화", undefined, "implemented");
+add("/auth/sso/{providerId}", "get", "login: public; link: current direct member + login within 5 minutes", "회사 OIDC/SAML 인증 시작; invite는 토큰 POST API를 사용", undefined, "implemented", "302");
+(paths["/auth/sso/{providerId}"].get as Operation).parameters = [{ in: "query", name: "mode", schema: { type: "string", enum: ["login", "link"], default: "login" } }];
+paths["/auth/sso/{providerId}"].parameters = [{ in: "path", name: "providerId", required: true, schema: { type: "string", format: "uuid" } }];
+add("/auth/sso/callback", "get", "one-time unexpired state + PKCE + verified OIDC issuer/audience/nonce/signature", "OIDC 응답 검증 후 대시보드·연결 완료 또는 개인 2FA로 이동", undefined, "implemented", "302");
+(paths["/auth/sso/callback"].get as Operation).parameters = [
+  { in: "query", name: "state", required: true, schema: { type: "string" } },
+  { in: "query", name: "code", schema: { type: "string" }, description: "code 또는 error 중 하나 필요" },
+  { in: "query", name: "error", schema: { type: "string" }, description: "취소/거절도 state를 소비하며 공급자 원문은 화면에 노출하지 않음" },
+];
+add("/auth/sso/saml", "post", "one-time RelayState + signed SAML assertion/response + issuer/audience/recipient/request/time checks", "SAML HTTP-POST ACS 검증 후 대시보드·연결 완료 또는 개인 2FA로 이동", undefined, "implemented", "302");
+(paths["/auth/sso/saml"].post as Operation).requestBody = { required: true, content: { "application/x-www-form-urlencoded": { schema: {
+  type: "object", required: ["SAMLResponse", "RelayState"], properties: { SAMLResponse: { type: "string", minLength: 1 }, RelayState: { type: "string", minLength: 1 } },
+  additionalProperties: true, description: "본문 최대 1,000,000 bytes. SAMLResponse·RelayState는 각 한 번만 허용한다.",
+} } } };
+(paths["/auth/sso/saml"].post as Operation)["x-origin-check"] = "external signed SAML assertion; Origin exemption only after independent cryptographic validation";
+function ssoJsonResponse(path: string, method: string, schema: z.ZodType, status = "200") {
+  const operation = paths[path][method] as Operation;
+  const responses = operation.responses as Record<string, { description: string; content?: unknown }>;
+  responses[status].content = { "application/json": { schema: z.toJSONSchema(schema) } };
+}
+ssoJsonResponse("/security/sso", "get", z.object({ items: z.array(ssoProviderRecord) }).strict());
+ssoJsonResponse("/security/sso", "post", ssoProviderCheckedRecord, "201");
+ssoJsonResponse("/security/sso/{id}", "patch", ssoProviderRecord);
+ssoJsonResponse("/security/sso/{id}", "delete", z.object({ deleted: z.literal(true), removedAccounts: z.number().int().nonnegative(), endedSessions: z.number().int().nonnegative(), signedOut: z.boolean() }).strict());
+ssoJsonResponse("/security/sso/{id}/preflight", "post", ssoProviderCheckedRecord);
+ssoJsonResponse("/me/sso-accounts", "get", ownSsoAccounts);
+ssoJsonResponse("/me/sso-accounts/{id}", "delete", z.object({ unlinked: z.literal(true), signedOut: z.literal(true) }).strict());
+ssoJsonResponse("/invitations/sso/options", "post", z.object({ providers: z.array(z.object({ id: z.uuid(), name: z.string(), protocol: z.string() }).strict()) }).strict());
+ssoJsonResponse("/invitations/sso/start", "post", z.object({ redirect: z.string() }).strict());
+const ssoExtraErrors = Object.fromEntries([500, 502].map(code => [String(code), { description: code === 500 ? "저장/감사 실패; 원자 롤백" : "IdP 통신 실패",
+  content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } }]));
+for (const [path, method] of [["/auth/sso/{providerId}", "get"], ["/auth/sso/callback", "get"], ["/auth/sso/saml", "post"],
+  ["/invitations/sso/options", "post"], ["/invitations/sso/start", "post"]]) {
+  const operation = paths[path][method] as Operation;
+  operation.security = [];
+  const responses = operation.responses as Record<string, unknown>;
+  Object.assign(responses, ssoExtraErrors);
+  responses["303"] = { description: "문서 탐색 실패는 고정 오류코드 로그인 화면으로 이동. API 요청은 JSON 오류 상태 유지.",
+    headers: { Location: { required: true, schema: { type: "string", pattern: "^/login\\?error=SSO_" } } } };
+  if (path.startsWith("/auth/sso/")) responses["302"] = { description: "인증 진행/성공. 개인 2FA가 있으면 아직 로그인 세션 없이 인증 화면으로 이동.",
+    headers: { Location: { required: true, schema: { type: "string" } }, "Set-Cookie": { schema: { type: "string" }, description: "콜백: 세션 또는 개인 2FA 쿠키; HttpOnly/SameSite=Lax. HTTPS에서는 Secure." } } };
+  operation["x-response-cache"] = "private, no-store; Referrer-Policy: no-referrer";
+}
+
 const policies = JSON.parse(await readFile("docs/planning/contracts/domain-policies.json", "utf8")) as { rules: PolicyRule[] };
 for (const [path, item] of Object.entries(paths)) {
   const matches = policies.rules.flatMap(policy => policy.prefixes

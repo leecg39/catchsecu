@@ -1,0 +1,59 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso-provider-reference.test.ts (7 tests | 1 failed) 3115ms
+   × SSO DB 참조: 계정 INSERT와 공급자 DELETE 경합에서도 고아 계정 없음 453ms
+(node:65398) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:73084) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:73971) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-provider-reference.test.ts > SSO DB 참조: 계정 INSERT와 공급자 DELETE 경합에서도 고아 계정 없음
+AssertionError: expected PrismaClientKnownRequestError{ …(7) } to match object { code: 'P2010', …(1) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+- {
++ PrismaClientKnownRequestError {
+    "code": "P2010",
+    "meta": {
++     "driverAdapterError": DriverAdapterError {
++       "message": "canceling statement due to lock timeout",
++       "cause": {
+          "code": "55P03",
++         "column": undefined,
++         "detail": undefined,
++         "hint": undefined,
++         "kind": "postgres",
++         "message": "canceling statement due to lock timeout",
++         "originalCode": "55P03",
++         "originalMessage": "canceling statement due to lock timeout",
++         "severity": "ERROR",
++       },
++       "name": "DriverAdapterError",
++     },
+    },
+  }
+
+ ❯ tests/server/sso-provider-reference.test.ts:72:8
+     70|       await tx.$executeRaw`SET LOCAL lock_timeout = '100ms'`;
+     71|       await tx.$executeRaw`DELETE FROM "SsoProvider" WHERE id=${f.prov…
+     72|     })).rejects.toMatchObject({ code: "P2010", meta: { code: "55P03" }…
+       |        ^
+     73|   } finally { release(); await writing; }
+     74|   await expect(db.ssoProvider.delete({ where: { id: f.provider.id } })…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  1 failed | 262 passed (263)
+   Start at  09:15:05
+   Duration  134.08s (tests 94%, import 6%, transform 1%)
+

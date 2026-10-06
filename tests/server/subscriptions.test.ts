@@ -12,10 +12,9 @@ import { GET as getBillingHistory } from "@/app/api/v1/billing-history/route";
 import { GET as getLedger } from "@/app/api/v1/ledger/route";
 import { POST as postService } from "@/app/api/v1/services/route";
 import { POST as createOrder } from "@/app/api/v1/billing/orders/route";
-import { GET as invoice } from "@/app/api/v1/billing/orders/[id]/invoice/route";
 import { applyPaymentEvent } from "@/server/payments";
 import { assertQuota } from "@/server/entitlements";
-import { expireTrials } from "@/server/subscription-worker";
+import { expireSubscriptions } from "@/server/subscription-worker";
 import { subjectHashes } from "@/server/subject-identity";
 import { encrypt } from "@/server/crypto";
 import { postTrustedLedgerTransfer } from "@/server/ledger";
@@ -191,12 +190,12 @@ describe("subscription and catalog boundary", () => {
       priceKrw: 0, activationSource: "trial", periodStart: start, periodEnd: new Date(start.getTime() + 7 * 86400000), cancelAt,
       events: { create: { version: 1, kind: "trial_started", detail: {} } } } });
     await expect(db.$transaction(tx => assertQuota(tx, tenantId, "services"))).rejects.toMatchObject({ status: 402 });
-    const results = await Promise.all([expireTrials(), expireTrials()]);
+    const results = await Promise.all([expireSubscriptions(), expireSubscriptions()]);
     expect(results.sort()).toEqual([0, 1]);
     const stored = await db.billingSubscription.findUniqueOrThrow({ where: { id: trial.id }, include: { events: true } });
     expect(stored).toMatchObject({ status: "expired", version: 2 });
     expect(stored.events.map(event => event.kind).sort()).toEqual(["trial_expired", "trial_started"]);
-    expect(await expireTrials()).toBe(0);
+    expect(await expireSubscriptions()).toBe(0);
   });
   test("serializes concurrent service creation at the trial limit", async () => {
     const create = (name: string) => postService(req("/services", "POST", "owner", { name, externalName: name }));

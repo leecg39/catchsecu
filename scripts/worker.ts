@@ -15,7 +15,7 @@ import { expireIdempotencyResponses } from "../src/server/idempotency";
 import { cleanupExpiredImports, runOneImport } from "../src/server/import-worker";
 
 import { cleanupSubjectAccess } from "../src/server/subjects";
-import { expireTrials } from "../src/server/subscription-worker";
+import { expireSubscriptions } from "../src/server/subscription-worker";
 import { expireExpertAssignments } from "../src/server/expert-assignments";
 import { cleanupExpiredExports, runOneExport } from "../src/server/exports";
 import { cleanupVerification } from "../src/server/verification-flow";
@@ -44,11 +44,11 @@ async function main() {
       const expired = await expireIdempotencyResponses();
       const verification = await cleanupVerification();
       if (verification.expired) console.info("인증 요청 정리", verification);
-      const expiredTrials = await expireTrials();
+      const expiredSubscriptions = await expireSubscriptions();
       const expiredExperts = await expireExpertAssignments();
       const destruction = await enqueueExpiredSubmissions();
       const reviewRetention = await sweepActivityReviewRetention();
-      if (expired.count || destruction.created || expiredTrials || expiredExperts || reviewRetention.pending) console.info("보유 기한 처리", { expiredCaches: expired.count, requests: destruction.created, expiredTrials, expiredExperts, reviewPending: reviewRetention.pending });
+      if (expired.count || destruction.created || expiredSubscriptions || expiredExperts || reviewRetention.pending) console.info("보유 기한 처리", { expiredCaches: expired.count, requests: destruction.created, expiredSubscriptions, expiredExperts, reviewPending: reviewRetention.pending });
       cleanedAt = Date.now();
     }
     const destroyed = await runOneDestruction(workerId);

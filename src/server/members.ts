@@ -37,7 +37,7 @@ async function manager(tx: Transaction, ctx: Context, write = true) {
   if (!actor || !roleCan(actor.role, "member.manage")) fail(403, "FORBIDDEN", "구성원 관리 권한이 없습니다.");
   return lockServiceActor(tx, ctx, "member.manage");
 }
-function mayAssign(actorRole: Role, targetRole: Role) {
+export function mayAssign(actorRole: Role, targetRole: Role) {
   if (targetRole === "owner" || (actorRole !== "owner" && !roleCapabilities(targetRole).every(capability => roleCan(actorRole, capability))))
     fail(403, "ROLE_ESCALATION", "현재 권한으로 이 역할을 부여하거나 변경할 수 없습니다.");
 }
@@ -232,6 +232,15 @@ export async function previewInvitation(actor: Actor, token: string) {
     return { id: row.id, companyName: row.tenant.name, role: row.role, email: row.email, expiresAt: row.expiresAt };
   });
 }
+// Company lock and the membership transition are owned by the acceptance transaction.
+export async function revokeInvitedExpert(tx: Transaction, member: { tenantId: string; userId: string; expertAssignmentId: string | null } | null, requestId: string) {
+  if (!member?.expertAssignmentId) return;
+  const changed = await tx.expertAssignment.updateMany({ where: { id: member.expertAssignmentId, tenantId: member.tenantId,
+    expertUserId: member.userId, status: "active" }, data: { status: "revoked", revokedAt: new Date(), version: { increment: 1 } } });
+  if (changed.count) await audit(tx, { tenantId: member.tenantId, user: { id: member.userId } }, requestId,
+    "expert.revoked", "expert_assignment", member.expertAssignmentId, ["status"]);
+}
+
 export async function acceptInvitation(actor: Actor, token: string, requestId: string, tx: Transaction) {
   const found = await checkedInvitation(actor, token, tx);
   await tx.$queryRawUnsafe('SELECT id FROM "Company" WHERE id=$1 FOR UPDATE', found.tenantId);
@@ -250,8 +259,7 @@ export async function acceptInvitation(actor: Actor, token: string, requestId: s
     ? await tx.membership.update({ where: { id: existing.id }, data: { role: row.role, status: "active",
       accessKind: "direct", expertAssignmentId: null, version: { increment: 1 } } })
     : await tx.membership.create({ data: { tenantId: row.tenantId, userId: actor.user.id, role: row.role } });
-  if (existing?.expertAssignmentId) await tx.expertAssignment.updateMany({ where: { id: existing.expertAssignmentId, status: "active" },
-    data: { status: "revoked", revokedAt: new Date(), version: { increment: 1 } } });
+  await revokeInvitedExpert(tx, existing, requestId);
   await replaceGrants(tx, row.tenantId, member.id, row.serviceIds, row.role);
   await tx.invitation.update({ where: { id: row.id }, data: { status: "accepted", acceptedBy: actor.user.id, version: { increment: 1 } } });
   await tx.session.update({ where: { id: actor.session.id }, data: { activeCompanyId: row.tenantId, activeServiceId: row.serviceIds[0] } });

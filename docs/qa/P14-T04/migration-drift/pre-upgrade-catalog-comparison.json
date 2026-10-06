@@ -1,0 +1,89 @@
+{
+  "at": "2026-10-06T00:58:04.552Z",
+  "developmentReadOnly": true,
+  "freshSchema": "qa_drift_98ced6c6a4b6c197",
+  "migrationCount": 96,
+  "developmentHistory": {
+    "count": 95,
+    "mismatches": [
+      {
+        "migration": "20261006100000_payment_methods",
+        "sourceChecksum": "b15e0ebcdb00335ebc73759832bd5e68e5e0a32effa47f5fac9b76ae9c313150",
+        "appliedChecksum": "5cef8112a4ea0cc5d0c21520a1c62eaf5e5af8bedcd78ec709d6632d97478ec7",
+        "gitVersions": [
+          {
+            "commit": "f8028b0b19200ba0180cc7ffa071aa22d0257550",
+            "checksum": "b15e0ebcdb00335ebc73759832bd5e68e5e0a32effa47f5fac9b76ae9c313150"
+          }
+        ],
+        "appliedVersionFoundInGitHistory": false
+      },
+      {
+        "migration": "20261006110000_paid_activation",
+        "sourceChecksum": "27ff73c87597b401cbedf5d945bd612b3b3dc42aa94642faffee3c25327fdcfd",
+        "appliedChecksum": "3b0a0ffc94b33e430081b98ada687e33f7b1ce03e0d281fd00569730ab6a40b0",
+        "gitVersions": [
+          {
+            "commit": "2e840e54604a20900c05aa408056c4e37fc93968",
+            "checksum": "27ff73c87597b401cbedf5d945bd612b3b3dc42aa94642faffee3c25327fdcfd"
+          }
+        ],
+        "appliedVersionFoundInGitHistory": false
+      },
+      {
+        "migration": "20261006120000_refund_closing",
+        "sourceChecksum": "e55303786b64b1d9b824635f15721589601e2b09b8b2e8647734abfb66c00a10",
+        "appliedChecksum": "b2299aa3bed207ed95cdba41df757e63b346da7f9bc7b2947bdf69b3f228171b",
+        "gitVersions": [
+          {
+            "commit": "b669083f3b7ff8f7157ab65325ff4375bbb55734",
+            "checksum": "e55303786b64b1d9b824635f15721589601e2b09b8b2e8647734abfb66c00a10"
+          }
+        ],
+        "appliedVersionFoundInGitHistory": false
+      },
+      {
+        "migration": "20261007000000_sso_providers",
+        "sourceChecksum": "b16dab6c40914acd621a3c9af9d29baf685a062d24a0a672d2c3896a50f3fc6d",
+        "appliedChecksum": "c092e24933fcbe6ba2f068660101b3539d2a8d19db54019b5ded13b208d0f9fb",
+        "gitVersions": [
+          {
+            "commit": "86c639e83a4ac11d21e219c1ea0d84ac4d26aa7b",
+            "checksum": "b16dab6c40914acd621a3c9af9d29baf685a062d24a0a672d2c3896a50f3fc6d"
+          }
+        ],
+        "appliedVersionFoundInGitHistory": false
+      }
+    ]
+  },
+  "freshHistory": {
+    "count": 96,
+    "mismatches": []
+  },
+  "catalogCounts": {
+    "development": 2825,
+    "freshInstall": 2826
+  },
+  "catalogHashes": {
+    "development": "e57733c21f5dc24ad64fa8d69f703d6bd65f0f5c9e2bd8bc06d81b1d7b25f04f",
+    "freshInstall": "af402b9945ad4e908b347f7a1fa954a3f2517a3be35b8804649d3ef789cd9b35"
+  },
+  "differences": [
+    {
+      "key": "function/billing_subscription_guard()",
+      "development": "CREATE OR REPLACE FUNCTION __schema__.billing_subscription_guard()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE p \"BillingPlanVersion\";\nDECLARE utc_now timestamp := CURRENT_TIMESTAMP AT TIME ZONE 'UTC';\nBEGIN\n  IF TG_OP = 'DELETE' THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_DELETE_DENIED'; END IF;\n  SELECT * INTO p FROM \"BillingPlanVersion\" WHERE id=NEW.\"planVersionId\";\n  IF p.\"planId\"<>NEW.\"planId\" OR NEW.\"priceKrw\" IS DISTINCT FROM p.\"priceKrw\" OR NEW.currency<>p.currency\n    THEN RAISE EXCEPTION 'BILLING_PRICE_MISMATCH'; END IF;\n  IF TG_OP = 'INSERT' THEN\n    IF NEW.version<>1 OR (NEW.status='pending' AND (NOT p.orderable OR p.cycle='trial' OR p.\"effectiveFrom\">utc_now\n      OR (p.\"effectiveTo\" IS NOT NULL AND p.\"effectiveTo\"<=utc_now)))\n      OR (NEW.\"planId\"='trial' AND (p.cycle<>'trial' OR NEW.\"periodEnd\"<>NEW.\"periodStart\"+interval '7 days'))\n      OR (NEW.status='active' AND NOT EXISTS(SELECT 1 FROM \"PaymentOrder\" o WHERE o.\"subscriptionId\"=NEW.id\n        AND o.\"tenantId\"=NEW.\"tenantId\" AND o.status='paid' AND o.amount=NEW.\"priceKrw\" AND o.currency=NEW.currency))\n      THEN RAISE EXCEPTION 'BILLING_INVALID_SUBSCRIPTION'; END IF;\n  ELSE\n    IF NEW.version<>OLD.version+1 THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n    IF OLD.status='pending' AND NEW.status='active' THEN\n      IF (NEW.id,NEW.\"tenantId\",NEW.\"planId\",NEW.\"planVersionId\",NEW.\"priceKrw\",NEW.currency,NEW.\"createdAt\")\n        IS DISTINCT FROM (OLD.id,OLD.\"tenantId\",OLD.\"planId\",OLD.\"planVersionId\",OLD.\"priceKrw\",OLD.currency,OLD.\"createdAt\")\n        OR NEW.\"activationSource\"<>'payment' OR NEW.\"cancelAt\" IS NOT NULL\n        OR NEW.\"periodStart\" IS NULL OR NEW.\"periodEnd\" IS NULL OR NEW.\"periodEnd\"<=NEW.\"periodStart\"\n        OR NEW.\"periodStart\" > utc_now + interval '1 hour'\n        THEN RAISE EXCEPTION 'BILLING_INVALID_ACTIVATION'; END IF;\n      IF NOT EXISTS(SELECT 1 FROM \"PaymentOrder\" o WHERE o.\"subscriptionId\"=NEW.id AND o.\"tenantId\"=NEW.\"tenantId\"\n        AND o.status='paid' AND o.amount=NEW.\"priceKrw\" AND o.currency=NEW.currency)\n        THEN RAISE EXCEPTION 'BILLING_ACTIVATION_WITHOUT_PAYMENT'; END IF;\n    ELSIF OLD.status='active' AND NEW.status='active' THEN\n      -- 유료 해지 예약/철회: cancelAt만 변경 가능하며 예약은 미래·기간 내.\n      IF (NEW.id,NEW.\"tenantId\",NEW.\"planId\",NEW.\"planVersionId\",NEW.\"priceKrw\",NEW.currency,\n          NEW.\"periodStart\",NEW.\"periodEnd\",NEW.\"activationSource\",NEW.\"createdAt\") IS DISTINCT FROM\n         (OLD.id,OLD.\"tenantId\",OLD.\"planId\",OLD.\"planVersionId\",OLD.\"priceKrw\",OLD.currency,\n          OLD.\"periodStart\",OLD.\"periodEnd\",OLD.\"activationSource\",OLD.\"createdAt\")\n        THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n      IF NEW.\"cancelAt\" IS NOT NULL AND (NEW.\"cancelAt\"<=utc_now OR NEW.\"cancelAt\">OLD.\"periodEnd\")\n        THEN RAISE EXCEPTION 'BILLING_INVALID_CANCEL_SCHEDULE'; END IF;\n    ELSE\n      IF (NEW.id,NEW.\"tenantId\",NEW.\"planId\",NEW.\"planVersionId\",NEW.\"priceKrw\",NEW.currency,\n          NEW.\"periodStart\",NEW.\"periodEnd\",NEW.\"activationSource\",NEW.\"createdAt\") IS DISTINCT FROM\n         (OLD.id,OLD.\"tenantId\",OLD.\"planId\",OLD.\"planVersionId\",OLD.\"priceKrw\",OLD.currency,\n          OLD.\"periodStart\",OLD.\"periodEnd\",OLD.\"activationSource\",OLD.\"createdAt\")\n        THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n      IF OLD.status='pending' AND NEW.status='cancelled' THEN\n        IF NEW.\"cancelAt\" IS DISTINCT FROM OLD.\"cancelAt\" THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n      ELSIF OLD.status='trialing' AND NEW.status='trialing' THEN\n        IF NEW.\"cancelAt\" IS NOT DISTINCT FROM OLD.\"cancelAt\"\n          OR (NEW.\"cancelAt\" IS NOT NULL AND (NEW.\"cancelAt\"<=utc_now OR NEW.\"cancelAt\">OLD.\"periodEnd\"))\n          OR LEAST(COALESCE(OLD.\"cancelAt\", OLD.\"periodEnd\"), OLD.\"periodEnd\")<=utc_now\n          THEN RAISE EXCEPTION 'BILLING_INVALID_CANCEL_SCHEDULE'; END IF;\n      ELSIF OLD.status='trialing' AND NEW.status='expired' THEN\n        IF NEW.\"cancelAt\" IS DISTINCT FROM OLD.\"cancelAt\" OR LEAST(COALESCE(OLD.\"cancelAt\", OLD.\"periodEnd\"), OLD.\"periodEnd\")>utc_now\n          THEN RAISE EXCEPTION 'BILLING_EARLY_EXPIRATION'; END IF;\n      ELSIF OLD.status='active' AND NEW.status='expired' THEN\n        IF NEW.\"cancelAt\" IS NOT DISTINCT FROM OLD.\"cancelAt\" OR LEAST(COALESCE(OLD.\"cancelAt\", OLD.\"periodEnd\"), OLD.\"periodEnd\")>utc_now\n          THEN RAISE EXCEPTION 'BILLING_EARLY_EXPIRATION'; END IF;\n      ELSE RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n    END IF;\n  END IF;\n  RETURN NEW;\nEND $function$\n",
+      "freshInstall": "CREATE OR REPLACE FUNCTION __schema__.billing_subscription_guard()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE p \"BillingPlanVersion\";\nDECLARE utc_now timestamp := CURRENT_TIMESTAMP AT TIME ZONE 'UTC';\nBEGIN\n  IF TG_OP = 'DELETE' THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_DELETE_DENIED'; END IF;\n  SELECT * INTO p FROM \"BillingPlanVersion\" WHERE id=NEW.\"planVersionId\";\n  IF p.\"planId\"<>NEW.\"planId\" OR NEW.\"priceKrw\" IS DISTINCT FROM p.\"priceKrw\" OR NEW.currency<>p.currency\n    THEN RAISE EXCEPTION 'BILLING_PRICE_MISMATCH'; END IF;\n  IF TG_OP = 'INSERT' THEN\n    IF NEW.version<>1 OR (NEW.status='pending' AND (NOT p.orderable OR p.cycle='trial' OR p.\"effectiveFrom\">utc_now\n      OR (p.\"effectiveTo\" IS NOT NULL AND p.\"effectiveTo\"<=utc_now)))\n      OR (NEW.\"planId\"='trial' AND (p.cycle<>'trial' OR NEW.\"periodEnd\"<>NEW.\"periodStart\"+interval '7 days'))\n      OR (NEW.status='active' AND NOT EXISTS(SELECT 1 FROM \"PaymentOrder\" o WHERE o.\"subscriptionId\"=NEW.id\n        AND o.\"tenantId\"=NEW.\"tenantId\" AND o.status='paid' AND o.amount=NEW.\"priceKrw\" AND o.currency=NEW.currency))\n      THEN RAISE EXCEPTION 'BILLING_INVALID_SUBSCRIPTION'; END IF;\n  ELSE\n    IF NEW.version<>OLD.version+1 THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n    IF OLD.status='pending' AND NEW.status='active' THEN\n      IF (NEW.id,NEW.\"tenantId\",NEW.\"planId\",NEW.\"planVersionId\",NEW.\"priceKrw\",NEW.currency,NEW.\"createdAt\")\n        IS DISTINCT FROM (OLD.id,OLD.\"tenantId\",OLD.\"planId\",OLD.\"planVersionId\",OLD.\"priceKrw\",OLD.currency,OLD.\"createdAt\")\n        OR NEW.\"activationSource\"<>'payment' OR NEW.\"cancelAt\" IS NOT NULL\n        OR NEW.\"periodStart\" IS NULL OR NEW.\"periodEnd\" IS NULL OR NEW.\"periodEnd\"<=NEW.\"periodStart\"\n        OR NEW.\"periodStart\" > utc_now + interval '1 hour'\n        THEN RAISE EXCEPTION 'BILLING_INVALID_ACTIVATION'; END IF;\n      IF NOT EXISTS(SELECT 1 FROM \"PaymentOrder\" o WHERE o.\"subscriptionId\"=NEW.id AND o.\"tenantId\"=NEW.\"tenantId\"\n        AND o.status='paid' AND o.amount=NEW.\"priceKrw\" AND o.currency=NEW.currency)\n        THEN RAISE EXCEPTION 'BILLING_ACTIVATION_WITHOUT_PAYMENT'; END IF;\n    ELSIF OLD.status='active' AND NEW.status='active' THEN\n      -- 유료 해지 예약/철회: cancelAt만 변경 가능하며 예약은 미래·기간 내.\n      IF (NEW.id,NEW.\"tenantId\",NEW.\"planId\",NEW.\"planVersionId\",NEW.\"priceKrw\",NEW.currency,\n          NEW.\"periodStart\",NEW.\"periodEnd\",NEW.\"activationSource\",NEW.\"createdAt\") IS DISTINCT FROM\n         (OLD.id,OLD.\"tenantId\",OLD.\"planId\",OLD.\"planVersionId\",OLD.\"priceKrw\",OLD.currency,\n          OLD.\"periodStart\",OLD.\"periodEnd\",OLD.\"activationSource\",OLD.\"createdAt\")\n        THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n      IF NEW.\"cancelAt\" IS NOT NULL AND (NEW.\"cancelAt\"<=utc_now OR NEW.\"cancelAt\">OLD.\"periodEnd\")\n        THEN RAISE EXCEPTION 'BILLING_INVALID_CANCEL_SCHEDULE'; END IF;\n    ELSE\n      IF (NEW.id,NEW.\"tenantId\",NEW.\"planId\",NEW.\"planVersionId\",NEW.\"priceKrw\",NEW.currency,\n          NEW.\"periodStart\",NEW.\"periodEnd\",NEW.\"activationSource\",NEW.\"createdAt\") IS DISTINCT FROM\n         (OLD.id,OLD.\"tenantId\",OLD.\"planId\",OLD.\"planVersionId\",OLD.\"priceKrw\",OLD.currency,\n          OLD.\"periodStart\",OLD.\"periodEnd\",OLD.\"activationSource\",OLD.\"createdAt\")\n        THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n      IF OLD.status='pending' AND NEW.status='cancelled' THEN\n        IF NEW.\"cancelAt\" IS DISTINCT FROM OLD.\"cancelAt\" THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n      ELSIF OLD.status='trialing' AND NEW.status='trialing' THEN\n        IF NEW.\"cancelAt\" IS NOT DISTINCT FROM OLD.\"cancelAt\"\n          OR (NEW.\"cancelAt\" IS NOT NULL AND (NEW.\"cancelAt\"<=utc_now OR NEW.\"cancelAt\">OLD.\"periodEnd\"))\n          OR LEAST(COALESCE(OLD.\"cancelAt\", OLD.\"periodEnd\"), OLD.\"periodEnd\")<=utc_now\n          THEN RAISE EXCEPTION 'BILLING_INVALID_CANCEL_SCHEDULE'; END IF;\n      ELSIF OLD.status='trialing' AND NEW.status='expired' THEN\n        IF NEW.\"cancelAt\" IS DISTINCT FROM OLD.\"cancelAt\" OR LEAST(COALESCE(OLD.\"cancelAt\", OLD.\"periodEnd\"), OLD.\"periodEnd\")>utc_now\n          THEN RAISE EXCEPTION 'BILLING_EARLY_EXPIRATION'; END IF;\n      ELSIF OLD.status='active' AND NEW.status='expired' THEN\n        IF NEW.\"cancelAt\" IS DISTINCT FROM OLD.\"cancelAt\" OR LEAST(COALESCE(OLD.\"cancelAt\", OLD.\"periodEnd\"), OLD.\"periodEnd\")>utc_now\n          THEN RAISE EXCEPTION 'BILLING_EARLY_EXPIRATION'; END IF;\n      ELSE RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n    END IF;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "key": "index/BillingSubscription_expiry_due_idx",
+      "development": null,
+      "freshInstall": "{\"definition\" : \"CREATE INDEX \\\"BillingSubscription_expiry_due_idx\\\" ON __schema__.\\\"BillingSubscription\\\" USING btree (LEAST(COALESCE(\\\"cancelAt\\\", \\\"periodEnd\\\"), \\\"periodEnd\\\"), id) WHERE (status = ANY (ARRAY['trialing'::text, 'active'::text]))\", \"valid\" : true, \"ready\" : true}"
+    }
+  ],
+  "allChecksumsMatch": false,
+  "ddlMatches": false,
+  "limitations": [
+    "Database/role grants, extension versions and runtime behavior are outside this catalog comparison.",
+    "Whitespace and SQL source differences in stored routines are reported without assuming semantic equivalence."
+  ]
+}

@@ -1,0 +1,579 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/payment-authority.test.ts (20 tests | 20 failed) 3949ms
+   × methodList: 이미 읽은 문맥도 현재 권한 회수를 적용한다 198ms
+   × methodList: 회수된 세션은 차단한다 119ms
+   × methodCreate: 이미 읽은 문맥도 현재 권한 회수를 적용한다 130ms
+   × methodCreate: 회수된 세션은 차단한다 109ms
+   × methodUpdate: 이미 읽은 문맥도 현재 권한 회수를 적용한다 105ms
+   × methodUpdate: 회수된 세션은 차단한다 118ms
+   × methodRemove: 이미 읽은 문맥도 현재 권한 회수를 적용한다 121ms
+   × methodRemove: 회수된 세션은 차단한다 117ms
+   × orderList: 이미 읽은 문맥도 현재 권한 회수를 적용한다 133ms
+   × orderList: 회수된 세션은 차단한다 125ms
+   × orderRead: 이미 읽은 문맥도 현재 권한 회수를 적용한다 106ms
+   × orderRead: 회수된 세션은 차단한다 99ms
+   × orderReturn: 이미 읽은 문맥도 현재 권한 회수를 적용한다 103ms
+   × orderReturn: 회수된 세션은 차단한다 123ms
+   × methodCreate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다 111ms
+   × methodUpdate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다 105ms
+   × methodRemove: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다 136ms
+   × create: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다 100ms
+   × update: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다 107ms
+   × 주문 생성 재전송은 서명 승인 후 최신 paid 상태를 반환한다 235ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 20 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodList: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+AssertionError: promise resolved "[ { …(8) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "createdAt": "2026-10-06T01:16:30.392Z",
+    "id": "b860ac49-67db-48c9-866a-1cb33f6c2e5c",
+    "isDefault": true,
+    "kind": "card",
+    "label": "첫 수단",
+    "provider": "local",
+    "status": "active",
+    "version": 1,
+  },
+]
+
+ ❯ tests/server/payment-authority.test.ts:65:37
+     63|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     64|     const before = await state();
+     65|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     66|     expect(await state()).toEqual(before);
+     67|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodList: 회수된 세션은 차단한다
+AssertionError: promise resolved "[ { …(8) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "createdAt": "2026-10-06T01:16:30.534Z",
+    "id": "6807e3da-aa55-4c87-9123-50ebffc9ec99",
+    "isDefault": true,
+    "kind": "card",
+    "label": "첫 수단",
+    "provider": "local",
+    "status": "active",
+    "version": 1,
+  },
+]
+
+ ❯ tests/server/payment-authority.test.ts:71:37
+     69|     await db.session.delete({ where: { id: ctx.session.id } });
+     70|     const before = await state();
+     71|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodCreate: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T01:16:30.678Z",
++   "id": "19a98d87-72a9-477a-9574-f8d07c389cd3",
++   "isDefault": true,
++   "kind": "card",
++   "label": "추가 수단",
++   "provider": "local",
++   "status": "active",
++   "version": 1,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:65:37
+     63|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     64|     const before = await state();
+     65|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     66|     expect(await state()).toEqual(before);
+     67|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodCreate: 회수된 세션은 차단한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T01:16:30.787Z",
++   "id": "9cadae85-ae6c-4d2a-8405-f1d5ebf8cd69",
++   "isDefault": true,
++   "kind": "card",
++   "label": "추가 수단",
++   "provider": "local",
++   "status": "active",
++   "version": 1,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:71:37
+     69|     await db.session.delete({ where: { id: ctx.session.id } });
+     70|     const before = await state();
+     71|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodUpdate: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T01:16:30.880Z",
++   "id": "8cee22ab-0245-4165-93f5-6a04d15031a8",
++   "isDefault": true,
++   "kind": "card",
++   "label": "변경",
++   "provider": "local",
++   "status": "active",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:65:37
+     63|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     64|     const before = await state();
+     65|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     66|     expect(await state()).toEqual(before);
+     67|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodUpdate: 회수된 세션은 차단한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T01:16:31.001Z",
++   "id": "5c2ba627-c6ea-434f-996e-3e1c1ab2c030",
++   "isDefault": true,
++   "kind": "card",
++   "label": "변경",
++   "provider": "local",
++   "status": "active",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:71:37
+     69|     await db.session.delete({ where: { id: ctx.session.id } });
+     70|     const before = await state();
+     71|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodRemove: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T01:16:31.113Z",
++   "id": "b03b03ce-f373-4037-926d-ab6ddd5210f5",
++   "isDefault": false,
++   "kind": "card",
++   "label": "첫 수단",
++   "provider": "local",
++   "status": "revoked",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:65:37
+     63|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     64|     const before = await state();
+     65|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     66|     expect(await state()).toEqual(before);
+     67|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodRemove: 회수된 세션은 차단한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T01:16:31.238Z",
++   "id": "9ca0bf4f-272a-49e0-8f93-aac8d54efde0",
++   "isDefault": false,
++   "kind": "card",
++   "label": "첫 수단",
++   "provider": "local",
++   "status": "revoked",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:71:37
+     69|     await db.session.delete({ where: { id: ctx.session.id } });
+     70|     const before = await state();
+     71|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > orderList: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+AssertionError: promise resolved "{ items: [ { …(9) } ] }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "amount": 12000,
++       "currency": "KRW",
++       "id": "ecef2562-c07c-41ec-a359-f4c0b1277961",
++       "methodId": null,
++       "planName": "결제 테스트",
++       "refundedTotal": 0,
++       "status": "pending",
++       "subscriptionId": "f9edb886-9710-4e92-a3ed-486f61463e5c",
++       "version": 1,
++     },
++   ],
+  }
+
+ ❯ tests/server/payment-authority.test.ts:65:37
+     63|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     64|     const before = await state();
+     65|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     66|     expect(await state()).toEqual(before);
+     67|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > orderList: 회수된 세션은 차단한다
+AssertionError: promise resolved "{ items: [ { …(9) } ] }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [
++     {
++       "amount": 12000,
++       "currency": "KRW",
++       "id": "a130e1b4-df17-45b5-830d-3c65b9066ae7",
++       "methodId": null,
++       "planName": "결제 테스트",
++       "refundedTotal": 0,
++       "status": "pending",
++       "subscriptionId": "dd6e9b44-eaeb-43b8-b796-1983e9298c66",
++       "version": 1,
++     },
++   ],
+  }
+
+ ❯ tests/server/payment-authority.test.ts:71:37
+     69|     await db.session.delete({ where: { id: ctx.session.id } });
+     70|     const before = await state();
+     71|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > orderRead: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+AssertionError: promise resolved "{ …(7) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "id": "44b0256e-bb13-44a8-bfbf-c4eb2f9921f8",
++   "methodId": null,
++   "status": "pending",
++   "subscriptionId": "9746487c-24f1-4fea-84bf-894e73146ae8",
++   "version": 1,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:65:37
+     63|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     64|     const before = await state();
+     65|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     66|     expect(await state()).toEqual(before);
+     67|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > orderRead: 회수된 세션은 차단한다
+AssertionError: promise resolved "{ …(7) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "id": "1bb4faad-3a4d-4eb0-a54d-3a4ed2433881",
++   "methodId": null,
++   "status": "pending",
++   "subscriptionId": "925c9508-b290-454d-8991-e15bb7836c4c",
++   "version": 1,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:71:37
+     69|     await db.session.delete({ where: { id: ctx.session.id } });
+     70|     const before = await state();
+     71|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > orderReturn: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+AssertionError: expected Error: 결제 성공 주소만으로는 결제를 확정할 수 없습니다. { …(2) } to match object { status: 403, code: 'FORBIDDEN' }
+
+- Expected
++ Received
+
+- {
+-   "code": "FORBIDDEN",
+-   "status": 403,
++ HttpError {
++   "code": "PAYMENT_UNCONFIRMED",
++   "status": 409,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:65:37
+     63|     await db.membership.update({ where: { id: ctx.member.id }, data: {…
+     64|     const before = await state();
+     65|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     66|     expect(await state()).toEqual(before);
+     67|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > orderReturn: 회수된 세션은 차단한다
+AssertionError: expected Error: 결제 성공 주소만으로는 결제를 확정할 수 없습니다. { …(2) } to match object { Object (status, code) }
+
+- Expected
++ Received
+
+- {
+-   "code": "SESSION_EXPIRED",
+-   "status": 401,
++ HttpError {
++   "code": "PAYMENT_UNCONFIRMED",
++   "status": 409,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:71:37
+     69|     await db.session.delete({ where: { id: ctx.session.id } });
+     70|     const before = await state();
+     71|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     72|     expect(await state()).toEqual(before);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodCreate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T01:16:32.045Z",
++   "id": "5618fc66-f4b4-4f3f-91b4-f196253ecafa",
++   "isDefault": true,
++   "kind": "card",
++   "label": "추가 수단",
++   "provider": "local",
++   "status": "active",
++   "version": 1,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:79:37
+     77|     await db.session.update({ where: { id: ctx.session.id }, data: { e…
+     78|     const before = await state(); vi.useFakeTimers({ toFake: ["Date"] …
+     79|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     80|     vi.useRealTimers(); expect(await state()).toEqual(before);
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodUpdate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T01:16:32.146Z",
++   "id": "bb6473ee-db2f-43e1-97b5-8f61772ddc67",
++   "isDefault": true,
++   "kind": "card",
++   "label": "변경",
++   "provider": "local",
++   "status": "active",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:79:37
+     77|     await db.session.update({ where: { id: ctx.session.id }, data: { e…
+     78|     const before = await state(); vi.useFakeTimers({ toFake: ["Date"] …
+     79|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     80|     vi.useRealTimers(); expect(await state()).toEqual(before);
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodRemove: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": "2026-10-06T01:16:32.274Z",
++   "id": "df990226-2e6b-45a9-a433-7def86ebfda6",
++   "isDefault": false,
++   "kind": "card",
++   "label": "첫 수단",
++   "provider": "local",
++   "status": "revoked",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:79:37
+     77|     await db.session.update({ where: { id: ctx.session.id }, data: { e…
+     78|     const before = await state(); vi.useFakeTimers({ toFake: ["Date"] …
+     79|     await expect(operations[name]()).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     80|     vi.useRealTimers(); expect(await state()).toEqual(before);
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > create: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다
+ FAIL  tests/server/payment-authority.test.ts > update: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다
+AssertionError: expected { …(12) } to match object { isDefault: false, version: 2 }
+(10 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "isDefault": false,
+-   "version": 2,
++   "version": 1,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:88:19
+     86|     if (change === "update") await updatePaymentMethod(ctx, second.id,…
+     87|     const first = await db.paymentMethod.findUniqueOrThrow({ where: { …
+     88|     expect(first).toMatchObject({ isDefault: false, version: 2 });
+       |                   ^
+     89|     await expect(updatePaymentMethod(ctx, methodId, { version: 1, labe…
+     90|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/20]⎯
+
+ FAIL  tests/server/payment-authority.test.ts > 주문 생성 재전송은 서명 승인 후 최신 paid 상태를 반환한다
+AssertionError: expected { …(7) } to match object { …(3) }
+(4 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "id": "8fdd0aac-f3b9-46cd-b623-102260da9a07",
+-   "status": "paid",
+-   "version": 2,
++   "status": "pending",
++   "version": 1,
+  }
+
+ ❯ tests/server/payment-authority.test.ts:98:31
+     96|   await applyPaymentEvent(raw, createHmac("sha256", secret).update(raw…
+     97|   const replay = await createOrder(req("billing/orders", input, key));…
+     98|   expect(await replay.json()).toMatchObject({ id: orderId, status: "pa…
+       |                               ^
+     99| });
+    100|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/20]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  20 failed (20)
+   Start at  10:16:27
+   Duration  5.13s (tests 79%, import 14%, transform 7%)
+

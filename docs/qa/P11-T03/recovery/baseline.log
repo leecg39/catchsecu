@@ -1,0 +1,80 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso-recovery.test.ts (4 tests | 4 failed) 11ms
+   × OIDC 브라우저 실패는 민감한 입력 없이 로그인 화면으로 이동한다 7ms
+   × SAML POST 실패도 GET 로그인 안내로 전환한다 1ms
+   × 잘못된 SSO 시작 주소는 안전한 화면 안내로 이동한다 1ms
+   × JSON API 오류에 IdP 상세 입력을 되돌려주지 않는다 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-recovery.test.ts > OIDC 브라우저 실패는 민감한 입력 없이 로그인 화면으로 이동한다
+AssertionError: expected 401 to be 303 // Object.is equality
+
+- Expected
++ Received
+
+- 303
++ 401
+
+ ❯ tests/server/sso-recovery.test.ts:9:27
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/sso-recovery.test.ts > SAML POST 실패도 GET 로그인 안내로 전환한다
+AssertionError: expected 422 to be 303 // Object.is equality
+
+- Expected
++ Received
+
+- 303
++ 422
+
+ ❯ tests/server/sso-recovery.test.ts:18:27
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/sso-recovery.test.ts > 잘못된 SSO 시작 주소는 안전한 화면 안내로 이동한다
+AssertionError: expected 422 to be 303 // Object.is equality
+
+- Expected
++ Received
+
+- 303
++ 422
+
+ ❯ tests/server/sso-recovery.test.ts:23:27
+     21| test("잘못된 SSO 시작 주소는 안전한 화면 안내로 이동한다", async () => {
+     22|   const response = await start(new Request(origin + "/api/v1/auth/sso/…
+     23|   expect(response.status).toBe(303);
+       |                           ^
+     24|   expect(response.headers.get("location")).toBe("/login?error=SSO_FAIL…
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/sso-recovery.test.ts > JSON API 오류에 IdP 상세 입력을 되돌려주지 않는다
+AssertionError: expected '{"error":{"code":"PROVIDER_DENIED","m…' not to contain 'private-provider-detail'
+
+Expected: "private-provider-detail"
+Received: "{"error":{"code":"PROVIDER_DENIED","message":"IdP가 로그인을 거절했습니다: private-provider-detail","requestId":"6fa2e1d4-6ae2-4539-82f2-475aab135e1d"}}"
+
+ ❯ tests/server/sso-recovery.test.ts:30:37
+     28|   expect(response.status).toBeGreaterThanOrEqual(400);
+     29|   expect(response.headers.get("location")).toBeNull();
+     30|   expect(await response.text()).not.toContain("private-provider-detail…
+       |                                     ^
+     31| });
+     32|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  08:34:27
+   Duration  1.13s (import 67%, transform 32%, tests 1%)
+

@@ -17,7 +17,8 @@ DELEGATED_AUTH = {"/auth/sign-up/email", "/auth/sign-in/email", "/auth/request-p
                   "/auth/sign-out", "/auth/two-factor/enable", "/auth/two-factor/verify-totp",
                   "/auth/two-factor/send-otp", "/auth/two-factor/verify-otp",
                   "/auth/two-factor/verify-backup-code", "/auth/two-factor/disable"}
-NO_BODY = {("post", "/uploads/{id}/complete"), ("put", "/forms/{id}/favorite"),
+REDIRECT_SUCCESS = {("get", "/auth/sso/{providerId}"), ("get", "/auth/sso/callback"), ("post", "/auth/sso/saml")}
+NO_BODY = {("post", "/security/sso/{id}/preflight"), ("post", "/uploads/{id}/complete"), ("put", "/forms/{id}/favorite"),
            ("post", "/viewer/logout"), ("post", "/subjects/logout"),
            ("post", "/subjects/me/withdrawals/{id}/confirm"),
            ("post", "/subjects/me/withdrawals/{id}/cancel"),
@@ -53,7 +54,7 @@ def render() -> tuple[str, dict]:
             assert op.get("x-permission"), f"{method} {path}: permission missing"
             assert op.get("x-contract-policy") == rule["id"], f"{method} {path}: policy reference mismatch"
             assert op.get("x-implementation") in {"implemented", "partial", "planned"}, f"{method} {path}: status missing"
-            assert any(code.startswith("2") for code in op["responses"]), f"{method} {path}: success response missing"
+            assert any(code.startswith("2") or (code == "302" and (method, path) in REDIRECT_SUCCESS) for code in op["responses"]), f"{method} {path}: success response missing"
             body = op.get("requestBody")
             if method in {"post", "put", "patch"} and body is None:
                 assert (method, path) in NO_BODY or path in DELEGATED_AUTH, f"{method} {path}: input schema missing"
@@ -63,7 +64,7 @@ def render() -> tuple[str, dict]:
             for parameter in parameters:
                 assert parameter.get("name") and parameter.get("schema"), f"{method} {path}: invalid parameter"
             success = next((f"{code} {response['description']}" for code, response in op["responses"].items()
-                            if code.startswith("2")), None)
+                            if code.startswith("2") or (code == "302" and (method, path) in REDIRECT_SUCCESS)), None)
             assert success, f"{method} {path}: response description missing"
             if body:
                 input_shape = "OpenAPI requestBody schema; " + rule["validation"]

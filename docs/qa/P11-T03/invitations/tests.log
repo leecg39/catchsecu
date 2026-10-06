@@ -1,0 +1,31 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:49337) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:50761) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso-saml.test.ts (33 tests | 1 failed) 22045ms
+   × SAML 초대가입: 초대된 역할·서비스로 수락, 다른 이메일·없는 초대는 거부 710ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-saml.test.ts > SAML 초대가입: 초대된 역할·서비스로 수락, 다른 이메일·없는 초대는 거부
+TypeError: Invalid URL
+ ❯ begin tests/server/sso-saml.test.ts:93:15
+     91|   const { startRoute } = await routes();
+     92|   const started = await startRoute(req(`/auth/sso/${providerId}?mode=$…
+     93|   const url = new URL(started.headers.get("location")!);
+       |               ^
+     94|   const requestXml = inflateRawSync(Buffer.from(url.searchParams.get("…
+     95|   const requestId = /ID="([^"]+)"/.exec(requestXml)![1];
+ ❯ tests/server/sso-saml.test.ts:214:42
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 183 passed (184)
+   Start at  09:02:26
+   Duration  107.07s (tests 96%, import 4%, transform 1%)
+

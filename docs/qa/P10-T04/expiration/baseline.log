@@ -1,0 +1,114 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/subscription-expiration.test.ts (5 tests | 4 failed) 4800ms
+   × 유료 자연 만료는 DB 상태·이력·감사를 한 번만 저장하고 결제 주문을 보존한다 1481ms
+   × 유료 DB 전이는 기한 도래를 허용하고 만료와 함께 해지일을 바꾸는 요청은 거부한다 429ms
+   × 유료 예약 해지는 도래 전 유지하고 도래 후 두 워커가 한 번만 종결한다 1837ms
+   × 유료 만료 감사 저장 실패는 상태·이력을 함께 롤백하고 다음 실행에서 복구한다 225ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/subscription-expiration.test.ts > 유료 자연 만료는 DB 상태·이력·감사를 한 번만 저장하고 결제 주문을 보존한다
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/server/subscription-expiration.test.ts:46:32
+     44|   const fx = await fixture(true);
+     45|   await expect(db.$transaction(tx => assertQuota(tx, fx.company.id, "s…
+     46|   expect(await expireTrials()).toBe(1);
+       |                                ^
+     47|   expect(await expireTrials()).toBe(0);
+     48|   const row = await db.billingSubscription.findUniqueOrThrow({ where: …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/subscription-expiration.test.ts > 유료 DB 전이는 기한 도래를 허용하고 만료와 함께 해지일을 바꾸는 요청은 거부한다
+AssertionError: promise resolved "{ …(14) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "activationSource": "payment",
++   "cancelAt": 2026-10-05T00:55:16.030Z,
++   "createdAt": 2026-10-06T00:55:17.024Z,
++   "currency": "KRW",
++   "id": "cbe82a64-47e4-4be7-8056-26bb01a10b75",
++   "periodEnd": 2026-10-05T00:55:17.030Z,
++   "periodStart": 2026-09-05T00:55:17.030Z,
++   "planId": "52f434aa-1dbf-4cc1-aca4-f9fe28c243c4",
++   "planVersionId": "4c510bce-3263-4752-ae30-1ab1cd7baffc",
++   "priceKrw": 12000,
++   "status": "expired",
++   "tenantId": "9be10681-a37c-491b-baa0-bdfacdb14fbb",
++   "updatedAt": 2026-10-06T00:55:17.036Z,
++   "version": 3,
+  }
+
+ ❯ tests/server/subscription-expiration.test.ts:60:8
+     58|   await expect(db.billingSubscription.update({ where: { id: fx.active.…
+     59|     status: "expired", cancelAt: new Date(fx.active.periodEnd!.getTime…
+     60|   } })).rejects.toThrow();
+       |        ^
+     61|   await expect(db.billingSubscription.update({ where: { id: fx.active.…
+     62|     status: "expired", version: { increment: 1 },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/subscription-expiration.test.ts > 유료 예약 해지는 도래 전 유지하고 도래 후 두 워커가 한 번만 종결한다
+AssertionError: expected [ +0, +0 ] to deeply equal [ +0, 1 ]
+
+- Expected
++ Received
+
+  [
+    0,
+-   1,
++   0,
+  ]
+
+ ❯ tests/server/subscription-expiration.test.ts:77:23
+     75|   await db.$executeRaw`SELECT pg_sleep(GREATEST(0, EXTRACT(EPOCH FROM …
+     76|   const pair = await Promise.all([expireTrials(), expireTrials()]);
+     77|   expect(pair.sort()).toEqual([0, 1]);
+       |                       ^
+     78|   const row = await db.billingSubscription.findUniqueOrThrow({ where: …
+     79|   expect(row).toMatchObject({ status: "expired", version: 4, cancelAt,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/subscription-expiration.test.ts > 유료 만료 감사 저장 실패는 상태·이력을 함께 롤백하고 다음 실행에서 복구한다
+AssertionError: promise resolved "+0" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+0
+
+ ❯ tests/server/subscription-expiration.test.ts:97:31
+     95|   const fx = await fixture(true);
+     96|   fault.audit = true;
+     97|   await expect(expireTrials()).rejects.toThrow("synthetic paid expiry …
+       |                               ^
+     98|   expect(await db.billingSubscription.findUniqueOrThrow({ where: { id:…
+     99|   expect(await db.billingSubscriptionEvent.count({ where: { subscripti…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed (5)
+   Start at  09:55:14
+   Duration  5.34s (tests 92%, transform 4%, import 3%)
+

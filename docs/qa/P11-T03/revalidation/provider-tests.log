@@ -1,0 +1,753 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:65872) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso.test.ts (19 tests | 16 failed) 11535ms
+   × P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"name":"이름 변경"} 595ms
+   × P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"scopes":"openid email"} 418ms
+   × P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"clientSecret":"new-secret"} 446ms
+   × P11 설정: 회수된 owner의 이전 Context로 list 불가 434ms
+   × P11 설정: 회수된 owner의 이전 Context로 create 불가 790ms
+   × P11 설정: 회수된 owner의 이전 Context로 update 불가 416ms
+   × P11 설정: 회수된 owner의 이전 Context로 remove 불가 576ms
+   × P11 설정: 회수된 owner의 이전 Context로 preflight 불가 416ms
+   × P11 설정: 폐기된 세션의 이전 Context로 list 불가 370ms
+   × P11 설정: 폐기된 세션의 이전 Context로 create 불가 363ms
+   × P11 설정: 폐기된 세션의 이전 Context로 update 불가 418ms
+   × P11 설정: 폐기된 세션의 이전 Context로 remove 불가 404ms
+   × P11 설정: 폐기된 세션의 이전 Context로 preflight 불가 363ms
+   × P11 설정: 같은 version 동시 변경은 하나만 성공한다 495ms
+   × P11 설정: 느린 사전검사 중 저장한 새 설정을 이전 검사 결과로 덮어쓰지 않는다 400ms
+   × P11 설정: 신규 사전검사 도중 권한이 회수되면 생성과 감사를 남기지 않는다 526ms
+(node:66128) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 16 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"name":"이름 변경"}
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "ed00b593-83c5-4fe6-a251-e32690884a65",
+          role: "owner",
+          user: {
+            create: {
+              id: "c5ad3f29-9114-46fa-a01f-a0d7a0bd1d20",
+              name: "복구 관리자",
+              email: "recovery-8ee077bc-c412-41a7-a309-843494c7702c@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:241:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"scopes":"openid email"}
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "b365590b-f6e9-43ba-91eb-7212bceef94b",
+          role: "owner",
+          user: {
+            create: {
+              id: "c2192a2a-7405-46cb-bb7a-06ecf8b40983",
+              name: "복구 관리자",
+              email: "recovery-b3c12399-43cd-4982-830f-0c07abecbdc2@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:241:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 다른 필드와 함께 요청해도 사전검사 실패 설정을 활성화할 수 없다 {"clientSecret":"new-secret"}
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "e9591c6c-8085-4852-ae80-4c12fe53d168",
+          role: "owner",
+          user: {
+            create: {
+              id: "e529f0cb-1d0d-4ee3-9415-f42275d1693b",
+              name: "복구 관리자",
+              email: "recovery-e3f8a786-0499-459a-a325-f273cca59f3e@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:241:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 list 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "d2a2efa0-9915-401b-9507-25e50c89a4be",
+          role: "owner",
+          user: {
+            create: {
+              id: "7e6f1857-479c-4375-89a7-f9aff79463d9",
+              name: "복구 관리자",
+              email: "recovery-b0f1dda3-17e2-4140-9730-a431768313d4@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:254:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 create 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "39f1f62f-aaa3-49cf-a94a-6256a4f84e14",
+          role: "owner",
+          user: {
+            create: {
+              id: "56152508-4497-4167-bc08-d80f13852db0",
+              name: "복구 관리자",
+              email: "recovery-a81069e3-8192-4689-aff8-db14df199151@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:254:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 update 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "1df47b30-ebc1-4e0b-ad43-f1cd676610bf",
+          role: "owner",
+          user: {
+            create: {
+              id: "b63fa9f9-2659-4e89-a21c-f62f7abc95e9",
+              name: "복구 관리자",
+              email: "recovery-356de8a0-cf95-482c-b737-0fddbd57b70a@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:254:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 remove 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "8313a689-b611-4003-b000-53a06c06e6de",
+          role: "owner",
+          user: {
+            create: {
+              id: "dd47d0a1-0763-43b8-bb6d-a0a7250a1c2b",
+              name: "복구 관리자",
+              email: "recovery-c5c57c5e-df7b-4999-8d0f-225fda35d090@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:254:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 회수된 owner의 이전 Context로 preflight 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "2b8180e8-4ae4-494f-b5e9-1db59a4f0d17",
+          role: "owner",
+          user: {
+            create: {
+              id: "9418d8e1-6684-4459-a217-e42609d135ff",
+              name: "복구 관리자",
+              email: "recovery-4e5bc91e-fdcb-4a85-aa58-9aced8d53eb2@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:254:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 list 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "1b5a889a-105f-4072-bf8b-3f9e151389e9",
+          role: "owner",
+          user: {
+            create: {
+              id: "32b35e14-bafa-4be9-9b75-9fa7af973c82",
+              name: "복구 관리자",
+              email: "recovery-af3d5ea5-67c3-4cbe-beb8-59d7999f6805@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:269:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 create 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "8c2598ba-517f-4375-b2ca-c9494417a29a",
+          role: "owner",
+          user: {
+            create: {
+              id: "e4b98bad-a6f1-48ea-9f38-4a030716bd3e",
+              name: "복구 관리자",
+              email: "recovery-5e8914c4-27bf-407a-8a98-94390e4be199@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:269:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 update 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "7584dcbc-56aa-4673-bf79-9e7a62137f21",
+          role: "owner",
+          user: {
+            create: {
+              id: "58fdd78a-b001-438e-abbe-0d3e7562670e",
+              name: "복구 관리자",
+              email: "recovery-188db34e-94cb-4a3d-ba0b-bae386a18016@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:269:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 remove 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "6606c6fb-ede1-435c-a605-adfeee44d61c",
+          role: "owner",
+          user: {
+            create: {
+              id: "6a2c4f7a-0b63-46b7-9719-fc9cc9afb83e",
+              name: "복구 관리자",
+              email: "recovery-6d9f703c-4d0c-4a95-9db1-572b023c2fa7@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:269:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 폐기된 세션의 이전 Context로 preflight 불가
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "44d62b2f-262a-48ef-a967-5eaae58f8c4f",
+          role: "owner",
+          user: {
+            create: {
+              id: "08163d14-9735-475d-a000-e61dddf9ad9e",
+              name: "복구 관리자",
+              email: "recovery-47a4312e-ae54-431a-8c94-c05d859c19c7@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:269:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 같은 version 동시 변경은 하나만 성공한다
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "884d1883-c396-4cdf-9332-f1e796e649da",
+          role: "owner",
+          user: {
+            create: {
+              id: "b74d9003-f6b3-4cf1-908a-924f9060de4e",
+              name: "복구 관리자",
+              email: "recovery-2edbf2a2-ee59-48ed-8fa2-6a800eb2ffc7@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:284:29
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 느린 사전검사 중 저장한 새 설정을 이전 검사 결과로 덮어쓰지 않는다
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "2070806b-da27-4dbd-b27b-efe4fcfb8899",
+          role: "owner",
+          user: {
+            create: {
+              id: "1aec1085-7e94-4bfb-b5ad-7bb5093328ee",
+              name: "복구 관리자",
+              email: "recovery-d0db7919-f926-4993-8fce-5faf2a093b68@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:294:29
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/16]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 신규 사전검사 도중 권한이 회수되면 생성과 감사를 남기지 않는다
+PrismaClientValidationError: 
+Invalid `db.membership.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:221:23
+
+  218 await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
+  219 idp.issuer = "http://127.0.0.1:" + (server.address() as { port: number }).port;
+  220 const owner = await ownerCookie();
+→ 221 await db.membership.create({
+        data: {
+          tenantId: "f48504e5-6d3f-42fd-8744-e65e209dde59",
+          role: "owner",
+          user: {
+            create: {
+              id: "8e18dbb6-1721-4588-913d-5cf746ba0f6e",
+              name: "복구 관리자",
+              email: "recovery-5ab9180e-9d8d-44fb-9986-b36e23d7514a@catchsecu.test",
+              emailVerified: true
+            }
+          },
+      +   tenant: {
+      +     create: CompanyCreateWithoutMembershipsInput | CompanyUncheckedCreateWithoutMembershipsInput,
+      +     connectOrCreate: CompanyCreateOrConnectWithoutMembershipsInput,
+      +     connect: CompanyWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `tenant` is missing.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ providerSettingsFixture tests/server/sso.test.ts:221:3
+    219|   idp.issuer = "http://127.0.0.1:" + (server.address() as { port: numb…
+    220|   const owner = await ownerCookie();
+    221|   await db.membership.create({ data: { tenantId: owner.company.id, rol…
+       |   ^
+    222|     create: { id: randomUUID(), name: "복구 관리자", email: "recovery-" + r…
+    223|   } } });
+ ❯ tests/server/sso.test.ts:307:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/16]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  16 failed | 7 passed (23)
+   Start at  07:43:28
+   Duration  16.72s (tests 87%, import 10%, transform 3%)
+

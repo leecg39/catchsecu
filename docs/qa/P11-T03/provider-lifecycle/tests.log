@@ -1,0 +1,74 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:16514) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso.test.ts (121 tests | 1 failed) 93060ms
+   × P11 설정: 같은 version 동시 변경은 하나만 성공한다 596ms
+(node:17321) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso-saml.test.ts (34 tests | 1 failed) 39317ms
+   × SAML 인증서 교체: 마지막 로그인 수단을 비활성화하는 교체 거부 1207ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-saml.test.ts > SAML 인증서 교체: 마지막 로그인 수단을 비활성화하는 교체 거부
+AssertionError: expected { …(18) } to match object { enabled: true, version: 2, …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+@@ -14,9 +14,8 @@
+  VribbkX+qrDT6IlvUy7qOY2ZHaQftggTifkSThwe/FvZGTZVXBlriGV+enGhdbEO
+  oaP8ytgV5WfqU9OsawjjE2sQRtxNYZ0Xxc9MiWUuxA68iJkqL8VqhFEvh1LJNpCn
+  YJKlRbX0dtjJc8QayT2wWs6LnsMNAY8YaTjhNVcGCXmahNt1/r4qFmeb5P7aDJV+
+  g5zoYF3kYAXj2g+IxgVLLrZpMBYdfuQcCKDnDF+LOlKAA6U32Jj+/6/pyN+7aCwL
+  aQt0Qwz8Cmcb67Pz0cGQKA==
+- -----END CERTIFICATE-----
+- ",
++ -----END CERTIFICATE-----",
+    "version": 2,
+  }
+
+ ❯ tests/server/sso-saml.test.ts:348:82
+    346|   const changed = await patchProvider(req(`/security/sso/${provider.id…
+    347|   expect(changed.status).toBe(409); expect((await changed.json()).erro…
+    348|   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provide…
+       |                                                                                  ^
+    349| });
+    350|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/sso.test.ts > P11 설정: 같은 version 동시 변경은 하나만 성공한다
+AssertionError: expected { status: 'rejected', …(1) } to match object { Object (reason) }
+(2 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": {
+-     "code": "VERSION_CONFLICT",
++   "reason": HttpError {
++     "code": "CONCURRENT_CHANGE",
+    },
+  }
+
+ ❯ tests/server/sso.test.ts:305:54
+    303|     updateSsoProvider(ctx, provider.id, { version: 1, name }, randomUU…
+    304|   expect(results.filter(r => r.status === "fulfilled")).toHaveLength(1…
+    305|   expect(results.find(r => r.status === "rejected")).toMatchObject({ r…
+       |                                                      ^
+    306|   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provide…
+    307| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  2 failed | 203 passed (205)
+   Start at  09:42:46
+   Duration  143.88s (tests 96%, import 3%, transform 1%)
+

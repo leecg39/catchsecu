@@ -84,3 +84,17 @@ test("acceptance replay uses the current company name without duplicate grants o
   expect(await db.serviceGrant.count({ where: { tenantId } })).toBe(1);
   expect(await db.auditEvent.count({ where: { tenantId } })).toBe(1);
 });
+
+test("이메일 재초대도 이전 전문가 배정을 종료하고 회수 감사를 남긴다", async () => {
+  const service = await db.service.findFirstOrThrow({ where: { tenantId } });
+  const assignment = await db.expertAssignment.create({ data: { tenantId, expertUserId: recipientId, assignedById: ownerId,
+    expiresAt: new Date(Date.now() + 3600000), services: { create: { serviceId: service.id } } } });
+  const member = await db.membership.create({ data: { tenantId, userId: recipientId, role: "viewer", status: "revoked",
+    accessKind: "expert", expertAssignmentId: assignment.id } });
+  const requestId = randomUUID();
+  await acceptInvitationRequest(actor, token, randomUUID(), requestId);
+  expect(await db.membership.findUniqueOrThrow({ where: { id: member.id } })).toMatchObject({ status: "active", accessKind: "direct", expertAssignmentId: null });
+  expect(await db.expertAssignment.findUniqueOrThrow({ where: { id: assignment.id } })).toMatchObject({ status: "revoked", version: 2 });
+  const audit = await db.auditEvent.findMany({ where: { tenantId, requestId } });
+  expect(audit.map(event => event.action).sort()).toEqual(["expert.revoked", "invitation.accepted"]);
+});

@@ -1,0 +1,63 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso.test.ts (49 tests | 2 failed | 36 skipped) 8705ms
+   × SSO MFA: closed 변경 후 새 세션을 만들지 않는다 695ms
+   × SSO MFA: ip 변경 후 새 세션을 만들지 않는다 527ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso.test.ts > SSO MFA: closed 변경 후 새 세션을 만들지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.user.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:543:40
+
+  540 if (kind === "provider") await db.ssoProvider.update({ where: { id: f.provider.id }, data: { version: { increment: 1 } } });
+  541 if (kind === "membership") await db.membership.update({ where: { id: f.ctx.member.id }, data: { status: "revoked", version: { increment: 1 } } });
+  542 if (kind === "account") await db.account.deleteMany({ where: { userId: f.user.id, providerId: "sso:" + f.provider.id } });
+→ 543 if (kind === "closed") await db.user.update(
+Database error. Code: `23514`. Message: `OWNERSHIP_TRANSFER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/sso.test.ts:543:26
+    541|   if (kind === "membership") await db.membership.update({ where: { id:…
+    542|   if (kind === "account") await db.account.deleteMany({ where: { userI…
+    543|   if (kind === "closed") await db.user.update({ where: { id: f.user.id…
+       |                          ^
+    544|   if (kind === "password") await db.user.update({ where: { id: f.user.…
+    545|   if (kind === "binding") await db.verification.deleteMany({ where: { …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/sso.test.ts > SSO MFA: ip 변경 후 새 세션을 만들지 않는다
+PrismaClientKnownRequestError: 
+Invalid `db.ipAccessPolicy.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso.test.ts:547:46
+
+  544 if (kind === "password") await db.user.update({ where: { id: f.user.id }, data: { passwordChangedAt: new Date() } });
+  545 if (kind === "binding") await db.verification.deleteMany({ where: { value: { startsWith: "v1." } } });
+  546 if (kind === "expiry") await db.verification.updateMany({ where: { value: { startsWith: "v1." } }, data: { expiresAt: new Date(Date.now() - 1) } });
+→ 547 if (kind === "ip") await db.ipAccessPolicy.create(
+Database error. Code: `23514`. Message: `Enabled IP restriction needs an enabled rule`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/sso.test.ts:547:22
+    545|   if (kind === "binding") await db.verification.deleteMany({ where: { …
+    546|   if (kind === "expiry") await db.verification.updateMany({ where: { v…
+    547|   if (kind === "ip") await db.ipAccessPolicy.create({ data: { tenantId…
+       |                      ^
+    548|   const verified = await auth.handler(req("/auth/two-factor/verify-bac…
+    549|   expect([401, 403, 409]).toContain(verified.status);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 11 passed | 36 skipped (49)
+   Start at  08:13:48
+   Duration  10.44s (tests 85%, import 10%, transform 5%)
+

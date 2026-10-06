@@ -1,0 +1,33 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso.test.ts (84 tests | 1 failed | 83 skipped) 1312ms
+   × P11 초대 진입: 초대 UUID만으로는 SSO를 시작할 수 없다 1307ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso.test.ts > P11 초대 진입: 초대 UUID만으로는 SSO를 시작할 수 없다
+AssertionError: expected 302 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 302
+
+ ❯ tests/server/sso.test.ts:941:27
+    939|   const { startRoute } = await ssoFlow();
+    940|   const response = await startRoute(req("/auth/sso/" + f.provider.id +…
+    941|   expect(response.status).toBe(422);
+       |                           ^
+    942|   expect(await db.ssoState.count()).toBe(0);
+    943| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 83 skipped (84)
+   Start at  09:00:27
+   Duration  2.73s (tests 51%, import 30%, transform 19%)
+

@@ -1,0 +1,88 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso-provider-reference.test.ts (2 tests | 2 failed) 927ms
+   × SSO DB 참조: 존재하지 않는 공급자 계정 생성 거부 621ms
+   × SSO DB 참조: 연결 계정이 있는 공급자의 직접 삭제 거부 303ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-provider-reference.test.ts > SSO DB 참조: 존재하지 않는 공급자 계정 생성 거부
+AssertionError: promise resolved "{ …(13) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "accessToken": null,
++   "accessTokenExpiresAt": null,
++   "accountId": "missing",
++   "createdAt": 2026-10-06T00:13:16.450Z,
++   "id": "6de0783c-0cab-4e0c-9f66-220dfc947c11",
++   "idToken": null,
++   "password": null,
++   "providerId": "sso:94278c9f-0558-479a-8c7a-5bad196732d2",
++   "refreshToken": null,
++   "refreshTokenExpiresAt": null,
++   "scope": null,
++   "updatedAt": 2026-10-06T00:13:16.450Z,
++   "userId": "38b77dff-1ca3-4862-9395-d3051f5b2791",
+  }
+
+ ❯ tests/server/sso-provider-reference.test.ts:20:124
+     18| test("SSO DB 참조: 존재하지 않는 공급자 계정 생성 거부", async () => {
+     19|   const f = await fixture();
+     20|   await expect(db.account.create({ data: { userId: f.user.id, provider…
+       |                                                                                                                            ^
+     21| });
+     22| test("SSO DB 참조: 연결 계정이 있는 공급자의 직접 삭제 거부", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/sso-provider-reference.test.ts > SSO DB 참조: 연결 계정이 있는 공급자의 직접 삭제 거부
+AssertionError: promise resolved "{ …(18) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "authorizationUrl": "https://idp.example.test/authorize",
++   "clientId": "qa",
++   "clientSecretCipher": null,
++   "createdAt": 2026-10-06T00:13:16.755Z,
++   "enabled": false,
++   "id": "824f3602-02e2-4c1f-8077-44754b0740b1",
++   "idpCert": null,
++   "issuer": "https://idp.example.test",
++   "jwksUrl": "https://idp.example.test/jwks",
++   "name": "참조 SSO",
++   "preflightDetail": "",
++   "preflightOk": false,
++   "protocol": "oidc",
++   "scopes": "openid profile email",
++   "tenantId": "b45c15f1-e6a9-4c9e-a17d-022e9343a2ed",
++   "tokenUrl": "https://idp.example.test/token",
++   "updatedAt": 2026-10-06T00:13:16.755Z,
++   "version": 1,
+  }
+
+ ❯ tests/server/sso-provider-reference.test.ts:25:72
+     23|   const f = await fixture();
+     24|   await db.account.create({ data: { userId: f.user.id, providerId: "ss…
+     25|   await expect(db.ssoProvider.delete({ where: { id: f.provider.id } })…
+       |                                                                        ^
+     26| });
+     27|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  09:13:15
+   Duration  1.47s (tests 68%, transform 16%, import 15%)
+

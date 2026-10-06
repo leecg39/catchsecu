@@ -1,0 +1,105 @@
+{
+  "results": [
+    {
+      "action": "POST /auth/sign-up/email",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-in/email",
+      "status": 200
+    },
+    {
+      "action": "POST /billing/methods",
+      "status": 201
+    },
+    {
+      "action": "POST /billing/methods",
+      "status": 201
+    },
+    {
+      "action": "GET /billing/methods",
+      "status": 200
+    },
+    {
+      "action": "PATCH /billing/methods/35e538d2-3fff-47d1-bd96-561f2c10ee47",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "action": "PATCH /billing/methods/35e538d2-3fff-47d1-bd96-561f2c10ee47",
+      "status": 200
+    },
+    {
+      "action": "PATCH /billing/methods/35e538d2-3fff-47d1-bd96-561f2c10ee47",
+      "status": 200
+    },
+    {
+      "action": "PATCH /billing/methods/35e538d2-3fff-47d1-bd96-561f2c10ee47",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "action": "DELETE /billing/methods/35e538d2-3fff-47d1-bd96-561f2c10ee47",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions",
+      "status": 202
+    },
+    {
+      "action": "POST /billing/orders",
+      "status": 201
+    },
+    {
+      "action": "POST /billing/orders",
+      "status": 409,
+      "code": "ORDER_METHOD_CONFLICT"
+    },
+    {
+      "action": "DELETE /billing/methods/df9d2723-20bc-456d-8609-bec086a89db3",
+      "status": 409,
+      "code": "METHOD_IN_USE"
+    },
+    {
+      "action": "POST /billing/orders/05295363-26bf-464c-aa17-3cb738605dc4/return",
+      "status": 409,
+      "code": "PAYMENT_UNCONFIRMED"
+    },
+    {
+      "action": "POST /billing/provider-events",
+      "status": 202
+    },
+    {
+      "action": "POST /billing/orders",
+      "status": 201
+    },
+    {
+      "action": "POST /billing/orders",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "action": "GET /billing/methods",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "action": "GET /billing/orders",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-out",
+      "status": 200
+    }
+  ],
+  "fingerprint": {
+    "sha256": "5bfb03939561f1b9f0d56cae75df49f3eba061e4e46cfaa90d57713ba48a6b14",
+    "counts": {
+      "methods": 2,
+      "orders": 1,
+      "audits": 9
+    }
+  },
+  "ownSessionsRemaining": 0,
+  "provider": "synthetic signed local event; no real PG"
+}

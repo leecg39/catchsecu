@@ -1,0 +1,25 @@
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/RequestHandler.ts:238
+      throw new PrismaClientKnownRequestError(message, {
+            ^
+
+PrismaClientKnownRequestError: 
+Invalid `db.service.findFirstOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-sso-invitations.ts:115:38
+
+  112 } else {
+  113   if (existsSync(marker) || existsSync(evidence + "http.json")) throw new Error("Review existing run before repeating");
+  114   assert.equal(original.protocol, "saml"); assert.ok(original.enabled && original.preflightOk);
+→ 115   const service = await db.service.findFirstOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+    at vn.handleRequestError (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13)
+    at vn.handleAndLogRequestError (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12)
+    at vn.request (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async a (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24)
+    at async <anonymous> (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-sso-invitations.ts:115:21) {
+  code: 'P2025',
+  meta: { modelName: 'Service', operation: 'a query' },
+  clientVersion: '7.10.0'
+}
+
+Node.js v24.19.0

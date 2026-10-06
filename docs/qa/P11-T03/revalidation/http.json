@@ -1,0 +1,147 @@
+{
+  "base": "http://127.0.0.1:3156",
+  "at": "2026-10-05T22:47:52.600Z",
+  "results": [
+    {
+      "action": "POST /auth/sign-up/email",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-in/email",
+      "status": 200
+    },
+    {
+      "action": "POST /security/sso",
+      "status": 201
+    },
+    {
+      "action": "PATCH /security/sso/6b32d1c4-1326-4387-a041-2428d40da964",
+      "status": 409
+    },
+    {
+      "action": "PATCH /security/sso/6b32d1c4-1326-4387-a041-2428d40da964",
+      "status": 409
+    },
+    {
+      "action": "PATCH /security/sso/6b32d1c4-1326-4387-a041-2428d40da964",
+      "status": 409
+    },
+    {
+      "action": "DELETE /security/sso/6b32d1c4-1326-4387-a041-2428d40da964",
+      "status": 200
+    },
+    {
+      "action": "POST /security/sso",
+      "status": 201
+    },
+    {
+      "action": "PATCH /security/sso/6c29dc0b-067c-4078-a880-cbc614e360d8",
+      "status": 200
+    },
+    {
+      "action": "PATCH /security/sso/6c29dc0b-067c-4078-a880-cbc614e360d8",
+      "status": 200
+    },
+    {
+      "action": "PATCH /security/sso/6c29dc0b-067c-4078-a880-cbc614e360d8",
+      "status": 409
+    },
+    {
+      "action": "POST /security/sso/6c29dc0b-067c-4078-a880-cbc614e360d8/preflight",
+      "status": 200
+    },
+    {
+      "action": "PATCH /security/sso/6c29dc0b-067c-4078-a880-cbc614e360d8",
+      "status": 200
+    },
+    {
+      "action": "PATCH /security/sso/6c29dc0b-067c-4078-a880-cbc614e360d8",
+      "status": 409
+    },
+    {
+      "action": "PATCH /security/sso/6c29dc0b-067c-4078-a880-cbc614e360d8",
+      "status": 200
+    },
+    {
+      "action": "GET /security/sso",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-out",
+      "status": 200
+    },
+    {
+      "action": "GET /security/sso",
+      "status": 401
+    }
+  ],
+  "independentDatabaseSnapshot": {
+    "id": "6c29dc0b-067c-4078-a880-cbc614e360d8",
+    "tenantId": "4c60e818-6c4d-4ce8-9688-93a17c3721d9",
+    "name": "SSO 재시작 확인",
+    "enabled": true,
+    "preflightOk": true,
+    "version": 6,
+    "issuer": "https://qa-idp.example.test",
+    "certificateHash": "515d2f07a6bcdff81c327d51722e06e8f434df0ec25b2eea6dd39c5a52cf25f6",
+    "secretCipherHash": "0d4b1b11d570b3914dc941d9c2830c7ac2d59d0228d5ff703ad3ae28a6db91de"
+  },
+  "audit": [
+    {
+      "action": "sso.provider_preflight",
+      "detail": {
+        "changedFields": [
+          "preflightOk",
+          "enabled"
+        ]
+      }
+    },
+    {
+      "action": "sso.provider_updated",
+      "detail": {
+        "changedFields": [
+          "name"
+        ]
+      }
+    },
+    {
+      "action": "sso.provider_updated",
+      "detail": {
+        "changedFields": [
+          "enabled"
+        ]
+      }
+    },
+    {
+      "action": "sso.provider_created",
+      "detail": {
+        "changedFields": [
+          "name",
+          "issuer",
+          "clientId",
+          "protocol"
+        ]
+      }
+    },
+    {
+      "action": "sso.provider_updated",
+      "detail": {
+        "changedFields": [
+          "enabled"
+        ]
+      }
+    },
+    {
+      "action": "sso.provider_updated",
+      "detail": {
+        "changedFields": [
+          "enabled",
+          "clientSecret",
+          "preflightOk"
+        ]
+      }
+    }
+  ],
+  "externalIdpTested": false,
+  "browserTested": false
+}

@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { SsoAccounts } from "./SsoAccounts";
+import { SsoStartForm } from "./SsoRecovery";
 import { IpDeniedCompanies } from "./LiveAuth";
 import { useSearchParams } from "next/navigation";
 import { authPath } from "@/lib/return-to";
@@ -31,6 +33,8 @@ function ChangePassword(){return <Frame><Card><h1>비밀번호 변경</h1><Passw
 function RecoverOrSignup({signup=false}:{signup?:boolean}){const returnTo=useSearchParams().get("returnTo");return <Frame><Card><h1>{signup?'회원가입':'비밀번호 찾기'}</h1><SignupOrResetForm signup={signup}/><Link className="auth-back" href={authPath("/login", returnTo)}>로그인으로 돌아가기</Link></Card></Frame>}
 export function AuthPages({ path }: { path: string }) {
  if(path === "/oauth2/invite/signup")return <Frame><Card><InvitationAccept/></Card></Frame>;
+ if (["/login/oauth2", "/login/saml", "/login/saml/start"].includes(path)) return <Frame><Card><h1>회사 SSO 로그인</h1><AuthCallbackError/><SsoStartForm/></Card></Frame>;
+ if (path === "/link/oauth2" || path === "/link/oauth2/verified") return <Frame><Card><h1>내 SSO 연결 계정</h1><SsoAccounts/></Card></Frame>;
  if(path === "/logout")return <Frame><Card><LogoutForm/></Card></Frame>;
  if (path === "/login") return <Login />;
  if (path === "/login-email") return <Verification email />;

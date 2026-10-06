@@ -147,5 +147,5 @@ export function LiveProfile({ edit = false }: { edit?: boolean }) {
     <ErrorNote error={result.error?.message} />{!result.data ? <p>프로필을 불러오는 중입니다.</p> : edit ? <ProfileForm key={result.data.version} initial={result.data} /> : <div className="mg-info-grid">
       <label><span>회사명</span><strong>{app.data?.company?.name ?? "소속 회사 없음"}</strong></label>
       {([["name", "이름"], ["email", "이메일"], ["department", "부서명"], ["jobTitle", "직책"], ["phone", "연락처"]] as const).map(([key, label]) => <label key={key}><span>{label}</span><strong>{result.data?.[key] || "-"}</strong></label>)}</div>}</Panel>
-    {!edit && <><Panel title="로그인 보안"><div className="mg-flex"><Link className="cs-button secondary" href="/password-change-rule">비밀번호 변경</Link><Link className="cs-button secondary" href="/two-step-setting">2단계 인증 {result.data?.twoFactorEnabled ? "관리" : "등록"}</Link></div></Panel><Sessions /></>}</div>;
+    {!edit && <><Panel title="로그인 보안"><div className="mg-flex"><Link className="cs-button secondary" href="/link/oauth2">내 SSO 연결 계정</Link><Link className="cs-button secondary" href="/password-change-rule">비밀번호 변경</Link><Link className="cs-button secondary" href="/two-step-setting">2단계 인증 {result.data?.twoFactorEnabled ? "관리" : "등록"}</Link></div></Panel><Sessions /></>}</div>;
 }

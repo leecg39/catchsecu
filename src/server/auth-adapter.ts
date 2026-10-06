@@ -79,6 +79,13 @@ export function auditedAuthAdapter(options: BetterAuthOptions) {
       if (typeof id !== "string") throw new Error("Created session ID is required");
       const session = await tx.session.findUniqueOrThrow({ where: { id } });
       await authAudit(tx, session.userId, session.activeCompanyId, "session.created", "session", session.id);
+      const sso = authMutationScope.getStore()?.ssoMfa;
+      if (sso) {
+        const consumed = await tx.verification.deleteMany({ where: { id: sso.bindingId, expiresAt: { gt: new Date() } } });
+        if (consumed.count !== 1 || session.userId !== sso.userId || session.activeCompanyId !== sso.tenantId)
+          throw new APIError("UNAUTHORIZED", { message: "SSO 인증이 만료되었습니다. 다시 시작해주세요." });
+        await authAudit(tx, session.userId, session.activeCompanyId, "sso.login", "user", session.userId);
+      }
       if (input.select && !input.select.includes("id")) {
         const selected = { ...created }; delete (selected as { id?: string }).id;
         return selected as R;

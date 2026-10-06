@@ -20,5 +20,5 @@ const messages: Record<string, string> = {
   INVALID_ORIGIN: "요청을 확인할 수 없습니다. 현재 사이트에서 다시 시도해주세요.",
 };
 export function authErrorMessage(code: string | null | undefined) {
-  return code ? messages[code] : undefined;
+  return code && Object.hasOwn(messages, code) ? messages[code] : undefined;
 }

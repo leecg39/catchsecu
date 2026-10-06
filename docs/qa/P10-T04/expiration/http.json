@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-06T01:00:25.098Z",
+  "results": [
+    {
+      "action": "POST /auth/sign-up/email",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-in/email",
+      "status": 200
+    },
+    {
+      "action": "GET /subscriptions",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions/9bc3608f-b586-4d5b-8dab-99c80501a692/schedule-cancel",
+      "status": 200
+    },
+    {
+      "action": "GET /subscriptions/entitlement",
+      "status": 200
+    },
+    {
+      "action": "GET /subscriptions",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-out",
+      "status": 200
+    }
+  ],
+  "firstWorker": {
+    "expired": 1
+  },
+  "secondWorker": {
+    "expired": 1
+  },
+  "readBoundaryEnforcedBeforeWorker": true,
+  "fingerprint": {
+    "sha256": "ccffaa6cbf6bad552c2642be0ec7d62a964679d8a31ea537e5f10c639ea41d98",
+    "counts": {
+      "subscriptions": 2,
+      "events": 7,
+      "orders": 2,
+      "expirationAudits": 2
+    }
+  },
+  "fixtureScope": "Isolated test database; synthetic historical paid subscriptions, no external payment"
+}

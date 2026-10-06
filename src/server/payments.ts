@@ -5,7 +5,9 @@ import { db, type Transaction } from "./db";
 import type { Context } from "./context";
 import { fail } from "./http";
 import { audit } from "./audit";
-import { roleCan } from "./permissions";
+import { lockBillingActor, withBillingAccess } from "./billing-access";
+import { assertFileDeadlines } from "./file-access";
+import { idempotent } from "./idempotency";
 import { postLedgerTransfer } from "./ledger";
 
 const providerEvent = z.object({
@@ -19,9 +21,8 @@ export type PaymentOrderRecord = { id: string; subscriptionId: string; methodId:
 function dto(row: PaymentOrder): PaymentOrderRecord {
   return { id: row.id, subscriptionId: row.subscriptionId, methodId: row.methodId, amount: row.amount, currency: row.currency, status: row.status as PaymentOrderRecord["status"], version: row.version };
 }
-function billingWrite(ctx: Context) { if (!roleCan(ctx.member.role, "billing.write")) fail(403, "FORBIDDEN", "결제를 변경할 권한이 없습니다."); }
-export async function createPaymentOrder(tx: Transaction, ctx: Context, subscriptionId: string, requestId: string, methodId?: string) {
-  billingWrite(ctx);
+async function createPaymentOrder(tx: Transaction, ctx: Context, subscriptionId: string, requestId: string, methodId?: string) {
+  await tx.$queryRaw`SELECT id FROM "BillingSubscription" WHERE id=${subscriptionId} AND "tenantId"=${ctx.tenantId} FOR UPDATE`;
   const subscription = await tx.billingSubscription.findFirst({ where: { id: subscriptionId, tenantId: ctx.tenantId } });
   if (!subscription || subscription.status !== "pending" || subscription.priceKrw === null) fail(409, "ORDER_UNAVAILABLE", "결제할 수 있는 대기 구독이 없습니다.");
   if (methodId !== undefined) {
@@ -30,32 +31,52 @@ export async function createPaymentOrder(tx: Transaction, ctx: Context, subscrip
     if (method.status !== "active") fail(409, "METHOD_INACTIVE", "해지된 결제수단으로는 결제할 수 없습니다.");
   }
   const existing = await tx.paymentOrder.findFirst({ where: { tenantId: ctx.tenantId, subscriptionId, status: "pending" } });
-  if (existing) return dto(existing);
+  if (existing) {
+    if (existing.methodId !== (methodId ?? null)) fail(409, "ORDER_METHOD_CONFLICT", "다른 결제수단의 대기 주문이 있습니다. 기존 주문을 확인해주세요.");
+    return dto(existing);
+  }
   const row = await tx.paymentOrder.create({ data: { tenantId: ctx.tenantId, subscriptionId, methodId: methodId ?? null, amount: subscription.priceKrw, currency: subscription.currency } });
   await audit(tx, ctx, requestId, "billing.order_created", "paymentOrder", row.id, ["amount", "methodId"], undefined);
   return dto(row);
 }
+export async function requestPaymentOrder(ctx: Context, input: { subscriptionId: string; methodId?: string }, key: string | null, requestId: string) {
+  let deadlines: Awaited<ReturnType<typeof lockBillingActor>>["deadlines"];
+  const authorize = async (tx: Transaction) => { deadlines = (await lockBillingActor(tx, ctx, "billing.write")).deadlines; };
+  return idempotent("billing-order:" + ctx.tenantId, key, input, async tx => {
+    await authorize(tx);
+    const row = await createPaymentOrder(tx, ctx, input.subscriptionId, requestId, input.methodId);
+    return { status: 201, body: row, resource: { tenantId: ctx.tenantId, resourceType: "payment-order" as const, resourceId: row.id } };
+  }, authorize, async (tx, cached) => {
+    await tx.$queryRaw`SELECT id FROM "PaymentOrder" WHERE id=${cached.id} AND "tenantId"=${ctx.tenantId} FOR SHARE`;
+    const row = await tx.paymentOrder.findFirst({ where: { id: cached.id, tenantId: ctx.tenantId } });
+    if (!row) fail(410, "ORDER_UNAVAILABLE", "기존 결제 주문을 찾을 수 없습니다.");
+    return dto(row);
+  }, async () => { assertFileDeadlines(deadlines); });
+}
 export type PaymentOrderListItem = PaymentOrderRecord & { planName: string; refundedTotal: number };
 export async function listPaymentOrders(ctx: Context) {
-  if (!roleCan(ctx.member.role, "billing.read")) fail(403, "FORBIDDEN", "결제 정보를 볼 권한이 없습니다.");
-  const rows = await db.paymentOrder.findMany({ where: { tenantId: ctx.tenantId },
-    include: { subscription: { include: { plan: { select: { name: true } } } }, refunds: { where: { status: "refunded" }, select: { amount: true } } },
-    orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 100 });
-  return { items: rows.map(row => ({ ...dto(row), planName: row.subscription.plan.name,
-    refundedTotal: row.refunds.reduce((sum, r) => sum + r.amount, 0) })) };
+  return withBillingAccess(ctx, "billing.read", async tx => {
+    const rows = await tx.paymentOrder.findMany({ where: { tenantId: ctx.tenantId },
+      include: { subscription: { include: { plan: { select: { name: true } } } }, refunds: { where: { status: "refunded" }, select: { amount: true } } },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 100 });
+    return { items: rows.map(row => ({ ...dto(row), planName: row.subscription.plan.name,
+      refundedTotal: row.refunds.reduce((sum, r) => sum + r.amount, 0) })) };
+  });
 }
 export async function readPaymentOrder(ctx: Context, id: string) {
-  if (!roleCan(ctx.member.role, "billing.read")) fail(403, "FORBIDDEN", "결제 정보를 볼 권한이 없습니다.");
-  const row = await db.paymentOrder.findFirst({ where: { id, tenantId: ctx.tenantId } });
-  if (!row) fail(404, "NOT_FOUND", "결제 주문을 찾을 수 없습니다.");
-  return dto(row);
+  return withBillingAccess(ctx, "billing.read", async tx => {
+    const row = await tx.paymentOrder.findFirst({ where: { id, tenantId: ctx.tenantId } });
+    if (!row) fail(404, "NOT_FOUND", "결제 주문을 찾을 수 없습니다.");
+    return dto(row);
+  });
 }
 export async function rejectPaymentReturn(ctx: Context, id: string) {
-  billingWrite(ctx);
-  const row = await db.paymentOrder.findFirst({ where: { id, tenantId: ctx.tenantId } });
-  if (!row) fail(404, "NOT_FOUND", "결제 주문을 찾을 수 없습니다.");
-  if (row.status === "pending") fail(409, "PAYMENT_UNCONFIRMED", "결제 성공 주소만으로는 결제를 확정할 수 없습니다.");
-  return dto(row);
+  return withBillingAccess(ctx, "billing.write", async tx => {
+    const row = await tx.paymentOrder.findFirst({ where: { id, tenantId: ctx.tenantId } });
+    if (!row) fail(404, "NOT_FOUND", "결제 주문을 찾을 수 없습니다.");
+    if (row.status === "pending") fail(409, "PAYMENT_UNCONFIRMED", "결제 성공 주소만으로는 결제를 확정할 수 없습니다.");
+    return dto(row);
+  });
 }
 function signaturesMatch(secret: string, body: string, signature: string) {
   const expected = createHmac("sha256", secret).update(body).digest("hex");

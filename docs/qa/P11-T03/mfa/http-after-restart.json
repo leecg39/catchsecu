@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-05T23:17:42.041Z",
+  "results": [
+    {
+      "action": "GET /me",
+      "status": 401
+    },
+    {
+      "action": "POST /auth/two-factor/verify-totp",
+      "status": 200
+    },
+    {
+      "action": "GET /me",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-out",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/two-factor/verify-totp",
+      "status": 401
+    },
+    {
+      "action": "GET /auth/sso/6c29dc0b-067c-4078-a880-cbc614e360d8?mode=login",
+      "status": 302
+    },
+    {
+      "action": "POST /auth/sso/saml",
+      "status": 302
+    },
+    {
+      "action": "POST /auth/two-factor/send-otp",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/two-factor/verify-otp",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/two-factor/disable",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-out",
+      "status": 200
+    }
+  ],
+  "pendingChallengeSurvivedRestart": true,
+  "tenantMatches": true,
+  "sessionCreatedAudit": true,
+  "emailCodeSource": "local encrypted outbox",
+  "ownSessionsRemaining": 0,
+  "fixtureMfaRestored": true,
+  "browserVerified": false,
+  "externalIdpVerified": false
+}

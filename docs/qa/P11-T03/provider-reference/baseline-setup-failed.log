@@ -1,0 +1,65 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso-provider-reference.test.ts (2 tests | 2 failed) 8236ms
+   × SSO DB 참조: 존재하지 않는 공급자 계정 생성 거부 7314ms
+   × SSO DB 참조: 연결 계정이 있는 공급자의 직접 삭제 거부 918ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-provider-reference.test.ts > SSO DB 참조: 존재하지 않는 공급자 계정 생성 거부
+PrismaClientKnownRequestError: 
+Invalid `db.ssoProvider.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso-provider-reference.test.ts:14:41
+
+  11 async function fixture() {
+  12   const user = await db.user.create({ data: { name: "참조 검사", email: randomUUID() + "@catchsecu.test", emailVerified: true } });
+  13   const company = await db.company.create({ data: { name: "참조 회사", publicName: "참조 회사" } });
+→ 14   const provider = await db.ssoProvider.create(
+Database error. Code: `23514`. Message: `new row for relation "SsoProvider" violates check constraint "SsoProvider_urls_https"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ fixture tests/server/sso-provider-reference.test.ts:14:20
+     12|   const user = await db.user.create({ data: { name: "참조 검사", email: ra…
+     13|   const company = await db.company.create({ data: { name: "참조 회사", pub…
+     14|   const provider = await db.ssoProvider.create({ data: { tenantId: com…
+       |                    ^
+     15|     clientId: "qa", authorizationUrl: "https://idp.example.test/author…
+     16|   return { user, company, provider };
+ ❯ tests/server/sso-provider-reference.test.ts:19:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/sso-provider-reference.test.ts > SSO DB 참조: 연결 계정이 있는 공급자의 직접 삭제 거부
+PrismaClientKnownRequestError: 
+Invalid `db.ssoProvider.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/sso-provider-reference.test.ts:14:41
+
+  11 async function fixture() {
+  12   const user = await db.user.create({ data: { name: "참조 검사", email: randomUUID() + "@catchsecu.test", emailVerified: true } });
+  13   const company = await db.company.create({ data: { name: "참조 회사", publicName: "참조 회사" } });
+→ 14   const provider = await db.ssoProvider.create(
+Database error. Code: `23514`. Message: `new row for relation "SsoProvider" violates check constraint "SsoProvider_urls_https"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ fixture tests/server/sso-provider-reference.test.ts:14:20
+     12|   const user = await db.user.create({ data: { name: "참조 검사", email: ra…
+     13|   const company = await db.company.create({ data: { name: "참조 회사", pub…
+     14|   const provider = await db.ssoProvider.create({ data: { tenantId: com…
+       |                    ^
+     15|     clientId: "qa", authorizationUrl: "https://idp.example.test/author…
+     16|   return { user, company, provider };
+ ❯ tests/server/sso-provider-reference.test.ts:23:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  09:12:48
+   Duration  9.32s (tests 91%, transform 5%, import 4%)
+

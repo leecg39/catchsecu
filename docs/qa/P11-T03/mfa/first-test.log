@@ -1,0 +1,49 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+stderr | tests/server/sso.test.ts > SSO MFA: 코드 검증 전 세션0, 검증 후 대상 회사 세션1과 감사
+# SERVER_ERROR:  HttpError: SSO 인증 정보를 확인할 수 없습니다.
+    at fail (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/http.ts:10:84)
+    at bindSsoMfa (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/sso-mfa.ts:55:11)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/auth.ts:73:23
+    at Object.internalHandler [as handler] (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-call/dist/middleware.mjs:15:21)
+    at runBeforeHooks (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-auth/dist/api/dispatch.mjs:79:18)
+    at file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-auth/dist/api/dispatch.mjs:210:18
+    at processRequest (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-call/dist/router.mjs:82:11)
+    at handler (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/better-call/dist/router.mjs:105:16)
+    at file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/@better-auth/core/dist/context/transaction.mjs:37:13 {
+  status: 401,
+  code: 'SSO_MFA_INVALID'
+}
+
+ ❯ tests/server/sso.test.ts (37 tests | 1 failed | 36 skipped) 1864ms
+   × SSO MFA: 코드 검증 전 세션0, 검증 후 대상 회사 세션1과 감사 1857ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso.test.ts > SSO MFA: 코드 검증 전 세션0, 검증 후 대상 회사 세션1과 감사
+AssertionError: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ tests/server/sso.test.ts:523:27
+    521|   expect((await me(req("/me", cookie))).status).toBe(401);
+    522|   const verified = await auth.handler(req("/auth/two-factor/verify-tot…
+    523|   expect(verified.status).toBe(200);
+       |                           ^
+    524|   const session = await db.session.findFirstOrThrow({ where: { userId:…
+    525|   expect(session.activeCompanyId).toBe(f.company.id);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 36 skipped (37)
+   Start at  08:12:30
+   Duration  3.61s (tests 54%, import 31%, transform 15%)
+

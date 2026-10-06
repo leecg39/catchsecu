@@ -10,6 +10,12 @@
 
 아래는 독립 백엔드의 설계 모델이며 원본 DB 스키마를 추출한 결과가 아니다. 구현된 모델의 정확한 필드·제약·삭제 규칙은 [P00-T03 계약 기준선](contracts/README.md), [Prisma schema](../../prisma/schema.prisma), migration SQL을 따른다. 아직 없는 모델은 아래 제안 상태를 유지한다.
 
+## P11-T03 공급자와 외부 계정 참조 구현 (2026-10-06)
+
+실제 모델은 `SsoProvider`, Better Auth `Account`, `SsoState`다. 아래 초기 설계의 IdentityProvider/ExternalIdentity/AuthAttempt 이름을 대신하며 동일한 공급자·신원·인증 시도 역할을 맡는다. `Account.providerId = sso:<공급자 UUID>`와 `Account.ssoProviderId`를 DB 트리거·CHECK로 일치시키고 FK RESTRICT로 고아 연결과 참조 중 공급자 ID 변경/직접 삭제를 막는다. 일반 인증 계정은 이 FK가 NULL이다. 공급자 소유 회사와 현재 Membership은 인증·조회·변경 시 서버에서 재검사한다.
+
+기존 유효 계정은 migration으로 참조를 채운다. 기존 고아 계정이 있으면 migration 전체를 롤백하며 임의 삭제하지 않는다. 정상 공급자 삭제 API는 마지막 로그인 수단 보호 후 연결 계정·세션·대기 인증·감사를 같은 트랜잭션에서 정리한다. [구현과 검증](../qa/P11-T03/provider-reference/README.md).
+
 ## 공통 기준
 
 - 모든 회사 소유 엔티티에 `tenantId`, `id(UUID)`, `createdAt`, `updatedAt`, 변경 가능한 엔티티에 `version`을 둔다. 조직 간 참조는 `(tenantId,id)` 복합 FK로 차단한다.

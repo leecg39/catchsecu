@@ -1,0 +1,95 @@
+{
+  "at": "2026-10-06T01:11:25.733Z",
+  "results": [
+    {
+      "action": "POST /auth/sign-up/email",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-in/email",
+      "status": 200
+    },
+    {
+      "action": "GET /plans",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions",
+      "status": 202
+    },
+    {
+      "action": "POST /subscriptions/2b89f39b-3d04-4713-8838-2ce1794a83c3/cancel",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions",
+      "status": 202
+    },
+    {
+      "action": "POST /subscriptions/c070ec6b-a726-4cfe-9876-20872c680d01/schedule-cancel",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions/c070ec6b-a726-4cfe-9876-20872c680d01/schedule-cancel",
+      "status": 409,
+      "code": "IDEMPOTENCY_MISMATCH"
+    },
+    {
+      "action": "POST /subscriptions/c070ec6b-a726-4cfe-9876-20872c680d01/undo-cancel",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions/c070ec6b-a726-4cfe-9876-20872c680d01/schedule-cancel",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions/c070ec6b-a726-4cfe-9876-20872c680d01/schedule-cancel",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions/c070ec6b-a726-4cfe-9876-20872c680d01/undo-cancel",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions/c070ec6b-a726-4cfe-9876-20872c680d01/undo-cancel",
+      "status": 200
+    },
+    {
+      "action": "POST /subscriptions/c070ec6b-a726-4cfe-9876-20872c680d01/undo-cancel",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "action": "POST /subscriptions",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "action": "GET /subscriptions",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "action": "GET /subscriptions",
+      "status": 200
+    },
+    {
+      "action": "POST /auth/sign-out",
+      "status": 200
+    }
+  ],
+  "fingerprint": {
+    "sha256": "7a75cd1cd7fe1518fb3af3ce0ef43ed5d7f8f47bcc717842297c2228ce1ae071",
+    "counts": {
+      "subscriptions": 2,
+      "events": 6,
+      "audits": 6
+    }
+  },
+  "concurrentStatuses": [
+    200,
+    409
+  ],
+  "scope": "Isolated test database; synthetic paid fixture, no external payment",
+  "ownSessionsRemaining": 0
+}

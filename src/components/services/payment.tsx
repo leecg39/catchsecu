@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { api, errorText, useResource } from "@/lib/api";
+import { api, ApiError, errorText, useResource } from "@/lib/api";
 import type { AssetOverview, BillingOverview, PlanRecord, SubscriptionRecord } from "@/contracts/subscriptions";
 import type { BillingHistoryList } from "@/contracts/billing-history";
 import type { LedgerOverview } from "@/contracts/ledger";
@@ -126,10 +126,15 @@ export function LicenseManagement() {
 function PaymentMethodsPanel({ methods }: { methods: ReturnType<typeof useResource<PaymentMethodRecord[]>> }) {
   const [busy, setBusy] = useState(false), [notice, setNotice] = useState("");
   const ask = useConfirm();
+  const [editing, setEditing] = useState<{ id: string; label: string; version: number } | null>(null);
   async function act(path: string, init: RequestInit, done: string) {
     setBusy(true); setNotice("");
-    try { await api(path, { ...init, headers: { "Idempotency-Key": crypto.randomUUID(), "content-type": "application/json", ...(init.headers ?? {}) } }); setNotice(done); methods.reload(); }
-    catch (error) { setNotice(errorText(error)); } finally { setBusy(false); }
+    try { await api(path, { ...init, headers: { "Idempotency-Key": crypto.randomUUID(), "content-type": "application/json", ...(init.headers ?? {}) } }); setNotice(done); methods.reload(); return true; }
+    catch (error) {
+      setNotice(errorText(error));
+      if (error instanceof ApiError && error.status === 409) methods.reload();
+      return false;
+    } finally { setBusy(false); }
   }
   return <Panel title="결제 수단">
     {methods.loading && <p role="status">결제 수단을 불러오는 중입니다.</p>}
@@ -140,6 +145,7 @@ function PaymentMethodsPanel({ methods }: { methods: ReturnType<typeof useResour
       {m.isDefault && <span className="svc-badge">대표</span>}
       {m.status === "revoked" && <span className="svc-badge">해지됨</span>}
       {m.status === "active" && <>
+        <ActionButton type="button" secondary disabled={busy} onClick={() => setEditing({ id: m.id, label: m.label, version: m.version })}>이름 수정</ActionButton>
         {!m.isDefault && <ActionButton type="button" secondary disabled={busy} onClick={() => act(`/billing/methods/${m.id}`, { method: "PATCH", body: JSON.stringify({ version: m.version, setDefault: true }) }, "대표 결제수단으로 변경했습니다.")}>대표로 지정</ActionButton>}
         <ActionButton type="button" secondary disabled={busy} onClick={async () => {
           if (await ask({ title: "결제수단 해지", message: `“${m.label}” 결제수단을 해지합니다. 해지하면 이 결제수단으로 결제할 수 없습니다.`, confirmLabel: "해지" }))
@@ -147,13 +153,27 @@ function PaymentMethodsPanel({ methods }: { methods: ReturnType<typeof useResour
         }}>해지</ActionButton>
       </>}
     </li>)}</ul> : <p className="svc-muted">등록된 결제수단이 없습니다.</p>)}
+    {editing && <form className="svc-trial-cancel" onSubmit={async event => {
+      event.preventDefault();
+      const current = methods.data?.find(method => method.id === editing.id);
+      if (!current) { setNotice("최신 결제수단 목록을 불러온 후 다시 시도해주세요."); return; }
+      if (current.version !== editing.version) {
+        setEditing({ ...editing, version: current.version });
+        setNotice("결제수단이 변경되었습니다. 입력한 이름을 확인하고 다시 저장해주세요."); return;
+      }
+      if (await act(`/billing/methods/${editing.id}`, { method: "PATCH", body: JSON.stringify({ version: editing.version, label: editing.label.trim() }) }, "결제수단 이름을 변경했습니다.")) setEditing(null);
+    }}>
+      <label>결제수단 이름 <input className="cs-input" value={editing.label} onChange={event => setEditing({ ...editing, label: event.target.value })} maxLength={40} required/></label>
+      <ActionButton type="submit" disabled={busy || methods.loading || !editing.label.trim()}>저장</ActionButton>
+      <ActionButton type="button" secondary disabled={busy} onClick={() => setEditing(null)}>취소</ActionButton>
+    </form>}
     <form className="svc-trial-cancel" onSubmit={event => {
       event.preventDefault(); const form = event.currentTarget;
       const token = (form.elements.namedItem("token") as HTMLInputElement).value.trim();
       const label = (form.elements.namedItem("label") as HTMLInputElement).value.trim();
       const kind = (form.elements.namedItem("kind") as HTMLSelectElement).value;
       act("/billing/methods", { method: "POST", body: JSON.stringify({ token, kind, label, setDefault: false }) }, "결제수단을 등록했습니다.")
-        .then(() => form.reset());
+        .then(saved => { if (saved) form.reset(); });
     }}>
       <label>PG 토큰 <input className="cs-input" type="text" name="token" placeholder="pm_..." pattern="pm_[A-Za-z0-9_\-]{8,64}" required/></label>
       <label>이름 <input className="cs-input" type="text" name="label" maxLength={40} required/></label>

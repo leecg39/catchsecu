@@ -395,3 +395,54 @@ GET/POST `/analytics/closes`, GET `/analytics/closes/{id}/export`는 저장된 �
 POST/GET `/analytics/exports`, GET/DELETE `/{id}`, POST `/{id}/cancel`, GET `/{id}/download`. 입력은 closeId+format, 변경은 version이며 생성은 요청 키와202응답이다. 현재 권한 및 요청자만 접근하고 회사 전체는 direct owner/admin이다. 동일 마감 PDF/CSV를 생성하며24시간 만료·16MB·대기5개 제한, 파일 해시 및 최종 기한을 검사한다. UI에서 요청/조회/취소/삭제/다운로드를 제공한다. 비동기 worker는 현재 발급자 권한을 독립적으로 확인하고 브라우저 세션은 다운로드에서 새로 검사한다. OpenAPI289/418작업/38정책. [검증](../qa/P12-T03/revalidation/exports/README.md).
 
 2026-10-04 P12-T03: 선택 범위의 5개 기술적 점검 근거(version=1/checkedAt/serviceIds/facts/hash)를 월마감 JSON에 선택 필드로 저장하고 화면·CSV·PDF에서 재사용한다. 과거 마감의 근거 미저장 상태·기존 원천 해시를 보존한다. 회사 인증 집계는 회사 전체 direct owner/admin 마감에만 포함한다. 관련77개와 실제파일·SQL·새프로세스 검증. 선행3개/FLOW-12 수용은 남았다. 상세: docs/qa/P12-T03/revalidation/evidence/README.md.
+
+## 본인 SSO 연결 관리 후속 계약
+
+2026-10-06 연결 관리 후속: 본인 회사 SSO 목록·연결·해제 API/UI, 최근 로그인 확인·마지막 수단 보호·일반 unlink 우회 차단·전체 세션/대기 인증 회수·원자 감사를 구현했다. 관련147개+인증70개·HTTP16개(재시작3 포함)·빌드/타입/린트 오류0·계약 통과. 초대 UI·공급자 삭제 시 연결 수명주기·브라우저/외부IdP 수용은 남음.
+
+- `GET /me/sso-accounts`: 현재 직접 소속 회사·본인의 안전한 연결 목록과 사용 가능한 공급자. 토큰과 외부 subject 제외.
+- `DELETE /me/sso-accounts/{id}`: updatedAt·confirm=true·5분 이내 로그인·다른 사용 가능한 로그인 수단 검사. 해제/본인 세션·대기 인증 회수/감사를 원자 처리하고 쿠키 만료.
+- `GET /auth/sso/{providerId}?mode=link`: 현재 회사/직접 소속/최근 로그인으로 연결 시작. 원래 세션과 최신 권한을 콜백에서 재검사.
+- 공통 인증의 unlink/list-accounts 엔드포인트는 별도 회사 검사 우회를 방지하기 위해 이 관리 화면으로 제한.
+- [실제 검증 및 미완료](../qa/P11-T03/accounts/README.md).
+
+### SSO 공급자 삭제 후속 동작
+
+- 실제 `DELETE /security/sso/{id}`는 version·owner 현재권한·5분 이내 로그인과 활성 연결 구성원의 다른 로그인 수단을 확인한다. 연결계정/세션/사용자 인증 proof/SSO state 정리와 감사 기록을 SERIALIZABLE 트랜잭션으로 처리한다. 결과는 deleted/removedAccounts/endedSessions/signedOut이다.
+- UI 확인창은 연결 계정 삭제·관련 사용자의 모든 기기 로그인 종료를 설명한다. 다른 로그인 수단이 없는 활성 구성원이 있으면409 SSO_PROVIDER_LAST_LOGIN을 반환한다.
+- [검증과 남은 참조/계약 정리](../qa/P11-T03/provider-removal/README.md).
+
+
+## 초대 SSO 진입 계약 (2026-10-06)
+
+| API | 입력 | 권한 및 응답 |
+|---|---|---|
+| POST /invitations/sso/options | `{token}` (43자) | 유효 초대·활성 회사·IP 검사 후 해당 회사의 활성/사전검사 통과 공급자 id/name/protocol만 반환 |
+| POST /invitations/sso/start | `{token,providerId}` | 같은 회사 공급자 확인, 초대 version/tokenHash 바인딩 후 `{redirect}` 반환 |
+
+두 API는 로그인 세션 대신 초대 bearer token으로 제한된 진입을 허용하며 정확한 Origin과 IP별 요청 제한을 적용한다. 기존 초대 상세 preview와 이메일 수락은 로그인/이메일 일치 조건을 유지한다. 초대 토큰을 IdP로 전달하지 않는다. GET SSO 시작의 mode=invite는 더 이상 허용하지 않는다. 콜백은 현재 초대 버전/해시·이메일·초대자 권한/역할 상한·서비스·정원·계정 충돌을 재검사한다. 실제 화면은 `/oauth2/invite/signup`(R161)에 연결하며 P11-T03의 부분 증거로 관리한다. [검증 및 남은 범위](../qa/P11-T03/invitations/README.md).
+
+
+## SSO 실제 Route Handler와 계약 일치 (2026-10-06)
+
+OpenAPI는 `security/sso` 5개·`auth/sso` 3개·`me/sso-accounts` 2개·`invitations/sso` 2개의 실제 작업을 선언한다. 초기 `/identity-providers` 계획을 구현 경로로 교체했다. 관리 CRUD/사전검사·본인 연결 관리·초대 시작 응답은 엄격한 스키마로 정의하며 비밀키/외부 subject는 제외한다. 인증 성공은 Location을 가진302, HTML 실패는 고정 로그인 안내303, API 실패는 해당 오류 JSON이다. SAML ACS는 서명·state로 검증하는 form-urlencoded 요청이며 초대 POST에는 정확한 Origin을 요구한다.
+
+실제 소스의 export를 읽어 12개 경로/메서드와 OpenAPI를 비교한다. 화면표의 P11-T03 11개 경로와 R161도 실제 모델/경로를 반영했다. SAML 결과는 callback 리디렉션과 세션으로 확인하므로 별도 AuthAttempt polling API를 만들지 않는다. 화면 동작과 외부 IdP 전체 수용 조건은 유지한다. [검증](../qa/P11-T03/provider-reference/README.md).
+
+
+### 전문가 이력이 있는 구성원의 재초대 수락 (2026-10-06)
+
+SSO callback과 이메일 초대 수락은 회수된 전문가 소속을 직접 소속으로 전환할 때 동일한 기존 배정 종료 함수를 사용한다. 활성 배정만 회수하고 시각/version·expert.revoked 감사를 남기며, 새 초대의 서비스 권한·소속·수락과 같은 트랜잭션에 저장한다. 이미 회수된 배정 이력과 타 회사 배정은 보존한다. 기존 서비스 접근은 현재 서비스 권한 검사에서403으로 거부된다. [검증](../qa/P11-T03/expert-reinvitation/README.md).
+
+
+### SSO 수동 중지·인증 정보 교체 (2026-10-06)
+
+PATCH는 활성 공급자를 비활성화하는 요청에 대해 연결 구성원의 대체 로그인 수단을 검사하고 SERIALIZABLE로 경합을 보호한다. 마지막 수단이면409 SSO_PROVIDER_LAST_LOGIN, 동시 변경이면409 CONCURRENT_CHANGE 또는 VERSION_CONFLICT다. 표시 이름만 변경하는 경우는 사용 상태를 유지한다. 중지/교체는 기존 앱 세션을 보존하고 신규/대기 인증을 차단한다. 사전검사 실패는 로그인 수단 수와 무관하게 비활성화한다. [내부 검증](../qa/P11-T03/provider-lifecycle/README.md).
+
+## 2026-10-06 구독 요청 후속
+
+구매 POST /subscriptions는202를 반환한다. 구매·취소·예약·철회는 Idempotency-Key를 요구하며 현재 회사/역할/세션/정책을 트랜잭션 안에서 재검사한다. 성공 요청 재전송은 작업을 반복하지 않고 현재 구독 상태를 반환한다. 해지 사유도 요청 해시에 포함한다. 변경 완료 전 세션·상품 판매 기간·해지/예약 기한 도래는 전체 롤백한다. [구체적 검증](../qa/P10-T04/subscription-authority/README.md).
+
+### 결제수단·주문 권한 보완 (2026-10-06)
+
+결제수단 CRUD와 주문 생성/조회/복귀는 현재 권한·세션·회사 정책 및 최종 기한을 검사한다. 주문 POST는 필수 Idempotency-Key와 선택 methodId를 받으며 기존 성공 요청 재전송도 최신 주문을 반환한다. 다른 수단의 대기 주문은409 ORDER_METHOD_CONFLICT다. 대표수단을 교체하면 이전 수단도 version을 증가시킨다. [검증](../qa/P10-T02/current-authority/README.md).

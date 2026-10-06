@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { api, ApiError, errorText, useResource } from "@/lib/api";
 import { authPath, safeReturnTo } from "@/lib/return-to";
+import { SsoRecovery } from "./SsoRecovery";
+import { ssoFailure } from "@/lib/sso-recovery";
 import { authErrorMessage } from "@/lib/auth-errors";
 
 function Password({ name = "password", label = "비밀번호", current = false, minimum = 12 }: { name?: string; label?: string; current?: boolean; minimum?: number }) {
@@ -31,6 +33,7 @@ function Status({ action }: { action: ReturnType<typeof useAction> }) {
 const post = <T,>(path: string, value: unknown) => api<T>("/auth" + path, { method: "POST", body: JSON.stringify(value) });
 export function AuthCallbackError() {
   const error = useSearchParams().get("error");
+  if (ssoFailure(error)) return <SsoRecovery code={error} />;
   return error ? <p role="alert" className="auth-error">{authErrorMessage(error) ?? "인증을 완료하지 못했습니다. 다시 요청해주세요."}</p> : null;
 }
 function VerificationResend({ email, returnTo }: { email: string; returnTo: string }) {

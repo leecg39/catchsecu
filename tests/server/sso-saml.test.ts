@@ -7,7 +7,7 @@ import { inflateRawSync } from "node:zlib";
 import { afterAll, beforeEach, expect, test } from "vitest";
 import { SignedXml } from "xml-crypto";
 import { auth } from "@/server/auth";
-import { tokenHash } from "@/server/crypto";
+import { opaqueToken, tokenHash } from "@/server/crypto";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
 
@@ -87,10 +87,14 @@ async function makeProvider(cookie: string) {
   return { provider, created, patchProvider };
 }
 // 시작 요청 → SAMLRequest 디코딩 → IdP가 서명한 응답 POST까지의 정상 흐름
-async function begin(cookie: string, providerId: string, invitationId?: string) {
+async function begin(cookie: string, providerId: string, invitationToken?: string) {
   const { startRoute } = await routes();
-  const started = await startRoute(req(`/auth/sso/${providerId}?mode=${invitationId ? "invite" : "login"}${invitationId ? `&invitation=${invitationId}` : ""}`, cookie));
-  const url = new URL(started.headers.get("location")!);
+  const { POST: inviteStart } = await import("@/app/api/v1/invitations/sso/start/route");
+  const started = invitationToken
+    ? await inviteStart(req("/invitations/sso/start", cookie, "POST", { token: invitationToken, providerId }))
+    : await startRoute(req(`/auth/sso/${providerId}?mode=login`, cookie));
+  expect(started.status).toBe(invitationToken ? 200 : 302);
+  const url = new URL(invitationToken ? (await started.json()).redirect : started.headers.get("location")!);
   const requestXml = inflateRawSync(Buffer.from(url.searchParams.get("SAMLRequest")!, "base64")).toString();
   const requestId = /ID="([^"]+)"/.exec(requestXml)![1];
   return { started, url, requestXml, requestId, relayState: url.searchParams.get("RelayState")! };
@@ -204,14 +208,15 @@ test("SAML 초대가입: 초대된 역할·서비스로 수락, 다른 이메일
   await db.ssoProvider.update({ where: { id: provider.id }, data: { enabled: true } });
   const service = await db.service.create({ data: { tenantId: company.id, name: "대상 서비스", externalName: "svc" } });
   const ownerMembership = await db.membership.findFirstOrThrow({ where: { tenantId: company.id, userId: owner.id } });
+  const invitationToken = opaqueToken(), otherToken = opaqueToken();
   const invitation = await db.invitation.create({ data: { tenantId: company.id, invitedBy: ownerMembership.id,
     email: "sso-saml@catchsecu.test", role: "editor", serviceIds: [service.id],
-    tokenHash: tokenHash(randomUUID()), expiresAt: new Date(Date.now() + 86400000) } });
+    tokenHash: tokenHash(invitationToken), expiresAt: new Date(Date.now() + 86400000) } });
   // invitation 없는 invite 모드 → 422
   const noInv = await (await routes()).startRoute(req(`/auth/sso/${provider.id}?mode=invite`));
   expect(noInv.status).toBe(422);
   // 정상 초대가입
-  const { url, requestId, relayState } = await begin(cookie, provider.id, invitation.id);
+  const { url, requestId, relayState } = await begin(cookie, provider.id, invitationToken);
   const res = await samlRoute(postSaml(sign(samlResponse({ inResponseTo: requestId })), relayState));
   expect(res.status).toBe(302);
   expect(res.headers.get("set-cookie")).toContain("better-auth.session_token=");
@@ -224,10 +229,121 @@ test("SAML 초대가입: 초대된 역할·서비스로 수락, 다른 이메일
   // 다른 이메일 초대로 탈취 시도 → 410
   const other = await db.invitation.create({ data: { tenantId: company.id, invitedBy: ownerMembership.id,
     email: "victim@catchsecu.test", role: "admin", serviceIds: [service.id],
-    tokenHash: tokenHash(randomUUID()), expiresAt: new Date(Date.now() + 86400000) } });
-  const evil = await begin(cookie, provider.id, other.id);
+    tokenHash: tokenHash(otherToken), expiresAt: new Date(Date.now() + 86400000) } });
+  const evil = await begin(cookie, provider.id, otherToken);
   const evilRes = await samlRoute(postSaml(sign(samlResponse({ inResponseTo: evil.requestId, nameId: "attacker-sub" })), evil.relayState));
   expect(evilRes.status).toBe(410);
   expect((await db.invitation.findUniqueOrThrow({ where: { id: other.id } })).status).toBe("pending");
   expect(url.searchParams.get("SAMLRequest")).toBeTruthy();
+});
+
+test("SAML 인증서 교체와 동시 활성화는 거부하고 교체 후 재검사를 요구한다", async () => {
+  const { cookie } = await ownerCookie();
+  const { provider, patchProvider } = await makeProvider(cookie);
+  await db.ssoProvider.update({ where: { id: provider.id }, data: { enabled: true } });
+  const replacement = "-----BEGIN CERTIFICATE-----\\n" + "QUJD".repeat(40) + "\\n-----END CERTIFICATE-----";
+  const simultaneous = await patchProvider(req("/security/sso/" + provider.id, cookie, "PATCH",
+    { version: 1, idpCert: replacement, enabled: true, name: "인증서 교체" }));
+  expect(simultaneous.status).toBe(409);
+  expect((await simultaneous.json()).error.code).toBe("PREFLIGHT_REQUIRED");
+  const rotated = await patchProvider(req("/security/sso/" + provider.id, cookie, "PATCH", { version: 1, idpCert: replacement }));
+  expect(await rotated.json()).toMatchObject({ enabled: false, preflightOk: false, version: 2 });
+  const { POST: preflight } = await import("@/app/api/v1/security/sso/[id]/preflight/route");
+  expect(await (await preflight(req("/security/sso/" + provider.id + "/preflight", cookie, "POST"))).json())
+    .toMatchObject({ enabled: false, preflightOk: false, version: 3 });
+});
+
+const protocolCases: [string, (xml: string) => string, ((xml: string) => string)?][] = [
+  ["missing authentication statement", xml => xml.replace(/<saml:AuthnStatement .*?<\/saml:AuthnStatement>/, "")],
+  ["oversized subject", xml => xml.replace("saml-sub-1", "a".repeat(301))],
+  ["attribute cannot replace NameID", xml => xml.replace(/<saml:NameID[^>]*>.*?<\/saml:NameID>/, "")
+    .replace('<saml:AttributeStatement>', '<saml:AttributeStatement><saml:Attribute Name="nameID"><saml:AttributeValue>forged-id</saml:AttributeValue></saml:Attribute>')],
+  ["confirmation not-before", xml => xml.replace("<saml:SubjectConfirmationData ", `<saml:SubjectConfirmationData NotBefore="${iso(-60000)}" `)],
+  ["DTD declaration", xml => xml, xml => '<!DOCTYPE samlp:Response [<!ENTITY test "unused">]>' + xml],
+  ["missing recipient", xml => xml.replace(` Recipient="${acs}"`, "")],
+  ["missing status", xml => xml.replace(/<samlp:Status>.*?<\/samlp:Status>/, "")],
+  ["missing subject identifier", xml => xml.replace(/<saml:NameID[^>]*>.*?<\/saml:NameID>/, "")],
+  ["blank subject identifier", xml => xml.replace("saml-sub-1", "   ")],
+  ["missing bearer method", xml => xml.replace(' Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"', "")],
+  ["wrong confirmation method", xml => xml.replace("cm:bearer", "cm:holder-of-key")],
+  ["missing confirmation expiry", xml => xml.replace(/(<saml:SubjectConfirmationData) NotOnOrAfter="[^"]+"/, "$1")],
+  ["missing confirmation request", xml => xml.replace(/(<saml:SubjectConfirmationData[^>]*?) InResponseTo="[^"]+"/, "$1")],
+  ["wrong destination", xml => xml.replace(`Destination="${acs}"`, 'Destination="https://wrong.example.test/acs"')],
+  ["wrong subject namespace", xml => xml.replace("<saml:Subject>", '<other:Subject xmlns:other="urn:wrong">').replace("</saml:Subject>", "</other:Subject>")],
+  ["decoy recipient", xml => xml.replace("<saml:Subject>", `<hint:Data xmlns:hint="urn:hint" Recipient="${acs}"/><saml:Subject>`)
+    .replace(/(SubjectConfirmationData[^>]*Recipient=")[^"]+/, '$1https://wrong.example.test/acs')],
+  ["single quoted recipient", xml => xml.replace(`Recipient="${acs}"`, 'Recipient="https://wrong.example.test/acs"'),
+    xml => xml.replace('Recipient="https://wrong.example.test/acs"', "Recipient='https://wrong.example.test/acs'")],
+  ["spaced denial status", xml => xml.replace("status:Success", "status:RequestDenied"),
+    xml => xml.replace('StatusCode Value="', 'StatusCode  Value = "')],
+];
+test.each(protocolCases)("SAML 구조: %s 응답은 계정과 세션을 만들지 않는다", async (_label, mutate, afterSign) => {
+  const { cookie } = await ownerCookie();
+  const { provider } = await makeProvider(cookie);
+  await db.ssoProvider.update({ where: { id: provider.id }, data: { enabled: true } });
+  const { requestId, relayState } = await begin(cookie, provider.id);
+  let encoded = sign(mutate(samlResponse({ inResponseTo: requestId })));
+  if (afterSign) encoded = Buffer.from(afterSign(Buffer.from(encoded, "base64").toString())).toString("base64");
+  const result = await (await routes()).samlRoute(postSaml(encoded, relayState));
+  expect(result.status).toBe(401);
+  expect(await db.account.count({ where: { providerId: "sso:" + provider.id } })).toBe(0);
+  expect(await db.user.count({ where: { email: "sso-saml@catchsecu.test" } })).toBe(0);
+});
+
+function signAssertion(xml: string) {
+  const id = /<saml:Assertion ID="([^"]+)"/.exec(xml)![1];
+  const sig = new SignedXml({ privateKey: idpKey, signatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+    canonicalizationAlgorithm: "http://www.w3.org/2001/10/xml-exc-c14n#" });
+  sig.addReference({ xpath: "//*[local-name(.)='Assertion']", uri: "#" + id,
+    digestAlgorithm: "http://www.w3.org/2001/04/xmlenc#sha256",
+    transforms: ["http://www.w3.org/2000/09/xmldsig#enveloped-signature", "http://www.w3.org/2001/10/xml-exc-c14n#"] });
+  sig.computeSignature(xml, { location: { reference: "//*[local-name(.)='Assertion']/*[local-name(.)='Issuer']", action: "after" } });
+  return Buffer.from(sig.getSignedXml()).toString("base64");
+}
+test.each(["assertion signature", "namespace prefix", "quote whitespace", "alternate bearer"])("SAML 호환: %s 정상 응답은 허용한다", async variant => {
+  const { cookie } = await ownerCookie(); const { provider } = await makeProvider(cookie);
+  await db.ssoProvider.update({ where: { id: provider.id }, data: { enabled: true } });
+  const { requestId, relayState } = await begin(cookie, provider.id);
+  let xml = samlResponse({ inResponseTo: requestId });
+  if (variant === "namespace prefix") xml = xml.replaceAll("xmlns:saml=", "xmlns:a=").replaceAll("xmlns:samlp=", "xmlns:p=")
+    .replaceAll("saml:", "a:").replaceAll("samlp:", "p:");
+  if (variant === "alternate bearer") {
+    const confirmation = /<saml:SubjectConfirmation .*?<\/saml:SubjectConfirmation>/.exec(xml)![0];
+    xml = xml.replace(confirmation, confirmation.replace(`Recipient="${acs}"`, 'Recipient="https://other.example.test/acs"') + confirmation);
+  }
+  let encoded = variant === "assertion signature" ? signAssertion(xml) : sign(xml);
+  if (variant === "quote whitespace") encoded = Buffer.from(Buffer.from(encoded, "base64").toString()
+    .replace('StatusCode Value="', 'StatusCode  Value = "').replace(`Recipient="${acs}"`, `Recipient = '${acs}'`)).toString("base64");
+  const result = await (await routes()).samlRoute(postSaml(encoded, relayState)); expect(result.status).toBe(302);
+  expect(await db.account.count({ where: { providerId: "sso:" + provider.id } })).toBe(1);
+});
+test("SAML 구조: 서명된 어서션의 수신자 대신 외부 포장 값으로 인증할 수 없다", async () => {
+  const { cookie } = await ownerCookie(); const { provider } = await makeProvider(cookie);
+  await db.ssoProvider.update({ where: { id: provider.id }, data: { enabled: true } });
+  const { requestId, relayState } = await begin(cookie, provider.id);
+  const xml = samlResponse({ inResponseTo: requestId, recipient: "https://other.example.test/acs" });
+  let signed = Buffer.from(signAssertion(xml), "base64").toString();
+  signed = signed.replace("<samlp:Status>", `<hint:Data xmlns:hint="urn:hint" Recipient="${acs}"/><samlp:Status>`);
+  const result = await (await routes()).samlRoute(postSaml(Buffer.from(signed).toString("base64"), relayState));
+  expect(result.status).toBe(401); expect(await db.account.count({ where: { providerId: "sso:" + provider.id } })).toBe(0);
+});
+test.each(["duplicate relay", "duplicate response", "oversized declared", "oversized streamed", "wrong type"])("SAML POST: %s 차단", async variant => {
+  const form = new URLSearchParams({ SAMLResponse: "encoded", RelayState: "relay" });
+  if (variant === "duplicate relay") form.append("RelayState", "other");
+  if (variant === "duplicate response") form.append("SAMLResponse", "other");
+  const headers = new Headers({ "content-type": variant === "wrong type" ? "application/json" : "application/x-www-form-urlencoded" });
+  if (variant === "oversized declared") headers.set("content-length", "1000001");
+  const body = variant === "oversized streamed" ? "SAMLResponse=" + "A".repeat(1000001) : form.toString();
+  const result = await (await routes()).samlRoute(new Request(acs, { method: "POST", headers, body }));
+  expect(result.status).toBe(variant === "wrong type" ? 415 : variant.startsWith("oversized") ? 413 : 422);
+});
+test("SAML 인증서 교체: 마지막 로그인 수단을 비활성화하는 교체 거부", async () => {
+  const { cookie, user } = await ownerCookie();
+  const { provider, patchProvider } = await makeProvider(cookie);
+  expect((await patchProvider(req(`/security/sso/${provider.id}`, cookie, "PATCH", { version: 1, enabled: true }))).status).toBe(200);
+  await db.account.create({ data: { userId: user.id, providerId: "sso:" + provider.id, accountId: "only-saml" } });
+  await db.account.deleteMany({ where: { userId: user.id, providerId: "credential" } });
+  const changed = await patchProvider(req(`/security/sso/${provider.id}`, cookie, "PATCH", { version: 2, idpCert: readFileSync(join(otherDir, "cert.pem"), "utf8") }));
+  expect(changed.status).toBe(409); expect((await changed.json()).error.code).toBe("SSO_PROVIDER_LAST_LOGIN");
+  expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provider.id } })).toMatchObject({ enabled: true, version: 2, idpCert: idpCert.trim() });
 });

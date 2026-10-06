@@ -13,6 +13,7 @@ import { env } from "./env";
 import { credentialOperation, guardCredentialRequests } from "./credential-lock";
 import { assertNextPassword } from "./password-policy";
 import { isSafeAuthCallback } from "@/lib/return-to";
+import { bindSsoMfa } from "./sso-mfa";
 
 const authInstance = betterAuth({
   appName: "캐치시큐",
@@ -67,6 +68,19 @@ const authInstance = betterAuth({
     } },
   })],
   hooks: { before: createAuthMiddleware(async ctx => {
+    if (["/unlink-account", "/list-accounts"].includes(ctx.path))
+      throw new APIError("FORBIDDEN", { code: "SSO_ACCOUNT_SCREEN_REQUIRED", message: "회사 SSO 연결 관리 화면을 사용해주세요." });
+    if (ctx.path.startsWith("/two-factor/")) {
+      const identifier = await ctx.getSignedCookie(ctx.context.createAuthCookie("two_factor").name, ctx.context.secret);
+      if (identifier) {
+        try { await bindSsoMfa(identifier, ctx.context, ctx.headers ?? new Headers(), !!await getSessionFromCtx(ctx)); }
+        catch (error) {
+          if (error instanceof HttpError) throw new APIError(error.status === 409 ? "CONFLICT" : error.status === 403 ? "FORBIDDEN" : "UNAUTHORIZED",
+            { code: error.code, message: error.message });
+          throw error;
+        }
+      }
+    }
     if (ctx.path === "/verify-email" && typeof ctx.query?.token === "string") {
       const token = await verifyJWT<{ email?: string; exp?: number }>(ctx.query.token, ctx.context.secret);
       if (token?.email) {
@@ -151,6 +165,12 @@ const authInstance = betterAuth({
     session: {
       create: {
         before: async (session, context) => {
+          const sso = authMutationScope.getStore()?.ssoMfa;
+          if (sso) {
+            if (session.userId !== sso.userId || sso.deadline <= new Date())
+              throw new APIError("UNAUTHORIZED", { message: "SSO 인증을 다시 시작해주세요." });
+            return { data: { ...session, activeCompanyId: sso.tenantId } };
+          }
           const user = await db.user.findUnique({ where: { id: session.userId }, select: { status: true } });
           if (!user || user.status !== "active") throw new APIError("FORBIDDEN", { message: "사용할 수 없는 계정입니다." });
           const members = await db.membership.findMany({

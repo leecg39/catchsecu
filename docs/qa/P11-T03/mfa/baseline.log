@@ -1,0 +1,30 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso.test.ts (37 tests | 1 failed | 36 skipped) 1071ms
+   × SSO MFA: 코드 검증 전 세션0, 검증 후 대상 회사 세션1과 감사 1067ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso.test.ts > SSO MFA: 코드 검증 전 세션0, 검증 후 대상 회사 세션1과 감사
+AssertionError: expected '/dashboard' to be '/login-otp?returnTo=%2Fdashboard' // Object.is equality
+
+Expected: "/login-otp?returnTo=%2Fdashboard"
+Received: "/dashboard"
+
+ ❯ tests/server/sso.test.ts:517:44
+    515|   const callback = await f.callbackRoute(req("/auth/sso/callback?" + f…
+    516|   expect(callback.status).toBe(302);
+    517|   expect(callback.headers.get("location")).toBe("/login-otp?returnTo=%…
+       |                                            ^
+    518|   expect(await db.session.count({ where: { userId: f.user.id } })).toB…
+    519|   const cookie = responseCookies(callback);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 36 skipped (37)
+   Start at  08:11:18
+   Duration  2.51s (tests 45%, import 40%, transform 16%)
+

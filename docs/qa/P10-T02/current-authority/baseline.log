@@ -1,0 +1,67 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/payment-authority.test.ts (20 tests | 20 failed) 3785ms
+   × methodList: 이미 읽은 문맥도 현재 권한 회수를 적용한다 174ms
+   × methodList: 회수된 세션은 차단한다 128ms
+   × methodCreate: 이미 읽은 문맥도 현재 권한 회수를 적용한다 155ms
+   × methodCreate: 회수된 세션은 차단한다 131ms
+   × methodUpdate: 이미 읽은 문맥도 현재 권한 회수를 적용한다 106ms
+   × methodUpdate: 회수된 세션은 차단한다 90ms
+   × methodRemove: 이미 읽은 문맥도 현재 권한 회수를 적용한다 93ms
+   × methodRemove: 회수된 세션은 차단한다 108ms
+   × orderList: 이미 읽은 문맥도 현재 권한 회수를 적용한다 95ms
+   × orderList: 회수된 세션은 차단한다 103ms
+   × orderRead: 이미 읽은 문맥도 현재 권한 회수를 적용한다 97ms
+   × orderRead: 회수된 세션은 차단한다 94ms
+   × orderReturn: 이미 읽은 문맥도 현재 권한 회수를 적용한다 90ms
+   × orderReturn: 회수된 세션은 차단한다 95ms
+   × methodCreate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다 94ms
+   × methodUpdate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다 92ms
+   × methodRemove: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다 89ms
+   × create: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다 90ms
+   × update: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다 106ms
+   × 주문 생성 재전송은 서명 승인 후 최신 paid 상태를 반환한다 104ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 20 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/payment-authority.test.ts > methodList: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+ FAIL  tests/server/payment-authority.test.ts > methodList: 회수된 세션은 차단한다
+ FAIL  tests/server/payment-authority.test.ts > methodCreate: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+ FAIL  tests/server/payment-authority.test.ts > methodCreate: 회수된 세션은 차단한다
+ FAIL  tests/server/payment-authority.test.ts > methodUpdate: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+ FAIL  tests/server/payment-authority.test.ts > methodUpdate: 회수된 세션은 차단한다
+ FAIL  tests/server/payment-authority.test.ts > methodRemove: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+ FAIL  tests/server/payment-authority.test.ts > methodRemove: 회수된 세션은 차단한다
+ FAIL  tests/server/payment-authority.test.ts > orderList: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+ FAIL  tests/server/payment-authority.test.ts > orderList: 회수된 세션은 차단한다
+ FAIL  tests/server/payment-authority.test.ts > orderRead: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+ FAIL  tests/server/payment-authority.test.ts > orderRead: 회수된 세션은 차단한다
+ FAIL  tests/server/payment-authority.test.ts > orderReturn: 이미 읽은 문맥도 현재 권한 회수를 적용한다
+ FAIL  tests/server/payment-authority.test.ts > orderReturn: 회수된 세션은 차단한다
+ FAIL  tests/server/payment-authority.test.ts > methodCreate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다
+ FAIL  tests/server/payment-authority.test.ts > methodUpdate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다
+ FAIL  tests/server/payment-authority.test.ts > methodRemove: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다
+ FAIL  tests/server/payment-authority.test.ts > create: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다
+ FAIL  tests/server/payment-authority.test.ts > update: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다
+ FAIL  tests/server/payment-authority.test.ts > 주문 생성 재전송은 서명 승인 후 최신 paid 상태를 반환한다
+Error: 카드 원문은 저장할 수 없습니다. PG 토큰을 등록해주세요.
+ ❯ fail src/server/http.ts:10:84
+      8|   constructor(public status: number, public code: string, message: str…
+      9| }
+     10| export function fail(status: number, code: string, message: string): n…
+       |                                                                                    ^
+     11| export function json(value: unknown, status = 200) {
+     12|   return Response.json(value, { status, headers: { "Cache-Control": "p…
+ ❯ rejectCardPlaintext src/server/payment-methods.ts:18:82
+ ❯ Module.createPaymentMethod src/server/payment-methods.ts:29:3
+ ❯ tests/server/payment-authority.test.ts:42:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/20]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  20 failed (20)
+   Start at  10:16:12
+   Duration  5.17s (tests 75%, import 15%, transform 10%)
+
