@@ -1,0 +1,605 @@
+{
+  "checkedAt": "2026-10-06T08:49:41.435Z",
+  "result": "passed",
+  "evidenceLevel": "local mock logical database/object restore",
+  "externalPitrVerified": false,
+  "sourceDatabase": "catchsecu_mock_admin",
+  "targetDatabase": "catchsecu_mock_restore_b3bc9d4c",
+  "privateBackup": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/mock-restores/catchsecu_mock_restore_b3bc9d4c",
+  "steps": [
+    {
+      "name": "logical backup",
+      "exitCode": 0
+    },
+    {
+      "name": "create isolated target",
+      "exitCode": 0
+    },
+    {
+      "name": "restore database",
+      "exitCode": 0
+    },
+    {
+      "name": "application reads in restored database",
+      "exitCode": 0
+    }
+  ],
+  "database": {
+    "tables": {
+      "AccessRequest": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Account": {
+        "rows": 8,
+        "sha256": "babe5859c0bc83bb65e55261956b4a3494085fe8823d39660439fdebc89b1b25"
+      },
+      "AccountClosure": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ActivityReview": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ActivityReviewMessage": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Answer": {
+        "rows": 19,
+        "sha256": "63b223e91cb8aadf09a63d629db1e1d70b9e9a94cb3639d0bd325e02b22be317"
+      },
+      "ApiRateLimit": {
+        "rows": 79,
+        "sha256": "521387db772589047b044653fa3e63709fc35a387f112654964dfb15b36dc4de"
+      },
+      "ApprovalRequest": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "AuditEvent": {
+        "rows": 719,
+        "sha256": "5f5a1b06fa66c4d0424562f899cbf757881eb699174cdd22d22b2cc491774f3d"
+      },
+      "BillingMonthClose": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "BillingPlan": {
+        "rows": 36,
+        "sha256": "a6575363e702e09520fdc7e34abe3adcbffe667f6863085708aef05f99edba32"
+      },
+      "BillingPlanVersion": {
+        "rows": 38,
+        "sha256": "8337b55ebba03f570ac11e5de83d5afed96f84ed9a6e8140f68a980ad2f2b4e7"
+      },
+      "BillingSubscription": {
+        "rows": 6,
+        "sha256": "3780225fb1e230de2fdfe0e20c366898bc50ad45d1d26f8dd35254aad9d3b83c"
+      },
+      "BillingSubscriptionEvent": {
+        "rows": 6,
+        "sha256": "ad707740ee0538a95662e631c65bcc859ddc8fe83b1122ffe1d7b4ec9af5d427"
+      },
+      "Campaign": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "CampaignDelivery": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "CampaignEvent": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ClauseTemplate": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Company": {
+        "rows": 7,
+        "sha256": "f8656a31f5a900bb398bd81d7bcd466f5918be9d169cb1e4b03daa6984393309"
+      },
+      "CompanyBusinessFile": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ComplianceClose": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ComplianceExportJob": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ConsentEvent": {
+        "rows": 7,
+        "sha256": "3a131e2063760f9043a089aa546c597472e4ad97635df9f2ac305d39ae8bb96e"
+      },
+      "ConsentReceipt": {
+        "rows": 7,
+        "sha256": "6e0c6e7946877fe01c8bce9f3454643979bcff384ac5643266148aec856ea9e7"
+      },
+      "Correction": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "CorrectionPayload": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "CreditAccount": {
+        "rows": 6,
+        "sha256": "a3f222498102f9668882d9440b78f6d49bb00aa4e6d2b7c8b91ee9f9fa0fe23e"
+      },
+      "DataSubject": {
+        "rows": 7,
+        "sha256": "fbae183a96cc19e8f4bbbf4325e878cde38dc05a293baf35a59b6e2e98c80957"
+      },
+      "DestructionCertificate": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "DestructionRequest": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Document": {
+        "rows": 18,
+        "sha256": "250e8dc11015c1baeb14f93173b6be284f3ccad7c0777b982311d2652fc0b552"
+      },
+      "DocumentPdf": {
+        "rows": 1,
+        "sha256": "9d031011db61ae27418ac182e1fe542e8b69b09423204729848b9b0886b02677"
+      },
+      "DocumentPublication": {
+        "rows": 18,
+        "sha256": "d400c0f273294adeca196e3c8c9e0d5be6b406172fe2d43a430f82af9b723e13"
+      },
+      "DocumentPurpose": {
+        "rows": 18,
+        "sha256": "8c3c0c6f56952aab4df5744fa057df196cb6a9fa223b6e31c0c2c66c0462623c"
+      },
+      "DocumentRecipient": {
+        "rows": 6,
+        "sha256": "082da568d42b791bc4f49dfc7239cb8dfd6ed3b1c400d6aaa9ae7e16fe360f22"
+      },
+      "DocumentVersion": {
+        "rows": 18,
+        "sha256": "8c655600b8967bff00c339ed2f6463fbe9f1a5ecb051c9c4f07165be8af8933c"
+      },
+      "EmailFeedback": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "EmailSuppression": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExpertAssignment": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExpertAssignmentService": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExportChunk": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExportJob": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExportSource": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "FileObject": {
+        "rows": 5,
+        "sha256": "6e10d8c607abec1e61e79b5b0d9bd83a441620ddc5e8254b50143140bf77c08f"
+      },
+      "FixedUrl": {
+        "rows": 1,
+        "sha256": "a1f1ee1c2fef5d3792f78105ac4a2f0818252280e0d3098e8a2f8e700950743d"
+      },
+      "Form": {
+        "rows": 6,
+        "sha256": "5a3aaa68fae63756d856918a985270df544202546c3d3dc21b67fc05f6f24816"
+      },
+      "FormDocumentBinding": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "FormFavorite": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "FormTemplate": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "FormVersion": {
+        "rows": 6,
+        "sha256": "cc9200b94fbb437cc84a0487d8f364c89710acf4d8f181d41217a3e77b124623"
+      },
+      "Guide": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "IdempotencyRecord": {
+        "rows": 96,
+        "sha256": "6d0c39de4af2cf5d99ab5c0d53de2b3ffeffc7485748016d92888939b71c553c"
+      },
+      "ImportEvidence": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ImportJob": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ImportRow": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Invitation": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "IpAccessPolicy": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "IpRule": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Job": {
+        "rows": 23,
+        "sha256": "5cebfb9e0eea776c42b43d86c86cb0d8681cb4f237c4e36bf66b42802b5a38eb"
+      },
+      "JobAttempt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "KakaoChannel": {
+        "rows": 8,
+        "sha256": "e5e517cd1b924bc4626803f419f57d989444e9dc1e28a59dbccf332609dc765e"
+      },
+      "KakaoMockReceipt": {
+        "rows": 3,
+        "sha256": "7dc4f4b91736827b585907698f8c7a3f401aac85068dd262bc8926d4235b7b64"
+      },
+      "KakaoTemplate": {
+        "rows": 12,
+        "sha256": "dea7f96c3175ba478d8a0771678cd34a5691a52d14abf489a7736a310c448264"
+      },
+      "LedgerEntry": {
+        "rows": 12,
+        "sha256": "19ff5edbd8c5708e36b866fd08ca79d86d005a4642acaa265cc9dddb6e53f291"
+      },
+      "LedgerTransaction": {
+        "rows": 6,
+        "sha256": "5990b085849fbd664e19137386b3bfcb93fb0ccc524a07d6f79e0080df720c67"
+      },
+      "MarketingEvent": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "MarketingPreference": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Membership": {
+        "rows": 7,
+        "sha256": "20dc77ee8b17419a91ac669706ec3e99c9db61ea1c2c0f921c1066fd41eeda5e"
+      },
+      "MessageTemplate": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "MessageTemplateRevision": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "MfaException": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Notice": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NoticeAttachment": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NotificationAttempt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NotificationDelivery": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NotificationEvent": {
+        "rows": 7,
+        "sha256": "90ac454de8d6fb5c8f866dc6a9adab76ff9a92257dfe7adde05d3065f209c46e"
+      },
+      "NotificationIntegration": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NotificationSubscription": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PasswordDeferral": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PasswordHistory": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PaymentEvent": {
+        "rows": 6,
+        "sha256": "d54227065007a538db41062fcf696ebb16f1133092b01b40cca7f8eadf66a004"
+      },
+      "PaymentMethod": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PaymentOrder": {
+        "rows": 6,
+        "sha256": "3f78206b4a4a5d44940b79da2a6df28b51f7c87d4470b8c674b638b9bd6aa8dc"
+      },
+      "PaymentRefund": {
+        "rows": 1,
+        "sha256": "cc5fed6c99be5c35a476f52e1b4e13ce8e70bd90345c7a32a6609365752c1fdd"
+      },
+      "ProcessingPurpose": {
+        "rows": 6,
+        "sha256": "3ab2e03fa0536a1cd2b653e3f1b18da9d9fa6dad5c223f4ad0077e773bc6ef8f"
+      },
+      "Publication": {
+        "rows": 6,
+        "sha256": "df7e8b81ef3e399967dd074430bbbb2e66bfa12045912711a8276cbb726c4eef"
+      },
+      "PurposeRecipient": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PurposeRevision": {
+        "rows": 6,
+        "sha256": "e7810b4f1cc41659041461eba0b247b865d2833d406ef8765403c4b6679e1d61"
+      },
+      "Question": {
+        "rows": 16,
+        "sha256": "de556cf31a2756ad01a284c69f697d644806a91d1da9e0b101c0071588d2aacd"
+      },
+      "QuestionOption": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "RateLimit": {
+        "rows": 1,
+        "sha256": "4d8781858e5fd25f8189ba1701e2a0f97fbdf2c58c6db61b3957a81bfffb0cbe"
+      },
+      "Recipient": {
+        "rows": 6,
+        "sha256": "9f8ed716f4c8ada9c4b52598a6c763b56fbc80428e0046859957e5cd4f6edeb7"
+      },
+      "RecipientRevision": {
+        "rows": 6,
+        "sha256": "39b8dee9fc7ad4fbc29ff5d9b033c97175b46f8ce3f0cecfe861c38d0f75cba2"
+      },
+      "RetentionRule": {
+        "rows": 1,
+        "sha256": "6988d6eb8eb353dcd1fbb55f92550ede295e580fafd25f5dd172c711ee804dde"
+      },
+      "SecurityPolicy": {
+        "rows": 7,
+        "sha256": "b0e2032a43c8a95d238606da33b503a0413e12bf6614b760b3729010df002f63"
+      },
+      "Sender": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SenderEvent": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SenderVerification": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Service": {
+        "rows": 7,
+        "sha256": "83a8470b94e96588eca5d534e3b56c8a6f857da9d4bc23e8f46632de410d5fcb"
+      },
+      "ServiceConsentDisplay": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ServiceGrant": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Session": {
+        "rows": 11,
+        "sha256": "34edd7ddc150eff2867fbeccd8e9a20b6cb0c5fc014a8f235676ff963e5ccf97"
+      },
+      "ShareField": {
+        "rows": 8,
+        "sha256": "8ecd6f76d2f42af6eeca04b297af34f0a32dbeef4d3324c08b474fde34a31ed7"
+      },
+      "ShareGrant": {
+        "rows": 4,
+        "sha256": "a5e0ca0e8061a143d84bfe87d298531fdcae35dea2c38d3a008c4fb285163e92"
+      },
+      "SmsReceipt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SsoProvider": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SsoState": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SubjectAccessRequest": {
+        "rows": 6,
+        "sha256": "2bb6ec2c481704bd4a4c78c15225e42b58dc6bbb497174815cba82a8e2d1dc4e"
+      },
+      "SubjectAccessScope": {
+        "rows": 6,
+        "sha256": "0ec0931e1a2371feeed3874c9590984b96bbfdd443c0138bfc3a136e84c7643e"
+      },
+      "SubjectSession": {
+        "rows": 6,
+        "sha256": "2830e15365b2a4f02cef0821e3b727b62c20cbe65893877983eae39628a69920"
+      },
+      "SubjectWithdrawal": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Submission": {
+        "rows": 7,
+        "sha256": "fdd94dab184d2f100cc2b38e58b8fdc18fddfead7298973ad2f11e14542562d3"
+      },
+      "SubmissionNote": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Subprocessor": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SubprocessorNotice": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SupportTicket": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Suppression": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "TwoFactor": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "User": {
+        "rows": 8,
+        "sha256": "196a1bf5ec5c5d70a6a3a38e2723d6227879f119bffe69ea16e5339d4892ecc2"
+      },
+      "Verification": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationAttempt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationEvent": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationIntegration": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationIntegrationRevision": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationReceipt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ViewerChallenge": {
+        "rows": 5,
+        "sha256": "4594e452d3b3cf648594a9f944ecb51495296e0de10f5f63812c0b087541f3f0"
+      },
+      "ViewerSession": {
+        "rows": 5,
+        "sha256": "dabf56cefaa4613adeab186f51806f26784a5d7356240ae75478bb52f9092497"
+      },
+      "VirtualOrgMember": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "_prisma_migrations": {
+        "rows": 101,
+        "sha256": "ea74b08af9cea886c1ddf1b5856b459634b4823b14a503a6562b4d36de85e822"
+      }
+    },
+    "sequences": [
+      {
+        "sequencename": "PasswordHistory_id_seq",
+        "start_value": "1",
+        "min_value": "1",
+        "max_value": "9223372036854775807",
+        "increment_by": "1",
+        "cycle": false,
+        "last_value": null
+      }
+    ],
+    "schemaEntries": 2766,
+    "schemaSha256": "1c7830246546baffea8580f554e3c316c4b2d32fbec92f1e72f7d4ad3a035a71",
+    "migrations": 101
+  },
+  "restoredDataEqual": true,
+  "sourceUnchanged": true,
+  "objects": {
+    "count": 4,
+    "sha256": "ca9bb034335776b2e7c2f431787709e8b6c1f8e527b6333dd9fbd078b7bb7674",
+    "restoredEqual": true
+  },
+  "backupSha256": "342db513a32eb5f82e79cb9e87660de2632ab6c76cda856eab07f09a70f68a9c",
+  "application": {
+    "checkedAt": "2026-10-06T08:49:50.669Z",
+    "result": "passed",
+    "checks": [
+      {
+        "name": "restored Mock Kakao receipt survives and remains immutable",
+        "status": 200
+      },
+      {
+        "name": "restored owner login",
+        "status": 200
+      },
+      {
+        "name": "restored encrypted file downloaded with matching plaintext hash",
+        "status": 200
+      },
+      {
+        "name": "restored file denies anonymous",
+        "status": 401
+      },
+      {
+        "name": "restored scoped viewer file byte hash",
+        "status": 200
+      },
+      {
+        "name": "restored share revocation immediately blocks old cookie",
+        "status": 401
+      },
+      {
+        "name": "restored submission re-destroyed; answers and object erased, certificate retained",
+        "status": 410
+      }
+    ]
+  },
+  "sourceUnchangedAfterRestoredDestruction": true,
+  "finishedAt": "2026-10-06T08:49:50.848Z"
+}

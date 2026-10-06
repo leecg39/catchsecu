@@ -20,6 +20,12 @@ const origin = new URL(env.BETTER_AUTH_URL).origin;
 assert.equal(origin, fixture.origin);
 const checks: { name: string; status: number }[] = [];
 try {
+  const receipt = await db.kakaoMockReceipt.findFirstOrThrow({ where: { tenantId: fixture.companyId } });
+  assert.equal(receipt.status, "local_delivered");
+  await assert.rejects(db.$executeRaw`UPDATE "KakaoMockReceipt" SET status='local_delivered' WHERE id=${receipt.id}`, /mock receipts are immutable/);
+  await assert.rejects(db.$executeRaw`DELETE FROM "KakaoMockReceipt" WHERE id=${receipt.id}`, /mock receipts are immutable/);
+  assert.deepEqual(await db.kakaoMockReceipt.findUniqueOrThrow({ where: { id: receipt.id } }), receipt);
+  checks.push({ name: "restored Mock Kakao receipt survives and remains immutable", status: 200 });
   const login = await auth.handler(new Request(origin + "/api/v1/auth/sign-in/email", { method: "POST", headers: { origin, "content-type": "application/json" }, body: JSON.stringify({ email: fixture.email, password: fixture.password }) }));
   assert.equal(login.status, 200); checks.push({ name: "restored owner login", status: 200 });
   const cookie = login.headers.getSetCookie().map(v => v.split(";")[0]).join("; ");
