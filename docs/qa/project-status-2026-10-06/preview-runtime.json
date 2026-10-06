@@ -1,0 +1,45 @@
+{
+  "checkedAt": "2026-10-06T03:08:01.989Z",
+  "port": 3177,
+  "results": [
+    {
+      "path": "/api/v1/health",
+      "status": 200,
+      "location": null,
+      "body": {
+        "status": "ok",
+        "database": "ready"
+      }
+    },
+    {
+      "path": "/api/v1/ready",
+      "status": 200,
+      "location": null,
+      "body": {
+        "status": "ready"
+      }
+    },
+    {
+      "path": "/api/v1/forms",
+      "status": 401,
+      "location": null,
+      "body": {
+        "error": {
+          "code": "UNAUTHENTICATED",
+          "message": "로그인이 필요합니다.",
+          "requestId": "98bd4d94-9618-4d2b-891d-a0e5e66e0a85"
+        }
+      }
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "location": null
+    },
+    {
+      "path": "/dashboard",
+      "status": 307,
+      "location": "/login?returnTo=%2Fdashboard"
+    }
+  ]
+}

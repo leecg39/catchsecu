@@ -25,6 +25,7 @@ import { approvalQuery } from "../src/server/approvals";
 import { templateInput, templatePatch, templateListQuery } from "../src/server/templates";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { noticeCreate, noticePatch } from "../src/contracts/notices";
+import { adminPlanCreate, adminPlanPatch } from "../src/contracts/admin-plans";
 import { guideCreate, guidePatch } from "../src/contracts/guides";
 import { supportTicketCreate, supportTicketPatch, supportTicketReply, supportTicketVersion } from "../src/contracts/support-tickets";
 import { accessRequestInput, accessDecisionInput } from "../src/server/access-requests";
@@ -186,8 +187,7 @@ add("/public/forms/{token}/submissions", "post", "active publication grant + ide
 for (const action of ["publish", "copy", "pause", "revise"]) add("/forms/{id}/" + action, "post", "form.publish or form.write", "폼 상태 전이 " + action, z.object({ version: z.number().int().positive() }).strict());
 for (const action of ["corrections", "withdrawals", "destruction"]) add("/submissions/{id}/" + action, "post", "submission.write or submission.destroy", "증거를 보존하는 " + action);
 const readOnly = [
-  ["audit-events", "audit.read"], ["forms/{id}/submissions", "submission.read"], ["submissions/{id}", "submission.read"],
-  ["ledger", "billing.read"], ["usage-events", "billing.read"], ["invoices", "billing.read"],
+  ["forms/{id}/submissions", "submission.read"], ["submissions/{id}", "submission.read"],
   ["analytics/privacy", "submission.read"], ["analytics/marketing", "submission.read"], ["compliance", "security.read"],
 ];
 for (const [path, permission] of readOnly) add("/" + path, "get", permission, "권한 범위 내 원천 데이터 조회. 사용자 임의 UPDATE/DELETE 없음.");
@@ -205,10 +205,8 @@ const domainContracts = [
   ["clause-templates", "document.write", "archive"], ["share-grants", "submission.read", "revoke"],
   ["retention-rules", "security.write", "archive if referenced"], ["senders", "message.manage", "disable if referenced"],
   ["campaigns", "message.send", "draft delete; scheduled cancel"], ["message-templates", "message.manage", "archive"],
-  ["kakao/channels", "message.manage", "disable if referenced"], ["kakao/templates", "message.manage", "draft delete; approved deactivate"],
   ["integrations", "service.manage", "disable then revoke secret"], ["security/ip-rules", "security.write", "delete with lockout protection"],
-  ["admin/plans", "platform-admin", "archive; sold price immutable"],
-  ["admin/notices", "platform-admin", "archive"], ["admin/guides", "platform-admin", "archive"], ["feedback", "self", "own draft delete"],
+  ["feedback", "self", "own draft delete"],
 ];
 // Proposed resource inputs remain explicitly marked planned until their handlers and QA exist.
 const proposedInputs: Record<string, { create: z.ZodType; patch: z.ZodType }> = {
@@ -256,6 +254,33 @@ for (const [name, permission, lifecycle] of domainContracts) {
   (paths["/" + name + "/{id}"].delete as Operation).parameters = [
     { in: "header", name: "If-Match", required: true, schema: { type: "string", pattern: "^[1-9][0-9]*$" } }];
 }
+for (const method of ["get", "post"]) {
+  add("/admin/plans", method, "platform-admin", method === "get" ? "플랜·버전·구독 수 목록" : "플랜 생성; 같은 코드 409", method === "post" ? adminPlanCreate : undefined, "implemented", method === "post" ? "201" : "200");
+}
+add("/admin/plans/{id}", "get", "platform-admin", "플랜 상세·버전 이력", undefined, "implemented");
+add("/admin/plans/{id}", "patch", "platform-admin", "이름·설명 변경 또는 새 버전 추가; 이미 판매된 버전 가격은 불변", adminPlanPatch, "implemented");
+add("/admin/plans/{id}", "delete", "platform-admin", "연결 구독 409·주문 가능 버전 409 후 삭제", undefined, "implemented", "204");
+for (const name of ["notices", "guides"]) {
+  const proposal = proposedInputs["admin/" + name];
+  add("/admin/" + name, "get", "platform-admin", name + " 목록·검색·상태 필터", undefined, "implemented");
+  add("/admin/" + name, "post", "platform-admin", name + " 생성", proposal.create, "implemented", "201");
+  add("/admin/" + name + "/{id}", "get", "platform-admin", name + " 상세 미리보기", undefined, "implemented");
+  add("/admin/" + name + "/{id}", "patch", "platform-admin", "version 검사 후 허용 필드 변경", proposal.patch, "implemented");
+  add("/admin/" + name + "/{id}", "delete", "platform-admin", "If-Match version으로 보관", undefined, "implemented", "204");
+  (paths["/admin/" + name + "/{id}"].delete as Operation).parameters = [
+    { in: "header", name: "If-Match", required: true, schema: { type: "string", pattern: "^[1-9][0-9]*$" } }];
+}
+add("/kakao/channels/{id}", "get", "message.manage + current service", "채널 상세·최신 인증 상태", undefined, "implemented");
+add("/kakao/channels/{id}", "delete", "message.manage + current service + If-Match", "남은 템플릿이 있으면 삭제 대신 보관 처리", undefined, "implemented");
+add("/kakao/templates/{id}", "get", "message.manage + current service", "템플릿 상세·심사 이력", undefined, "implemented");
+add("/kakao/templates/{id}", "delete", "message.manage + current service + If-Match", "초안만 삭제; 승인·참조 템플릿은 보관 처리", undefined, "implemented");
+for (const path of ["/kakao/channels/{id}", "/kakao/templates/{id}"]) {
+  (paths[path].delete as Operation).parameters = [
+    { in: "header", name: "If-Match", required: true, schema: { type: "string", pattern: "^[1-9][0-9]*$" } }];
+}
+add("/usage-events", "get", "billing.read + current tenant", "사용량·충전·정산 원장 거래 페이지. 서비스 필터 가능", undefined, "implemented");
+add("/invoices", "get", "billing.read + current tenant", "결제 완료 주문의 청구서 대상 목록", undefined, "implemented");
+add("/forms/{id}/revise", "post", "form.write + current service grant", "게시본을 새 초안으로 복제; 열린 초안·미게시 409", z.object({ version: z.number().int().positive() }).strict(), "implemented", "201");
 for (const endpoint of ["sign-up/email", "sign-in/email", "request-password-reset", "reset-password", "change-password", "sign-out", "two-factor/enable", "two-factor/verify-totp", "two-factor/send-otp", "two-factor/verify-otp", "two-factor/verify-backup-code", "two-factor/disable"]) {
   add("/auth/" + endpoint, "post", "Better Auth endpoint contract", "Better Auth 1.7.7 고정 버전의 인증 계약", undefined, "implemented");
 }

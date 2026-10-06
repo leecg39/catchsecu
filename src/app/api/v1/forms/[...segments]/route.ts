@@ -3,7 +3,7 @@ import { approvalForForm, requestApproval } from "@/server/approvals";
 import { z } from "zod";
 import { requireContext } from "@/server/context";
 import { body, fail, json, listQuery, route } from "@/server/http";
-import { archiveForm, copyForm, designateFormRetention, formDeletionState, formDto, formPatch, lockCurrentForm, publishForm, purgeForm, readForm, setFormFavorite, transitionForm, updateForm, updateFormDraft } from "@/server/forms";
+import { archiveForm, copyForm, designateFormRetention, formDeletionState, formDto, formPatch, lockCurrentForm, publishForm, purgeForm, readForm, reviseForm, setFormFavorite, transitionForm, updateForm, updateFormDraft } from "@/server/forms";
 import { retentionDesignationInput } from "@/contracts/forms";
 import { listSubmissions } from "@/server/submissions";
 import { idempotent } from "@/server/idempotency";
@@ -74,6 +74,14 @@ export const POST = route(async (request, requestId) => {
     const result = await idempotent("form:copy:" + ctx.member.id + ":" + id, request.headers.get("idempotency-key"), input, async tx => {
       const copied = await copyForm(tx, ctx, id, input.title, requestId);
       return { status: 201, body: copied, resource: { tenantId: ctx.tenantId, resourceType: "form", resourceId: copied.id } };
+    }, tx => lockCurrentForm(tx, ctx, id, "form.write", true));
+    return json(result.body, result.status);
+  }
+  if (action === "revise") {
+    const input = await body(request, z.object({ version: z.number().int().positive() }).strict());
+    const result = await idempotent("form:revise:" + ctx.member.id + ":" + id, request.headers.get("idempotency-key"), input, async tx => {
+      const revised = await reviseForm(tx, ctx, id, input.version, requestId);
+      return { status: 201, body: revised, resource: { tenantId: ctx.tenantId, resourceType: "form", resourceId: id } };
     }, tx => lockCurrentForm(tx, ctx, id, "form.write", true));
     return json(result.body, result.status);
   }

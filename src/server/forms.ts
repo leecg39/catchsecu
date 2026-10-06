@@ -322,6 +322,18 @@ export async function purgeForm(ctx: Context, id: string, version: number, reque
     await audit(tx, ctx, requestId, "form.purged", "form", id, ["draft", "questions", "favorites", "requestCache"], form.serviceId);
   }, { timeout: 15000 });
 }
+export async function reviseForm(tx: Transaction, ctx: Context, id: string, formVersion: number, requestId: string) {
+  const { form } = await lockCurrentForm(tx, ctx, id, "form.write");
+  if (form.version !== formVersion) fail(409, "VERSION_CONFLICT", "다른 곳에서 변경되었습니다. 최신 내용을 불러와주세요.");
+  if (form.versions.some(version => version.status === "draft")) fail(409, "DRAFT_EXISTS", "이미 편집 중인 초안이 있습니다.");
+  if (!["published", "paused"].includes(form.status)) fail(409, "REVISE_UNAVAILABLE", "게시된 폼만 새 초안을 만들 수 있습니다.");
+  const source = form.versions.find(version => version.status === "published") ?? form.versions[0];
+  const version = await createVersion(tx, ctx, form.serviceId, id, form.title, source.number + 1,
+    cloneFormContent({ ...contentDto(source), retentionDays: source.retentionDays ?? form.designatedRetentionDays }));
+  await tx.form.update({ where: { id }, data: { version: { increment: 1 } } });
+  await audit(tx, ctx, requestId, "form.revised", "form", id, ["draft"], form.serviceId);
+  return { id, draftId: version.id, number: version.number, version: formVersion + 1 };
+}
 export async function copyForm(tx: Transaction, ctx: Context, id: string, title: string | undefined, requestId: string) {
   const { form } = await lockCurrentForm(tx, ctx, id, "form.write", true);
   const source = form.versions.find(version => version.status === "draft") ?? form.versions[0];

@@ -3,17 +3,19 @@ import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoTemplateI
 import { requireContext } from "@/server/context";
 import { body, fail, json, route } from "@/server/http";
 import { idempotent } from "@/server/idempotency";
-import { createKakaoChannel, createKakaoTemplate, listKakaoChannels, listKakaoTemplates, previewKakaoTemplate, readKakaoReview, requestKakaoChannelVerification, sendKakaoTemplate, submitKakaoTemplate, updateKakaoChannel, updateKakaoTemplate } from "@/server/kakao";
+import { createKakaoChannel, createKakaoTemplate, listKakaoChannels, listKakaoTemplates, previewKakaoTemplate, readKakaoChannel, readKakaoReview, readKakaoTemplate, removeKakaoChannel, removeKakaoTemplate, requestKakaoChannelVerification, sendKakaoTemplate, submitKakaoTemplate, updateKakaoChannel, updateKakaoTemplate } from "@/server/kakao";
 
 const versionInput = z.object({ version: z.number().int().positive() }).strict();
 function segments(request: Request) { return new URL(request.url).pathname.split("/").slice(4); }
 export const GET = route(async request => {
   const ctx = await requireContext(request.headers, "message.manage");
   const [first, id, action] = segments(request);
+  if (first === "templates" && id && action === "review") return json(await readKakaoReview(ctx, z.uuid().parse(id)));
+  if (first === "channels" && id) return json(await readKakaoChannel(ctx, z.uuid().parse(id)));
+  if (first === "templates" && id) return json(await readKakaoTemplate(ctx, z.uuid().parse(id)));
   const serviceId = z.uuid().parse(new URL(request.url).searchParams.get("serviceId"));
   if (first === "channels" && !id) return json(await listKakaoChannels(ctx, serviceId));
   if (first === "templates" && !id) return json(await listKakaoTemplates(ctx, serviceId));
-  if (first === "templates" && id && action === "review") return json(await readKakaoReview(ctx, z.uuid().parse(id)));
   fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
 });
 export const POST = route(async (request, requestId) => {
@@ -50,4 +52,14 @@ export const PATCH = route(async (request, requestId) => {
   if (first === "channels" && id) return json(await updateKakaoChannel(ctx, z.uuid().parse(id), await body(request, kakaoChannelPatch), requestId));
   if (first === "templates" && id) return json(await updateKakaoTemplate(ctx, z.uuid().parse(id), await body(request, kakaoTemplatePatch), requestId));
   fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
+});
+export const DELETE = route(async (request, requestId) => {
+  const ctx = await requireContext(request.headers, "message.manage");
+  const [first, id, action] = segments(request);
+  if (action) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
+  const version = z.coerce.number().int().positive().parse(request.headers.get("if-match"));
+  const result = first === "channels" ? await removeKakaoChannel(ctx, z.uuid().parse(id), version, requestId)
+    : first === "templates" ? await removeKakaoTemplate(ctx, z.uuid().parse(id), version, requestId)
+    : fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
+  return result.deleted ? new Response(null, { status: 204 }) : json(result.body, 200);
 });

@@ -163,3 +163,54 @@ export async function applyKakaoReview(raw: string, signature: string, secret: s
     return templateDto(saved);
   });
 }
+
+export async function readKakaoChannel(ctx: Context, id: string) {
+  return db.$transaction(async tx => {
+    const row = await tx.kakaoChannel.findFirst({ where: { id, tenantId: ctx.tenantId } });
+    if (!row) fail(404, "NOT_FOUND", "카카오 채널을 찾을 수 없습니다.");
+    await lockService(tx, ctx, row.serviceId);
+    return channelDto(row);
+  });
+}
+export async function readKakaoTemplate(ctx: Context, id: string) {
+  return db.$transaction(async tx => {
+    const row = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
+    if (!row) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
+    await lockService(tx, ctx, row.serviceId);
+    return templateDto(row);
+  });
+}
+export async function removeKakaoChannel(ctx: Context, id: string, version: number, requestId: string) {
+  return db.$transaction(async tx => {
+    const current = await tx.kakaoChannel.findFirst({ where: { id, tenantId: ctx.tenantId } });
+    if (!current) fail(404, "NOT_FOUND", "카카오 채널을 찾을 수 없습니다.");
+    await lockService(tx, ctx, current.serviceId);
+    if (current.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    const templates = await tx.kakaoTemplate.count({ where: { tenantId: ctx.tenantId, channelId: id } });
+    if (templates) {
+      const row = await tx.kakaoChannel.update({ where: { id }, data: { status: "archived", version: { increment: 1 } } });
+      await audit(tx, ctx, requestId, "kakao.channel_archived", "kakaoChannel", id, ["status"], current.serviceId);
+      return { deleted: false, archived: true, body: channelDto(row) };
+    }
+    await tx.kakaoChannel.delete({ where: { id } });
+    await audit(tx, ctx, requestId, "kakao.channel_deleted", "kakaoChannel", id, ["name", "searchId"], current.serviceId);
+    return { deleted: true, archived: false, body: null };
+  });
+}
+export async function removeKakaoTemplate(ctx: Context, id: string, version: number, requestId: string) {
+  return db.$transaction(async tx => {
+    const current = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
+    if (!current) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
+    await lockService(tx, ctx, current.serviceId);
+    if (current.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    const referenced = await tx.campaign.count({ where: { tenantId: ctx.tenantId, kakaoTemplateId: id } });
+    if (current.status !== "draft" || referenced) {
+      const row = await tx.kakaoTemplate.update({ where: { id }, data: { status: "archived", version: { increment: 1 } } });
+      await audit(tx, ctx, requestId, "kakao.template_archived", "kakaoTemplate", id, ["status"], current.serviceId);
+      return { deleted: false, archived: true, body: templateDto(row) };
+    }
+    await tx.kakaoTemplate.delete({ where: { id } });
+    await audit(tx, ctx, requestId, "kakao.template_deleted", "kakaoTemplate", id, ["name"], current.serviceId);
+    return { deleted: true, archived: false, body: null };
+  });
+}

@@ -1,0 +1,918 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 구현 현황 점검"(67): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    anchor [ref=89, loc=href:/form/manage#main, url=http://localhost:3177/form/manage#main]
+      text "본문으로 건너뛰기"
+    container
+      button [ref=51]
+        container
+          text "서비스명"
+          text "기본 서비스"
+        container
+          text "외부 ⓘ"
+          text "기본 서비스"
+          image
+      container [ref=52]
+        anchor [ref=53, loc=href:/dashboard, url=http://localhost:3177/dashboard]
+          image
+          text "대시보드"
+        container
+          button [ref=54]
+            image
+            text "개인정보 수집/관리"
+            text "⌃"
+          container
+            button [ref=55]
+              text "캐치폼 생성"
+            anchor [ref=56, loc=href:/form/template, url=http://localhost:3177/form/template]
+              text "캐치폼 템플릿"
+            anchor [ref=57, url=http://localhost:3177/form/info-upload]
+              text "개인정보 업로드"
+            anchor [ref=58, loc=href:/form/manage, url=http://localhost:3177/form/manage]
+              text "캐치폼·업로드 목록"
+            anchor [ref=59, loc=href:/form/ad-manage, url=http://localhost:3177/form/ad-manage]
+              text "광고성 정보 수신동의 관리"
+            anchor [ref=60, loc=href:/form/fixed-url, url=http://localhost:3177/form/fixed-url]
+              text "고정URL 관리"
+        button [ref=61]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=62]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=63]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=64]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=65]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=66]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=90]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=91, loc=href:/shared-privacy/view, url=http://localhost:3177/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=67, url=http://localhost:3177/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=68, loc=href:/help-center, url=http://localhost:3177/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          anchor [ref=69, loc=href:https://catchsecu.com/, url=https://catchsecu.com/]
+            text "홈페이지"
+          anchor [ref=70, loc=href:/legal/privacy, url=http://localhost:3177/legal/privacy]
+            text "개인정보"
+            text "처리방침"
+          anchor [ref=71, loc=href:/legal/terms, url=http://localhost:3177/legal/terms]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          text "캐치시큐 테스트 회사 A"
+        container
+          button [ref=72]
+            svg_root
+            text "검색"
+            text "Ctrl K"
+          button "키보드 단축키 안내" [ref=73, loc=css:button[aria-label="키보드 단축키 안내"]]
+            svg_root
+          button [ref=74]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=75, loc=css:a[aria-label="공지사항"], url=http://localhost:3177/notice]
+            image
+          button "문의" [ref=76, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=77, loc=css:a[aria-label="알림"], url=http://localhost:3177/integration/message]
+            image
+          button [ref=78]
+            image
+            text "MY"
+      container [ref=79]
+        container "이동 경로"
+          ordered_list
+            list_item
+              text "개인정보 수집/관리"
+            list_item
+              text "/"
+              text "캐치폼·업로드 목록"
+        container
+          heading
+            text "캐치폼·업로드 목록"
+          paragraph
+            text "캐치폼과 수집한 응답을 관리할 수 있습니다."
+          anchor [ref=92, url=http://localhost:3177/form/info-upload]
+            text "업로드 작업 목록"
+          container
+            anchor [ref=93, loc=href:/form/ai/create?new=1, url=http://localhost:3177/form/ai/create?new=1]
+              text "캐치폼 생성"
+            anchor [ref=94, url=http://localhost:3177/form/info-upload]
+              text "개인정보 업로드"
+        container
+          form
+            textbox "캐치폼 검색" [ref=80, loc=css:input[placeholder="캐치폼명 또는 생성자명을 입력해주세요."]]
+              text "캐치폼명 또는 생성자명을 입력해주세요."
+            button [ref=81]
+              text "검색"
+            button [ref=82]
+              text "상세 검색"
+              text "열기"
+          container
+            paragraph
+              text "기본 서비스"
+            container
+              text "정렬"
+              combobox "캐치폼 정렬 기준" [ref=83, loc=css:select[aria-label="캐치폼 정렬 기준"]]
+                text "생성일"
+            container
+              text "순서"
+              combobox "캐치폼 정렬 순서" [ref=84, loc=css:select[aria-label="캐치폼 정렬 순서"]]
+                text "내림차순"
+            container
+              checkbox [ref=85]
+              text "즐겨찾기만 보기"
+          status
+          table
+            table_row
+              table_cell
+                text "#"
+              table_cell
+                text "즐겨찾기"
+              table_cell
+                text "공개상태"
+              table_cell
+                text "서비스 명"
+              table_cell
+                text "캐치폼 명"
+              table_cell
+                text "생성자"
+              table_cell
+                text "현재 게시 응답"
+              table_cell
+                text "생성일"
+              table_cell
+                text "보유 기간"
+              table_cell
+                text "설정"
+            table_row
+              table_cell
+                text "1"
+              table_cell
+                button "P06-T06 인증 실측 폼 (복사) 즐겨찾기" [ref=95, loc=css:button[aria-label="P06-T06 인증 실측 폼 (복사) 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "초안"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=96, loc=href:/form/manage/applicant/e053c326-2aed-4653-a999-a3316c906660, url=http://localhost:3177/form/manage/applicant/e053c326-2aed-4653-a999-a3316c906660]
+                  text "P06-T06 인증 실측 폼 (복사)"
+              table_cell
+                text "owner A"
+              table_cell
+                text "-"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=97]
+                  text "미리보기"
+                anchor [ref=98, loc=href:/form/ai/create?formId=e053c326-2aed-4653-a999-a3316c906660, url=http://localhost:3177/form/ai/create?formId=e053c326-2aed-4653-a999-a3316c906660]
+                  text "편집"
+                anchor [ref=99, loc=href:/form/ai/create?templateEdit=new&formId=e053c326-2aed-4653-a999-a3316c906660, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=e053c326-2aed-4653-a999-a3316c906660]
+                  text "템플릿 등록"
+                button [ref=100]
+                  text "복사"
+                button [ref=101]
+                  text "보관"
+                button [ref=102]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "2"
+              table_cell
+                button "P06-T06 인증 실측 폼 즐겨찾기" [ref=103]
+                  text "★"
+              table_cell
+                text "일시 중지"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=104, loc=href:/form/manage/applicant/ae8f8541-d66b-4db5-afe0-cd6954216920, url=http://localhost:3177/form/manage/applicant/ae8f8541-d66b-4db5-afe0-cd6954216920]
+                  text "P06-T06 인증 실측 폼"
+              table_cell
+                text "owner A"
+              table_cell
+                text "2 / 50"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=105]
+                  text "미리보기"
+                anchor [ref=106, loc=href:/form/ai/create?formId=ae8f8541-d66b-4db5-afe0-cd6954216920, url=http://localhost:3177/form/ai/create?formId=ae8f8541-d66b-4db5-afe0-cd6954216920]
+                  text "편집"
+                anchor [ref=107, loc=href:/form/ai/create?templateEdit=new&formId=ae8f8541-d66b-4db5-afe0-cd6954216920, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=ae8f8541-d66b-4db5-afe0-cd6954216920]
+                  text "템플릿 등록"
+                button [ref=108]
+                  text "복사"
+                anchor [ref=109, loc=href:/form/ai/share?formId=ae8f8541-d66b-4db5-afe0-cd6954216920, url=http://localhost:3177/form/ai/share?formId=ae8f8541-d66b-4db5-afe0-cd6954216920]
+                  text "공유"
+                button [ref=110]
+                  text "공개 재개"
+                button [ref=111]
+                  text "보관"
+                button [ref=112]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "3"
+              table_cell
+                button "P06-T06 인증 실측 폼 즐겨찾기" [ref=113]
+                  text "☆"
+              table_cell
+                text "승인 대기"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=114, loc=href:/form/manage/applicant/656a149c-c3ad-4735-83f6-e0c557c9df0e, url=http://localhost:3177/form/manage/applicant/656a149c-c3ad-4735-83f6-e0c557c9df0e]
+                  text "P06-T06 인증 실측 폼"
+              table_cell
+                text "owner A"
+              table_cell
+                text "-"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=115]
+                  text "미리보기"
+                anchor [ref=116, loc=href:/form/ai/create?formId=656a149c-c3ad-4735-83f6-e0c557c9df0e, url=http://localhost:3177/form/ai/create?formId=656a149c-c3ad-4735-83f6-e0c557c9df0e]
+                  text "편집"
+                anchor [ref=117, loc=href:/form/ai/create?templateEdit=new&formId=656a149c-c3ad-4735-83f6-e0c557c9df0e, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=656a149c-c3ad-4735-83f6-e0c557c9df0e]
+                  text "템플릿 등록"
+                button [ref=118]
+                  text "복사"
+                button [ref=119]
+                  text "보관"
+                button [ref=120]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "4"
+              table_cell
+                button "P06-T06 인증 실측 폼 즐겨찾기" [ref=121]
+                  text "☆"
+              table_cell
+                text "초안"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=122, loc=href:/form/manage/applicant/cf41e6e0-04aa-412a-a234-0a8b87322bcd, url=http://localhost:3177/form/manage/applicant/cf41e6e0-04aa-412a-a234-0a8b87322bcd]
+                  text "P06-T06 인증 실측 폼"
+              table_cell
+                text "owner A"
+              table_cell
+                text "-"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=123]
+                  text "미리보기"
+                anchor [ref=124, loc=href:/form/ai/create?formId=cf41e6e0-04aa-412a-a234-0a8b87322bcd, url=http://localhost:3177/form/ai/create?formId=cf41e6e0-04aa-412a-a234-0a8b87322bcd]
+                  text "편집"
+                anchor [ref=125, loc=href:/form/ai/create?templateEdit=new&formId=cf41e6e0-04aa-412a-a234-0a8b87322bcd, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=cf41e6e0-04aa-412a-a234-0a8b87322bcd]
+                  text "템플릿 등록"
+                button [ref=126]
+                  text "복사"
+                button [ref=127]
+                  text "보관"
+                button [ref=128]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "5"
+              table_cell
+                button "P06-T06 인증 실측 폼 즐겨찾기" [ref=129]
+                  text "☆"
+              table_cell
+                text "초안"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=130, loc=href:/form/manage/applicant/0d7708f3-bd75-4fa3-98ce-11e93c88be4c, url=http://localhost:3177/form/manage/applicant/0d7708f3-bd75-4fa3-98ce-11e93c88be4c]
+                  text "P06-T06 인증 실측 폼"
+              table_cell
+                text "owner A"
+              table_cell
+                text "-"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=131]
+                  text "미리보기"
+                anchor [ref=132, loc=href:/form/ai/create?formId=0d7708f3-bd75-4fa3-98ce-11e93c88be4c, url=http://localhost:3177/form/ai/create?formId=0d7708f3-bd75-4fa3-98ce-11e93c88be4c]
+                  text "편집"
+                anchor [ref=133, loc=href:/form/ai/create?templateEdit=new&formId=0d7708f3-bd75-4fa3-98ce-11e93c88be4c, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=0d7708f3-bd75-4fa3-98ce-11e93c88be4c]
+                  text "템플릿 등록"
+                button [ref=134]
+                  text "복사"
+                button [ref=135]
+                  text "보관"
+                button [ref=136]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "6"
+              table_cell
+                button "P06-T06 인증 실측 폼 즐겨찾기" [ref=137]
+                  text "☆"
+              table_cell
+                text "초안"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=138, loc=href:/form/manage/applicant/8e5daf32-b753-49a0-bac2-0ba2cf037960, url=http://localhost:3177/form/manage/applicant/8e5daf32-b753-49a0-bac2-0ba2cf037960]
+                  text "P06-T06 인증 실측 폼"
+              table_cell
+                text "owner A"
+              table_cell
+                text "-"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=139]
+                  text "미리보기"
+                anchor [ref=140, loc=href:/form/ai/create?formId=8e5daf32-b753-49a0-bac2-0ba2cf037960, url=http://localhost:3177/form/ai/create?formId=8e5daf32-b753-49a0-bac2-0ba2cf037960]
+                  text "편집"
+                anchor [ref=141, loc=href:/form/ai/create?templateEdit=new&formId=8e5daf32-b753-49a0-bac2-0ba2cf037960, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=8e5daf32-b753-49a0-bac2-0ba2cf037960]
+                  text "템플릿 등록"
+                button [ref=142]
+                  text "복사"
+                button [ref=143]
+                  text "보관"
+                button [ref=144]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "7"
+              table_cell
+                button "E2E 응답 1791139451948 즐겨찾기" [ref=145, loc=css:button[aria-label="E2E 응답 1791139451948 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=146, loc=href:/form/manage/applicant/7119a29a-e955-478d-9483-b463cc0e1bd9, url=http://localhost:3177/form/manage/applicant/7119a29a-e955-478d-9483-b463cc0e1bd9]
+                  text "E2E 응답 1791139451948"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 50"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "7일"
+              table_cell
+                button [ref=147]
+                  text "미리보기"
+                anchor [ref=148, loc=href:/form/ai/create?formId=7119a29a-e955-478d-9483-b463cc0e1bd9, url=http://localhost:3177/form/ai/create?formId=7119a29a-e955-478d-9483-b463cc0e1bd9]
+                  text "편집"
+                anchor [ref=149, loc=href:/form/ai/create?templateEdit=new&formId=7119a29a-e955-478d-9483-b463cc0e1bd9, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=7119a29a-e955-478d-9483-b463cc0e1bd9]
+                  text "템플릿 등록"
+                button [ref=150]
+                  text "복사"
+                anchor [ref=151, loc=href:/form/ai/share?formId=7119a29a-e955-478d-9483-b463cc0e1bd9, url=http://localhost:3177/form/ai/share?formId=7119a29a-e955-478d-9483-b463cc0e1bd9]
+                  text "공유"
+                button [ref=152]
+                  text "일시 중지"
+                button [ref=153]
+                  text "보관"
+                button [ref=154]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "8"
+              table_cell
+                button "E2E 응답 1791139441366 즐겨찾기" [ref=155, loc=css:button[aria-label="E2E 응답 1791139441366 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=156, loc=href:/form/manage/applicant/d2855b21-b60c-4d14-b834-4efdd7d01d09, url=http://localhost:3177/form/manage/applicant/d2855b21-b60c-4d14-b834-4efdd7d01d09]
+                  text "E2E 응답 1791139441366"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 50"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "7일"
+              table_cell
+                button [ref=157]
+                  text "미리보기"
+                anchor [ref=158, loc=href:/form/ai/create?formId=d2855b21-b60c-4d14-b834-4efdd7d01d09, url=http://localhost:3177/form/ai/create?formId=d2855b21-b60c-4d14-b834-4efdd7d01d09]
+                  text "편집"
+                anchor [ref=159, loc=href:/form/ai/create?templateEdit=new&formId=d2855b21-b60c-4d14-b834-4efdd7d01d09, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=d2855b21-b60c-4d14-b834-4efdd7d01d09]
+                  text "템플릿 등록"
+                button [ref=160]
+                  text "복사"
+                anchor [ref=161, loc=href:/form/ai/share?formId=d2855b21-b60c-4d14-b834-4efdd7d01d09, url=http://localhost:3177/form/ai/share?formId=d2855b21-b60c-4d14-b834-4efdd7d01d09]
+                  text "공유"
+                button [ref=162]
+                  text "일시 중지"
+                button [ref=163]
+                  text "보관"
+                button [ref=164]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "9"
+              table_cell
+                button "E2E 응답 1791139361697 즐겨찾기" [ref=165, loc=css:button[aria-label="E2E 응답 1791139361697 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=166, loc=href:/form/manage/applicant/0807e1ed-fe6a-4699-986d-45392a11153c, url=http://localhost:3177/form/manage/applicant/0807e1ed-fe6a-4699-986d-45392a11153c]
+                  text "E2E 응답 1791139361697"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 50"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "7일"
+              table_cell
+                button [ref=167]
+                  text "미리보기"
+                anchor [ref=168, loc=href:/form/ai/create?formId=0807e1ed-fe6a-4699-986d-45392a11153c, url=http://localhost:3177/form/ai/create?formId=0807e1ed-fe6a-4699-986d-45392a11153c]
+                  text "편집"
+                anchor [ref=169, loc=href:/form/ai/create?templateEdit=new&formId=0807e1ed-fe6a-4699-986d-45392a11153c, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=0807e1ed-fe6a-4699-986d-45392a11153c]
+                  text "템플릿 등록"
+                button [ref=170]
+                  text "복사"
+                anchor [ref=171, loc=href:/form/ai/share?formId=0807e1ed-fe6a-4699-986d-45392a11153c, url=http://localhost:3177/form/ai/share?formId=0807e1ed-fe6a-4699-986d-45392a11153c]
+                  text "공유"
+                button [ref=172]
+                  text "일시 중지"
+                button [ref=173]
+                  text "보관"
+                button [ref=174]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "10"
+              table_cell
+                button "E2E 응답 1791139349911 즐겨찾기" [ref=175, loc=css:button[aria-label="E2E 응답 1791139349911 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=176, loc=href:/form/manage/applicant/660077a8-ea2b-422f-8f8b-aa2bb23f62ef, url=http://localhost:3177/form/manage/applicant/660077a8-ea2b-422f-8f8b-aa2bb23f62ef]
+                  text "E2E 응답 1791139349911"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 50"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "7일"
+              table_cell
+                button [ref=177]
+                  text "미리보기"
+                anchor [ref=178, loc=href:/form/ai/create?formId=660077a8-ea2b-422f-8f8b-aa2bb23f62ef, url=http://localhost:3177/form/ai/create?formId=660077a8-ea2b-422f-8f8b-aa2bb23f62ef]
+                  text "편집"
+                anchor [ref=179, loc=href:/form/ai/create?templateEdit=new&formId=660077a8-ea2b-422f-8f8b-aa2bb23f62ef, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=660077a8-ea2b-422f-8f8b-aa2bb23f62ef]
+                  text "템플릿 등록"
+                button [ref=180]
+                  text "복사"
+                anchor [ref=181, loc=href:/form/ai/share?formId=660077a8-ea2b-422f-8f8b-aa2bb23f62ef, url=http://localhost:3177/form/ai/share?formId=660077a8-ea2b-422f-8f8b-aa2bb23f62ef]
+                  text "공유"
+                button [ref=182]
+                  text "일시 중지"
+                button [ref=183]
+                  text "보관"
+                button [ref=184]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "11"
+              table_cell
+                button "E2E 응답 1791139338973 즐겨찾기" [ref=185, loc=css:button[aria-label="E2E 응답 1791139338973 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=186, loc=href:/form/manage/applicant/ff4a786a-1fd9-4572-869e-f6144347669d, url=http://localhost:3177/form/manage/applicant/ff4a786a-1fd9-4572-869e-f6144347669d]
+                  text "E2E 응답 1791139338973"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 50"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "7일"
+              table_cell
+                button [ref=187]
+                  text "미리보기"
+                anchor [ref=188, loc=href:/form/ai/create?formId=ff4a786a-1fd9-4572-869e-f6144347669d, url=http://localhost:3177/form/ai/create?formId=ff4a786a-1fd9-4572-869e-f6144347669d]
+                  text "편집"
+                anchor [ref=189, loc=href:/form/ai/create?templateEdit=new&formId=ff4a786a-1fd9-4572-869e-f6144347669d, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=ff4a786a-1fd9-4572-869e-f6144347669d]
+                  text "템플릿 등록"
+                button [ref=190]
+                  text "복사"
+                anchor [ref=191, loc=href:/form/ai/share?formId=ff4a786a-1fd9-4572-869e-f6144347669d, url=http://localhost:3177/form/ai/share?formId=ff4a786a-1fd9-4572-869e-f6144347669d]
+                  text "공유"
+                button [ref=192]
+                  text "일시 중지"
+                button [ref=193]
+                  text "보관"
+                button [ref=194]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "12"
+              table_cell
+                button "E2E 응답 1791139294713 즐겨찾기" [ref=195, loc=css:button[aria-label="E2E 응답 1791139294713 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=196, loc=href:/form/manage/applicant/263077e4-3923-4cc2-884a-ba081d83d4da, url=http://localhost:3177/form/manage/applicant/263077e4-3923-4cc2-884a-ba081d83d4da]
+                  text "E2E 응답 1791139294713"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 50"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "7일"
+              table_cell
+                button [ref=197]
+                  text "미리보기"
+                anchor [ref=198, loc=href:/form/ai/create?formId=263077e4-3923-4cc2-884a-ba081d83d4da, url=http://localhost:3177/form/ai/create?formId=263077e4-3923-4cc2-884a-ba081d83d4da]
+                  text "편집"
+                anchor [ref=199, loc=href:/form/ai/create?templateEdit=new&formId=263077e4-3923-4cc2-884a-ba081d83d4da, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=263077e4-3923-4cc2-884a-ba081d83d4da]
+                  text "템플릿 등록"
+                button [ref=200]
+                  text "복사"
+                anchor [ref=201, loc=href:/form/ai/share?formId=263077e4-3923-4cc2-884a-ba081d83d4da, url=http://localhost:3177/form/ai/share?formId=263077e4-3923-4cc2-884a-ba081d83d4da]
+                  text "공유"
+                button [ref=202]
+                  text "일시 중지"
+                button [ref=203]
+                  text "보관"
+                button [ref=204]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "13"
+              table_cell
+                button "E2E 응답 1791139281596 즐겨찾기" [ref=205, loc=css:button[aria-label="E2E 응답 1791139281596 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=206, loc=href:/form/manage/applicant/016f2a99-3604-41a9-98bd-0125c4ca0b57, url=http://localhost:3177/form/manage/applicant/016f2a99-3604-41a9-98bd-0125c4ca0b57]
+                  text "E2E 응답 1791139281596"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 50"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "7일"
+              table_cell
+                button [ref=207]
+                  text "미리보기"
+                anchor [ref=208, loc=href:/form/ai/create?formId=016f2a99-3604-41a9-98bd-0125c4ca0b57, url=http://localhost:3177/form/ai/create?formId=016f2a99-3604-41a9-98bd-0125c4ca0b57]
+                  text "편집"
+                anchor [ref=209, loc=href:/form/ai/create?templateEdit=new&formId=016f2a99-3604-41a9-98bd-0125c4ca0b57, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=016f2a99-3604-41a9-98bd-0125c4ca0b57]
+                  text "템플릿 등록"
+                button [ref=210]
+                  text "복사"
+                anchor [ref=211, loc=href:/form/ai/share?formId=016f2a99-3604-41a9-98bd-0125c4ca0b57, url=http://localhost:3177/form/ai/share?formId=016f2a99-3604-41a9-98bd-0125c4ca0b57]
+                  text "공유"
+                button [ref=212]
+                  text "일시 중지"
+                button [ref=213]
+                  text "보관"
+                button [ref=214]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "14"
+              table_cell
+                button "E2E 응답 1791139258910 즐겨찾기" [ref=215, loc=css:button[aria-label="E2E 응답 1791139258910 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=216, loc=href:/form/manage/applicant/34dd1ca7-ea8f-43f0-be4e-12d5deef72c3, url=http://localhost:3177/form/manage/applicant/34dd1ca7-ea8f-43f0-be4e-12d5deef72c3]
+                  text "E2E 응답 1791139258910"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 50"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "7일"
+              table_cell
+                button [ref=217]
+                  text "미리보기"
+                anchor [ref=218, loc=href:/form/ai/create?formId=34dd1ca7-ea8f-43f0-be4e-12d5deef72c3, url=http://localhost:3177/form/ai/create?formId=34dd1ca7-ea8f-43f0-be4e-12d5deef72c3]
+                  text "편집"
+                anchor [ref=219, loc=href:/form/ai/create?templateEdit=new&formId=34dd1ca7-ea8f-43f0-be4e-12d5deef72c3, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=34dd1ca7-ea8f-43f0-be4e-12d5deef72c3]
+                  text "템플릿 등록"
+                button [ref=220]
+                  text "복사"
+                anchor [ref=221, loc=href:/form/ai/share?formId=34dd1ca7-ea8f-43f0-be4e-12d5deef72c3, url=http://localhost:3177/form/ai/share?formId=34dd1ca7-ea8f-43f0-be4e-12d5deef72c3]
+                  text "공유"
+                button [ref=222]
+                  text "일시 중지"
+                button [ref=223]
+                  text "보관"
+                button [ref=224]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "15"
+              table_cell
+                button "솔라피 라이브 동의 1791138754863 즐겨찾기" [ref=225, loc=css:button[aria-label="솔라피 라이브 동의 1791138754863 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=226, loc=href:/form/manage/applicant/ac7a012c-92c2-4853-9d8d-36baa7a42a16, url=http://localhost:3177/form/manage/applicant/ac7a012c-92c2-4853-9d8d-36baa7a42a16]
+                  text "솔라피 라이브 동의 1791138754863"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 20"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=227]
+                  text "미리보기"
+                anchor [ref=228, loc=href:/form/ai/create?formId=ac7a012c-92c2-4853-9d8d-36baa7a42a16, url=http://localhost:3177/form/ai/create?formId=ac7a012c-92c2-4853-9d8d-36baa7a42a16]
+                  text "편집"
+                anchor [ref=229, loc=href:/form/ai/create?templateEdit=new&formId=ac7a012c-92c2-4853-9d8d-36baa7a42a16, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=ac7a012c-92c2-4853-9d8d-36baa7a42a16]
+                  text "템플릿 등록"
+                button [ref=230]
+                  text "복사"
+                anchor [ref=231, loc=href:/form/ai/share?formId=ac7a012c-92c2-4853-9d8d-36baa7a42a16, url=http://localhost:3177/form/ai/share?formId=ac7a012c-92c2-4853-9d8d-36baa7a42a16]
+                  text "공유"
+                button [ref=232]
+                  text "일시 중지"
+                button [ref=233]
+                  text "보관"
+                button [ref=234]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "16"
+              table_cell
+                button "솔라피 라이브 동의 1791138387915 즐겨찾기" [ref=235, loc=css:button[aria-label="솔라피 라이브 동의 1791138387915 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=236, loc=href:/form/manage/applicant/2fbbce22-50a2-4984-8e15-0a59b8dbc9c0, url=http://localhost:3177/form/manage/applicant/2fbbce22-50a2-4984-8e15-0a59b8dbc9c0]
+                  text "솔라피 라이브 동의 1791138387915"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 20"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=237]
+                  text "미리보기"
+                anchor [ref=238, loc=href:/form/ai/create?formId=2fbbce22-50a2-4984-8e15-0a59b8dbc9c0, url=http://localhost:3177/form/ai/create?formId=2fbbce22-50a2-4984-8e15-0a59b8dbc9c0]
+                  text "편집"
+                anchor [ref=239, loc=href:/form/ai/create?templateEdit=new&formId=2fbbce22-50a2-4984-8e15-0a59b8dbc9c0, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=2fbbce22-50a2-4984-8e15-0a59b8dbc9c0]
+                  text "템플릿 등록"
+                button [ref=240]
+                  text "복사"
+                anchor [ref=241, loc=href:/form/ai/share?formId=2fbbce22-50a2-4984-8e15-0a59b8dbc9c0, url=http://localhost:3177/form/ai/share?formId=2fbbce22-50a2-4984-8e15-0a59b8dbc9c0]
+                  text "공유"
+                button [ref=242]
+                  text "일시 중지"
+                button [ref=243]
+                  text "보관"
+                button [ref=244]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "17"
+              table_cell
+                button "솔라피 라이브 동의 1791138353680 즐겨찾기" [ref=245, loc=css:button[aria-label="솔라피 라이브 동의 1791138353680 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=246, loc=href:/form/manage/applicant/574f373f-d9d3-4432-ae2c-1ac10b219742, url=http://localhost:3177/form/manage/applicant/574f373f-d9d3-4432-ae2c-1ac10b219742]
+                  text "솔라피 라이브 동의 1791138353680"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 20"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=247]
+                  text "미리보기"
+                anchor [ref=248, loc=href:/form/ai/create?formId=574f373f-d9d3-4432-ae2c-1ac10b219742, url=http://localhost:3177/form/ai/create?formId=574f373f-d9d3-4432-ae2c-1ac10b219742]
+                  text "편집"
+                anchor [ref=249, loc=href:/form/ai/create?templateEdit=new&formId=574f373f-d9d3-4432-ae2c-1ac10b219742, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=574f373f-d9d3-4432-ae2c-1ac10b219742]
+                  text "템플릿 등록"
+                button [ref=250]
+                  text "복사"
+                anchor [ref=251, loc=href:/form/ai/share?formId=574f373f-d9d3-4432-ae2c-1ac10b219742, url=http://localhost:3177/form/ai/share?formId=574f373f-d9d3-4432-ae2c-1ac10b219742]
+                  text "공유"
+                button [ref=252]
+                  text "일시 중지"
+                button [ref=253]
+                  text "보관"
+                button [ref=254]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "18"
+              table_cell
+                button "솔라피 라이브 동의 1791138337252 즐겨찾기" [ref=255, loc=css:button[aria-label="솔라피 라이브 동의 1791138337252 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "공개 중"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=256, loc=href:/form/manage/applicant/b2fee776-9bcc-4455-8f6d-889085d51276, url=http://localhost:3177/form/manage/applicant/b2fee776-9bcc-4455-8f6d-889085d51276]
+                  text "솔라피 라이브 동의 1791138337252"
+              table_cell
+                text "owner A"
+              table_cell
+                text "1 / 20"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=257]
+                  text "미리보기"
+                anchor [ref=258, loc=href:/form/ai/create?formId=b2fee776-9bcc-4455-8f6d-889085d51276, url=http://localhost:3177/form/ai/create?formId=b2fee776-9bcc-4455-8f6d-889085d51276]
+                  text "편집"
+                anchor [ref=259, loc=href:/form/ai/create?templateEdit=new&formId=b2fee776-9bcc-4455-8f6d-889085d51276, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=b2fee776-9bcc-4455-8f6d-889085d51276]
+                  text "템플릿 등록"
+                button [ref=260]
+                  text "복사"
+                anchor [ref=261, loc=href:/form/ai/share?formId=b2fee776-9bcc-4455-8f6d-889085d51276, url=http://localhost:3177/form/ai/share?formId=b2fee776-9bcc-4455-8f6d-889085d51276]
+                  text "공유"
+                button [ref=262]
+                  text "일시 중지"
+                button [ref=263]
+                  text "보관"
+                button [ref=264]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "19"
+              table_cell
+                button "솔라피 라이브 동의 1791138323780 즐겨찾기" [ref=265, loc=css:button[aria-label="솔라피 라이브 동의 1791138323780 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "초안"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=266, loc=href:/form/manage/applicant/28d6c6d8-575e-4217-a7e5-96b20d686695, url=http://localhost:3177/form/manage/applicant/28d6c6d8-575e-4217-a7e5-96b20d686695]
+                  text "솔라피 라이브 동의 1791138323780"
+              table_cell
+                text "owner A"
+              table_cell
+                text "-"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=267]
+                  text "미리보기"
+                anchor [ref=268, loc=href:/form/ai/create?formId=28d6c6d8-575e-4217-a7e5-96b20d686695, url=http://localhost:3177/form/ai/create?formId=28d6c6d8-575e-4217-a7e5-96b20d686695]
+                  text "편집"
+                anchor [ref=269, loc=href:/form/ai/create?templateEdit=new&formId=28d6c6d8-575e-4217-a7e5-96b20d686695, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=28d6c6d8-575e-4217-a7e5-96b20d686695]
+                  text "템플릿 등록"
+                button [ref=270]
+                  text "복사"
+                button [ref=271]
+                  text "보관"
+                button [ref=272]
+                  text "완전 삭제"
+            table_row
+              table_cell
+                text "20"
+              table_cell
+                button "솔라피 라이브 동의 1791138266250 즐겨찾기" [ref=273, loc=css:button[aria-label="솔라피 라이브 동의 1791138266250 즐겨찾기"]]
+                  text "☆"
+              table_cell
+                text "초안"
+              table_cell
+                text "기본 서비스"
+              table_cell
+                anchor [ref=274, loc=href:/form/manage/applicant/9b9d56d2-a42a-4609-acd3-b523e070fdf2, url=http://localhost:3177/form/manage/applicant/9b9d56d2-a42a-4609-acd3-b523e070fdf2]
+                  text "솔라피 라이브 동의 1791138266250"
+              table_cell
+                text "owner A"
+              table_cell
+                text "-"
+              table_cell
+                text "2026. 10. 5."
+              table_cell
+                text "30일"
+              table_cell
+                button [ref=275]
+                  text "미리보기"
+                anchor [ref=276, loc=href:/form/ai/create?formId=9b9d56d2-a42a-4609-acd3-b523e070fdf2, url=http://localhost:3177/form/ai/create?formId=9b9d56d2-a42a-4609-acd3-b523e070fdf2]
+                  text "편집"
+                anchor [ref=277, loc=href:/form/ai/create?templateEdit=new&formId=9b9d56d2-a42a-4609-acd3-b523e070fdf2, url=http://localhost:3177/form/ai/create?templateEdit=new&formId=9b9d56d2-a42a-4609-acd3-b523e070fdf2]
+                  text "템플릿 등록"
+                button [ref=278]
+                  text "복사"
+                button [ref=279]
+                  text "보관"
+                button [ref=280]
+                  text "완전 삭제"
+          text "총"
+          text "23"
+          text "개"
+          combobox "페이지당 행 수" [ref=86, loc=css:select[aria-label="페이지당 행 수"]]
+            text "20"
+          button "이전 페이지" [ref=87, loc=css:button[aria-label="이전 페이지"]]
+            text "‹"
+          text "1"
+          text "/"
+          text "2"
+          button "다음 페이지" [ref=88, loc=css:button[aria-label="다음 페이지"]]
+            text "›"
+  alert
