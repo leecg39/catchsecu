@@ -652,7 +652,7 @@
 - 작업: 계약/SDK와 조직 식별자를 확인하고 login/verified/fail/email-register 경로를 연결한다.
 - 선행: P11-T03
 - 검증/완료: 공식 sandbox/테스트환경의 성공·실패 증거; SDK/접근권 없으면 블로커 유지; 임의 성공 처리 금지
-- 증거: [docs/qa/P11-T04/](docs/qa/P11-T04/README.md) — 미연결 방어 기반만 확인. GPKI·새올·그룹웨어 외부 인증 필요로 미완료.
+- 증거: [docs/qa/P11-T04/](docs/qa/P11-T04/README.md) — 가상(mock) 어댑터 구현·검증 완료([서버 5개](../../tests/server/org-auth.test.ts)·[브라우저 8/8](docs/qa/P11-T04/virtual-auth/README.md)). 실제 GPKI·새올·그룹웨어 공식 sandbox 접근권 부재로 외부 수용 조건 미충족 — 체크 유지.
 
 ### P11-T05 — 보안 모듈 게이트
 
