@@ -12,6 +12,7 @@ const receiptBody = z.object({
   deliveryId: z.uuid(),
   receiptId: z.string().trim().min(8).max(80).regex(/^[A-Za-z0-9:_-]+$/),
   outcome: z.enum(["accepted", "failed", "timeout"]),
+  attempt: z.number().int().min(1).max(5).optional(),
 }).strict();
 export type SmsReceiptResult = { deliveryId: string; receiptId: string; status: "provider_accepted" | "failed" | "unknown"; duplicate: boolean };
 
@@ -47,6 +48,7 @@ export async function deliverSms(input: { transport: "unconfigured" | "local" | 
   let parsed: z.infer<typeof solapiSendResponse>;
   try { parsed = solapiSendResponse.parse(await response.json()); }
   catch { if (!response.ok) fail(503, "SMS_PROVIDER_UNAVAILABLE", "문자 공급자에 연결할 수 없습니다."); fail(503, "SMS_PROVIDER_RESPONSE", "공급자 응답 형식을 확인할 수 없습니다."); }
+  if (response.status >= 500) fail(503, "SMS_PROVIDER_UNAVAILABLE", "문자 공급자에 연결할 수 없습니다.");
   if (parsed.errorCode || !response.ok)
     fail(422, "SMS_PROVIDER_REJECTED", "문자 공급자가 발송을 거부했습니다. " + (parsed.errorCode ?? parsed.statusCode ?? response.status));
   if (!parsed.groupId) fail(503, "SMS_PROVIDER_RESPONSE", "공급자 응답 형식을 확인할 수 없습니다.");
@@ -72,12 +74,16 @@ export async function applySmsReceipt(raw: string, signature: string, secret: st
     await tx.$queryRaw`SELECT id FROM "Campaign" WHERE id=${initial.campaignId} FOR UPDATE`;
     await tx.$queryRaw`SELECT id FROM "CampaignDelivery" WHERE id=${initial.id} FOR UPDATE`;
     const delivery = await tx.campaignDelivery.findUniqueOrThrow({ where: { id: initial.id }, include: { campaign: { select: { channel: true } } } });
-    const existing = await tx.smsReceipt.findUnique({ where: { deliveryId: delivery.id } });
+    const currentAttempt = Math.max(1, delivery.attempt);
+    if (input.attempt === undefined && currentAttempt > 1) fail(422, "SMS_ATTEMPT_REQUIRED", "재요청 결과에는 발송 회차가 필요합니다.");
+    const attempt = input.attempt ?? currentAttempt;
+    const existing = await tx.smsReceipt.findUnique({ where: { deliveryId_attempt: { deliveryId: delivery.id, attempt } } });
     if (existing) {
       if (existing.receiptId !== input.receiptId) fail(409, "DUPLICATE_WEBHOOK", "이미 다른 문자 결과가 기록되어 있습니다.");
       return { deliveryId: delivery.id, receiptId: existing.receiptId, status: existing.status as SmsReceiptResult["status"], duplicate: true };
     }
-    await tx.smsReceipt.create({ data: { tenantId: delivery.tenantId, deliveryId: delivery.id, receiptId: input.receiptId, status } });
+    if (attempt !== currentAttempt) fail(409, "STALE_SMS_RECEIPT", "현재 발송 회차의 결과가 아닙니다.");
+    await tx.smsReceipt.create({ data: { tenantId: delivery.tenantId, deliveryId: delivery.id, attempt, receiptId: input.receiptId, status } });
     const deliveryStatus = status === "provider_accepted" ? "accepted" : status;
     // unknown은 종결 상태다 — 수신 결과는 원장만 정산하고 발송 상태는 다시 열지 않는다.
     if (["queued", "sending", "local_delivered"].includes(delivery.status) && (deliveryStatus !== "accepted" || delivery.preferenceId)) {

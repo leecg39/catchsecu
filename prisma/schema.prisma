@@ -2001,11 +2001,13 @@ model KakaoMockReceipt {
 model SmsReceipt {
   id String @id @default(uuid())
   tenantId String
-  deliveryId String @unique
-  delivery CampaignDelivery @relation(fields: [deliveryId], references: [id], onDelete: Restrict)
+  deliveryId String
+  delivery CampaignDelivery @relation(fields: [tenantId, deliveryId], references: [tenantId, id], onDelete: Restrict)
+  attempt Int @default(1)
   receiptId String @unique
   status String
   createdAt DateTime @default(now())
+  @@unique([deliveryId, attempt])
   @@index([tenantId, createdAt])
 }
 model Campaign {
@@ -2075,7 +2077,7 @@ model CampaignDelivery {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   jobs Job[]
-  smsReceipt SmsReceipt?
+  smsReceipts SmsReceipt[]
   @@unique([tenantId, id])
   @@unique([campaignId, contactHash])
   @@index([campaignId, status, position, id])

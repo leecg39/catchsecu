@@ -49150,6 +49150,12 @@
                       "failed",
                       "timeout"
                     ]
+                  },
+                  "attempt": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "description": "발송 회차. 최초 요청은 생략 가능하며 재요청/대체발송 결과는 반드시 명시한다."
                   }
                 },
                 "required": [
@@ -49163,7 +49169,8 @@
           }
         },
         "x-origin-check": "exact configured application Origin",
-        "x-contract-policy": "messaging"
+        "x-contract-policy": "messaging",
+        "x-attempt-policy": "회차별 불변 영수증; 재요청의 회차 생략422, 신규 과거/미래 회차409; 과거 동일 영수증 재전송은 기존 결과만 반환하고 현재 예약/상태를 변경하지 않음"
       }
     },
     "/kakao/channels": {

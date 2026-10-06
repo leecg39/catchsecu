@@ -175,7 +175,7 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
     const ledgerSource = await campaignLedgerSource(tx, recipient.tenantId, recipient.id, payload.attempt, campaign.channel, payload.transport);
     if (recipient.status === "sending") {
       const solapi = payload.transport === "sms-solapi";
-      const smsRow = solapi ? await tx.smsReceipt.findUnique({ where: { deliveryId: payload.deliveryId } }) : null;
+      const smsRow = solapi ? await tx.smsReceipt.findUnique({ where: { deliveryId_attempt: { deliveryId: payload.deliveryId, attempt: payload.attempt } } }) : null;
       const receipt = payload.transport === "local" ? await localReceipt(job.id) : payload.transport === "sms-local" ? await smsReceiptFile(job.id) : solapi ? smsRow?.createdAt ?? null : payload.transport === "kakao-local" ? await kakaoReceipt(job.id) : null;
       // 공급자가 거부·미확인으로 답한 건은 접수가 아니다 — 홀드를 환불하고 종결한다.
       if (smsRow && smsRow.status !== "provider_accepted") {
@@ -255,10 +255,12 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
       try {
         const sent = await deliverSms({ transport: solapi ? "solapi" : "local", jobId: job.id, to: fresh.evaluated.contact!.contact,
           from: decrypt<string>(fresh.sender!.addressCipher!), text: fresh.evaluated.content!.text });
-        if (solapi) await tx.smsReceipt.create({ data: { tenantId: recipient.tenantId, deliveryId: recipient.id, receiptId: sent.receiptId, status: "provider_accepted" } });
+        if (solapi) await tx.smsReceipt.create({ data: { tenantId: recipient.tenantId, deliveryId: recipient.id, attempt: payload.attempt, receiptId: sent.receiptId, status: "provider_accepted" } });
       }
       catch (error) {
         if (error instanceof HttpError && error.status === 422) { if (hold) await releaseHeld(tx, recipient, ledgerSource); await finish(tx, job, campaign, recipient, "failed", error.code); return; }
+        // 공급자 요청 후 오류는 접수 여부를 모른다. 재전송하지 않고 webhook 대사까지 예약을 유지한다.
+        if (solapi) { await finish(tx, job, campaign, recipient, "unknown", "DELIVERY_UNCERTAIN"); return; }
         if (job.attempts >= job.maxAttempts) { if (hold) await releaseHeld(tx, recipient, ledgerSource); await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }
         await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "queued", reason: "DELIVERY_FAILED" } });
         await tx.job.update({ where: { id: job.id }, data: { status: "retry", dueAt: new Date(Date.now() + Math.min(300000, 1000 * 2 ** job.attempts)), leaseOwner: null, leaseUntil: null, lastError: "DELIVERY_FAILED" } });
@@ -328,7 +330,7 @@ export async function cleanupCampaigns() {
     const transport = parsed?.transport ?? null;
     const unitCost = parsed && isMessage(parsed.transport) ? (parsed.unitCost ?? (isKakao(parsed.transport) ? env.KAKAO_UNIT_COST_KRW : env.MESSAGE_UNIT_COST_KRW)) : 0;
     const ledgerSource = await campaignLedgerSource(tx, row.tenantId, row.id, row.attempt, campaign.channel, transport);
-    const smsRow = transport === "sms-solapi" ? await tx.smsReceipt.findUnique({ where: { deliveryId: row.id } }) : null;
+    const smsRow = transport === "sms-solapi" ? await tx.smsReceipt.findUnique({ where: { deliveryId_attempt: { deliveryId: row.id, attempt: row.attempt } } }) : null;
     const receipt = transport === "sms-local" ? await smsReceiptFile(job.id) : transport === "sms-solapi" ? smsRow?.createdAt ?? null : transport === "kakao-local" ? await kakaoReceipt(job.id) : transport ? await localReceipt(job.id) : null;
     const status = smsRow && smsRow.status !== "provider_accepted" ? smsRow.status === "failed" ? "failed" : "unknown"
       : receipt && row.status === "sending" ? transport === "sms-solapi" ? "accepted" : "local_delivered"

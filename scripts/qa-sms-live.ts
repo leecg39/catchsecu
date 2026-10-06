@@ -51,7 +51,7 @@ console.log("SMS_TRANSPORT", env.SMS_TRANSPORT);
 let job = await db.job.findFirstOrThrow({ where: { campaignDelivery: { campaignId: cid } } });
 for (let i = 0; i < 20 && !["done", "cancelled", "dead"].includes(job.status); i++) { await runOneJob("qa-live-" + crypto.randomUUID()); job = await db.job.findUniqueOrThrow({ where: { id: job.id } }); }
 const delivery = await db.campaignDelivery.findFirstOrThrow({ where: { campaignId: cid } });
-const receipt = await db.smsReceipt.findUnique({ where: { deliveryId: delivery.id } });
+const receipt = await db.smsReceipt.findUnique({ where: { deliveryId_attempt: { deliveryId: delivery.id, attempt: delivery.attempt } } });
 const row = await db.campaign.findUniqueOrThrow({ where: { id: cid } });
 console.log(JSON.stringify({ campaign: row.status, delivery: delivery.status, reason: delivery.reason, job: job.status, lastError: job.lastError, receipt: receipt ? { receiptId: receipt.receiptId, status: receipt.status } : null }));
 await writeFile("docs/qa/P08-T02/live-solapi-campaign.json", JSON.stringify({ checkedAt: new Date().toISOString(), campaignId: cid, campaign: row.status, delivery: { status: delivery.status, reason: delivery.reason, acceptedAt: delivery.acceptedAt }, job: { id: job.id, status: job.status }, receipt: receipt ? { receiptId: receipt.receiptId, status: receipt.status } : null }, null, 2));

@@ -177,9 +177,9 @@ test("예약된 문자 캠페인 취소는 미발송분을 취소하고 발송�
 
 const webhookSecret = "settle-webhook-secret-0123456789";
 const signReceipt = (body: string) => createHmac("sha256", webhookSecret).update(body).digest("hex");
-async function smsReceipt(deliveryId: string, outcome: "accepted" | "failed" | "timeout") {
+async function smsReceipt(deliveryId: string, outcome: "accepted" | "failed" | "timeout", attempt?: number) {
   const { applySmsReceipt } = await import("@/server/sms-adapter");
-  const body = JSON.stringify({ deliveryId, receiptId: "rcpt-" + randomUUID(), outcome });
+  const body = JSON.stringify({ deliveryId, receiptId: "rcpt-" + randomUUID(), outcome, ...(attempt ? { attempt } : {}) });
   return applySmsReceipt(body, signReceipt(body), webhookSecret);
 }
 // 발송 중 크래시를 재현한다 — delivery는 sending, 예약 홀드만 남고 finish가 안 끝난 상태.
@@ -314,7 +314,7 @@ test.each(["accepted","failed","timeout"] as const)("수동 재요청 문자 web
   expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delivery.id}})).toMatchObject({attempt:2,status:"queued"});
   await db.campaignDelivery.update({where:{id:delivery.id},data:{status:"sending"}});
   const source=delivery.id+":attempt:2",hold=await postTrustedLedgerTransfer({tenantId:fx.company.id,serviceId:fx.service.id,currency:"KRW",kind:"reserve",amount:BigInt(50),sourceKind:"campaign_delivery",sourceId:source});
-  await smsReceipt(delivery.id,outcome);
+  await smsReceipt(delivery.id,outcome,2);
   const entries=await db.ledgerTransaction.findMany({where:{tenantId:fx.company.id,sourceId:source}});
   expect(entries.map(r=>r.kind).sort()).toEqual([outcome==="accepted"?"capture":"release","reserve"].sort());
   expect(entries.find(r=>r.kind!=="reserve")?.reservationId).toBe(hold.id);
@@ -351,4 +351,57 @@ test.each(["worker","cleanup"] as const)("이전 빌드가 예약한 수동 atte
     expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delivery.id}})).toMatchObject({status:"local_delivered",attempt:2});
     await cleanupCampaigns();expect(await account(fx.company.id)).toMatchObject({available:BigInt(50),held:BigInt(0)});
   }finally {vi.restoreAllMocks();}
+});
+
+test.each(["network","malformed","server"] as const)("문자 공급자 %s 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다", async failure=>{
+  const fx=await fixture();env.SMS_TRANSPORT="solapi";env.SOLAPI_API_KEY="test-solapi-key";env.SOLAPI_API_SECRET="test-solapi-secret-0123";env.SOLAPI_TENANT_ID=fx.company.id;
+  await postTrustedLedgerTransfer({tenantId:fx.company.id,currency:"KRW",kind:"funding",amount:BigInt(100),sourceKind:"pg_capture",sourceId:randomUUID()});
+  const campaignId=await campaign(fx),job=await db.job.findFirstOrThrow({where:{campaignDelivery:{campaignId}}});
+  const realFetch=globalThis.fetch;let sends=0;
+  globalThis.fetch=(async(url,init)=>{
+    if(!String(url).startsWith('https://api.solapi.com/'))return realFetch(url,init);sends++;
+    if(failure==="network")throw new Error('Mock response lost after possible acceptance');
+    return failure==="malformed"?new Response('<html>unknown</html>',{status:200}):new Response('{}',{status:500});
+  }) as typeof fetch;
+  try {
+    await runOneJob('uncertain-provider-'+randomUUID(),{tenantId:fx.company.id,jobId:job.id});
+    expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:job.campaignDeliveryId!}})).toMatchObject({status:'unknown',reason:'DELIVERY_UNCERTAIN'});
+    expect(await db.job.findUniqueOrThrow({where:{id:job.id}})).toMatchObject({status:'dead'});
+    expect(await account(fx.company.id)).toMatchObject({available:BigInt(50),held:BigInt(50)});
+    await runOneJob('uncertain-provider-replay-'+randomUUID(),{tenantId:fx.company.id,jobId:job.id});expect(sends).toBe(1);
+    await smsReceipt(job.campaignDeliveryId!,'accepted');
+    expect(await account(fx.company.id)).toMatchObject({available:BigInt(50),held:BigInt(0)});
+    expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:job.campaignDeliveryId!}})).toMatchObject({status:'unknown'});
+  }finally {globalThis.fetch=realFetch;}
+});
+
+test("공급자 실패가 기록된 문자의 수동 재요청은 새 영수증으로 청구하고 이전 결과 재전송은 무시한다",async()=>{
+  const fx=await fixture();env.SMS_TRANSPORT='solapi';env.SOLAPI_API_KEY='test-solapi-key';env.SOLAPI_API_SECRET='test-solapi-secret-0123';env.SOLAPI_TENANT_ID=fx.company.id;
+  await postTrustedLedgerTransfer({tenantId:fx.company.id,currency:'KRW',kind:'funding',amount:BigInt(150),sourceKind:'pg_capture',sourceId:randomUUID()});
+  const {campaignId,delivery}=await crashedSend(fx),oldReceipt='old-'+randomUUID(),oldBody=JSON.stringify({deliveryId:delivery.id,receiptId:oldReceipt,outcome:'failed'});
+  const {applySmsReceipt}=await import('@/server/sms-adapter');await applySmsReceipt(oldBody,signReceipt(oldBody),webhookSecret);
+  await drain(fx.company.id,campaignId);
+  const current=await ok<{version:number}>(await GET(req('/campaigns/'+campaignId,fx.cookie)));
+  await ok(await POST(req('/campaigns/'+campaignId+'/retry',fx.cookie,'POST',{version:current.version,ids:[delivery.id]},randomUUID())),202);
+  const missingBody=JSON.stringify({deliveryId:delivery.id,receiptId:'missing-'+randomUUID(),outcome:'accepted'});
+  await expect(applySmsReceipt(missingBody,signReceipt(missingBody),webhookSecret)).rejects.toMatchObject({status:422,code:'SMS_ATTEMPT_REQUIRED'});
+  for(const attempt of [1,3]) {
+    const wrongBody=JSON.stringify({deliveryId:delivery.id,receiptId:'stale-'+randomUUID(),outcome:'accepted',attempt});
+    await expect(applySmsReceipt(wrongBody,signReceipt(wrongBody),webhookSecret)).rejects.toMatchObject({status:409});
+  }
+  const next=await db.job.findFirstOrThrow({where:{campaignDeliveryId:delivery.id},orderBy:{createdAt:'desc'}}),realFetch=globalThis.fetch;let sends=0;
+  globalThis.fetch=(async(url,init)=>{if(!String(url).startsWith('https://api.solapi.com/'))return realFetch(url,init);sends++;return new Response(JSON.stringify({groupId:'retry-'+next.id,messageId:'new',statusCode:'2000'}),{status:200});}) as typeof fetch;
+  try {
+    await runOneJob('new-provider-attempt-'+randomUUID(),{tenantId:fx.company.id,jobId:next.id});
+    expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delivery.id}})).toMatchObject({status:'accepted',attempt:2});
+    expect(await account(fx.company.id)).toMatchObject({available:BigInt(100),held:BigInt(0)});
+    expect(sends).toBe(1);expect(await db.smsReceipt.count({where:{deliveryId:delivery.id}})).toBe(2);
+    await expect(db.smsReceipt.updateMany({where:{deliveryId:delivery.id},data:{status:'failed'}})).rejects.toThrow();
+    await expect(db.smsReceipt.deleteMany({where:{deliveryId:delivery.id}})).rejects.toThrow();
+    await expect(db.smsReceipt.create({data:{tenantId:fx.company.id,deliveryId:delivery.id,attempt:6,receiptId:'bad-attempt-'+randomUUID(),status:'failed'}})).rejects.toThrow();
+    const staleBody=JSON.stringify({deliveryId:delivery.id,receiptId:oldReceipt,outcome:'failed',attempt:1});
+    expect(await applySmsReceipt(staleBody,signReceipt(staleBody),webhookSecret)).toMatchObject({duplicate:true,status:'failed'});
+    expect(await account(fx.company.id)).toMatchObject({available:BigInt(100),held:BigInt(0)});
+    expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delivery.id}})).toMatchObject({status:'accepted',attempt:2});
+  }finally {globalThis.fetch=realFetch;}
 });
