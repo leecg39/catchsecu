@@ -5,6 +5,7 @@ import { db } from "@/server/db";
 import { decrypt } from "@/server/crypto";
 import { env } from "@/server/env";
 import * as auditModule from "@/server/audit";
+import * as ssoModule from "@/server/sso";
 
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
@@ -273,4 +274,31 @@ test("티켓 발급 뒤 디렉터리 버전이 바뀌면 기존 티켓으로 등
   expect(await db.virtualOrgMember.findUniqueOrThrow({ where: { id: fixture.member.id } }))
     .toMatchObject({ emailCipher: null, version: 2 });
   expect(await db.ssoState.findUnique({ where: { id: fixture.state.id } })).not.toBeNull();
+});
+
+test.each(["removed", "changed"])("PIN 확인 뒤 디렉터리가 %s 상태가 되면 진행 중인 로그인도 거절한다", async kind => {
+  const { cookie } = await ownerCookie();
+  const provider = await makeGpki(cookie);
+  const { member } = await addDirectory(cookie, provider.id,
+    { orgCode: "ORG-1", employeeNo: "EMP-1", name: "회수 대상", email: "revoked-directory@catchsecu.test", pin: "4321" });
+  const { orgLogin } = await routes();
+  let reached!: () => void, release!: () => void;
+  const entered = new Promise<void>(resolve => { reached = resolve; });
+  const resume = new Promise<void>(resolve => { release = resolve; });
+  const original = ssoModule.completeSso;
+  const spy = vi.spyOn(ssoModule, "completeSso").mockImplementation(async (...args) => {
+    reached(); await resume; return original(...args);
+  });
+  const pending = orgLogin(req("/auth/org/login", "", "POST", loginBody()));
+  try {
+    await entered;
+    if (kind === "removed") await db.virtualOrgMember.delete({ where: { id: member.id } });
+    else await db.virtualOrgMember.update({ where: { id: member.id }, data: { version: { increment: 1 } } });
+    release();
+    const response = await pending;
+    expect(response.status).toBe(kind === "removed" ? 401 : 409);
+    expect(response.headers.get("set-cookie")).toBeNull();
+    expect(await db.user.findUnique({ where: { email: "revoked-directory@catchsecu.test" } })).toBeNull();
+    expect(await db.account.count({ where: { providerId: "sso:" + provider.id } })).toBe(0);
+  } finally { release(); await pending; spy.mockRestore(); }
 });

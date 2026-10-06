@@ -1,0 +1,55 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:72069) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/org-auth.test.ts (15 tests | 2 failed | 13 skipped) 1187ms
+   × PIN 확인 뒤 디렉터리가 removed 상태가 되면 진행 중인 로그인도 거절한다 735ms
+   × PIN 확인 뒤 디렉터리가 changed 상태가 되면 진행 중인 로그인도 거절한다 449ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/org-auth.test.ts > PIN 확인 뒤 디렉터리가 removed 상태가 되면 진행 중인 로그인도 거절한다
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ tests/server/org-auth.test.ts:299:29
+    297|     release();
+    298|     const response = await pending;
+    299|     expect(response.status).toBe(kind === "removed" ? 401 : 409);
+       |                             ^
+    300|     expect(response.headers.get("set-cookie")).toBeNull();
+    301|     expect(await db.user.findUnique({ where: { email: "revoked-directo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/org-auth.test.ts > PIN 확인 뒤 디렉터리가 changed 상태가 되면 진행 중인 로그인도 거절한다
+AssertionError: expected 200 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 200
+
+ ❯ tests/server/org-auth.test.ts:299:29
+    297|     release();
+    298|     const response = await pending;
+    299|     expect(response.status).toBe(kind === "removed" ? 401 : 409);
+       |                             ^
+    300|     expect(response.headers.get("set-cookie")).toBeNull();
+    301|     expect(await db.user.findUnique({ where: { email: "revoked-directo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 13 skipped (15)
+   Start at  08:55:35
+   Duration  2.01s (tests 63%, import 21%, transform 16%)
+

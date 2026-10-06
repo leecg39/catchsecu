@@ -76,7 +76,15 @@ async function finishOrgLogin(provider: SsoProvider, state: SsoState, member: Vi
   const email = member.emailCipher ? decrypt<string>(member.emailCipher) : undefined;
   const result = await completeSso(provider, state, {
     sub: `${member.orgCode}:${member.employeeNo}`, iss: provider.issuer,
-    email, name: decrypt<string>(member.nameCipher), emailVerified: !!email }, headers);
+    email, name: decrypt<string>(member.nameCipher), emailVerified: !!email }, headers, async tx => {
+    await tx.$queryRawUnsafe('SELECT id FROM "VirtualOrgMember" WHERE id=$1 AND "providerId"=$2 FOR UPDATE', member.id, provider.id);
+    const current = await tx.virtualOrgMember.findUnique({ where: { id: member.id } });
+    if (!current || current.providerId !== provider.id)
+      fail(401, "ORG_AUTH_FAILED", "조직 인증 계정이 해제되었습니다. 다시 로그인해주세요.");
+    if (memberSnapshot(current) !== memberSnapshot(member) || current.pinHash !== member.pinHash
+      || current.emailCipher !== member.emailCipher || current.nameCipher !== member.nameCipher)
+      fail(409, "DIRECTORY_CHANGED", "디렉터리 정보가 변경되었습니다. 다시 로그인해주세요.");
+  });
   return { status: "verified" as const, ...result };
 }
 
