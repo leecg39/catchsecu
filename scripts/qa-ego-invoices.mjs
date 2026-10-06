@@ -1,0 +1,18 @@
+/* global taskSpace, root */
+const fs=await import('node:fs/promises');const {join}=await import('node:path');
+const f=JSON.parse(await fs.readFile(join(root,'.local/mock-page-fixtures.json'),'utf8'));
+if(f.origin!=='http://catchsecu-mock.localhost:3189')throw Error('Mock origin required');
+const task=await taskSpace(56);if(task.ownership!=='agent')throw Error('Control required');const page=task.page('p1');
+const id=f.routes['/pay/result/success/:purchaseId'].split('/').at(-1);
+const dir=join(root,'.local/invoice-ui');const out=join(root,'docs/qa/mock-completion/invoice-ui');await fs.mkdir(dir,{recursive:true});await fs.mkdir(out,{recursive:true});
+const report={checkedAt:new Date().toISOString(),browser:'Ego Lite',spaceId:56,results:[]};
+const instrument=await page.cdp('Page.addScriptToEvaluateOnNewDocument',{source:`(()=>{window.__invoiceErrors=[];addEventListener('error',e=>window.__invoiceErrors.push(String(e.message)));addEventListener('unhandledrejection',e=>window.__invoiceErrors.push(String(e.reason)));const old=console.error;console.error=(...args)=>{window.__invoiceErrors.push(args.map(String).join(' '));old.apply(console,args);};})();`});
+try{for(const path of ['/bill/:id','/creditBill/:id','/bill/:id/refund']){
+ const route=path.replace(':id',id),r={path,widths:[]};report.results.push(r);
+ await page.goto(f.origin+'/dashboard',{waitUntil:'domcontentloaded'});await page.goto(f.origin+route,{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>document.body.innerText.includes('12,000원')&&document.body.innerText.includes('Mock 화면 요금제'),undefined,{timeout:10000});
+ r.pathMatches=new URL(await page.url()).pathname===route;
+ for(const width of [1440,768,390]){await page.cdp('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));const state=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth,errors:window.__invoiceErrors||[],alerts:[...document.querySelectorAll('[role=alert]')].map(x=>x.textContent).filter(Boolean),failedResources:performance.getEntriesByType('resource').filter(x=>x.responseStatus>=400).length}));await fs.writeFile(join(dir,report.results.length+'-'+width+'.json'),JSON.stringify(state));await page.screenshot({path:join(dir,report.results.length+'-'+width+'.png')});r.widths.push({width,overflow:state.overflow,errorCount:state.errors.length,alerts:state.alerts.length,failedResources:state.failedResources});}
+ await fs.writeFile(join(dir,report.results.length+'.txt'),await page.snapshot({scope:'full_page'}));await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.innerText.includes('12,000원'),undefined,{timeout:10000});r.reloaded=true;await page.evaluate(()=>history.back());await page.waitForURL('**/dashboard',{timeout:10000});r.back=true;r.result=r.pathMatches&&r.widths.every(w=>!w.overflow&&!w.errorCount&&!w.alerts&&!w.failedResources)?'passed':'failed';
+}}finally{await page.cdp('Page.removeScriptToEvaluateOnNewDocument',{identifier:instrument.identifier});await page.cdp('Emulation.clearDeviceMetricsOverride');}
+report.result=report.results.every(r=>r.result==='passed')?'passed':'failed';await fs.writeFile(join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(report);await page.goto(f.origin+'/bill/'+id+'/refund',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>!!document.querySelector('input[name=amount]'),undefined,{timeout:10000});console.log(await page.snapshot());if(report.result!=='passed')throw Error('Invoice page QA failed');

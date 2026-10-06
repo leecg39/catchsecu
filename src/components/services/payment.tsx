@@ -226,7 +226,7 @@ function PaymentOrdersPanel({ onChanged }: { onChanged: () => void }) {
         <ActionButton type="button" secondary disabled={busy !== null} onClick={() => void virtualCheckout(row.id, "failed")}>가상 실패</ActionButton>
         <span className="svc-muted">mock — 실제 PG 아님</span></span>}
       {row.status === "paid" && <>
-        <a className="cs-button secondary" href={`/api/v1/billing/orders/${row.id}/invoice`} target="_blank" rel="noreferrer">청구서</a>
+        <Link className="cs-button secondary" href={`/bill/${row.id}`}>청구서 상세</Link><a className="cs-button secondary" href={`/api/v1/billing/orders/${row.id}/invoice`} target="_blank" rel="noreferrer">청구서</a>
         <form className="svc-trial-cancel" onSubmit={event => { event.preventDefault(); refund(row.id, event.currentTarget); }}>
           <label>환불 금액 <input className="cs-input" type="number" name="amount" min={1} max={row.amount - row.refundedTotal} required/></label>
           <label>사유 <input className="cs-input" type="text" name="reason" maxLength={500} required/></label>
@@ -333,7 +333,7 @@ export function PaymentResult({ orderId: pathOrderId }: { orderId?: string } = {
     {valid && order.error && <div className="svc-red-note"><b>{order.error.message}</b></div>}
     {status === "paid" && <><div className="svc-neutral-note"><b>결제가 확인됐습니다.</b></div>
       <p className="svc-muted">{order.data!.amount.toLocaleString("ko-KR")}원 — 서명된 공급자 승인으로 확정된 주문입니다.</p>
-      <p><a className="cs-button secondary" href={`/api/v1/billing/orders/${orderId}/invoice`} target="_blank" rel="noreferrer">청구서 보기</a></p></>}
+      <p><Link className="cs-button secondary" href={`/bill/${orderId}`}>청구서 상세</Link> <a className="cs-button secondary" href={`/api/v1/billing/orders/${orderId}/invoice`} target="_blank" rel="noreferrer">청구서 보기</a></p></>}
     {status === "pending" && <><div className="svc-neutral-note"><b>승인을 확인하는 중입니다.</b></div>
       <p className="svc-muted">결제 결과 URL만으로는 승인되지 않습니다. 공급자 콜백이 확인되면 상태가 갱신됩니다.</p></>}
     {status === "failed" && <><div className="svc-red-note"><b>결제가 실패했습니다.</b></div>
