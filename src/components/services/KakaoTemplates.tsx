@@ -53,7 +53,7 @@ export function KakaoTemplates({ path }: { path: string }) {
         <label>템플릿 이름<input className="cs-input" aria-label="템플릿 이름" required maxLength={40} value={templateName} onChange={event => setTemplateName(event.target.value)} /></label>
         <label>본문<textarea className="cs-input" aria-label="템플릿 본문" required maxLength={1000} rows={4} value={templateBody} onChange={event => setTemplateBody(event.target.value)} placeholder={"#{name}님 안내드립니다."} /></label>
       </fieldset><ActionButton disabled={busy || !templateChannel}>초안 저장</ActionButton></form>
-      <ul>{(templates.data?.items ?? []).map(item => <li key={item.id}>{item.name} · v{item.version} · {templateStatus[item.status]}
+      <ul>{(templates.data?.items ?? []).map(item => <li key={item.id}><Link href={"/alimtalk/templates/" + item.id}>{item.name}</Link> · v{item.version} · {templateStatus[item.status]}
         {(item.status === "draft" || item.status === "rejected") && <> <ActionButton secondary disabled={busy} onClick={() => run(() => api("/kakao/templates/" + item.id + "/submit", { method: "POST", body: JSON.stringify({ version: item.version }) }), "심사를 요청했습니다.")}>심사 요청</ActionButton></>}
         {item.status === "rejected" && item.reviewNote && <small> · 반려 사유: {item.reviewNote}</small>}</li>)}</ul>
       <p>승인되지 않은 템플릿은 발송할 수 없습니다. 내용을 바꾸면 다시 심사해야 합니다. 캠페인은 <Link className="cs-link" href="/alimtalk/direct">알림톡 보내기</Link>에서 작성합니다.</p></Panel>}

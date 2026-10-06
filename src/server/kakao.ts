@@ -9,7 +9,8 @@ import type { Context } from "./context";
 import { env } from "./env";
 import { fail } from "./http";
 import { audit } from "./audit";
-import { lockFormService } from "./form-access";
+import { lockServiceActor } from "./service-actor";
+import { assertFileDeadlines } from "./file-access";
 
 function channelDto(row: KakaoChannel): KakaoChannelRecord {
   return { id: row.id, serviceId: row.serviceId, name: row.name, searchId: row.searchId, status: row.status as KakaoChannelRecord["status"], version: row.version };
@@ -18,7 +19,14 @@ function templateDto(row: KakaoTemplate): KakaoTemplateRecord {
   return { id: row.id, serviceId: row.serviceId, channelId: row.channelId, name: row.name, body: row.body, buttons: row.buttons as KakaoTemplateRecord["buttons"], status: row.status as KakaoTemplateRecord["status"], reviewNote: row.reviewNote, version: row.version };
 }
 async function lockService(tx: Transaction, ctx: Context, serviceId: string) {
-  return lockFormService(tx, ctx, serviceId, "message.manage");
+  const actor = await lockServiceActor(tx, ctx, "message.manage");
+  const service = await tx.service.findFirst({ where: { AND: [actor.scope, { id: serviceId }] } });
+  if (!service) {
+    if (!await tx.service.count({ where: { id: serviceId, tenantId: ctx.tenantId } })) fail(404, "NOT_FOUND", "서비스를 찾을 수 없습니다.");
+    fail(403, "SERVICE_FORBIDDEN", "해당 서비스에 대한 권한이 없습니다.");
+  }
+  if (service.status !== "active") fail(409, "SERVICE_ARCHIVED", "보관된 서비스의 알림톡을 관리할 수 없습니다.");
+  return actor.deadlines;
 }
 export async function listKakaoChannels(ctx: Context, serviceId: string) {
   return db.$transaction(async tx => {
@@ -84,10 +92,15 @@ export async function updateKakaoTemplate(ctx: Context, id: string, input: z.inf
   return db.$transaction(async tx => {
     const current = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!current) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
-    await lockService(tx, ctx, current.serviceId);
+    const deadlines = await lockService(tx, ctx, current.serviceId);
     if (current.version !== input.version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
-    const row = await tx.kakaoTemplate.update({ where: { id }, data: { name: input.name, body: input.body, buttons: input.buttons, status: "draft", reviewNote: "", version: { increment: 1 } } });
+    if (["submitted", "archived"].includes(current.status)) fail(409, "TEMPLATE_LOCKED", "심사 중이거나 보관된 템플릿은 수정할 수 없습니다.");
+    const changed = await tx.kakaoTemplate.updateMany({ where: { id, tenantId: ctx.tenantId, version: input.version, status: { in: ["draft", "rejected", "approved"] } },
+      data: { name: input.name, body: input.body, buttons: input.buttons, status: "draft", reviewNote: "", version: { increment: 1 } } });
+    if (changed.count !== 1) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    const row = await tx.kakaoTemplate.findUniqueOrThrow({ where: { id } });
     await audit(tx, ctx, requestId, "kakao.template_updated", "kakaoTemplate", id, ["name", "body", "status"], current.serviceId);
+    assertFileDeadlines(deadlines);
     return templateDto(row);
   });
 }
@@ -95,11 +108,14 @@ export async function submitKakaoTemplate(ctx: Context, id: string, version: num
   const submitted = await db.$transaction(async tx => {
     const current = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!current) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
-    await lockService(tx, ctx, current.serviceId);
+    const deadlines = await lockService(tx, ctx, current.serviceId);
     if (current.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
     if (!["draft", "rejected"].includes(current.status)) fail(409, "REVIEW_UNAVAILABLE", "초안이거나 반려된 템플릿만 심사 요청할 수 있습니다.");
-    const row = await tx.kakaoTemplate.update({ where: { id }, data: { status: "submitted", reviewNote: "", version: { increment: 1 } } });
+    const changed = await tx.kakaoTemplate.updateMany({ where: { id, tenantId: ctx.tenantId, version, status: { in: ["draft", "rejected"] } }, data: { status: "submitted", reviewNote: "", version: { increment: 1 } } });
+    if (changed.count !== 1) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    const row = await tx.kakaoTemplate.findUniqueOrThrow({ where: { id } });
     await audit(tx, ctx, requestId, "kakao.template_submitted", "kakaoTemplate", id, ["status"], current.serviceId);
+    assertFileDeadlines(deadlines);
     return { row: templateDto(row), serviceId: current.serviceId, body: current.body };
   });
   // 로컬 공급자는 심사를 즉시 확정한다 — 본문의 `#반려` 표지는 반려를 재현하는 적대적 테스트 훅이다.
@@ -158,7 +174,9 @@ export async function applyKakaoReview(raw: string, signature: string, secret: s
     if (input.outcome === "verified") fail(422, "INVALID_REVIEW", "템플릿은 승인 또는 반려만 받을 수 있습니다.");
     const row = await tx.kakaoTemplate.findUnique({ where: { id: input.id } });
     if (!row || row.status !== "submitted") fail(409, "REVIEW_UNAVAILABLE", "심사 요청 중인 템플릿만 결과를 반영할 수 있습니다.");
-    const saved = await tx.kakaoTemplate.update({ where: { id: row.id }, data: { status: input.outcome === "approved" ? "approved" : "rejected", reviewNote: input.note, version: { increment: 1 } } });
+    const changed = await tx.kakaoTemplate.updateMany({ where: { id: row.id, version: row.version, status: "submitted" }, data: { status: input.outcome === "approved" ? "approved" : "rejected", reviewNote: input.note, version: { increment: 1 } } });
+    if (changed.count !== 1) fail(409, "REVIEW_UNAVAILABLE", "이미 처리되었거나 변경된 심사 요청입니다.");
+    const saved = await tx.kakaoTemplate.findUniqueOrThrow({ where: { id: row.id } });
     await audit(tx, { tenantId: row.tenantId, user: { id: null } }, requestId, "kakao.template_" + input.outcome, "kakaoTemplate", row.id, ["status", "reviewNote"], row.serviceId);
     return templateDto(saved);
   });
@@ -174,10 +192,11 @@ export async function readKakaoChannel(ctx: Context, id: string) {
 }
 export async function readKakaoTemplate(ctx: Context, id: string) {
   return db.$transaction(async tx => {
-    const row = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
+    const row = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId }, include: { channel: true } });
     if (!row) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
-    await lockService(tx, ctx, row.serviceId);
-    return templateDto(row);
+    const deadlines = await lockService(tx, ctx, row.serviceId);
+    assertFileDeadlines(deadlines);
+    return { ...templateDto(row), channelName: row.channel.name, channelSearchId: row.channel.searchId };
   });
 }
 export async function removeKakaoChannel(ctx: Context, id: string, version: number, requestId: string) {
@@ -201,16 +220,21 @@ export async function removeKakaoTemplate(ctx: Context, id: string, version: num
   return db.$transaction(async tx => {
     const current = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!current) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
-    await lockService(tx, ctx, current.serviceId);
+    const deadlines = await lockService(tx, ctx, current.serviceId);
     if (current.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
     const referenced = await tx.campaign.count({ where: { tenantId: ctx.tenantId, kakaoTemplateId: id } });
     if (current.status !== "draft" || referenced) {
-      const row = await tx.kakaoTemplate.update({ where: { id }, data: { status: "archived", version: { increment: 1 } } });
+      const changed = await tx.kakaoTemplate.updateMany({ where: { id, tenantId: ctx.tenantId, version }, data: { status: "archived", version: { increment: 1 } } });
+      if (changed.count !== 1) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+      const row = await tx.kakaoTemplate.findUniqueOrThrow({ where: { id } });
       await audit(tx, ctx, requestId, "kakao.template_archived", "kakaoTemplate", id, ["status"], current.serviceId);
+      assertFileDeadlines(deadlines);
       return { deleted: false, archived: true, body: templateDto(row) };
     }
-    await tx.kakaoTemplate.delete({ where: { id } });
+    const removed = await tx.kakaoTemplate.deleteMany({ where: { id, tenantId: ctx.tenantId, version, status: "draft" } });
+    if (removed.count !== 1) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
     await audit(tx, ctx, requestId, "kakao.template_deleted", "kakaoTemplate", id, ["name"], current.serviceId);
+    assertFileDeadlines(deadlines);
     return { deleted: true, archived: false, body: null };
   });
 }

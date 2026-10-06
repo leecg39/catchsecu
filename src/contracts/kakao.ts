@@ -41,4 +41,4 @@ export function kakaoVariables(body: string) {
   return [...body.matchAll(/#\{([A-Za-z0-9_]{1,30})\}/g)].map(match => match[1]);
 }
 export type KakaoChannelRecord = { id: string; serviceId: string; name: string; searchId: string; status: "pending" | "verified" | "archived"; version: number };
-export type KakaoTemplateRecord = { id: string; serviceId: string; channelId: string; name: string; body: string; buttons: z.infer<typeof kakaoButtons>; status: "draft" | "submitted" | "rejected" | "approved" | "archived"; reviewNote: string; version: number };
+export type KakaoTemplateRecord = { id: string; serviceId: string; channelId: string; channelName?: string; channelSearchId?: string; name: string; body: string; buttons: z.infer<typeof kakaoButtons>; status: "draft" | "submitted" | "rejected" | "approved" | "archived"; reviewNote: string; version: number };

@@ -6,10 +6,15 @@ import { idempotent } from "@/server/idempotency";
 import { createKakaoChannel, createKakaoTemplate, listKakaoChannels, listKakaoTemplates, previewKakaoTemplate, readKakaoChannel, readKakaoReview, readKakaoTemplate, removeKakaoChannel, removeKakaoTemplate, requestKakaoChannelVerification, sendKakaoTemplate, submitKakaoTemplate, updateKakaoChannel, updateKakaoTemplate } from "@/server/kakao";
 
 const versionInput = z.object({ version: z.number().int().positive() }).strict();
-function segments(request: Request) { return new URL(request.url).pathname.split("/").slice(4); }
+function segments(request: Request) {
+  const values = new URL(request.url).pathname.split("/").slice(4);
+  if (values.length > 3 || values.some(value => !value)) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
+  return values;
+}
 export const GET = route(async request => {
   const ctx = await requireContext(request.headers, "message.manage");
   const [first, id, action] = segments(request);
+  if (action && !(first === "templates" && action === "review")) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   if (first === "templates" && id && action === "review") return json(await readKakaoReview(ctx, z.uuid().parse(id)));
   if (first === "channels" && id) return json(await readKakaoChannel(ctx, z.uuid().parse(id)));
   if (first === "templates" && id) return json(await readKakaoTemplate(ctx, z.uuid().parse(id)));
@@ -48,7 +53,8 @@ export const POST = route(async (request, requestId) => {
 });
 export const PATCH = route(async (request, requestId) => {
   const ctx = await requireContext(request.headers, "message.manage");
-  const [first, id] = segments(request);
+  const [first, id, action] = segments(request);
+  if (action) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   if (first === "channels" && id) return json(await updateKakaoChannel(ctx, z.uuid().parse(id), await body(request, kakaoChannelPatch), requestId));
   if (first === "templates" && id) return json(await updateKakaoTemplate(ctx, z.uuid().parse(id), await body(request, kakaoTemplatePatch), requestId));
   fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
