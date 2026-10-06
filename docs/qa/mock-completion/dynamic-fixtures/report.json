@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-06T05:52:52.379Z",
+  "checkedAt": "2026-10-06T06:24:41.882Z",
   "result": "passed",
   "evidenceLevel": "mock-api-fixture",
   "browserVerified": false,
@@ -74,6 +74,14 @@
       "status": 200
     },
     {
+      "name": "fixed URL create",
+      "status": 201
+    },
+    {
+      "name": "fixed URL resolve",
+      "status": 200
+    },
+    {
       "name": "upload init",
       "status": 201
     },
@@ -145,47 +153,51 @@
   "routes": [
     {
       "path": "/pay/result/success/:purchaseId",
-      "fixtureSha256": "8cb2bf7603a266f03574b1f209be2ac86809a98a8ae9ff4a1a3f089f6f258e9f"
+      "fixtureSha256": "614bd02342a54d63b9406f937abfc50be8d9329a24e31f396e7431087abc4bbf"
     },
     {
       "path": "/pay/credit/success/:purchaseId",
-      "fixtureSha256": "5dadc18b6fbab0c50096e0527165f10f159b13b6248d0216f9d6165357c7f1db"
+      "fixtureSha256": "404a20e1aae136d051d6047ad2a37be5ac6d38578ec4768b90dc73d0bb551942"
     },
     {
       "path": "/pay/plus/success/:purchaseId",
-      "fixtureSha256": "6e59a0ca33636326cd0d62cd0733d95a7acb417995154d342ed6965135d87363"
+      "fixtureSha256": "48c72ea6ae474edd8524a8d1df80673f780034e4ee777c0b727bc2755cf3d002"
     },
     {
       "path": "/pay/plus/success/:purchasedId/:type",
-      "fixtureSha256": "2879ff38ccbe6fd825c99622df00e04bfb39dda9ce15771d14616234aca19339"
+      "fixtureSha256": "361ac7bad3e03704351d006f678b5e95d35080ba93101609c2d062caad49f73c"
     },
     {
-      "path": "/document/P/:token",
-      "fixtureSha256": "842d687edad4029602cf03d2fb531886e2dde469f835b7e2cee9df72f635e761"
+      "path": "/document/view/:privacy_policyToken",
+      "fixtureSha256": "b937c1b0b4af8f38b6597a208213ac47b54f5017e399d95d8da70aa666a39cd1"
     },
     {
-      "path": "/document/C/:token",
-      "fixtureSha256": "a2f2d34acdc7eb5160571899b2b18368758f30ac8e91782ca5674f1c39f1fcd2"
+      "path": "/document/view/:consentToken",
+      "fixtureSha256": "019fe0b2a58370b5a4fff9bcc0e9587db2d2ba35f5e26b2f99285c613a55cf30"
     },
     {
-      "path": "/document/OC/:token",
-      "fixtureSha256": "e94b7ca30465c22ccbb8fdc57a7ce2610ac0a236c9bbedb3f4c8e6ec6445cf28"
+      "path": "/document/view/:overseas_transferToken",
+      "fixtureSha256": "56466b3a59af6463335a922cbf893c2579168c287a22ef29c730d04cba2ad73f"
+    },
+    {
+      "path": "/url/:outerToken",
+      "fixtureSha256": "018465bd5b6f9f2948e156469052c308f0ae4d50887221965d79a06a6a517411"
     },
     {
       "path": "/file-view/:customerId",
-      "fixtureSha256": "fde00bee339d320730e9f67750fe91235105582fc682570b592966d6b1d038ae"
+      "fixtureSha256": "bfa9e51758f5bc8d274e7fc0a8bf52c9c529a4401ceea36503ed3f24eaa48252"
     },
     {
       "path": "/file-view/:customerId/shared",
-      "fixtureSha256": "7b16484531ed0b61ecb559b509bec1242f01ee0c4f6d83dce18f462caebdf38b"
+      "fixtureSha256": "bc98522a8c8a1759811c3cc5d67d6c7c4b3c1bf08d5796f7f159584febbf1ddd"
     },
     {
       "path": "/file-view/:customerId/:questionId/:fileId",
-      "fixtureSha256": "5e05ce0cd2a28fd6e03cda02390530f3823c75bb2db119683674277deb67eedd"
+      "fixtureSha256": "e8b20daca3f50237aee1e98533ce5f56914df98e118c3f55c48557d8e5eff5b8"
     },
     {
       "path": "/file-view/:customerId/:questionId/:fileId/shared",
-      "fixtureSha256": "639f558d24e56e9240745df6d86abf2fc6d14c26e8df2b6d0a6f292a572966be"
+      "fixtureSha256": "f5ba48478617a3d8fd4b33a98d4a69559098884338745ad11fcd6f9f0a8e4965"
     },
     {
       "path": "/shared-privacy/view",
@@ -193,34 +205,30 @@
     },
     {
       "path": "/projects/:outerToken/form",
-      "fixtureSha256": "14a4135e840332e17fbae1d6c6a5ca93adac39ea1a8d0fd58f7720ae9c4c63ec"
+      "fixtureSha256": "d005913ed96b49e17247177601ae3b9d378684b01c119de67bc20d157904a1e4"
     },
     {
       "path": "/project/:outerToken/form",
-      "fixtureSha256": "6126e03c04e71dc446192b9e0e4d7f7a25e7e1d8d13abcfeedb532d6e3ca7758"
-    },
-    {
-      "path": "/url/:outerToken",
-      "fixtureSha256": "0792cc76c658d9154675c4cecbd2f2f16af71c8fc42cb28fc1f51d924ad3a433"
+      "fixtureSha256": "5bf8f57e58e1116128cf575c6b476f62052390a9d6aa13a874667afdc8be9821"
     },
     {
       "path": "/test-projects/:outerToken/form",
-      "fixtureSha256": "5b642f4b73c1dc988aed2a7e228443726c161d965e1f7cb02630c94f250eb3c2"
+      "fixtureSha256": "75fd69aaf156e2a70648936310bf137d545c6e5374f08a2974e4a77030f31010"
     },
     {
       "path": "/customer-use-case/:outerToken",
-      "fixtureSha256": "7f79ca8b28054349f24937686415891f5e77769b3d14d2f4cbe5ce45d181f5bb"
+      "fixtureSha256": "b91ebc1f0e7962ec2ed45d44482a78f0ff4b84fa633be87312c470613a8155fd"
     },
     {
       "path": "/infoOwner/agree-history/:infoOwnerToken",
-      "fixtureSha256": "ae4d4d4a3abebcf90ea00cc3aad3934422cdbfbf90693320c17e1acadaa21193"
+      "fixtureSha256": "90d7c03a704821998725ac6dd95701301ae67c353c35c1df273c435194b18771"
     },
     {
       "path": "/infoOwner/action-history/:infoOwnerToken",
-      "fixtureSha256": "beeb54a14320a9921a991409f55b62c5596db9fd274ae31010b841c162230530"
+      "fixtureSha256": "feff5b692bb71e29e2ed19a149fe7cabe74881cc6b3d6501d6b79367aaba599a"
     }
   ],
   "privateFixture": ".local/mock-page-fixtures.json",
-  "subjectExpiresAt": "2026-10-06T06:22:51.387Z",
+  "subjectExpiresAt": "2026-10-06T06:54:40.982Z",
   "note": "No mail sent. Re-run to refresh expiring subject session; private cookie/token values are excluded from this report."
 }

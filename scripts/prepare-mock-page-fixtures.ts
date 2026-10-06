@@ -15,6 +15,8 @@ import { POST as createRecipient } from "../src/app/api/v1/recipients/route";
 import { POST as createDocument } from "../src/app/api/v1/documents/route";
 import { POST as documentAction } from "../src/app/api/v1/documents/[...segments]/route";
 import { GET as publicDocument } from "../src/app/api/v1/public/documents/[token]/route";
+import { POST as createFixedUrl } from "../src/app/api/v1/fixed-urls/route";
+import { GET as resolveFixedUrl } from "../src/app/api/v1/public/urls/[slug]/route";
 import { POST as createForm } from "../src/app/api/v1/forms/route";
 import { POST as formAction } from "../src/app/api/v1/forms/[...segments]/route";
 import { GET as publicForm, POST as submit } from "../src/app/api/v1/public/forms/[...segments]/route";
@@ -70,13 +72,18 @@ try {
     const published = await checked<{ url: string }>("publish " + prefix, await documentAction(req(`/documents/${document.id}/publish`, "POST", { version: document.version, expiresAt: null })), 201);
     const token = published.url.split("/").at(-1)!;
     const body = await checked<{ snapshot: { type: string } }>("public " + prefix, await publicDocument(req("/public/documents/" + token, "GET", undefined, true)));
-    assert.equal(body.snapshot.type, type); routes[`/document/${prefix}/:token`] = `/document/${prefix}/${token}`;
+    assert.equal(body.snapshot.type, type); routes[`/document/view/:${type}Token`] = published.url;
   }
   const nameId = randomUUID(), emailId = randomUUID(), fileQuestion = randomUUID();
   const form = await checked<{ id: string; version: number }>("form create", await createForm(req("/forms", "POST", { serviceId, title: "Mock 동적 폼", content: { body: "합성 동적 시험", consentPurpose: "합성 상담 처리", consentRequired: true, retentionDays: 30, maxResponses: 100, questions: [
     { id: nameId, label: "이름", required: true, type: "단문형 답변", subjectRole: "name" }, { id: emailId, label: "이메일", required: true, type: "단문형 답변", subjectRole: "email" }, { id: fileQuestion, label: "Mock 첨부", required: true, type: "파일 업로드" }] } })), 201);
   const publication = await checked<{ token: string }>("form publish", await formAction(req(`/forms/${form.id}/publish`, "POST", { version: form.version })), 201);
   await checked("public form", await publicForm(req("/public/forms/" + publication.token, "GET", undefined, true)));
+  const slug = "mock-" + randomUUID();
+  await checked("fixed URL create", await createFixedUrl(req("/fixed-urls", "POST", { name: "Mock 고정 링크", formId: form.id, slug })), 201);
+  const fixed = await checked<{ token: string }>("fixed URL resolve", await resolveFixedUrl(req("/public/urls/" + slug, "GET", undefined, true)));
+  assert.equal(fixed.token, publication.token);
+  routes["/url/:outerToken"] = "/url/" + slug;
   const contact = { name: "Mock 정보주체", email: "subject-" + randomUUID() + "@catchsecu.test" };
   const bytes = Buffer.from("Mock 첨부파일 검증 데이터\n" + randomUUID());
   const file = await checked<{ id: string; uploadToken: string }>("upload init", await submit(req(`/public/forms/${publication.token}/uploads`, "POST", { questionId: fileQuestion, name: "mock-proof.txt", mime: "text/plain", size: bytes.length, sha256: createHash("sha256").update(bytes).digest("hex") }, true)), 201);
@@ -113,7 +120,7 @@ try {
   for (const path of ["/file-view/:customerId", "/file-view/:customerId/shared", "/file-view/:customerId/:questionId/:fileId", "/file-view/:customerId/:questionId/:fileId/shared"])
     routes[path] = path.replace(":customerId", submission.id).replace(":questionId", fileQuestion).replace(":fileId", file.id);
   routes["/shared-privacy/view"] = "/shared-privacy/view";
-  for (const path of ["/projects/:outerToken/form", "/project/:outerToken/form", "/url/:outerToken", "/test-projects/:outerToken/form", "/customer-use-case/:outerToken"])
+  for (const path of ["/projects/:outerToken/form", "/project/:outerToken/form", "/test-projects/:outerToken/form", "/customer-use-case/:outerToken"])
     routes[path] = path.replace(":outerToken", publication.token);
   const access = await requestSubjectAccess({ ...contact, consent: true }, null, randomUUID());
   const jobs = await db.job.findMany({ where: { dedupeKey: { startsWith: "mail:subject-access:" } }, orderBy: { createdAt: "desc" } });
