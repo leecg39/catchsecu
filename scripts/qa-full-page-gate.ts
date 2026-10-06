@@ -2,6 +2,7 @@
 // 1440/768/390 뷰포트 수평 오버플로 측정, 스크린샷·콘솔 오류·최종 URL·HTTP 상태를 증거로 남긴다.
 // 루트당 한 번 방문해 뷰포트를 리사이즈하며 측정하고, 결과를 루트 단위로 즉시 기록한다.
 import assert from "node:assert/strict";
+import { resolve } from "node:path";
 import { chromium, type BrowserContext, type Page } from "playwright";
 import { db } from "../src/server/db";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -9,15 +10,18 @@ import { env } from "../src/server/env";
 import { summarizePageGate, resolvePageFixture, type PageGateResult } from "./lib/qa-page-gate";
 
 const base = new URL(env.BETTER_AUTH_URL).origin;
-type MockFixtures = { origin: string; database: string; email: string; password: string; companyId: string; serviceId: string; formId: string; routes: Record<string, string>;
+type MockFixtures = { storage: string; origin: string; database: string; email: string; password: string; companyId: string; serviceId: string; formId: string; routes: Record<string, string>;
+  viewer?: { expiresAt: string; cookies: { name: string; value: string; path: string; httpOnly: boolean; sameSite: "Strict" }[] };
   subject: { expiresAt: string; cookies: { name: string; value: string; path: string; httpOnly: boolean; sameSite: "Strict" }[] } };
 const mock: MockFixtures | null = process.env.QA_MOCK_FIXTURES === "1" ? JSON.parse(await readFile(".local/mock-page-fixtures.json", "utf8")) : null;
 if (mock) {
   const database = new URL(env.DATABASE_URL);
   assert.equal(database.pathname, "/catchsecu_mock_admin");
   assert.ok(["localhost", "127.0.0.1"].includes(database.hostname));
+  assert.equal(mock.storage, resolve(env.PRIVATE_STORAGE_DIR));
   assert.equal(mock.database, database.pathname); assert.equal(mock.origin, base);
   assert.ok(Date.parse(mock.subject.expiresAt) > Date.now(), "Regenerate expired Mock subject fixtures.");
+  if (mock.viewer) assert.ok(Date.parse(mock.viewer.expiresAt) > Date.now(), "Regenerate expired Mock viewer fixtures.");
   for (const route of Object.values(mock.routes)) assert.equal(new URL(route, base).origin, base);
 }
 // Live local tokens and captured URLs must stay outside tracked evidence.
@@ -86,7 +90,7 @@ async function login(ctx: BrowserContext) {
 }
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 await login(ctx);
-if (mock) await ctx.addCookies(mock.subject.cookies.map(cookie => ({ ...cookie, domain: new URL(base).hostname })));
+if (mock) await ctx.addCookies([...mock.subject.cookies, ...(mock.viewer?.cookies ?? [])].map(cookie => ({ ...cookie, domain: new URL(base).hostname })));
 const page = await ctx.newPage();
 page.on("console", m => { if (m.type() === "error" && currentResult && currentResult.consoleErrors.length < 5) currentResult.consoleErrors.push(m.text().slice(0, 120)); });
 for (const row of manifest) {

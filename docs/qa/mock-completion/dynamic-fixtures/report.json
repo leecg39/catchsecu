@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-06T05:50:30.600Z",
+  "checkedAt": "2026-10-06T05:52:52.379Z",
   "result": "passed",
   "evidenceLevel": "mock-api-fixture",
   "browserVerified": false,
@@ -74,8 +74,56 @@
       "status": 200
     },
     {
+      "name": "upload init",
+      "status": 201
+    },
+    {
+      "name": "upload bytes",
+      "status": 200
+    },
+    {
+      "name": "upload scan complete",
+      "status": 200
+    },
+    {
       "name": "public submission",
       "status": 201
+    },
+    {
+      "name": "owner file byte roundtrip",
+      "status": 200
+    },
+    {
+      "name": "anonymous private file denied",
+      "status": 401
+    },
+    {
+      "name": "share options",
+      "status": 200
+    },
+    {
+      "name": "share create",
+      "status": 201
+    },
+    {
+      "name": "viewer challenge",
+      "status": 202
+    },
+    {
+      "name": "viewer verified",
+      "status": 200
+    },
+    {
+      "name": "shared records",
+      "status": 200
+    },
+    {
+      "name": "shared file byte roundtrip with hidden email excluded",
+      "status": 200
+    },
+    {
+      "name": "shared file without cookie denied",
+      "status": 401
     },
     {
       "name": "subject cookie session and persisted consent/event queries",
@@ -97,62 +145,82 @@
   "routes": [
     {
       "path": "/pay/result/success/:purchaseId",
-      "fixtureSha256": "a084aafc7dc46b43726a6d84d3dbb61faba0c32117e551bfee5d48889344ce1d"
+      "fixtureSha256": "8cb2bf7603a266f03574b1f209be2ac86809a98a8ae9ff4a1a3f089f6f258e9f"
     },
     {
       "path": "/pay/credit/success/:purchaseId",
-      "fixtureSha256": "0fd4ea866f3c118831178625a6b0df6e86c5458a1b75d89ae495872e01269384"
+      "fixtureSha256": "5dadc18b6fbab0c50096e0527165f10f159b13b6248d0216f9d6165357c7f1db"
     },
     {
       "path": "/pay/plus/success/:purchaseId",
-      "fixtureSha256": "a304504b5fb719cc7d06f527db765b0a9014f00ef49c947da644e518d8642c44"
+      "fixtureSha256": "6e59a0ca33636326cd0d62cd0733d95a7acb417995154d342ed6965135d87363"
     },
     {
       "path": "/pay/plus/success/:purchasedId/:type",
-      "fixtureSha256": "0b696013d804c2e38cf9391fada0a153ac2bebc5f8ed44e86b3e786d9939bf6b"
+      "fixtureSha256": "2879ff38ccbe6fd825c99622df00e04bfb39dda9ce15771d14616234aca19339"
     },
     {
       "path": "/document/P/:token",
-      "fixtureSha256": "b53df509994390c29faf07415db048db3bd7e5ebeb98500fc53bf6ea87728e58"
+      "fixtureSha256": "842d687edad4029602cf03d2fb531886e2dde469f835b7e2cee9df72f635e761"
     },
     {
       "path": "/document/C/:token",
-      "fixtureSha256": "219639731b413f8a063a4f65159becddcb3a6fefebd2256e742b3866f56c6896"
+      "fixtureSha256": "a2f2d34acdc7eb5160571899b2b18368758f30ac8e91782ca5674f1c39f1fcd2"
     },
     {
       "path": "/document/OC/:token",
-      "fixtureSha256": "850e7c92a90dd1b131cefdf040a2dc8e1d7030b98f8c93fda4a2fbdc69a473a4"
+      "fixtureSha256": "e94b7ca30465c22ccbb8fdc57a7ce2610ac0a236c9bbedb3f4c8e6ec6445cf28"
+    },
+    {
+      "path": "/file-view/:customerId",
+      "fixtureSha256": "fde00bee339d320730e9f67750fe91235105582fc682570b592966d6b1d038ae"
+    },
+    {
+      "path": "/file-view/:customerId/shared",
+      "fixtureSha256": "7b16484531ed0b61ecb559b509bec1242f01ee0c4f6d83dce18f462caebdf38b"
+    },
+    {
+      "path": "/file-view/:customerId/:questionId/:fileId",
+      "fixtureSha256": "5e05ce0cd2a28fd6e03cda02390530f3823c75bb2db119683674277deb67eedd"
+    },
+    {
+      "path": "/file-view/:customerId/:questionId/:fileId/shared",
+      "fixtureSha256": "639f558d24e56e9240745df6d86abf2fc6d14c26e8df2b6d0a6f292a572966be"
+    },
+    {
+      "path": "/shared-privacy/view",
+      "fixtureSha256": "fabf8cea3da0e6e0e5fdc3d63611bf4b7cbd66b00406c39e3d3e1c1c453e48c9"
     },
     {
       "path": "/projects/:outerToken/form",
-      "fixtureSha256": "3c986bf28211c3c25602fe1ca7d176503fcb61c90b4d250238b43cf2f7ebb8aa"
+      "fixtureSha256": "14a4135e840332e17fbae1d6c6a5ca93adac39ea1a8d0fd58f7720ae9c4c63ec"
     },
     {
       "path": "/project/:outerToken/form",
-      "fixtureSha256": "a41fd1aa35d7bd75f55cc7045350d74fadfefb8073ad25936d69e7d04f1b923c"
+      "fixtureSha256": "6126e03c04e71dc446192b9e0e4d7f7a25e7e1d8d13abcfeedb532d6e3ca7758"
     },
     {
       "path": "/url/:outerToken",
-      "fixtureSha256": "66e4719d1ca1f8005056f183710ef0ee12a95b2ec9d6fd4a0a10506c94f1347b"
+      "fixtureSha256": "0792cc76c658d9154675c4cecbd2f2f16af71c8fc42cb28fc1f51d924ad3a433"
     },
     {
       "path": "/test-projects/:outerToken/form",
-      "fixtureSha256": "6409c9c850f5d54a246140ef90a7cfd666e3fecacdddb0c134d08b5a049e9a88"
+      "fixtureSha256": "5b642f4b73c1dc988aed2a7e228443726c161d965e1f7cb02630c94f250eb3c2"
     },
     {
       "path": "/customer-use-case/:outerToken",
-      "fixtureSha256": "8d85eba26eb58c9f4878505f48cde80264eb8895459376721db7c18494f5511e"
+      "fixtureSha256": "7f79ca8b28054349f24937686415891f5e77769b3d14d2f4cbe5ce45d181f5bb"
     },
     {
       "path": "/infoOwner/agree-history/:infoOwnerToken",
-      "fixtureSha256": "41a34df7a6d80c103d26e508061b43043d59582457c451eb3d7debbf6d0b0f4c"
+      "fixtureSha256": "ae4d4d4a3abebcf90ea00cc3aad3934422cdbfbf90693320c17e1acadaa21193"
     },
     {
       "path": "/infoOwner/action-history/:infoOwnerToken",
-      "fixtureSha256": "5ad2806833cf43e5509a0228f188d6ec56400d08b7abb01f7fab107033421448"
+      "fixtureSha256": "beeb54a14320a9921a991409f55b62c5596db9fd274ae31010b841c162230530"
     }
   ],
   "privateFixture": ".local/mock-page-fixtures.json",
-  "subjectExpiresAt": "2026-10-06T06:20:30.084Z",
+  "subjectExpiresAt": "2026-10-06T06:22:51.387Z",
   "note": "No mail sent. Re-run to refresh expiring subject session; private cookie/token values are excluded from this report."
 }
