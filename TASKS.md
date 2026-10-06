@@ -579,6 +579,8 @@
 
 - 2026-10-06 추가: 유료 만료·해지일 변경 방어·원자 감사 구현. PostgreSQL 40개·HTTP 10개·타입/최종 린트/빌드 통과. [증거](docs/qa/P10-T04/expiration/README.md).
 
+- 2026-10-16 가상 PG 후속: PAYMENT_PROVIDER=local 가상 결제 공급자를 추가했다. 서버가 `vpg:` 이벤트를 HMAC 서명해 `applyPaymentEvent` 실경로(서명검증·중복·순서·구독활성·원장)로 통과시키므로 임의 상태 변경이 없다. `/billing/orders/{id}/virtual-checkout`·`/billing/refunds/{id}/virtual-settle`, 결제 UI에 mock 표기 버튼. 서버 5개+브라우저(가상 승인→active·환불 정산) 검증. 실제 PG 승인·대사는 계속 미완료. [증거](docs/qa/P11-T04/virtual-auth/README.md).
+
 - [ ] P10-T04 구현·검증 완료
 - 작업: 부분/전체환불·해지 effective date·취소사유·청구서 PDF·월마감·조정을 구현한다.
 - 선행: P10-T03, P01-T03
