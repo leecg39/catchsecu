@@ -34,6 +34,7 @@ export const kakaoPreviewInput = z.object({
 export const kakaoReviewInput = z.object({
   kind: z.enum(["channel", "template"]),
   id: z.uuid(),
+  version: z.number().int().positive(),
   outcome: z.enum(["verified", "approved", "rejected"]),
   note: z.string().trim().max(500).default(""),
 }).strict();

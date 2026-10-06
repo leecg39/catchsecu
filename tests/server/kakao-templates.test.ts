@@ -39,11 +39,11 @@ test("승인되지 않은 알림톡은 발송하지 않고 수정하면 심사�
   expect(submitted.status).toBe(200);
   expect((await submitted.json()).status).toBe("submitted");
   expect((await create(req("/kakao/templates/" + template.id + "/send", cookie, "POST", {}))).status).toBe(409);
-  const approvedBody = JSON.stringify({ kind: "template", id: template.id, outcome: "approved", note: "" });
+  const approvedBody = JSON.stringify({ kind: "template", id: template.id, version: template.version + 1, outcome: "approved", note: "" });
   await expect(applyKakaoReview(approvedBody, "00", secret)).rejects.toMatchObject({ status: 401 });
   expect((await applyKakaoReview(approvedBody, sign(approvedBody), secret)).status).toBe("approved");
   expect((await create(req("/kakao/templates/" + template.id + "/send", cookie, "POST", {}))).status).toBe(409);
-  const verifiedBody = JSON.stringify({ kind: "channel", id: channel.id, outcome: "verified", note: "" });
+  const verifiedBody = JSON.stringify({ kind: "channel", id: channel.id, version: channel.version, outcome: "verified", note: "" });
   expect((await applyKakaoReview(verifiedBody, sign(verifiedBody), secret)).status).toBe("verified");
   expect((await create(req("/kakao/templates/" + template.id + "/send", cookie, "POST", {}))).status).toBe(503);
   const current = await db.kakaoTemplate.findUniqueOrThrow({ where: { id: template.id } });
@@ -124,12 +124,13 @@ test("알 수 없는 상세 하위 경로를 정상 조회·수정으로 처리�
 });
 
 import { requireContext } from "@/server/context";
-import { readKakaoTemplate } from "@/server/kakao";
+import { readKakaoTemplate, requestKakaoChannelVerification } from "@/server/kakao";
 test("이전에 읽은 회사 컨텍스트도 강화된 MFA·세션 정책을 다시 적용한다", async () => {
   const { cookie, template, companyId } = await detailFixture();
   const ctx = await requireContext(req("/context", cookie).headers, "message.manage");
   await db.securityPolicy.update({ where: { tenantId: companyId }, data: { requireMfa: true } });
   await expect(readKakaoTemplate(ctx, template.id)).rejects.toMatchObject({ status: 403 });
+  await expect(requestKakaoChannelVerification(ctx, template.channelId)).rejects.toMatchObject({ status: 403 });
   await db.securityPolicy.update({ where: { tenantId: companyId }, data: { requireMfa: false, sessionMinutes: 5 } });
   await db.session.update({ where: { id: ctx.session.id }, data: { updatedAt: new Date(Date.now() - 360000) } });
   await expect(readKakaoTemplate(ctx, template.id)).rejects.toMatchObject({ status: 401 });
@@ -144,4 +145,100 @@ test("동시 초안 삭제는 한 번만 성공하고 보관은 최신 버전으
   expect(replies.filter(r => [404, 409].includes(r.status))).toHaveLength(1);
   expect(await db.kakaoTemplate.count({ where: { id: template.id } })).toBe(0);
   expect(await db.auditEvent.count({ where: { resourceId: template.id, action: "kakao.template_deleted" } })).toBe(1);
+});
+
+
+test("이전 서명된 심사 결과는 재신청을 승인하지 않고 중복 결과는 감사를 늘리지 않는다", async () => {
+  const { cookie, template } = await detailFixture();
+  const path = "/kakao/templates/" + template.id;
+  const first = await (await create(req(path + "/submit", cookie, "POST", { version: template.version }))).json();
+  const old = JSON.stringify({ kind: "template", id: template.id, version: first.version, outcome: "approved", note: "" });
+  await applyKakaoReview(old, sign(old), secret);
+  await expect(applyKakaoReview(old, sign(old), secret)).rejects.toMatchObject({ status: 409 });
+  const approved = await db.kakaoTemplate.findUniqueOrThrow({ where: { id: template.id } });
+  const draft = await (await update(req(path, cookie, "PATCH", { name: template.name, body: "수정된 새 본문", buttons: [], version: approved.version }))).json();
+  const second = await (await create(req(path + "/submit", cookie, "POST", { version: draft.version }))).json();
+  await expect(applyKakaoReview(old, sign(old), secret)).rejects.toMatchObject({ status: 409 });
+  expect((await db.kakaoTemplate.findUniqueOrThrow({ where: { id: template.id } })).status).toBe("submitted");
+  const fresh = JSON.stringify({ kind: "template", id: template.id, version: second.version, outcome: "approved", note: "" });
+  expect((await applyKakaoReview(fresh, sign(fresh), secret)).status).toBe("approved");
+  expect(await db.auditEvent.count({ where: { resourceId: template.id, action: "kakao.template_approved" } })).toBe(2);
+});
+test("채널 검색 ID 변경은 확인을 해제하고 예전 확인 콜백을 거절한다", async () => {
+  const { cookie, template } = await detailFixture();
+  const channel = await db.kakaoChannel.findUniqueOrThrow({ where: { id: template.channelId } });
+  const raw = JSON.stringify({ kind: "channel", id: channel.id, version: channel.version, outcome: "verified", note: "" });
+  await applyKakaoReview(raw, sign(raw), secret);
+  const verified = await db.kakaoChannel.findUniqueOrThrow({ where: { id: channel.id } });
+  await db.kakaoTemplate.update({ where: { id: template.id }, data: { status: "approved" } });
+  const changed = await update(req("/kakao/channels/" + channel.id, cookie, "PATCH", { name: channel.name, searchId: "@changed", status: "pending", version: verified.version }));
+  expect(changed.status).toBe(200); expect((await changed.json()).status).toBe("pending");
+  const reset = await db.kakaoTemplate.findUniqueOrThrow({ where: { id: template.id } });
+  expect(reset.status).toBe("draft"); expect(reset.version).toBe(template.version + 1);
+  expect(await db.auditEvent.count({ where: { resourceId: template.id, action: "kakao.template_review_reset" } })).toBe(1);
+  await expect(applyKakaoReview(raw, sign(raw), secret)).rejects.toMatchObject({ status: 409 });
+  expect(await db.auditEvent.count({ where: { resourceId: channel.id, action: "kakao.channel_verified" } })).toBe(1);
+});
+test("사용 중인 채널 삭제는 보관 우회로 처리하지 않는다", async () => {
+  const { cookie, template } = await detailFixture();
+  const request = new Request(origin + "/api/v1/kakao/channels/" + template.channelId, { method: "DELETE", headers: { origin, cookie, "if-match": "1" } });
+  expect((await remove(request)).status).toBe(409);
+  expect((await db.kakaoChannel.findUniqueOrThrow({ where: { id: template.channelId } })).status).toBe("pending");
+  expect(await db.auditEvent.count({ where: { resourceId: template.channelId, action: "kakao.channel_archived" } })).toBe(0);
+});
+test("채널 동시 수정은 한 번만 성공하고 같은 확인 콜백도 한 번만 반영한다", async () => {
+  const { cookie, template } = await detailFixture();
+  const path = "/kakao/channels/" + template.channelId;
+  const replies = await Promise.all(["첫 채널", "둘째 채널"].map(name => update(req(path, cookie, "PATCH", { name, searchId: "@detail", status: "pending", version: 1 }))));
+  expect(replies.map(r => r.status).sort()).toEqual([200, 409]);
+  const channel = await db.kakaoChannel.findUniqueOrThrow({ where: { id: template.channelId } });
+  const raw = JSON.stringify({ kind: "channel", id: channel.id, version: channel.version, outcome: "verified", note: "" });
+  const callbacks = await Promise.allSettled([applyKakaoReview(raw, sign(raw), secret), applyKakaoReview(raw, sign(raw), secret)]);
+  expect(callbacks.filter(r => r.status === "fulfilled")).toHaveLength(1);
+  expect(await db.auditEvent.count({ where: { resourceId: channel.id, action: "kakao.channel_verified" } })).toBe(1);
+});
+
+
+test("채널 삭제와 새 템플릿 생성은 활성 템플릿의 보관 채널을 만들지 않는다", async () => {
+  const { cookie, template } = await detailFixture();
+  const existing = await db.kakaoChannel.findUniqueOrThrow({ where: { id: template.channelId } });
+  const channel = await db.kakaoChannel.create({ data: { tenantId: existing.tenantId, serviceId: existing.serviceId, name: "동시 삭제", searchId: "@race" } });
+  const request = new Request(origin + "/api/v1/kakao/channels/" + channel.id, { method: "DELETE", headers: { origin, cookie, "if-match": "1" } });
+  const [deletion, creation] = await Promise.all([remove(request), create(req("/kakao/templates", cookie, "POST", { serviceId: channel.serviceId, channelId: channel.id, name: "동시 생성", body: "안내", buttons: [] }, randomUUID()))]);
+  expect([204, 409]).toContain(deletion.status); expect([201, 404]).toContain(creation.status);
+  const saved = await db.kakaoChannel.findUnique({ where: { id: channel.id } });
+  const count = await db.kakaoTemplate.count({ where: { channelId: channel.id } });
+  if (creation.status === 201) { expect(saved?.status).toBe("pending"); expect(count).toBe(1); expect(deletion.status).toBe(409); }
+  else { expect(saved).toBeNull(); expect(count).toBe(0); expect(deletion.status).toBe(204); }
+});
+test("로컬 즉시 심사 감사 실패는 초안과 신청 감사까지 함께 롤백한다", async () => {
+  const { cookie, template } = await detailFixture(), previous = env.KAKAO_PROVIDER;
+  env.KAKAO_PROVIDER = "local";
+  await db.$executeRawUnsafe(`CREATE FUNCTION qa_kakao_local_fault() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='kakao.template_approved' THEN RAISE EXCEPTION 'synthetic failure'; END IF; RETURN NEW; END $$`);
+  await db.$executeRawUnsafe('CREATE TRIGGER qa_kakao_local_fault BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION qa_kakao_local_fault()');
+  try {
+    expect((await create(req("/kakao/templates/" + template.id + "/submit", cookie, "POST", { version: template.version }))).status).toBe(500);
+    const row = await db.kakaoTemplate.findUniqueOrThrow({ where: { id: template.id } });
+    expect(row.status).toBe("draft"); expect(row.version).toBe(template.version);
+    expect(await db.auditEvent.count({ where: { resourceId: template.id, action: { in: ["kakao.template_submitted", "kakao.template_approved"] } } })).toBe(0);
+  } finally {
+    env.KAKAO_PROVIDER = previous;
+    await db.$executeRawUnsafe('DROP TRIGGER qa_kakao_local_fault ON "AuditEvent"');
+    await db.$executeRawUnsafe('DROP FUNCTION qa_kakao_local_fault()');
+  }
+});
+
+
+import { POST as reviewWebhook } from "@/app/api/v1/kakao/reviews/route";
+test("버전 없는 서명된 콜백은 HTTP422로 거절하고 심사 상태를 보존한다", async () => {
+  const { cookie, template } = await detailFixture();
+  const submitted = await (await create(req("/kakao/templates/" + template.id + "/submit", cookie, "POST", { version: template.version }))).json();
+  const raw = JSON.stringify({ kind: "template", id: template.id, outcome: "approved", note: "" }), previous = env.KAKAO_REVIEW_SECRET;
+  env.KAKAO_REVIEW_SECRET = secret;
+  try {
+    const result = await reviewWebhook(new Request(origin + "/api/v1/kakao/reviews", { method: "POST", headers: { "content-type": "application/json", "x-kakao-signature": sign(raw) }, body: raw }));
+    expect(result.status).toBe(422);
+    expect((await db.kakaoTemplate.findUniqueOrThrow({ where: { id: template.id } })).version).toBe(submitted.version);
+    expect(await db.auditEvent.count({ where: { resourceId: template.id, action: "kakao.template_approved" } })).toBe(0);
+  } finally { env.KAKAO_REVIEW_SECRET = previous; }
 });

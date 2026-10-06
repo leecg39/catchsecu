@@ -55,7 +55,7 @@ test.each(["channel", "template"] as const)("카카오 %s 심사는 안전한 �
   const f = await fixture(), channel = await db.kakaoChannel.create({ data: { ...f, name: "합성 채널", searchId: "@synthetic" } });
   const template = await db.kakaoTemplate.create({ data: { ...f, channelId: channel.id, name: "합성 템플릿", body: "PRIVATE_PROVIDER_MESSAGE", buttons: [], status: "submitted" } });
   const id = kind === "channel" ? channel.id : template.id, action = kind === "channel" ? "kakao.channel_verified" : "kakao.template_approved";
-  const raw = JSON.stringify({ kind, id, outcome: kind === "channel" ? "verified" : "approved", note: "PRIVATE_PROVIDER_NOTE" }), requestId = randomUUID();
+  const raw = JSON.stringify({ kind, id, version: 1, outcome: kind === "channel" ? "verified" : "approved", note: "PRIVATE_PROVIDER_NOTE" }), requestId = randomUUID();
   await fault(action, async () => { await expect(applyKakaoReview(raw, sign(raw), secret, requestId)).rejects.toThrow(); });
   expect((kind === "channel" ? await db.kakaoChannel.findUniqueOrThrow({ where: { id } }) : await db.kakaoTemplate.findUniqueOrThrow({ where: { id } })).status).toBe(kind === "channel" ? "pending" : "submitted");
   await applyKakaoReview(raw, sign(raw), secret, requestId);

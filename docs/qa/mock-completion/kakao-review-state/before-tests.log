@@ -1,0 +1,127 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:80579) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/kakao-templates.test.ts (11 tests | 5 failed) 6698ms
+   × 승인되지 않은 알림톡은 발송하지 않고 수정하면 심사를 다시 요구한다 2250ms
+   × 이전 서명된 심사 결과는 재신청을 승인하지 않고 중복 결과는 감사를 늘리지 않는다 392ms
+   × 채널 검색 ID 변경은 확인을 해제하고 예전 확인 콜백을 거절한다 477ms
+   × 사용 중인 채널 삭제는 보관 우회로 처리하지 않는다 377ms
+   × 채널 동시 수정은 한 번만 성공하고 같은 확인 콜백도 한 번만 반영한다 377ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > 승인되지 않은 알림톡은 발송하지 않고 수정하면 심사를 다시 요구한다
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "version"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"version\""
+  }
+]
+ ❯ applyKakaoReview src/server/kakao.ts:164:34
+    162|   if (!secret) fail(503, "KAKAO_PROVIDER_REQUIRED", "카카오 심사 결과 비밀이 설정되…
+    163|   if (!signaturesMatch(secret, raw, signature)) fail(401, "KAKAO_SIGNA…
+    164|   const input = kakaoReviewInput.parse(JSON.parse(raw));
+       |                                  ^
+    165|   return db.$transaction(async tx => {
+    166|     if (input.kind === "channel") {
+ ❯ tests/server/kakao-templates.test.ts:44:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > 이전 서명된 심사 결과는 재신청을 승인하지 않고 중복 결과는 감사를 늘리지 않는다
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "version"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"version\""
+  }
+]
+ ❯ applyKakaoReview src/server/kakao.ts:164:34
+    162|   if (!secret) fail(503, "KAKAO_PROVIDER_REQUIRED", "카카오 심사 결과 비밀이 설정되…
+    163|   if (!signaturesMatch(secret, raw, signature)) fail(401, "KAKAO_SIGNA…
+    164|   const input = kakaoReviewInput.parse(JSON.parse(raw));
+       |                                  ^
+    165|   return db.$transaction(async tx => {
+    166|     if (input.kind === "channel") {
+ ❯ tests/server/kakao-templates.test.ts:155:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > 채널 검색 ID 변경은 확인을 해제하고 예전 확인 콜백을 거절한다
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "version"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"version\""
+  }
+]
+ ❯ applyKakaoReview src/server/kakao.ts:164:34
+    162|   if (!secret) fail(503, "KAKAO_PROVIDER_REQUIRED", "카카오 심사 결과 비밀이 설정되…
+    163|   if (!signaturesMatch(secret, raw, signature)) fail(401, "KAKAO_SIGNA…
+    164|   const input = kakaoReviewInput.parse(JSON.parse(raw));
+       |                                  ^
+    165|   return db.$transaction(async tx => {
+    166|     if (input.kind === "channel") {
+ ❯ tests/server/kakao-templates.test.ts:170:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > 사용 중인 채널 삭제는 보관 우회로 처리하지 않는다
+AssertionError: expected 200 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 200
+
+ ❯ tests/server/kakao-templates.test.ts:180:42
+    178|   const { cookie, template } = await detailFixture();
+    179|   const request = new Request(origin + "/api/v1/kakao/channels/" + tem…
+    180|   expect((await remove(request)).status).toBe(409);
+       |                                          ^
+    181|   expect((await db.kakaoChannel.findUniqueOrThrow({ where: { id: templ…
+    182|   expect(await db.auditEvent.count({ where: { resourceId: template.cha…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > 채널 동시 수정은 한 번만 성공하고 같은 확인 콜백도 한 번만 반영한다
+AssertionError: expected [ 200, 200 ] to deeply equal [ 200, 409 ]
+
+- Expected
++ Received
+
+  [
+    200,
+-   409,
++   200,
+  ]
+
+ ❯ tests/server/kakao-templates.test.ts:188:45
+    186|   const path = "/kakao/channels/" + template.channelId;
+    187|   const replies = await Promise.all(["첫 채널", "둘째 채널"].map(name => upda…
+    188|   expect(replies.map(r => r.status).sort()).toEqual([200, 409]);
+       |                                             ^
+    189|   const channel = await db.kakaoChannel.findUniqueOrThrow({ where: { i…
+    190|   const raw = JSON.stringify({ kind: "channel", id: channel.id, versio…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 6 passed (11)
+   Start at  16:50:15
+   Duration  7.88s (tests 86%, import 9%, transform 5%)
+

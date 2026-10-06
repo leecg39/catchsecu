@@ -5,7 +5,7 @@ const state = vi.hoisted(() => ({ capabilities: ["message.manage"], status: "app
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
 vi.mock("@/components/ApplicationContext", () => ({ useApplication: () => ({ data: { capabilities: state.capabilities, serviceId: "service", services: [] } }) }));
 vi.mock("@/lib/api", () => ({ api: vi.fn(), ApiError: class extends Error { status=409; }, errorText: String, useResource: (path: string) => {
- state.queried.push(path);return { reload: vi.fn(), error: state.error, data: { id: "10000000-0000-4000-8000-000000000001", serviceId: "service", channelId: "channel", version: 4, name: "검증 템플릿", body: "#{name}님 안내", status: state.status, reviewNote: "심사 의견", buttons: [{ name: "자세히", type: "WL", link: "https://example.test" }] } };
+ state.queried.push(path);if (path.includes("?serviceId=")) return { reload: vi.fn(), error: state.error, data: { items: [] } };return { reload: vi.fn(), error: state.error, data: { id: "10000000-0000-4000-8000-000000000001", serviceId: "service", channelId: "channel", version: 4, name: "검증 템플릿", body: "#{name}님 안내", status: state.status, reviewNote: "심사 의견", buttons: [{ name: "자세히", type: "WL", link: "https://example.test" }] } };
 } }));
 import { ServicesPages } from "@/components/services";
 const id="10000000-0000-4000-8000-000000000001";
@@ -19,3 +19,6 @@ test("관리 권한이 없으면 템플릿 API를 요청하지 않는다",()=>{s
 test("잘못된 UUID는 안내만 표시한다",()=>{expect(renderToStaticMarkup(createElement(ServicesPages,{path:"/alimtalk/templates/invalid"}))).toContain("템플릿 주소");expect(state.queried).toEqual([]);});
 
 test("템플릿 등록 경로는 UUID 오류가 아닌 작성 화면을 표시한다",()=>{const html=renderToStaticMarkup(createElement(ServicesPages,{path:"/alimtalk/templates/register"}));expect(html).toContain("템플릿 이름");expect(html).not.toContain("템플릿 주소");});
+
+test("목록 관리 권한이 없으면 채널·템플릿 목록을 요청하지 않는다",()=>{state.capabilities=[];const html=renderToStaticMarkup(createElement(ServicesPages,{path:"/alimtalk/templates"}));expect(html).toContain("관리할 권한");expect(state.queried).toEqual([]);});
+test("목록 조회 오류는 재시도와 등록 잠금을 표시한다",()=>{state.error={message:"목록을 읽지 못했습니다"};const html=renderToStaticMarkup(createElement(ServicesPages,{path:"/alimtalk/templates"}));expect(html).toContain("채널 다시 불러오기");expect(html).toContain("템플릿 다시 불러오기");expect(html).toContain('<fieldset disabled=""');});
