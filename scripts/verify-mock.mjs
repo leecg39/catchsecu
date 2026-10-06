@@ -10,8 +10,13 @@ import { parseEnv } from "node:util";
 const root = fileURLToPath(new URL("../", import.meta.url));
 process.chdir(root);
 const mode = process.argv.includes("--providers") ? "providers" : "full";
-const out = resolve("docs/qa/mock-completion", mode);
-const config = parseEnv(await readFile(".env.test.local", "utf8"));
+const out = resolve(process.env.MOCK_VERIFICATION_EVIDENCE_DIR ?? resolve("docs/qa/mock-completion", mode));
+if (!out.startsWith(resolve("docs/qa/mock-completion") + "/"))
+  throw new Error("Mock evidence must stay inside docs/qa/mock-completion.");
+const envFile = resolve(process.env.MOCK_VERIFICATION_ENV_FILE ?? ".env.test.local");
+if (envFile !== resolve(".env.test.local") && !envFile.startsWith(resolve(".local") + "/"))
+  throw new Error("Alternative Mock settings must stay inside the private .local folder.");
+const config = parseEnv(await readFile(envFile, "utf8"));
 const database = new URL(config.DATABASE_URL), app = new URL(config.BETTER_AUTH_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname) || !["localhost", "127.0.0.1"].includes(app.hostname))
   throw new Error("Mock verification requires loopback catchsecu_test and application URLs.");
@@ -66,6 +71,10 @@ async function run(id, command, args, env = testEnv) {
   report.steps.push({ id, status: result.code === 0 ? "passed" : "failed", ...result, durationMs: Date.now() - started, log: id + ".log" });
   await save();
   console.log((result.code === 0 ? "PASS " : "FAIL ") + id);
+}
+await run("scanner", process.execPath, ["--import", "tsx", "scripts/check-mock-scanner.ts"]);
+if (report.steps.at(-1).status !== "passed") {
+  report.result = "failed"; report.finishedAt = new Date().toISOString(); await save(); process.exit(1);
 }
 await run("migrations", process.execPath, ["node_modules/prisma/build/index.js", "migrate", "deploy"]);
 if (report.steps.at(-1).status !== "passed") {

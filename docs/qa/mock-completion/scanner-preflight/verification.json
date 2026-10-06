@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-06T23:40:29.345Z",
+  "result": "passed",
+  "scenarios": [
+    {
+      "name": "real scanner clean file and EICAR",
+      "expectedExit": 0,
+      "actualExit": 0
+    },
+    {
+      "name": "unavailable socket rejected",
+      "expectedExit": 1,
+      "actualExit": 1
+    },
+    {
+      "name": "runner aborts before migrations and tests",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "onlyStep": "scanner"
+    },
+    {
+      "name": "settings outside private folder rejected before reading",
+      "expectedExit": 1,
+      "actualExit": 1
+    },
+    {
+      "name": "evidence outside QA folder rejected before creating",
+      "expectedExit": 1,
+      "actualExit": 1
+    }
+  ]
+}
