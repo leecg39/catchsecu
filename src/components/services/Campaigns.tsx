@@ -55,7 +55,7 @@ function CampaignHistory({ serviceId, channel, canManage }: Scope) {
         <Link key="title" className="cs-link" href={recordPath(r)}>{r.title || "삭제된 초안"}</Link>, r.source === "form" ? "수집 자료 선택" : "직접 입력", campaignStatuses[r.status], r.total,
         <span key="count">접수·로컬 전달 {(r.counts.accepted ?? 0) + (r.counts.local_delivered ?? 0)}<small>실패·확인 필요 {(r.counts.failed ?? 0) + (r.counts.unknown ?? 0)} · 제외 {r.counts.excluded ?? 0}</small></span>, when(r.scheduledAt), when(r.createdAt)
       ] }))} total={result.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage} onPageSize={n => { setPageSize(n); setPage(1); }} loading={result.loading} error={result.error?.message} />
-    </Panel><p className="campaign-note">SMTP 접수는 메일 서버의 접수 결과입니다. 수신 결과는 인증된 이벤트가 접수된 경우에만 표시합니다. 외부 공급자 연결은 별도 확인이 필요합니다. 캠페인 내용과 연락처 사본은 생성 후 최대 30일 동안 보관합니다.</p></>;
+    </Panel><p className="campaign-note">공급자 접수는 발송 요청이 접수된 상태입니다. 수신 결과는 인증된 이벤트가 접수된 경우에만 표시합니다. 외부 공급자 연결은 별도 확인이 필요합니다. 캠페인 내용과 연락처 사본은 생성 후 최대 30일 동안 보관합니다.</p></>;
 }
 function ContentFields({ record, channel, serviceId }: { record?: CampaignRecord; channel: Channel; serviceId: string }) {
   const [search, setSearch] = useState(""), [senderId, setSenderId] = useState(record?.senderId ?? "");
@@ -136,7 +136,7 @@ function CampaignBody({ record: r, refresh, canManage, canSend, canTargets, ...s
       {r.status === "scheduled" && canSend && <form className="campaign-actions" onSubmit={e => { e.preventDefault(); change("reschedule", { at: new Date(at).toISOString() }); }}><label>변경할 예약 시각<input className="cs-input" aria-label="변경할 예약 시각" type="datetime-local" value={at} onChange={e => setAt(e.target.value)} required /></label><ActionButton secondary disabled={busy}>예약 변경</ActionButton></form>}
       <div className="campaign-actions">{canManage && ["scheduled", "dispatching"].includes(r.status) && <ActionButton secondary disabled={busy} onClick={() => setConfirm("cancel")}>발송 취소</ActionButton>}
         {canManage && ["completed", "partial_failed", "failed", "cancelled"].includes(r.status) && <ActionButton secondary disabled={busy} onClick={() => change("archive")}>{r.archivedAt ? "보관 해제" : "캠페인 보관"}</ActionButton>}</div>
-      <p className="campaign-note">이미 로컬 메일함에 전달되거나 SMTP가 접수한 건은 취소로 회수되지 않습니다. 접수 여부가 불확실한 건은 공급자 확인 전 재전송할 수 없습니다.</p></div></Panel>}
+      <p className="campaign-note">이미 로컬 전달이 완료되거나 공급자가 접수한 건은 취소로 회수되지 않습니다. 접수 여부가 불확실한 건은 공급자 확인 전 재전송할 수 없습니다.</p></div></Panel>}
     {draft && canManage && <ActionButton secondary disabled={busy} onClick={() => setConfirm("delete")}>초안 삭제</ActionButton>}
     <Panel title="변경 이력"><ol className="campaign-events">{r.events?.map(e => <li key={e.version}>{eventLabels[e.kind] ?? e.kind}<small>v{e.version} · {when(e.createdAt)}</small></li>)}</ol></Panel>
     {confirm && <Modal title={confirm === "delete" ? "초안 삭제" : "발송 취소"} onClose={() => { if (!busy) setConfirm(undefined); }}><div className="campaign-fields"><p>{confirm === "delete" ? "초안 내용·수신자 사본·첨부파일 원문을 삭제합니다." : "아직 전달되지 않은 예약을 취소합니다. 이미 접수된 메시지는 회수되지 않습니다."}</p><div className="campaign-actions"><ActionButton secondary disabled={busy} onClick={() => setConfirm(undefined)}>돌아가기</ActionButton><ActionButton disabled={busy} onClick={() => change(confirm === "delete" ? "" : "cancel", {}, confirm === "delete" ? "DELETE" : "POST")}>확인</ActionButton></div>{error && <p role="alert">{error}</p>}</div></Modal>}
