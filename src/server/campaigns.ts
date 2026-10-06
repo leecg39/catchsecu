@@ -1,3 +1,4 @@
+import { lockKakaoBinding } from "./kakao-binding";
 import { randomUUID } from "node:crypto";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
@@ -29,8 +30,8 @@ async function kakaoTemplateChoice(tx: Transaction, tenantId: string, serviceId:
     return { kakaoTemplateId: null, kakaoTemplateVersion: null };
   }
   if (!id) return { kakaoTemplateId: null, kakaoTemplateVersion: null };
-  const template = await tx.kakaoTemplate.findFirst({ where: { id, tenantId, serviceId, status: { not: "archived" } } });
-  if (!template) fail(404, "TEMPLATE_NOT_FOUND", "현재 서비스의 알림톡 템플릿을 선택해주세요.");
+  const template = await lockKakaoBinding(tx, tenantId, serviceId, id);
+  if (!template || template.status === "archived") fail(404, "TEMPLATE_NOT_FOUND", "현재 서비스의 알림톡 템플릿을 선택해주세요.");
   return { kakaoTemplateId: template.id, kakaoTemplateVersion: template.version };
 }
 /** 알림톡 실패 시 문자로 대체 발송할 발신자. SMS 채널 발신자만 허용하고 바인딩 시 버전을 고정한다. */
@@ -173,8 +174,7 @@ export async function previewCampaign(ctx: Context, id: string, version: number,
     const { row, sender, evaluations } = await prepareCampaign(tx, ctx, id, version);
     let attachmentReason: string | null = null;
     try { await readCampaignAttachments(tx, row, row.status !== "draft"); } catch (error) { attachmentReason = error instanceof HttpError ? error.message : "첨부파일을 읽을 수 없습니다. 파일을 다시 확인해주세요."; }
-    const kakaoTemplate = row.channel === "kakao" && row.kakaoTemplateId
-      ? await tx.kakaoTemplate.findFirst({ where: { id: row.kakaoTemplateId, tenantId: row.tenantId }, include: { channel: true } }) : null;
+    const kakaoTemplate = row.channel === "kakao" ? await lockKakaoBinding(tx, row.tenantId, row.serviceId, row.kakaoTemplateId) : null;
     const senderReason = row.channel === "kakao"
       ? !kakaoTemplate ? "알림톡 템플릿을 선택해주세요."
         : kakaoTemplate.status !== "approved" || kakaoTemplate.channel.status !== "verified" ? "승인된 알림톡 템플릿과 확인된 채널이 필요합니다."

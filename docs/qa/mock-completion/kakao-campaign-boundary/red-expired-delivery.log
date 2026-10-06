@@ -1,0 +1,35 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:18201) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/campaigns.test.ts (64 tests | 1 failed | 63 skipped) 2643ms
+   × 알림톡 잔고 잠금을 기다리는 동안 동의 원천 보유 기한이 끝나면 발송·차감을 하지 않는다 921ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/campaigns.test.ts > 알림톡 잔고 잠금을 기다리는 동안 동의 원천 보유 기한이 끝나면 발송·차감을 하지 않는다
+AssertionError: expected { …(17) } to match object { status: 'cancelled', …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": "SOURCE_UNAVAILABLE",
+-   "status": "cancelled",
++   "reason": null,
++   "status": "local_delivered",
+  }
+
+ ❯ tests/server/campaigns.test.ts:958:82
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 63 skipped (64)
+   Start at  17:15:10
+   Duration  4.57s (tests 59%, transform 21%, import 20%)
+

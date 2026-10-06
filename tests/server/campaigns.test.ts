@@ -19,6 +19,7 @@ import { readFile, readdir, access, stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import nodemailer from "nodemailer";
+import { Client } from "pg";
 import type { Role } from "@/generated/prisma/client";
 import type { CampaignRecord, CampaignPreview, DeliveryRecord } from "@/contracts/campaigns";
 import type { Paged, FormRecord } from "@/contracts/forms";
@@ -860,4 +861,102 @@ test("the exact advertised one-click URL redirects only GET and accepts receiver
   expect(await db.emailFeedback.count({ where: { jobId: job.id } })).toBe(0);
   const confirmed = await unsubscribePost(new Request(advertised, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" }, body: "List-Unsubscribe=One-Click" }));
   expect(confirmed.status).toBe(200); expect(confirmed.headers.get("location")).toBeNull(); expect(await confirmed.json()).toEqual({ unsubscribed: true });
+});
+
+
+async function approvedKakaoCampaign(count = 1) {
+  env.KAKAO_PROVIDER = "local"; env.LOCAL_KAKAO_DIR = ".local/catchsecu_test/kakao-race-" + randomUUID();
+  env.KAKAO_UNIT_COST_KRW = 5;
+  const channel = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/channels", "POST", "owner", { serviceId: service, name: "경계 채널", searchId: "@race" + randomUUID().slice(0, 8) }, { "idempotency-key": randomUUID() })), 201);
+  await ok(await kakaoPost(req("/kakao/channels/" + channel.id + "/verify", "POST", "owner", {})));
+  const created = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates", "POST", "owner", { serviceId: service, channelId: channel.id, name: "경계 템플릿 " + randomUUID(), body: "#{name}님 안내", buttons: [] }, { "idempotency-key": randomUUID() })), 201);
+  const template = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates/" + created.id + "/submit", "POST", "owner", { version: created.version })));
+  const contacts = [];
+  for (let index=0; index<count; index++) contacts.push((await recipient("경계 수신자 " + index, "kakao")).contact);
+  const draft = await targets(await create({ channel: "kakao", senderId: null, kakaoTemplateId: template.id }), contacts);
+  await postTrustedLedgerTransfer({ tenantId: tenant, currency: "KRW", kind: "funding", amount: BigInt(100), sourceKind: "pg_capture", sourceId: randomUUID() });
+  return { channel, template, draft };
+}
+async function waitForDatabaseBlock(holder: number, table: string) {
+  if (!/^[A-Za-z]+$/.test(table)) throw new Error("Invalid block target");
+  const query = '%"' + table + '"%';
+  for (let attempt=0; attempt<250; attempt++) {
+    const rows = await db.$queryRaw<{ blocked: boolean }[]>`SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE pid<>pg_backend_pid() AND ${holder}=ANY(pg_blocking_pids(pid)) AND query LIKE ${query}) AS blocked`;
+    if (rows[0].blocked) return;
+    await new Promise(resolve => setTimeout(resolve, 20));
+  }
+  throw new Error("Worker did not reach the database barrier");
+}
+async function changeKakaoWithTimeout(kind: "channel" | "template", id: string) {
+  return db.$transaction(async tx => {
+    await tx.$executeRawUnsafe("SET LOCAL lock_timeout='200ms'");
+    return kind === "channel" ? tx.kakaoChannel.update({ where: { id }, data: { status: "pending", version: { increment: 1 } } })
+      : tx.kakaoTemplate.update({ where: { id }, data: { status: "draft", version: { increment: 1 } } });
+  });
+}
+test.each(["channel", "template"] as const)("알림톡 실제 발송 경계에서 %s 변경은 영수증까지 기다리고 다음 건은 차단된다", async kind => {
+  const { channel, template, draft } = await approvedKakaoCampaign(2); await schedule(draft);
+  const jobs = await db.job.findMany({ where: { campaignDelivery: { campaignId: draft.id } }, orderBy: { createdAt: "asc" } });
+  const workerId="kakao-boundary-"+randomUUID(), job = await mailer.claimJob(workerId, { tenantId: tenant, jobId: jobs[0].id }); expect(job).toBeDefined();
+  const holder = new Client({ connectionString: env.DATABASE_URL }); await holder.connect();
+  let running: Promise<void> | undefined;
+  try {
+    await holder.query('BEGIN'); await holder.query(`SELECT "tenantId" FROM "CreditAccount" WHERE "tenantId"=$1 AND currency='KRW' FOR UPDATE`, [tenant]);
+    const pid = Number((await holder.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+    running = runCampaignJob(job!, workerId);
+    await waitForDatabaseBlock(pid, "CreditAccount");
+    await expect(access(resolve(env.LOCAL_KAKAO_DIR, job!.id + ".json"))).rejects.toThrow();
+    await expect(changeKakaoWithTimeout(kind, kind === "channel" ? channel.id : template.id)).rejects.toThrow();
+  } finally {
+    await holder.query('ROLLBACK'); await holder.end(); await running;
+  }
+  expect((await db.job.findUniqueOrThrow({ where: { id: job!.id } })).status).toBe("done");
+  expect(JSON.parse(await readFile(resolve(env.LOCAL_KAKAO_DIR, job!.id + ".json"), "utf8"))).toMatchObject({ templateId: template.id, status: "local_delivered" });
+  await changeKakaoWithTimeout(kind, kind === "channel" ? channel.id : template.id);
+  const otherJob = await mailer.claimJob(workerId, { tenantId: tenant, jobId: jobs[1].id }); expect(otherJob).toBeDefined(); await runCampaignJob(otherJob!, workerId);
+  expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: otherJob!.campaignDeliveryId! } }))).toMatchObject({ status: "cancelled", reason: "TEMPLATE_UNAVAILABLE" });
+  await expect(access(resolve(env.LOCAL_KAKAO_DIR, otherJob!.id + ".json"))).rejects.toThrow();
+});
+test("예약은 승인 확인 뒤 감사 저장을 기다리는 동안 채널·템플릿 변경을 허용하지 않는다", async () => {
+  const { channel, template, draft } = await approvedKakaoCampaign();
+  const lock = BigInt("0x" + randomUUID().replaceAll("-", "").slice(0, 15)).toString();
+  await db.$executeRawUnsafe(`CREATE FUNCTION qa_kakao_schedule_barrier() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='campaign.scheduled' AND NEW."resourceId"='${draft.id}' THEN PERFORM pg_advisory_xact_lock(${lock}::bigint); END IF; RETURN NEW; END $$`);
+  await db.$executeRawUnsafe('CREATE TRIGGER qa_kakao_schedule_barrier BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION qa_kakao_schedule_barrier()');
+  const holder = new Client({ connectionString: env.DATABASE_URL }); await holder.connect(); let pending: Promise<Response> | undefined; let response: Response | undefined;
+  try {
+    await holder.query('BEGIN'); await holder.query('SELECT pg_advisory_xact_lock($1::bigint)', [lock]);
+    const pid=Number((await holder.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+    pending=POST(req("/campaigns/"+draft.id+"/schedule","POST","owner",{version:draft.version,at:null},{"idempotency-key":randomUUID()}));
+    await waitForDatabaseBlock(pid,"AuditEvent");
+    await expect(changeKakaoWithTimeout("channel",channel.id)).rejects.toThrow();
+    await expect(changeKakaoWithTimeout("template",template.id)).rejects.toThrow();
+  } finally {
+    await holder.query('ROLLBACK');await holder.end();response=await pending;
+    await db.$executeRawUnsafe('DROP TRIGGER qa_kakao_schedule_barrier ON "AuditEvent"');await db.$executeRawUnsafe('DROP FUNCTION qa_kakao_schedule_barrier()');
+  }
+  expect(response!.status).toBe(202);
+  await changeKakaoWithTimeout("template",template.id);
+  const job=await jobFor(draft.id);expect((await drain(job.id)).status).toBe("cancelled");
+  await expect(access(resolve(env.LOCAL_KAKAO_DIR,job.id+".json"))).rejects.toThrow();
+});
+
+test("알림톡 잔고 잠금을 기다리는 동안 동의 원천 보유 기한이 끝나면 발송·차감을 하지 않는다", async () => {
+  const { draft } = await approvedKakaoCampaign(); await schedule(draft);
+  const queued=await jobFor(draft.id), workerId="kakao-expiry-"+randomUUID();
+  const recipient=await db.campaignDelivery.findUniqueOrThrow({where:{id:queued.campaignDeliveryId!}});
+  const expires=new Date(Date.now()+20000);
+  await db.submission.update({where:{id:recipient.sourceSubmissionId!},data:{retentionUntil:expires}});
+  const job=await mailer.claimJob(workerId,{tenantId:tenant,jobId:queued.id});expect(job).toBeDefined();
+  const before=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});
+  const holder=new Client({connectionString:env.DATABASE_URL});await holder.connect();let running:Promise<void>|undefined;
+  try {
+    await holder.query('BEGIN');await holder.query(`SELECT "tenantId" FROM "CreditAccount" WHERE "tenantId"=$1 AND currency='KRW' FOR UPDATE`,[tenant]);
+    const pid=Number((await holder.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+    running=runCampaignJob(job!,workerId);await waitForDatabaseBlock(pid,"CreditAccount");
+    vi.useFakeTimers({toFake:["Date"]});vi.setSystemTime(new Date(expires.getTime()+1000));
+  } finally {await holder.query('ROLLBACK');await holder.end();await running;vi.useRealTimers();}
+  expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:recipient.id}})).toMatchObject({status:"cancelled",reason:"SOURCE_UNAVAILABLE"});
+  await expect(access(resolve(env.LOCAL_KAKAO_DIR,queued.id+".json"))).rejects.toThrow();
+  const after=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});expect(after.available).toBe(before.available);expect(after.held).toBe(before.held);
+  expect(await db.ledgerTransaction.count({where:{tenantId:tenant,kind:"capture",sourceId:recipient.id}})).toBe(0);
 });

@@ -1,0 +1,134 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:14571) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/campaigns.test.ts (63 tests | 3 failed | 60 skipped) 3866ms
+   × 알림톡 실제 발송 경계에서 channel 변경은 영수증까지 기다리고 다음 건은 차단된다 1118ms
+   × 알림톡 실제 발송 경계에서 template 변경은 영수증까지 기다리고 다음 건은 차단된다 627ms
+   × 예약은 승인 확인 뒤 감사 저장을 기다리는 동안 채널·템플릿 변경을 허용하지 않는다 395ms
+(node:14711) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/kakao-templates.test.ts (21 tests | 1 failed | 20 skipped) 831ms
+   × 보관한 채널·템플릿은 반복 삭제나 수정으로 상태·감사를 바꾸지 않는다 828ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/campaigns.test.ts > 알림톡 실제 발송 경계에서 channel 변경은 영수증까지 기다리고 다음 건은 차단된다
+AssertionError: promise resolved "{ …(9) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-06T08:12:39.144Z,
++   "id": "51cbc4bb-5823-44ba-bfee-95282614bba7",
++   "name": "경계 채널",
++   "searchId": "@race341ca469",
++   "serviceId": "92517591-5bcf-4a43-8fac-e2c8dc181789",
++   "status": "pending",
++   "tenantId": "de8a26b4-2ef3-4248-8957-5becbf3d52ff",
++   "updatedAt": 2026-10-06T08:12:40.193Z,
++   "version": 3,
+  }
+
+ ❯ tests/server/campaigns.test.ts:909:94
+    907|     await waitForDatabaseBlock(pid, "CreditAccount");
+    908|     await expect(access(resolve(env.LOCAL_KAKAO_DIR, job!.id + ".json"…
+    909|     await expect(changeKakaoWithTimeout(kind, kind === "channel" ? cha…
+       |                                                                                              ^
+    910|   } finally {
+    911|     await holder.query('ROLLBACK'); await holder.end(); await running;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 알림톡 실제 발송 경계에서 template 변경은 영수증까지 기다리고 다음 건은 차단된다
+AssertionError: promise resolved "{ …(12) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": "#{name}님 안내",
++   "buttons": [],
++   "channelId": "2abd55f8-03e2-4744-9edf-64966056be3e",
++   "createdAt": 2026-10-06T08:12:40.278Z,
++   "id": "2c89e817-c508-472c-ac66-4f7e8d6b0020",
++   "name": "경계 템플릿 3bb40f78-58bb-419c-bac7-250730d01a5b",
++   "reviewNote": "로컬 심사: 승인",
++   "serviceId": "92517591-5bcf-4a43-8fac-e2c8dc181789",
++   "status": "draft",
++   "tenantId": "de8a26b4-2ef3-4248-8957-5becbf3d52ff",
++   "updatedAt": 2026-10-06T08:12:40.847Z,
++   "version": 4,
+  }
+
+ ❯ tests/server/campaigns.test.ts:909:94
+    907|     await waitForDatabaseBlock(pid, "CreditAccount");
+    908|     await expect(access(resolve(env.LOCAL_KAKAO_DIR, job!.id + ".json"…
+    909|     await expect(changeKakaoWithTimeout(kind, kind === "channel" ? cha…
+       |                                                                                              ^
+    910|   } finally {
+    911|     await holder.query('ROLLBACK'); await holder.end(); await running;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 예약은 승인 확인 뒤 감사 저장을 기다리는 동안 채널·템플릿 변경을 허용하지 않는다
+AssertionError: promise resolved "{ …(9) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "createdAt": 2026-10-06T08:12:40.871Z,
++   "id": "2e9ca44a-64ae-4007-93ca-d325275680cc",
++   "name": "경계 채널",
++   "searchId": "@raceab370ca6",
++   "serviceId": "92517591-5bcf-4a43-8fac-e2c8dc181789",
++   "status": "pending",
++   "tenantId": "de8a26b4-2ef3-4248-8957-5becbf3d52ff",
++   "updatedAt": 2026-10-06T08:12:41.245Z,
++   "version": 3,
+  }
+
+ ❯ tests/server/campaigns.test.ts:931:63
+    929|     pending=POST(req("/campaigns/"+draft.id+"/schedule","POST","owner"…
+    930|     await waitForDatabaseBlock(pid,"AuditEvent");
+    931|     await expect(changeKakaoWithTimeout("channel",channel.id)).rejects…
+       |                                                               ^
+    932|     await expect(changeKakaoWithTimeout("template",template.id)).rejec…
+    933|   } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > 보관한 채널·템플릿은 반복 삭제나 수정으로 상태·감사를 바꾸지 않는다
+AssertionError: expected 200 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 200
+
+ ❯ tests/server/kakao-templates.test.ts:357:183
+    355|   expect(channel.status).toBe("archived");
+    356|   const count = await db.auditEvent.count();
+    357|   expect((await remove(new Request(origin + "/api/v1/kakao/channels/" …
+       |                                                                                                                                                                                       ^
+    358|   expect((await update(req("/kakao/channels/"+channel.id,cookie,"PATCH…
+    359|   expect((await remove(new Request(origin + "/api/v1/kakao/templates/"…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 80 skipped (84)
+   Start at  17:12:35
+   Duration  7.30s (tests 67%, import 20%, transform 12%)
+

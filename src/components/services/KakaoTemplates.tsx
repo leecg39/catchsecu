@@ -90,7 +90,7 @@ function KakaoForms({ path, serviceId, setService }: { path: string; serviceId: 
     <ul>{(channels.data?.items ?? []).map(item => <li key={item.id}>{item.name} {item.searchId} · {channelStatus[item.status] ?? item.status}
       {item.status === "pending" && <> <ActionButton secondary disabled={busy || managing} onClick={() => run(() => api("/kakao/channels/" + item.id + "/verify", { method: "POST", body: "{}" }), "채널 확인을 요청했습니다.")}>확인 요청</ActionButton></>}
       {item.status !== "archived" && <ActionButton secondary disabled={busy || managing} aria-label={item.name + " " + item.searchId + " 채널 수정"} onClick={() => { setError(""); setMessage(""); setEditing(item); }}>수정</ActionButton>}
-      <ActionButton secondary disabled={busy || managing} aria-label={item.name + " " + item.searchId + " 채널 삭제·보관"} onClick={() => { setError(""); setMessage(""); setRemoving(item); setRemoveConflict(false); }}>삭제·보관</ActionButton>
+      {item.status !== "archived" ? <ActionButton secondary disabled={busy || managing} aria-label={item.name + " " + item.searchId + " 채널 삭제·보관"} onClick={() => { setError(""); setMessage(""); setRemoving(item); setRemoveConflict(false); }}>삭제·보관</ActionButton> : <span>보관된 채널</span>}
     </li>)}</ul>
     {editing && <ChannelEditor row={editing} busy={busy} run={run} close={() => setEditing(null)} />}
     {removing && <div role="alertdialog" aria-label="채널 삭제·보관 확인"><p>{removing.name} · {removing.searchId} · v{removing.version}</p><p>사용 중인 템플릿이 있으면 진행할 수 없습니다. 템플릿 이력이 있으면 보관하고, 이력이 없으면 삭제합니다.</p>

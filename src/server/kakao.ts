@@ -58,6 +58,7 @@ export async function updateKakaoChannel(ctx: Context, id: string, input: z.infe
     const deadlines = await lockService(tx, ctx, initial.serviceId);
     const current = await lockChannel(tx, ctx.tenantId, id);
     if (current.version !== input.version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    if (current.status === "archived") fail(409, "CHANNEL_ARCHIVED", "보관된 채널은 변경할 수 없습니다.");
     if (input.status === "archived" && await tx.kakaoTemplate.count({ where: { channelId: id, status: { not: "archived" } } }))
       fail(409, "CHANNEL_IN_USE", "사용 중인 템플릿이 있어 채널을 보관할 수 없습니다.");
     const row = await tx.kakaoChannel.update({ where: { id }, data: { name: input.name, searchId: input.searchId, status: input.status === "archived" ? "archived" : current.status === "verified" && current.searchId === input.searchId ? "verified" : "pending", version: { increment: 1 } } });
@@ -247,6 +248,7 @@ export async function removeKakaoChannel(ctx: Context, id: string, version: numb
     if (current.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
     if (await tx.kakaoTemplate.count({ where: { tenantId: ctx.tenantId, channelId: id, status: { not: "archived" } } }))
       fail(409, "CHANNEL_IN_USE", "사용 중인 템플릿이 있어 채널을 보관할 수 없습니다.");
+    if (current.status === "archived") fail(409, "CHANNEL_ARCHIVED", "이미 보관된 채널입니다.");
     const templates = await tx.kakaoTemplate.count({ where: { tenantId: ctx.tenantId, channelId: id } });
     if (templates) {
       const row = await tx.kakaoChannel.update({ where: { id }, data: { status: "archived", version: { increment: 1 } } });
@@ -266,6 +268,7 @@ export async function removeKakaoTemplate(ctx: Context, id: string, version: num
     if (!current) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
     const deadlines = await lockService(tx, ctx, current.serviceId);
     if (current.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    if (current.status === "archived") fail(409, "TEMPLATE_ARCHIVED", "이미 보관된 템플릿입니다.");
     const referenced = await tx.campaign.count({ where: { tenantId: ctx.tenantId, kakaoTemplateId: id } }) + await tx.kakaoMockReceipt.count({ where: { tenantId: ctx.tenantId, templateId: id } });
     if (current.status !== "draft" || referenced) {
       const changed = await tx.kakaoTemplate.updateMany({ where: { id, tenantId: ctx.tenantId, version }, data: { status: "archived", version: { increment: 1 } } });

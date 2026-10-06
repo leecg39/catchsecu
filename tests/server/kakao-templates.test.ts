@@ -343,3 +343,20 @@ test("영수증 DB 경계는 다른 서비스·채널·승인 버전의 직접 �
   for (const patch of [{ serviceId: randomUUID() }, { channelId: randomUUID() }, { templateVersion: data.templateVersion + 1 }, { channelVersion: data.channelVersion + 1 }]) await expect(db.kakaoMockReceipt.create({ data: { ...data, ...patch } })).rejects.toThrow();
   expect(await db.kakaoMockReceipt.count()).toBe(0);
 });
+
+
+test("보관한 채널·템플릿은 반복 삭제나 수정으로 상태·감사를 바꾸지 않는다", async () => {
+  const { cookie, template } = await detailFixture();
+  const archivedTemplate = await remove(new Request(origin + "/api/v1/kakao/templates/" + template.id, { method: "DELETE", headers: { origin, cookie, "if-match": String(template.version) } }));
+  expect(archivedTemplate.status).toBe(204);
+  const second = await (await create(req("/kakao/templates", cookie, "POST", { serviceId: template.serviceId, channelId: template.channelId, name: "보관 검증", body: "안내", buttons: [] }, randomUUID()))).json();
+  await db.kakaoTemplate.update({ where: { id: second.id }, data: { status: "archived", version: { increment: 1 } } });
+  const channel = await (await remove(new Request(origin + "/api/v1/kakao/channels/" + template.channelId, { method: "DELETE", headers: { origin, cookie, "if-match": "1" } }))).json();
+  expect(channel.status).toBe("archived");
+  const count = await db.auditEvent.count();
+  expect((await remove(new Request(origin + "/api/v1/kakao/channels/" + channel.id, { method: "DELETE", headers: { origin, cookie, "if-match": String(channel.version) } }))).status).toBe(409);
+  expect((await update(req("/kakao/channels/"+channel.id,cookie,"PATCH",{name:channel.name,searchId:channel.searchId,status:"pending",version:channel.version}))).status).toBe(409);
+  expect((await remove(new Request(origin + "/api/v1/kakao/templates/" + second.id, { method: "DELETE", headers: { origin, cookie, "if-match": "2" } }))).status).toBe(409);
+  expect(await db.auditEvent.count()).toBe(count);
+  expect((await db.kakaoChannel.findUniqueOrThrow({where:{id:channel.id}})).version).toBe(channel.version);
+});

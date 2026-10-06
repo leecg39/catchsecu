@@ -25,3 +25,5 @@ test("목록 관리 권한이 없으면 채널·템플릿 목록을 요청하지
 test("목록 조회 오류는 재시도와 등록 잠금을 표시한다",()=>{state.error={message:"목록을 읽지 못했습니다"};const html=renderToStaticMarkup(createElement(ServicesPages,{path:"/alimtalk/templates"}));expect(html).toContain("채널 다시 불러오기");expect(html).toContain("템플릿 다시 불러오기");expect(html).toContain('<fieldset disabled=""');});
 
 test("이름이 같은 채널도 검색 ID로 수정·삭제 버튼을 구분한다",()=>{state.channels=[{id:"first",name:"같은 이름",searchId:"@first",status:"verified"},{id:"second",name:"같은 이름",searchId:"@second",status:"verified"}];const html=renderToStaticMarkup(createElement(ServicesPages,{path:"/alimtalk"}));for(const id of ["first","second"]){expect(html).toContain('aria-label="같은 이름 @'+id+' 채널 수정"');expect(html).toContain('aria-label="같은 이름 @'+id+' 채널 삭제·보관"');}});
+
+test("보관한 채널은 수정·삭제 버튼 대신 보관 상태를 표시한다",()=>{state.channels=[{id:"archived",name:"과거 채널",searchId:"@archived",status:"archived"}];const html=renderToStaticMarkup(createElement(ServicesPages,{path:"/alimtalk"}));expect(html).toContain("보관된 채널");expect(html).not.toContain('aria-label="과거 채널 @archived 채널 수정"');expect(html).not.toContain('aria-label="과거 채널 @archived 채널 삭제·보관"');});

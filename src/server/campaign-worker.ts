@@ -1,3 +1,4 @@
+import { lockKakaoBinding } from "./kakao-binding";
 import { mkdir, stat, unlink, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { z } from "zod";
@@ -53,8 +54,7 @@ async function lockedState(tx: Transaction, job: ClaimedJob, workerId: string, p
   if (fallbackLeg) {
     if (!sender || sender.version !== campaign.fallbackSenderVersion || senderDenial(sender)) reason ??= "FALLBACK_UNAVAILABLE";
   } else if (campaign.channel === "kakao") {
-    kakaoTemplate = campaign.kakaoTemplateId
-      ? await tx.kakaoTemplate.findFirst({ where: { id: campaign.kakaoTemplateId, tenantId: campaign.tenantId }, include: { channel: true } }) : null;
+    kakaoTemplate = await lockKakaoBinding(tx, campaign.tenantId, campaign.serviceId, campaign.kakaoTemplateId);
     if (!kakaoTemplate || kakaoTemplate.status !== "approved" || kakaoTemplate.channel.status !== "verified" || kakaoTemplate.version !== campaign.kakaoTemplateVersion) reason ??= "TEMPLATE_UNAVAILABLE";
   } else if (!sender || sender.version !== campaign.senderVersion || senderDenial(sender)) reason ??= "SENDER_UNAVAILABLE";
   const expectedTransport = fallbackLeg || campaign.channel === "sms"
@@ -198,7 +198,14 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
         if (!existing && (acct.length === 0 || acct[0].available < BigInt(unitCost))) { await finish(tx, job, campaign, recipient, "failed", "INSUFFICIENT_CREDIT"); return; }
         hold = await reserveMessage(tx, recipient, unitCost, ledgerSource);
       }
-      try { await deliverKakaoLocal(job.id, recipient.id, kakaoTemplate, evaluated.contact!); }
+      // 잔고 잠금 대기 중에도 시각은 흐른다. 발송 직전에 보유 기한·현재 권한·리스 기한을 다시 검사한다.
+      const fresh = await lockedState(tx, job, workerId, payload);
+      if (!fresh) { if (hold) await releaseHeld(tx, recipient, ledgerSource); return; }
+      if (fresh.reason || !fresh.kakaoTemplate || !fresh.evaluated.contact) {
+        if (hold) await releaseHeld(tx, recipient, ledgerSource);
+        await finish(tx, job, campaign, recipient, "cancelled", fresh.reason ?? "TEMPLATE_UNAVAILABLE"); return;
+      }
+      try { await deliverKakaoLocal(job.id, recipient.id, fresh.kakaoTemplate, fresh.evaluated.contact); }
       catch (error) {
         if (error instanceof HttpError && error.status === 422) { if (hold) await releaseHeld(tx, recipient, ledgerSource); if (await enqueueFallback(tx, job, campaign, recipient, error.code)) return; await finish(tx, job, campaign, recipient, "failed", error.code); return; }
         if (job.attempts >= job.maxAttempts) { if (hold) await releaseHeld(tx, recipient, ledgerSource); if (await enqueueFallback(tx, job, campaign, recipient, "DELIVERY_FAILED")) return; await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }

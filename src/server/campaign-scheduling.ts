@@ -1,3 +1,4 @@
+import { lockKakaoBinding } from "./kakao-binding";
 import { z } from "zod";
 import { CAMPAIGN_MAIL_JOB_TYPE, campaignSchedule, campaignReschedule, campaignRetry } from "@/contracts/campaigns";
 import type { Campaign, CampaignDelivery, Sender } from "@/generated/prisma/client";
@@ -22,8 +23,7 @@ function validateTime(row: Campaign, at: string | null) {
 async function requireTransport(tx: Transaction, row: Campaign, sender: Sender | null, at: Date, snapshot = false) {
   if (row.channel === "kakao") {
     if (env.KAKAO_PROVIDER !== "local") fail(503, "KAKAO_PROVIDER_REQUIRED", "알림톡 발송 공급자를 연결한 뒤 발송할 수 있습니다.");
-    const template = row.kakaoTemplateId
-      ? await tx.kakaoTemplate.findFirst({ where: { id: row.kakaoTemplateId, tenantId: row.tenantId }, include: { channel: true } }) : null;
+    const template = await lockKakaoBinding(tx, row.tenantId, row.serviceId, row.kakaoTemplateId);
     if (!template || template.status !== "approved" || template.channel.status !== "verified" || template.version !== row.kakaoTemplateVersion)
       fail(409, "TEMPLATE_UNAVAILABLE", "승인된 알림톡 템플릿과 확인된 채널이 필요합니다. 템플릿이 수정되면 내용 저장으로 다시 연결해주세요.");
     if (row.fallbackSenderId) {
