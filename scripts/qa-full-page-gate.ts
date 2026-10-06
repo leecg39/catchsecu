@@ -3,11 +3,13 @@
 // 루트당 한 번 방문해 뷰포트를 리사이즈하며 측정하고, 결과를 루트 단위로 즉시 기록한다.
 import { chromium, type BrowserContext, type Page } from "playwright";
 import { db } from "../src/server/db";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { env } from "../src/server/env";
+import { summarizePageGate, resolvePageFixture, type PageGateResult } from "./lib/qa-page-gate";
 
 const base = new URL(env.BETTER_AUTH_URL).origin;
 const outDir = "docs/qa/P13-T04";
+await mkdir(`${outDir}/screens`, { recursive: true });
 const manifest = JSON.parse(await readFile("src/data/route-manifest.json", "utf8")) as { path: string; dynamic?: boolean; category?: string }[];
 const pw = JSON.parse(await readFile(".local/catchsecu_dev-accounts.json", "utf8"));
 
@@ -17,40 +19,35 @@ const tenant = "10000000-0000-4000-8000-000000000001";
 const form = await db.form.findFirst({ where: { service: { tenantId: tenant } }, select: { id: true } });
 const notice = await db.notice.findFirst({ select: { id: true } });
 const alim = await db.kakaoTemplate.findFirst({ select: { id: true } }).catch(() => null);
-const bill = await db.paymentOrder.findFirst({ select: { id: true } }).catch(() => null);
-const fixtures: Record<string, string> = {
-  ":serviceId": svc, ":formId": form?.id ?? "00000000-0000-4000-8000-000000000000",
-  ":noticeId": notice?.id ? String(notice.id) : "0", ":id": svc,
-  ":templateId": alim?.id ?? "00000000-0000-4000-8000-000000000000",
-  ":billId": bill?.id ?? "00000000-0000-4000-8000-000000000000",
-  ":token": "qa-gate-invalid-token",
+const bill = await db.paymentOrder.findFirst({ where: { tenantId: tenant }, select: { id: true } }).catch(() => null);
+const fixtures: Record<string, string | undefined> = {
+  ":serviceId": svc, ":formId": form?.id,
+  ":admNotiId": notice?.id ? String(notice.id) : undefined,
+  ":templateId": alim?.id,
+  ":id": bill?.id,
 };
-function resolvePath(path: string) {
-  return path.split("/").map(seg => seg.startsWith(":") ? (fixtures[seg] ?? fixtures[":token"]) : seg).join("/");
-}
 const skipDynamic = /:token|:code|pay|infoOwner|saeol|identification/;
 
 const browser = await chromium.launch();
-type Result = { route: string; status?: number; finalUrl?: string; overflow?: Record<number, boolean>;
-  refreshed?: boolean; backOk?: boolean; consoleErrors: string[]; error?: string };
+type Result = PageGateResult;
 const results: Result[] = [];
 const shotRoutes = new Set(["/dashboard", "/form/manage", "/notice", "/log/authority", "/sms/history", "/my-page", "/marketing", "/compliance", "/payment", "/set/user"]);
 const widths: [number, number][] = [[1440, 900], [768, 1024], [390, 844]];
 let currentResult: Result | null = null;
 async function flush() { await writeFile(`${outDir}/full-sweep.json`, JSON.stringify(results, null, 1)); }
 async function check(page: Page, route: string, manifestPath: string) {
-  const r: Result = { route, consoleErrors: [], overflow: {} };
+  const r: Result = { manifestPath, route, consoleErrors: [], overflow: {} };
   currentResult = r;
   try {
     const res = await page.goto(base + route, { waitUntil: "domcontentloaded", timeout: 20000 });
     r.status = res?.status();
-    await page.waitForFunction(() => (document.querySelector("#root")?.children.length ?? 0) > 0, undefined, { timeout: 8000 }).catch(() => {});
+    await page.waitForFunction(() => (document.querySelector("#root")?.children.length ?? 0) > 0, undefined, { timeout: 8000 });
     r.finalUrl = new URL(page.url()).pathname;
     for (const [w, h] of widths) {
       await page.setViewportSize({ width: w, height: h });
       await page.waitForTimeout(250);
       r.overflow![w] = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
-      if (shotRoutes.has(manifestPath)) await page.screenshot({ path: `${outDir}/screens/${w}${route.replaceAll("/", "_")}.png`, fullPage: false }).catch(() => {});
+      if (shotRoutes.has(manifestPath)) await page.screenshot({ path: `${outDir}/screens/${w}${route.replaceAll("/", "_")}.png`, fullPage: false });
     }
     const prev = r.finalUrl;
     const res2 = await page.reload({ waitUntil: "domcontentloaded", timeout: 20000 }).catch(() => null);
@@ -79,12 +76,18 @@ await login(ctx);
 const page = await ctx.newPage();
 page.on("console", m => { if (m.type() === "error" && currentResult && currentResult.consoleErrors.length < 5) currentResult.consoleErrors.push(m.text().slice(0, 120)); });
 for (const row of manifest) {
-  if (row.dynamic && skipDynamic.test(row.path)) continue;
-  await check(page, resolvePath(row.path), row.path);
+  const fixture = resolvePageFixture(row.path, fixtures);
+  if (fixture.missing.length || (row.dynamic && skipDynamic.test(row.path))) {
+    results.push({ manifestPath: row.path, route: fixture.route, consoleErrors: [], skipped: fixture.missing.length ? `실제 fixture 없음: ${fixture.missing.join(", ")}` : "정상 동적 fixture 미준비" });
+    await flush();
+    continue;
+  }
+  await check(page, fixture.route, row.path);
 }
 await ctx.close();
-const bad = results.filter(r => r.error || (r.status !== 200 && r.status !== 307)
-  || Object.values(r.overflow ?? {}).some(Boolean) || r.refreshed === false || r.backOk === false);
-console.log(JSON.stringify({ total: results.length, anomalies: bad.length, sample: bad.slice(0, 15) }));
+const summary = summarizePageGate(manifest.map(row => row.path), results);
+await writeFile(`${outDir}/full-sweep-summary.json`, JSON.stringify({ checkedAt: new Date().toISOString(), ...summary }, null, 2) + "\n");
+console.log(JSON.stringify(summary));
+process.exitCode = summary.result === "passed" ? 0 : 1;
 await browser.close();
 await db.$disconnect();
