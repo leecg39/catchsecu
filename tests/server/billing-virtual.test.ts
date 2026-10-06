@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeEach, expect, test } from "vitest";
+import { afterAll, afterEach, beforeEach, expect, test, vi } from "vitest";
+import * as auditModule from "@/server/audit";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
@@ -16,6 +17,7 @@ function req(path: string, cookie = "", method = "GET", input?: unknown, key?: s
 }
 beforeEach(async () => { await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "Job" CASCADE'); });
 afterAll(async () => { await db.$disconnect(); });
+afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
 
 async function fixture() {
   const email = "vpg-" + randomUUID() + "@catchsecu.test";
@@ -28,8 +30,78 @@ async function fixture() {
   const login = await auth.handler(req("/auth/sign-in/email", "", "POST", { email, password }));
   const cookie = login.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
   const order = await (await createOrder(req("/billing/orders", cookie, "POST", { subscriptionId: subscription.id }, randomUUID()))).json();
-  return { company, subscription, order, cookie };
+  return { company, subscription, order, cookie, user };
 }
+
+test.each(["checkout", "refund"] as const)("가상 %s 처리 중 세션 만료는 전체 변경을 롤백한다", async operation => {
+  const { company, subscription, order, cookie, user } = await fixture();
+  let refundId: string | undefined;
+  if (operation === "refund") {
+    expect((await virtualCheckout(req(`/billing/orders/${order.id}/virtual-checkout`, cookie, "POST", { outcome: "paid" }))).status).toBe(200);
+    const refund = await (await requestRefund(req(`/billing/orders/${order.id}/refunds`, cookie, "POST", { amount: 4000, reason: "부분" }, randomUUID()))).json();
+    refundId = refund.id;
+  }
+  const now = Date.now();
+  await db.session.updateMany({ where: { userId: user.id }, data: { expiresAt: new Date(now + 60000) } });
+  const realAudit = auditModule.audit;
+  const action = operation === "checkout" ? "billing.virtual_checkout" : "billing.virtual_refund_settle";
+  vi.spyOn(auditModule, "audit").mockImplementation(async (...args) => {
+    await realAudit(...args);
+    if (args[3] === action) {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(now + 120000);
+    }
+  });
+  const res = operation === "checkout"
+    ? await virtualCheckout(req(`/billing/orders/${order.id}/virtual-checkout`, cookie, "POST", { outcome: "paid" }))
+    : await virtualSettle(req(`/billing/refunds/${refundId}/virtual-settle`, cookie, "POST", { outcome: "refunded" }));
+  expect(res.status).toBe(401);
+  expect((await res.json()).error.code).toBe("SESSION_EXPIRED");
+  expect(await db.auditEvent.count({ where: { resourceId: refundId ?? order.id, action } })).toBe(0);
+  if (operation === "checkout") {
+    expect((await db.paymentOrder.findUniqueOrThrow({ where: { id: order.id } })).status).toBe("pending");
+    expect((await db.billingSubscription.findUniqueOrThrow({ where: { id: subscription.id } })).status).toBe("pending");
+    expect(await db.paymentEvent.count({ where: { orderId: order.id } })).toBe(0);
+    expect(await db.creditAccount.findFirst({ where: { tenantId: company.id } })).toBeNull();
+  } else {
+    expect((await db.paymentRefund.findUniqueOrThrow({ where: { id: refundId } })).status).toBe("requested");
+    expect(await db.paymentEvent.count({ where: { orderId: order.id, outcome: "refunded" } })).toBe(0);
+    expect((await db.creditAccount.findUniqueOrThrow({ where: { tenantId_currency: { tenantId: company.id, currency: "KRW" } } })).available).toBe(BigInt(12000));
+  }
+});
+
+test("가상 승인 감사 저장 실패는 결제·구독·원장을 함께 롤백한다", async () => {
+  const { company, subscription, order, cookie } = await fixture();
+  const realAudit = auditModule.audit;
+  vi.spyOn(auditModule, "audit").mockImplementation(async (...args) => {
+    if (args[3] === "billing.virtual_checkout") throw new Error("Injected audit failure");
+    return realAudit(...args);
+  });
+  const res = await virtualCheckout(req(`/billing/orders/${order.id}/virtual-checkout`, cookie, "POST", { outcome: "paid" }));
+  expect(res.status).toBe(500);
+  expect((await db.paymentOrder.findUniqueOrThrow({ where: { id: order.id } })).status).toBe("pending");
+  expect((await db.billingSubscription.findUniqueOrThrow({ where: { id: subscription.id } })).status).toBe("pending");
+  expect(await db.paymentEvent.count({ where: { orderId: order.id } })).toBe(0);
+  expect(await db.creditAccount.findFirst({ where: { tenantId: company.id } })).toBeNull();
+  expect(await db.auditEvent.count({ where: { resourceId: order.id, action: "billing.payment_paid" } })).toBe(0);
+});
+
+test("가상 환불 감사 저장 실패는 정산·원장·공급자 이벤트를 함께 롤백한다", async () => {
+  const { company, order, cookie } = await fixture();
+  expect((await virtualCheckout(req(`/billing/orders/${order.id}/virtual-checkout`, cookie, "POST", { outcome: "paid" }))).status).toBe(200);
+  const refund = await (await requestRefund(req(`/billing/orders/${order.id}/refunds`, cookie, "POST", { amount: 4000, reason: "부분" }, randomUUID()))).json();
+  const realAudit = auditModule.audit;
+  vi.spyOn(auditModule, "audit").mockImplementation(async (...args) => {
+    if (args[3] === "billing.virtual_refund_settle") throw new Error("Injected audit failure");
+    return realAudit(...args);
+  });
+  const res = await virtualSettle(req(`/billing/refunds/${refund.id}/virtual-settle`, cookie, "POST", { outcome: "refunded" }));
+  expect(res.status).toBe(500);
+  expect((await db.paymentRefund.findUniqueOrThrow({ where: { id: refund.id } })).status).toBe("requested");
+  expect(await db.paymentEvent.count({ where: { orderId: order.id, outcome: "refunded" } })).toBe(0);
+  expect((await db.creditAccount.findUniqueOrThrow({ where: { tenantId_currency: { tenantId: company.id, currency: "KRW" } } })).available).toBe(BigInt(12000));
+  expect(await db.auditEvent.count({ where: { resourceId: refund.id, action: "billing.refunded" } })).toBe(0);
+});
 
 test("주문 목록이 가상 결제 활성 여부를 보고한다", async () => {
   const { cookie } = await fixture();

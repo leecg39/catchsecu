@@ -1,0 +1,55 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:30546) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+stderr | tests/server/billing-virtual.test.ts > 가상 승인 감사 저장 실패는 결제·구독·원장을 함께 롤백한다
+{"requestId":"dbbb32da-f0e6-47d2-abaf-409ab9ff14e2","code":"INTERNAL_ERROR","kind":"Error","stack":"    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-virtual.test.ts:40:55 |     at audit (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/vitest/dist/chunks/spy.DgMTfhrK.js:323:40) |     at virtualPaymentCheckout (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/payments.ts:103:9) |     at processTicksAndRejections (node:internal/process/task_queues:104:5) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/api/v1/billing/orders/[id]/virtual-checkout/route.ts:9:15 |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/http.ts:54:24 |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-virtual.test.ts:43:15"}
+
+stderr | tests/server/billing-virtual.test.ts > 가상 환불 감사 저장 실패는 정산·원장·공급자 이벤트를 함께 롤백한다
+{"requestId":"eb41305b-01a0-4150-9b89-904bdc3ec855","code":"INTERNAL_ERROR","kind":"Error","stack":"    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-virtual.test.ts:58:60 |     at audit (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/vitest/dist/chunks/spy.DgMTfhrK.js:323:40) |     at virtualRefundSettle (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/payments.ts:116:9) |     at processTicksAndRejections (node:internal/process/task_queues:104:5) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/api/v1/billing/refunds/[id]/virtual-settle/route.ts:9:15 |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/http.ts:54:24 |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-virtual.test.ts:61:15"}
+
+ ❯ tests/server/billing-virtual.test.ts (7 tests | 2 failed) 3795ms
+   × 가상 승인 감사 저장 실패는 결제·구독·원장을 함께 롤백한다 818ms
+   × 가상 환불 감사 저장 실패는 정산·원장·공급자 이벤트를 함께 롤백한다 630ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/billing-virtual.test.ts > 가상 승인 감사 저장 실패는 결제·구독·원장을 함께 롤백한다
+AssertionError: expected 'paid' to be 'pending' // Object.is equality
+
+Expected: "pending"
+Received: "paid"
+
+ ❯ tests/server/billing-virtual.test.ts:45:89
+     43|   const res = await virtualCheckout(req(`/billing/orders/${order.id}/v…
+     44|   expect(res.status).toBe(500);
+     45|   expect((await db.paymentOrder.findUniqueOrThrow({ where: { id: order…
+       |                                                                                         ^
+     46|   expect((await db.billingSubscription.findUniqueOrThrow({ where: { id…
+     47|   expect(await db.paymentEvent.count({ where: { orderId: order.id } })…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/billing-virtual.test.ts > 가상 환불 감사 저장 실패는 정산·원장·공급자 이벤트를 함께 롤백한다
+AssertionError: expected 'refunded' to be 'requested' // Object.is equality
+
+Expected: "requested"
+Received: "refunded"
+
+ ❯ tests/server/billing-virtual.test.ts:63:91
+     61|   const res = await virtualSettle(req(`/billing/refunds/${refund.id}/v…
+     62|   expect(res.status).toBe(500);
+     63|   expect((await db.paymentRefund.findUniqueOrThrow({ where: { id: refu…
+       |                                                                                           ^
+     64|   expect(await db.paymentEvent.count({ where: { orderId: order.id, out…
+     65|   expect((await db.creditAccount.findUniqueOrThrow({ where: { tenantId…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+   Start at  14:02:42
+   Duration  4.93s (tests 79%, import 13%, transform 8%)
+
