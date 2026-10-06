@@ -1,10 +1,10 @@
 {
-  "checkedAt": "2026-10-06T05:25:47.132Z",
+  "checkedAt": "2026-10-06T06:38:46.706Z",
   "mode": "full",
   "evidenceLevel": "mock",
   "realExternalAcceptance": false,
   "node": "v24.19.0",
-  "gitHead": "61c3aa4a30df001da41cb053c818e24b83931100",
+  "gitHead": "4934e8922249608f2a767804e5e2d7adf8fdab2d",
   "result": "passed",
   "steps": [
     {
@@ -12,7 +12,7 @@
       "status": "passed",
       "code": 0,
       "signal": null,
-      "durationMs": 1063,
+      "durationMs": 1115,
       "log": "migrations.log"
     },
     {
@@ -20,7 +20,7 @@
       "status": "passed",
       "code": 0,
       "signal": null,
-      "durationMs": 1012844,
+      "durationMs": 1021588,
       "log": "tests.log"
     },
     {
@@ -28,7 +28,7 @@
       "status": "passed",
       "code": 0,
       "signal": null,
-      "durationMs": 363,
+      "durationMs": 270,
       "log": "s3.log"
     },
     {
@@ -36,7 +36,7 @@
       "status": "passed",
       "code": 0,
       "signal": null,
-      "durationMs": 154,
+      "durationMs": 103,
       "log": "contracts.log"
     },
     {
@@ -44,7 +44,7 @@
       "status": "passed",
       "code": 0,
       "signal": null,
-      "durationMs": 87,
+      "durationMs": 99,
       "log": "plan.log"
     },
     {
@@ -52,7 +52,7 @@
       "status": "passed",
       "code": 0,
       "signal": null,
-      "durationMs": 30500,
+      "durationMs": 30144,
       "log": "typecheck.log"
     },
     {
@@ -60,7 +60,7 @@
       "status": "passed",
       "code": 0,
       "signal": null,
-      "durationMs": 22085,
+      "durationMs": 22534,
       "log": "lint.log"
     },
     {
@@ -68,7 +68,7 @@
       "status": "passed",
       "code": 0,
       "signal": null,
-      "durationMs": 18373,
+      "durationMs": 22242,
       "log": "build.log"
     }
   ],
@@ -235,11 +235,11 @@
     "Uses real isolated PostgreSQL; does not replace DB with memory mocks."
   ],
   "tests": {
-    "passed": 1665,
+    "passed": 1695,
     "failed": 0,
     "pending": 0,
     "todo": 0,
-    "files": 109
+    "files": 112
   },
   "tasks": [
     {
@@ -793,7 +793,7 @@
       "acceptance": "전 Task 체크·외부검증 완료·critical/high미해결0·무근거 완성 주장0; 미충족 있으면 전체 완료금지"
     }
   ],
-  "finishedAt": "2026-10-06T05:43:52.643Z",
+  "finishedAt": "2026-10-06T06:57:04.835Z",
   "sourceHashes": {
     "next.config.ts": "3f7c0e4e51a869cf95d097959b66e8b97bddecc7e19188b7be46ea5d5b847b56",
     "package-lock.json": "89416f6024a0d6536583ae564dd466d6a370d6accf26c2d2149d1da8f4c75394",
@@ -915,7 +915,9 @@
     "scripts/export-worker.ts": "813a5f40ef2966093ec0bcfc41581bb6f25ee3b764a91c0213e26d4925716a96",
     "scripts/generate-openapi.ts": "6f00ccc7a192860afa4db440de2ab0609ec179d8591c5aab270cdca50a430aa7",
     "scripts/inspect-public.mjs": "d2cacbb2066a80421f012565b3f063378fa60014ef5a475b08835d5f0eb8d100",
+    "scripts/lib/qa-page-gate.ts": "1b57ba74f242ad29e62751508231e39b7107650f6a81d858d30bf8da47bfd03d",
     "scripts/load-env.ts": "47301da2847ad22f7c314bbb3448823d752f6afba2357cd1f94922b9af7335b3",
+    "scripts/prepare-mock-page-fixtures.ts": "68f6df1564a47af522de76079071344ba4f484d39cb5c5a4922fa54a899f2dcc",
     "scripts/qa-ab-tenancy.ts": "e982fb1055cc660121d97e3e3596edd025260453ef3481533dcc0929a4026e2c",
     "scripts/qa-access-denial.ts": "b717de140f412006c7e88f91f83d7584a20a3ee825980b5173f9591c0184c64e",
     "scripts/qa-access-requests.ts": "22991077a234ba794a29d072dc3ba869f80cee4a0db0a3390eb02fe8a0b4cf8a",
@@ -946,6 +948,9 @@
     "scripts/qa-document-tokens.ts": "04f8273fa51a355ba784e259b9264ff229c465a8993ece7daf484b890d789d59",
     "scripts/qa-documents.ts": "fbad356e5b848dfb31e84ef0a9455e1c75e1f25cfcf5bebf3df2e127baa999b0",
     "scripts/qa-dynamic-real.ts": "5ac46ff8fa7703f9df913a8f5172cae1944a135cc619ce6a144e4778a157157f",
+    "scripts/qa-ego-authenticated-pages.mjs": "3b9f46f1f438a17e0596235cbfdf6cb751881702079d245c27efff357e0bb43c",
+    "scripts/qa-ego-entry-rechecks.mjs": "d5a87f4a663ee3db8ce7ac876df3f17080bdbda72b2cf683a88eadf8f614c1bf",
+    "scripts/qa-ego-mock-pages.mjs": "44d52ae7749275f25689d4afe69db54122b351da3f511a827262023352ac5445",
     "scripts/qa-email-content.ts": "58aa3d380df6cf55912881d9465b3fbdd72ae54456ae3dc3058773fda22619a8",
     "scripts/qa-email-feedback.ts": "4be2cdfcd77727a0d6f85f2018f30cf959d064e3a1a15a411d5ae29ba13d9f26",
     "scripts/qa-expert-assignments.ts": "41a3c0851e4012f289021960d21e60b986f528e419b5716c7cf5827c823e5253",
@@ -964,7 +969,7 @@
     "scripts/qa-form-module-flow.ts": "88b2094b2341d3b9cc0adeb6cbd4b0ca418a20232cb1f2c0ad6cc1665fcb60a1",
     "scripts/qa-form-receipt-race.ts": "635bcc89f59601d2d55f40eb3adabbefca471c3ee9755a9866ecb9cd68ab70d3",
     "scripts/qa-form-versioning.ts": "8ff3e768025757d071c254d18e9e4ef464c5eacb796778cbcafc009e9b873158",
-    "scripts/qa-full-page-gate.ts": "5be813a26ea360664ef6fa6af729272a98c32a3d52c2d84f30f72601364787c8",
+    "scripts/qa-full-page-gate.ts": "db6fbe12c1c0b63f749e914f44cb8874a826ff52c791e3a17013e2f23f1e6efe",
     "scripts/qa-imap-fetch.ts": "013893185c741abb80dc73f845d2c8c75a3f0fdbc11bde648e74e970c6ce3839",
     "scripts/qa-import-lifecycle.ts": "dae90f6b2bfc3792da58aeeec393ccc2c0292672bca588ca3cf68ad3f82525e7",
     "scripts/qa-import-migrations.ts": "b7083b5c7b11c15d4cfd0efb8fa4359408a32d2fc022e73b183b5d0a0a74222b",
@@ -1044,6 +1049,8 @@
     "scripts/task-status.mjs": "514b054110e3192e713a7438bcb5d97710e192020874b98f9bd019a1728b9a4f",
     "scripts/verify-company-browser.ts": "7b51444a11654217e7cbef1dc754baec3dc78544e5a119210939d36b057a1b1b",
     "scripts/verify-contracts.py": "231680530469c5113d458c0c84196d61efaa352fc09b6ffd90ebf3ee62f411a4",
+    "scripts/verify-mock-restore.mjs": "690cd92c6eb741858ecf2be0823bd3a2c3ab99869fcacb4f3d71c6d3d248c9c8",
+    "scripts/verify-mock-restored-data.ts": "82cb69cfbfb28afae841fb3890be2aeaaea39138b4fbaf9aae0c3acf337bbc43",
     "scripts/verify-mock.mjs": "8ca45392a6f55d4d4695b1ca5cb05fc4a4f64d8783e8f16f3cd9427d35cf5546",
     "scripts/verify-outbox.ts": "a33b3d418e6167100be936fd59b3732d9f2580c71988ba6fce58129a70a4a34b",
     "scripts/verify-p01-api.ts": "1836798879604b423d073d35023ac7af2c95cea3674a67806ec588c329f08e0f",
@@ -1229,7 +1236,7 @@
     "src/components/NoticePages.tsx": "bb8e9c580f7eca6d1239036ea38a5e692636d7c9448d438e70bee71ab84c8236",
     "src/components/PdfDownload.tsx": "9efc7b6f7ffaba12de3a2c79b6a1a5a2f7ec1c24c73a22606f93f18c6137d127",
     "src/components/PublicPages.tsx": "b60feb04a24652920998dfddd0eb7815f6250360dadc9b60f791f76d53d4d89a",
-    "src/components/RemoteTable.tsx": "85a3f6230e9ceeb9d890cba941526daf2d831624fa9f0b387e330db3c28dd3db",
+    "src/components/RemoteTable.tsx": "c8a3f63406d6852c21d0a5dde67a12544fcf13eaaeecac7ab2df9f6abc2760c8",
     "src/components/ServiceAccessPage.tsx": "4c9e067d168b3ca756f562f9f57bc311ad1ad36110f8c74fa71b906ebf6dc79e",
     "src/components/StatisticsPages.tsx": "6a167724d9af70d63298e88919c31530e6a512e320d1059e07aa98828e7926de",
     "src/components/SupportPages.tsx": "6cedcc636407e024450b3eb73b9e19284f1b4dd06773f2d8cceb07603aa249f5",
@@ -1307,7 +1314,7 @@
     "src/components/services/campaigns.css": "3b3172c4fb59175007913ef8454c571f2581ad22b040e48a40ec41f3fd08c3fa",
     "src/components/services/content.json": "28b706661f3662b58c69b4bfb2be75dc1e056683f27c7e8c128e2ea5fe3313cb",
     "src/components/services/gates.tsx": "048b43998a9fa8b2510729c8992a13d4575a42b82f2b41c02bd2f53cb3487dab",
-    "src/components/services/index.tsx": "a790e5aaf51147dee00d3f162b0ea06b0f785c68e87fd30fd08c6e5731bd8d9e",
+    "src/components/services/index.tsx": "691f1bc3bbb0c9b98e6a7c7f3b1e8d1563fe9fa7695fa95a349ed4c69033db30",
     "src/components/services/kakao.tsx": "36e9aab16893e35e80ab6a349792ea2d9cbbd30ba54564db231feff85389b72f",
     "src/components/services/notifications.css": "ba8bd46b41df22deafcbc707fff693e96236f98760a0c5541a66b497cc1c7ae4",
     "src/components/services/payment.tsx": "65dc4136eebd0588fc4a17897ae7571c8fdd496359913ccbcb8306aaae94496d",
@@ -1423,7 +1430,7 @@
     "src/server/auth.ts": "d9ccd9a4b95658e8ba8380c39edd6e6671a8be378af5cc81aba48b5e630ba287",
     "src/server/billing-access.ts": "50164b83f3482ed6362ee549688ef93bed39cc0b48de2ba889017ee600f5f8cc",
     "src/server/billing-history.ts": "84a034bc2d3cabb331879e9b43748238e2d389d13b08b097c9dc63385b72c067",
-    "src/server/billing-reads.ts": "b93d2e52b83d3909a3afec8fcd51a103fe35f23923e5489d62a9128311709d89",
+    "src/server/billing-reads.ts": "e134bd754bb9b903e767b00755b5982f9f231f929e8ad6eff991611cc6bb07db",
     "src/server/billing-settlement.ts": "62d94eecc480b11aae2861fc030c774a98eac3f7f43b849e93cca7370e347b08",
     "src/server/campaign-common.ts": "f7610c3bf901e388653873e6e60a9584d9e593b783d55c69c7805902c33781c2",
     "src/server/campaign-erasure.ts": "912927ce506d24ed011bdff9a8830a755dbf6b3ac2361eb0566087e33fa6f42f",
@@ -1566,6 +1573,7 @@
     "tests/server/auth-navigation.test.ts": "023ab7a7d38aa53708a5d0f9d4f161244bd3fb6ae90a451207084fcc271bf3fc",
     "tests/server/auth-public-audit.test.ts": "c52cd6d39428af3130a33033146967aa48e37e2f1452f3d274b6bee587c86688",
     "tests/server/auth-session-gate.test.ts": "9255c8e62d22fd8102ec84aca3d62b1fd170e23721ad08fe2a82d2e7f674e270",
+    "tests/server/billing-read-authority.test.ts": "df44960478b6ec30ae6979c15d6e72750123ea75ef594ac6261da8cc4c4aa268",
     "tests/server/billing-refunds.test.ts": "0fcd671b6972f08743ddbe227a79490b683399a43875f051643a8621842cdb0c",
     "tests/server/billing-settlement.test.ts": "8b6e64775430d2f5fc9c8d6eb2891ffc8d66f82724f2a59988adaef0f2261102",
     "tests/server/billing-virtual.test.ts": "1d72e5a6f915017fc14e16e6ac83109fd779cfee215c88ee0fbe534d9d7d512c",
@@ -1619,6 +1627,7 @@
     "tests/server/notices.test.ts": "5c08a92b3a2b6b8501ea614deda92ca65cef1b7c0c988f39fbfe2f1bd86845e8",
     "tests/server/notifications.test.ts": "e92edf8a099112408d744195862e7bf59d0a2a2b300b14dca27bbabb6b3105f0",
     "tests/server/org-auth.test.ts": "44f7789047c19b80ce3ee5f3182db5a1688845df10ddca209c39723bbd339dcb",
+    "tests/server/page-gate-report.test.ts": "d6a598c164cd8002b1abeeee30b17bffc61db2671e9452db78a084e5ace21bf3",
     "tests/server/password-policy.test.ts": "068bd6f743c2deb39396de11401869b394a68e26473d560ddbcc532521f50868",
     "tests/server/payment-authority.test.ts": "af5ab5682d9057975eb201d46783a6d7e1ca35c8d1681c468085839afd9c3725",
     "tests/server/payment-concurrency.test.ts": "9b23f3cbbc339be448364bcc91b37a70d111fcf78b7543b3afa23a34b8e8144f",
@@ -1633,6 +1642,7 @@
     "tests/server/public-submission-state.test.ts": "8080b31b5e0668d65991e1fb512bbd183db6072c19e96eac69ec9039408531c1",
     "tests/server/publication-access-gate.test.ts": "4474c0554378b74949abaab84df298ccdbb6dd61413a5ff78f1e01e2b8af3e85",
     "tests/server/question-rules.test.ts": "753e3d27d2eda4b542cb7f47a6c30d5f21c903cf5987846468337aba6cf6d425",
+    "tests/server/remote-table-state.test.ts": "c6110df1690507f12cf895e100e47acf323ec477f0b45326841d67aca8db7dac",
     "tests/server/retention-designation.test.ts": "c24419997ea21a07ea01d0c0e346edce96330412b7c7c8e9bb92cda789513160",
     "tests/server/retention-rules.test.ts": "de12911c820fbf2348140d70482c3a8d391ecffd5d5a1d717fbbd847e54ca63d",
     "tests/server/security-gate.test.ts": "b8160f82a7d536d9ac89049ad574e7e07507bc0174bffd1dcc0252b2534440b2",

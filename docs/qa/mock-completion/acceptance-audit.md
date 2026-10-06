@@ -11,7 +11,7 @@
 | 비밀/키 회전 | 기존 P14-T04 1,345셀 리허설 및 이번 crypto-rotation 회귀 | 해당 증거 범위 통과 |
 | 실행 환경/의존성 보안 | runtime-audit.json0건, 이번 변경의 실제비밀값 노출0 | 전면 신규 보안 감사로 확대하지 않음 |
 | PG/SMTP/SMS/Kakao/S3 등 외부 증명 대체 | full/report.json 공급자11영역 | 사용자 요청에 따라 Mock 대체; 실제 수신/승인 증명 아님 |
-| 전체 서버 회귀 | ad15c47에 저장한109파일1665개, 실패/skip/todo0 | 해당 소스해시 기준 |
+| 전체 서버 회귀 | 최신112파일1695개, 실패/skip/todo0 | 해당 소스해시 기준 |
 | 이후 앱 코드 변경 | billing-reads.ts 신규10+기존30=40개 회귀 통과. 후속 services/index.tsx 진입 화면 수정은 production 빌드·Ego 재검증 통과 | 후속 변경 시험 포함 |
 | 검증기 판정 | 신규14개 시험 및 타입/린트 | 화면 실행 결과가 아님 |
 | 실제 HTTP/재시작 | HTTP21개, 재시작 업무해시 유지·권한 회수403 | 서버 범위 통과 |
@@ -23,7 +23,7 @@
 | 원본 화면 충실도 | verify-plan: 원본 재방문 false, 제한128개 | **미충족** |
 | 최종 모든 Task 체크 | 현재17/72 완료,55개 미체크. task-matrix의 원래 수용 조건 보존 | **미충족** |
 
-최신 production 빌드 결과는 [latest-build.log](latest-build.log)에 기록한다. 전체1665개를 후속 변경 후 다시 실행한 것으로 표시하지 않는다. 작업별 수용 조건·증거 연결은 [72개 작업 매핑](task-matrix.md)과 [원문 조건](task-matrix.json)에 있다.
+최신 production 빌드 결과는 [latest-build.log](latest-build.log)에 기록한다. 최신 전체1695개 실행은 청구 조회·페이지 판정기·메일/문자 진입·공통 목록 상태 변경까지 포함한다. 청구서 화면 초안은 아직 포함하지 않는다. 작업별 수용 조건·증거 연결은 [72개 작업 매핑](task-matrix.md)과 [원문 조건](task-matrix.json)에 있다.
 
 ## 다음 필수 단계
 
