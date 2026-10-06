@@ -1,0 +1,52 @@
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 16ms
+
+  Creating an optimized production build ...
+Error: Can't resolve 'shadcn/tailwind.css' in '/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app'
+    [2m[at finishWithoutResolve (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/enhanced-resolve/lib/Resolver.js:959:18)][0m
+    [2m[at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/enhanced-resolve/lib/Resolver.js:1055:13][0m
+    [2m[at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/enhanced-resolve/lib/Resolver.js:1139:5][0m
+    [2m[at eval (eval at create (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:15:1)][0m
+    [2m[at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/enhanced-resolve/lib/Resolver.js:1139:5][0m
+    [2m[at eval (eval at create (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:27:1)][0m
+    [2m[at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/enhanced-resolve/lib/DescriptionFilePlugin.js:94:43][0m
+    [2m[at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/enhanced-resolve/lib/Resolver.js:1139:5][0m
+    [2m[at eval (eval at create (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:15:1)][0m
+    [2m[at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/enhanced-resolve/lib/Resolver.js:1139:5][0m {
+  details: "resolve 'shadcn/tailwind.css' in '/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app'\n" +
+    '  Parsed request is a module\n' +
+    '  using description file: /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/package.json (relative path: ./src/app)\n' +
+    '    resolve as module\n' +
+    "      /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/node_modules doesn't exist or is not a directory\n" +
+    "      /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/node_modules doesn't exist or is not a directory\n" +
+    '      looking for modules in /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules\n' +
+    "        /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/shadcn doesn't exist\n" +
+    "      /Users/user01/Desktop/캐쳐시큐/node_modules doesn't exist or is not a directory\n" +
+    "      /Users/user01/Desktop/node_modules doesn't exist or is not a directory\n" +
+    "      /Users/user01/node_modules doesn't exist or is not a directory\n" +
+    "      /Users/node_modules doesn't exist or is not a directory\n" +
+    "      /node_modules doesn't exist or is not a directory"
+}
+
+> Build error occurred
+Error: Turbopack build failed with 1 error:
+./src/app/globals.css
+Error: Error evaluating Node.js code
+CssSyntaxError: tailwindcss: /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/globals.css:1:1: Can't resolve 'shadcn/tailwind.css' in '/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app'
+    at Input.error (node_modules/postcss/lib/input.js:135:16) [/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/resumed-cli-removal-build/build/chunks/node_modules_20v-8wl._.js:919:22]
+    at error (node_modules/postcss/lib/node.js:166:32) [/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/resumed-cli-removal-build/build/chunks/node_modules_20v-8wl._.js:2274:38]
+    [at Object.Once (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@tailwindcss/postcss/dist/index.js:10:7013)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:104:5)]
+    at async LazyResult.runAsync (node_modules/postcss/lib/lazy-result.js:299:11) [/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/resumed-cli-removal-build/build/chunks/node_modules_20v-8wl._.js:1323:21]
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts?config=[project]/postcss.config.mjs:70:34) [/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/resumed-cli-removal-build/build/chunks/[root-of-the-server]__1kki86f._.js:98:36]
+    at async run (turbopack:///[turbopack-node]/child_process/evaluate.ts:89:23) [/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/resumed-cli-removal-build/build/chunks/[root-of-the-server]__05i36w1._.js:73:31]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+
+
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts?config=[project]/postcss.config.mjs:70:34) [/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/resumed-cli-removal-build/build/chunks/[root-of-the-server]__1kki86f._.js:98:36])
+    at async run (turbopack:///[turbopack-node]/child_process/evaluate.ts:89:23) [/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/resumed-cli-removal-build/build/chunks/[root-of-the-server]__05i36w1._.js:73:31])
