@@ -68,3 +68,20 @@
 [docs/audit/audit-report-2026-10-16.md](../../audit/audit-report-2026-10-16.md) — 인프라 표면(env·히스토리 시크릿·하드코딩·웹훅 서명) 이상 없음, `npm audit --omit=dev`에서 발견된 high 7건(shadcn CLI 경유 braces DoS)은 devDependencies 이동으로 런타임 표면 제거 → **critical/high 미해결 0**. OWASP 점검(SQLi·XSS·CSRF·eval·세션·요청 제한) 이상 없음.
 
 잔여: 외부 IdP 실연동 수용·키 회전 라이브 리허설 — 여전히 미완료.
+
+## 비밀관리·키 회전 조건 (2026-10-16 정리)
+
+P14-T04의 키 회전 리허설 증거가 본 조건을 충족한다 — [docs/qa/P14-T04/README.md](../P14-T04/README.md): 복원 DB 1345셀 전수 재암호화·폴백 복호·구키 폐기 증명·회전 env 앱 기동 실측 완료. SSO 클라이언트 시크릿 회전은 provider PATCH(version 검사)로 실측(`qa-sso-provider-lifecycle`).
+
+### P11-T05 잔여 조건 정리
+
+| 조건 | 상태 |
+|---|---|
+| 정책→로그인→IP→2FA→회수→만료→감사 통합 체인 | ✅ security-gate.test.ts 2/2(가상 SSO 단계 포함) |
+| 실제 권한 집행·재생/만료/회수 | ✅ |
+| 비밀관리·키 회전 | ✅ P14-T04 리허설 증거 |
+| critical/high 미해결 0 | ✅ audit-report-2026-10-16 |
+| **실제 SSO 공급자 수용** | ❌ 외부 IdP 자격증명 필요 — 유일한 잔여 차단 |
+| 브라우저/재시작 증거 | 부분(재기동 라운드는 P14-T04에서 실측) |
+
+체크 유지 사유: 외부 IdP sandbox 수용 불가.
