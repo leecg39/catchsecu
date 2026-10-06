@@ -1,8 +1,11 @@
+import { auditEventQuery } from "@/server/audit-events";
+import { formAuditEvents } from "@/server/form-audit-events";
+import { requestQuery } from "@/server/request-query";
 import { approvalRequestInput } from "@/contracts/security";
 import { approvalForForm, requestApproval } from "@/server/approvals";
 import { z } from "zod";
 import { requireContext } from "@/server/context";
-import { body, fail, json, listQuery, route } from "@/server/http";
+import { body, fail, json, listQuery, rateLimit, route } from "@/server/http";
 import { archiveForm, copyForm, designateFormRetention, formDeletionState, formDto, formPatch, lockCurrentForm, publishForm, purgeForm, readForm, reviseForm, setFormFavorite, transitionForm, updateForm, updateFormDraft } from "@/server/forms";
 import { retentionDesignationInput } from "@/contracts/forms";
 import { listSubmissions } from "@/server/submissions";
@@ -10,8 +13,9 @@ import { idempotent } from "@/server/idempotency";
 import { submissionListQuery } from "@/contracts/submissions";
 function parts(request: Request) {
   const [id, action, ...rest] = new URL(request.url).pathname.split("/").slice(4);
-  if (rest.length) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
-  return { id: z.uuid().parse(id), action };
+  const auditExport = request.method === "GET" && action === "audit-events" && rest.length === 1 && rest[0] === "export";
+  if (rest.length && !auditExport) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
+  return { id: z.uuid().parse(id), action, auditExport };
 }
 type FormReply = ReturnType<typeof formDto>;
 function draftReply(value: Omit<FormReply, "publication"> & { publication: Omit<NonNullable<FormReply["publication"]>, "token"> | null }) {
@@ -20,7 +24,16 @@ function draftReply(value: Omit<FormReply, "publication"> & { publication: Omit<
     maxResponses: publication.maxResponses, expiresAt: publication.expiresAt } : null };
 }
 export const GET = route(async (request, requestId) => {
-  const { id, action } = parts(request);
+  const { id, action, auditExport } = parts(request);
+  if (action === "audit-events") {
+    const input = auditEventQuery.parse(requestQuery(request));
+    const ctx = await requireContext(request.headers, "audit.read");
+    if (auditExport) await rateLimit("audit-export:" + ctx.user.id, 10);
+    const result = await formAuditEvents(ctx, id, input, requestId, auditExport);
+    return typeof result === "string" ? new Response(result, { headers: {
+      "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": 'attachment; filename="form-audit-events.csv"', "X-Content-Type-Options": "nosniff",
+    } }) : json(result);
+  }
   const ctx = await requireContext(request.headers, action === "submissions" ? "submission.read" : "form.read");
   if (action === "submissions") {
     const query = submissionListQuery.parse(Object.fromEntries(new URL(request.url).searchParams));

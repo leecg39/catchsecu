@@ -401,6 +401,14 @@ add("/forms/{id}/copy", "post", "form.write + service grant", "전체 폼 복사
 for (const action of ["pause", "resume"]) add("/forms/{id}/" + action, "post", "form.publish + service grant", "공개 " + action, version, "implemented");
 add("/forms/{id}/favorite", "put", "form.read + service grant", "본인 즐겨찾기 등록", undefined, "implemented");
 add("/forms/{id}/favorite", "delete", "form.read + service grant", "본인 즐겨찾기 해제", undefined, "implemented", "204");
+for (const path of ["/forms/{id}/audit-events", "/forms/{id}/audit-events/export"]) {
+  add(path, "get", "audit.read + current company/service grant", "폼·응답·첨부·내보내기 감사 기록의 기간·처리자·검색·페이지 조회; 안전 DTO와 CSV 5,000건 상한", undefined, "implemented");
+  (paths[path].get as Operation).parameters = [
+    { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+    ...((paths["/audit-events"].get as Operation).parameters as { name: string }[]).filter(parameter => parameter.name !== "scope"),
+  ];
+}
+(paths["/forms/{id}/audit-events/export"].get as Operation).responses = (paths["/audit-events/export"].get as Operation).responses;
 add("/forms/{id}/submissions", "get", "submission.read + service grant", "암호화 응답을 권한 범위에서 조회·감사; 보유 기한 종료 또는 파기 시작 뒤 원문 제외", undefined, "implemented");
 add("/forms/{id}/submissions/export", "get", "submission.read + current tenant/service/user/session/expert grant", "동일 기간·상태·응답 ID 필터의 UTF-8 BOM CSV; 게시 버전·행렬 행별 열; 5,000건·1,000열·20MB 상한; 다운로드 감사", undefined, "implemented");
 for (const [path, query] of [["/forms/{id}/submissions", submissionListQuery], ["/forms/{id}/submissions/export", submissionFilters]] as const) {

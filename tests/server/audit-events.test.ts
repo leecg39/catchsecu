@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { beforeAll, afterAll, describe, expect, test } from "vitest";
 import { db } from "@/server/db";
+import { encrypt } from "@/server/crypto";
 import { env } from "@/server/env";
 import { auth } from "@/server/auth";
 import { GET as list } from "@/app/api/v1/audit-events/route";
@@ -183,5 +184,71 @@ describe("회사 격리 감사 이벤트 조회", () => {
     const csv = parse(await exported.text(), { bom: true }) as string[][];
     expect(csv.slice(1).map(row => row[0]).sort()).toEqual(ids.sort());
     expect(JSON.stringify(csv)).not.toContain("never-return-this-token");
+  });
+});
+
+// The form-specific path must not return a service's other forms or the company-wide audit stream.
+import { GET as formLog } from "@/app/api/v1/forms/[...segments]/route";
+import { requireContext } from "@/server/context";
+import { formAuditEvents } from "@/server/form-audit-events";
+import { auditEventQuery } from "@/server/audit-events";
+const formA = randomUUID(), siblingForm = randomUUID(), foreignForm = randomUUID();
+const formEventIds: string[] = [];
+describe("폼별 감사 조회·내보내기", () => {
+  beforeAll(async () => {
+    const other = await db.membership.findFirstOrThrow({ where: { tenantId: companyB } });
+    for (const [id, tenantId, serviceId, ownerId] of [[formA, companyA, serviceA1, adminId], [siblingForm, companyA, serviceA1, adminId], [foreignForm, companyB, serviceB, other.userId]]) {
+      await db.form.create({ data: { id, tenantId, serviceId, ownerId, title: "감사 범위 시험" } });
+      const version = await db.formVersion.create({ data: { tenantId, formId: id, number: 1, title: "감사 범위 시험", status: "draft" } });
+      const question = await db.question.create({ data: { tenantId, formVersionId: version.id, stableKey: randomUUID(), type: "파일 업로드", label: "파일", required: false, order: 0 } });
+      await db.formVersion.update({ where: { id: version.id }, data: { status: "published" } });
+      const publication = await db.publication.create({ data: { tenantId, formId: id, formVersionId: version.id, tokenHash: randomUUID(), tokenCipher: "test-only", maxResponses: 100 } });
+      const submission = await db.submission.create({ data: { tenantId, formVersionId: version.id, publicationId: publication.id, retentionUntil: new Date(Date.now() + 86400000), originalRetentionUntil: new Date(Date.now() + 86400000) } });
+      const file = await db.fileObject.create({ data: { tenantId, serviceId, ownerKind: "member", ownerId, publicationId: publication.id, formVersionId: version.id, questionId: question.id, submissionId: submission.id, storageKey: randomUUID(), nameCipher: encrypt("test.txt"), sha256: "a".repeat(64), mime: "text/plain", size: 1, status: "pending", expiresAt: new Date(Date.now() + 86400000) } });
+      for (const [resource, resourceId, action] of [["form", id, "submission.list_viewed"], ["submission", submission.id, "submission.corrected"], ["file", file.id, "file.downloaded"]]) {
+        const row = await db.auditEvent.create({ data: { tenantId, serviceId, actorId: ownerId, resource, resourceId, action, requestId: randomUUID(), detail: { secret: "form-log-must-not-leak" } } });
+        if (id === formA) formEventIds.push(row.id);
+      }
+    }
+  });
+  test("선택 폼만 조회하고 동일 서비스의 다른 폼·회사 및 비밀 필드는 제외한다", async () => {
+    const r = await formLog(request(`/forms/${formA}/audit-events?pageSize=100`, "GET", adminCookie)); expect(r.status).toBe(200);
+    const data = await r.json(); expect(data.total).toBe(3); expect(data.items.map((r: { id: string }) => r.id).sort()).toEqual(formEventIds.sort());
+    expect(JSON.stringify(data)).not.toContain("form-log-must-not-leak");
+    const limited = await (await formLog(request(`/forms/${formA}/audit-events`, "GET", privacyCookie))).json();
+    expect(limited.items.every((r: { actorName: string | null; resourceId: string | null }) => r.actorName === null && r.resourceId === null)).toBe(true);
+    expect((await formLog(request(`/forms/${foreignForm}/audit-events`, "GET", adminCookie))).status).toBe(404);
+    expect((await formLog(request(`/forms/${randomUUID()}/audit-events`, "GET", adminCookie))).status).toBe(404);
+  });
+  test("검색·페이지·CSV가 같은 범위를 쓰며 CSV는 전체 필터 행을 내보낸다", async () => {
+    const r = await formLog(request(`/forms/${formA}/audit-events?search=corrected&pageSize=1`, "GET", adminCookie)); expect(r.status).toBe(200);
+    const data = await r.json(); expect(data.total).toBe(1); expect(data.items[0].action).toBe("submission.corrected");
+    const csv = await formLog(request(`/forms/${formA}/audit-events/export?pageSize=1`, "GET", adminCookie)); expect(csv.status).toBe(200);
+    expect(csv.headers.get("cache-control")).toBe("private, no-store");
+    const rows = parse(await csv.text(), { bom: true }) as string[][];
+    expect(rows.slice(1).map(row => row[0]).sort()).toEqual(formEventIds.sort()); expect(rows[1][2]).toBe("'=2+2");
+    const literal = await (await formLog(request(`/forms/${formA}/audit-events?search=%25_`, "GET", adminCookie))).json(); expect(literal.total).toBe(0);
+    const access = await db.auditEvent.findFirstOrThrow({ where: { requestId: csv.headers.get("x-request-id")! } }); expect(access).toMatchObject({ action: "audit.exported", serviceId: serviceA1, detail: { rowCount: 3 } });
+  });
+  test("미인증·뷰어·다른 서비스·자기활동 우회·잘못된 중첩 경로를 거부한다", async () => {
+    const path = `/forms/${formA}/audit-events`;
+    expect((await formLog(request(path))).status).toBe(401);
+    expect((await formLog(request(path, "GET", viewerCookie))).status).toBe(403);
+    expect((await formLog(request(path + "?scope=mine", "GET", adminCookie))).status).toBe(422);
+    expect((await formLog(request(path + "?serviceId=" + serviceA2, "GET", adminCookie))).status).toBe(404);
+    expect((await formLog(request(path + "/export/extra", "GET", adminCookie))).status).toBe(404);
+    expect((await formLog(request(path + "?search=admin&searchField=actor", "GET", privacyCookie))).status).toBe(403);
+  });
+  test("미리 읽은 권한도 회수 후 현재 서비스 권한으로 다시 검사한다", async () => {
+    const ctx = await requireContext(request("/context", "GET", privacyCookie).headers, "audit.read");
+    const grant = await db.serviceGrant.findFirstOrThrow({ where: { memberId: ctx.member.id, serviceId: serviceA1 } });
+    await db.serviceGrant.update({ where: { id: grant.id }, data: { capabilities: ["service.read"] } });
+    try { await expect(formAuditEvents(ctx, formA, auditEventQuery.parse({}), randomUUID())).rejects.toMatchObject({ status: 404 }); }
+    finally { await db.serviceGrant.update({ where: { id: grant.id }, data: { capabilities: grant.capabilities } }); }
+  });
+  test("폼 로그 CSV 상한을 넘으면 부분 파일과 성공 감사 없이 거부한다", async () => {
+    await db.auditEvent.createMany({ data: Array.from({ length: 5001 }, () => ({ tenantId: companyA, serviceId: serviceA1, actorId: adminId, resource: "form", resourceId: formA, action: "form.audit_overflow", requestId: randomUUID(), detail: {} })) });
+    const r = await formLog(request(`/forms/${formA}/audit-events/export?search=form.audit_overflow`, "GET", adminCookie)); expect(r.status).toBe(413);
+    expect(await db.auditEvent.count({ where: { requestId: r.headers.get("x-request-id")! } })).toBe(0);
   });
 });

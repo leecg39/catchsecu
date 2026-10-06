@@ -1,6 +1,8 @@
 "use client";
 
 import { ActivityReviewRequest } from "./ActivityReviews";
+import Link from "next/link";
+import "./management.css";
 import { useState } from "react";
 import { useResource } from "@/lib/api";
 import type { AuditEventKind, AuditEventList, AuditEventRecord } from "@/contracts/audit-events";
@@ -45,8 +47,9 @@ function cell(column: string, row: AuditEventRecord, number: number) {
   return "-";
 }
 
-export function AuditLogs({ path }: { path: string }) {
-  const config = configs[path];
+export function AuditLogs({ path, formId }: { path: string; formId?: string }) {
+  const config: AuditConfig = formId ? { title: "캐치폼 감사 로그", kind: "all", columns: generic,
+    description: "선택한 캐치폼과 응답·첨부파일·내보내기의 기록을 조회합니다." } : configs[path];
   const context = useResource<Application>("/context");
   const [draft, setDraft] = useState(blank);
   const [applied, setApplied] = useState(blank);
@@ -60,7 +63,7 @@ export function AuditLogs({ path }: { path: string }) {
   if (applied.end) params.set("to", iso(applied.end, true));
   if (applied.serviceId) params.set("serviceId", applied.serviceId);
   if (applied.search.trim()) { params.set("search", applied.search.trim()); params.set("searchField", applied.searchField); }
-  const auditPath = config.scope === "mine" ? "/me/audit-events" : "/audit-events";
+  const auditPath = formId ? "/forms/" + formId + "/audit-events" : config.scope === "mine" ? "/me/audit-events" : "/audit-events";
   const result = useResource<AuditEventList>(auditPath + "?" + params.toString());
   const companyWide = ["owner", "admin", "security", "auditor"].includes(context.data?.company?.role ?? "");
   const currentPage = result.data?.page ?? page;
@@ -89,14 +92,14 @@ export function AuditLogs({ path }: { path: string }) {
     } catch (cause) { setError(cause instanceof Error ? cause.message : "감사 기록을 내려받지 못했습니다."); }
     finally { setExporting(false); }
   }
-  return <><PageHeading title={config.title} />{config.description && <p className="mg-description">{config.description}</p>}
+  return <><PageHeading title={config.title}>{formId && <Link href={"/form/manage/applicant/" + formId}>응답 목록으로</Link>}</PageHeading>{config.description && <p className="mg-description">{config.description}</p>}
     <Panel><div className="mg-filters">
       <div className="mg-flex">
         <label>시작일 <input className="cs-input" type="date" value={draft.start}
           onChange={event => setDraft(previous => ({ ...previous, start: event.target.value }))} /></label>
         <label>종료일 <input className="cs-input" type="date" value={draft.end}
           onChange={event => setDraft(previous => ({ ...previous, end: event.target.value }))} /></label>
-        {config.scope !== "mine" && <select className="cs-input" aria-label="서비스" value={draft.serviceId}
+        {config.scope !== "mine" && !formId && <select className="cs-input" aria-label="서비스" value={draft.serviceId}
           onChange={event => setDraft(previous => ({ ...previous, serviceId: event.target.value }))}>
           <option value="">전체 서비스</option>
           {context.data?.services.map(service => <option key={service.id} value={service.id}>{service.name}</option>)}
@@ -122,12 +125,17 @@ export function AuditLogs({ path }: { path: string }) {
     {!!result.data && result.data.total > 5000 && <p>5,000건 이하가 되도록 기간이나 서비스를 좁히면 CSV로 내려받을 수 있습니다.</p>}
     {result.loading && <p role="status">실제 감사 기록을 불러오는 중입니다.</p>}
     {result.error && <p role="alert">{result.error.message}</p>}
-    {result.data && <><div className="cs-table-wrap"><table className="cs-table"><thead><tr>
-      {config.columns.map((column, index) => <th key={index}>{column}</th>)}{canReview && <th>검토</th>}</tr></thead><tbody>
+    {result.data && <>{!result.data.items.length && <EmptyState text="조회된 감사 기록이 없습니다." />}<div className="cs-table-wrap"><table className="cs-table"><thead><tr>
+      {config.columns.map((column, index) => <th key={index}>{column}</th>)}{formId && <th>상세</th>}{canReview && <th>검토</th>}</tr></thead><tbody>
       {result.data.items.length ? result.data.items.map((item, index) => <tr key={item.id}>
         {config.columns.map((column, columnIndex) => <td key={columnIndex}>{cell(column, item, (currentPage - 1) * pageSize + index + 1)}</td>)}
+        {formId && <td><details><summary>기록 상세</summary><dl style={{ minWidth: 180, overflowWrap: "anywhere" }}>
+          <dt>이벤트 ID</dt><dd>{item.id}</dd><dt>처리일시</dt><dd>{new Date(item.createdAt).toLocaleString("ko-KR")}</dd>
+          <dt>처리자</dt><dd>{item.actorName ?? "비공개"}</dd><dt>처리내용</dt><dd>{item.action}</dd>
+          <dt>처리대상</dt><dd>{item.resource}</dd><dt>대상 ID</dt><dd>{item.resourceId ?? "비공개"}</dd>
+        </dl></details></td>}
         {canReview && <td><button className="cs-link" aria-label={"활동 " + ((currentPage - 1) * pageSize + index + 1) + " 검토 요청"} onClick={() => setReviewEvent(item)}>검토 요청</button></td>}
-      </tr>) : <tr><td colSpan={config.columns.length + (canReview ? 1 : 0)}><EmptyState text="조회된 감사 기록이 없습니다." /></td></tr>}
+      </tr>) : null}
     </tbody></table></div><nav className="cs-pagination" aria-label="로그 페이지">
       <select aria-label="페이지당 행 수" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>
         {[10, 20, 50, 100].map(size => <option key={size}>{size}</option>)}

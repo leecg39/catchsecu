@@ -1,4 +1,6 @@
 "use client";
+import { AuditLogs } from "../management/AuditLogs";
+import { z } from "zod";
 import { ExportJobs } from "./ExportJobs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -25,11 +27,19 @@ import { FormPublicationSession } from "@/lib/form-publication";
 export function Workflow({ path }: { path: string }) {
   const params = useSearchParams(), applicant = path.includes("/applicant");
   const id = applicant ? path.split("/").at(-1) : params.get("formId") ?? params.get("edit");
-  const result = useResource<FormRecord>(id ? "/forms/" + id : null);
+  const log = path.startsWith("/form/manage/applicant/log/");
+  const result = useResource<FormRecord>(id && !log ? "/forms/" + id : null);
+  if (log) return id && z.uuid().safeParse(id).success && path.split("/").filter(Boolean).length === 5
+    ? <AuditLogs key={id} path={path} formId={id} /> : <Panel><p role="alert">캐치폼 로그 주소를 확인해주세요.</p></Panel>;
   if (result.error) return <Panel><p role="alert">{result.error.message}</p></Panel>;
   if (result.loading) return <Panel><p role="status">캐치폼을 불러오는 중입니다.</p></Panel>;
   if (!result.data) return <Panel><p>목록에서 캐치폼을 선택해주세요.</p><Link className="cs-button" href="/form/manage">캐치폼 목록</Link></Panel>;
-  return applicant ? <Responses form={result.data} /> : <Settings key={path + result.data.id} path={path} initial={result.data} />;
+  if (applicant) {
+    const segments = path.split("/").filter(Boolean);
+    if (segments.length === 5 && segments[3] !== "log" && segments[3] !== result.data.serviceId)
+      return <Panel><p role="alert">캐치폼의 서비스를 확인해주세요.</p></Panel>;
+  }
+  return applicant ? <Responses key={result.data.id} form={result.data} /> : <Settings key={path + result.data.id} path={path} initial={result.data} />;
 }
 function Responses({ form }: { form: FormRecord }) {
   const app = useApplication();
@@ -59,7 +69,7 @@ function Responses({ form }: { form: FormRecord }) {
       link.href = objectUrl; link.download = "responses-" + form.id + ".csv"; document.body.append(link); link.click(); link.remove(); URL.revokeObjectURL(objectUrl);
     } catch (cause) { setExportError(errorText(cause)); } finally { setExporting(false); }
   }
-  return <><PageHeading title="응답 정보"><p>{form.title}</p><Link className="cs-link" href={form.sourceType === "import" ? "/form/info-upload" : "/form/manage"}>목록으로</Link></PageHeading><Panel>
+  return <><PageHeading title="응답 정보"><p>{form.title}</p>{app.data?.capabilities.includes("audit.read") && <Link className="cs-link" href={"/form/manage/applicant/log/" + form.id}>감사 로그</Link>}<Link className="cs-link" href={form.sourceType === "import" ? "/form/info-upload" : "/form/manage"}>목록으로</Link></PageHeading><Panel>
     <form className="forms-actions" onSubmit={event => { event.preventDefault(); search(); }}>
       <label className="cs-label">제출 시작일<input className="cs-input" type="date" value={draft.start} onChange={event => setDraft({ ...draft, start: event.target.value })} /></label>
       <label className="cs-label">제출 종료일<input className="cs-input" type="date" value={draft.end} onChange={event => setDraft({ ...draft, end: event.target.value })} /></label>

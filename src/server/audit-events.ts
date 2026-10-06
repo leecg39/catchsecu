@@ -25,7 +25,7 @@ export const auditEventQuery = z.object({
   { path: ["to"], message: "종료일시는 시작일시 이후여야 합니다." });
 export type AuditEventQuery = z.infer<typeof auditEventQuery>;
 
-const actionPrefixes: Record<AuditEventQuery["kind"], readonly string[]> = {
+export const actionPrefixes: Record<AuditEventQuery["kind"], readonly string[]> = {
   all: [], service: ["service.", "company."],
   info: ["submission.", "file.", "consent_receipt.", "destruction.", "import."],
   marketing: ["marketing."], customer: ["subject.", "submission."],
@@ -37,7 +37,7 @@ const actionPrefixes: Record<AuditEventQuery["kind"], readonly string[]> = {
 
 const companyAuditRoles = new Set(["owner", "admin", "security", "auditor"]);
 const safeResourceId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const auditSelect = { id: true, action: true, resource: true, resourceId: true,
+export const auditSelect = { id: true, action: true, resource: true, resourceId: true,
   serviceId: true, createdAt: true, actor: { select: { name: true } } } as const;
 type AuditRow = Prisma.AuditEventGetPayload<{ select: typeof auditSelect }>;
 export const maxAuditExportRows = 5000;
@@ -82,17 +82,17 @@ export async function exportOwnAuditEvents(actor: AccountActor, input: AuditEven
   }, auditTransaction);
 }
 
-const auditTransaction = { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 15000 };
-function accessDetail(input: AuditEventQuery, rowCount: number) {
+export const auditTransaction = { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 15000 };
+export function accessDetail(input: AuditEventQuery, rowCount: number) {
   return { scope: input.scope, kind: input.kind, rowCount, hasSearch: !!input.search,
     hasActorFilter: !!input.actorId, hasFrom: !!input.from, hasTo: !!input.to };
 }
-async function auditActor(tx: Transaction, ctx: Context, input: AuditEventQuery) {
+export async function auditActor(tx: Transaction, ctx: Context, input: AuditEventQuery) {
   const actor = await lockServiceActor(tx, ctx, input.scope === "company" ? "audit.read" : "service.read");
   const current: Context = { ...ctx, member: actor.member, capabilities: roleCapabilities(actor.member.role) };
-  return { current, deadlines: actor.deadlines };
+  return { current, deadlines: actor.deadlines, serviceScope: actor.scope };
 }
-async function auditWhere(tx: Transaction, ctx: Context, input: AuditEventQuery) {
+export async function auditWhere(tx: Transaction, ctx: Context, input: AuditEventQuery) {
   const companyWide = companyAuditRoles.has(ctx.member.role);
   if (input.scope === "company" && !ctx.capabilities.includes("audit.read"))
     fail(403, "AUDIT_FORBIDDEN", "감사 기록 조회 권한이 없습니다.");
@@ -128,7 +128,7 @@ async function auditWhere(tx: Transaction, ctx: Context, input: AuditEventQuery)
   return { where, companyWide };
 }
 
-async function safeRows(tx: Transaction, ctx: Context, rows: AuditRow[], companyWide: boolean, scope: AuditEventQuery["scope"]) {
+export async function safeRows(tx: Transaction, ctx: Context, rows: AuditRow[], companyWide: boolean, scope: AuditEventQuery["scope"]) {
   const services = rows.length ? await tx.service.findMany({ where: { tenantId: ctx.tenantId,
     id: { in: rows.flatMap(row => row.serviceId ? [row.serviceId] : []) } }, select: { id: true, name: true } }) : [];
   const names = new Map(services.map(item => [item.id, item.name]));
