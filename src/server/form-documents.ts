@@ -66,7 +66,7 @@ async function captureDisplay(tx: Transaction, tenantId: string, serviceId: stri
 export async function validateDocumentSelections(tx: Transaction, ctx: Context, serviceId: string, selections: DocumentSelection[], retentionDays: number | null) {
   if (!selections.length) return [];
   await assertDocumentAccess(tx, ctx, serviceId);
-  const days = retentionDays ?? await companyRetentionDays(tx, ctx.tenantId);
+  const days = retentionDays ?? await companyRetentionDays(tx, ctx.tenantId, serviceId);
   const rows = await tx.documentVersion.findMany({ where: { id: { in: selections.map(item => item.documentVersionId) }, tenantId: ctx.tenantId, serviceId,
     document: { status: "published", type: { in: ["consent", "overseas_transfer"] } },
     publications: { some: { status: "active", OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] } } } });

@@ -42,9 +42,13 @@ export async function publicForm(token: string) {
     const designated = publication.form.designatedRetentionDays;
     if (designated !== null) content.retentionDays = designated;
     else {
-      const policy = await db.securityPolicy.findUnique({ where: { tenantId: publication.tenantId }, select: { retentionDays: true } });
-      if (!policy) fail(409, "POLICY_REQUIRED", "회사 보안 정책이 없습니다.");
-      content.retentionDays = policy.retentionDays;
+      const rule = await db.retentionRule.findUnique({ where: { tenantId_serviceId: { tenantId: publication.tenantId, serviceId: publication.form.serviceId }, status: "active" }, select: { retentionDays: true } });
+      if (rule) content.retentionDays = rule.retentionDays;
+      else {
+        const policy = await db.securityPolicy.findUnique({ where: { tenantId: publication.tenantId }, select: { retentionDays: true } });
+        if (!policy) fail(409, "POLICY_REQUIRED", "회사 보안 정책이 없습니다.");
+        content.retentionDays = policy.retentionDays;
+      }
     }
   }
   // 검증 요구 폼에는 사용 가능한 공급자 kind만 노출한다(공급자 식별자는 내부 정보).
@@ -81,7 +85,7 @@ export async function submitForm(token: string, input: z.infer<typeof submission
     if (live.formVersionId !== publication.formVersionId) fail(410, "PUBLICATION_CLOSED", "게시 버전이 변경되었습니다. 폼을 다시 열어주세요.");
     await tx.publication.update({ where: { id: live.id }, data: { responseCount: { increment: 1 } } });
     // 폼에 보유 기간이 없으면 제출 시점의 회사 기본 보유 기간을 적용한다. 정책 변경은 다음 제출부터 반영된다.
-    const policyDays = await companyRetentionDays(tx, live.tenantId);
+    const policyDays = await companyRetentionDays(tx, live.tenantId, live.form.serviceId);
     const retentionDays = live.formVersion.retentionDays ?? live.form.designatedRetentionDays ?? policyDays;
     const retentionUntil = new Date(Date.now() + retentionDays * 86400000);
     const submission = await tx.submission.create({ data: {

@@ -37,8 +37,14 @@ export async function lockPolicy(tx: Transaction, tenantId: string) {
   if (!policy) fail(409, "POLICY_REQUIRED", "회사 보안 정책이 없습니다.");
   return policy;
 }
-// 보유 기간을 지정하지 않은 폼은 제출·게시 시점의 회사 기본 보유 기간으로 해석한다.
-export async function companyRetentionDays(tx: Transaction, tenantId: string) {
+// 보유 기간을 지정하지 않은 폼은 제출·게시 시점의 기본 보유 기간으로 해석한다.
+// 서비스 규칙(RetentionRule)이 있으면 회사 기본값보다 우선 적용한다.
+export async function companyRetentionDays(tx: Transaction, tenantId: string, serviceId?: string) {
+  if (serviceId) {
+    const rule = await tx.retentionRule.findUnique({ where: { tenantId_serviceId: { tenantId, serviceId }, status: "active" },
+      select: { retentionDays: true } });
+    if (rule) return rule.retentionDays;
+  }
   const policy = await tx.securityPolicy.findUnique({ where: { tenantId }, select: { retentionDays: true } });
   if (!policy) fail(409, "POLICY_REQUIRED", "회사 보안 정책이 없습니다.");
   return policy.retentionDays;

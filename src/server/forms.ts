@@ -2,7 +2,7 @@ import { marketingConfig, validateMarketingConfig } from "@/contracts/marketing"
 import { checkSubjectQuestions } from "@/contracts/subjects";
 import { createHash } from "node:crypto";
 import { requireFileScanner } from "./file-scanner";
-import { lockPolicy } from "./security-policy";
+import { companyRetentionDays, lockPolicy } from "./security-policy";
 import { z } from "zod";
 import { Prisma } from "@/generated/prisma/client";
 import { db, type Transaction } from "./db";
@@ -197,9 +197,10 @@ export async function publishForm(tx: Transaction, ctx: Context, id: string, inp
   const draft = form.versions.find(item => item.status === "draft");
   if (!draft) fail(409, "NO_DRAFT", "게시할 초안이 없습니다. 수정 후 다시 게시해주세요.");
   const content = contentDto(draft);
+  const defaultDays = await companyRetentionDays(tx, ctx.tenantId, form.serviceId);
   const approval = await tx.approvalRequest.findFirst({ where: { tenantId: ctx.tenantId, formId: id,
     formVersionId: draft.id, status: "approved", policyRevision: policy.approvalRevision,
-    contentHash: fingerprint(draft, policy.retentionDays) }, orderBy: { createdAt: "desc" } });
+    contentHash: fingerprint(draft, defaultDays) }, orderBy: { createdAt: "desc" } });
   if (policy.requireApproval && !approval) fail(409, "APPROVAL_REQUIRED", "현재 초안과 정책에 대한 게시 승인이 필요합니다.");
   if (approval) {
     const reviewer = await tx.membership.findFirst({ where: { id: approval.decidedBy!, tenantId: ctx.tenantId, status: "active" }, include: { grants: true, user: { select: { status: true } } } });
@@ -210,7 +211,7 @@ export async function publishForm(tx: Transaction, ctx: Context, id: string, inp
   }
   try { validateFormForPublish(content); } catch (error) { fail(422, "INVALID_FORM", error instanceof Error ? error.message : "폼 내용을 확인해주세요."); }
   await validateFormDocuments(tx, ctx, form.serviceId, draft);
-  await preflightConsentReceipt(draft, policy.retentionDays);
+  await preflightConsentReceipt(draft, defaultDays);
   await validateFormDocuments(tx, ctx, form.serviceId, draft);
   if (content.verify) {
     const integration = await tx.verificationIntegration.findUnique({ where: { tenantId_serviceId: { tenantId: ctx.tenantId, serviceId: form.serviceId } } });

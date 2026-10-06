@@ -249,6 +249,7 @@ model Company {
   supportTickets SupportTicket[]
   accessRequests AccessRequest[]
   expertAssignments ExpertAssignment[]
+  retentionRules RetentionRule[]
 }
 
 model CompanyBusinessFile {
@@ -528,6 +529,7 @@ model Service {
   grants       ServiceGrant[]
   accessRequests AccessRequest[]
   expertAssignmentServices ExpertAssignmentService[]
+  retentionRule RetentionRule?
   forms        Form[]
   templates    FormTemplate[]
   files        FileObject[]
@@ -804,6 +806,22 @@ model SecurityPolicy {
   activityReviewRetentionDays Int?
   version         Int      @default(1)
   updatedAt       DateTime @updatedAt
+}
+model RetentionRule {
+  id            String   @id @default(uuid())
+  tenantId      String
+  tenant        Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  serviceId     String
+  service       Service  @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  retentionDays Int
+  reason        String   @default("")
+  status        String   @default("active")
+  version       Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@unique([tenantId, serviceId])
+  @@unique([tenantId, id])
+  @@index([tenantId, status, createdAt])
 }
 model SsoProvider {
   id           String   @id @default(uuid())

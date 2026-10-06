@@ -26,6 +26,7 @@ import { templateInput, templatePatch, templateListQuery } from "../src/server/t
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { noticeCreate, noticePatch } from "../src/contracts/notices";
 import { adminPlanCreate, adminPlanPatch } from "../src/contracts/admin-plans";
+import { retentionRuleCreate, retentionRulePatch } from "../src/contracts/retention-rules";
 import { guideCreate, guidePatch } from "../src/contracts/guides";
 import { supportTicketCreate, supportTicketPatch, supportTicketReply, supportTicketVersion } from "../src/contracts/support-tickets";
 import { accessRequestInput, accessDecisionInput } from "../src/server/access-requests";
@@ -188,7 +189,6 @@ for (const action of ["publish", "copy", "pause", "revise"]) add("/forms/{id}/" 
 for (const action of ["corrections", "withdrawals", "destruction"]) add("/submissions/{id}/" + action, "post", "submission.write or submission.destroy", "증거를 보존하는 " + action);
 const readOnly = [
   ["forms/{id}/submissions", "submission.read"], ["submissions/{id}", "submission.read"],
-  ["analytics/privacy", "submission.read"], ["analytics/marketing", "submission.read"], ["compliance", "security.read"],
 ];
 for (const [path, permission] of readOnly) add("/" + path, "get", permission, "권한 범위 내 원천 데이터 조회. 사용자 임의 UPDATE/DELETE 없음.");
 add("/ledger", "get", "billing.read", "현재 회사의 통화별 가용·예약 잔액과 불변 원장 거래. 원천 ID 제외; 충전·차감 쓰기 API는 외부 검증 전까지 제공하지 않음", undefined, "implemented");
@@ -203,10 +203,9 @@ const domainContracts = [
   ["form-templates", "form.write", "archive"], ["fixed-urls", "form.publish", "revoke"],
   ["processing-purposes", "document.write", "archive if referenced"], ["recipients", "document.write", "archive if referenced"],
   ["clause-templates", "document.write", "archive"], ["share-grants", "submission.read", "revoke"],
-  ["retention-rules", "security.write", "archive if referenced"], ["senders", "message.manage", "disable if referenced"],
+  ["senders", "message.manage", "disable if referenced"],
   ["campaigns", "message.send", "draft delete; scheduled cancel"], ["message-templates", "message.manage", "archive"],
   ["integrations", "service.manage", "disable then revoke secret"], ["security/ip-rules", "security.write", "delete with lockout protection"],
-  ["feedback", "self", "own draft delete"],
 ];
 // Proposed resource inputs remain explicitly marked planned until their handlers and QA exist.
 const proposedInputs: Record<string, { create: z.ZodType; patch: z.ZodType }> = {
@@ -281,6 +280,23 @@ for (const path of ["/kakao/channels/{id}", "/kakao/templates/{id}"]) {
 add("/usage-events", "get", "billing.read + current tenant", "사용량·충전·정산 원장 거래 페이지. 서비스 필터 가능", undefined, "implemented");
 add("/invoices", "get", "billing.read + current tenant", "결제 완료 주문의 청구서 대상 목록", undefined, "implemented");
 add("/forms/{id}/revise", "post", "form.write + current service grant", "게시본을 새 초안으로 복제; 열린 초안·미게시 409", z.object({ version: z.number().int().positive() }).strict(), "implemented", "201");
+add("/retention-rules", "get", "security.read + scoped services", "서비스별 기본 보유 기간 규칙 목록", undefined, "implemented");
+add("/retention-rules", "post", "security.write + current service grant", "서비스 기본 보유 기간 지정; 활성 규칙 중복 409·보관 규칙은 재활성화", retentionRuleCreate, "implemented", "201");
+add("/retention-rules/{id}", "get", "security.read + scoped services", "규칙 상세", undefined, "implemented");
+add("/retention-rules/{id}", "patch", "security.write + current service grant", "version 검사 후 기간·사유 변경", retentionRulePatch, "implemented");
+add("/retention-rules/{id}", "delete", "security.write + current service grant + If-Match", "version 검사 후 보관", undefined, "implemented", "204");
+(paths["/retention-rules/{id}"].delete as Operation).parameters = [
+  { in: "header", name: "If-Match", required: true, schema: { type: "string", pattern: "^[1-9][0-9]*$" } }];
+for (const method of ["get", "post"]) {
+  add("/feedback", method, method === "get" ? "current member" : "current member + rate limit",
+    method === "get" ? "본인 지원 요청 목록(/support-tickets 저장소 별칭)" : "본인 요청 생성", method === "post" ? supportTicketCreate : undefined, "implemented", method === "post" ? "201" : "200");
+}
+add("/feedback/{id}", "get", "current member + own ticket", "본인 요청 상세", undefined, "implemented");
+add("/feedback/{id}", "patch", "current member + own submitted ticket", "접수 상태 요청의 본인 수정", supportTicketPatch, "implemented");
+add("/feedback/{id}", "delete", "current member + own ticket + If-Match", "본인 요청 보관(내용 암호화 필드 제거)", undefined, "implemented", "204");
+add("/analytics/privacy", "get", "submission.read + scoped services", "서비스별 응답·동의·철회·파기 집계", undefined, "implemented");
+add("/analytics/marketing", "get", "marketing.read + scoped services", "서비스별 마케팅 동의 집계(/marketing/summary 동일)", undefined, "implemented");
+add("/compliance", "get", "security.read + scoped services", "회사 보안 검사 + 서비스별 준수 상태", undefined, "implemented");
 for (const endpoint of ["sign-up/email", "sign-in/email", "request-password-reset", "reset-password", "change-password", "sign-out", "two-factor/enable", "two-factor/verify-totp", "two-factor/send-otp", "two-factor/verify-otp", "two-factor/verify-backup-code", "two-factor/disable"]) {
   add("/auth/" + endpoint, "post", "Better Auth endpoint contract", "Better Auth 1.7.7 고정 버전의 인증 계약", undefined, "implemented");
 }
