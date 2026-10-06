@@ -74,6 +74,29 @@ async function finish(tx: Transaction, job: ClaimedJob, campaign: Campaign, reci
   await settleCampaign(tx, campaign);
   await deliveryAudit(tx, job, recipient, status);
 }
+/** 잠금/첨부 I/O를 기다린 뒤 현재 기한을 다시 확인한다. 아직 발송 전이므로 임대 만료는 안전하게 재예약할 수 있다. */
+async function readyBeforeIo(tx: Transaction, job: ClaimedJob, workerId: string, payload: Payload,
+  campaign: Campaign, recipient: CampaignDelivery, hasHold: boolean, ledgerSource: string) {
+  const fresh = await lockedState(tx, job, workerId, payload);
+  if (!fresh) {
+    if (job.attempts >= job.maxAttempts) {
+      if (hasHold) await releaseHeld(tx, recipient, ledgerSource);
+      await finish(tx, job, campaign, recipient, "cancelled", "LEASE_EXHAUSTED");
+    } else {
+      // 같은 원천의 reserve는 멱등이다. 재시도할 예약 잔액을 release하면 다음 capture가 불가능해진다.
+      await tx.campaignDelivery.update({ where: { id: recipient.id }, data: { status: "queued", reason: "LEASE_EXPIRED" } });
+      await tx.job.update({ where: { id: job.id }, data: { status: "retry",
+        leaseOwner: null, leaseUntil: null, lastError: "LEASE_EXPIRED" } });
+      await deliveryAudit(tx, job, recipient, "queued");
+    }
+    return null;
+  }
+  if (fresh.reason) {
+    if (hasHold) await releaseHeld(tx, recipient, ledgerSource);
+    await finish(tx, job, campaign, recipient, "cancelled", fresh.reason); return null;
+  }
+  return fresh;
+}
 /** 발송 정산. 예약은 원천키 멱등이라 재시도에서 재사용하고, 최종 상태에서만 capture/release로 정산한다. */
 function isSms(transport: string) { return transport === "sms-local" || transport === "sms-solapi"; }
 function isKakao(transport: string) { return transport === "kakao-local"; }
@@ -179,7 +202,7 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
   if (!prepared) return;
   await db.$transaction(async tx => {
     const state = await lockedState(tx, job, workerId, payload); if (!state) return;
-    const { campaign, recipient, reason, sender, evaluated, kakaoTemplate } = state;
+    const { campaign, recipient, reason, kakaoTemplate } = state;
     const ledgerSource = payload.deliveryId + (isSms(payload.transport) && campaign.channel === "kakao" ? ":fallback" : "");
     if (recipient.status !== "sending") {
       if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient, ledgerSource);
@@ -199,11 +222,11 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
         hold = await reserveMessage(tx, recipient, unitCost, ledgerSource);
       }
       // 잔고 잠금 대기 중에도 시각은 흐른다. 발송 직전에 보유 기한·현재 권한·리스 기한을 다시 검사한다.
-      const fresh = await lockedState(tx, job, workerId, payload);
-      if (!fresh) { if (hold) await releaseHeld(tx, recipient, ledgerSource); return; }
-      if (fresh.reason || !fresh.kakaoTemplate || !fresh.evaluated.contact) {
+      const fresh = await readyBeforeIo(tx, job, workerId, payload, campaign, recipient, !!hold, ledgerSource);
+      if (!fresh) return;
+      if (!fresh.kakaoTemplate || !fresh.evaluated.contact) {
         if (hold) await releaseHeld(tx, recipient, ledgerSource);
-        await finish(tx, job, campaign, recipient, "cancelled", fresh.reason ?? "TEMPLATE_UNAVAILABLE"); return;
+        await finish(tx, job, campaign, recipient, "cancelled", "TEMPLATE_UNAVAILABLE"); return;
       }
       try { await deliverKakaoLocal(job.id, recipient.id, fresh.kakaoTemplate, fresh.evaluated.contact); }
       catch (error) {
@@ -226,8 +249,11 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
         if (!existing && (acct.length === 0 || acct[0].available < BigInt(unitCost))) { await finish(tx, job, campaign, recipient, "failed", "INSUFFICIENT_CREDIT"); return; }
         hold = await reserveMessage(tx, recipient, unitCost, ledgerSource);
       }
+      const fresh = await readyBeforeIo(tx, job, workerId, payload, campaign, recipient, !!hold, ledgerSource);
+      if (!fresh) return;
       try {
-        const sent = await deliverSms({ transport: solapi ? "solapi" : "local", jobId: job.id, to: evaluated.contact!.contact, from: decrypt<string>(sender!.addressCipher!), text: evaluated.content!.text });
+        const sent = await deliverSms({ transport: solapi ? "solapi" : "local", jobId: job.id, to: fresh.evaluated.contact!.contact,
+          from: decrypt<string>(fresh.sender!.addressCipher!), text: fresh.evaluated.content!.text });
         if (solapi) await tx.smsReceipt.create({ data: { tenantId: recipient.tenantId, deliveryId: recipient.id, receiptId: sent.receiptId, status: "provider_accepted" } });
       }
       catch (error) {
@@ -242,9 +268,13 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
     }
     let attachments: MailAttachment[];
     try { attachments = (await readCampaignAttachments(tx, campaign)).attachments; } catch { await finish(tx, job, campaign, recipient, "failed", "ATTACHMENT_UNAVAILABLE"); return; }
+    const fresh = await readyBeforeIo(tx, job, workerId, payload, campaign, recipient, false, ledgerSource);
+    if (!fresh) return;
     let status: "local_delivered" | "accepted";
     try {
-      status = await deliverMail(job, withEmailPolicy(job.id, { to: evaluated.contact!.contact, subject: evaluated.content!.subject, attachments, text: evaluated.content!.text, ...(evaluated.content!.format === "html" ? { html: evaluated.content!.html } : {}) }), { name: sender!.label, address: decrypt<string>(sender!.addressCipher!) });
+      status = await deliverMail(job, withEmailPolicy(job.id, { to: fresh.evaluated.contact!.contact, subject: fresh.evaluated.content!.subject,
+        attachments, text: fresh.evaluated.content!.text, ...(fresh.evaluated.content!.format === "html" ? { html: fresh.evaluated.content!.html } : {}) }),
+        { name: fresh.sender!.label, address: decrypt<string>(fresh.sender!.addressCipher!) });
     } catch {
       if (payload.transport === "smtp") { await finish(tx, job, campaign, recipient, "unknown", "DELIVERY_UNCERTAIN"); return; }
       if (job.attempts >= job.maxAttempts) { await finish(tx, job, campaign, recipient, "failed", "DELIVERY_FAILED"); return; }

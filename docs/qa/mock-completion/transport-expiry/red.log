@@ -1,0 +1,165 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:73621) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/campaigns.test.ts (71 tests | 7 failed | 64 skipped) 7828ms
+   × 발송 직전 잔고 대기 중 sms 기한이 만료되면 문자·과금을 차단한다 824ms
+   × 발송 직전 잔고 대기 중 fallback 기한이 만료되면 문자·과금을 차단한다 708ms
+   × 발송 직전 잔고 대기 중 sms-campaign 기한이 만료되면 문자·과금을 차단한다 497ms
+   × 발송 직전 첨부 읽기 중 local/source 기한이 끝나면 메일 전송을 차단한다 844ms
+   × 발송 직전 첨부 읽기 중 smtp/source 기한이 끝나면 메일 전송을 차단한다 971ms
+   × 발송 직전 첨부 읽기 중 local/campaign 기한이 끝나면 메일 전송을 차단한다 769ms
+   × 잔고 대기 중 카카오 작업 임대가 만료돼도 다음 실행은 예약 잔액으로 한 번만 정산한다 895ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/campaigns.test.ts > 발송 직전 잔고 대기 중 sms 기한이 만료되면 문자·과금을 차단한다
+ FAIL  tests/server/campaigns.test.ts > 발송 직전 잔고 대기 중 fallback 기한이 만료되면 문자·과금을 차단한다
+AssertionError: expected { …(17) } to match object { status: 'cancelled', …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": "SOURCE_UNAVAILABLE",
+-   "status": "cancelled",
++   "reason": null,
++   "status": "local_delivered",
+  }
+
+ ❯ tests/server/campaigns.test.ts:1002:81
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 발송 직전 잔고 대기 중 sms-campaign 기한이 만료되면 문자·과금을 차단한다
+AssertionError: expected { …(17) } to match object { status: 'cancelled', …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": "DATA_ERASED",
+-   "status": "cancelled",
++   "reason": null,
++   "status": "local_delivered",
+  }
+
+ ❯ tests/server/campaigns.test.ts:1002:81
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 발송 직전 첨부 읽기 중 local/source 기한이 끝나면 메일 전송을 차단한다
+AssertionError: expected { …(17) } to match object { status: 'cancelled', …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": "SOURCE_UNAVAILABLE",
+-   "status": "cancelled",
++   "reason": null,
++   "status": "local_delivered",
+  }
+
+ ❯ tests/server/campaigns.test.ts:1028:81
+    1026|   try {await barrier;vi.useFakeTimers({toFake:["Date"]});vi.setSystemT…
+    1027|   finally {release();await running;vi.useRealTimers();spy.mockRestore(…
+    1028|   expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delive…
+       |                                                                                 ^
+    1029|   await expect(access(resolve(env.LOCAL_MAIL_DIR,queued.id+".json"))).…
+    1030| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 발송 직전 첨부 읽기 중 smtp/source 기한이 끝나면 메일 전송을 차단한다
+AssertionError: expected { …(17) } to match object { status: 'cancelled', …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": "SOURCE_UNAVAILABLE",
+-   "status": "cancelled",
++   "reason": null,
++   "status": "accepted",
+  }
+
+ ❯ tests/server/campaigns.test.ts:1028:81
+    1026|   try {await barrier;vi.useFakeTimers({toFake:["Date"]});vi.setSystemT…
+    1027|   finally {release();await running;vi.useRealTimers();spy.mockRestore(…
+    1028|   expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delive…
+       |                                                                                 ^
+    1029|   await expect(access(resolve(env.LOCAL_MAIL_DIR,queued.id+".json"))).…
+    1030| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 발송 직전 첨부 읽기 중 local/campaign 기한이 끝나면 메일 전송을 차단한다
+AssertionError: expected { …(17) } to match object { status: 'cancelled', …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": "DATA_ERASED",
+-   "status": "cancelled",
++   "reason": null,
++   "status": "local_delivered",
+  }
+
+ ❯ tests/server/campaigns.test.ts:1028:81
+    1026|   try {await barrier;vi.useFakeTimers({toFake:["Date"]});vi.setSystemT…
+    1027|   finally {release();await running;vi.useRealTimers();spy.mockRestore(…
+    1028|   expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delive…
+       |                                                                                 ^
+    1029|   await expect(access(resolve(env.LOCAL_MAIL_DIR,queued.id+".json"))).…
+    1030| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 잔고 대기 중 카카오 작업 임대가 만료돼도 다음 실행은 예약 잔액으로 한 번만 정산한다
+AssertionError: expected { …(4) } to deeply equal { resumeError: undefined, …(3) }
+
+- Expected
++ Received
+
+  {
+-   "available": 380n,
++   "available": 385n,
+    "held": 0n,
+    "kinds": [
+      "reserve",
+-     "capture",
++     "release",
+    ],
+-   "resumeError": undefined,
++   "resumeError": "PrismaClientKnownRequestError: 
++ Invalid `tx.ledgerTransaction.create()` invocation in
++ /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/ledger.ts:33:42
++
++   30     fail(409, \"LEDGER_SOURCE_CONFLICT\", \"같은 원천에 다른 원장 내용이 사용되었습니다.\");
++   31   return existing;
++   32 }
++ → 33 const row = await tx.ledgerTransaction.create(
++ Database error. Code: `P0001`. Message: `CREDIT_RESERVATION_EXCEEDED`",
+  }
+
+ ❯ tests/server/campaigns.test.ts:1056:96
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 64 skipped (71)
+   Start at  18:05:23
+   Duration  10.22s (tests 78%, import 11%, transform 11%)
+

@@ -864,16 +864,16 @@ test("the exact advertised one-click URL redirects only GET and accepts receiver
 });
 
 
-async function approvedKakaoCampaign(count = 1) {
+async function approvedKakaoCampaign(count = 1, options: { body?: string; channels?: string[]; fallbackSenderId?: string } = {}) {
   env.KAKAO_PROVIDER = "local"; env.LOCAL_KAKAO_DIR = ".local/catchsecu_test/kakao-race-" + randomUUID();
   env.KAKAO_UNIT_COST_KRW = 5;
   const channel = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/channels", "POST", "owner", { serviceId: service, name: "경계 채널", searchId: "@race" + randomUUID().slice(0, 8) }, { "idempotency-key": randomUUID() })), 201);
   await ok(await kakaoPost(req("/kakao/channels/" + channel.id + "/verify", "POST", "owner", {})));
-  const created = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates", "POST", "owner", { serviceId: service, channelId: channel.id, name: "경계 템플릿 " + randomUUID(), body: "#{name}님 안내", buttons: [] }, { "idempotency-key": randomUUID() })), 201);
+  const created = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates", "POST", "owner", { serviceId: service, channelId: channel.id, name: "경계 템플릿 " + randomUUID(), body: options.body ?? "#{name}님 안내", buttons: [] }, { "idempotency-key": randomUUID() })), 201);
   const template = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates/" + created.id + "/submit", "POST", "owner", { version: created.version })));
   const contacts = [];
-  for (let index=0; index<count; index++) contacts.push((await recipient("경계 수신자 " + index, "kakao")).contact);
-  const draft = await targets(await create({ channel: "kakao", senderId: null, kakaoTemplateId: template.id }), contacts);
+  for (let index=0; index<count; index++) contacts.push((await recipient("경계 수신자 " + index, "kakao", options.channels ?? ["kakao"])).contact);
+  const draft = await targets(await create({ channel: "kakao", senderId: null, kakaoTemplateId: template.id, fallbackSenderId: options.fallbackSenderId ?? null }), contacts);
   await postTrustedLedgerTransfer({ tenantId: tenant, currency: "KRW", kind: "funding", amount: BigInt(100), sourceKind: "pg_capture", sourceId: randomUUID() });
   return { channel, template, draft };
 }
@@ -959,4 +959,165 @@ test("알림톡 잔고 잠금을 기다리는 동안 동의 원천 보유 기한
   await expect(access(resolve(env.LOCAL_KAKAO_DIR,queued.id+".json"))).rejects.toThrow();
   const after=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});expect(after.available).toBe(before.available);expect(after.held).toBe(before.held);
   expect(await db.ledgerTransaction.count({where:{tenantId:tenant,kind:"capture",sourceId:recipient.id}})).toBe(0);
+});
+
+
+async function shortLivedDraft(seed:CampaignRecord) {
+  const row=await db.campaign.findUniqueOrThrow({where:{id:seed.id}}),id=randomUUID();
+  await db.$transaction(async tx=>{
+    await tx.campaign.create({data:{id,tenantId:row.tenantId,serviceId:row.serviceId,creatorId:row.creatorId,
+      channel:row.channel,source:row.source,title:row.title,senderId:row.senderId,kakaoTemplateId:row.kakaoTemplateId,
+      kakaoTemplateVersion:row.kakaoTemplateVersion,fallbackSenderId:row.fallbackSenderId,fallbackSenderVersion:row.fallbackSenderVersion,
+      contentCipher:row.contentCipher,createdAt:new Date(Date.now()-86400000),expiresAt:new Date(Date.now()+30000)}});
+    await tx.campaignEvent.create({data:{tenantId:row.tenantId,campaignId:id,version:1,kind:"created"}});
+  });return read(id);
+}
+
+test.each(["sms", "fallback", "sms-campaign"] as const)("발송 직전 잔고 대기 중 %s 기한이 만료되면 문자·과금을 차단한다", async kind => {
+  env.SMS_TRANSPORT="local";env.LOCAL_SMS_DIR=".local/catchsecu_test/sms-expiry-"+randomUUID();env.MESSAGE_UNIT_COST_KRW=5;
+  const sms=await verifiedSmsSender("만료 경계 문자");
+  let campaign:CampaignRecord;
+  if(kind==="fallback") {
+    const f=await approvedKakaoCampaign(1,{body:"#{name} #{coupon}",channels:["kakao","sms"],fallbackSenderId:sms.sender.id});
+    campaign=await schedule(f.draft);const first=await jobFor(campaign.id);await drain(first.id);
+  } else {
+    const target=await recipient("문자 만료 경계","sms");
+    await postTrustedLedgerTransfer({tenantId:tenant,currency:"KRW",kind:"funding",amount:BigInt(100),sourceKind:"pg_capture",sourceId:randomUUID()});
+    const created=await create({channel:"sms",senderId:sms.sender.id});
+    campaign=await schedule(await targets(kind==="sms-campaign"?await shortLivedDraft(created):created,[target.contact]));
+  }
+  const queued=await jobFor(campaign.id),delivery=await db.campaignDelivery.findUniqueOrThrow({where:{id:queued.campaignDeliveryId!}});
+  expect(decrypt<{transport:string}>(queued.payloadCipher).transport).toBe("sms-local");
+  const expires=kind==="sms-campaign"?new Date(campaign.expiresAt):new Date(Date.now()+20000);
+  if(kind!=="sms-campaign") await db.submission.update({where:{id:delivery.sourceSubmissionId!},data:{retentionUntil:expires}});
+  const workerId="sms-expiry-"+randomUUID(),job=await mailer.claimJob(workerId,{tenantId:tenant,jobId:queued.id});expect(job).toBeDefined();
+  const before=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});
+  const holder=new Client({connectionString:env.DATABASE_URL});await holder.connect();let running:Promise<void>|undefined;
+  try {
+    await holder.query('BEGIN');await holder.query(`SELECT "tenantId" FROM "CreditAccount" WHERE "tenantId"=$1 AND currency='KRW' FOR UPDATE`,[tenant]);
+    const pid=Number((await holder.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+    running=runCampaignJob(job!,workerId);await waitForDatabaseBlock(pid,"CreditAccount");
+    vi.useFakeTimers({toFake:["Date"]});vi.setSystemTime(new Date(expires.getTime()+1000));
+  } finally {await holder.query('ROLLBACK');await holder.end();await running;vi.useRealTimers();}
+  expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delivery.id}})).toMatchObject({status:"cancelled",reason:kind==="sms-campaign"?"DATA_ERASED":"SOURCE_UNAVAILABLE"});
+  await expect(access(resolve(env.LOCAL_SMS_DIR,queued.id+".json"))).rejects.toThrow();
+  const after=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});expect(after.available).toBe(before.available);expect(after.held).toBe(before.held);
+  expect(await db.ledgerTransaction.count({where:{tenantId:tenant,kind:"capture",sourceId:delivery.id+(kind==="fallback"?":fallback":"")}})).toBe(0);
+});
+
+test.each([["local","source"],["smtp","source"],["local","campaign"]] as const)("발송 직전 첨부 읽기 중 %s/%s 기한이 끝나면 메일 전송을 차단한다",async(transport,boundary)=>{
+  const send=vi.fn(async(mail:{to:string})=>({accepted:[mail.to]}));
+  let from=sender;
+  if(transport==="smtp") {
+    env.MAIL_TRANSPORT="smtp";env.SMTP_HOST="synthetic.local.test";env.SENDER_DNS_SERVER=undefined;
+    vi.spyOn(Resolver.prototype,"resolveTxt").mockImplementation(async name=>[[records.get(name)??""]]);
+    vi.spyOn(nodemailer,"createTransport").mockReturnValue({sendMail:send} as never);from=await verifiedSender();
+  }
+  const target=await recipient("첨부 대기 만료"),created=await create({senderId:from.id});
+  const attachment=await attachFile(await targets(boundary==="campaign"?await shortLivedDraft(created):created,[target.contact]));
+  const campaign=await schedule(attachment.c),queued=await jobFor(campaign.id),delivery=await db.campaignDelivery.findUniqueOrThrow({where:{id:queued.campaignDeliveryId!}});
+  const expires=boundary==="campaign"?new Date(campaign.expiresAt):new Date(Date.now()+20000);
+  if(boundary!=="campaign") await db.submission.update({where:{id:delivery.sourceSubmissionId!},data:{retentionUntil:expires}});
+  const workerId="mail-expiry-"+randomUUID(),job=await mailer.claimJob(workerId,{tenantId:tenant,jobId:queued.id});expect(job).toBeDefined();
+  let entered!:()=>void,release!:()=>void;
+  const barrier=new Promise<void>(resolve=>{entered=resolve}),gate=new Promise<void>(resolve=>{release=resolve}),readBytes=privateFiles.read.bind(privateFiles);
+  const spy=vi.spyOn(privateFiles,"read").mockImplementationOnce(async key=>{entered();await gate;return readBytes(key)});
+  send.mockClear();const running=runCampaignJob(job!,workerId);
+  try {await barrier;vi.useFakeTimers({toFake:["Date"]});vi.setSystemTime(new Date(expires.getTime()+1000));}
+  finally {release();await running;vi.useRealTimers();spy.mockRestore();}
+  expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delivery.id}})).toMatchObject({status:"cancelled",reason:boundary==="campaign"?"DATA_ERASED":"SOURCE_UNAVAILABLE"});
+  await expect(access(resolve(env.LOCAL_MAIL_DIR,queued.id+".json"))).rejects.toThrow();expect(send).not.toHaveBeenCalled();
+});
+
+test("잔고 대기 중 카카오 작업 임대가 만료돼도 다음 실행은 예약 잔액으로 한 번만 정산한다",async()=>{
+  const {draft}=await approvedKakaoCampaign();await schedule(draft);
+  const queued=await jobFor(draft.id),workerId="lease-expiry-"+randomUUID(),job=await mailer.claimJob(workerId,{tenantId:tenant,jobId:queued.id});expect(job).toBeDefined();
+  const before=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});
+  const holder=new Client({connectionString:env.DATABASE_URL});await holder.connect();let running:Promise<void>|undefined;
+  try {
+    await holder.query('BEGIN');await holder.query(`SELECT "tenantId" FROM "CreditAccount" WHERE "tenantId"=$1 AND currency='KRW' FOR UPDATE`,[tenant]);
+    const pid=Number((await holder.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+    running=runCampaignJob(job!,workerId);await waitForDatabaseBlock(pid,"CreditAccount");
+    vi.useFakeTimers({toFake:["Date"]});vi.setSystemTime(new Date(Date.now()+61000));
+  }finally{await holder.query('ROLLBACK');await holder.end();await running;vi.useRealTimers();}
+  await expect(access(resolve(env.LOCAL_KAKAO_DIR,queued.id+".json"))).rejects.toThrow();
+  let resumeError:string|undefined;
+  // 이전 구현의 leased 행도 실제 재선점 경로로 진행시켜 발송 후 정산 실패/복구 결과까지 관찰한다.
+  for(let index=0;index<2;index++) {
+    const current=await db.job.findUniqueOrThrow({where:{id:queued.id}});if(current.status==="done")break;
+    if(current.status==="leased")await db.job.update({where:{id:current.id},data:{leaseUntil:new Date(Date.now()-1000)}});
+    const owner="lease-reclaim-"+randomUUID(),next=await mailer.claimJob(owner,{tenantId:tenant,jobId:queued.id});expect(next).toBeDefined();
+    try{await runCampaignJob(next!,owner)}catch(cause){resumeError=String(cause)}
+  }
+  expect(await db.job.findUniqueOrThrow({where:{id:queued.id}})).toMatchObject({status:"done"});
+  const file=JSON.parse(await readFile(resolve(env.LOCAL_KAKAO_DIR,queued.id+".json"),"utf8"));expect(file.status).toBe("local_delivered");
+  const entries=await db.ledgerTransaction.findMany({where:{tenantId:tenant,sourceId:queued.campaignDeliveryId!},orderBy:{createdAt:"asc"}});
+  const after=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});
+  expect(entries.find(r=>r.kind==="capture")?.reservationId).toBe(entries.find(r=>r.kind==="reserve")?.id);
+  expect({resumeError,kinds:entries.map(r=>r.kind).sort(),available:after.available,held:after.held}).toEqual({resumeError:undefined,kinds:["capture","reserve"],available:before.available-BigInt(5),held:before.held});
+});
+
+
+test.each(["local","smtp"] as const)("첨부 읽기 중 %s 작업 임대가 만료되면 미발송을 재예약하고 한 번만 전송한다",async transport=>{
+  const send=vi.fn(async(mail:{to:string})=>({accepted:[mail.to]}));let from=sender;
+  if(transport==="smtp") {
+    env.MAIL_TRANSPORT="smtp";env.SMTP_HOST="synthetic.local.test";env.SENDER_DNS_SERVER=undefined;
+    vi.spyOn(Resolver.prototype,"resolveTxt").mockImplementation(async name=>[[records.get(name)??""]]);
+    vi.spyOn(nodemailer,"createTransport").mockReturnValue({sendMail:send} as never);from=await verifiedSender();
+  }
+  const target=await recipient("임대 만료 이메일"),attachment=await attachFile(await targets(await create({senderId:from.id}),[target.contact]));
+  const campaign=await schedule(attachment.c),queued=await jobFor(campaign.id),worker="mail-lease-"+randomUUID(),job=await mailer.claimJob(worker,{tenantId:tenant,jobId:queued.id});expect(job).toBeDefined();
+  let entered!:()=>void,release!:()=>void;const barrier=new Promise<void>(r=>{entered=r}),gate=new Promise<void>(r=>{release=r}),readBytes=privateFiles.read.bind(privateFiles);
+  const spy=vi.spyOn(privateFiles,"read").mockImplementationOnce(async key=>{entered();await gate;return readBytes(key)});
+  send.mockClear();const running=runCampaignJob(job!,worker);
+  try{await barrier;vi.useFakeTimers({toFake:["Date"]});vi.setSystemTime(new Date(Date.now()+61000));}
+  finally{release();await running;vi.useRealTimers();spy.mockRestore();}
+  expect(await db.job.findUniqueOrThrow({where:{id:queued.id}})).toMatchObject({status:"retry",lastError:"LEASE_EXPIRED",leaseOwner:null});
+  expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:queued.campaignDeliveryId!}})).toMatchObject({status:"queued",reason:"LEASE_EXPIRED"});
+  await expect(access(resolve(env.LOCAL_MAIL_DIR,queued.id+".json"))).rejects.toThrow();expect(send).not.toHaveBeenCalled();
+  const nextOwner="mail-lease-resume-"+randomUUID(),next=await mailer.claimJob(nextOwner,{tenantId:tenant,jobId:queued.id});expect(next).toBeDefined();await runCampaignJob(next!,nextOwner);
+  expect(await db.job.findUniqueOrThrow({where:{id:queued.id}})).toMatchObject({status:"done"});
+  if(transport==="smtp")expect(send).toHaveBeenCalledTimes(1);
+  else expect(JSON.parse(await readFile(resolve(env.LOCAL_MAIL_DIR,queued.id+".json"),"utf8")).attachments).toHaveLength(1);
+});
+
+test("문자 임대 만료는 예약 잔액을 유지하고 재시도 완료에서만 차감한다",async()=>{
+  env.SMS_TRANSPORT="local";env.LOCAL_SMS_DIR=".local/catchsecu_test/sms-lease-"+randomUUID();env.MESSAGE_UNIT_COST_KRW=5;
+  const from=await verifiedSmsSender("문자 임대 경계"),target=await recipient("임대 만료 문자","sms");
+  await postTrustedLedgerTransfer({tenantId:tenant,currency:"KRW",kind:"funding",amount:BigInt(100),sourceKind:"pg_capture",sourceId:randomUUID()});
+  const campaign=await schedule(await targets(await create({channel:"sms",senderId:from.sender.id}),[target.contact]));
+  const queued=await jobFor(campaign.id),worker="sms-lease-"+randomUUID(),job=await mailer.claimJob(worker,{tenantId:tenant,jobId:queued.id});expect(job).toBeDefined();
+  const before=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});
+  const holder=new Client({connectionString:env.DATABASE_URL});await holder.connect();let running:Promise<void>|undefined;
+  try{await holder.query('BEGIN');await holder.query(`SELECT "tenantId" FROM "CreditAccount" WHERE "tenantId"=$1 AND currency='KRW' FOR UPDATE`,[tenant]);
+    const pid=Number((await holder.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);running=runCampaignJob(job!,worker);await waitForDatabaseBlock(pid,"CreditAccount");
+    vi.useFakeTimers({toFake:["Date"]});vi.setSystemTime(new Date(Date.now()+61000));}
+  finally{await holder.query('ROLLBACK');await holder.end();await running;vi.useRealTimers();}
+  expect(await db.job.findUniqueOrThrow({where:{id:queued.id}})).toMatchObject({status:"retry",lastError:"LEASE_EXPIRED"});
+  await expect(access(resolve(env.LOCAL_SMS_DIR,queued.id+".json"))).rejects.toThrow();
+  const held=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});expect(held.held).toBe(before.held+BigInt(5));
+  const nextOwner="sms-lease-resume-"+randomUUID(),next=await mailer.claimJob(nextOwner,{tenantId:tenant,jobId:queued.id});expect(next).toBeDefined();await runCampaignJob(next!,nextOwner);
+  expect(await db.job.findUniqueOrThrow({where:{id:queued.id}})).toMatchObject({status:"done"});
+  const after=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});expect(after.available).toBe(before.available-BigInt(5));expect(after.held).toBe(before.held);
+  const entries=await db.ledgerTransaction.findMany({where:{tenantId:tenant,sourceId:queued.campaignDeliveryId!}});expect(entries.map(r=>r.kind).sort()).toEqual(["capture","reserve"]);
+});
+
+test("카카오 마지막 시도의 임대 만료는 예약 잔액을 반환하고 종결한다",async()=>{
+  const {draft}=await approvedKakaoCampaign();await schedule(draft);const queued=await jobFor(draft.id);
+  let job:Awaited<ReturnType<typeof mailer.claimJob>>=undefined,worker="";
+  for(let index=0;index<queued.maxAttempts;index++) {
+    if(index)await db.job.update({where:{id:queued.id},data:{leaseUntil:new Date(Date.now()-1000)}});
+    worker="lease-exhaust-"+randomUUID();job=await mailer.claimJob(worker,{tenantId:tenant,jobId:queued.id});expect(job).toBeDefined();
+  }
+  expect(job!.attempts).toBe(job!.maxAttempts);
+  const before=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});
+  const holder=new Client({connectionString:env.DATABASE_URL});await holder.connect();let running:Promise<void>|undefined;
+  try{await holder.query('BEGIN');await holder.query(`SELECT "tenantId" FROM "CreditAccount" WHERE "tenantId"=$1 AND currency='KRW' FOR UPDATE`,[tenant]);
+    const pid=Number((await holder.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);running=runCampaignJob(job!,worker);await waitForDatabaseBlock(pid,"CreditAccount");
+    vi.useFakeTimers({toFake:["Date"]});vi.setSystemTime(new Date(Date.now()+61000));}
+  finally{await holder.query('ROLLBACK');await holder.end();await running;vi.useRealTimers();}
+  expect(await db.job.findUniqueOrThrow({where:{id:queued.id}})).toMatchObject({status:"cancelled",lastError:"LEASE_EXHAUSTED"});
+  expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:queued.campaignDeliveryId!}})).toMatchObject({status:"cancelled",reason:"LEASE_EXHAUSTED"});
+  await expect(access(resolve(env.LOCAL_KAKAO_DIR,queued.id+".json"))).rejects.toThrow();
+  const after=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});expect(after.available).toBe(before.available);expect(after.held).toBe(before.held);
 });
