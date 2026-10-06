@@ -43,8 +43,15 @@ function assertProviderEndpoints(input: { issuer: string; authorizationUrl: stri
   }
 }
 
+const VIRTUAL_ORG_PROTOCOLS = new Set<string>(["gpki", "saeol", "groupware"]);
+export const isVirtualOrgProtocol = (protocol: string) => VIRTUAL_ORG_PROTOCOLS.has(protocol);
+export const VIRTUAL_ORG_DETAIL = "가상 조직 인증 어댑터 — 외부 기관(GPKI·새올·그룹웨어) 미연동, mock 디렉터리로 동작";
+const ORG_LOGIN_PATHS: Record<string, string> = { gpki: "/login/gpki", saeol: "/login/saeol", groupware: "/gwloginUser/login" };
+export const orgLoginPath = (protocol: string) => ORG_LOGIN_PATHS[protocol] ?? "/login/gpki";
+
 function dto(row: SsoProvider): SsoProviderRecord {
-  return { id: row.id, name: row.name, protocol: row.protocol === "saml" ? "saml" : "oidc", issuer: row.issuer, clientId: row.clientId, authorizationUrl: row.authorizationUrl,
+  return { id: row.id, name: row.name, protocol: (row.protocol === "saml" || isVirtualOrgProtocol(row.protocol) ? row.protocol : "oidc") as SsoProviderRecord["protocol"],
+    issuer: row.issuer, clientId: row.clientId, authorizationUrl: row.authorizationUrl,
     tokenUrl: row.tokenUrl, jwksUrl: row.jwksUrl, scopes: row.scopes, enabled: row.enabled, hasSecret: row.clientSecretCipher !== null,
     hasCert: row.idpCert !== null,
     preflightOk: row.preflightOk, preflightDetail: row.preflightDetail, version: row.version, createdAt: row.createdAt.toISOString() };
@@ -96,24 +103,29 @@ export async function listSsoProviders(ctx: Context) {
   });
 }
 export async function createSsoProvider(ctx: Context, input: z.infer<typeof ssoProviderCreate>, requestId: string) {
-  assertProviderEndpoints(input);
+  // 가상 조직 인증(gpki·saeol·groupware)은 외부 URL이 없다 — mock 디렉터리만 사용한다.
+  const ext = input.protocol === "oidc" || input.protocol === "saml" ? input : null;
+  if (ext) assertProviderEndpoints(ext);
   await db.$transaction(async tx => {
     const actor = await lockSsoActor(tx, ctx, true);
     assertFileDeadlines(actor.deadlines);
   });
   const saml = input.protocol === "saml";
   // 외부 요청 중에는 DB 잠금을 유지하지 않고 결과 저장 직전에 권한을 다시 확인한다.
-  const check = await preflight({ issuer: input.issuer, protocol: input.protocol,
-    jwksUrl: saml ? null : input.jwksUrl, idpCert: saml ? input.idpCert : null });
+  const check = !ext ? { ok: true, detail: VIRTUAL_ORG_DETAIL }
+    : await preflight({ issuer: ext.issuer, protocol: ext.protocol,
+      jwksUrl: ext.protocol === "oidc" ? ext.jwksUrl : null, idpCert: ext.protocol === "saml" ? ext.idpCert : null });
   return db.$transaction(async tx => {
     const actor = await lockSsoActor(tx, ctx, true);
-    const created = await tx.ssoProvider.create({ data: { tenantId: ctx.tenantId, name: input.name, issuer: input.issuer,
+    const created = await tx.ssoProvider.create({ data: { tenantId: ctx.tenantId, name: input.name,
+      issuer: ext ? ext.issuer : `urn:virtual:${input.protocol}`,
       protocol: input.protocol,
-      clientId: input.clientId, clientSecretCipher: input.clientSecret ? encrypt(input.clientSecret) : null,
-      authorizationUrl: input.authorizationUrl,
-      tokenUrl: saml ? null : input.tokenUrl, jwksUrl: saml ? null : input.jwksUrl,
-      idpCert: saml ? input.idpCert : null,
-      scopes: saml ? "" : input.scopes,
+      clientId: ext ? ext.clientId : `virtual:${input.protocol}`,
+      clientSecretCipher: ext?.clientSecret ? encrypt(ext.clientSecret) : null,
+      authorizationUrl: ext ? ext.authorizationUrl : "",
+      tokenUrl: ext?.protocol === "oidc" ? ext.tokenUrl : null, jwksUrl: ext?.protocol === "oidc" ? ext.jwksUrl : null,
+      idpCert: ext?.protocol === "saml" ? ext.idpCert : null,
+      scopes: ext?.protocol === "oidc" ? ext.scopes : "",
       preflightOk: check.ok, preflightDetail: check.detail } });
     await audit(tx, ctx, requestId, "sso.provider_created", "ssoProvider", created.id, ["name", "issuer", "clientId", "protocol"]);
     assertFileDeadlines(actor.deadlines);
@@ -186,7 +198,7 @@ export async function preflightSsoProvider(ctx: Context, id: string, requestId: 
     assertFileDeadlines(actor.deadlines);
     return row;
   });
-  const check = await preflight(snapshot);
+  const check = isVirtualOrgProtocol(snapshot.protocol) ? { ok: true, detail: VIRTUAL_ORG_DETAIL } : await preflight(snapshot);
   return db.$transaction(async tx => {
     const actor = await lockSsoActor(tx, ctx, true);
     const row = await providerForUpdate(tx, ctx, id);
@@ -268,7 +280,10 @@ export async function startSso(providerId: string, mode: string, headers: Header
     const params = new URLSearchParams({ response_type: "code", client_id: provider.clientId,
       redirect_uri: baseUrl() + "/api/v1/auth/sso/callback", scope: provider.scopes, state, nonce,
       code_challenge: createHash("sha256").update(verifier).digest("base64url"), code_challenge_method: "S256" });
-    const redirect = provider.protocol === "saml"
+    // 가상 조직 인증은 외부 IdP가 없다 — mock 디렉터리 로그인 화면으로 state를 넘긴다.
+    const redirect = isVirtualOrgProtocol(provider.protocol)
+      ? orgLoginPath(provider.protocol) + "?state=" + encodeURIComponent(state)
+      : provider.protocol === "saml"
       ? await samlFor(provider, requestId).getAuthorizeUrlAsync(state, undefined, {})
       : provider.authorizationUrl + (provider.authorizationUrl.includes("?") ? "&" : "?") + params;
     if (linkActor) { assertFileDeadlines(linkActor.deadlines); assertFreshSsoSession(linkContext!.session); }
@@ -351,7 +366,7 @@ export async function handleSsoCallback(query: URLSearchParams, headers: Headers
     headers);
 }
 
-type SsoSubject = { sub: string; iss: string; email?: string; name?: string; emailVerified: boolean };
+export type SsoSubject = { sub: string; iss: string; email?: string; name?: string; emailVerified: boolean };
 
 async function linkActorForState(tx: Transaction, provider: SsoProvider, state: SsoState, headers: Headers) {
   if (!state.userId || !state.sessionId) fail(401, "LINK_SESSION_REQUIRED", "계정 연결을 다시 시작해주세요.");
@@ -377,7 +392,7 @@ async function lockSsoInvitation(tx: Transaction, provider: SsoProvider, state: 
     fail(410, "INVITATION_UNAVAILABLE", "초대가 만료되었거나 이 계정의 초대가 아닙니다.");
   return invitation;
 }
-async function completeSso(initialProvider: SsoProvider, state: SsoState, subject: SsoSubject, headers: Headers) {
+export async function completeSso(initialProvider: SsoProvider, state: SsoState, subject: SsoSubject, headers: Headers) {
   const accountKey = subject.iss + "|" + subject.sub;
   return db.$transaction(async tx => {
     await lockSsoCompany(tx, initialProvider.tenantId, headers);

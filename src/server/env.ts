@@ -23,6 +23,9 @@ const schema = z.object({
   KAKAO_UNIT_COST_KRW: z.coerce.number().int().min(0).max(1000000).default(0),
   LOCAL_KAKAO_DIR: z.string().default(".local/kakao"),
   KAKAO_REVIEW_SECRET: z.string().min(32).max(128).optional(),
+  // 가상 PG(local)는 서버가 내부 서명 이벤트를 발행하는 mock — 실제 서명 검증
+  // 경로(applyPaymentEvent)를 그대로 탄다. 운영에서는 ALLOW_LOCAL_PAYMENT=1 없이 차단.
+  PAYMENT_PROVIDER: z.enum(["unconfigured", "local", "webhook"]).default("unconfigured"),
   PAYMENT_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
@@ -60,4 +63,7 @@ if (process.env.NODE_ENV === "production" && env.MAIL_TRANSPORT === "local" && !
 }
 if (process.env.NODE_ENV === "production" && env.KAKAO_PROVIDER === "local" && !process.env.ALLOW_LOCAL_KAKAO) {
   throw new Error("운영 환경은 카카오 공급자 연결이 필요합니다. 로컬 발송은 ALLOW_LOCAL_KAKAO=1을 사용하세요.");
+}
+if (process.env.NODE_ENV === "production" && env.PAYMENT_PROVIDER === "local" && !process.env.ALLOW_LOCAL_PAYMENT) {
+  throw new Error("운영 환경은 결제 공급자 연결이 필요합니다. 가상 결제는 ALLOW_LOCAL_PAYMENT=1을 사용하세요.");
 }

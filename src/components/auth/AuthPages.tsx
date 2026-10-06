@@ -8,6 +8,7 @@ import { authPath } from "@/lib/return-to";
 import { InvitationAccept } from "./InvitationAccept";
 import { useEffect, useState, type ReactNode } from "react";
 import {LoginForm, SignupOrResetForm, PasswordForm, VerificationForm, MfaForm, LogoutForm, AuthCallbackError} from "./LiveAuth";
+import { api, errorText } from "@/lib/api";
 import "./auth.css";
 
 const A = "/assets/img/catchsecu/";
@@ -31,6 +32,42 @@ function Verification({email=false}:{email?:boolean}){return <Frame><Card><h1>{e
 function TwoStep(){return <Frame><Card><h1>2단계 인증 설정</h1><MfaForm/></Card></Frame>}
 function ChangePassword(){return <Frame><Card><h1>비밀번호 변경</h1><PasswordForm/></Card></Frame>}
 function RecoverOrSignup({signup=false}:{signup?:boolean}){const returnTo=useSearchParams().get("returnTo");return <Frame><Card><h1>{signup?'회원가입':'비밀번호 찾기'}</h1><SignupOrResetForm signup={signup}/><Link className="auth-back" href={authPath("/login", returnTo)}>로그인으로 돌아가기</Link></Card></Frame>}
+// 가상 조직 인증 — 외부 GPKI·새올·그룹웨어 기관 미연동 상태에서
+// mock 디렉터리(VirtualOrgMember)로 login/verified/fail/email-register 경로를 검증한다.
+const ORG_PROTOCOLS: Record<string, { protocol: "gpki" | "saeol" | "groupware"; label: string }> = {
+  "/login/gpki": { protocol: "gpki", label: "GPKI" }, "/gpki": { protocol: "gpki", label: "GPKI" },
+  "/login/saeol": { protocol: "saeol", label: "새올" }, "/saeol": { protocol: "saeol", label: "새올" },
+  "/gwloginUser/login": { protocol: "groupware", label: "그룹웨어" },
+};
+type OrgLoginResult = { status: "verified" | "email-register"; redirect?: string; ticket?: string };
+function OrgLoginForm({ protocol, label }: { protocol: string; label: string }) {
+  const state = useSearchParams().get("state") ?? undefined;
+  const [orgCode, setOrgCode] = useState(""), [employeeNo, setEmployeeNo] = useState(""), [pin, setPin] = useState("");
+  const [ticket, setTicket] = useState(""), [email, setEmail] = useState(""), [error, setError] = useState(""), [pending, setPending] = useState(false);
+  const post = async (path: string, value: unknown) => api<OrgLoginResult>(path, { method: "POST", body: JSON.stringify(value) });
+  async function run(path: string, value: unknown) {
+    setPending(true); setError("");
+    try {
+      const result = await post(path, value);
+      if (result.status === "verified") window.location.assign(result.redirect ?? "/dashboard");
+      else setTicket(result.ticket ?? "");
+    } catch (cause) { setError(errorText(cause)); }
+    finally { setPending(false); }
+  }
+  return <form onSubmit={event => { event.preventDefault(); void run(
+      ticket ? "/auth/org/email-register" : "/auth/org/login",
+      ticket ? { ticket, email } : { protocol, orgCode, employeeNo, pin, ...(state ? { state } : {}) }); }}>
+    <p className="auth-note">가상 인증 — 외부 {label} 기관 미연동. mock 디렉터리에 등록된 계정만 로그인됩니다.</p>
+    {ticket
+      ? <><input className="auth-email" type="email" name="email" aria-label="이메일" placeholder="등록할 이메일을 입력해주세요" required value={email} onChange={event => setEmail(event.target.value)} />
+        <p className="auth-note">디렉터리에 이메일이 없습니다. 등록하면 계정에 연결됩니다.</p></>
+      : <><input className="auth-email" name="orgCode" aria-label="조직 식별자" placeholder="조직 식별자" required value={orgCode} onChange={event => setOrgCode(event.target.value)} />
+        <input className="auth-email" name="employeeNo" aria-label="사번" placeholder="사번" required value={employeeNo} onChange={event => setEmployeeNo(event.target.value)} />
+        <input className="auth-email" name="pin" type="password" aria-label="인증번호" placeholder="인증번호" required minLength={4} maxLength={64} value={pin} onChange={event => setPin(event.target.value)} /></>}
+    {error && <p role="alert" className="auth-error">{error}</p>}
+    <button disabled={pending} className="auth-primary auth-block">{pending ? "인증 중…" : ticket ? "이메일 등록" : `${label} 인증 로그인`}</button>
+  </form>;
+}
 export function AuthPages({ path }: { path: string }) {
  if(path === "/oauth2/invite/signup")return <Frame><Card><InvitationAccept/></Card></Frame>;
  if (["/login/oauth2", "/login/saml", "/login/saml/start"].includes(path)) return <Frame><Card><h1>회사 SSO 로그인</h1><AuthCallbackError/><SsoStartForm/></Card></Frame>;
@@ -45,6 +82,8 @@ export function AuthPages({ path }: { path: string }) {
  if (path === "/password-change-email") return <RecoverOrSignup />;
  if (path === "/signup" || path.startsWith("/oauth2/") && path.includes("signup")) return <RecoverOrSignup signup />;
  if (path === "/not-allow-ip") return <Frame><Card><h1>허용되지 않은 IP 접근 제한</h1><p className="auth-description">회사에서 허용한 IP 주소에서 접속해주세요. 다른 소속 회사의 접근 권한이 있다면 회사를 변경할 수 있습니다.</p><IpDeniedCompanies/></Card></Frame>;
+ const org = ORG_PROTOCOLS[path];
+ if (org) return <Frame><Card><h1>{org.label} 조직 인증</h1><OrgLoginForm protocol={org.protocol} label={org.label}/></Card></Frame>;
  if (path.includes("fail")) return <Message title="로그인에 실패했습니다. 다시 시도해 주세요." />;
  if (path.startsWith("/expire")) return <Message title="인증 시간이 만료되었습니다." description="로그인 화면에서 다시 시작해주세요." />;
  return <Message title="외부 인증이 필요합니다." description="이 인증 공급자는 아직 연결되지 않았습니다. 이메일 계정으로 로그인할 수 있습니다." />;

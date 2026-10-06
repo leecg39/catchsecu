@@ -8,6 +8,11 @@ import { ActionButton, EmptyState, Modal, PageHeading, Panel } from "../shared";
 import { useConfirm } from "../ux/confirm";
 
 type ListResponse = { items: SsoProviderRecord[] };
+const VIRTUAL_PROTOCOLS = new Set(["gpki", "saeol", "groupware"]);
+const isVirtual = (protocol: string) => VIRTUAL_PROTOCOLS.has(protocol);
+const PROTOCOL_LABELS: Record<string, string> = { oidc: "OIDC", saml: "SAML 2.0", gpki: "가상 GPKI", saeol: "가상 새올", groupware: "가상 그룹웨어" };
+const ORG_LOGIN_PATHS: Record<string, string> = { gpki: "/login/gpki", saeol: "/login/saeol", groupware: "/gwloginUser/login" };
+type OrgMember = { id: string; orgCode: string; employeeNo: string; name: string; email: string | null; version: number };
 
 export function SsoProviders({ settings = false }: { settings?: boolean }) {
   const app = useApplication();
@@ -18,6 +23,7 @@ function SsoContent({ settings }: { settings: boolean }) {
   const app = useApplication();
   const canManage = !!app.data?.capabilities.includes("security.write");
   const [edit, setEdit] = useState<SsoProviderRecord | null | undefined>(settings ? null : undefined);
+  const [directory, setDirectory] = useState<SsoProviderRecord | undefined>();
   const [reauth, setReauth] = useState(false);
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [notice, setNotice] = useState("");
   const ask = useConfirm();
@@ -64,13 +70,14 @@ function SsoContent({ settings }: { settings: boolean }) {
             </tr></thead><tbody>
               {items.map(row => <tr key={row.id}>
                 <td>{row.name}</td>
-                <td>{row.protocol.toUpperCase()}</td>
+                <td>{PROTOCOL_LABELS[row.protocol] ?? row.protocol.toUpperCase()}</td>
                 <td className="sso-issuer">{row.issuer}</td>
-                <td><code className="sso-login-url">/api/v1/auth/sso/{row.id}?mode=login</code></td>
+                <td><code className="sso-login-url">{isVirtual(row.protocol) ? ORG_LOGIN_PATHS[row.protocol] : `/api/v1/auth/sso/${row.id}?mode=login`}</code></td>
                 <td>{row.preflightOk ? <span className="sso-ok">통과</span> : <span className="sso-fail" title={row.preflightDetail}>미통과 — {row.preflightDetail}</span>}</td>
                 <td>{row.enabled ? "사용" : "사용 안 함"}</td>
                 <td>{new Date(row.createdAt).toLocaleDateString("ko-KR")}</td>
                 {canManage && <td><div className="mg-flex">
+                  {isVirtual(row.protocol) && <ActionButton secondary disabled={busy} onClick={() => setDirectory(row)}>디렉터리</ActionButton>}
                   <ActionButton secondary disabled={busy} onClick={() => void preflight(row)}>사전검사</ActionButton>
                   <ActionButton secondary disabled={busy || (!row.enabled && !row.preflightOk)}
                     title={!row.enabled && !row.preflightOk ? "사전검사를 먼저 통과해야 합니다" : undefined}
@@ -83,14 +90,66 @@ function SsoContent({ settings }: { settings: boolean }) {
           : <EmptyState text="등록한 SSO 연결이 없습니다." />}</Panel>}
     {edit !== undefined && <ProviderEditor key={edit?.id ?? "new"} row={edit}
       onClose={() => { setEdit(undefined); result.reload(); }} onSaved={m => { setEdit(undefined); setNotice(m); result.reload(); }} />}
+    {directory && <OrgDirectory key={directory.id} provider={directory} onClose={() => setDirectory(undefined)} />}
   </>;
 }
 
-function ProviderEditor({ row, onClose, onSaved }: { row: SsoProviderRecord | null; onClose: () => void; onSaved: (message: string) => void }) {
-  const [protocol, setProtocol] = useState<"oidc" | "saml">(row?.protocol ?? "oidc");
+// 가상 조직 인증 디렉터리 — mock DB. 등록된 구성원만 조직 인증을 통과한다.
+function OrgDirectory({ provider, onClose }: { provider: SsoProviderRecord; onClose: () => void }) {
+  const result = useResource<{ items: OrgMember[] }>(`/security/sso/${provider.id}/directory`);
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
   const key = useRef(crypto.randomUUID());
-  const saml = protocol === "saml";
+  const ask = useConfirm();
+
+  async function save(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    setBusy(true); setError("");
+    try {
+      await api(`/security/sso/${provider.id}/directory`, { method: "POST", headers: { "Idempotency-Key": key.current },
+        body: JSON.stringify({ orgCode: String(form.get("orgCode") ?? "").trim(), employeeNo: String(form.get("employeeNo") ?? "").trim(),
+          name: String(form.get("name") ?? "").trim(), ...(String(form.get("email") ?? "").trim() ? { email: String(form.get("email")).trim() } : {}),
+          pin: String(form.get("pin") ?? "") }) });
+      (event.target as HTMLFormElement).reset(); key.current = crypto.randomUUID(); result.reload();
+    } catch (cause) { setError(errorText(cause)); }
+    finally { setBusy(false); }
+  }
+  const remove = async (row: OrgMember) => {
+    if (!await ask({ title: "디렉터리 구성원 삭제", message: `${row.name}(${row.orgCode}/${row.employeeNo})의 조직 인증을 해제합니다.`, confirmLabel: "삭제" })) return;
+    setBusy(true); setError("");
+    try { await api(`/security/sso/${provider.id}/directory/${row.id}`, { method: "DELETE", body: JSON.stringify({ version: row.version }) }); result.reload(); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "삭제하지 못했습니다."); }
+    finally { setBusy(false); }
+  };
+
+  return <Modal title={`가상 디렉터리 — ${provider.name}`} onClose={() => { if (!busy) onClose(); }}>
+    <p className="mg-description">mock 디렉터리 — 여기 등록된 조직 식별자+사번+인증번호만 로그인을 통과합니다. 이메일을 비우면 첫 로그인 시 등록 화면이 나옵니다.</p>
+    {error && <p role="alert">{error}</p>}
+    {result.data?.items.length ? <div className="mg-table-wrap"><table className="cs-table"><thead><tr>
+        <th>조직 식별자</th><th>사번</th><th>이름</th><th>이메일</th><th>관리</th></tr></thead><tbody>
+        {result.data.items.map(row => <tr key={row.id}>
+          <td>{row.orgCode}</td><td>{row.employeeNo}</td><td>{row.name}</td>
+          <td>{row.email ?? "미등록 — 첫 로그인 시 등록"}</td>
+          <td><ActionButton secondary disabled={busy} onClick={() => void remove(row)}>삭제</ActionButton></td></tr>)}
+      </tbody></table></div> : <EmptyState text="등록된 디렉터리 구성원이 없습니다." />}
+    <form onSubmit={e => void save(e)}>
+      <fieldset disabled={busy} className="policy-fields">
+        <label>조직 식별자<input className="cs-input" name="orgCode" required minLength={2} maxLength={60} placeholder="예: CATCH-SEOUL" /></label>
+        <label>사번<input className="cs-input" name="employeeNo" required minLength={2} maxLength={60} placeholder="예: EMP-001" /></label>
+        <label>이름<input className="cs-input" name="name" required maxLength={100} /></label>
+        <label>이메일 (비우면 첫 로그인 시 등록)<input className="cs-input" name="email" type="email" maxLength={320} /></label>
+        <label>인증번호 (4자 이상)<input className="cs-input" name="pin" type="password" required minLength={4} maxLength={64} autoComplete="new-password" /></label>
+      </fieldset>
+      <div className="mg-flex"><ActionButton type="submit" disabled={busy}>디렉터리에 등록</ActionButton></div>
+    </form>
+  </Modal>;
+}
+
+function ProviderEditor({ row, onClose, onSaved }: { row: SsoProviderRecord | null; onClose: () => void; onSaved: (message: string) => void }) {
+  const [protocol, setProtocol] = useState<SsoProviderRecord["protocol"]>(row?.protocol ?? "oidc");
+  const [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const key = useRef(crypto.randomUUID());
+  const saml = protocol === "saml", virtual = isVirtual(protocol);
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -107,13 +166,13 @@ function ProviderEditor({ row, onClose, onSaved }: { row: SsoProviderRecord | nu
         onSaved(saved.preflightOk ? "SSO 연결을 수정했습니다."
           : "SSO 연결을 수정했습니다. 사전검사를 통과한 뒤 사용을 활성화해주세요.");
       } else {
-        const body: Record<string, unknown> = {
-          protocol, name: text("name"), issuer: text("issuer"), clientId: text("clientId"),
-          authorizationUrl: text("authorizationUrl"),
-        };
+        const body: Record<string, unknown> = virtual
+          ? { protocol, name: text("name") }
+          : { protocol, name: text("name"), issuer: text("issuer"), clientId: text("clientId"),
+            authorizationUrl: text("authorizationUrl") };
         if (text("clientSecret")) body.clientSecret = text("clientSecret");
         if (saml) body.idpCert = text("idpCert");
-        else Object.assign(body, { tokenUrl: text("tokenUrl"), jwksUrl: text("jwksUrl"), scopes: text("scopes") || "openid profile email" });
+        else if (!virtual) Object.assign(body, { tokenUrl: text("tokenUrl"), jwksUrl: text("jwksUrl"), scopes: text("scopes") || "openid profile email" });
         const created = await api<SsoProviderRecord & { preflight?: { ok: boolean; detail: string } }>("/security/sso",
           { method: "POST", headers: { "Idempotency-Key": key.current }, body: JSON.stringify(body) });
         onSaved(created.preflight && !created.preflight.ok
@@ -130,11 +189,15 @@ function ProviderEditor({ row, onClose, onSaved }: { row: SsoProviderRecord | nu
       {row && <p className="mg-description">인증서·시크릿·스코프를 변경하면 새 로그인과 진행 중 인증이 중지됩니다. 기존 로그인은 유지됩니다. 활성 구성원의 다른 로그인 수단을 먼저 준비하고, 저장 후 사전검사를 통과해 사용을 다시 활성화해주세요.</p>}
       <fieldset disabled={busy} className="policy-fields">
         {!row && <label>프로토콜<select className="cs-input" name="protocol" value={protocol}
-          onChange={e => setProtocol(e.target.value as "oidc" | "saml")}>
+          onChange={e => setProtocol(e.target.value as SsoProviderRecord["protocol"])}>
           <option value="oidc">OIDC (OpenID Connect)</option><option value="saml">SAML 2.0</option>
+          <option value="gpki">가상 GPKI (mock 디렉터리)</option>
+          <option value="saeol">가상 새올 (mock 디렉터리)</option>
+          <option value="groupware">가상 그룹웨어 (mock 디렉터리)</option>
         </select></label>}
+        {virtual && <p className="mg-description">가상 어댑터 — 외부 기관 미연동. 등록 후 목록의 “디렉터리”에서 mock 구성원을 추가해야 로그인이 동작합니다.</p>}
         <label>표시 이름<input className="cs-input" name="name" required maxLength={60} defaultValue={row?.name} placeholder="예: 본사 Entra ID" /></label>
-        {!row && <>
+        {!row && !virtual && <>
           <label>Issuer<input className="cs-input" name="issuer" required maxLength={500}
             placeholder={saml ? "IdP 엔터티 ID (예: https://idp.example.com/metadata)" : "https://idp.example.com"} /></label>
           <label>클라이언트 ID<input className="cs-input" name="clientId" required maxLength={300}
@@ -152,8 +215,8 @@ function ProviderEditor({ row, onClose, onSaved }: { row: SsoProviderRecord | nu
               </>}
         </>}
         {row && <>
-          {!saml && <label>스코프<input className="cs-input" name="scopes" maxLength={300} defaultValue={row.scopes} /></label>}
-          <label>클라이언트 시크릿 교체 (비우면 유지)<input className="cs-input" name="clientSecret" type="password" maxLength={500} autoComplete="new-password" /></label>
+          {!saml && !virtual && <label>스코프<input className="cs-input" name="scopes" maxLength={300} defaultValue={row.scopes} /></label>}
+          {!virtual && <label>클라이언트 시크릿 교체 (비우면 유지)<input className="cs-input" name="clientSecret" type="password" maxLength={500} autoComplete="new-password" /></label>}
           {saml && <label>IdP 서명 인증서 교체 (비우면 유지 — 교체 시 사전검사 재실행 필요)<textarea className="cs-input sso-cert" name="idpCert"
             placeholder={"-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"} /></label>}
         </>}

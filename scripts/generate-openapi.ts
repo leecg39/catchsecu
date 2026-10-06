@@ -1,5 +1,5 @@
 import { paymentMethodCreate, paymentMethodUpdate, paymentMethodRemove } from "../src/contracts/payment-methods";
-import { ssoAccountUnlink, ssoInvitationToken, ssoInvitationStart, ssoProviderCreate, ssoProviderPatch, ssoProviderRemove, ssoProviderRecord, ssoProviderCheckedRecord, ownSsoAccounts } from "../src/contracts/sso";
+import { ssoAccountUnlink, ssoInvitationToken, ssoInvitationStart, ssoProviderCreate, ssoProviderPatch, ssoProviderRemove, ssoProviderRecord, ssoProviderCheckedRecord, ownSsoAccounts, orgMemberCreate, orgMemberRemove, orgLoginBody, orgEmailRegisterBody } from "../src/contracts/sso";
 import { reviewCreate, reviewAction, reviewQuery, reviewNotify, reviewDestruction } from "../src/contracts/activity-reviews";
 import { contextSelectionInput } from "../src/contracts/context";
 import { mfaPolicyChange,mfaExceptionCreate,mfaExceptionPatch,mfaExceptionDelete,mfaMemberQuery } from "../src/contracts/mfa-policy";
@@ -954,6 +954,8 @@ add("/billing/orders", "post", "billing.write + current tenant", "현재 권한�
 add("/billing/orders/{id}", "get", "billing.read", "결제 상태. result=success 쿼리는 무시하고 paid로 바꾸지 않음", undefined, "implemented");
 add("/billing/orders/{id}/return", "post", "billing.write", "성공 복귀 주소는 결제를 확정하지 않음", z.object({ result: z.enum(["success", "fail"]) }).strict(), "implemented");
 add("/billing/provider-events", "post", "signed payment webhook", "서명된 결제 결과만 반영. 중복은 같은 상태, 종료 후 다른 결과는 409", z.object({ orderId: z.uuid(), eventId: z.string(), outcome: z.enum(["paid", "failed"]) }).strict(), "implemented", "202");
+add("/billing/orders/{id}/virtual-checkout", "post", "billing.write + PAYMENT_PROVIDER=local", "가상 PG 체크아웃(mock) — 내부 서명 이벤트를 실제 서명 검증 경로(applyPaymentEvent)에 적용. providerEventId는 vpg: 접두사", z.object({ outcome: z.enum(["paid", "failed"]) }).strict(), "implemented");
+add("/billing/refunds/{id}/virtual-settle", "post", "billing.write + PAYMENT_PROVIDER=local", "가상 환불 정산(mock) — 요청 중인 환불을 내부 서명 이벤트로 확정/거절", z.object({ outcome: z.enum(["refunded", "refund_rejected"]) }).strict(), "implemented");
 add("/subscriptions/entitlement", "get", "billing.read + current tenant", "회사별 실제 entitlement", undefined, "implemented");
 for (const [action, schema] of [["cancel", cancelRequest], ["undo-cancel", cancelRequest], ["schedule-cancel", scheduleTrialCancelRequest]] as const)
   add("/subscriptions/{id}/" + action, "post", "billing.write + current tenant", "무료/유료 구독의 " + action + " 전이. 현재 권한·최종 기한 검사, version 충돌409. 같은 키 재전송은 최신 상태 반환; schedule-cancel 사유도 요청 해시에 포함", schema, "implemented");
@@ -1058,6 +1060,11 @@ add("/security/sso", "post", "current direct owner + security.write", "비활성
 add("/security/sso/{id}", "patch", "current direct owner + security.write", "version 확인 후 변경; 사용 중 공급자의 수동 비활성화/인증정보 변경은 대체 로그인 검사·SERIALIZABLE 경합 보호. 인증정보 변경은 비활성화·사전검사 초기화. 기존 세션은 유지, 대기 인증은 version 재검사로 차단", ssoProviderPatch, "implemented");
 add("/security/sso/{id}", "delete", "current direct owner + security.write + login within 5 minutes", "대체 로그인 검사 후 공급자·연결 계정·영향 사용자 세션/대기 인증을 원자 정리", ssoProviderRemove, "implemented");
 add("/security/sso/{id}/preflight", "post", "current direct owner + security.write", "JWKS 또는 인증서 사전검사, 검사 전후 version·권한 확인; 실패하면 비활성화", undefined, "implemented");
+add("/security/sso/{id}/directory", "get", "current direct membership + security.read", "가상 조직 인증(gpki·saeol·groupware) mock 디렉터리 구성원 목록", undefined, "implemented");
+add("/security/sso/{id}/directory", "post", "current direct membership + security.write", "가상 디렉터리 구성원 등록; 조직 식별자+사번 전역 유일, PIN은 해시만 저장", orgMemberCreate, "implemented", "201");
+add("/security/sso/{id}/directory/{memberId}", "delete", "current direct membership + security.write", "version 확인 후 디렉터리 구성원 삭제", orgMemberRemove, "implemented");
+add("/auth/org/login", "post", "public + rate limit", "가상 조직 인증 로그인 — mock 디렉터리 자격 확인 후 completeSso 실제 경로. 이메일 미등록은 email-register 티켓", orgLoginBody, "implemented");
+add("/auth/org/email-register", "post", "one-time unexpired ticket + rate limit", "디렉터리 이메일 등록 후 completeSso 실제 경로로 완료", orgEmailRegisterBody, "implemented");
 add("/auth/sso/{providerId}", "get", "login: public; link: current direct member + login within 5 minutes", "회사 OIDC/SAML 인증 시작; invite는 토큰 POST API를 사용", undefined, "implemented", "302");
 (paths["/auth/sso/{providerId}"].get as Operation).parameters = [{ in: "query", name: "mode", schema: { type: "string", enum: ["login", "link"], default: "login" } }];
 paths["/auth/sso/{providerId}"].parameters = [{ in: "path", name: "providerId", required: true, schema: { type: "string", format: "uuid" } }];

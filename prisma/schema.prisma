@@ -845,6 +845,7 @@ model SsoProvider {
   updatedAt    DateTime @updatedAt
   states       SsoState[]
   accounts     Account[]
+  orgMembers   VirtualOrgMember[]
   @@unique([tenantId, id])
   @@index([tenantId, enabled])
 }
@@ -865,9 +866,30 @@ model SsoState {
   invitationId String?
   invitationVersion Int?
   invitationTokenHash String?
+  orgMemberId String?
   expiresAt   DateTime
   createdAt   DateTime @default(now())
   @@index([expiresAt])
+}
+
+// 가상 조직 인증 디렉터리 — GPKI·새올·그룹웨어 외부 기관 미연동 상태에서
+// login/verified/fail/email-register 경로를 실제 DB·세션으로 검증하기 위한
+// mock 디렉터리. protocol이 "gpki"/"saeol"/"groupware"인 SsoProvider에만 속한다.
+model VirtualOrgMember {
+  id          String   @id @default(uuid())
+  tenantId    String
+  providerId  String
+  provider    SsoProvider @relation(fields: [tenantId, providerId], references: [tenantId, id], onDelete: Cascade)
+  orgCode     String
+  employeeNo  String
+  nameCipher  String
+  emailCipher String?
+  pinHash     String
+  version     Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@unique([providerId, orgCode, employeeNo])
+  @@unique([orgCode, employeeNo])
 }
 
 model PasswordHistory {

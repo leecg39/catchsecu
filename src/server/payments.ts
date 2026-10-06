@@ -9,6 +9,7 @@ import { lockBillingActor, withBillingAccess } from "./billing-access";
 import { assertFileDeadlines } from "./file-access";
 import { idempotent } from "./idempotency";
 import { postLedgerTransfer } from "./ledger";
+import { env } from "./env";
 
 const providerEvent = z.object({
   orderId: z.uuid(),
@@ -60,7 +61,8 @@ export async function listPaymentOrders(ctx: Context) {
       include: { subscription: { include: { plan: { select: { name: true } } } }, refunds: { where: { status: "refunded" }, select: { amount: true } } },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 100 });
     return { items: rows.map(row => ({ ...dto(row), planName: row.subscription.plan.name,
-      refundedTotal: row.refunds.reduce((sum, r) => sum + r.amount, 0) })) };
+      refundedTotal: row.refunds.reduce((sum, r) => sum + r.amount, 0) })),
+      virtual: virtualPaymentEnabled() };
   });
 }
 export async function readPaymentOrder(ctx: Context, id: string) {
@@ -77,6 +79,43 @@ export async function rejectPaymentReturn(ctx: Context, id: string) {
     if (row.status === "pending") fail(409, "PAYMENT_UNCONFIRMED", "결제 성공 주소만으로는 결제를 확정할 수 없습니다.");
     return dto(row);
   });
+}
+// ---- 가상 PG(local mock) ----
+// PAYMENT_PROVIDER=local일 때만 동작한다. 서버가 내부 서명 이벤트를 발행해 실제
+// 서명 검증 경로(applyPaymentEvent)를 그대로 탄다 — 가상 우회로 paid를 만들지 않는다.
+// providerEventId의 "vpg:" 접두사로 실제 공급자 이벤트와 구분된다.
+export const virtualPaymentEnabled = () => env.PAYMENT_PROVIDER === "local";
+const virtualSecret = () => env.PAYMENT_WEBHOOK_SECRET
+  ?? createHmac("sha256", env.DATA_ENCRYPTION_KEY).update("virtual-pg-signing").digest("hex");
+async function applyVirtualEvent(orderId: string, outcome: "paid" | "failed" | "refunded" | "refund_rejected", refundId: string | undefined, requestId: string) {
+  const event = JSON.stringify({ orderId, eventId: "vpg:" + randomUUID(), outcome, ...(refundId ? { refundId } : {}) });
+  const signature = createHmac("sha256", virtualSecret()).update(event).digest("hex");
+  return applyPaymentEvent(event, signature, virtualSecret(), requestId);
+}
+export async function virtualPaymentCheckout(ctx: Context, orderId: string, outcome: "paid" | "failed", requestId: string) {
+  if (!virtualPaymentEnabled()) fail(404, "NOT_FOUND", "가상 결제가 설정되지 않았습니다.");
+  await withBillingAccess(ctx, "billing.write", async tx => {
+    const row = await tx.paymentOrder.findFirst({ where: { id: orderId, tenantId: ctx.tenantId } });
+    if (!row) fail(404, "NOT_FOUND", "결제 주문을 찾을 수 없습니다.");
+    if (row.status !== "pending") fail(409, "OUT_OF_ORDER", "이미 종료된 결제입니다.");
+  });
+  const result = await applyVirtualEvent(orderId, outcome, undefined, requestId);
+  await audit(db, { tenantId: ctx.tenantId, user: { id: ctx.user.id } }, requestId,
+    "billing.virtual_checkout", "paymentOrder", orderId, ["status"]);
+  return result;
+}
+export async function virtualRefundSettle(ctx: Context, refundId: string, outcome: "refunded" | "refund_rejected", requestId: string) {
+  if (!virtualPaymentEnabled()) fail(404, "NOT_FOUND", "가상 결제가 설정되지 않았습니다.");
+  const orderId = await withBillingAccess(ctx, "billing.write", async tx => {
+    const refund = await tx.paymentRefund.findFirst({ where: { id: refundId, tenantId: ctx.tenantId } });
+    if (!refund) fail(404, "NOT_FOUND", "환불 요청을 찾을 수 없습니다.");
+    if (refund.status !== "requested") fail(409, "OUT_OF_ORDER", "이미 종료된 환불입니다.");
+    return refund.orderId;
+  });
+  const result = await applyVirtualEvent(orderId, outcome, refundId, requestId);
+  await audit(db, { tenantId: ctx.tenantId, user: { id: ctx.user.id } }, requestId,
+    "billing.virtual_refund_settle", "paymentRefund", refundId, ["status"]);
+  return result;
 }
 function signaturesMatch(secret: string, body: string, signature: string) {
   const expected = createHmac("sha256", secret).update(body).digest("hex");

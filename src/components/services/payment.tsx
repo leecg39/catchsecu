@@ -185,7 +185,7 @@ function PaymentMethodsPanel({ methods }: { methods: ReturnType<typeof useResour
 }
 
 function PaymentOrdersPanel({ onChanged }: { onChanged: () => void }) {
-  const orders = useResource<{ items: PaymentOrderListItem[] }>("/billing/orders");
+  const orders = useResource<{ items: PaymentOrderListItem[]; virtual?: boolean }>("/billing/orders");
   const [busy, setBusy] = useState<string | null>(null), [notice, setNotice] = useState(""), [refunds, setRefunds] = useState<Record<string, RefundRecord[]>>({});
   const orderStatus: Record<string, string> = { pending: "승인 대기", paid: "결제 완료", failed: "결제 실패" };
   async function refund(orderId: string, form: HTMLFormElement) {
@@ -199,6 +199,20 @@ function PaymentOrdersPanel({ onChanged }: { onChanged: () => void }) {
       setRefunds(prev => ({ ...prev, [orderId]: list.items }));
     } catch (error) { setNotice(errorText(error)); } finally { setBusy(null); }
   }
+  async function virtualCheckout(orderId: string, outcome: "paid" | "failed") {
+    setBusy(orderId); setNotice("");
+    try {
+      await api(`/billing/orders/${orderId}/virtual-checkout`, { method: "POST", body: JSON.stringify({ outcome }) });
+      setNotice(outcome === "paid" ? "가상 결제를 승인했습니다(실제 PG 아님)." : "가상 결제를 실패 처리했습니다."); orders.reload(); onChanged();
+    } catch (error) { setNotice(errorText(error)); } finally { setBusy(null); }
+  }
+  async function virtualSettle(refundId: string, outcome: "refunded" | "refund_rejected") {
+    setBusy(refundId); setNotice("");
+    try {
+      await api(`/billing/refunds/${refundId}/virtual-settle`, { method: "POST", body: JSON.stringify({ outcome }) });
+      setNotice(outcome === "refunded" ? "가상 환불을 승인했습니다(실제 PG 아님)." : "가상 환불을 거절했습니다."); orders.reload(); onChanged();
+    } catch (error) { setNotice(errorText(error)); } finally { setBusy(null); }
+  }
   return <Panel title="결제 주문">
     {orders.loading && <p role="status">주문을 불러오는 중입니다.</p>}
     {orders.error && <p role="alert">{orders.error.message}</p>}
@@ -207,6 +221,10 @@ function PaymentOrdersPanel({ onChanged }: { onChanged: () => void }) {
       <strong>{row.planName}</strong> {money(row.amount)} <span className="svc-badge">{orderStatus[row.status] ?? row.status}</span>
       {row.refundedTotal > 0 && <span className="svc-badge">환불 {row.refundedTotal.toLocaleString("ko-KR")}원</span>}
       {row.status === "pending" && <span className="svc-muted">PG 승인 대기 — 승인은 공급자 콜백으로만 확정됩니다.</span>}
+      {row.status === "pending" && orders.data?.virtual && <span className="mg-flex">
+        <ActionButton type="button" secondary disabled={busy !== null} onClick={() => void virtualCheckout(row.id, "paid")}>가상 승인</ActionButton>
+        <ActionButton type="button" secondary disabled={busy !== null} onClick={() => void virtualCheckout(row.id, "failed")}>가상 실패</ActionButton>
+        <span className="svc-muted">mock — 실제 PG 아님</span></span>}
       {row.status === "paid" && <>
         <a className="cs-button secondary" href={`/api/v1/billing/orders/${row.id}/invoice`} target="_blank" rel="noreferrer">청구서</a>
         <form className="svc-trial-cancel" onSubmit={event => { event.preventDefault(); refund(row.id, event.currentTarget); }}>
@@ -214,7 +232,11 @@ function PaymentOrdersPanel({ onChanged }: { onChanged: () => void }) {
           <label>사유 <input className="cs-input" type="text" name="reason" maxLength={500} required/></label>
           <ActionButton type="submit" secondary disabled={busy !== null}>환불 요청</ActionButton>
         </form>
-        {refunds[row.id]?.map(r => <p key={r.id} className="svc-muted">환불 {r.amount.toLocaleString("ko-KR")}원 — {r.status === "requested" ? "공급자 승인 대기" : r.status === "refunded" ? "환불 완료" : "환불 거절"}</p>)}
+        {refunds[row.id]?.map(r => <p key={r.id} className="svc-muted">환불 {r.amount.toLocaleString("ko-KR")}원 — {r.status === "requested" ? "공급자 승인 대기" : r.status === "refunded" ? "환불 완료" : "환불 거절"}
+          {r.status === "requested" && orders.data?.virtual && <>
+            {" "}<ActionButton type="button" secondary disabled={busy !== null} onClick={() => void virtualSettle(r.id, "refunded")}>가상 환불 승인</ActionButton>
+            {" "}<ActionButton type="button" secondary disabled={busy !== null} onClick={() => void virtualSettle(r.id, "refund_rejected")}>가상 거절</ActionButton>
+            {" "}<span className="svc-muted">mock</span></>}</p>)}
       </>}
     </li>)}</ul> : <p className="svc-muted">결제 주문이 없습니다.</p>)}
   </Panel>;
