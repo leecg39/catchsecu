@@ -1,0 +1,88 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:93904) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/kakao-templates.test.ts (17 tests | 4 failed) 8443ms
+   × 로컬 공급자는 채널 확인·심사·발송을 영수증과 함께 완료하고 반려 표지를 반려한다 459ms
+   × 단건 Mock 발송은 같은 키의 동시 재시도에 한 영수증과 감사만 저장한다 437ms
+   × Mock 발송의 버전·키 계약을 검사하고 현재 정책 회수 후 재생도 거절한다 369ms
+   × Mock 발송 감사 실패는 영수증·요청 키를 롤백하고 복구 후 같은 키로 처리한다 351ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > 로컬 공급자는 채널 확인·심사·발송을 영수증과 함께 완료하고 반려 표지를 반려한다
+TypeError: Cannot read properties of undefined (reading 'findUniqueOrThrow')
+ ❯ tests/server/kakao-templates.test.ts:85:47
+     83|     expect(delivery.status).toBe("local_delivered");
+     84|     expect(delivery.receiptId).toBe("local-kakao:" + delivery.id);
+     85|     const receipt = await db.kakaoMockReceipt.findUniqueOrThrow({ wher…
+       |                                               ^
+     86|     expect(receipt).toMatchObject({ templateId: template.id, channelId…
+     87|     const rejected = await (await create(req("/kakao/templates", cooki…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > 단건 Mock 발송은 같은 키의 동시 재시도에 한 영수증과 감사만 저장한다
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ tests/server/kakao-templates.test.ts:259:126
+    257|     const key = randomUUID(), replies = await Promise.all([send(cookie…
+    258|     expect(replies.map(r => r.status)).toEqual([200, 200]);
+    259|     const [first, second] = await Promise.all(replies.map(r => r.json(…
+       |                                                                                                                              ^
+    260|     const rows = await db.kakaoMockReceipt.findMany({ where: { templat…
+    261|     expect(rows[0].contentHash).toMatch(/^[a-f0-9]{64}$/); expect(JSON…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > Mock 발송의 버전·키 계약을 검사하고 현재 정책 회수 후 재생도 거절한다
+AssertionError: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ tests/server/kakao-templates.test.ts:276:93
+    274|     await db.kakaoTemplate.update({ where: { id: template.id }, data: …
+    275|     const path = "/kakao/templates/" + template.id + "/send";
+    276|     expect((await create(req(path, cookie, "POST", { version: template…
+       |                                                                                             ^
+    277|     expect((await create(req(path, cookie, "POST", {}, randomUUID())))…
+    278|     expect((await create(req(path, cookie, "POST", { version: template…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/kakao-templates.test.ts > Mock 발송 감사 실패는 영수증·요청 키를 롤백하고 복구 후 같은 키로 처리한다
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ tests/server/kakao-templates.test.ts:295:59
+    293|   await db.$executeRawUnsafe('CREATE TRIGGER qa_kakao_send_fault BEFOR…
+    294|   try {
+    295|     expect((await send(cookie, template.id, key)).status).toBe(500); e…
+       |                                                           ^
+    296|     expect(await db.idempotencyRecord.count({ where: { key } })).toBe(…
+    297|   } finally { await db.$executeRawUnsafe('DROP TRIGGER qa_kakao_send_f…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 13 passed (17)
+   Start at  16:59:01
+   Duration  9.59s (tests 89%, import 7%, transform 4%)
+

@@ -26,6 +26,7 @@ export const kakaoTemplateInput = z.object({
   buttons: kakaoButtons.default([]),
 }).strict();
 export const kakaoTemplatePatch = kakaoTemplateInput.omit({ serviceId: true, channelId: true }).extend({ version: z.number().int().positive() }).strict();
+export const kakaoSendInput = z.object({ version: z.number().int().positive() }).strict();
 export const kakaoPreviewInput = z.object({
   body: z.string().trim().min(1).max(1000),
   buttons: kakaoButtons.default([]),
@@ -43,3 +44,5 @@ export function kakaoVariables(body: string) {
 }
 export type KakaoChannelRecord = { id: string; serviceId: string; name: string; searchId: string; status: "pending" | "verified" | "archived"; version: number };
 export type KakaoTemplateRecord = { id: string; serviceId: string; channelId: string; channelName?: string; channelSearchId?: string; name: string; body: string; buttons: z.infer<typeof kakaoButtons>; status: "draft" | "submitted" | "rejected" | "approved" | "archived"; reviewNote: string; version: number };
+
+export type KakaoMockDelivery = { id: string; receiptId: string; serviceId: string; templateId: string; templateVersion: number; channelId: string; channelVersion: number; status: "local_delivered"; mock: true; createdAt: string };

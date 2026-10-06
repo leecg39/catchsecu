@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoTemplateInput, kakaoTemplatePatch } from "@/contracts/kakao";
+import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoSendInput, kakaoTemplateInput, kakaoTemplatePatch } from "@/contracts/kakao";
 import { requireContext } from "@/server/context";
 import { body, fail, json, route } from "@/server/http";
 import { idempotent } from "@/server/idempotency";
@@ -48,7 +48,10 @@ export const POST = route(async (request, requestId) => {
     const input = await body(request, versionInput);
     return json(await submitKakaoTemplate(ctx, z.uuid().parse(id), input.version, requestId));
   }
-  if (first === "templates" && id && action === "send") return json(await sendKakaoTemplate(ctx, z.uuid().parse(id)));
+  if (first === "templates" && id && action === "send") {
+    const input = await body(request, kakaoSendInput);
+    return json(await sendKakaoTemplate(ctx, z.uuid().parse(id), input.version, request.headers.get("idempotency-key"), requestId));
+  }
   fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
 });
 export const PATCH = route(async (request, requestId) => {

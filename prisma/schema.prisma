@@ -1970,6 +1970,7 @@ model KakaoTemplate {
   channelId String
   channel KakaoChannel @relation(fields: [tenantId, channelId], references: [tenantId, id], onDelete: Restrict)
   campaigns Campaign[]
+  mockReceipts KakaoMockReceipt[]
   name String
   body String
   buttons Json
@@ -1981,6 +1982,21 @@ model KakaoTemplate {
   @@unique([tenantId, serviceId, name])
   @@unique([tenantId, id])
   @@index([tenantId, channelId, status])
+}
+model KakaoMockReceipt {
+  id String @id @default(uuid())
+  tenantId String
+  templateId String
+  template KakaoTemplate @relation(fields: [tenantId, templateId], references: [tenantId, id], onDelete: Restrict)
+  serviceId String
+  channelId String
+  templateVersion Int
+  channelVersion Int
+  contentHash String
+  requestId String @unique
+  status String @default("local_delivered")
+  createdAt DateTime @default(now())
+  @@index([tenantId, templateId, createdAt])
 }
 model SmsReceipt {
   id String @id @default(uuid())

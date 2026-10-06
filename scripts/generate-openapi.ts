@@ -13,7 +13,7 @@ import { documentPatch, documentAction, documentPublish, clauseInput, clausePatc
 import { subprocessorInput, subprocessorPatch, subprocessorNoticeInput } from "../src/contracts/subprocessors";
 import { complianceExportInput, complianceExportList, complianceExportChange } from "../src/contracts/compliance-exports";
 import { complianceCloseInput } from "../src/contracts/analytics";
-import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoReviewInput, kakaoTemplateInput, kakaoTemplatePatch } from "../src/contracts/kakao";
+import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoReviewInput, kakaoSendInput, kakaoTemplateInput, kakaoTemplatePatch } from "../src/contracts/kakao";
 import { importCreate, importPatch, importAction } from "../src/contracts/imports";
 import { policyPatch, policyReset, approvalRequestInput, approvalDecisionInput, approvalCancelInput, passwordDeferralInput, passwordChangeInput, passwordResetInput } from "../src/contracts/security";
 import { memberInput } from "../src/server/members";
@@ -800,7 +800,8 @@ add("/kakao/templates/preview", "post", "message.manage", "변수 치환 미리�
 add("/kakao/templates/{id}", "patch", "message.manage + current service", "템플릿 수정 시 draft로 되돌려 재심사", kakaoTemplatePatch, "implemented");
 add("/kakao/templates/{id}/submit", "post", "message.manage + current service", "심사 요청. approved로 만들지 않음", z.object({ version: z.number().int().positive() }).strict(), "implemented");
 add("/kakao/templates/{id}/review", "get", "message.manage + current service", "저장된 심사 상태. providerMatched는 공급자 대조 전 false", undefined, "implemented");
-add("/kakao/templates/{id}/send", "post", "message.manage + current service", "미승인 템플릿 409. 승인돼도 발송 공급자 없으면 503", undefined, "implemented");
+add("/kakao/templates/{id}/send", "post", "message.manage + current service", "버전·요청 키 필수. 현재 승인/확인 필요. Mock 영수증·감사를 원자적으로 저장하며 같은 키 재시도는 현재 권한 검사 후 같은 결과 반환. 실제 발송 증명 아님", kakaoSendInput, "implemented");
+(paths["/kakao/templates/{id}/send"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", minLength: 16, maxLength: 128, pattern: "^[a-zA-Z0-9_-]+$" } }];
 add("/kakao/reviews", "post", "signed kakao review webhook", "서명된 채널 확인·템플릿 승인/반려. 심사 중이 아니면 반영하지 않음", kakaoReviewInput, "implemented", "202");
 add("/analytics/closes", "get", "service.read + current service grants; company-wide: direct owner/admin", "현재 세션·정책·서비스 권한을 재검사하는 월마감 조회. 없으면 close는 null. 조회 감사 기록, 준수 통과 없음", undefined, "implemented");
 add("/analytics/closes", "post", "service.read + current service grants; company-wide: direct owner/admin", "한국 시간 월과 범위별 집계·5개 점검 근거·생성 감사를 원자적으로 저장. 법적 준수 미판정. 회사 인증 근거는 회사 전체 마감만 포함. 재요청 현재 권한 재검사와 단일 마감", complianceCloseInput, "implemented");

@@ -50399,12 +50399,12 @@
         }
       ],
       "post": {
-        "summary": "미승인 템플릿 409. 승인돼도 발송 공급자 없으면 503",
+        "summary": "버전·요청 키 필수. 현재 승인/확인 필요. Mock 영수증·감사를 원자적으로 저장하며 같은 키 재시도는 현재 권한 검사 후 같은 결과 반환. 실제 발송 증명 아님",
         "x-permission": "message.manage + current service",
         "x-implementation": "implemented",
         "responses": {
           "200": {
-            "description": "미승인 템플릿 409. 승인돼도 발송 공급자 없으면 503"
+            "description": "버전·요청 키 필수. 현재 승인/확인 필요. Mock 영수증·감사를 원자적으로 저장하며 같은 키 재시도는 현재 권한 검사 후 같은 결과 반환. 실제 발송 증명 아님"
           },
           "400": {
             "description": "요청 형식 오류",
@@ -50517,7 +50517,42 @@
             }
           }
         },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "version"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
         "x-origin-check": "exact configured application Origin",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 16,
+              "maxLength": 128,
+              "pattern": "^[a-zA-Z0-9_-]+$"
+            }
+          }
+        ],
         "x-contract-policy": "messaging"
       }
     },

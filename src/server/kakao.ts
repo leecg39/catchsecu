@@ -1,15 +1,15 @@
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import type { z } from "zod";
 import type { KakaoChannel, KakaoTemplate } from "@/generated/prisma/client";
-import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoReviewInput, kakaoTemplateInput, kakaoTemplatePatch, kakaoVariables, type KakaoChannelRecord, type KakaoTemplateRecord } from "@/contracts/kakao";
+import { kakaoChannelInput, kakaoChannelPatch, kakaoPreviewInput, kakaoReviewInput, kakaoTemplateInput, kakaoTemplatePatch, kakaoVariables, type KakaoChannelRecord, type KakaoTemplateRecord, type KakaoMockDelivery } from "@/contracts/kakao";
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
 import { env } from "./env";
 import { fail } from "./http";
 import { audit } from "./audit";
 import { lockServiceActor } from "./service-actor";
+import { idempotent } from "./idempotency";
+import { tokenHash } from "./crypto";
 import { assertFileDeadlines } from "./file-access";
 
 function channelDto(row: KakaoChannel): KakaoChannelRecord {
@@ -161,18 +161,32 @@ export function previewKakaoTemplate(input: z.infer<typeof kakaoPreviewInput>) {
   const text = input.body.replaceAll(/#\{([A-Za-z0-9_]{1,30})\}/g, (_, name: string) => input.values[name]);
   return { text, buttons: input.buttons, stored: false };
 }
-export async function sendKakaoTemplate(ctx: Context, id: string) {
-  const row = await db.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId }, include: { channel: true } });
-  if (!row) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
-  await db.$transaction(tx => lockService(tx, ctx, row.serviceId));
-  if (row.status !== "approved" || row.channel.status !== "verified") fail(409, "TEMPLATE_NOT_APPROVED", "승인된 템플릿과 확인된 채널만 발송할 수 있습니다.");
-  if (env.KAKAO_PROVIDER !== "local") fail(503, "KAKAO_PROVIDER_REQUIRED", "알림톡 발송 공급자를 연결한 뒤에 발송할 수 있습니다.");
-  // 로컬 공급자 발송 — sms-local과 같은 방식으로 영수증 파일만 남긴다.
-  await mkdir(env.LOCAL_KAKAO_DIR, { recursive: true });
-  const receipt = { templateId: row.id, channelId: row.channelId, searchId: row.channel.searchId, body: row.body,
-    buttons: row.buttons, status: "local_delivered", at: new Date().toISOString() };
-  await writeFile(resolve(env.LOCAL_KAKAO_DIR, row.id + ".json"), JSON.stringify(receipt));
-  return { ...templateDto(row), status: "local_delivered" as const, receiptId: "local-kakao:" + row.id };
+export async function sendKakaoTemplate(ctx: Context, id: string, version: number, key: string | null, requestId: string): Promise<KakaoMockDelivery> {
+  let deadlines: Awaited<ReturnType<typeof lockService>>;
+  async function authorize(tx: Transaction) {
+    const initial = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
+    if (!initial) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
+    deadlines = await lockService(tx, ctx, initial.serviceId);
+    return initial;
+  }
+  const result = await idempotent("kakao-mock-send:" + ctx.tenantId + ":" + id, key, { id, version }, async tx => {
+    const initial = await authorize(tx);
+    // 채널 변경/보관과 템플릿 변경/심사 결과가 영수증 저장 전 끼어들 수 없다.
+    const channel = await lockChannel(tx, ctx.tenantId, initial.channelId);
+    await tx.$queryRaw`SELECT id FROM "KakaoTemplate" WHERE id=${id} AND "tenantId"=${ctx.tenantId} FOR SHARE`;
+    const row = await tx.kakaoTemplate.findFirst({ where: { id, tenantId: ctx.tenantId } });
+    if (!row) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
+    if (row.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
+    if (row.status !== "approved" || channel.status !== "verified") fail(409, "TEMPLATE_NOT_APPROVED", "승인된 템플릿과 확인된 채널만 발송할 수 있습니다.");
+    if (env.KAKAO_PROVIDER !== "local") fail(503, "KAKAO_PROVIDER_REQUIRED", "알림톡 발송 공급자를 연결한 뒤에 발송할 수 있습니다.");
+    const receipt = await tx.kakaoMockReceipt.create({ data: { tenantId: ctx.tenantId, serviceId: row.serviceId, templateId: id, templateVersion: row.version,
+      channelId: row.channelId, channelVersion: channel.version, contentHash: tokenHash(JSON.stringify({ body: row.body, buttons: row.buttons })), requestId } });
+    await audit(tx, ctx, requestId, "kakao.mock_delivered", "kakaoMockReceipt", receipt.id, ["status"], row.serviceId);
+    const body: KakaoMockDelivery = { id: receipt.id, receiptId: "local-kakao:" + receipt.id, serviceId: row.serviceId, templateId: id, templateVersion: row.version,
+      channelId: row.channelId, channelVersion: channel.version, status: "local_delivered", mock: true, createdAt: receipt.createdAt.toISOString() };
+    return { status: 200, body };
+  }, authorize, undefined, async () => { assertFileDeadlines(deadlines); });
+  return result.body;
 }
 function signaturesMatch(secret: string, body: string, signature: string) {
   const expected = createHmac("sha256", secret).update(body).digest("hex");
@@ -252,7 +266,7 @@ export async function removeKakaoTemplate(ctx: Context, id: string, version: num
     if (!current) fail(404, "NOT_FOUND", "알림톡 템플릿을 찾을 수 없습니다.");
     const deadlines = await lockService(tx, ctx, current.serviceId);
     if (current.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
-    const referenced = await tx.campaign.count({ where: { tenantId: ctx.tenantId, kakaoTemplateId: id } });
+    const referenced = await tx.campaign.count({ where: { tenantId: ctx.tenantId, kakaoTemplateId: id } }) + await tx.kakaoMockReceipt.count({ where: { tenantId: ctx.tenantId, templateId: id } });
     if (current.status !== "draft" || referenced) {
       const changed = await tx.kakaoTemplate.updateMany({ where: { id, tenantId: ctx.tenantId, version }, data: { status: "archived", version: { increment: 1 } } });
       if (changed.count !== 1) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 내용을 불러와주세요.");
