@@ -1,0 +1,567 @@
+{
+  "checkedAt": "2026-10-06T05:56:30.276Z",
+  "result": "failed",
+  "evidenceLevel": "local mock logical database/object restore",
+  "externalPitrVerified": false,
+  "sourceDatabase": "catchsecu_mock_admin",
+  "targetDatabase": "catchsecu_mock_restore_ffbd4c31",
+  "privateBackup": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/mock-restores/catchsecu_mock_restore_ffbd4c31",
+  "steps": [
+    {
+      "name": "logical backup",
+      "exitCode": 0
+    },
+    {
+      "name": "create isolated target",
+      "exitCode": 0
+    },
+    {
+      "name": "restore database",
+      "exitCode": 0
+    },
+    {
+      "name": "application reads in restored database",
+      "exitCode": 1
+    }
+  ],
+  "database": {
+    "tables": {
+      "AccessRequest": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Account": {
+        "rows": 6,
+        "sha256": "866940b5a855e4e5fad1153fc1f429d42de65adc7d7d102ae960e4d5c7861d74"
+      },
+      "AccountClosure": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ActivityReview": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ActivityReviewMessage": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Answer": {
+        "rows": 10,
+        "sha256": "d2843b358de335aff3f54d2e8324c6d5887845e8397d89ef3831344ea3ead94f"
+      },
+      "ApiRateLimit": {
+        "rows": 42,
+        "sha256": "b5ba013b3f21bd30b02ebf5b675c72a9c1c62bb5ba1bd64c5dfcdeb8182a943e"
+      },
+      "ApprovalRequest": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "AuditEvent": {
+        "rows": 132,
+        "sha256": "42704033b21686ab744bc3bee917d5e382070806113cd0db1affc1444404b60b"
+      },
+      "BillingMonthClose": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "BillingPlan": {
+        "rows": 34,
+        "sha256": "9c71219c7b36c13b9618621f2f252f1d87a34378964a1942056026b91e32e9c3"
+      },
+      "BillingPlanVersion": {
+        "rows": 36,
+        "sha256": "e3e1bdaeaac8983cabaca2a931279d243630e53504f6306267b1e04d7a4ae492"
+      },
+      "BillingSubscription": {
+        "rows": 4,
+        "sha256": "958bbe3b6e0a2c3e9a4c362d0cb388b54f984f65588587dc4ba572c0727a1515"
+      },
+      "BillingSubscriptionEvent": {
+        "rows": 4,
+        "sha256": "5b9f62ab303b4c6fe42611baf120fdda2ce556b534bdb3c910bff443709dca6d"
+      },
+      "Campaign": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "CampaignDelivery": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "CampaignEvent": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ClauseTemplate": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Company": {
+        "rows": 5,
+        "sha256": "344e5d1d283c3ecce19fa154728c4df8b6d1c5288a3dc5139a524fdb06c0dde3"
+      },
+      "CompanyBusinessFile": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ComplianceClose": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ComplianceExportJob": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ConsentEvent": {
+        "rows": 4,
+        "sha256": "4be3e30462c1ec5d10d16647535c91ce5909540c79c5f12c22d1aa66f0a22b96"
+      },
+      "ConsentReceipt": {
+        "rows": 4,
+        "sha256": "3b998aeedb9e16b09dfd82acbf0af14ec97013f997a9818b97376a93480ff8e2"
+      },
+      "Correction": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "CorrectionPayload": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "CreditAccount": {
+        "rows": 4,
+        "sha256": "e1695f9eda96c3d26e3cf79c186588820f058a9de8fb8e56e8d91ad61ff2961b"
+      },
+      "DataSubject": {
+        "rows": 4,
+        "sha256": "d04bdc8af75603fab89672562670f69ef15c90267c027d723b1cf48c4ae8afe4"
+      },
+      "DestructionCertificate": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "DestructionRequest": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Document": {
+        "rows": 12,
+        "sha256": "39c4719b330f2c0979159206a7aa6ddd8c87556c90fa9db23f21991af8eafc00"
+      },
+      "DocumentPdf": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "DocumentPublication": {
+        "rows": 12,
+        "sha256": "add89931cc4470a3ef0f2a9463dbd18d952fc7a4c25d3b2f82b6a83ef993ebbc"
+      },
+      "DocumentPurpose": {
+        "rows": 12,
+        "sha256": "3711329d764ac97786e39fab7383593e2ec24d59cc63bbe104b54353dba55c5d"
+      },
+      "DocumentRecipient": {
+        "rows": 4,
+        "sha256": "9495cd13b5697bd31978c2cfcf71bb38247603103c17c3633f21668e92558e44"
+      },
+      "DocumentVersion": {
+        "rows": 12,
+        "sha256": "6f7b4d70ce531b9fe530f4fb5dc57ea53c13c44dc4a70d5e29094663b1500f92"
+      },
+      "EmailFeedback": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "EmailSuppression": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExpertAssignment": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExpertAssignmentService": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExportChunk": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExportJob": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ExportSource": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "FileObject": {
+        "rows": 2,
+        "sha256": "173a5eda79bf414a63c0e1ae04dd9d50437bdc66c75cfb90bf08b7f5294a5efd"
+      },
+      "FixedUrl": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Form": {
+        "rows": 4,
+        "sha256": "8129fb3dff4969028f31c7543ef140419881a1c0d1ded06cec5eef6c1fa621c5"
+      },
+      "FormDocumentBinding": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "FormFavorite": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "FormTemplate": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "FormVersion": {
+        "rows": 4,
+        "sha256": "f6753315761ae3e0da327bda0e233c69a51713253d47717f91b108236fed2518"
+      },
+      "Guide": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "IdempotencyRecord": {
+        "rows": 41,
+        "sha256": "f545b853cd2530358b1fc68bf0c744c635c3e8f3e18bd344dfe27ab1a82f2899"
+      },
+      "ImportEvidence": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ImportJob": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ImportRow": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Invitation": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "IpAccessPolicy": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "IpRule": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Job": {
+        "rows": 14,
+        "sha256": "b9d2a3ac2a2fe53be1eaca36196ae8748bfeeb4d2a381c6579bcb06b34b1602c"
+      },
+      "JobAttempt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "KakaoChannel": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "KakaoTemplate": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "LedgerEntry": {
+        "rows": 8,
+        "sha256": "51de6836f82430130eddd6d3c1da02d97fa8568d5c1d9c8e84558a0494dc71a2"
+      },
+      "LedgerTransaction": {
+        "rows": 4,
+        "sha256": "35b8fe42a7983665b8591ddf0fad1b1c5910c356e4dc5defed67513459c23a55"
+      },
+      "MarketingEvent": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "MarketingPreference": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Membership": {
+        "rows": 5,
+        "sha256": "85496af13d958da3160fdfedce38c091c335cb3b39342263841dbbfaf665b7cf"
+      },
+      "MessageTemplate": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "MessageTemplateRevision": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "MfaException": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Notice": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NoticeAttachment": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NotificationAttempt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NotificationDelivery": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NotificationEvent": {
+        "rows": 4,
+        "sha256": "b486d5621950e79d6fb6e7451223efa347397bd70e550f3c8b4a37dfef3f98f1"
+      },
+      "NotificationIntegration": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "NotificationSubscription": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PasswordDeferral": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PasswordHistory": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PaymentEvent": {
+        "rows": 4,
+        "sha256": "faa1f08250858243fb3e8ba91f77525505f475d2766a50a85c3e2bd36f24fab0"
+      },
+      "PaymentMethod": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PaymentOrder": {
+        "rows": 4,
+        "sha256": "dc4ec4660b104d7c92dbd5405a9516669c449bb13e06efa0d57bc52f23755a7c"
+      },
+      "PaymentRefund": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ProcessingPurpose": {
+        "rows": 4,
+        "sha256": "ccd54fda0c2fbd6766834215393390c0fa7306855519a0bb00a78f88a115c42c"
+      },
+      "Publication": {
+        "rows": 4,
+        "sha256": "f1b2e016b95be3552898e6e454d11ed9a7a4d215393ae2fb37e9805903b7cb92"
+      },
+      "PurposeRecipient": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "PurposeRevision": {
+        "rows": 4,
+        "sha256": "fc7b1a5004a5524c53e0545cb564f7a1e6a676bb6aa39647769bb83fc45df922"
+      },
+      "Question": {
+        "rows": 10,
+        "sha256": "f7b7a438a18013b0831955ddbfc22f18710c1c8f116b9c1942eefd1793462343"
+      },
+      "QuestionOption": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "RateLimit": {
+        "rows": 2,
+        "sha256": "73261d393eca1f7dc195f2dfd75053e8082fdec4c264353d2b300d69f1cf486e"
+      },
+      "Recipient": {
+        "rows": 4,
+        "sha256": "c4b117511844c57cd78c35953e69ca12ae4b824224c1c5e7ca0134154b5a8f3a"
+      },
+      "RecipientRevision": {
+        "rows": 4,
+        "sha256": "79f1810b7631b112ff7d8a546735f3c8d96b06dab5f14a32b97b7a9aac62f0a3"
+      },
+      "RetentionRule": {
+        "rows": 1,
+        "sha256": "6988d6eb8eb353dcd1fbb55f92550ede295e580fafd25f5dd172c711ee804dde"
+      },
+      "SecurityPolicy": {
+        "rows": 5,
+        "sha256": "dc3ed7ef56aab269026a6aa81744360491b7c2270a257a270ca5d9d4eb040fc1"
+      },
+      "Sender": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SenderEvent": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SenderVerification": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Service": {
+        "rows": 5,
+        "sha256": "ceb748f74f8d9861f0038900ea98ec3d10ad1b9e5a383ec45c055749ece0c24b"
+      },
+      "ServiceConsentDisplay": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ServiceGrant": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Session": {
+        "rows": 7,
+        "sha256": "b23f4a45059825384f9aba547d36f6c70a3ad4809b38fd9468f2ee813d886f55"
+      },
+      "ShareField": {
+        "rows": 4,
+        "sha256": "6c6225ecd225b956fe1ead90d39f5636e6b540f121b23ae7b56b8efcd50e83d6"
+      },
+      "ShareGrant": {
+        "rows": 2,
+        "sha256": "f530205721dfeab6f2278bee1b1be2717a76087d3a3d6caf91c0c0905897b60d"
+      },
+      "SmsReceipt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SsoProvider": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SsoState": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SubjectAccessRequest": {
+        "rows": 4,
+        "sha256": "b7e6a999bc3ea53b7e04c2d3a8cecdcfe0355d2b48b2c0b4f652ff50c5d91bc2"
+      },
+      "SubjectAccessScope": {
+        "rows": 4,
+        "sha256": "b14efd3425219219cb67eb45ae2168d811892743fef95941393b959193a44a12"
+      },
+      "SubjectSession": {
+        "rows": 4,
+        "sha256": "d7335c0993cb796e8a4dbeb5616dfcb806314f4dbea1287ce1c5a3b2ce32f716"
+      },
+      "SubjectWithdrawal": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Submission": {
+        "rows": 4,
+        "sha256": "23e1aedca0984ac48ca94374118c251b2232211096f006643f458782e05641b4"
+      },
+      "SubmissionNote": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Subprocessor": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SubprocessorNotice": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "SupportTicket": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Suppression": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "TwoFactor": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "User": {
+        "rows": 6,
+        "sha256": "2093aec8d7b17279e813e95e2cfeffe281c2949dbd0bc037ad427490c5444e35"
+      },
+      "Verification": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationAttempt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationEvent": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationIntegration": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationIntegrationRevision": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "VerificationReceipt": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ViewerChallenge": {
+        "rows": 2,
+        "sha256": "36c4ec02729e5958d5fb2233d3bc213201dbe578386d554bdcc43c49f003cca0"
+      },
+      "ViewerSession": {
+        "rows": 2,
+        "sha256": "d3980ab053946f875bbfc41e5cf1622079aade82382cf688253acb5a6224d0e2"
+      },
+      "VirtualOrgMember": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "_prisma_migrations": {
+        "rows": 100,
+        "sha256": "f3e65ae038c5aaa64cc44afc15d1c66f1c622ea95b851ee0ffb94a1c62e7a9e2"
+      }
+    },
+    "sequences": [
+      {
+        "sequencename": "PasswordHistory_id_seq",
+        "start_value": "1",
+        "min_value": "1",
+        "max_value": "9223372036854775807",
+        "increment_by": "1",
+        "cycle": false,
+        "last_value": null
+      }
+    ],
+    "schemaEntries": 2747,
+    "schemaSha256": "fb669c050f92d33c762053e7b98a32608d239391bc59f8c0e4bd1488a6834c23",
+    "migrations": 100
+  },
+  "restoredDataEqual": true,
+  "sourceUnchanged": true,
+  "objects": {
+    "count": 1,
+    "sha256": "c4d56ff8e12a8c1faa38ec1942ed4ee2f97b61b623be073228e920c69c88410d",
+    "restoredEqual": true
+  },
+  "backupSha256": "9bd83fa9681b30a8bb9b80cea2117ea53946c867c207934e5b4142acc19af6ea",
+  "error": "application reads in restored database failed (1); no credentials or SQL rows logged",
+  "finishedAt": "2026-10-06T05:56:36.022Z"
+}

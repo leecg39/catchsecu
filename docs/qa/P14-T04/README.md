@@ -119,3 +119,7 @@
 - worker 재기동은 mail·destruction 두 작업군으로 실증 — campaign/import/export 각 워커의 프로세스 수준 중도 kill은 해당 유닛의 lease·재시도 테스트로 커버되며 별도 실증은 미수행.
 
 관련: [scripts/qa-restore-enqueue.ts](../../../scripts/qa-restore-enqueue.ts), [scripts/qa-restore-destroy.ts](../../../scripts/qa-restore-destroy.ts), [src/server/destruction-worker.ts](../../../src/server/destruction-worker.ts)
+
+## 2026-10-06 최신100개 마이그레이션의 Mock 복구
+
+[최신 로컬 논리 복구 리허설](../mock-completion/restore/README.md): 별도 Mock DB128테이블617행과 스키마2,747항목·암호화 객체1개를 새 DB/폴더로 복원해 해시 동일성을 확인했다. 복원본의 로그인·내부/공유 다운로드·권한 회수·재파기6검사 통과. 재파기 후 원본 DB와 객체 해시 보존. 기존85개 설치 증거를 최신100개로 보완하며, WAL/PITR 등 실제 인프라 수용과 구분한다.
