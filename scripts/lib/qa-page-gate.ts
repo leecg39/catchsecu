@@ -23,7 +23,7 @@ export function summarizePageGate(expected: string[], results: PageGateResult[])
   const unexpected = results.filter(row => !expectedSet.has(row.manifestPath)).map(row => row.manifestPath);
   const skipped = results.filter(row => row.skipped).map(row => ({ path: row.manifestPath, reason: row.skipped! }));
   const failed = results.filter(row => !row.skipped && (
-    !!row.error || row.status !== 200 || !row.finalUrl || row.refreshed !== true || row.backOk !== true ||
+    !!row.error || row.status !== 200 || !row.finalUrl || row.finalUrl !== row.route.split(/[?#]/, 1)[0] || row.refreshed !== true || row.backOk !== true ||
     row.consoleErrors.length > 0 || [1440, 768, 390].some(width => row.overflow?.[width] !== false)
   )).map(row => row.manifestPath);
   return { result: missing.length || duplicate.length || unexpected.length || skipped.length || failed.length ? "failed" : "passed",

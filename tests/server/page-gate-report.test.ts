@@ -29,3 +29,14 @@ test("fixture 값은 경로 인자로 인코딩한다", async () => {
   const { resolvePageFixture } = await import("../../scripts/lib/qa-page-gate");
   expect(resolvePageFixture("/document/:token", { ":token": "a/b?c" })).toEqual({ route: "/document/a%2Fb%3Fc", missing: [] });
 });
+
+test("HTTP200 로그인·대시보드 리다이렉트는 요청 화면의 통과가 아니다", () => {
+  for (const finalUrl of ["/login", "/dashboard"]) {
+    expect(summarizePageGate(["/private"], [{ ...valid("/private"), finalUrl }])).toMatchObject({ result: "failed", failed: ["/private"] });
+  }
+});
+test("동적 화면은 템플릿이 아닌 실제 fixture 경로와 비교한다", () => {
+  const row = { ...valid("/document/:token"), route: "/document/real-token?view=public", finalUrl: "/document/real-token" };
+  expect(summarizePageGate([row.manifestPath], [row]).result).toBe("passed");
+  expect(summarizePageGate([row.manifestPath], [{ ...row, finalUrl: "/document/wrong-token" }]).result).toBe("failed");
+});
