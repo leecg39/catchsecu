@@ -50,6 +50,7 @@ import { localSenderDns } from "../helpers/sender-dns";
 import { POST as kakaoPost, PATCH as kakaoPatch } from "@/app/api/v1/kakao/[...segments]/route";
 import { senderAddressHash } from "@/server/senders";
 import { postTrustedLedgerTransfer } from "@/server/ledger";
+import * as ledgerModule from "@/server/ledger";
 const database = new URL(env.DATABASE_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test database required");
 const origin = env.BETTER_AUTH_URL, tenant = randomUUID(), foreign = randomUUID(), service = randomUUID(), second = randomUUID(), other = randomUUID();
@@ -1120,4 +1121,68 @@ test("카카오 마지막 시도의 임대 만료는 예약 잔액을 반환하�
   expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:queued.campaignDeliveryId!}})).toMatchObject({status:"cancelled",reason:"LEASE_EXHAUSTED"});
   await expect(access(resolve(env.LOCAL_KAKAO_DIR,queued.id+".json"))).rejects.toThrow();
   const after=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});expect(after.available).toBe(before.available);expect(after.held).toBe(before.held);
+});
+
+test.each([["sms","normal"],["kakao","normal"],["fallback","normal"],["sms","worker"],["kakao","cleanup"],["fallback","cleanup"]] as const)("수동 재요청 %s/%s는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다", async (kind,recovery) => {
+  env.SMS_TRANSPORT="local";env.MESSAGE_UNIT_COST_KRW=5;env.LOCAL_SMS_DIR=".local/catchsecu_test/manual-sms-"+randomUUID();
+  let draft:CampaignRecord;
+  if(kind==="sms") {
+    const sms=await verifiedSmsSender("재요청 문자"),target=await recipient("재요청 수신자","sms");
+    draft=await targets(await create({channel:"sms",senderId:sms.sender.id}),[target.contact]);
+    await postTrustedLedgerTransfer({tenantId:tenant,currency:"KRW",kind:"funding",amount:BigInt(100),sourceKind:"pg_capture",sourceId:randomUUID()});
+  }else {
+    const sms=kind==="fallback"?await verifiedSmsSender("재요청 대체발신자"):null;
+    draft=(await approvedKakaoCampaign(1,kind==="fallback"?{body:"#{name} #{coupon}",channels:["kakao","sms"],fallbackSenderId:sms!.sender.id}:{})).draft;
+  }
+  const before=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});
+  await schedule(draft);let first=await jobFor(draft.id);
+  if(kind==="fallback") {await mailer.runOneJob("manual-primary-"+randomUUID(),{tenantId:tenant,jobId:first.id});first=await jobFor(draft.id);}
+  const goodDir=kind==="kakao"?env.LOCAL_KAKAO_DIR:env.LOCAL_SMS_DIR;
+  if(kind==="kakao")env.LOCAL_KAKAO_DIR="/dev/null/manual-kakao";else env.LOCAL_SMS_DIR="/dev/null/manual-sms";
+  await db.job.update({where:{id:first.id},data:{maxAttempts:1}});
+  await mailer.runOneJob("manual-failure-"+randomUUID(),{tenantId:tenant,jobId:first.id});
+  expect(await db.job.findUniqueOrThrow({where:{id:first.id}})).toMatchObject({status:"dead"});
+  expect((await deliveries(draft.id)).items[0]).toMatchObject({status:"failed"});
+  const failed=await read(draft.id),delivery=(await deliveries(draft.id)).items[0],key=randomUUID(),input={version:failed.version,ids:[delivery.id]};
+  await ok(await POST(req("/campaigns/"+draft.id+"/retry","POST","owner",input,{"idempotency-key":key})),202);
+  await ok(await POST(req("/campaigns/"+draft.id+"/retry","POST","owner",input,{"idempotency-key":key})),202);
+  if(kind==="kakao")env.LOCAL_KAKAO_DIR=goodDir;else env.LOCAL_SMS_DIR=goodDir;
+  let next=await jobFor(draft.id);expect(next.id).not.toBe(first.id);
+  let interrupted=false;
+  if(recovery!=="normal") {
+    const post=ledgerModule.postLedgerTransfer;
+    vi.spyOn(ledgerModule,"postLedgerTransfer").mockImplementation(async (tx,input)=>{
+      if(input.kind==="capture"&&!interrupted){interrupted=true;throw new Error("MOCK_CAPTURE_INTERRUPTED");}
+      return post(tx,input);
+    });
+  }
+  let sendError:unknown;
+  try {
+    await mailer.runOneJob("manual-success-"+randomUUID(),{tenantId:tenant,jobId:next.id});
+    if(kind==="fallback") {next=await jobFor(draft.id);await mailer.runOneJob("manual-fallback-"+randomUUID(),{tenantId:tenant,jobId:next.id});}
+  }catch(error){sendError=(error as Error).message;}
+  if(recovery!=="normal") {
+    expect(interrupted).toBe(true);expect((await deliveries(draft.id)).items[0].status).toBe("sending");
+    const receipt=resolve(kind==="kakao"?env.LOCAL_KAKAO_DIR:env.LOCAL_SMS_DIR,next.id+".json"),beforeReceipt=await readFile(receipt);
+    vi.restoreAllMocks();
+    if(recovery==="worker") {
+      await db.job.update({where:{id:next.id},data:{dueAt:new Date(Date.now()-1000)}});
+      await mailer.runOneJob("manual-recovery-"+randomUUID(),{tenantId:tenant,jobId:next.id});
+    }else {
+      await db.job.update({where:{id:next.id},data:{status:"dead",leaseOwner:null,leaseUntil:null}});
+      await cleanupCampaigns();
+    }
+    expect(await readFile(receipt)).toEqual(beforeReceipt);
+  }
+  const entries=await db.ledgerTransaction.findMany({where:{tenantId:tenant,sourceKind:"campaign_delivery",sourceId:{startsWith:delivery.id}}});
+  const captures=entries.filter(r=>r.kind==="capture"),after=await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}});
+  expect({sendError,captures:captures.length,available:after.available,held:after.held}).toEqual({sendError:undefined,captures:1,available:before.available-BigInt(5),held:before.held});
+  const capture=captures[0],hold=entries.find(r=>r.id===capture.reservationId)!;expect(hold).toMatchObject({kind:"reserve",sourceId:capture.sourceId});
+  expect(entries.some(r=>r.kind==="release"&&r.reservationId===hold.id)).toBe(false);
+  expect(await db.job.findUniqueOrThrow({where:{id:next.id}})).toMatchObject({status:"done"});
+  expect((await deliveries(draft.id)).items[0]).toMatchObject({status:"local_delivered",attempt:kind==="fallback"?4:2});
+  const file=resolve(kind==="kakao"?env.LOCAL_KAKAO_DIR:env.LOCAL_SMS_DIR,next.id+".json"),bytes=await readFile(file);
+  await mailer.runOneJob("manual-duplicate-"+randomUUID(),{tenantId:tenant,jobId:next.id});await cleanupCampaigns();
+  expect(await readFile(file)).toEqual(bytes);
+  expect(await db.creditAccount.findUniqueOrThrow({where:{tenantId_currency:{tenantId:tenant,currency:"KRW"}}})).toMatchObject({available:after.available,held:after.held});
 });

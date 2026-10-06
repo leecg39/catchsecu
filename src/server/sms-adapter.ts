@@ -6,6 +6,7 @@ import { db } from "./db";
 import { env } from "./env";
 import { fail } from "./http";
 import { postLedgerTransfer } from "./ledger";
+import { campaignLedgerSource } from "./campaign-ledger";
 
 const receiptBody = z.object({
   deliveryId: z.uuid(),
@@ -65,8 +66,12 @@ export async function applySmsReceipt(raw: string, signature: string, secret: st
   const input = receiptBody.parse(JSON.parse(raw));
   const status = input.outcome === "accepted" ? "provider_accepted" : input.outcome === "timeout" ? "unknown" : "failed";
   return db.$transaction(async tx => {
-    const delivery = await tx.campaignDelivery.findUnique({ where: { id: input.deliveryId } });
-    if (!delivery) fail(404, "NOT_FOUND", "문자 발송 기록을 찾을 수 없습니다.");
+    const initial = await tx.campaignDelivery.findUnique({ where: { id: input.deliveryId } });
+    if (!initial) fail(404, "NOT_FOUND", "문자 발송 기록을 찾을 수 없습니다.");
+    // 발송/수동 재요청과 같은 순서로 잠가 현재 attempt의 예약만 정산한다.
+    await tx.$queryRaw`SELECT id FROM "Campaign" WHERE id=${initial.campaignId} FOR UPDATE`;
+    await tx.$queryRaw`SELECT id FROM "CampaignDelivery" WHERE id=${initial.id} FOR UPDATE`;
+    const delivery = await tx.campaignDelivery.findUniqueOrThrow({ where: { id: initial.id }, include: { campaign: { select: { channel: true } } } });
     const existing = await tx.smsReceipt.findUnique({ where: { deliveryId: delivery.id } });
     if (existing) {
       if (existing.receiptId !== input.receiptId) fail(409, "DUPLICATE_WEBHOOK", "이미 다른 문자 결과가 기록되어 있습니다.");
@@ -79,8 +84,8 @@ export async function applySmsReceipt(raw: string, signature: string, secret: st
       await tx.campaignDelivery.update({ where: { id: delivery.id }, data: { status: deliveryStatus, reason: deliveryStatus === "accepted" ? null : input.outcome.toUpperCase(), ...(deliveryStatus === "accepted" ? { acceptedAt: new Date() } : {}) } });
     }
     // 공급자 결과는 미정산 발송 예약을 종결한다 — 접수 확인만 청구하고 실패·미확인은 환불한다.
-    const holds = await tx.ledgerTransaction.findMany({ where: { tenantId: delivery.tenantId, kind: "reserve", sourceKind: "campaign_delivery",
-      OR: [{ sourceId: delivery.id }, { sourceId: delivery.id + ":fallback" }] } });
+    const sourceId = await campaignLedgerSource(tx, delivery.tenantId, delivery.id, delivery.attempt, delivery.campaign.channel, "sms-solapi");
+    const holds = await tx.ledgerTransaction.findMany({ where: { tenantId: delivery.tenantId, kind: "reserve", sourceKind: "campaign_delivery", sourceId } });
     for (const hold of holds) {
       const settled = await tx.ledgerTransaction.findFirst({ where: { reservationId: hold.id, kind: { in: ["release", "capture"] } } });
       if (settled) continue;

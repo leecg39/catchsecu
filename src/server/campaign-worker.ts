@@ -1,4 +1,5 @@
 import { lockKakaoBinding } from "./kakao-binding";
+import { campaignLedgerSource } from "./campaign-ledger";
 import { mkdir, stat, unlink, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { z } from "zod";
@@ -171,7 +172,7 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
     const state = await lockedState(tx, job, workerId, payload); if (!state) return false;
     const { campaign, recipient, reason } = state;
     // 대체발송 잡은 카카오 홀드와 분리된 원장 원천으로 정산한다.
-    const ledgerSource = payload.deliveryId + (isSms(payload.transport) && campaign.channel === "kakao" ? ":fallback" : "");
+    const ledgerSource = await campaignLedgerSource(tx, recipient.tenantId, recipient.id, payload.attempt, campaign.channel, payload.transport);
     if (recipient.status === "sending") {
       const solapi = payload.transport === "sms-solapi";
       const smsRow = solapi ? await tx.smsReceipt.findUnique({ where: { deliveryId: payload.deliveryId } }) : null;
@@ -203,7 +204,7 @@ export async function runCampaignJob(job: ClaimedJob, workerId: string) {
   await db.$transaction(async tx => {
     const state = await lockedState(tx, job, workerId, payload); if (!state) return;
     const { campaign, recipient, reason, kakaoTemplate } = state;
-    const ledgerSource = payload.deliveryId + (isSms(payload.transport) && campaign.channel === "kakao" ? ":fallback" : "");
+    const ledgerSource = await campaignLedgerSource(tx, recipient.tenantId, recipient.id, payload.attempt, campaign.channel, payload.transport);
     if (recipient.status !== "sending") {
       if (isMessage(payload.transport) && unitCost > 0) await releaseHeld(tx, recipient, ledgerSource);
       await finish(tx, job, campaign, recipient, recipient.status, recipient.reason, recipient.acceptedAt ?? undefined); return;
@@ -326,7 +327,7 @@ export async function cleanupCampaigns() {
     const parsed = (() => { try { return jobPayload.parse(decrypt(current.payloadCipher)); } catch { return null; } })();
     const transport = parsed?.transport ?? null;
     const unitCost = parsed && isMessage(parsed.transport) ? (parsed.unitCost ?? (isKakao(parsed.transport) ? env.KAKAO_UNIT_COST_KRW : env.MESSAGE_UNIT_COST_KRW)) : 0;
-    const ledgerSource = row.id + (transport && isSms(transport) && campaign.channel === "kakao" ? ":fallback" : "");
+    const ledgerSource = await campaignLedgerSource(tx, row.tenantId, row.id, row.attempt, campaign.channel, transport);
     const smsRow = transport === "sms-solapi" ? await tx.smsReceipt.findUnique({ where: { deliveryId: row.id } }) : null;
     const receipt = transport === "sms-local" ? await smsReceiptFile(job.id) : transport === "sms-solapi" ? smsRow?.createdAt ?? null : transport === "kakao-local" ? await kakaoReceipt(job.id) : transport ? await localReceipt(job.id) : null;
     const status = smsRow && smsRow.status !== "provider_accepted" ? smsRow.status === "failed" ? "failed" : "unknown"

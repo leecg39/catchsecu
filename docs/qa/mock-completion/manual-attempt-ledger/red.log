@@ -1,0 +1,171 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:1667) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/campaigns.test.ts (81 tests | 6 failed | 75 skipped) 20378ms
+   × 수동 재요청 sms/normal는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다 3375ms
+   × 수동 재요청 kakao/normal는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다 1910ms
+   × 수동 재요청 fallback/normal는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다 2549ms
+   × 수동 재요청 sms/worker는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다 1690ms
+   × 수동 재요청 kakao/cleanup는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다 1538ms
+   × 수동 재요청 fallback/cleanup는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다 1576ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/campaigns.test.ts > 수동 재요청 sms/normal는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다
+AssertionError: expected { sendError: undefined, …(3) } to deeply equal { sendError: undefined, …(3) }
+
+- Expected
++ Received
+
+  {
+-   "available": 95n,
+-   "captures": 1,
++   "available": 100n,
++   "captures": 0,
+    "held": 0n,
+    "sendError": undefined,
+  }
+
+ ❯ tests/server/campaigns.test.ts:1179:90
+    1177|   const entries=await db.ledgerTransaction.findMany({where:{tenantId:t…
+    1178|   const captures=entries.filter(r=>r.kind==="capture"),after=await db.…
+    1179|   expect({sendError,captures:captures.length,available:after.available…
+       |                                                                                          ^
+    1180|   const capture=captures[0],hold=entries.find(r=>r.id===capture.reserv…
+    1181|   expect(entries.some(r=>r.kind==="release"&&r.reservationId===hold.id…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 수동 재요청 kakao/normal는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다
+AssertionError: expected { sendError: undefined, …(3) } to deeply equal { sendError: undefined, …(3) }
+
+- Expected
++ Received
+
+  {
+-   "available": 195n,
+-   "captures": 1,
++   "available": 200n,
++   "captures": 0,
+    "held": 0n,
+    "sendError": undefined,
+  }
+
+ ❯ tests/server/campaigns.test.ts:1179:90
+    1177|   const entries=await db.ledgerTransaction.findMany({where:{tenantId:t…
+    1178|   const captures=entries.filter(r=>r.kind==="capture"),after=await db.…
+    1179|   expect({sendError,captures:captures.length,available:after.available…
+       |                                                                                          ^
+    1180|   const capture=captures[0],hold=entries.find(r=>r.id===capture.reserv…
+    1181|   expect(entries.some(r=>r.kind==="release"&&r.reservationId===hold.id…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 수동 재요청 fallback/normal는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다
+AssertionError: expected { sendError: undefined, …(3) } to deeply equal { sendError: undefined, …(3) }
+
+- Expected
++ Received
+
+  {
+-   "available": 295n,
+-   "captures": 1,
++   "available": 300n,
++   "captures": 0,
+    "held": 0n,
+    "sendError": undefined,
+  }
+
+ ❯ tests/server/campaigns.test.ts:1179:90
+    1177|   const entries=await db.ledgerTransaction.findMany({where:{tenantId:t…
+    1178|   const captures=entries.filter(r=>r.kind==="capture"),after=await db.…
+    1179|   expect({sendError,captures:captures.length,available:after.available…
+       |                                                                                          ^
+    1180|   const capture=captures[0],hold=entries.find(r=>r.id===capture.reserv…
+    1181|   expect(entries.some(r=>r.kind==="release"&&r.reservationId===hold.id…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 수동 재요청 sms/worker는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다
+AssertionError: expected { sendError: undefined, …(3) } to deeply equal { sendError: undefined, …(3) }
+
+- Expected
++ Received
+
+  {
+-   "available": 395n,
+-   "captures": 1,
++   "available": 400n,
++   "captures": 0,
+    "held": 0n,
+    "sendError": undefined,
+  }
+
+ ❯ tests/server/campaigns.test.ts:1179:90
+    1177|   const entries=await db.ledgerTransaction.findMany({where:{tenantId:t…
+    1178|   const captures=entries.filter(r=>r.kind==="capture"),after=await db.…
+    1179|   expect({sendError,captures:captures.length,available:after.available…
+       |                                                                                          ^
+    1180|   const capture=captures[0],hold=entries.find(r=>r.id===capture.reserv…
+    1181|   expect(entries.some(r=>r.kind==="release"&&r.reservationId===hold.id…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 수동 재요청 kakao/cleanup는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다
+AssertionError: expected { sendError: undefined, …(3) } to deeply equal { sendError: undefined, …(3) }
+
+- Expected
++ Received
+
+  {
+-   "available": 495n,
+-   "captures": 1,
++   "available": 500n,
++   "captures": 0,
+    "held": 0n,
+    "sendError": undefined,
+  }
+
+ ❯ tests/server/campaigns.test.ts:1179:90
+    1177|   const entries=await db.ledgerTransaction.findMany({where:{tenantId:t…
+    1178|   const captures=entries.filter(r=>r.kind==="capture"),after=await db.…
+    1179|   expect({sendError,captures:captures.length,available:after.available…
+       |                                                                                          ^
+    1180|   const capture=captures[0],hold=entries.find(r=>r.id===capture.reserv…
+    1181|   expect(entries.some(r=>r.kind==="release"&&r.reservationId===hold.id…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/server/campaigns.test.ts > 수동 재요청 fallback/cleanup는 해제된 원장을 재사용하지 않고 새 발송을 한 번 청구한다
+AssertionError: expected { sendError: undefined, …(3) } to deeply equal { sendError: undefined, …(3) }
+
+- Expected
++ Received
+
+  {
+-   "available": 595n,
+-   "captures": 1,
++   "available": 600n,
++   "captures": 0,
+    "held": 0n,
+    "sendError": undefined,
+  }
+
+ ❯ tests/server/campaigns.test.ts:1179:90
+    1177|   const entries=await db.ledgerTransaction.findMany({where:{tenantId:t…
+    1178|   const captures=entries.filter(r=>r.kind==="capture"),after=await db.…
+    1179|   expect({sendError,captures:captures.length,available:after.available…
+       |                                                                                          ^
+    1180|   const capture=captures[0],hold=entries.find(r=>r.id===capture.reserv…
+    1181|   expect(entries.some(r=>r.kind==="release"&&r.reservationId===hold.id…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 75 skipped (81)
+   Start at  18:29:10
+   Duration  26.37s (tests 78%, import 11%, transform 10%)
+

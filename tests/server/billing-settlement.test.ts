@@ -1,7 +1,7 @@
 import { randomUUID, createHmac } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { afterAll, beforeEach, expect, test } from "vitest";
+import { afterAll, beforeEach, expect, test, vi } from "vitest";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
@@ -9,6 +9,7 @@ import { encrypt } from "@/server/crypto";
 import { senderAddressHash } from "@/server/senders";
 import { roleCapabilities } from "@/server/permissions";
 import { postTrustedLedgerTransfer } from "@/server/ledger";
+import * as ledgerModule from "@/server/ledger";
 import { runOneJob } from "@/server/jobs";
 import { POST, GET } from "@/app/api/v1/campaigns/[[...segments]]/route";
 import { POST as formPost } from "@/app/api/v1/forms/route";
@@ -297,4 +298,57 @@ test("월별 사용량은 서비스별로 집계되고 마감 스냅샷에 보�
   expect(closed.services).toEqual([]);
   const reread = await ok<{ closed: boolean; services: unknown[] }>(await closingGet(req("/billing/closing?month=" + past, fx.cookie)));
   expect(reread).toMatchObject({ closed: true, services: [] });
+});
+
+test.each(["accepted","failed","timeout"] as const)("수동 재요청 문자 webhook %s는 새 attempt 예약만 정산한다", async outcome=>{
+  const fx=await fixture();await postTrustedLedgerTransfer({tenantId:fx.company.id,currency:"KRW",kind:"funding",amount:BigInt(150),sourceKind:"pg_capture",sourceId:randomUUID()});
+  const campaignId=await campaign(fx),delivery=await db.campaignDelivery.findFirstOrThrow({where:{campaignId}});
+  const old=await postTrustedLedgerTransfer({tenantId:fx.company.id,serviceId:fx.service.id,currency:"KRW",kind:"reserve",amount:BigInt(50),sourceKind:"campaign_delivery",sourceId:delivery.id});
+  await postTrustedLedgerTransfer({tenantId:fx.company.id,serviceId:fx.service.id,currency:"KRW",kind:"release",amount:BigInt(50),sourceKind:"campaign_delivery",sourceId:delivery.id,reservationId:old.id});
+  await db.campaignDelivery.update({where:{id:delivery.id},data:{status:"sending"}});
+  await db.campaignDelivery.update({where:{id:delivery.id},data:{status:"failed",reason:"DELIVERY_FAILED"}});
+  const job=await db.job.findFirstOrThrow({where:{campaignDeliveryId:delivery.id}});await db.job.update({where:{id:job.id},data:{status:"dead"}});
+  const {cleanupCampaigns}=await import("@/server/campaign-worker");await cleanupCampaigns();
+  const current=await ok<{version:number}>(await GET(req("/campaigns/"+campaignId,fx.cookie)));
+  await ok(await POST(req("/campaigns/"+campaignId+"/retry",fx.cookie,"POST",{version:current.version,ids:[delivery.id]},randomUUID())),202);
+  expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delivery.id}})).toMatchObject({attempt:2,status:"queued"});
+  await db.campaignDelivery.update({where:{id:delivery.id},data:{status:"sending"}});
+  const source=delivery.id+":attempt:2",hold=await postTrustedLedgerTransfer({tenantId:fx.company.id,serviceId:fx.service.id,currency:"KRW",kind:"reserve",amount:BigInt(50),sourceKind:"campaign_delivery",sourceId:source});
+  await smsReceipt(delivery.id,outcome);
+  const entries=await db.ledgerTransaction.findMany({where:{tenantId:fx.company.id,sourceId:source}});
+  expect(entries.map(r=>r.kind).sort()).toEqual([outcome==="accepted"?"capture":"release","reserve"].sort());
+  expect(entries.find(r=>r.kind!=="reserve")?.reservationId).toBe(hold.id);
+  expect((await holdsOf(fx.company.id,delivery.id)).map(r=>r.kind).sort()).toEqual(["release","reserve"]);
+  expect(await account(fx.company.id)).toMatchObject({available:BigInt(outcome==="accepted"?100:150),held:BigInt(0)});
+});
+
+test.each(["worker","cleanup"] as const)("이전 빌드가 예약한 수동 attempt의 기존 원장은 %s에서도 중복 예약 없이 복구한다", async mode=>{
+  const fx=await fixture(),campaignId=await campaign(fx);
+  await drain(fx.company.id,campaignId);
+  const delivery=await db.campaignDelivery.findFirstOrThrow({where:{campaignId}});expect(delivery.status).toBe("failed");
+  expect(await db.ledgerTransaction.count({where:{tenantId:fx.company.id,sourceId:delivery.id}})).toBe(0);
+  await postTrustedLedgerTransfer({tenantId:fx.company.id,currency:"KRW",kind:"funding",amount:BigInt(100),sourceKind:"pg_capture",sourceId:randomUUID()});
+  const current=await ok<{version:number}>(await GET(req("/campaigns/"+campaignId,fx.cookie)));
+  await ok(await POST(req("/campaigns/"+campaignId+"/retry",fx.cookie,"POST",{version:current.version,ids:[delivery.id]},randomUUID())),202);
+  await postTrustedLedgerTransfer({tenantId:fx.company.id,serviceId:fx.service.id,currency:"KRW",kind:"reserve",amount:BigInt(50),sourceKind:"campaign_delivery",sourceId:delivery.id});
+  const job=await db.job.findFirstOrThrow({where:{campaignDeliveryId:delivery.id},orderBy:{createdAt:"desc"}});
+  const {cleanupCampaigns}=await import("@/server/campaign-worker");
+  try {
+    if(mode==="cleanup") {
+      const post=ledgerModule.postLedgerTransfer;
+      vi.spyOn(ledgerModule,"postLedgerTransfer").mockImplementation(async(tx,input)=>{
+        if(input.kind==="capture")throw new Error("MOCK_LEGACY_CAPTURE_INTERRUPTED");return post(tx,input);
+      });
+    }
+    await runOneJob("legacy-attempt-"+randomUUID(),{tenantId:fx.company.id,jobId:job.id});
+    if(mode==="cleanup") {
+      vi.restoreAllMocks();expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delivery.id}})).toMatchObject({status:"sending",attempt:2});
+      await db.job.update({where:{id:job.id},data:{status:"dead",leaseOwner:null,leaseUntil:null}});await cleanupCampaigns();
+    }
+    const rows=await db.ledgerTransaction.findMany({where:{tenantId:fx.company.id,sourceKind:"campaign_delivery",sourceId:{startsWith:delivery.id}}});
+    expect(rows.map(r=>r.kind).sort()).toEqual(["capture","reserve"]);expect(rows.every(r=>r.sourceId===delivery.id)).toBe(true);
+    expect(await account(fx.company.id)).toMatchObject({available:BigInt(50),held:BigInt(0)});
+    expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:delivery.id}})).toMatchObject({status:"local_delivered",attempt:2});
+    await cleanupCampaigns();expect(await account(fx.company.id)).toMatchObject({available:BigInt(50),held:BigInt(0)});
+  }finally {vi.restoreAllMocks();}
 });
