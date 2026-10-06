@@ -1,6 +1,7 @@
 // P13-T04 전 페이지 게이트: 181개 매니페스트 경로를 실제 브라우저(Playwright)로 직접URL→새로고침→뒤로가기 검증.
 // 1440/768/390 뷰포트 수평 오버플로 측정, 스크린샷·콘솔 오류·최종 URL·HTTP 상태를 증거로 남긴다.
 // 루트당 한 번 방문해 뷰포트를 리사이즈하며 측정하고, 결과를 루트 단위로 즉시 기록한다.
+import assert from "node:assert/strict";
 import { chromium, type BrowserContext, type Page } from "playwright";
 import { db } from "../src/server/db";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -8,17 +9,29 @@ import { env } from "../src/server/env";
 import { summarizePageGate, resolvePageFixture, type PageGateResult } from "./lib/qa-page-gate";
 
 const base = new URL(env.BETTER_AUTH_URL).origin;
-const outDir = "docs/qa/P13-T04";
+type MockFixtures = { origin: string; database: string; email: string; password: string; companyId: string; serviceId: string; formId: string; routes: Record<string, string>;
+  subject: { expiresAt: string; cookies: { name: string; value: string; path: string; httpOnly: boolean; sameSite: "Strict" }[] } };
+const mock: MockFixtures | null = process.env.QA_MOCK_FIXTURES === "1" ? JSON.parse(await readFile(".local/mock-page-fixtures.json", "utf8")) : null;
+if (mock) {
+  const database = new URL(env.DATABASE_URL);
+  assert.equal(database.pathname, "/catchsecu_mock_admin");
+  assert.ok(["localhost", "127.0.0.1"].includes(database.hostname));
+  assert.equal(mock.database, database.pathname); assert.equal(mock.origin, base);
+  assert.ok(Date.parse(mock.subject.expiresAt) > Date.now(), "Regenerate expired Mock subject fixtures.");
+  for (const route of Object.values(mock.routes)) assert.equal(new URL(route, base).origin, base);
+}
+// Live local tokens and captured URLs must stay outside tracked evidence.
+const outDir = mock ? ".local/mock-page-sweep" : "docs/qa/P13-T04";
 await mkdir(`${outDir}/screens`, { recursive: true });
 const manifest = JSON.parse(await readFile("src/data/route-manifest.json", "utf8")) as { path: string; dynamic?: boolean; category?: string }[];
-const pw = JSON.parse(await readFile(".local/catchsecu_dev-accounts.json", "utf8"));
+const pw = mock ? null : JSON.parse(await readFile(".local/catchsecu_dev-accounts.json", "utf8"));
 
 // 동적 경로 → 실제 fixture
-const svc = "20000000-0000-4000-8000-000000000001";
-const tenant = "10000000-0000-4000-8000-000000000001";
+const svc = mock?.serviceId ?? "20000000-0000-4000-8000-000000000001";
+const tenant = mock?.companyId ?? "10000000-0000-4000-8000-000000000001";
 const form = await db.form.findFirst({ where: { service: { tenantId: tenant } }, select: { id: true } });
 const notice = await db.notice.findFirst({ select: { id: true } });
-const alim = await db.kakaoTemplate.findFirst({ select: { id: true } }).catch(() => null);
+const alim = await db.kakaoTemplate.findFirst({ where: { tenantId: tenant }, select: { id: true } }).catch(() => null);
 const bill = await db.paymentOrder.findFirst({ where: { tenantId: tenant }, select: { id: true } }).catch(() => null);
 const fixtures: Record<string, string | undefined> = {
   ":serviceId": svc, ":formId": form?.id,
@@ -67,17 +80,19 @@ async function login(ctx: BrowserContext) {
   const page = await ctx.newPage();
   const res = await page.request.post(base + "/api/v1/auth/sign-in/email", {
     headers: { origin: base, "content-type": "application/json" },
-    data: { email: "owner@catchsecu.local.test", password: pw["owner@catchsecu.local.test"] } });
+    data: { email: mock?.email ?? "owner@catchsecu.local.test", password: mock?.password ?? pw["owner@catchsecu.local.test"] } });
   if (res.status() !== 200) throw new Error("로그인 실패: " + res.status());
   await page.close();
 }
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 await login(ctx);
+if (mock) await ctx.addCookies(mock.subject.cookies.map(cookie => ({ ...cookie, domain: new URL(base).hostname })));
 const page = await ctx.newPage();
 page.on("console", m => { if (m.type() === "error" && currentResult && currentResult.consoleErrors.length < 5) currentResult.consoleErrors.push(m.text().slice(0, 120)); });
 for (const row of manifest) {
-  const fixture = resolvePageFixture(row.path, fixtures);
-  if (fixture.missing.length || (row.dynamic && skipDynamic.test(row.path))) {
+  const explicit = mock?.routes[row.path];
+  const fixture = explicit ? { route: explicit, missing: [] } : resolvePageFixture(row.path, fixtures);
+  if (fixture.missing.length || (!explicit && row.dynamic && skipDynamic.test(row.path))) {
     results.push({ manifestPath: row.path, route: fixture.route, consoleErrors: [], skipped: fixture.missing.length ? `실제 fixture 없음: ${fixture.missing.join(", ")}` : "정상 동적 fixture 미준비" });
     await flush();
     continue;

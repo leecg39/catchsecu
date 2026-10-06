@@ -1,0 +1,158 @@
+{
+  "checkedAt": "2026-10-06T05:50:30.600Z",
+  "result": "passed",
+  "evidenceLevel": "mock-api-fixture",
+  "browserVerified": false,
+  "realExternalAcceptance": false,
+  "checks": [
+    {
+      "name": "signup",
+      "status": 200
+    },
+    {
+      "name": "login",
+      "status": 200
+    },
+    {
+      "name": "virtual payment persisted paid",
+      "status": 200
+    },
+    {
+      "name": "purpose",
+      "status": 201
+    },
+    {
+      "name": "recipient",
+      "status": 201
+    },
+    {
+      "name": "document P",
+      "status": 201
+    },
+    {
+      "name": "publish P",
+      "status": 201
+    },
+    {
+      "name": "public P",
+      "status": 200
+    },
+    {
+      "name": "document C",
+      "status": 201
+    },
+    {
+      "name": "publish C",
+      "status": 201
+    },
+    {
+      "name": "public C",
+      "status": 200
+    },
+    {
+      "name": "document OC",
+      "status": 201
+    },
+    {
+      "name": "publish OC",
+      "status": 201
+    },
+    {
+      "name": "public OC",
+      "status": 200
+    },
+    {
+      "name": "form create",
+      "status": 201
+    },
+    {
+      "name": "form publish",
+      "status": 201
+    },
+    {
+      "name": "public form",
+      "status": 200
+    },
+    {
+      "name": "public submission",
+      "status": 201
+    },
+    {
+      "name": "subject cookie session and persisted consent/event queries",
+      "status": 200
+    },
+    {
+      "name": "unknown public document rejected",
+      "status": 404
+    },
+    {
+      "name": "unknown public form rejected",
+      "status": 404
+    },
+    {
+      "name": "subject history without cookie rejected",
+      "status": 401
+    }
+  ],
+  "routes": [
+    {
+      "path": "/pay/result/success/:purchaseId",
+      "fixtureSha256": "a084aafc7dc46b43726a6d84d3dbb61faba0c32117e551bfee5d48889344ce1d"
+    },
+    {
+      "path": "/pay/credit/success/:purchaseId",
+      "fixtureSha256": "0fd4ea866f3c118831178625a6b0df6e86c5458a1b75d89ae495872e01269384"
+    },
+    {
+      "path": "/pay/plus/success/:purchaseId",
+      "fixtureSha256": "a304504b5fb719cc7d06f527db765b0a9014f00ef49c947da644e518d8642c44"
+    },
+    {
+      "path": "/pay/plus/success/:purchasedId/:type",
+      "fixtureSha256": "0b696013d804c2e38cf9391fada0a153ac2bebc5f8ed44e86b3e786d9939bf6b"
+    },
+    {
+      "path": "/document/P/:token",
+      "fixtureSha256": "b53df509994390c29faf07415db048db3bd7e5ebeb98500fc53bf6ea87728e58"
+    },
+    {
+      "path": "/document/C/:token",
+      "fixtureSha256": "219639731b413f8a063a4f65159becddcb3a6fefebd2256e742b3866f56c6896"
+    },
+    {
+      "path": "/document/OC/:token",
+      "fixtureSha256": "850e7c92a90dd1b131cefdf040a2dc8e1d7030b98f8c93fda4a2fbdc69a473a4"
+    },
+    {
+      "path": "/projects/:outerToken/form",
+      "fixtureSha256": "3c986bf28211c3c25602fe1ca7d176503fcb61c90b4d250238b43cf2f7ebb8aa"
+    },
+    {
+      "path": "/project/:outerToken/form",
+      "fixtureSha256": "a41fd1aa35d7bd75f55cc7045350d74fadfefb8073ad25936d69e7d04f1b923c"
+    },
+    {
+      "path": "/url/:outerToken",
+      "fixtureSha256": "66e4719d1ca1f8005056f183710ef0ee12a95b2ec9d6fd4a0a10506c94f1347b"
+    },
+    {
+      "path": "/test-projects/:outerToken/form",
+      "fixtureSha256": "6409c9c850f5d54a246140ef90a7cfd666e3fecacdddb0c134d08b5a049e9a88"
+    },
+    {
+      "path": "/customer-use-case/:outerToken",
+      "fixtureSha256": "8d85eba26eb58c9f4878505f48cde80264eb8895459376721db7c18494f5511e"
+    },
+    {
+      "path": "/infoOwner/agree-history/:infoOwnerToken",
+      "fixtureSha256": "41a34df7a6d80c103d26e508061b43043d59582457c451eb3d7debbf6d0b0f4c"
+    },
+    {
+      "path": "/infoOwner/action-history/:infoOwnerToken",
+      "fixtureSha256": "5ad2806833cf43e5509a0228f188d6ec56400d08b7abb01f7fab107033421448"
+    }
+  ],
+  "privateFixture": ".local/mock-page-fixtures.json",
+  "subjectExpiresAt": "2026-10-06T06:20:30.084Z",
+  "note": "No mail sent. Re-run to refresh expiring subject session; private cookie/token values are excluded from this report."
+}
