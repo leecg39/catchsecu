@@ -1,0 +1,358 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:14228) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+stderr | tests/server/billing-settlement.test.ts > 공급자 수신 결과는 미정산 발송 예약을 접수는 청구·거부와 미확인은 환불로 정산한다
+{"requestId":"a96e8e15-de02-4c19-8b97-175a64eda55e","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError","stack":"Invalid `tx.submission.create()` invocation in | /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts:91:44 |  |   88 const policyDays = await companyRetentionDays(tx, live.tenantId, live.form.serviceId); |   89 const retentionDays = live.formVersion.retentionDays ?? live.form.designatedRetentionDays ?? policyDays; |   90 const retentionUntil = new Date(Date.now() + retentionDays * 86400000); | → 91 const submission = await tx.submission.create("}
+
+ ❯ tests/server/billing-settlement.test.ts (17 tests | 13 failed) 86314ms
+   × 공급자 수신 결과는 미정산 발송 예약을 접수는 청구·거부와 미확인은 환불로 정산한다 35346ms
+   × solapi 영수증 부재 복구는 재전송하지 않고 webhook 대사가 정산한다 5276ms
+   × 끊긴 발송 잡의 수리는 영수증으로 정산하고 미전송분은 환불한다 957ms
+   × 월별 사용량은 서비스별로 집계되고 마감 스냅샷에 보존된다 267ms
+   × 수동 재요청 문자 webhook accepted는 새 attempt 예약만 정산한다 388ms
+   × 수동 재요청 문자 webhook failed는 새 attempt 예약만 정산한다 375ms
+   × 수동 재요청 문자 webhook timeout는 새 attempt 예약만 정산한다 512ms
+   × 이전 빌드가 예약한 수동 attempt의 기존 원장은 worker에서도 중복 예약 없이 복구한다 256ms
+   × 이전 빌드가 예약한 수동 attempt의 기존 원장은 cleanup에서도 중복 예약 없이 복구한다 885ms
+   × 문자 공급자 network 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 193ms
+   × 문자 공급자 malformed 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 304ms
+   × 문자 공급자 server 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 600ms
+   × 공급자 실패가 기록된 문자의 수동 재요청은 새 영수증으로 청구하고 이전 결과 재전송은 무시한다 547ms
+ ❯ tests/server/campaigns.test.ts (81 tests | 81 skipped) 446ms
+ ❯ tests/server/kakao-templates.test.ts (0 test)
+ ❯ tests/server/system-producer-audit.test.ts (0 test)
+ ❯ tests/server/kakao-detail-ui.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/campaigns.test.ts [ tests/server/campaigns.test.ts ]
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958581": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/campaigns.test.ts:90:3
+     88| }
+     89| beforeAll(async () => {
+     90|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     91|   for (const id of [tenant, foreign]) await db.company.create({ data: …
+     92|   for (const [id, tenantId] of [[service, tenant], [second, tenant], […
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/18]⎯
+
+ FAIL  tests/server/campaigns.test.ts [ tests/server/campaigns.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ tests/server/campaigns.test.ts:99:217
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/18]⎯
+
+ FAIL  tests/server/kakao-detail-ui.test.ts [ tests/server/kakao-detail-ui.test.ts ]
+Error: ENOENT: no such file or directory, open '/var/folders/04/y54015w94szby3vf2k72l9wr0000gp/T/_tBRIVhZbC9NYAHns9cgH/ssr/873db1b456f53b54931c4a47251e26ea698bf3a3'
+ ❯ src/components/services/KakaoTemplateDetail.tsx:9:1
+      7| import { ActionButton, PageHeading, Panel } from "../shared";
+      8| import { api, ApiError, errorText, useResource } from "@/lib/api";
+      9| import { kakaoTemplatePatch, kakaoVariables, type KakaoTemplateRecord …
+       | ^
+     10| import "./KakaoTemplateDetail.css";
+     11|
+ ❯ src/components/services/index.tsx:11:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/18]⎯
+
+ FAIL  tests/server/kakao-templates.test.ts [ tests/server/kakao-templates.test.ts ]
+Error: ENOENT: no such file or directory, open '/var/folders/04/y54015w94szby3vf2k72l9wr0000gp/T/_tBRIVhZbC9NYAHns9cgH/ssr/5f8c42c0020e8a92875d15aea3e26d8e4cde97b3'
+ ❯ tests/server/kakao-templates.test.ts:8:1
+      6| import { db } from "@/server/db";
+      7| import { env } from "@/server/env";
+      8| import { POST as create, GET as read, PATCH as update, DELETE as remov…
+       | ^
+      9| import { applyKakaoReview } from "@/server/kakao";
+     10|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/18]⎯
+
+ FAIL  tests/server/system-producer-audit.test.ts [ tests/server/system-producer-audit.test.ts ]
+Error: ENOENT: no such file or directory, open '/var/folders/04/y54015w94szby3vf2k72l9wr0000gp/T/_tBRIVhZbC9NYAHns9cgH/ssr/c308e3ee11d38f70e60f37b7a67edcec2c65f6f8'
+ ❯ tests/server/system-producer-audit.test.ts:7:1
+      5| import { encrypt } from "@/server/crypto";
+      6| import { POST as paymentWebhook } from "@/app/api/v1/billing/provider-…
+      7| import { applyKakaoReview } from "@/server/kakao";
+       | ^
+      8| import { postTrustedLedgerTransfer } from "@/server/ledger";
+      9| import { expireSubscriptions } from "@/server/subscription-worker";
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/18]⎯
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 공급자 수신 결과는 미정산 발송 예약을 접수는 청구·거부와 미확인은 환불로 정산한다
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"a96e8e15-de02-4c19-8b97-175a64eda55e"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/billing-settlement.test.ts:25:169
+
+ ❯ fixture tests/server/billing-settlement.test.ts:61:15
+ ❯ tests/server/billing-settlement.test.ts:196:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > solapi 영수증 부재 복구는 재전송하지 않고 webhook 대사가 정산한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958569": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 끊긴 발송 잡의 수리는 영수증으로 정산하고 미전송분은 환불한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958570": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 월별 사용량은 서비스별로 집계되고 마감 스냅샷에 보존된다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958571": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 수동 재요청 문자 webhook accepted는 새 attempt 예약만 정산한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958572": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 수동 재요청 문자 webhook failed는 새 attempt 예약만 정산한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958573": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 수동 재요청 문자 webhook timeout는 새 attempt 예약만 정산한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958574": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 이전 빌드가 예약한 수동 attempt의 기존 원장은 worker에서도 중복 예약 없이 복구한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958575": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 이전 빌드가 예약한 수동 attempt의 기존 원장은 cleanup에서도 중복 예약 없이 복구한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958576": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 문자 공급자 network 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958577": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 문자 공급자 malformed 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958578": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 문자 공급자 server 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958579": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/18]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 공급자 실패가 기록된 문자의 수동 재요청은 새 영수증으로 청구하고 이전 결과 재전송은 무시한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `53100`. Message: `could not create file "base/852519/14958580": No space left on device`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/18]⎯
+
+
+ Test Files  5 failed | 3 passed (8)
+      Tests  13 failed | 23 passed | 81 skipped (117)
+   Start at  18:50:31
+   Duration  147.83s (tests 76%, import 14%, transform 10%)
+

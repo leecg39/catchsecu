@@ -1,0 +1,180 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:15996) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+stderr | tests/server/billing-settlement.test.ts > 동의 철회로 취소된 발송은 예약 크레딧을 반환한다
+{"requestId":"a2debaf9-316c-4aee-b22e-f5a99b73c5bc","code":"INTERNAL_ERROR","kind":"PrismaClientKnownRequestError","stack":"Invalid `tx.notificationEvent.create()` invocation in | /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/notifications.ts:162:44 |  |   159 } |   160 await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${\"notification-event:\" + data.eventKey},0))`; |   161 if (await tx.notificationEvent.findUnique({ where: { eventKey: data.eventKey } })) return; | → 162 const event = await tx.notificationEvent.create("}
+
+ ❯ tests/server/billing-settlement.test.ts (17 tests | 6 failed) 184620ms
+   × 동의 철회로 취소된 발송은 예약 크레딧을 반환한다 32844ms
+   × 이전 빌드가 예약한 수동 attempt의 기존 원장은 worker에서도 중복 예약 없이 복구한다 10625ms
+   × 이전 빌드가 예약한 수동 attempt의 기존 원장은 cleanup에서도 중복 예약 없이 복구한다 7822ms
+   × 문자 공급자 malformed 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 1432ms
+   × 문자 공급자 server 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 14083ms
+   × 공급자 실패가 기록된 문자의 수동 재요청은 새 영수증으로 청구하고 이전 결과 재전송은 무시한다 6498ms
+(node:20263) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/campaigns.test.ts (81 tests | 81 skipped) 5730ms
+(node:20411) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/campaigns.test.ts [ tests/server/campaigns.test.ts ]
+AssertionError: {"error":{"code":"UNAUTHENTICATED","message":"로그인이 필요합니다.","requestId":"9b79a164-1153-47e8-a192-4c44f4663bb4"}}: expected 401 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 401
+
+ ❯ ok tests/server/campaigns.test.ts:63:169
+
+ ❯ verifiedSender tests/server/campaigns.test.ts:81:9
+ ❯ tests/server/campaigns.test.ts:95:85
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 동의 철회로 취소된 발송은 예약 크레딧을 반환한다
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"요청을 처리하지 못했습니다.","requestId":"a2debaf9-316c-4aee-b22e-f5a99b73c5bc"}}: expected 500 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 500
+
+ ❯ ok tests/server/billing-settlement.test.ts:25:169
+
+ ❯ fixture tests/server/billing-settlement.test.ts:61:15
+ ❯ tests/server/billing-settlement.test.ts:123:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 이전 빌드가 예약한 수동 attempt의 기존 원장은 worker에서도 중복 예약 없이 복구한다
+PrismaClientKnownRequestError: 
+Invalid `db.job.findFirstOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-settlement.test.ts:334:26
+
+  331 const current=await ok<{version:number}>(await GET(req("/campaigns/"+campaignId,fx.cookie)));
+  332 await ok(await POST(req("/campaigns/"+campaignId+"/retry",fx.cookie,"POST",{version:current.version,ids:[delivery.id]},randomUUID())),202);
+  333 await postTrustedLedgerTransfer({tenantId:fx.company.id,serviceId:fx.service.id,currency:"KRW",kind:"reserve",amount:BigInt(50),sourceKind:"campaign_delivery",sourceId:delivery.id});
+→ 334 const job=await db.job.findFirstOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:334:13
+    332|   await ok(await POST(req("/campaigns/"+campaignId+"/retry",fx.cookie,…
+    333|   await postTrustedLedgerTransfer({tenantId:fx.company.id,serviceId:fx…
+    334|   const job=await db.job.findFirstOrThrow({where:{campaignDeliveryId:d…
+       |             ^
+    335|   const {cleanupCampaigns}=await import("@/server/campaign-worker");
+    336|   try {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 이전 빌드가 예약한 수동 attempt의 기존 원장은 cleanup에서도 중복 예약 없이 복구한다
+PrismaClientKnownRequestError: 
+Invalid `db.campaignDelivery.findUniqueOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-settlement.test.ts:345:61
+
+  342 }
+  343 await runOneJob("legacy-attempt-"+randomUUID(),{tenantId:fx.company.id,jobId:job.id});
+  344 if(mode==="cleanup") {
+→ 345   vi.restoreAllMocks();expect(await db.campaignDelivery.findUniqueOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:345:35
+    343|     await runOneJob("legacy-attempt-"+randomUUID(),{tenantId:fx.compan…
+    344|     if(mode==="cleanup") {
+    345|       vi.restoreAllMocks();expect(await db.campaignDelivery.findUnique…
+       |                                   ^
+    346|       await db.job.update({where:{id:job.id},data:{status:"dead",lease…
+    347|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 문자 공급자 malformed 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `40P01`. Message: `deadlock detected`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:27:3
+     25| async function ok<T = Record<string, unknown>>(r: Response, status = 2…
+     26| beforeEach(async () => {
+     27|   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verif…
+       |   ^
+     28|   env.SMS_TRANSPORT = "local"; env.MESSAGE_UNIT_COST_KRW = 50;
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 문자 공급자 server 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다
+PrismaClientKnownRequestError: 
+Invalid `db.job.findUniqueOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-settlement.test.ts:369:25
+
+  366 try {
+  367   await runOneJob('uncertain-provider-'+randomUUID(),{tenantId:fx.company.id,jobId:job.id});
+  368   expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:job.campaignDeliveryId!}})).toMatchObject({status:'unknown',reason:'DELIVERY_UNCERTAIN'});
+→ 369   expect(await db.job.findUniqueOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:369:12
+    367|     await runOneJob('uncertain-provider-'+randomUUID(),{tenantId:fx.co…
+    368|     expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:job.…
+    369|     expect(await db.job.findUniqueOrThrow({where:{id:job.id}})).toMatc…
+       |            ^
+    370|     expect(await account(fx.company.id)).toMatchObject({available:BigI…
+    371|     await runOneJob('uncertain-provider-replay-'+randomUUID(),{tenantI…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 공급자 실패가 기록된 문자의 수동 재요청은 새 영수증으로 청구하고 이전 결과 재전송은 무시한다
+PrismaClientKnownRequestError: 
+Invalid `db.campaignDelivery.findUniqueOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-settlement.test.ts:396:38
+
+  393 globalThis.fetch=(async(url,init)=>{if(!String(url).startsWith('https://api.solapi.com/'))return realFetch(url,init);sends++;return new Response(JSON.stringify({groupId:'retry-'+next.id,messageId:'new',statusCode:'2000'}),{status:200});}) as typeof fetch;
+  394 try {
+  395   await runOneJob('new-provider-attempt-'+randomUUID(),{tenantId:fx.company.id,jobId:next.id});
+→ 396   expect(await db.campaignDelivery.findUniqueOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/billing-settlement.test.ts:396:12
+    394|   try {
+    395|     await runOneJob('new-provider-attempt-'+randomUUID(),{tenantId:fx.…
+    396|     expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:deli…
+       |            ^
+    397|     expect(await account(fx.company.id)).toMatchObject({available:BigI…
+    398|     expect(sends).toBe(1);expect(await db.smsReceipt.count({where:{del…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  2 failed | 6 passed (8)
+      Tests  6 failed | 71 passed | 81 skipped (158)
+   Start at  18:55:11
+   Duration  281.04s (tests 93%, import 5%, transform 2%)
+

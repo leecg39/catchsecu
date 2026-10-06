@@ -1,0 +1,19 @@
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 461ms
+
+  Creating an optimized production build ...
+
+thread 'tokio-rt-worker' (19731159) panicked at crates/next-napi-bindings/src/next_api/turbopack_ctx.rs:425:29:
+Failed to open /var/folders/04/y54015w94szby3vf2k72l9wr0000gp/T/next-panic-690f10edd924fee2e2c1cf03f65a4185.log
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Persisting failed during shutdown: Unable to write SST file 00000003.sst
+
+Caused by:
+    failed to create file `/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/mock-provider-attempt-build/cache/turbopack/v16.3.8-b0fad0d4/00000003.sst`: No space left on device (os error 28)
+uncaughtException [Error: ENOSPC: no space left on device, open '/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/mock-provider-attempt-build/trace'] {
+  errno: -28,
+  code: 'ENOSPC',
+  syscall: 'open',
+  path: '/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/mock-provider-attempt-build/trace'
+}

@@ -1,0 +1,91 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:9808) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/billing-settlement.test.ts (17 tests | 4 failed | 12 skipped) 14112ms
+   × 문자 공급자 network 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 1096ms
+   × 문자 공급자 malformed 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 3391ms
+   × 문자 공급자 server 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 2068ms
+   × 공급자 실패가 기록된 문자의 수동 재요청은 새 영수증으로 청구하고 이전 결과 재전송은 무시한다 1553ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 문자 공급자 network 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다
+ FAIL  tests/server/billing-settlement.test.ts > 문자 공급자 malformed 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다
+AssertionError: expected { …(17) } to match object { status: 'unknown', …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": "DELIVERY_UNCERTAIN",
+-   "status": "unknown",
++   "reason": "DELIVERY_FAILED",
++   "status": "queued",
+  }
+
+ ❯ tests/server/billing-settlement.test.ts:368:95
+    366|   try {
+    367|     await runOneJob('uncertain-provider-'+randomUUID(),{tenantId:fx.co…
+    368|     expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:job.…
+       |                                                                                               ^
+    369|     expect(await db.job.findUniqueOrThrow({where:{id:job.id}})).toMatc…
+    370|     expect(await account(fx.company.id)).toMatchObject({available:BigI…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 문자 공급자 server 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다
+AssertionError: expected { …(17) } to match object { status: 'unknown', …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "reason": "DELIVERY_UNCERTAIN",
+-   "status": "unknown",
++   "reason": "SMS_PROVIDER_REJECTED",
++   "status": "failed",
+  }
+
+ ❯ tests/server/billing-settlement.test.ts:368:95
+    366|   try {
+    367|     await runOneJob('uncertain-provider-'+randomUUID(),{tenantId:fx.co…
+    368|     expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:job.…
+       |                                                                                               ^
+    369|     expect(await db.job.findUniqueOrThrow({where:{id:job.id}})).toMatc…
+    370|     expect(await account(fx.company.id)).toMatchObject({available:BigI…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/billing-settlement.test.ts > 공급자 실패가 기록된 문자의 수동 재요청은 새 영수증으로 청구하고 이전 결과 재전송은 무시한다
+AssertionError: expected { …(17) } to match object { status: 'accepted', attempt: 2 }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "attempt": 2,
+-   "status": "accepted",
++   "status": "sending",
+  }
+
+ ❯ tests/server/billing-settlement.test.ts:390:83
+    388|   try {
+    389|     await runOneJob('new-provider-attempt-'+randomUUID(),{tenantId:fx.…
+    390|     expect(await db.campaignDelivery.findUniqueOrThrow({where:{id:deli…
+       |                                                                                   ^
+    391|     expect(await account(fx.company.id)).toMatchObject({available:BigI…
+    392|     expect(sends).toBe(1);expect(await db.smsReceipt.count({where:{del…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed | 12 skipped (17)
+   Start at  18:42:35
+   Duration  16.54s (tests 86%, import 8%, transform 6%)
+
