@@ -52,3 +52,7 @@
 과정에서 회사 등록 폼의 선택 필드 빈 문자열이 `z.url().refine`의 `new URL` TypeError로 500을 내는 실버그를 발견·수정했다(`src/server/schemas.ts` website refine 방어 + 회귀 테스트 `tests/server/company-management.test.ts`).
 
 미완료 유지: 원본 Ego 화면 대조, 전체 P13-T04 게이트.
+
+## 2026-10-16 경로 수용 — [route-gates/](route-gates/README.md)
+
+7개 경로의 권한·빈 상태·모바일 시나리오를 dev 서버+실제 브라우저로 검증(8/8). viewer의 서비스 B는 API 404·화면 미표시, 마케팅은 capability 부재로 403. `/compliance` 데모 값 없음. 남은 것은 원본 Ego 대조뿐.
