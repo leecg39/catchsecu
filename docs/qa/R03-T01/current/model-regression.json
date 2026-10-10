@@ -1,0 +1,17 @@
+{
+  "result": "passed",
+  "database": "catchsecu_test",
+  "files": 6,
+  "tests": 158,
+  "failed": 0,
+  "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/company-management.test.ts tests/server/access-requests.test.ts tests/server/access-request-authority.test.ts tests/server/management-authority.test.ts tests/server/context-audit.test.ts tests/server/foundation.test.ts",
+  "durationSeconds": 94.83,
+  "coverage": [
+    "company create/read/update/closure request and cancellation",
+    "business file upload/download/replacement/deletion and optimistic company version",
+    "service create/read/update/archive/restore and referenced-data rejection",
+    "context selection and current authority",
+    "access request create/list/approve/reject/cancel and grant creation",
+    "tenant, role, origin, active-state and stale-version rejection"
+  ]
+}

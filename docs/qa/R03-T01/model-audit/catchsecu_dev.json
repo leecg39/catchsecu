@@ -1,8 +1,18 @@
 {
   "result": "passed",
   "database": "catchsecu_dev",
-  "checkedAt": "2026-10-09T18:57:12.333Z",
-  "scope": "six management models; metadata and explicit tenant/state/uniqueness assertions, not all business acceptance",
+  "checkedAt": "2026-10-10T22:47:59.036Z",
+  "scope": "six management models; required fields, tenant ownership, optimistic company/service/request versions, state transitions, uniqueness, retention and delete boundaries",
+  "versionOwnership": {
+    "company": "Company.version",
+    "service": "Service.version",
+    "accessRequest": "AccessRequest.version",
+    "businessFileMutation": "Company.version serializes upload, replacement and deletion; CompanyBusinessFile keeps immutable file evidence rows"
+  },
+  "lifecycleSeparation": {
+    "companyClosure": "Company.status and closureRequested*",
+    "memberWithdrawal": "Membership.status=revoked"
+  },
   "tables": [
     "Company",
     "Service",
@@ -679,9 +689,9 @@
     }
   ],
   "sourceFingerprints": {
-    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/schema.prisma": "1a780ed7caf074953ffa7f9139d35b272916f35d0c7892bd24c82a73a375aca3",
     "prisma/migrations/20261003140000_service_access_requests/migration.sql": "fb97b6980807154a6862ce53d037c71d931e1f048ce13c05cf5cdd3adeefcd05",
-    "src/server/company-management.ts": "9df1b5042cfa2b52ebbfa922a16ca0de193acb82f366a1eb47f4be753057f286",
+    "src/server/company-management.ts": "acaebb6f8edbfbd8829964edd0cdae752c9ed7473fba3496f2178b5679b56492",
     "src/server/service-management.ts": "16c94f65e5e63f5bc3dfae89e5048c112af7ed3374a4ee37ebfb90b1a3283b39",
     "src/server/access-requests.ts": "bf1be491ffae5ea0f85c8ef050206f2799d1322806d31c2b241f1fd57389c3aa",
     "src/contracts/access-requests.ts": "8defe9040457a2cd0721537db0054ad2cdddb15cb9de236a3d174cc9bc7fdba9"

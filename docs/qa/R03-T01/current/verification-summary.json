@@ -1,0 +1,22 @@
+{
+  "result": "passed",
+  "task": "R03-T01",
+  "status": "completed",
+  "externalStatus": "not_applicable",
+  "databases": {
+    "catchsecu_dev": { "models": 6, "columns": 66, "constraints": 29, "indexes": 24 },
+    "catchsecu_test": { "models": 6, "columns": 66, "constraints": 29, "indexes": 24 }
+  },
+  "regression": { "files": 6, "tests": 158, "failed": 0 },
+  "migrationAdded": false,
+  "versionContract": {
+    "company": "Company.version",
+    "service": "Service.version",
+    "accessRequest": "AccessRequest.version",
+    "businessFileMutation": "Company.version"
+  },
+  "lifecycleSeparation": {
+    "companyClosure": "Company.status and closureRequested*",
+    "memberWithdrawal": "Membership.status=revoked"
+  }
+}

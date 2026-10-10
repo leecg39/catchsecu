@@ -217,7 +217,7 @@ A 계정 가입 후 로컬 시험메일 링크를 한 번 사용, 재사용 거�
 
 ## R03 회사·서비스·초기 설정
 
-### [~] R03-T01 회사·서비스·초기 설정 — 모델·규칙 대조 및 보완
+### [x] R03-T01 회사·서비스·초기 설정 — 모델·규칙 대조 및 보완
 
 Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceGrant 관계, 사업자 파일 소유권과 version을 검사한다. 회사 종료와 구성원 탈퇴를 구분한다.
 
@@ -228,6 +228,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
 - 완료 조건:
   - C 회사/서비스/접근요청; R 목록·상세·현재 컨텍스트; U 기본정보/이름/요청결정; D 서비스 보관·회사 종료요청. 참조 데이터 즉시 cascade 삭제 금지.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
+- 완료 증거: [현재 보고서](../../qa/R03-T01/current/README.md), [검증 집계](../../qa/R03-T01/current/verification-summary.json), [158개 모델·업무 회귀](../../qa/R03-T01/current/model-regression.json), [dev 모델 감사](../../qa/R03-T01/model-audit/catchsecu_dev.json), [test 모델 감사](../../qa/R03-T01/model-audit/catchsecu_test.json). 신규 migration 없이 6모델66열·29제약·24인덱스를 확인했다.
 
 ### [~] R03-T02 회사·서비스·초기 설정 — 서버 API·업무 처리
 

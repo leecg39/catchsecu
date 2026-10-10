@@ -771,28 +771,39 @@
     "legacy_tasks": [
       "P03-T01"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "model",
     "evidence_directory": "catchsecu-clone/docs/qa/R03-T01/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R03-T01/current/README.md",
+      "docs/qa/R03-T01/current/verification-summary.json",
+      "docs/qa/R03-T01/current/model-regression.json",
+      "docs/qa/R03-T01/current/quality-gates.json",
+      "docs/qa/R03-T01/model-audit/catchsecu_dev.json",
+      "docs/qa/R03-T01/model-audit/catchsecu_test.json"
+    ],
     "dependency_gates": {
       "R02-T04": "local_acceptance_pass"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "dev/test6모델66컬럼29제약24인덱스 대조. 회사·서비스·멤버·권한·접근요청·사업자파일의 tenant FK/unique/상태/삭제 규칙을 실제 메타데이터와 검사. 신규 migration 없음. 운영 폐쇄·전체 조합은 후속.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "회사·서비스·구성원·서비스권한·접근요청·사업자파일 6모델의 필수열·tenant FK·unique/index·상태·보존/삭제·version 규칙을 dev/test PostgreSQL에서 대조했다. 회사 폐쇄와 멤버 회수를 분리하고 사업자파일 변경을 Company.version으로 직렬화함을 확인했다. 6파일158시험·타입·린트·production build가 통과했고 신규 migration은 필요하지 않았다.",
     "progress_evidence": [
+      "docs/qa/R03-T01/current/README.md",
+      "docs/qa/R03-T01/current/verification-summary.json",
+      "docs/qa/R03-T01/current/model-regression.json",
+      "docs/qa/R03-T01/current/quality-gates.json",
       "docs/qa/R03-T01/model-audit/README.md",
       "docs/qa/R03-T01/model-audit/catchsecu_dev.json",
       "docs/qa/R03-T01/model-audit/catchsecu_test.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
+      "database": "verified",
       "api": "not_applicable",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {
