@@ -1,0 +1,31 @@
+{
+  "result": "passed",
+  "gates": [
+    {
+      "name": "focused regression",
+      "command": "vitest run r03-management-ui-contract client-api-errors route-fixture-contract",
+      "result": "4 suites, 19 tests passed"
+    },
+    {
+      "name": "typecheck",
+      "command": "npm run typecheck",
+      "result": "passed"
+    },
+    {
+      "name": "eslint",
+      "command": "eslint R03 UI contract and connected sources",
+      "result": "passed"
+    },
+    {
+      "name": "production build",
+      "command": "ALLOW_LOCAL_MAIL=1 ALLOW_LOCAL_KAKAO=1 ALLOW_LOCAL_PAYMENT=1 npm run build",
+      "result": "passed; 82 static pages generated",
+      "externalClaim": false
+    }
+  ],
+  "expectedPreflight": {
+    "command": "npm run build without local-provider allow flags",
+    "result": "blocked by production SMTP guard during page-data collection",
+    "classification": "environment safety guard, not a source or type failure"
+  }
+}

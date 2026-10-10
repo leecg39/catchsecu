@@ -16,16 +16,19 @@ export function LiveServices() {
   const app = useApplication(), canManage = app.data?.capabilities.includes("service.manage");
   const [query, setQuery] = useState(""), [search, setSearch] = useState(""), [page, setPage] = useState(1);
   const [status, setStatus] = useState("active"), [archive, setArchive] = useState<Service>();
+  const [sort, setSort] = useState("createdAt"), [direction, setDirection] = useState("desc");
   const [error, setError] = useState(""), [busy, setBusy] = useState(false);
   const [archiveConflict, setArchiveConflict] = useState(false);
   const lock = useRef(false);
-  const result = useResource<{ items: Service[]; total: number; page: number; pageSize: number }>("/services?page=" + page + "&search=" + encodeURIComponent(query) + "&status=" + status);
+  const result = useResource<{ items: Service[]; total: number; page: number; pageSize: number }>("/services?page=" + page + "&search=" + encodeURIComponent(query) + "&status=" + status + "&sort=" + sort + "&direction=" + direction);
   const currentPage = result.data?.page ?? page;
   function reloadList() { if (busy) return; setArchive(undefined); setArchiveConflict(false); setError(""); result.reload(); app.reload(); }
   return <><PageHeading title="서비스 관리">{canManage && <Link className="cs-button" href="/set/service/modification">서비스 생성</Link>}</PageHeading>
     <Panel><form className="mg-flex mg-search" onSubmit={e => { e.preventDefault(); setQuery(search); setPage(1); }}>
       <input className="cs-input" aria-label="서비스명 검색" placeholder="서비스명 검색" value={search} onChange={e => setSearch(e.target.value)} />
-      <select className="cs-input" aria-label="서비스 상태" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}><option value="active">운영 중</option><option value="archived">보관</option><option value="all">전체</option></select><ActionButton secondary>검색</ActionButton></form>
+      <select className="cs-input" aria-label="서비스 상태" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}><option value="active">운영 중</option><option value="archived">보관</option><option value="all">전체</option></select>
+      <select className="cs-input" aria-label="서비스 정렬 기준" value={sort} onChange={e => { setSort(e.target.value); setPage(1); }}><option value="createdAt">등록일</option><option value="name">서비스명</option></select>
+      <select className="cs-input" aria-label="서비스 정렬 방향" value={direction} onChange={e => { setDirection(e.target.value); setPage(1); }}><option value="desc">내림차순</option><option value="asc">오름차순</option></select><ActionButton secondary>검색</ActionButton></form>
       <ErrorNote error={result.error?.message || (!archive ? error : "")} />{(result.error || (!archive && error)) && <ActionButton secondary disabled={busy || result.loading} onClick={reloadList}>목록 다시 불러오기</ActionButton>}{result.loading ? <p role="status">서비스를 불러오는 중입니다.</p> :
       <><div className="cs-table-wrap"><table className="cs-table"><thead><tr>{["서비스 명", "외부 공개 서비스 명", "유형", "소개", "상태", "관리"].map(label => <th key={label}>{label}</th>)}</tr></thead><tbody>
         {result.data?.items.map(service => <tr key={service.id}><td>{service.name}</td><td>{service.externalName}</td><td>{{ website: "웹사이트", app: "앱", offline: "오프라인", other: "기타" }[service.type] ?? service.type}</td><td>{service.description || "-"}</td><td>{service.status === "active" ? "운영 중" : "보관"}</td><td>{canManage && <div className="mg-flex"><Link className="cs-link" href={"/set/service/modification?id=" + service.id}>수정</Link>{service.status === "active" ? <><Link href={"/set/service/consent?serviceId=" + service.id}>동의서 표시</Link><button disabled={busy} onClick={() => { setError(""); setArchiveConflict(false); setArchive(service); }}>보관</button></> : <button disabled={busy} onClick={async () => { if (lock.current) return; lock.current = true; setBusy(true); setError(""); try { await api("/services/" + service.id, { method: "PATCH", body: JSON.stringify({ version: service.version, status: "active" }) }); result.reload(); app.reload(); } catch (error) { setError(errorText(error)); } finally { lock.current = false; setBusy(false); } }}>복원</button>}</div>}</td></tr>)}

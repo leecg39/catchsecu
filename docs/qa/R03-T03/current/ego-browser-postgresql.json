@@ -1,0 +1,76 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-10T23:06:43.406Z",
+  "database": "catchsecu_dev",
+  "browser": "Ego Lite",
+  "scenario": "R03-T03 current company/service pagination, search and access request",
+  "company": {
+    "idHash": "ca918104e6ac471c",
+    "name": "R03 현재 화면 회사",
+    "publicName": "R03 현재 공개 회사",
+    "status": "active",
+    "version": 1
+  },
+  "services": {
+    "total": 25,
+    "active": 25,
+    "pageSizeObserved": 20,
+    "pagesObserved": 2,
+    "sortControlsObserved": {
+      "field": "name",
+      "direction": "asc",
+      "firstVisibleName": "R03 서비스 01",
+      "secondVisibleName": "R03 서비스 02"
+    },
+    "searchObserved": "R03 서비스 01",
+    "searchResultCount": 1,
+    "firstIdHash": "d773c461d7b2678a",
+    "lastIdHash": "a44c13b448c9ed39"
+  },
+  "memberships": [
+    {
+      "idHash": "a2a909f7b26cf5bf",
+      "userIdHash": "7af47c07df8a09c1",
+      "role": "owner",
+      "status": "active",
+      "version": 1,
+      "grantCount": 0
+    },
+    {
+      "idHash": "d4cb686781ba0654",
+      "userIdHash": "d32bd6d56dba2cc9",
+      "role": "viewer",
+      "status": "active",
+      "version": 1,
+      "grantCount": 0
+    }
+  ],
+  "accessRequests": [
+    {
+      "idHash": "b7284e5701b60083",
+      "requesterIdHash": "d4cb686781ba0654",
+      "serviceIdHash": "d773c461d7b2678a",
+      "reason": "현재 화면 접근 요청 검증",
+      "status": "pending",
+      "version": 1,
+      "createdAt": "2026-10-10T23:03:49.649Z"
+    }
+  ],
+  "audits": [
+    {
+      "idHash": "06a6ed1a34d066de",
+      "action": "access_request.created",
+      "resource": "access_request",
+      "resourceIdHash": "b7284e5701b60083",
+      "serviceIdHash": "d773c461d7b2678a",
+      "detail": {
+        "changedFields": [
+          "serviceId",
+          "reason"
+        ]
+      },
+      "createdAt": "2026-10-10T23:03:49.662Z"
+    }
+  ],
+  "secretsStored": false
+}

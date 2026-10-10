@@ -1,0 +1,62 @@
+{
+  "result": "passed",
+  "paths": [
+    {
+      "path": "/company-info",
+      "normal": "../company-flow/created.json",
+      "loadingRetry": "tests/server/r03-management-ui-contract.test.ts",
+      "validation": "required company name and public name; server 422 covered by R03-T02",
+      "permissionExpired": "R03-T02 authority and client API error regressions",
+      "conflict": "../company-flow/conflict.json",
+      "reload": "../company-flow/reload.json"
+    },
+    {
+      "path": "/service/none",
+      "normalEmpty": "../access-flow/requester-responsive.json",
+      "loadingRetry": "../access-flow/retry-error.json and retry-recovered.json",
+      "validation": "available-service membership check before submit",
+      "permissionExpired": "../access-flow/viewer-denied.json and client API error regression",
+      "conflict": "../access-flow/conflict.json and conflict-recovered.json",
+      "reload": "../access-flow/after-restart.json"
+    },
+    {
+      "path": "/set/company",
+      "normal": "../company-flow/final.json",
+      "empty": "../company-flow/created.json before business-file upload",
+      "loadingRetry": "tests/server/r03-management-ui-contract.test.ts",
+      "permissionExpired": "R03-T02 authority and client API error regressions",
+      "conflict": "../company-flow/conflict.json",
+      "reload": "../company-flow/reload.json"
+    },
+    {
+      "path": "/set/company/edit",
+      "normalValidation": "../company-flow/created.json and closure-validation.json",
+      "loadingRetry": "tests/server/r03-management-ui-contract.test.ts",
+      "permissionExpired": "R03-T02 authority and client API error regressions",
+      "conflict": "../company-flow/conflict-recovery.json",
+      "reload": "../company-flow/reload.json"
+    },
+    {
+      "path": "/set/service",
+      "normalEmpty": "../service-flow/created.json and UI contract empty-row regression",
+      "loadingRetry": "../service-flow/dependency-recovered.json and UI contract regression",
+      "permissionExpired": "R03-T02 authority and client API error regressions",
+      "conflict": "../service-flow/conflict.json",
+      "paginationSearch": "ego-browser-postgresql.json",
+      "reload": "../service-flow/restored.json"
+    },
+    {
+      "path": "/set/service/modification",
+      "normalValidation": "../service-flow/created.json",
+      "loadingRetry": "tests/server/r03-management-ui-contract.test.ts",
+      "permissionExpired": "R03-T02 authority and client API error regressions",
+      "conflict": "../service-flow/conflict-reloaded.json",
+      "queryAndInputGuard": "../service-flow/cancel-after.json and context-guard-after.json"
+    }
+  ],
+  "crossScreenPersistence": {
+    "company": "browser create/edit/file/closure actions were re-read from PostgreSQL and after process restart",
+    "service": "browser create/edit/archive/restore and 25-row pagination/search were re-read from PostgreSQL",
+    "accessRequest": "browser POST produced a pending row and access_request.created audit event; owner review flows and requester reload were previously observed"
+  }
+}

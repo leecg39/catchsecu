@@ -243,7 +243,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 - 완료 증거: [현재 보고서](../../qa/R03-T02/current/README.md), [검증 집계](../../qa/R03-T02/current/verification-summary.json), [257개 서버 회귀](../../qa/R03-T02/current/server-api-regression.json), [OpenAPI 20작업](../../qa/R03-T02/current/api-contract.json). tenant/role/session/MFA/version/구독한도와 보관 서비스 후속 차단까지 확인했다.
 
-### [~] R03-T03 회사·서비스·초기 설정 — 전체 화면·모달 연결
+### [x] R03-T03 회사·서비스·초기 설정 — 전체 화면·모달 연결
 
 회사 조회/편집, 서비스 목록·추가 모달·편집/보관, 회사 최초 등록, 서비스 없음→접근요청 흐름. 전환 시 목록·권한·선택값 캐시를 함께 갱신한다.
 
@@ -254,6 +254,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
 - 완료 조건:
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
+- 완료 증거: [현재 보고서](../../qa/R03-T03/current/README.md), [상태 행렬](../../qa/R03-T03/current/state-matrix.json), [Ego Lite·PostgreSQL 대조](../../qa/R03-T03/current/ego-browser-postgresql.json), [19개 화면 계약 회귀](../../qa/R03-T03/current/ui-contract-regression.json), [반응형 요약](../../qa/R03-T03/current/responsive-summary.json). 여섯 경로와 25개 서비스의 2페이지 이동·정렬·검색, 접근요청·감사 저장, 390/768/1440폭을 확인했다.
 
 ### [~] R03-T04 회사·서비스·초기 설정 — DB·브라우저·재시작 수용검증
 
