@@ -1,10 +1,10 @@
 # Prisma 모델과 실제 DB 정합성
 
-2026-10-10. Migration 102개가 적용된 DB를 읽기 전용으로 비교했다. 기존 SQL·DB 데이터·제약을 변경하지 않고 Prisma의 FK 이름/갱신 동작, 기본값, 인덱스 이름을 실제 DB에 맞췄다. 기존 FileObject 2개·Job 4개 인덱스와 MessageTemplateRevision 작성자 관계를 추가했다.
+2026-10-11. 현재 migration 148개가 적용된 dev/test DB를 읽기 전용으로 다시 비교했다. 기존 SQL·DB 데이터·제약을 변경하지 않고 Prisma의 FK 이름/갱신 동작, 기본값, 인덱스 이름을 실제 DB에 맞춘 과거 정합화 결과를 현재 스키마까지 재검증했다.
 
 ## 최종 결과
 
-- 게시 수탁자 출처·구조화 처리방침 migration 추가 후104개 적용 상태에서 dev/test를 다시 읽기 전용으로 대조했다. 아래 contract.json과 checked-diff.sql은 이 최신 결과이며,102개 시점의 회귀/설계 기록은 보존한다.
+- dev/test migration 148/148과 checksum 차이0을 확인한 뒤 다시 읽기 전용으로 대조했다. 아래 contract.json과 checked-diff.sql은 최신 결과이며, 102~104개 시점의 회귀·설계 기록은 보존한다.
 - dev/test: 예상하지 않은 차이 **0개**. SQL에서만 관리하는 회사 폐쇄 요청자 FK **1개**가 유지됨을 실제 pg_catalog 정의와 validated 값으로 확인했다.
 - `catchsecu_dev-contract.json`, `catchsecu_test-contract.json`과 각 checked-diff.sql이 최종 결과다. `scripts/verify-schema-contract.ts`는 이 FK 한 개 외의 모든 차이를 실패로 처리하며 DDL을 실행하지 않는다.
 - `regression-final.json`: 회사 생성·계정 폐쇄·원장·환불·SSO·감사 관련 7파일 **88개 통과, 실패 0개**. Prisma validate/client 생성·전체 타입·변경 린트 통과.

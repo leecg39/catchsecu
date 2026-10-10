@@ -63,3 +63,4 @@ CREATE CONSTRAINT TRIGGER "FormVersion_consent_items_projection"
 CREATE CONSTRAINT TRIGGER "Question_consent_items_projection"
   AFTER INSERT OR UPDATE OR DELETE ON "Question" DEFERRABLE INITIALLY DEFERRED
   FOR EACH ROW EXECUTE FUNCTION check_form_consent_items_projection();
+

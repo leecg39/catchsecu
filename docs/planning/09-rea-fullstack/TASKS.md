@@ -1,6 +1,6 @@
 # 상세 TASKS — 캐치시큐 전 페이지 풀스택 완성 계획
 
-R00-T04 fixture·QA 재현계약 완료: 실제 PostgreSQL 시드에서 원본186개와 부가21개 경로를 모두 구체화하고 정상·권한거부·실패 시나리오621개를 고정했다. callback은 실제 state/challenge, wildcard는 알 수 없는 URL, 외부비용 시험은 전용 allowlist/sandbox 계정만 요구한다. 브라우저 선행상태와 외부 공급자 검증은 준비조건이며 CRUD 실행 성공으로 집계하지 않는다. 현재 공식 상태는 완료4·진행49·계획54다. [검증](../../qa/R00-T04/active-fixtures/README.md).
+R01-T01 실행환경·DB 정합성 완료: 적용 당시 Git blob에서 migration3개의 파일 끝 빈 줄을 복구해 Node24 dev/test 148/148 checksum 차이0을 확인했다. schema 예상 밖 차이0·SQL전용FK1개, shadow 빈 설치·147→148 upgrade·실패 rollback/recovery·seed·FK/unique 거부가 통과했다. 현재 공식 상태는 완료5·진행48·계획54다. [검증](../../qa/R01-T01/current/README.md).
 
 F3 입력 패턴 체크포인트: 원본 확인 ID 1·2·3·4·7·8의 nullable 모델·DB 조합 제약, 폼 CRUD/복제/템플릿/게시/정정과 편집/공개 화면을 구현했다. 임의 정규식은 strict 계약에서 거부하며 고정 길이 검증만 실행한다. 집중6·관련27·frozen fixture20/20, migration140 빈 설치·기존 질문415개 보존, Ego 잘못된 값 거부/정상 제출·production 재시작 hash, 82페이지 build를 통과했다. [검증](../../qa/R08-T02/question-patterns/README.md). R08-T02와 공식 완료0/진행53/계획54는 유지한다.
 
@@ -88,7 +88,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
 
 ## R01 공통 서버 기반
 
-### [~] R01-T01 실행환경·DB 변경 이력·스키마 정합성
+### [x] R01-T01 실행환경·DB 변경 이력·스키마 정합성
 
 현재 채택된 Node/Next/Prisma/PostgreSQL 환경을 확인하고 설치문서를 기준으로 변경한다. 마이그레이션 누적과 과거 checksum 불일치를 백업/증거로 대조하며 기존SQL 덮어쓰기를 금지한다.
 
@@ -98,7 +98,8 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
 - 증거: `catchsecu-clone/docs/qa/R01-T01/`
 - 완료 조건:
   - 빈 DB migrate+seed와 기존시험DB upgrade 모두 통과; FK/unique/index 점검
-  - 현재102 migration 파일과 실행DB 이력은 별도 검증; checksum 차이 해소 근거 보존
+  - 현재 migration 파일 전수와 실행DB 이력은 별도 검증; checksum 차이 해소 근거 보존
+- 완료 증거: [현재 보고서](../../qa/R01-T01/current/README.md), [shadow 148개 재현](../../qa/R01-T01/current/db-rehearsal.json), [dev 스키마 계약](../../qa/R01-T01/schema-alignment/catchsecu_dev-contract.json), [test 스키마 계약](../../qa/R01-T01/schema-alignment/catchsecu_test-contract.json), [checksum 복구 근거](../../qa/R01-T01/current/checksum-recovery.json). Node24 dev/test 148/148 checksum 일치, 빈 설치·147→148 업그레이드·실패 rollback/recovery·seed·FK/unique 거부를 확인했다.
 
 ### [ ] R01-T02 API·권한·경합·멱등 공통 경계
 

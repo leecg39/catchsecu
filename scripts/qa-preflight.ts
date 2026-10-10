@@ -31,7 +31,9 @@ try {
   const ready = checks.every(check => check.status === "passed") && unapplied.length === 0 && failed.length === 0;
   const report = { checkedAt: new Date().toISOString(), runtimeReady: ready, externalAcceptance: false, checks,
     migrations: { source:source.size, applied:applied.length, mismatches, unapplied, failed, historicalSqlModified:false },
-    note: "과거 체크섬 차이는 원본 확보와 업그레이드 검증 전까지 미해결로 보존한다. 런타임 준비 여부와 출시 승인은 별개다." };
+    note: mismatches.length
+      ? "체크섬 차이는 적용 당시 원본 바이트를 확보하고 업그레이드를 검증하기 전까지 미해결이다. 런타임 준비 여부와 출시 승인은 별개다."
+      : "적용된 migration checksum이 현재 source bytes와 모두 일치한다. 런타임 준비 여부와 출시 승인은 별개다." };
   const out = "docs/qa/R01-T05/preflight"; await mkdir(out, { recursive:true });
   await writeFile(join(out,database.pathname.slice(1)+".json"),JSON.stringify(report,null,2)+"\n");
   console.log(JSON.stringify({ runtimeReady:ready, checks:checks.map(item=>({name:item.name,status:item.status})), migrationChecksumMismatches:mismatches.length, unapplied:unapplied.length }));

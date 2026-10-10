@@ -2,7 +2,7 @@
 
 2026-10-10 · **사용자 승인 후 구현·검증 진행 중**
 
-R00-T04 fixture·QA 재현계약이 완료됐다. 실제 PostgreSQL 시드에서 원본186+부가21경로를 모두 구체화하고 정상·권한거부·실패 시나리오621개, callback 선행상태, 음성 wildcard, 외부 시험 대상 정책을 자동 검증한다. 전체107개 작업 상태는 완료4·진행49·계획54이며, 브라우저·외부 실행은 각 소유 Task에서 별도 증거로 확인한다. [현재 증거](../../qa/R00-T04/active-fixtures/README.md).
+R01-T01 실행환경·DB 정합성이 완료됐다. Node24 dev/test 148/148 checksum, schema diff 예상 밖0, shadow 빈 설치·147→148 업그레이드·실패 복구·seed와 FK/unique 거부를 확인했다. 전체107개 작업 상태는 완료5·진행48·계획54이며 다음 의존 작업은 R01-T02 API·권한·경합·멱등 공통 경계다. [현재 증거](../../qa/R01-T01/current/README.md).
 
 원본 계획은 outputs에 보존했다. 이 복사본과 tasks.json이 활성 실행 기준선이다. 증거는 저장소 docs/qa/Rxx-Tyy에 기록한다.
 

@@ -42,3 +42,4 @@ BEGIN
  RETURN true;
 EXCEPTION WHEN numeric_value_out_of_range THEN RETURN false;
 END $$;
+

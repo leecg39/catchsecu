@@ -130,9 +130,15 @@ async function main() {
     evidence.checksumSample = createHash("sha256").update(names.join("\n")).digest("hex");
     evidence.result = "passed";
   } finally { await client.end(); }
-  await mkdir("docs/qa/P01-T01", { recursive: true });
-  await writeFile("docs/qa/P01-T01/db-rehearsal.json", JSON.stringify(evidence, null, 2) + "\n");
-  await writeFile("docs/qa/P01-T01/README.md", `# P01-T01 DB 마이그레이션·seed
+  const legacyDirectory = "docs/qa/P01-T01";
+  const activeDirectory = "docs/qa/R01-T01/current";
+  await Promise.all([mkdir(legacyDirectory, { recursive: true }), mkdir(activeDirectory, { recursive: true })]);
+  const report = JSON.stringify(evidence, null, 2) + "\n";
+  await Promise.all([
+    writeFile(legacyDirectory + "/db-rehearsal.json", report),
+    writeFile(activeDirectory + "/db-rehearsal.json", report),
+  ]);
+  const readme = `# R01-T01 DB 마이그레이션·seed
 
 ${new Date().toISOString()}. 프로젝트 shadow 데이터베이스에서 빈 설치, 직전 migration에서의 업그레이드, 실패한 migration의 롤백과 재실행, 회사 교차 참조 거부, 이메일 중복 거부, seed를 확인했다. dev/test 데이터는 변경하지 않았다.
 
@@ -146,8 +152,12 @@ ${new Date().toISOString()}. 프로젝트 shadow 데이터베이스에서 빈 �
 - shadow seed 후 회사 2개와 fixture 계정이 있다.
 
 실행: \`npm run verify:p01-db\`. 결과: \`db-rehearsal.json\`.
-이 검증은 181개 화면 CRUD 완료가 아니다.
-`);
+이 검증은 전체 페이지 CRUD 완료가 아니다.
+`;
+  await Promise.all([
+    writeFile(legacyDirectory + "/README.md", readme.replace("R01-T01", "P01-T01")),
+    writeFile(activeDirectory + "/db-rehearsal-README.md", readme),
+  ]);
   console.log(JSON.stringify({ result: evidence.result, migrations: names.length, constraints: evidence.constraints, seed: evidence.seed }));
 }
 main().catch(error => { console.error(error instanceof Error ? error.message : error); process.exitCode = 1; });

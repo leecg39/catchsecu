@@ -1,4 +1,8 @@
-## 최신 작업: R00-T04 fixture·QA 재현계약 완료
+## 최신 작업: R01-T01 실행환경·DB 정합성 완료
+
+2026-10-11 적용 당시 도달 불가 Git blob에서 migration3개의 원본 바이트를 찾아 파일 끝 빈 줄을 복원했다. Node24에서 dev/test migration148/148 checksum 차이0, PostgreSQL·ClamAV 준비, Prisma schema 예상 밖 차이0·SQL전용FK1개를 확인했다. shadow 빈 설치148, 147→148 업그레이드, 의도적 실패 migration rollback/recovery, 반복 seed, 회사 교차 FK23503·중복 이메일23505가 통과했다. 계획 상태 완료5/진행48/계획54, 전체 goal active. [증거](../../docs/qa/R01-T01/current/README.md).
+
+## 이전 작업: R00-T04 fixture·QA 재현계약 완료
 
 2026-10-11 실제 PostgreSQL 시드에서 역할10개(회사A 역할9종+빈 회사B 소유자), 제출파일·가져오기·카카오 draft·pending 결제주문을 제약에 맞춰 생성했다. 원본186개와 부가21개 경로 모두 실제 ID/토큰 또는 의도된 음성 wildcard로 구체화했고 정상·권한거부·실패 시나리오621개를 고정했다. callback 19개 브라우저 선행상태와 외부 인증19개는 준비조건으로 남기며 실행 성공으로 집계하지 않는다. 전용 시험 수신자·sandbox 정책, 단위시험6개·타입·린트가 통과했다. 계획 상태 완료4/진행49/계획54, 전체 goal active. [증거](../../docs/qa/R00-T04/active-fixtures/README.md).
 

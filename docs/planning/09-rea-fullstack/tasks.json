@@ -223,7 +223,7 @@
     ],
     "acceptance": [
       "빈 DB migrate+seed와 기존시험DB upgrade 모두 통과; FK/unique/index 점검",
-      "현재102 migration 파일과 실행DB 이력은 별도 검증; checksum 차이 해소 근거 보존"
+      "현재 migration 파일 전수와 실행DB 이력은 별도 검증; checksum 차이 해소 근거 보존"
     ],
     "files": [
       "package.json",
@@ -235,28 +235,40 @@
       "P00-T02",
       "P01-T01"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "cross-cutting",
     "evidence_directory": "catchsecu-clone/docs/qa/R01-T01/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R01-T01/current/README.md",
+      "docs/qa/R01-T01/current/db-rehearsal.json",
+      "docs/qa/R01-T01/schema-alignment/catchsecu_dev-contract.json",
+      "docs/qa/R01-T01/schema-alignment/catchsecu_test-contract.json",
+      "docs/qa/R01-T01/current/checksum-recovery.json",
+      "docs/qa/R01-T05/preflight/catchsecu_dev.json",
+      "docs/qa/R01-T05/preflight/catchsecu_test.json"
+    ],
     "dependency_gates": {
       "R00-T04": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "dev/test104개 checksum 일치. 격리DB 빈설치·업그레이드·seed반복·FK/unique·131테이블/암호화파일 복구 통과. 스키마 예상밖 차이0·SQL전용FK1개 실제검사·최종 회귀88개 통과.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "verified",
+    "progress_note": "Node24 dev/test migration148/148 checksum 일치, schema 예상 밖 차이0. shadow 빈 설치·147→148 upgrade·실패 rollback/recovery·seed·FK/unique 거부 통과. 적용 당시 Git blob으로 파일 끝 빈 줄3건을 복구했다.",
     "progress_evidence": [
-      "docs/qa/R01-T01/db-rehearsal/result.json",
-      "docs/qa/R01-T01/schema-alignment/README.md",
-      "docs/qa/R01-T01/schema-alignment/regression-final.json"
+      "docs/qa/R01-T01/current/README.md",
+      "docs/qa/R01-T01/current/db-rehearsal.json",
+      "docs/qa/R01-T01/current/checksum-recovery.json",
+      "docs/qa/R01-T01/schema-alignment/catchsecu_dev-contract.json",
+      "docs/qa/R01-T01/schema-alignment/catchsecu_test-contract.json",
+      "docs/qa/R01-T05/preflight/catchsecu_dev.json",
+      "docs/qa/R01-T05/preflight/catchsecu_test.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
+      "database": "verified",
       "api": "not_applicable",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {
