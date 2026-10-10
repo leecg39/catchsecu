@@ -404,22 +404,43 @@
       "P01-T04",
       "P01-T05"
     ],
-    "status": "planned",
+    "status": "completed",
     "stage": "cross-cutting",
     "evidence_directory": "catchsecu-clone/docs/qa/R01-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R01-T04/current/README.md",
+      "docs/qa/R01-T04/current/verification-summary.json",
+      "docs/qa/R01-T04/current/outbox-shadow.json",
+      "docs/qa/R01-T04/current/mail-job-audit.json",
+      "docs/qa/R01-T04/current/auth-public-audit.json",
+      "docs/qa/R01-T04/current/auth-mutations-audit.json",
+      "docs/qa/R01-T04/current/audit-auth-atomicity.json",
+      "docs/qa/R01-T04/current/r01-outbox-boundaries.json"
+    ],
     "dependency_gates": {
       "R01-T02": "task_complete"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "verified",
     "verification_status": {
-      "database": "not_assessed",
-      "api": "not_assessed",
+      "database": "verified",
+      "api": "verified",
       "ui": "not_applicable",
-      "external": "not_assessed"
-    }
+      "external": "not_applicable"
+    },
+    "progress_note": "실제 PostgreSQL과 shadow DB에서 worker lease 강제종료·회수·시도이력·중복방지, job/감사 원자성, 인증 proof/job/audit rollback, 로컬·SMTP 인증메일과 마케팅 비의존성을 64시험으로 검증했다. 공식 SMTP 수신은 후속 외부연동 task 범위다.",
+    "progress_evidence": [
+      "docs/qa/R01-T04/current/README.md",
+      "docs/qa/R01-T04/current/verification-summary.json",
+      "docs/qa/R01-T04/current/outbox-shadow.json",
+      "docs/qa/R01-T04/current/mail-job-audit.json",
+      "docs/qa/R01-T04/current/auth-public-audit.json",
+      "docs/qa/R01-T04/current/auth-mutations-audit.json",
+      "docs/qa/R01-T04/current/audit-auth-atomicity.json",
+      "docs/qa/R01-T04/current/r01-outbox-boundaries.json"
+    ],
+    "updatedOn": "2026-10-11"
   },
   {
     "id": "R01-T05",

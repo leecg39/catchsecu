@@ -2,7 +2,7 @@
 
 2026-10-10 · **사용자 승인 후 구현·검증 진행 중**
 
-R01-T03 파일·비공개 저장소·다운로드 공통 경계가 완료됐다. 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전 차단, EICAR 격리, tenant 결합 거부, 최신 권한·보유기한, 실패 정리, hash·바이트 왕복과 다국어 PDF를 확인했다. 전체107개 작업 상태는 완료7·진행47·계획53이며 다음 의존 작업은 R01-T04 Outbox·worker·플랫폼 인증메일·감사 기반이다. [현재 증거](../../qa/R01-T03/current/README.md).
+R01-T04 Outbox·worker·플랫폼 인증메일·감사 기반이 완료됐다. 실제 PostgreSQL과 shadow DB에서 lease 복구·중복방지·시도이력, job/감사 원자성, 인증 트랜잭션 rollback, 로컬·SMTP와 마케팅 비의존성을 확인했다. 전체107개 작업 상태는 완료8·진행47·계획52이며 다음 의존 작업은 R01-T05 실행·관측·CI·복구다. [현재 증거](../../qa/R01-T04/current/README.md).
 
 원본 계획은 outputs에 보존했다. 이 복사본과 tasks.json이 활성 실행 기준선이다. 증거는 저장소 docs/qa/Rxx-Tyy에 기록한다.
 

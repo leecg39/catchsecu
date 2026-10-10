@@ -1,6 +1,8 @@
 # 2026-10-10 활성 구현 계획
 
-R01-T03 파일 공통 경계 완료: 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전 열람 차단, EICAR 격리, tenant 결합 거부, 최신 권한·보유기한 재검사, 저장 실패 재시도·삭제 정리, hash/바이트 왕복과 다국어 PDF를 확인했다. 4파일77시험·S3 9요청·타입·린트가 통과했다. 활성 계획은 완료7/진행47/계획53이며 전체 목표는 진행 중이다. [검증](docs/qa/R01-T03/current/README.md).
+R01-T04 outbox·인증메일·감사 기반 완료: 실제 PostgreSQL과 shadow DB에서 worker lease 강제종료·회수·시도이력·중복방지, job/감사 원자성, 인증 proof/job/audit rollback, 로컬·SMTP 인증메일과 마케팅 비의존성을 확인했다. 5파일64시험·shadow 재현·타입·린트가 통과했다. 활성 계획은 완료8/진행47/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R01-T04/current/README.md).
+
+R01-T03 파일 공통 경계 완료: 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전 열람 차단, EICAR 격리, tenant 결합 거부, 최신 권한·보유기한 재검사, 저장 실패 재시도·삭제 정리, hash/바이트 왕복과 다국어 PDF를 확인했다. 4파일77시험·S3 9요청·타입·린트가 통과했다. 당시 활성 계획은 완료7/진행47/계획53이었다. [검증](docs/qa/R01-T03/current/README.md).
 
 R01-T02 공통 API 경계 완료: 실제 PostgreSQL과 현재 Route Handler에서 세션 tenant·복합 FK, 동일 멱등 키 동시/순차 재전송 단일 결과, 다른 payload 409, 경쟁 PATCH 200/409, 읽기와 create/update/delete 권한 분리, HTTP 상태·requestId·요청 크기·안정 목록을 확인했다. 3파일13시험·타입·린트가 통과했다. 당시 활성 계획은 완료6/진행48/계획53이었다. [검증](docs/qa/R01-T02/current/README.md).
 

@@ -1,6 +1,8 @@
 # 상세 TASKS — 캐치시큐 전 페이지 풀스택 완성 계획
 
-R01-T03 파일 공통 경계 완료: 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전 열람 차단, EICAR 격리, tenant 결합 거부, 현재 권한·보유기한 재검사, 저장 실패 재시도·삭제 정리, hash/바이트 왕복과 다국어 PDF를 검증했다. 4파일77시험·S3 9요청·타입·린트가 통과했고 현재 공식 상태는 완료7·진행47·계획53이다. [검증](../../qa/R01-T03/current/README.md).
+R01-T04 outbox·인증메일·감사 기반 완료: 실제 PostgreSQL과 shadow DB에서 worker lease 강제종료·회수·시도이력·중복방지, job/감사 원자성, 인증 proof/job/audit rollback, 로컬·SMTP 인증메일과 마케팅 비의존성을 확인했다. 5파일64시험·shadow 재현·타입·린트가 통과했고 현재 공식 상태는 완료8·진행47·계획52다. [검증](../../qa/R01-T04/current/README.md).
+
+R01-T03 파일 공통 경계 완료: 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전 열람 차단, EICAR 격리, tenant 결합 거부, 현재 권한·보유기한 재검사, 저장 실패 재시도·삭제 정리, hash/바이트 왕복과 다국어 PDF를 검증했다. 4파일77시험·S3 9요청·타입·린트가 통과했고 당시 공식 상태는 완료7·진행47·계획53이었다. [검증](../../qa/R01-T03/current/README.md).
 
 R01-T02 공통 API 경계 완료: 실제 PostgreSQL과 현재 Route Handler에서 세션 tenant·복합 FK, 동일 멱등 키 동시/순차 재전송 단일 결과, 다른 payload 409, 경쟁 PATCH 200/409, 읽기와 create/update/delete 권한 분리, HTTP 상태·requestId·1 MiB 제한·안정 목록을 확인했다. 3파일13시험·타입·린트가 통과했고 당시 공식 상태는 완료6·진행48·계획53이었다. [검증](../../qa/R01-T02/current/README.md).
 
@@ -131,7 +133,7 @@ DB metadata/비공개 binary/검사status·용량·확장자·파일형식검증
   - 다운로드 시 최신권한/보유기한 확인; 분리저장 실패정리 및 파일hash실제대조
 - 완료 증거: [현재 보고서](../../qa/R01-T03/current/README.md), [검증 집계](../../qa/R01-T03/current/verification-summary.json), [파일·ClamAV](../../qa/R01-T03/current/files.json), [현재 권한·보유기한](../../qa/R01-T03/current/file-access-gate.json), [분리 저장 실패·재시도](../../qa/R01-T03/current/author-asset-uploads.json), [다국어 PDF](../../qa/R01-T03/current/pdf-renderer-v2.json), [S3 SigV4](../../qa/R01-T03/current/s3-roundtrip.json). 실제 PostgreSQL·ClamAV에서 77시험과 독립 S3 검증 9요청, 타입·린트가 통과했다.
 
-### [ ] R01-T04 Outbox·worker·플랫폼 인증메일·감사 기반
+### [x] R01-T04 Outbox·worker·플랫폼 인증메일·감사 기반
 
 Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원자성, 인증용 로컬메일/SMTP transport를 제공한다. 캠페인메일과 순환의존을 만들지 않는다.
 
@@ -142,6 +144,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
 - 완료 조건:
   - worker강제종료→재시작시 이벤트유실/이중발송 방지; 시도이력 보존
   - 비즈니스 실패 rollback이면 감사/외부job 성공기록도 없음; 인증메일은 마케팅동의 기능에 의존하지 않음
+- 완료 증거: [현재 보고서](../../qa/R01-T04/current/README.md), [검증 집계](../../qa/R01-T04/current/verification-summary.json), [shadow lease 복구](../../qa/R01-T04/current/outbox-shadow.json), [job·시도·감사](../../qa/R01-T04/current/mail-job-audit.json), [공개 인증 트랜잭션](../../qa/R01-T04/current/auth-public-audit.json), [세션·MFA 감사](../../qa/R01-T04/current/auth-mutations-audit.json), [로그인 원자성](../../qa/R01-T04/current/audit-auth-atomicity.json), [마케팅 비의존 SMTP](../../qa/R01-T04/current/r01-outbox-boundaries.json). 5파일64시험과 shadow 강제종료 재현, 타입·린트가 통과했다.
 
 ### [~] R01-T05 자동 검증·관측·통합환경
 

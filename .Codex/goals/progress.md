@@ -1,6 +1,10 @@
-## 최신 작업: R01-T03 파일·비공개 저장소·다운로드 공통 경계 완료
+## 최신 작업: R01-T04 Outbox·worker·플랫폼 인증메일·감사 기반 완료
 
-2026-10-11 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전·미결합 파일 열람 차단, EICAR 격리, tenant/서비스/응답/질문 결합 거부, 다운로드 중 현재 세션·권한·보유기한 재검사, 저장 확인 손실 재시도와 삭제 실패 worker 정리, 원본 hash·바이트 왕복, 다국어 PDF fail-closed를 확인했다. 4파일77시험·S3 9요청·타입·린트가 통과했다. 계획 상태 완료7/진행47/계획53, 전체 goal active. [증거](../../docs/qa/R01-T03/current/README.md).
+2026-10-11 실제 PostgreSQL과 일회성 shadow DB에서 두 worker claim 경쟁, 강제 종료 뒤 lease 회수, expired→delivered 시도이력, 마지막 lease exhaustion, 완료·취소 중복 실행 방지를 확인했다. 로컬 파일과 격리 SMTP 인증메일, job/attempt/audit 원자성, 가입·비밀번호 재설정·MFA proof/job/audit rollback, 회사·마케팅 데이터0 상태의 인증메일 전달을 5파일64시험으로 검증했다. 공식 SMTP 수신은 후속 외부 task에 남겼다. 계획 상태 완료8/진행47/계획52, 전체 goal active. [증거](../../docs/qa/R01-T04/current/README.md).
+
+## 이전 작업: R01-T03 파일·비공개 저장소·다운로드 공통 경계 완료
+
+2026-10-11 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전·미결합 파일 열람 차단, EICAR 격리, tenant/서비스/응답/질문 결합 거부, 다운로드 중 현재 세션·권한·보유기한 재검사, 저장 확인 손실 재시도와 삭제 실패 worker 정리, 원본 hash·바이트 왕복, 다국어 PDF fail-closed를 확인했다. 4파일77시험·S3 9요청·타입·린트가 통과했다. 당시 계획 상태 완료7/진행47/계획53, 전체 goal active. [증거](../../docs/qa/R01-T03/current/README.md).
 
 ## 이전 작업: R01-T02 API·권한·경합·멱등 공통 경계 완료
 

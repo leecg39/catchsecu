@@ -1,0 +1,39 @@
+{
+  "task": "R01-T04",
+  "checkedAt": "2026-10-11",
+  "result": "passed",
+  "environment": {
+    "node": "24.18.0",
+    "postgresql": "17.11",
+    "database": "isolated local catchsecu_test plus disposable shadow database",
+    "mail": "actual local mailbox and isolated Nodemailer SMTP adapter",
+    "browser": "not applicable",
+    "externalProvider": "not applicable"
+  },
+  "tests": {
+    "mailJobAudit": { "tests": 10, "passed": 10, "failed": 0 },
+    "publicAuthenticationAudit": { "tests": 30, "passed": 30, "failed": 0 },
+    "authenticationMutationAudit": { "tests": 20, "passed": 20, "failed": 0 },
+    "loginAuditAtomicity": { "tests": 3, "passed": 3, "failed": 0 },
+    "smtpAuthenticationBoundary": { "tests": 1, "passed": 1, "failed": 0 },
+    "total": { "files": 5, "tests": 64, "passed": 64, "failed": 0 },
+    "shadowOutboxRehearsal": "passed"
+  },
+  "acceptance": {
+    "leaseRecoveryWithoutLossOrDuplicateDelivery": "passed",
+    "attemptHistoryRetained": "passed",
+    "businessRollbackLeavesNoSuccessAuditOrJobReceipt": "passed",
+    "authenticationMailIndependentOfMarketingConsent": "passed",
+    "localAndSmtpTransports": "passed",
+    "safeAuditMetadataOnly": "passed"
+  },
+  "quality": {
+    "typecheck": "passed",
+    "eslint": "passed"
+  },
+  "limitations": [
+    "The SMTP adapter was verified with an isolated Nodemailer transport response; provider acceptance and inbox receipt belong to downstream external-provider tasks.",
+    "This cross-cutting worker task has no browser surface.",
+    "No credential, recipient body, verification code, or authentication URL is stored in the evidence."
+  ]
+}
