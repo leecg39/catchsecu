@@ -7,6 +7,7 @@ import { decrypt, opaqueToken, tokenHash } from "@/server/crypto";
 import { env } from "@/server/env";
 import * as auditModule from "@/server/audit";
 import * as ssoModule from "@/server/sso";
+import { POST as requestOrgEmailChallengeRoute } from "@/app/api/v1/auth/org/email-register/challenge/route";
 
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
@@ -179,8 +180,7 @@ test("테넌트 격리: 다른 회사 디렉터리·공급자에 접근할 수 �
 });
 
 async function emailChallenge(ticket: string, email: string) {
-  const { POST } = await import("@/app/api/v1/auth/org/email-register/challenge/route");
-  const response = await POST(req("/auth/org/email-register/challenge", "", "POST", { ticket, email }));
+  const response = await requestOrgEmailChallengeRoute(req("/auth/org/email-register/challenge", "", "POST", { ticket, email }));
   expect(response.status).toBe(200);
   const { challengeId } = await response.json();
   const job = await db.job.findUniqueOrThrow({ where: { dedupeKey: "mail:org-email:" + challengeId } });

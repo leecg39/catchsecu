@@ -5,10 +5,12 @@ import { db } from "@/server/db";
 import { env } from "@/server/env";
 import { requireContext, type Context } from "@/server/context";
 import { listInvoices, listUsageEvents } from "@/server/billing-reads";
+import { GET as listInvoicesRoute } from "@/app/api/v1/invoices/route";
+import { GET as listUsageEventsRoute } from "@/app/api/v1/usage-events/route";
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required");
 const email = "billing-read-" + randomUUID() + "@catchsecu.test", password = "Billing-read!123";
-let userId: string, ownerId: string, ctx: Context;
+let userId: string, ownerId: string, ctx: Context, activeCookie: string;
 function request(path: string, body: unknown) {
   return new Request(origin + "/api/v1/auth/" + path, { method: "POST", headers: { origin, "content-type": "application/json" }, body: JSON.stringify(body) });
 }
@@ -23,6 +25,7 @@ beforeEach(async () => {
   const company = await db.company.create({ data: { name: "청구 조회", publicName: "청구 조회", policy: { create: { passwordMonths: 0 } }, memberships: { create: [{ userId, role: "billing" }, { userId: ownerId, role: "owner" }] } } });
   const login = await auth.handler(request("sign-in/email", { email, password })); expect(login.status).toBe(200);
   const cookie = login.headers.getSetCookie().map(v => v.split(";")[0]).join("; ");
+  activeCookie = cookie;
   const session = await db.session.findFirstOrThrow({ where: { userId }, orderBy: { createdAt: "desc" } });
   await db.session.update({ where: { id: session.id }, data: { activeCompanyId: company.id } });
   ctx = await requireContext(new Headers({ cookie }), "billing.read");
@@ -50,3 +53,11 @@ for (const [name, read] of Object.entries({ invoices: listInvoices, usage: listU
     await expect(read(ctx, {})).rejects.toMatchObject({ status: 403, code: "COMPANY_CHANGED" });
   });
 }
+test("청구서·사용량 HTTP 조회 경로가 현재 billing 권한과 빈 페이지를 반환한다", async () => {
+  for (const [path, handler] of [["/invoices", listInvoicesRoute], ["/usage-events", listUsageEventsRoute]] as const) {
+    const response = await handler(new Request(origin + "/api/v1" + path, { headers: { origin, cookie: activeCookie } }));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ items: [], total: 0, page: 1, pageSize: 20 });
+    expect((await handler(new Request(origin + "/api/v1" + path, { headers: { origin } }))).status).toBe(401);
+  }
+});

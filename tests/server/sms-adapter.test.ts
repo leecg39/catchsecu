@@ -5,11 +5,16 @@ import { afterAll, beforeEach, expect, test } from "vitest";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
 import { applySmsReceipt, deliverSms } from "@/server/sms-adapter";
+import { POST as smsReceiptRoute } from "@/app/api/v1/sms/receipts/route";
 
 const database = new URL(env.DATABASE_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
 const secret = "sms-webhook-secret-0123456789abcdef";
-function sign(body: string) { return createHmac("sha256", secret).update(body).digest("hex"); }
+function sign(body: string, key = secret) { return createHmac("sha256", key).update(body).digest("hex"); }
+function receiptRequest(body: string, signature: string) {
+  return new Request(new URL("/api/v1/sms/receipts", env.BETTER_AUTH_URL), { method: "POST", body,
+    headers: { "content-type": "application/json", "x-sms-signature": signature } });
+}
 beforeEach(async () => { await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "Job" CASCADE'); });
 afterAll(async () => { await db.$disconnect(); });
 
@@ -30,8 +35,15 @@ test("공급자가 없으면 문자를 보내지 않고 로컬 영수증과 서�
     return tx.campaignDelivery.create({ data: { tenantId: company.id, serviceId: company.services[0].id, campaignId: campaign.id, position: 1, contactHash: "a".repeat(64), status: "draft" } });
   });
   const body = JSON.stringify({ deliveryId: delivery.id, receiptId: "provider-receipt-1", outcome: "accepted" });
-  await expect(applySmsReceipt(body, "00", secret)).rejects.toMatchObject({ status: 401 });
-  const applied = await applySmsReceipt(body, sign(body), secret);
+  const savedWebhookSecret = env.SMS_WEBHOOK_SECRET;
+  let applied: { status: string; duplicate: boolean };
+  try {
+    env.SMS_WEBHOOK_SECRET = secret;
+    expect((await smsReceiptRoute(receiptRequest(body, "00"))).status).toBe(401);
+    const appliedResponse = await smsReceiptRoute(receiptRequest(body, sign(body, env.SMS_WEBHOOK_SECRET)));
+    expect(appliedResponse.status).toBe(202);
+    applied = await appliedResponse.json();
+  } finally { env.SMS_WEBHOOK_SECRET = savedWebhookSecret; }
   expect(applied).toMatchObject({ status: "provider_accepted", duplicate: false });
   expect((await db.campaignDelivery.findUniqueOrThrow({ where: { id: delivery.id } })).status).toBe("draft");
   expect(await applySmsReceipt(body, sign(body), secret)).toMatchObject({ duplicate: true, status: "provider_accepted" });

@@ -11,6 +11,7 @@ import { auth } from "@/server/auth";
 import { opaqueToken, tokenHash } from "@/server/crypto";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
+import { POST as preflightSsoRoute } from "@/app/api/v1/security/sso/[id]/preflight/route";
 
 vi.hoisted(() => { process.env.BETTER_AUTH_URL = process.env.BETTER_AUTH_URL!.replace(/^http:/, "https:"); });
 
@@ -259,8 +260,7 @@ test("SAML 인증서 교체와 동시 활성화는 거부하고 교체 후 재�
   expect((await simultaneous.json()).error.code).toBe("PREFLIGHT_REQUIRED");
   const rotated = await patchProvider(req("/security/sso/" + provider.id, cookie, "PATCH", { version: 1, idpCert: replacement }));
   expect(await rotated.json()).toMatchObject({ enabled: false, preflightOk: false, version: 2 });
-  const { POST: preflight } = await import("@/app/api/v1/security/sso/[id]/preflight/route");
-  expect(await (await preflight(req("/security/sso/" + provider.id + "/preflight", cookie, "POST"))).json())
+  expect(await (await preflightSsoRoute(req("/security/sso/" + provider.id + "/preflight", cookie, "POST"))).json())
     .toMatchObject({ enabled: false, preflightOk: false, version: 3 });
 });
 

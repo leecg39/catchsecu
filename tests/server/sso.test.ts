@@ -9,6 +9,10 @@ import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
 import { opaqueToken, tokenHash } from "@/server/crypto";
+import { GET as listOwnSsoAccountsRoute } from "@/app/api/v1/me/sso-accounts/route";
+import { DELETE as unlinkOwnSsoAccountRoute } from "@/app/api/v1/me/sso-accounts/[id]/route";
+import { POST as invitationSsoOptionsRoute } from "@/app/api/v1/invitations/sso/options/route";
+import { POST as invitationSsoStartRoute } from "@/app/api/v1/invitations/sso/start/route";
 
 const ssoFault = vi.hoisted(() => ({ audit: false, unlinkAudit: false, unlinkAuditSeen: false, providerAudit: false, providerAuditSeen: false, providerUpdateAudit: false }));
 vi.mock("@/server/audit", async original => {
@@ -742,8 +746,7 @@ async function ownAccountsFixture() {
   await db.ssoProvider.update({ where: { id: f.provider.id }, data: { enabled: true } });
   const account = await db.account.create({ data: { userId: f.ctx.user.id, providerId: "sso:" + f.provider.id,
     accountId: "private-subject", accessToken: "private-access-token", refreshToken: "private-refresh-token" } });
-  const { GET: list } = await import("@/app/api/v1/me/sso-accounts/route");
-  const { DELETE: unlink } = await import("@/app/api/v1/me/sso-accounts/[id]/route");
+  const list = listOwnSsoAccountsRoute, unlink = unlinkOwnSsoAccountRoute;
   const remove = () => unlink(req("/me/sso-accounts/" + account.id, f.cookie, "DELETE", { updatedAt: account.updatedAt.toISOString(), confirm: true }));
   return { ...f, account, list, unlink, remove };
 }
@@ -983,8 +986,7 @@ async function invitationSsoFixture() {
   const service = await db.service.create({ data: { tenantId: f.company.id, name: "초대 서비스", externalName: "초대 서비스" } });
   const invitation = await db.invitation.create({ data: { tenantId: f.company.id, invitedBy: f.ctx.member.id,
     email: "sso-user@catchsecu.test", role: "editor", serviceIds: [service.id], tokenHash: tokenHash(token), expiresAt: new Date(Date.now() + 600000) } });
-  const { POST: options } = await import("@/app/api/v1/invitations/sso/options/route");
-  const { POST: start } = await import("@/app/api/v1/invitations/sso/start/route");
+  const options = invitationSsoOptionsRoute, start = invitationSsoStartRoute;
   const { callbackRoute } = await ssoFlow();
   async function begin() {
     const response = await browser.wrap(start)(req("/invitations/sso/start", "", "POST", { token, providerId: f.provider.id }));
