@@ -8,7 +8,7 @@
 - 보유기간 규칙·피드백 CRUD와 개인정보·마케팅·준수 집계 13개 operation을 실제 route handler와 격리 PostgreSQL로 실행했다. 대상3파일17시험, 타입 검사와 변경 파일 lint가 통과했다. [내부 별칭·집계 route 수용](internal-alias-routes/README.md)
 - 가입·로그인·비밀번호·세션·MFA의 공통 인증 route 13개 operation을 격리 PostgreSQL로 실행했다. 대상3파일71시험, 타입 검사와 변경 파일 lint가 통과했다. [공통 인증 route 수용](auth-route-adapter/README.md)
 - 본인 SSO 연결·청구/사용량·초대 SSO·문자 수신확인·SSO 사전검사·기관 이메일 인증번호의 잔여9개 operation을 실제 route로 실행했다. 현재 소스의 대상5파일228시험이 단일 실행으로 통과했다. [잔여 API route 수용](final-handler-routes/README.md)
-- 현재 API 감사는 466 operation·158 handler, handler/메서드 누락0·정책 누락0·작업 소유자 누락0이다. 모든466개 operation에 handler 직접 import 시험이 연결됐다. catch-all 285개는 분기별 실행 증거가 계속 필요하다.
+- 현재 API 감사는 466 operation·158 handler, handler/메서드 누락0·정책 누락0·작업 소유자 누락0이다. 모든466개 operation에 handler 직접 import 시험이 연결됐다. 실제 route wrapper 요청807건 중 계약766건을 연결했고 성공 operation57개, catch-all 분기34/285개를 확인했다. 남은 catch-all251개는 분기별 실행 증거가 계속 필요하다. [런타임 route 추적](runtime-route-trace/README.md)
 - [현재 감사 요약](current-audit-summary.json), [API operation 감사](api-audit/README.md), [지원 Node 전체 실행](full-tests-current.json), [SSO 재실행](sso-node24-retry.json)
 
 R00-T02는 위 누락과 단일 지원 Node 전체 실행 실패 때문에 진행 상태를 유지한다.

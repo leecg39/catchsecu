@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Prisma } from "@/generated/prisma/client";
 import { env } from "./env";
 import { db } from "./db";
+import { publishRouteTrace } from "./route-trace";
 
 export class HttpError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
@@ -54,6 +55,7 @@ export function route(handler: Handler, externalAuthentication?: "signed-webhook
       const response = await handler(request, requestId);
       response.headers.set("X-Request-Id", requestId);
       response.headers.set("Cache-Control", "private, no-store");
+      publishRouteTrace(request, response.status);
       return response;
     } catch (error) {
       let status = 500, code = "INTERNAL_ERROR", message = "요청을 처리하지 못했습니다.", fieldErrors;
@@ -76,9 +78,11 @@ export function route(handler: Handler, externalAuthentication?: "signed-webhook
       }
       if (status === 500) console.error(JSON.stringify({ requestId, code, kind: error instanceof Error ? error.name : "UnknownError",
         stack: error instanceof Error ? error.stack?.split("\n").slice(1, 8).join(" | ") : undefined }));
-      return Response.json({ error: { code, message, fieldErrors, requestId } }, {
+      const response = Response.json({ error: { code, message, fieldErrors, requestId } }, {
         status, headers: { "X-Request-Id": requestId, "Cache-Control": "private, no-store", ...(status === 429 ? { "Retry-After": "60" } : {}) },
       });
+      publishRouteTrace(request, response.status);
+      return response;
     }
   };
 }

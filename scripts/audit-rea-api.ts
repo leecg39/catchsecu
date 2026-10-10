@@ -39,6 +39,14 @@ const policies = parse(await readFile("docs/planning/contracts/operation-policy-
 const ownership = JSON.parse(await readFile("docs/planning/09-rea-fullstack/api-ownership.json", "utf8")) as Array<{method: string; path: string; owner_tasks: string[]}>;
 const testEvidenceFile = "docs/qa/R00-T02/full-tests-current.json";
 const retryEvidenceFile = "docs/qa/R00-T02/sso-node24-retry.json";
+const runtimeTraceFile = "docs/qa/R00-T02/runtime-route-trace.json";
+type RuntimeTrace = {
+  requests: number; matchedRequests: number; unmatchedRequests: number;
+  operationsObserved: number; operationsSuccessful: number;
+  records: Array<{method: string; path: string; requests: number; successes: number; statuses: Record<string, number>}>;
+};
+const runtimeTrace = JSON.parse(await readFile(runtimeTraceFile, "utf8")) as RuntimeTrace;
+const runtimeByOperation = new Map(runtimeTrace.records.map(item => [`${item.method} ${item.path}`, item]));
 type TestEvidence = {
   success: boolean; numFailedTestSuites: number; numFailedTests: number; numPendingTests: number;
   testResults: Array<{name: string; status: string; assertionResults: Array<{status: string}>}>;
@@ -131,26 +139,39 @@ for (const [path, value] of Object.entries(contract.paths)) for (const [rawMetho
   const policy = policies.find(item => item.method === method && item.path === path);
   const contractSchemaRefs = schemaReferences(operation);
   const handlerSchemaImports = reachable.handlerImports.filter(item => /(?:contracts|schemas)/.test(item));
+  const runtime = runtimeByOperation.get(`${method} ${path}`) ?? null;
+  const runtimeOperationVerified = (runtime?.successes ?? 0) > 0;
   records.push({ method, path, handler: handlerPath, handlerPattern: handler?.pattern ?? null, methodExported: !!exported,
-    catchAll: !!handler?.pattern.includes("..."), branchVerified: false, runtimeOperationVerified: false,
+    catchAll: !!handler?.pattern.includes("..."), branchVerified: !!handler?.pattern.includes("...") && runtimeOperationVerified,
+    runtimeOperationVerified,
     ownerTasks: ownership.find(item => item.method === method && item.path === path)?.owner_tasks ?? [],
     policy: policy ?? null, contract: operation,
     dtoEvidence: { contractSchemaRefs, handlerSchemaImports, policyResponseDto: policy?.response_dto ?? null },
     reachable, executionEvidence: { mode: testEvidenceMode, fullTestReport: testEvidenceFile,
       targetedRetryReport: retryEvidenceFile, directHandlerImportTests: testFiles,
-      status: testFiles.length ? "direct_handler_import_present_operation_branch_unverified" : "missing_direct_handler_import" },
+      runtimeTrace: runtime ? { report: runtimeTraceFile, ...runtime } : null,
+      status: runtimeOperationVerified ? "runtime_success_observed"
+        : testFiles.length ? "direct_handler_import_present_operation_branch_unverified" : "missing_direct_handler_import" },
     importingTestFiles: testFiles });
 }
 const missing = records.filter(item => !item.handler || !item.methodExported);
 const missingPolicies = records.filter(item => !item.policy);
 const missingOwners = records.filter(item => !item.ownerTasks.length);
 const missingDirectTestImports = records.filter(item => !item.importingTestFiles.length);
+const runtimeVerified = records.filter(item => item.runtimeOperationVerified);
+const catchAllRuntimeVerified = records.filter(item => item.catchAll && item.runtimeOperationVerified);
 const report = { checkedAt: new Date().toISOString(), scope: "정적 계약·진입점·호출 함수 대조. 개별 API 실행/분기 통과를 의미하지 않음",
   operations: records.length, handlerFiles: handlers.length, missingHandlers: missing.length, missingPolicies: missingPolicies.length,
   catchAllOperations: records.filter(item => item.catchAll).length, testEvidenceFile, retryEvidenceFile, testEvidenceMode,
   fullRunFailedSuites: fullEvidence.numFailedTestSuites, fullRunFailedTests: fullEvidence.numFailedTests,
   operationsWithDirectHandlerTestImport: records.length - missingDirectTestImports.length,
   operationsMissingDirectHandlerTestImport: missingDirectTestImports.length,
+  runtimeTraceFile,
+  runtimeTraceRequests: runtimeTrace.requests,
+  runtimeTraceMatchedRequests: runtimeTrace.matchedRequests,
+  runtimeTraceUnmatchedRequests: runtimeTrace.unmatchedRequests,
+  operationsRuntimeVerified: runtimeVerified.length,
+  catchAllOperationsRuntimeVerified: catchAllRuntimeVerified.length,
   operationsMissingOwnerTasks: missingOwners.length,
   sourceHashes: Object.fromEntries(sourceHashes), records };
 await mkdir(directory, { recursive: true });
@@ -159,9 +180,11 @@ const missingLines = missing.map(item => `- ${item.method} ${item.path}: ${item.
 const evidenceDescription = fullEvidenceGreen
   ? `Node 24 전체 회귀 ${testEvidenceFile}이 단일 실행으로 통과했다.`
   : `Node 24 전체 회귀 ${testEvidenceFile}은 SSO DB 초기화 hook timeout 2건으로 단일 실행 실패다. 같은 현재 소스의 SSO 파일 재실행 ${retryEvidenceFile}은 131/131 통과했다. 이 둘을 결합한 실행 증거를 사용하며 단일 전체 회귀 성공으로 집계하지 않는다.`;
-await writeFile(directory + "/README.md", `# R00-T02 API 진입점 대조\n\n${report.checkedAt}\n\n현재 계약 ${records.length}개 작업, handler 파일 ${handlers.length}개. 진입점/메서드 누락 ${missing.length}개, 정책 누락 ${missingPolicies.length}개.\n\n${evidenceDescription} handler를 직접 import한 통과 시험이 연결된 operation은 ${report.operationsWithDirectHandlerTestImport}개이고, 직접 연결이 없는 operation은 ${report.operationsMissingDirectHandlerTestImport}개다. 작업 소유자 연결이 없는 operation은 ${report.operationsMissingOwnerTasks}개다.\n\ncatch-all ${report.catchAllOperations}개 작업은 실제 분기와 실행 증거를 추가 확인해야 한다. 테스트 파일의 통과는 해당 파일 전체 결과이며 API별 성공 판정으로 전환하지 않는다.\n\n[기계 판독 결과](operations.json)에 handler→서버 함수·DTO 계약/handler import·권한/이벤트 문자열·정책·원래 계약·현재 테스트 파일과 소스 해시를 기록했다.${missingLines ? `\n\n${missingLines}` : ""}\n`);
+await writeFile(directory + "/README.md", `# R00-T02 API 진입점 대조\n\n${report.checkedAt}\n\n현재 계약 ${records.length}개 작업, handler 파일 ${handlers.length}개. 진입점/메서드 누락 ${missing.length}개, 정책 누락 ${missingPolicies.length}개.\n\n${evidenceDescription} handler를 직접 import한 통과 시험이 연결된 operation은 ${report.operationsWithDirectHandlerTestImport}개이고, 직접 연결이 없는 operation은 ${report.operationsMissingDirectHandlerTestImport}개다. 작업 소유자 연결이 없는 operation은 ${report.operationsMissingOwnerTasks}개다.\n\n실제 route wrapper 추적 ${runtimeTrace.requests}건 중 ${runtimeTrace.matchedRequests}건을 계약에 연결했고, 성공 응답이 관측된 operation은 ${report.operationsRuntimeVerified}개다. catch-all ${report.catchAllOperations}개 중 분기 성공이 관측된 것은 ${report.catchAllOperationsRuntimeVerified}개다. 나머지는 실제 분기와 실행 증거를 추가 확인해야 한다. handler import나 테스트 파일 전체 통과만으로 API별 성공 판정을 만들지 않는다. [정규화된 런타임 추적](../runtime-route-trace.json)\n\n[기계 판독 결과](operations.json)에 handler→서버 함수·DTO 계약/handler import·권한/이벤트 문자열·정책·원래 계약·현재 테스트 파일과 소스 해시를 기록했다.${missingLines ? `\n\n${missingLines}` : ""}\n`);
 console.log(JSON.stringify({ operations: records.length, handlers: handlers.length, missing: missing.map(item => ({method:item.method,path:item.path,handler:item.handler})), missingPolicies: missingPolicies.length,
   operationsWithDirectHandlerTestImport: report.operationsWithDirectHandlerTestImport,
   operationsMissingDirectHandlerTestImport: report.operationsMissingDirectHandlerTestImport,
+  operationsRuntimeVerified: report.operationsRuntimeVerified,
+  catchAllOperationsRuntimeVerified: report.catchAllOperationsRuntimeVerified,
   operationsMissingOwnerTasks: report.operationsMissingOwnerTasks }));
 if (missing.length || missingPolicies.length) process.exitCode = 1;

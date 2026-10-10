@@ -72,7 +72,7 @@
     "local_status": "partial_verified",
     "external_status": "not_assessed",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "현재466 operation·158 handler의 진입점/정책/작업소유자 누락0이며 모든 operation에 직접 handler 시험이 연결됐다. 마지막9 route는 현재 소스의 SSO·청구·문자 등5파일228시험 단일 실행으로 통과했다. 지원Node24 전체2865/2867은 SSO hook timeout2로 단일실행 실패, 해당파일 재실행131/131. catch-all 분기 미검증285로 완료 조건은 아직 미충족.",
+    "progress_note": "현재466 operation·158 handler의 진입점/정책/작업소유자 누락0이며 모든 operation에 직접 handler 시험이 연결됐다. 실제 route wrapper 807요청을 추적해 계약766건을 매칭했고 성공 operation57개, catch-all 분기34/285개를 확인했다. 원시 동적 경로/query는 로컬에만 두고 정규화 결과만 보존한다. 지원Node24 전체2865/2867은 SSO hook timeout2로 단일실행 실패, 해당파일 재실행131/131. 남은 catch-all251개와 단일 전체 회귀 성공이 없어 완료 조건은 아직 미충족.",
     "updatedOn": "2026-10-11",
     "progress_evidence": [
       "docs/qa/R00-T02/README.md",
@@ -93,7 +93,9 @@
       "docs/qa/R00-T02/final-handler-routes/README.md",
       "docs/qa/R00-T02/final-handler-routes/regression.json",
       "docs/qa/R00-T02/final-handler-routes/initial-regression.json",
-      "docs/qa/R00-T02/final-handler-routes/sms-retry.json"
+      "docs/qa/R00-T02/final-handler-routes/sms-retry.json",
+      "docs/qa/R00-T02/runtime-route-trace.json",
+      "docs/qa/R00-T02/runtime-route-trace/README.md"
     ]
   },
   {

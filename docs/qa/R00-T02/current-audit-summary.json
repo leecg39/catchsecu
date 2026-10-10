@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-11T05:20:00+09:00",
+  "checkedAt": "2026-10-11T05:35:00+09:00",
   "result": "partial_verified",
   "supportedNode": "v24.18.0",
   "diagnosticNode": "v25.4.0 (outside package engines; not final quality evidence)",
@@ -141,6 +141,24 @@
           "failed": 0
         }
       }
+    },
+    "runtimeRouteTrace": {
+      "path": "docs/qa/R00-T02/runtime-route-trace.json",
+      "sha256": "a7e9eafa25f64625fb5fef02d3d1851dad9fe8089d49ce300a18b6ffd19e1ce0",
+      "success": true,
+      "testFiles": 6,
+      "tests": {
+        "total": 86,
+        "passed": 86,
+        "failed": 0,
+        "pending": 0
+      },
+      "requests": 807,
+      "matchedRequests": 766,
+      "unmatchedRequests": 41,
+      "operationsObserved": 59,
+      "operationsSuccessful": 57,
+      "catchAllOperationsSuccessful": 34
     }
   },
   "defect": {
@@ -156,13 +174,17 @@
     "missingPolicies": 0,
     "directHandlerTestImport": 466,
     "missingDirectHandlerTestImport": 0,
-    "missingOwnerTasks": 0
+    "missingOwnerTasks": 0,
+    "runtimeOperationsVerified": 57,
+    "catchAllOperations": 285,
+    "catchAllOperationsRuntimeVerified": 34,
+    "catchAllOperationsRemaining": 251
   },
   "taskComplete": false,
   "remaining": [
-    "285 catch-all operations still need branch-level runtime evidence",
+    "251 catch-all operations still need branch-level runtime evidence",
     "single Node24 full-suite run is not green"
   ],
-  "baseCommit": "19c993a770dbf8ebebb0ebfc800244fec58c73d6",
-  "sourceState": "baseCommit plus the tested final nine handler routes and SMS webhook fixture correction in this checkpoint"
+  "baseCommit": "ca20b81b7f3c62afed05d7ed827aeb14a975a21f",
+  "sourceState": "baseCommit plus runtime route instrumentation, normalized trace collector, 6-file 86-test trace run, and generated API audit"
 }
