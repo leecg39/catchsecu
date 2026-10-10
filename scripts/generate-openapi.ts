@@ -488,6 +488,8 @@ for (const path of ["/public/forms/{token}/participation-challenges", "/public/f
   paths[path].parameters = [{ in: "path", name: "token", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{43}$" } }];
 (paths["/public/forms/{token}/submissions"].post as Operation).responses = { ...errors, "201": { description: "접수 당시 ID·시각·상태, 해당 게시본 완료 안내와 짧은 열람 증명; 같은 키의 정상 재시도는 같은 값", content: { "application/json": { schema: { $ref: "#/components/schemas/PublicSubmissionReceipt" } } } } };
 add("/submissions/{id}", "get", "submission.read + service grant", "응답·변경 이력·메모·동의 영수증; contentAvailable=false이면 원문·첨부 제외", undefined, "implemented");
+add("/submissions/{id}/pdf", "get", "submission.read + current service grant + unexpired or held submission", "현재 응답과 열여섯 질문 유형의 표시값을 PDF로 생성한다. file.read가 없으면 첨부파일 이름을 제외하며 생성 뒤 응답·권한·보유 기한을 다시 확인한다.", undefined, "implemented");
+(paths["/submissions/{id}/pdf"].get as Operation).responses = { ...errors, "200": { description: "현재 응답 PDF. private, no-store, X-PDF-SHA256, X-Document-SHA256", content: { "application/pdf": { schema: { type: "string", format: "binary" } } } } };
 add("/submissions/{id}", "patch", "submission.write + service grant", "응답 정정; 암호화된 이전 값 보존", correctionInput, "implemented");
 for (const action of ["withdraw", "destruction-request", "hold"]) add("/submissions/{id}/" + action, "post",
   action === "withdraw" ? "submission.write + service grant" : "submission.destroy + service grant",

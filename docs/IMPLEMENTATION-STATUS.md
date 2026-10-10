@@ -1,5 +1,7 @@
 # 2026-10-10 최신 전체 계획 구현 중
 
+R08 F3 응답 PDF 표현 하위 범위를 완료했다. 현재 응답 16종과 폼/응답 버전·상태·보유 정보를 PDF로 만들고, 생성 뒤 현재 권한·보유 기한·응답 버전·파일 권한을 재검사한다. FILE/DRAW는 `file.read`가 없으면 이름과 내부 ID를 제외한다. PostgreSQL 관련8파일84시험, 타입·변경 린트, 계약329경로466작업, production82페이지와 Ego Lite 실제 저장/PDF.js/감사 이벤트가 통과했다. [검증](qa/R08-T02/special-question-acceptance/README.md). 외부 공식 본인확인·전자서명은 `external_pending`이며 공식 완료0/진행53/계획54를 유지한다.
+
 R08 F3 외부 인증·전자서명 준비 상태 하위 범위를 완료했다. 로컬 `sandbox` 성공과 외부 공급자 공식 인증을 설정·공개 화면에서 분리하고, 영수증 소비 뒤 준비 상태와 완료 뒤 테스트 안내를 유지한다. 집중3파일37개·관련7파일118개, 타입·변경 린트·production82페이지, 실제 브라우저 제출과 PostgreSQL `consumed` 영수증 연결을 확인했다. [검증](qa/R08-T02/verification-readiness/README.md). 외부 공급자 자격증명·공식 sandbox·production은 `external_pending`이며 공식 완료0/진행53/계획54를 유지한다.
 
 R08 F3 질문 부가 필드 하위 범위를 완료했다. 질문 설명·문항/보기 이미지·참고 LINK/FILE·기타 직접입력·수동 개인정보 분류를 현재 소스의 PostgreSQL·통합 7파일132개와 계약·화면 렌더 5파일36개, 총12파일168개로 재검증하고 기존 Ego Lite·DB·production 재시작 증거를 연결했다. [검증](qa/R08-T02/question-metadata/integrated-acceptance/README.md). 특수 질문 전체, 외부 본인확인/전자서명, NLP/AI 분류와 F4~F7이 남아 R08-T01~T04 및 공식 완료0/진행53/계획54는 유지한다.

@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { beforeAll, beforeEach, afterAll, expect, test } from "vitest";
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
 import { auth } from "@/server/auth";
@@ -23,6 +24,7 @@ import { POST as fixedCreate } from "@/app/api/v1/fixed-urls/route";
 import { GET as publicRead, POST as publicPost } from "@/app/api/v1/public/forms/[...segments]/route";
 import { POST as uploadPost, PUT as uploadPut } from "@/app/api/v1/uploads/[...segments]/route";
 import { GET as fileRead } from "@/app/api/v1/files/[...segments]/route";
+import { GET as submissionRead } from "@/app/api/v1/submissions/[...segments]/route";
 import { POST as shareCreate } from "@/app/api/v1/share-grants/route";
 import type { FormRecord } from "@/contracts/forms";
 import type { FormConsentBundle } from "@/contracts/form-documents";
@@ -34,6 +36,21 @@ function req(path: string, method = "GET", input?: unknown, actor = 0, headers: 
   return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie: cookies[actor] ?? "", ...(input === undefined ? {} : { "content-type": "application/json" }), ...(method === "POST" ? { "idempotency-key": randomUUID() } : {}), ...headers }, ...(input === undefined ? {} : { body: JSON.stringify(input) }) });
 }
 async function ok<T>(response: Response, status = 200): Promise<T> { expect(response.status, response.status >= 400 ? JSON.stringify(await response.clone().json()) : "").toBe(status); return response.json(); }
+async function pdfText(bytes: Uint8Array) {
+  const task = getDocument({ data: new Uint8Array(bytes), useSystemFonts: false });
+  const pdf = await task.promise;
+  try {
+    const pages: string[] = [];
+    for (let number = 1; number <= pdf.numPages; number++) {
+      const page = await pdf.getPage(number), content = await page.getTextContent();
+      pages.push(content.items.map(item => "str" in item ? item.str : "").join(" "));
+      page.cleanup();
+    }
+    expect(await pdf.getJSActions()).toBeNull();
+    expect(await pdf.getAttachments()).toBeNull();
+    return pages.join("\n");
+  } finally { await task.destroy(); }
+}
 const read = (id: string) => formRead(req("/forms/" + id)).then(response => ok<FormRecord>(response));
 function questionOf(questions: readonly QuestionDefinition[], type: (typeof questionTypes)[number]) {
   const question = questions.find(item => item.type === type);
@@ -135,6 +152,30 @@ test("열여섯 질문의 생성·템플릿·동의·반려/승인·게시·파�
   const download = await fileRead(req(downloadPath, "GET", undefined, 1)); expect(download.status).toBe(200); expect(Buffer.from(await download.arrayBuffer())).toEqual(bytes);
   const drawingPath = "/files/" + drawing.id + "/download?submissionId=" + submitted.id + "&questionId=" + drawingQuestion;
   const drawingDownload = await fileRead(req(drawingPath, "GET", undefined, 1)); expect(drawingDownload.status).toBe(200); expect(Buffer.from(await drawingDownload.arrayBuffer())).toEqual(png);
+  const responsePdf = await submissionRead(req("/submissions/" + submitted.id + "/pdf", "GET", undefined, 1));
+  expect(responsePdf.status).toBe(200); expect(responsePdf.headers.get("content-type")).toBe("application/pdf");
+  expect(responsePdf.headers.get("cache-control")).toBe("private, no-store"); expect(responsePdf.headers.get("x-document-sha256")).toMatch(/^[a-f0-9]{64}$/);
+  const responsePdfBytes = new Uint8Array(await responsePdf.arrayBuffer());
+  expect(responsePdf.headers.get("x-pdf-sha256")).toBe(createHash("sha256").update(responsePdfBytes).digest("hex"));
+  const responseText = (await pdfText(responsePdfBytes)).replace(/\s/g, "");
+  for (const type of questionTypes) expect(responseText).toContain(type.replace(/\s/g, ""));
+  for (const expected of ["합성이름", "장문답변", "첫째", "둘째", "2026-10-03", "행A", "행B", "010-1234-5678", "qa@example.test",
+    "direct@example.test", "19900102", "(06236)서울강남구테헤란로1523층", "국가:미국(US)", "도시:SanFrancisco", "전체검증.txt", "userSignImage.png"])
+    expect(responseText).toContain(expected.replace(/\s/g, ""));
+  expect(responseText).toContain(responsePdf.headers.get("x-document-sha256"));
+  expect(responseText).not.toContain(upload.id); expect(responseText).not.toContain(drawing.id);
+
+  const limitedEmail = "form-flow-limited-" + randomUUID() + "@catchsecu.test", limitedPassword = "Form-module-limited!123";
+  expect((await auth.handler(req("/auth/sign-up/email", "POST", { email: limitedEmail, password: limitedPassword, name: "파일 제한 담당자" }, 3))).status).toBe(200);
+  const limitedUser = await db.user.update({ where: { email: limitedEmail }, data: { emailVerified: true } });
+  const limitedMember = await db.membership.create({ data: { tenantId: company.id, userId: limitedUser.id, role: "privacy" } });
+  await db.serviceGrant.create({ data: { tenantId: company.id, memberId: limitedMember.id, serviceId, capabilities: ["submission.read"] } });
+  const limitedLogin = await auth.handler(req("/auth/sign-in/email", "POST", { email: limitedEmail, password: limitedPassword }, 3)); expect(limitedLogin.status).toBe(200);
+  cookies[3] = limitedLogin.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
+  const limitedPdf = await submissionRead(req("/submissions/" + submitted.id + "/pdf", "GET", undefined, 3)); expect(limitedPdf.status).toBe(200);
+  const limitedText = (await pdfText(new Uint8Array(await limitedPdf.arrayBuffer()))).replace(/\s/g, "");
+  expect(limitedText).toContain("열람할수없는첨부파일"); expect(limitedText).not.toContain("전체검증.txt"); expect(limitedText).not.toContain("userSignImage.png");
+  expect(limitedText).not.toContain(upload.id); expect(limitedText).not.toContain(drawing.id);
   const share = await ok<{ id: string }>(await shareCreate(req("/share-grants", "POST", { formId: used.id, formVersionId: stored.formVersionId, email: "form-flow-share@catchsecu.local.test", questionIds: [q("단문형 답변").id], expiresAt: new Date(Date.now() + 86400000).toISOString() }, 1)), 201);
   const current = await read(used.id), changed = await ok<FormRecord>(await formSave(req("/forms/" + used.id + "/draft", "PATCH", { version: current.version, content: { ...used.content, body: "새 게시 본문" } }, 0, { "idempotency-key": randomUUID() })));
   expect(changed.id).toBe(used.id); expect(changed.draftNumber).toBe(2); await approve("approved"); const newPublication = await publish();
@@ -154,6 +195,10 @@ test("열여섯 질문의 생성·템플릿·동의·반려/승인·게시·파�
   expect((await db.shareGrant.findUniqueOrThrow({ where: { id: share.id } })).formVersionId).toBe(stored.formVersionId);
   const laterDownload = await fileRead(req(downloadPath, "GET", undefined, 1)); expect(laterDownload.status).toBe(200); expect(Buffer.from(await laterDownload.arrayBuffer())).toEqual(bytes);
   const laterDrawing = await fileRead(req(drawingPath, "GET", undefined, 1)); expect(laterDrawing.status).toBe(200); expect(Buffer.from(await laterDrawing.arrayBuffer())).toEqual(png);
+  await db.submission.update({ where: { id: submitted.id }, data: { retentionUntil: new Date(Date.now() - 1000) } });
+  const expiredPdf = await submissionRead(req("/submissions/" + submitted.id + "/pdf", "GET", undefined, 1)); expect(expiredPdf.status).toBe(410);
+  expect((await expiredPdf.json()).error.code).toBe("SUBMISSION_EXPIRED");
+  expect(await db.auditEvent.count({ where: { tenantId: company.id, resourceId: submitted.id, action: "submission.pdf_downloaded" } })).toBe(2);
   expect(await db.approvalRequest.count({ where: { formId: used.id } })).toBe(3); expect(await db.submission.count({ where: { tenantId: company.id } })).toBe(1);
   expect(await db.auditEvent.count({ where: { tenantId: company.id, action: "submission.created" } })).toBe(1);
-});
+}, 60000);

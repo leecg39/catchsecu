@@ -1,18 +1,26 @@
 import { z } from "zod";
 import { requireContext } from "@/server/context";
-import { body, fail, json, route } from "@/server/http";
+import { body, fail, json, rateLimit, route } from "@/server/http";
 import { actionInput, changeSubmission, correctionInput, correctSubmission, createNote, getSubmission, mutateNote, noteInput } from "@/server/submission-management";
 import { idempotent } from "@/server/idempotency";
 import { changeRetention, destructionRequestQuery } from "@/server/destruction";
 import { retentionInput } from "@/contracts/destruction";
 import { lockSubmission } from "@/server/submission-access";
+import { privateSubmissionPdf } from "@/server/submission-pdf";
+import { pdfResponse } from "@/server/pdf-renderer";
+export const runtime = "nodejs";
 function parts(request: Request) {
   const [rawId, action, rawNoteId, ...rest] = new URL(request.url).pathname.split("/").slice(4);
   if (rest.length) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   return { id: z.uuid().parse(rawId), action, noteId: rawNoteId ? z.uuid().parse(rawNoteId) : undefined };
 }
 export const GET = route(async (request, requestId) => {
-  const { id, action } = parts(request);
+  const { id, action, noteId } = parts(request);
+  if (action === "pdf" && !noteId) {
+    const ctx = await requireContext(request.headers, "submission.read");
+    await rateLimit("submission-pdf:member:" + ctx.member.id, 30);
+    return pdfResponse(await privateSubmissionPdf(ctx, id, requestId));
+  }
   if (action) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   return json(await getSubmission(await requireContext(request.headers, "submission.read"), id, requestId));
 });

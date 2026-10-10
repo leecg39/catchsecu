@@ -34,6 +34,8 @@
 
 # 실행 진행판 — 2026-10-10
 
+R08 F3 응답 PDF 표현: 현재 응답 16종·폼/응답 버전·상태·보유 정보, FILE/DRAW 권한 마스킹과 생성 전후 현재 권한/기한/버전 재검사를 구현했다. 실제 PostgreSQL 관련8파일84시험·타입/린트·계약329/466·production82페이지·Ego Lite 저장/PDF.js/감사 이벤트 통과. [검증](../../docs/qa/R08-T02/special-question-acceptance/README.md). 외부 공식 인증·서명과 F3/R08 전체 수용은 남아 goal active·공식0/53/54를 유지한다.
+
 F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. [검증](../../docs/qa/R08-T02/question-metadata/reference-link/README.md). 공식 상태 완료0/진행53/계획54 유지.
 
 F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. [검증](../../docs/qa/R08-T02/question-metadata/explanation/README.md).

@@ -345,3 +345,5 @@ F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질�
 2026-10-10 BI-05c 완료·마감 rich 편집과 active/completion/closed/viewer 읽기 권한을 완료했다. 관련 9파일 83시험, type/lint/OpenAPI/plan/diff, production 82페이지 build와 Ego 실제 게시·제출·완료·일시중지·마감, PostgreSQL 자산/pin·production HTTP byte hash가 통과했다. 다음 실행 단위는 BI-06 rich 영수증/PDF 증거 v2다. 전체 공식 상태는 완료0·진행53·계획54이며, 내부 구현·검증 잔여 추정은 5~10영업일이다. 외부 계정·승인 대기는 별도다.
 
 2026-10-10 BI-06 rich 동의 증거·이미지 PDF 영수증 v2를 완료했다. 관련 7파일 68시험, migration139 빈 설치·138→139 v1 불변, type/lint/Prisma/OpenAPI/plan/diff, production 82페이지 build와 Ego 실제 2페이지 제출·관리자 증거·PDF 다운로드, PostgreSQL 저장 bytes/PDF.js 대조가 통과했다. 다음 실행 단위는 BI-07a 4개 표시 영역 전체 수명주기와 BI-07b 반응형·RTL·키보드·실패·재시작 수용이다. 전체 공식 상태는 완료0·진행53·계획54이며, 외부 계정·승인을 제외한 전체 목표 잔여 추정은 4~9영업일이다.
+
+2026-10-11 R08 F3 응답 PDF 표현 체크포인트 완료: 현재 응답 16종과 메타데이터를 `GET /submissions/{id}/pdf` 및 상세 화면에 연결했다. 생성 전후 현재 권한·보유 기한·응답 버전·`file.read`를 재검사하고 권한 없는 FILE/DRAW 이름·ID를 숨긴다. 실제 PostgreSQL 관련8파일84시험, 타입·변경 린트, 계약329경로466작업, production82페이지와 Ego Lite 실제 다운로드/PDF.js/감사 이벤트를 확인했다. [검증](../../docs/qa/R08-T02/special-question-acceptance/README.md). 외부 공식 인증·서명은 `external_pending`, 전체 goal active·공식0/53/54 유지.

@@ -1,0 +1,80 @@
+{
+  "checkedAt": "2026-10-10T16:12:00.000Z",
+  "result": "passed",
+  "scope": "current submission PDF representation for all 16 implemented question types",
+  "implementation": {
+    "endpoint": "GET /api/v1/submissions/{id}/pdf",
+    "ui": "SubmissionDetail 응답 PDF 다운로드",
+    "questionTypeCount": 16,
+    "currentAuthorityRevalidatedAfterRender": true,
+    "contentAvailabilityRevalidatedAfterRender": true,
+    "submissionVersionRevalidatedAfterRender": true,
+    "fileReadRevalidatedAfterRender": true,
+    "fileNamesHiddenWithoutFileRead": true,
+    "auditAction": "submission.pdf_downloaded",
+    "cacheControl": "private, no-store"
+  },
+  "tests": {
+    "files": 8,
+    "tests": 84,
+    "result": "passed",
+    "typecheck": "passed",
+    "changedFileEslint": "passed",
+    "openapiPaths": 329,
+    "openapiOperations": 466,
+    "contractPolicies": 45,
+    "unmappedOperations": 0,
+    "missingPermissions": 0,
+    "missingInputSchemas": 0,
+    "planVerification": "passed",
+    "productionBuild": {
+      "result": "passed",
+      "staticPages": 82,
+      "localProviderOverrides": [
+        "ALLOW_LOCAL_MAIL=1",
+        "ALLOW_LOCAL_KAKAO=1",
+        "ALLOW_LOCAL_PAYMENT=1"
+      ]
+    }
+  },
+  "browser": {
+    "browser": "Ego Lite",
+    "route": "/form/manage/applicant/76779eda-eac2-4868-afdf-d87516858bd6",
+    "submissionId": "4dcfc7a0-c541-43fc-b4d7-640e9467f066",
+    "buttonVisible": true,
+    "downloadCompleted": true,
+    "screenshot": "ego-response-pdf-download.png",
+    "screenshotSha256": "adf4b54330185be655b2716c30c6e06ae5d9f8bf5574e9a37288f0990a864d7c"
+  },
+  "pdf": {
+    "file": "ego-response.pdf",
+    "bytes": 39684,
+    "pages": 1,
+    "sha256": "1ca8bcf9571a268ac41552e4c824fca51f94e8dee62b5802365d58b13314e125",
+    "titleParsed": true,
+    "currentCorrectionParsed": true,
+    "emailParsed": true,
+    "contentHashParsed": true
+  },
+  "postgresql": {
+    "database": "catchsecu_dev",
+    "auditAction": "submission.pdf_downloaded",
+    "matchingEvents": 1,
+    "latestAuditId": "a1fba485-e8a9-46ed-8f54-23a9aa28dd17",
+    "changedFields": []
+  },
+  "sourceSha256": {
+    "src/server/submission-pdf.ts": "54329b5086d937a2194e7f47ad8a8861d53921c21dbd5d60a5a83b9bf7ae2f0a",
+    "src/app/api/v1/submissions/[...segments]/route.ts": "53386495452429bfb1b6f1a84dc3b20d5e3948ba71eb3e2006ddb670a54618bf",
+    "src/components/forms/SubmissionDetail.tsx": "850b1c2d7320df751faa76bccfb387dcc19f86ab7bd9533bf351550c977bf460",
+    "tests/server/form-module-flow.test.ts": "ab49cdfb9939175281cbdaed7c158a890f8fc4637698aa2bec6a45de5af436e5"
+  },
+  "external": {
+    "officialIdentityProviderCredentials": "external_pending",
+    "officialSignatureProviderCredentials": "external_pending",
+    "officialSandbox": "external_pending",
+    "production": "external_pending",
+    "countedAsComplete": false
+  },
+  "taskStatus": "in_progress"
+}

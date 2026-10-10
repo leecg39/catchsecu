@@ -40,6 +40,8 @@ F3 입력 패턴 체크포인트: [허용 목록·DB 제약·공개 제출/정�
 
 F3 특수 유형 체크포인트: [국내 CONTACT·EMAIL/EMAIL_DIRECT·BIRTH의 모델/CRUD/실제 제출·정정](../../qa/R08-T02/special-questions/README.md). 고유125개·HTTP11·Ego·migration114·재시작 보존 통과. 국제전화·ADDRESS/FOREIGN_ADDRESS/DRAW·서명/인증·메타데이터와 이미지 검토는 남아 있어 첫 통합 항목은 미완료로 유지한다.
 
+F3 응답 PDF 표현 체크포인트: [16종 현재 응답 PDF·파일 권한 마스킹·현재 권한 재검사·Ego Lite 다운로드](../../qa/R08-T02/special-question-acceptance/README.md). `GET /submissions/{id}/pdf`와 상세 화면을 추가하고, PostgreSQL 관련8파일84시험·계약329경로466작업·production82페이지·PDF.js·감사 이벤트를 확인했다. 외부 공급자 공식 인증·서명과 F3 첫 통합 항목의 남은 수용 범위가 있어 체크박스는 미완료로 유지한다.
+
 F3 주소 체크포인트: [모델/암호화 저장·실제 검색/제출/정정/CSV·재시작](../../qa/R08-T02/address-questions/README.md). migration115와 원래8테이블/11fixture 불변, 고유85시험 통과. 이미지/PDF·모든 SDK 지연 조합 및 F3 나머지 유형은 잔여.
 
 F3 직접 그리기 체크포인트: [PNG/권한/정정/CSV·터치·재시작](../../qa/R08-T02/drawing-questions/README.md). migration116·기존8테이블/12fixture 불변, 고유201시험 통과. 실제 적용 PNG·저장·다운로드 일치. 전체 화면 시각 일치·인증 서명·국제전화/언어·부가필드와 전체수용은 잔여.
