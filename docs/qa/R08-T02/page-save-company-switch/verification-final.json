@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-10-10T16:30:37.381Z",
+  "scope": "R08 F4 multi-page autosave failure retry and company switch protection",
+  "status": "passed",
+  "database": {
+    "formStatus": "draft",
+    "formVersion": 2,
+    "latestVersionNumber": 1,
+    "sectionCount": 2,
+    "sectionTitles": [
+      "",
+      "확인 페이지 · 저장 실패 보존"
+    ],
+    "secondPageTitle": "확인 페이지 · 저장 실패 보존",
+    "auditActionCounts": {
+      "context.company_selected": 2,
+      "form.draft_updated": 1
+    },
+    "draftUpdateAuditCount": 1,
+    "companySelectionAuditCount": 2
+  },
+  "browser": {
+    "engine": "Ego Lite",
+    "checked": [
+      "network failure kept the two-page draft in the editor",
+      "company switch opened the failed-save leave warning",
+      "continue editing preserved the second-page title",
+      "save retry succeeded after the production server restarted",
+      "company switch succeeded after the retry",
+      "the second-page title remained after returning and reopening"
+    ]
+  },
+  "automated": {
+    "focused": {
+      "files": 2,
+      "tests": 24,
+      "passed": true
+    },
+    "related": {
+      "files": 7,
+      "tests": 97,
+      "passed": true
+    },
+    "typecheck": "passed",
+    "lint": {
+      "errors": 0,
+      "warnings": 1,
+      "note": "existing @next/next/no-img-element warning in FormEditor.tsx"
+    },
+    "productionBuild": {
+      "passed": true,
+      "staticPages": 82
+    }
+  },
+  "externalDependencies": {
+    "status": "not_applicable",
+    "reason": "This checkpoint uses only local application, PostgreSQL, and Ego Lite."
+  },
+  "sha256": {
+    "source": {
+      "src/lib/form-draft.ts": "eba970b3ec90a563b56054b09568cd516bd25166a7816ebf1c8ab5b55bece98a",
+      "src/components/forms/FormEditor.tsx": "889e3c0178f42579383f4b294b62daafda96a2c03e7d9d7f65c3c17671b525b2",
+      "tests/server/form-draft-state.test.ts": "867894e07d40a29bc7c55f37470275a03b559b75f31e78ffab68d8e62d1964f1",
+      "tests/server/form-draft-save.test.ts": "a71434143698907e5f15b691e1e0299766020ed6b9408aa2a98b5f800791304c"
+    },
+    "screenshots": {
+      "docs/qa/R08-T02/page-save-company-switch/ego-company-switch-guard.png": "5a787db1d65726ceeb2eb04c176f869e47cd8f220546c179f37dd6ccc0598880",
+      "docs/qa/R08-T02/page-save-company-switch/ego-company-switch-success.png": "eb058f8c0c7ff535436a366e18e3f8cd7c62eb9793595acecc539716a556f61a",
+      "docs/qa/R08-T02/page-save-company-switch/ego-after-restart.png": "c9fd09357a0398cdb8bf2447e16747a558c880c688678ef3cdf85004f7b6e73b"
+    }
+  }
+}

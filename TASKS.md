@@ -1,5 +1,7 @@
 # 2026-10-10 활성 구현 계획
 
+R08 F4 저장 실패·회사 전환 보호 하위 범위 완료: 폼 초안의 저장 중·실패·충돌·검증 실패를 공통 이탈 보호에 연결했다. 집중2파일24개·관련7파일97개, 타입·변경 린트·production82페이지를 통과했고 Ego Lite에서 서버 중단, 페이지2 수정, 회사 전환 경고, 입력 유지, 재시작·저장 재시도, 회사 전환·복귀·재열기를 확인했다. PostgreSQL은 폼 버전2·편집 버전1·페이지2개·초안 감사1·회사 선택 감사2를 확인했다. [검증](docs/qa/R08-T02/page-save-company-switch/README.md). F3/F5/F6/F7과 외부 공급자 검증이 남아 공식0/53/54를 유지한다.
+
 R08 F3 응답 PDF 표현 하위 범위 완료: 현재 응답 16종의 표시값·폼/응답 버전·상태·보유 정보를 `GET /submissions/{id}/pdf`와 상세 화면에 연결했다. PDF 생성 전후 현재 권한·보유 기한·응답 버전·`file.read`를 다시 확인하고, 파일 권한이 없으면 FILE/DRAW 이름과 ID를 숨긴다. 실제 PostgreSQL 관련8파일84시험·타입·변경 린트·계약329경로466작업·production82페이지와 Ego Lite 다운로드/PDF.js/감사 이벤트를 확인했다. [검증](docs/qa/R08-T02/special-question-acceptance/README.md). 외부 공급자 공식 인증·서명은 `external_pending`이고 F3/R08 전체와 공식 완료0/진행53/계획54는 유지한다.
 
 R08 F3 외부 인증·전자서명 준비 상태 하위 범위 완료: 로컬 `sandbox`와 외부 공급자 공식 인증을 화면·상태에서 구분하고, 영수증 소비 뒤에도 로컬 검증 상태와 비공식 테스트 안내를 유지한다. 집중3파일37개·관련7파일118개, 타입·변경 린트·production82페이지, 실제 브라우저 제출과 PostgreSQL 영수증 연결을 확인했다. [검증](docs/qa/R08-T02/verification-readiness/README.md). 외부 공급자 자격증명·공식 sandbox·production은 `external_pending`이며 공식 완료0/진행53/계획54를 유지한다.

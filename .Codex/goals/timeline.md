@@ -1,5 +1,7 @@
 # 실행 순서와 일정
 
+2026-10-11 R08 F4 저장 실패·회사 전환 체크포인트: 자동저장 실패 상태를 공통 NavigationGuard에 등록해 회사 전환 전에 저장 재시도/입력 폐기를 선택하게 했다. 집중24개·관련97개·타입·변경 린트·production82페이지, Ego Lite의 서버 중단/재시도/회사 전환/복귀/재열기, PostgreSQL 폼 버전2·페이지2·감사3을 확인했다. [검증](../../docs/qa/R08-T02/page-save-company-switch/README.md). 전체 goal active·공식0/53/54를 유지한다.
+
 2026-10-10 F5 참여자 인증 체크포인트: 이메일 OTP·허용 대상 CRUD·폼 범위 중복 제한·게시본 세션/proof와 파일 권한을 구현했다. 관련16파일171시험, 새 설치145개 migration, 기존196버전 기본값, production 제출/중복 차단과 재시작 hash를 확인했다. [검증](../../docs/qa/R08-T02/participation-access/README.md). 실제 카카오·네이버 OAuth와 SMTP 수신은 외부 의존으로 남고 전체 goal active·공식0/53/54를 유지한다.
 
 2026-10-10 F3 입력 패턴 체크포인트 완료: 원본 확인 ID 1·2·3·4·7·8의 nullable 모델·DB 조합 제약, CRUD/복제/템플릿/게시/정정, 편집/공개 화면을 구현했다. 임의 정규식은 거부하고 고정 문자 검증만 실행한다. 집중6·관련27·frozen fixture20/20, migration140 빈 설치·기존 질문415개 보존, Ego 잘못된 값 거부/정상 제출·production 재시작 hash9e30c2e5…·82페이지 build 통과. [검증](../../docs/qa/R08-T02/question-patterns/README.md). 전체 goal active·공식0/53/54 유지.
