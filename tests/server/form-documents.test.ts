@@ -46,12 +46,12 @@ async function display(startText: string, publicationId?: string) {
   return ok<DisplayRecord>(await displayEdit(req(displayPath(), "PATCH", "owner", { ...emptyDisplay(), version: current.version, startText,
     ...(publicationId ? { policyMode: "document", publicationId } : {}) })));
 }
-async function document(patch: Partial<DocumentInput> = {}) {
+async function document(patch: Partial<DocumentInput> = {}, who = "owner") {
   const serviceId = patch.serviceId ?? service;
-  const purpose = await ok<{id:string}>(await purposeCreate(req("/processing-purposes", "POST", "owner", { serviceId, name: "증거 목적 " + randomUUID(), purpose: "합성 상담", lawfulBasis: "consent", basisReference: "", items: [{ name: "이름", kind: "general", required: true }], retentionMode: "days", retentionDays: 30, retentionReason: "", recipientIds: [] }, { "idempotency-key": randomUUID() })), 201);
+  const purpose = await ok<{id:string}>(await purposeCreate(req("/processing-purposes", "POST", who, { serviceId, name: "증거 목적 " + randomUUID(), purpose: "합성 상담", lawfulBasis: "consent", basisReference: "", items: [{ name: "이름", kind: "general", required: true }], retentionMode: "days", retentionDays: 30, retentionReason: "", recipientIds: [] }, { "idempotency-key": randomUUID() })), 201);
   const input: DocumentInput = { serviceId, title: "동의 문서 " + randomUUID(), type: "consent", body: "당시의 한글 동의 본문", refusalNotice: "동의를 거부할 수 있습니다.", rightsContact: "QA 문의", effectiveDate: "2026-10-03", recipientIds: [], ...patch, purposeIds: [purpose.id] };
-  const row = await ok<DocumentRecord>(await docCreate(req("/documents", "POST", "owner", input, { "idempotency-key": randomUUID() })), 201);
-  const published = await ok<{ document: DocumentRecord; publicationId: string }>(await docAction(req(`/documents/${row.id}/publish`, "POST", "owner", { version: row.version, expiresAt: null })), 201);
+  const row = await ok<DocumentRecord>(await docCreate(req("/documents", "POST", who, input, { "idempotency-key": randomUUID() })), 201);
+  const published = await ok<{ document: DocumentRecord; publicationId: string }>(await docAction(req(`/documents/${row.id}/publish`, "POST", who, { version: row.version, expiresAt: null })), 201);
   const version = await db.documentVersion.findFirstOrThrow({ where: { documentId: row.id } });
   return { ...published, version, input };
 }
@@ -131,9 +131,10 @@ describe("versioned form documents and consent receipt PDFs", () => {
     expect(published.body.consentBundle.documents[0]).toMatchObject({ title: doc.input.title, renderedText: doc.version.renderedText, contentHash: doc.version.contentHash, required: true });
     await display("別 설정");
   });
-  test("validates published same-service selections, kind, duplicate documents and retention limit", async () => {
-    const doc = await document(), other = await document({ serviceId: second }), policy = await document({ type: "privacy_policy" });
-    for (const documentVersionId of [other.version.id, policy.version.id, randomUUID()]) {
+  test("validates same-service selections and rejects cross-service or cross-tenant documents", async () => {
+    const foreignService = await db.service.create({ data: { tenantId: foreign, name: "외부 회사 서비스 " + randomUUID(), externalName: "외부 회사 서비스" } });
+    const doc = await document(), other = await document({ serviceId: second }), foreignDocument = await document({ serviceId: foreignService.id }, "foreign"), policy = await document({ type: "privacy_policy" });
+    for (const documentVersionId of [other.version.id, foreignDocument.version.id, policy.version.id, randomUUID()]) {
       expect((await formCreate(req("/forms", "POST", "owner", { serviceId: service, title: "잘못된 선택", content: content([{ ...selection(doc), documentVersionId }]) }, { "idempotency-key": randomUUID() }))).status).toBe(422);
     }
     expect((await formCreate(req("/forms", "POST", "owner", { serviceId: service, title: "초과", content: content([selection(doc)], { retentionDays: 31 }) }, { "idempotency-key": randomUUID() }))).status).toBe(422);
