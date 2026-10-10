@@ -11,8 +11,14 @@ const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL
 assert.equal(database.pathname, "/catchsecu_dev"); assert.ok(["localhost", "127.0.0.1"].includes(database.hostname));
 assert.equal(origin, "http://localhost:3100"); assert.equal(env.MAIL_TRANSPORT, "local");
 const privateDirectory = ".local/rea-fullstack/members", privateFile = privateDirectory + "/fixture.json", directory = "docs/qa/R04-T04/members-flow";
+const stableAuditActions = [
+  "company.created", "service.created", "email.local_delivered",
+  "invitation.created", "invitation.resent", "invitation.accepted", "invitation.revoked",
+  "member.updated", "member.removed", "company.ownership_transferred",
+  "expert.assigned", "expert.updated", "expert.reassigned", "expert.revoked",
+] as const;
 type Person = { email: string; password: string; userId: string; cookie: string };
-type Fixture = { tag: string; preparedAt: string; ready: boolean; people: Record<string, Person>; tenantId: string; otherTenantId: string; serviceIds: string[]; invitationLinks: Record<string, string>; currentInvitationId?: string; assignmentId?: string; reinvitationId?: string; cancelInvitationId?: string };
+type Fixture = { tag: string; preparedAt: string; ready: boolean; people: Record<string, Person>; tenantId: string; otherTenantId: string; serviceIds: string[]; invitationLinks: Record<string, string>; memberReloginCookie?: string; currentInvitationId?: string; assignmentId?: string; reinvitationId?: string; cancelInvitationId?: string };
 async function save(fixture: Fixture) { await writeFile(privateFile, JSON.stringify(fixture, null, 2) + "\n", { mode: 0o600 }); }
 async function request(path: string, method = "GET", body?: unknown, cookie = "", headers: Record<string, string> = {}) {
   return fetch(origin + "/api/v1" + path, { method, redirect: "manual", headers: { Origin: origin, ...(cookie ? { cookie } : {}),
@@ -53,7 +59,12 @@ try {
     await writeFile(directory + "/prepared.json", JSON.stringify(report, null, 2) + "\n"); console.log(JSON.stringify(report));
   } else {
     const fixture: Fixture = JSON.parse(await readFile(privateFile, "utf8")); assert.equal(fixture.ready, true);
-    if (process.argv[2] === "mail") {
+    if (process.argv[2] === "refresh-sessions") {
+      for (const label of ["owner", "foreign", "expert", "operator"] as const) await login(fixture.people[label]);
+      const memberAfterRelogin = { ...fixture.people.member, cookie: "" }; await login(memberAfterRelogin);
+      fixture.memberReloginCookie = memberAfterRelogin.cookie; await save(fixture);
+      console.log(JSON.stringify({ result: "passed", sessionsRefreshed: 5, memberReloginStored: true }));
+    } else if (process.argv[2] === "mail") {
       const id = process.argv[3]; assert.ok(id);
       const invitation = await db.invitation.findFirstOrThrow({ where: { id, tenantId: fixture.tenantId } });
       assert.ok(Object.values(fixture.people).some(person => person.email === invitation.email), "Only synthetic fixture recipients are allowed");
@@ -115,7 +126,9 @@ try {
         invitations: await db.invitation.findMany({ where: { tenantId: fixture.tenantId }, select: { id: true, email: true, role: true, serviceIds: true, status: true, version: true, expiresAt: true }, orderBy: { id: "asc" } }),
         assignments: await db.expertAssignment.findMany({ where: { tenantId: fixture.tenantId }, select: { id: true, expertUserId: true, status: true, version: true, expiresAt: true, services: { select: { serviceId: true }, orderBy: { serviceId: "asc" } } }, orderBy: { id: "asc" } }),
         outbox: await db.job.findMany({ where: { tenantId: fixture.tenantId, dedupeKey: { startsWith: "mail:invitation:" } }, select: { id: true, dedupeKey: true, status: true, attempts: true, attemptsLog: { select: { id: true }, orderBy: { id: "asc" } } }, orderBy: { id: "asc" } }),
-        audits: await db.auditEvent.findMany({ where: { tenantId: fixture.tenantId }, select: { id: true, actorId: true, action: true, resource: true, resourceId: true, requestId: true }, orderBy: [{ createdAt: "asc" }, { id: "asc" }] }) };
+        // 로그인·읽기 화면은 session/analytics 감사를 추가할 수 있다. 재시작 지문에는
+        // 이 수용검증이 만든 도메인 변경과 메일 전달 감사만 포함한다.
+        audits: await db.auditEvent.findMany({ where: { tenantId: fixture.tenantId, action: { in: [...stableAuditActions] } }, select: { id: true, actorId: true, action: true, resource: true, resourceId: true, requestId: true }, orderBy: [{ createdAt: "asc" }, { id: "asc" }] }) };
       if (!verifying) {
         await writeFile(directory + "/" + tag + ".json", JSON.stringify(report, null, 2) + "\n"); console.log(JSON.stringify({ memberships: report.memberships.length, invitations: report.invitations.length, audits: report.audits.length }));
       } else {
@@ -132,7 +145,7 @@ try {
         }
         assert.equal(report.assignments.length, 1); assert.equal(report.assignments[0].id, fixture.assignmentId);
         assert.deepEqual([report.assignments[0].status, report.assignments[0].version], ["revoked", 9]);
-        assert.equal(report.audits.length, 45);
+        assert.equal(report.audits.length, 33);
         const actionCounts = report.audits.reduce<Record<string, number>>((all, row) => { all[row.action] = (all[row.action] ?? 0) + 1; return all; }, {});
         for (const [action, count] of Object.entries({ "member.updated": 7, "member.removed": 1, "company.ownership_transferred": 2, "invitation.created": 3, "invitation.resent": 2, "invitation.accepted": 2, "invitation.revoked": 1, "expert.assigned": 1, "expert.updated": 4, "expert.reassigned": 2, "expert.revoked": 2 })) assert.equal(actionCounts[action], count, action);
         assert.equal(report.outbox.length, 5); assert.equal(report.outbox.filter(job => job.status === "done").length, 4);
@@ -143,9 +156,12 @@ try {
           const delivery = JSON.parse(await readFile(directory + "/mail-" + match[1] + "-" + match[2] + ".json", "utf8"));
           assert.equal(createHash("sha256").update(await readFile(resolve(env.LOCAL_MAIL_DIR, job.id + ".json"))).digest("hex"), delivery.fileHash);
         }
+        const staleMember = { ...fixture.people.member }; assert.ok(fixture.memberReloginCookie);
+        const memberAfterRelogin = { ...fixture.people.member, cookie: fixture.memberReloginCookie };
         const cases: { label: string; status: number }[] = [];
-        async function check(label: string, path: string, actor: string, expected: number, method = "GET", body?: unknown) {
-          const response = await request(path, method, body, fixture.people[actor].cookie); assert.equal(response.status, expected, label); cases.push({ label, status: response.status }); return response.json();
+        async function check(label: string, path: string, actor: string | Person, expected: number, method = "GET", body?: unknown) {
+          const person = typeof actor === "string" ? fixture.people[actor] : actor;
+          const response = await request(path, method, body, person.cookie); assert.equal(response.status, expected, label); cases.push({ label, status: response.status }); return response.json();
         }
         assert.equal((await check("members persisted including revoked", "/members?status=all", "owner", 200)).total, 3);
         assert.equal((await check("member version persisted", "/members/" + member.id, "owner", 200)).version, 12);
@@ -153,14 +169,16 @@ try {
         assert.equal((await check("invitations persisted", "/invitations?status=all", "owner", 200)).total, 3);
         assert.equal((await check("expert assignment persisted", "/expert-assignments/" + fixture.assignmentId, "operator", 200)).version, 9);
         assert.equal((await check("expert sees revoked assignment", "/expert-assignments/" + fixture.assignmentId, "expert", 200)).canSelect, false);
+        await check("reinvited member can read granted service after relogin", "/services/" + fixture.serviceIds[0], memberAfterRelogin, 200);
         await check("expert service A denied", "/services/" + fixture.serviceIds[0], "expert", 403);
         await check("expert service B denied", "/services/" + fixture.serviceIds[1], "expert", 403);
         await check("foreign tenant member hidden", "/members/" + member.id, "foreign", 404);
-        await check("removed old member session remains invalid", "/context", "member", 401);
+        await check("removed old member session remains invalid", "/context", staleMember, 401);
         const token = new URL(fixture.invitationLinks[fixture.cancelInvitationId + ":2"]).searchParams.get("token"); assert.ok(token);
         await check("revoked invitation remains invalid", "/invitations/preview", "foreign", 410, "POST", { token });
         const stateHash = createHash("sha256").update(JSON.stringify(report)).digest("hex");
-        if (tag !== "verified") assert.equal(stateHash, JSON.parse(await readFile(directory + "/verified.json", "utf8")).stateHash);
+        const baselineTag = process.argv[4] ?? "verified"; assert.match(baselineTag, /^[a-z0-9-]+$/);
+        if (tag !== baselineTag) assert.equal(stateHash, JSON.parse(await readFile(directory + "/" + baselineTag + ".json", "utf8")).stateHash);
         const result = { result: "passed", checkedAt: new Date().toISOString(), stateHash, actionCounts, httpCases: cases, data: report, externalProviderVerified: false };
         await writeFile(directory + "/" + tag + ".json", JSON.stringify(result, null, 2) + "\n"); console.log(JSON.stringify({ result: "passed", stateHash, httpCases: cases.length, audits: report.audits.length, deliveries: 4 }));
       }

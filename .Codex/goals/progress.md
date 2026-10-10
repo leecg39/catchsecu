@@ -1,4 +1,8 @@
-## 최신 작업: R04-T03 구성원·초대·권한·전문가 화면 완료
+## 최신 작업: R04-T04 내부 수용검증 완료·외부 대기
+
+2026-10-11 PostgreSQL 도메인 감사33건·로컬메일4건·HTTP12건을 fresh 로그인과 서버 재시작 전후 같은 지문으로 확인했다. Ego Lite 재시작 화면·별도 브라우저 세션 격리와 R04 회귀12파일249개·타입·린트 오류0·production82페이지 통과. 실제 SMTP·Google/Microsoft·기관 SSO 영수증이 없어 R04-T04는 in_progress/external_pending으로 유지하고 전체 goal은 사용자 요청에 따라 paused. [증거](../../docs/qa/R04-T04/current/README.md).
+
+## 이전 작업: R04-T03 구성원·초대·권한·전문가 화면 완료
 
 2026-10-11 네 원본 경로와 운영자 부가 경로의 전체 UI 상태를 연결하고 목록 URL 복원을 구현했다. Ego Lite에서 초대필터·권한화면·전문가검색·403·초대오류와 임시21명 포함 총23명3페이지의 2페이지 새로고침, fixture삭제 후 1페이지·URL보정을 확인했다. UI/API계약13개·타입·린트오류0·production82페이지 통과. 계획 상태 완료19/진행36/계획52, 전체 goal active. [증거](../../docs/qa/R04-T03/current/README.md).
 

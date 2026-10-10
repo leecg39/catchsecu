@@ -1,5 +1,7 @@
 # 2026-10-10 활성 구현 계획
 
+R04-T04 내부 수용검증 완료·외부 대기: 실제 PostgreSQL의 도메인 감사33건·로컬메일4건·HTTP12건을 fresh 로그인과 서버 재시작 전후 동일 지문으로 확인했다. Ego Lite 재시작 화면과 별도 브라우저 세션 격리, R04 회귀12파일249개·타입·린트 오류0·production82페이지를 통과했다. 실제 SMTP·Google/Microsoft·기관 SSO 영수증이 없어 Task는 `in_progress / external_pending`이며 전체 목표는 사용자 요청으로 일시정지한다. [검증](docs/qa/R04-T04/current/README.md).
+
 R04-T03 구성원·초대·권한·전문가 화면 완료: 네 원본 경로와 운영자 부가 경로의 정상·빈·로딩·검증·403·만료·409·재시도·새로고침 상태를 연결했다. 검색·탭·상태·페이지를 URL에 보존하고 Ego Lite에서 23명3페이지의 2페이지 새로고침과 fixture 삭제 후 1페이지 보정을 확인했다. UI/API 계약13개·타입·린트 오류0·production82페이지 통과. 활성 계획은 완료19/진행36/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R04-T03/current/README.md).
 
 R04-T02 구성원·초대·권한·전문가 서버 API 완료: OpenAPI 15경로23작업을 실제 Route Handler와 대조하고 초대·구성원·접근요청·전문가의 권한·경합·감사·outbox 원자성을 PostgreSQL 12suite239시험으로 확인했다. 타입·전체 린트 오류0·production82페이지를 통과했다. 활성 계획은 완료18/진행37/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R04-T02/current/README.md).

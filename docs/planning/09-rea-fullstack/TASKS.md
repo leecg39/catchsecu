@@ -324,6 +324,7 @@ A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 
   - 회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증
   - 브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과
   - 외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지.
+- 현재 증거: [내부 수용 보고서](../../qa/R04-T04/current/README.md), [재시작 동일 지문](../../qa/R04-T04/current/acceptance-summary.json), [브라우저 재시작·격리](../../qa/R04-T04/current/browser-restart.json), [249개 회귀·품질 게이트](../../qa/R04-T04/current/quality-gates.json), [외부 대기 목록](../../qa/R04-T04/current/external-pending.json). DB·API·UI 내부 수용은 통과했지만 실제 SMTP·외부 SSO 영수증이 없어 Task는 완료로 올리지 않는다.
 
 
 ## R05 MY·프로필·활동 검토·탈퇴
