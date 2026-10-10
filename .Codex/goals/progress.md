@@ -1,6 +1,10 @@
-## 최신 작업: R01-T02 API·권한·경합·멱등 공통 경계 완료
+## 최신 작업: R01-T03 파일·비공개 저장소·다운로드 공통 경계 완료
 
-2026-10-11 실제 PostgreSQL과 현재 Route Handler에서 세션 tenant 결정·본문 tenant 주입 거부·회사 교차 복합 FK, 동일 멱등 키의 동시/순차 재전송 단일 결과, 다른 payload 409, 경쟁 PATCH 200/409와 감사 한 건, viewer 읽기와 create/update/delete 권한 분리를 확인했다. 401/403/404/409/410/413/415/422/429·requestId·1 MiB·안정 목록과 실제 SQLSTATE 변환을 포함해 3파일13시험·타입·린트가 통과했다. 계획 상태 완료6/진행48/계획53, 전체 goal active. [증거](../../docs/qa/R01-T02/current/README.md).
+2026-10-11 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전·미결합 파일 열람 차단, EICAR 격리, tenant/서비스/응답/질문 결합 거부, 다운로드 중 현재 세션·권한·보유기한 재검사, 저장 확인 손실 재시도와 삭제 실패 worker 정리, 원본 hash·바이트 왕복, 다국어 PDF fail-closed를 확인했다. 4파일77시험·S3 9요청·타입·린트가 통과했다. 계획 상태 완료7/진행47/계획53, 전체 goal active. [증거](../../docs/qa/R01-T03/current/README.md).
+
+## 이전 작업: R01-T02 API·권한·경합·멱등 공통 경계 완료
+
+2026-10-11 실제 PostgreSQL과 현재 Route Handler에서 세션 tenant 결정·본문 tenant 주입 거부·회사 교차 복합 FK, 동일 멱등 키의 동시/순차 재전송 단일 결과, 다른 payload 409, 경쟁 PATCH 200/409와 감사 한 건, viewer 읽기와 create/update/delete 권한 분리를 확인했다. 401/403/404/409/410/413/415/422/429·requestId·1 MiB·안정 목록과 실제 SQLSTATE 변환을 포함해 3파일13시험·타입·린트가 통과했다. 당시 계획 상태 완료6/진행48/계획53, 전체 goal active. [증거](../../docs/qa/R01-T02/current/README.md).
 
 ## 이전 작업: R01-T01 실행환경·DB 정합성 완료
 

@@ -1,6 +1,8 @@
 # 상세 TASKS — 캐치시큐 전 페이지 풀스택 완성 계획
 
-R01-T02 공통 API 경계 완료: 실제 PostgreSQL과 현재 Route Handler에서 세션 tenant·복합 FK, 동일 멱등 키 동시/순차 재전송 단일 결과, 다른 payload 409, 경쟁 PATCH 200/409, 읽기와 create/update/delete 권한 분리, HTTP 상태·requestId·1 MiB 제한·안정 목록을 확인했다. 3파일13시험·타입·린트가 통과했고 현재 공식 상태는 완료6·진행48·계획53이다. [검증](../../qa/R01-T02/current/README.md).
+R01-T03 파일 공통 경계 완료: 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전 열람 차단, EICAR 격리, tenant 결합 거부, 현재 권한·보유기한 재검사, 저장 실패 재시도·삭제 정리, hash/바이트 왕복과 다국어 PDF를 검증했다. 4파일77시험·S3 9요청·타입·린트가 통과했고 현재 공식 상태는 완료7·진행47·계획53이다. [검증](../../qa/R01-T03/current/README.md).
+
+R01-T02 공통 API 경계 완료: 실제 PostgreSQL과 현재 Route Handler에서 세션 tenant·복합 FK, 동일 멱등 키 동시/순차 재전송 단일 결과, 다른 payload 409, 경쟁 PATCH 200/409, 읽기와 create/update/delete 권한 분리, HTTP 상태·requestId·1 MiB 제한·안정 목록을 확인했다. 3파일13시험·타입·린트가 통과했고 당시 공식 상태는 완료6·진행48·계획53이었다. [검증](../../qa/R01-T02/current/README.md).
 
 R01-T01 실행환경·DB 정합성 완료: 적용 당시 Git blob에서 migration3개의 파일 끝 빈 줄을 복구해 Node24 dev/test 148/148 checksum 차이0을 확인했다. schema 예상 밖 차이0·SQL전용FK1개, shadow 빈 설치·147→148 upgrade·실패 rollback/recovery·seed·FK/unique 거부가 통과했다. 당시 공식 상태는 완료5·진행48·계획54였다. [검증](../../qa/R01-T01/current/README.md).
 
@@ -116,7 +118,7 @@ HttpError/DTO·requestId·pagination·최대크기·401/403/404/409/410/422/429 
   - 경쟁PATCH409·동일키재시도1회·다른payload동일키409; create/update/delete 모두읽기와독립권한검증
 - 완료 증거: [현재 보고서](../../qa/R01-T02/current/README.md), [검증 집계](../../qa/R01-T02/current/verification-summary.json), [전용 경계 통합 시험](../../qa/R01-T02/current/r01-api-boundaries.json), [보호 라우트 회사 격리](../../qa/R01-T02/current/tenant-boundary.json), [실제 PostgreSQL 오류 변환](../../qa/R01-T02/current/http-database-errors.json). 실제 PostgreSQL에서 3파일13시험, 타입 검사와 공통 서버·변경 시험 린트가 통과했다.
 
-### [~] R01-T03 파일·비공개 저장소·다운로드 공통 경계
+### [x] R01-T03 파일·비공개 저장소·다운로드 공통 경계
 
 DB metadata/비공개 binary/검사status·용량·확장자·파일형식검증, 로컬/S3 adapter 및 한글PDF 생성 기반을 재검증한다.
 
@@ -127,6 +129,7 @@ DB metadata/비공개 binary/검사status·용량·확장자·파일형식검증
 - 완료 조건:
   - 파일완료전열람불가·악성파일격리·다른tenant파일bind거부
   - 다운로드 시 최신권한/보유기한 확인; 분리저장 실패정리 및 파일hash실제대조
+- 완료 증거: [현재 보고서](../../qa/R01-T03/current/README.md), [검증 집계](../../qa/R01-T03/current/verification-summary.json), [파일·ClamAV](../../qa/R01-T03/current/files.json), [현재 권한·보유기한](../../qa/R01-T03/current/file-access-gate.json), [분리 저장 실패·재시도](../../qa/R01-T03/current/author-asset-uploads.json), [다국어 PDF](../../qa/R01-T03/current/pdf-renderer-v2.json), [S3 SigV4](../../qa/R01-T03/current/s3-roundtrip.json). 실제 PostgreSQL·ClamAV에서 77시험과 독립 S3 검증 9요청, 타입·린트가 통과했다.
 
 ### [ ] R01-T04 Outbox·worker·플랫폼 인증메일·감사 기반
 

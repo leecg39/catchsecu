@@ -346,27 +346,40 @@
     "legacy_tasks": [
       "P01-T03"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "cross-cutting",
     "evidence_directory": "catchsecu-clone/docs/qa/R01-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R01-T03/current/README.md",
+      "docs/qa/R01-T03/current/verification-summary.json",
+      "docs/qa/R01-T03/current/files.json",
+      "docs/qa/R01-T03/current/file-access-gate.json",
+      "docs/qa/R01-T03/current/author-asset-uploads.json",
+      "docs/qa/R01-T03/current/pdf-renderer-v2.json",
+      "docs/qa/R01-T03/current/s3-roundtrip.json"
+    ],
     "dependency_gates": {
       "R01-T02": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "서명 검증 ClamAV1.5.4·curl8.22.0 사용자폴더 설치. TLS 경고 해결·공식6개 시험·실제 파일/EICAR/권한41개 통과. 실제 HTTPS 공식정의 다운로드·서명·최신성·socket0600 검증. 관리자 설치 불필요.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "verified",
+    "progress_note": "실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전 차단, EICAR 격리, tenant 결합 거부, 최신 권한·보유기한 재검사, 저장 실패 재시도·삭제 정리, hash/바이트 왕복과 다국어 PDF를 77시험+S3 9요청으로 검증했다.",
     "progress_evidence": [
-      "docs/qa/R01-T03/scanner-runtime/source-build/runtime-final.json",
-      "docs/qa/R01-T03/scanner-runtime/files-restored-tests.json"
+      "docs/qa/R01-T03/current/README.md",
+      "docs/qa/R01-T03/current/verification-summary.json",
+      "docs/qa/R01-T03/current/files.json",
+      "docs/qa/R01-T03/current/file-access-gate.json",
+      "docs/qa/R01-T03/current/author-asset-uploads.json",
+      "docs/qa/R01-T03/current/pdf-renderer-v2.json",
+      "docs/qa/R01-T03/current/s3-roundtrip.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
+      "database": "verified",
+      "api": "verified",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {
