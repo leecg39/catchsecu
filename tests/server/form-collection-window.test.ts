@@ -17,7 +17,7 @@ if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].inclu
 let ctx: Context, serviceId: string;
 const minute = 60_000;
 const isoAfter = (minutes: number) => new Date(Date.now() + minutes * minute).toISOString();
-function content(open = isoAfter(60), close = isoAfter(120)) {
+function content(open: string | null = isoAfter(60), close: string | null = isoAfter(120)) {
   return formContentSchema.parse({ body: "수집 일정 검증", questions: [{ id: randomUUID(), type: "단문형 답변", label: "메모", required: false }],
     consentRequired: false, consentPurpose: "", retentionDays: 30, maxResponses: 2,
     collectionOpenAt: open, collectionCloseAt: close });
@@ -134,6 +134,29 @@ test("시작 전에는 공개 내용과 제출을 차단하고 시작·종료 �
   expect(late.error.code).toBe("PUBLICATION_CLOSED");
   publication = await db.publication.findUniqueOrThrow({ where: { id: live.id } });
   expect(publication.responseCount).toBe(1); expect(await db.submission.count()).toBe(1);
+});
+
+test("중지·기간 종료·응답 한도는 공개 화면에 서로 다른 마감 사유를 반환한다", async () => {
+  const form = await create(content(null, null), "마감 사유 폼");
+  const live = await db.$transaction(tx => publishForm(tx, ctx, form.id, { version: 1 }, randomUUID()));
+
+  await transitionForm(ctx, form.id, 2, "pause", randomUUID());
+  expect(await json(await publicRead(request("/public/forms/" + live.token))))
+    .toMatchObject({ closed: true, closedReason: "paused" });
+
+  await db.publication.update({ where: { id: live.id }, data: { expiresAt: new Date(Date.now() - minute) } });
+  expect(await json(await publicRead(request("/public/forms/" + live.token))))
+    .toMatchObject({ closed: true, closedReason: "expired" });
+  await db.publication.update({ where: { id: live.id }, data: { expiresAt: null } });
+
+  await transitionForm(ctx, form.id, 3, "resume", randomUUID());
+  await db.publication.update({ where: { id: live.id }, data: { responseCount: 2 } });
+  expect(await json(await publicRead(request("/public/forms/" + live.token))))
+    .toMatchObject({ closed: true, closedReason: "response_limit" });
+
+  await db.publication.update({ where: { id: live.id }, data: { responseCount: 0, expiresAt: new Date(Date.now() - minute) } });
+  expect(await json(await publicRead(request("/public/forms/" + live.token))))
+    .toMatchObject({ closed: true, closedReason: "expired" });
 });
 
 test("게시 요청의 과거 일정·저장된 종료일 불일치를 거절하고 DB도 우회 변조를 막는다", async () => {

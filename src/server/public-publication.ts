@@ -33,7 +33,11 @@ export async function lockPublicPublicationView(tx: Transaction, id: string) {
     live.form.service.tenant.status !== "active" || live.formVersion.status !== "published" || live.form.publishedVersionId !== live.formVersionId)
     fail(410, "PUBLICATION_CLOSED", "종료되었거나 만료된 폼입니다.");
   const now = new Date();
-  const state = live.form.status === "paused" || !!(live.expiresAt && live.expiresAt <= now) || live.responseCount >= live.maxResponses
-    ? "closed" as const : live.opensAt && live.opensAt > now ? "scheduled" as const : "active" as const;
-  return { publication: live, state };
+  const closedReason = live.expiresAt && live.expiresAt <= now ? "expired" as const
+    : live.form.status === "paused" ? "paused" as const
+    : live.responseCount >= live.maxResponses ? "response_limit" as const
+    : undefined;
+  if (closedReason) return { publication: live, state: "closed" as const, closedReason };
+  if (live.opensAt && live.opensAt > now) return { publication: live, state: "scheduled" as const };
+  return { publication: live, state: "active" as const };
 }

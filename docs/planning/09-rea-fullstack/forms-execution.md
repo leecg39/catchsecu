@@ -69,7 +69,7 @@ F4 저장 실패·회사 전환 체크포인트: 공통 이탈 보호에 폼 초
 
 - [~] 시작/종료 시각과 기존 응답 상한·언어를 버전 계약에 연결했다. 시작 전 본문 비노출/425, 시작 후 제출, 종료 후410/마감 화면과 브라우저 현지 시각↔UTC 저장을 PostgreSQL·Ego Lite·재시작으로 확인했다. 이메일 OTP·전체/허용 대상·대상 CRUD·폼 범위 중복 참여 제한도 PostgreSQL·production 브라우저·재시작으로 확인했다. R08 전수 수용은 남아 있다. [일정 검증](../../qa/R08-T02/collection-window/README.md), [참여 인증 검증](../../qa/R08-T02/participation-access/README.md).
 - [~] EMAIL_OTP는 로컬 암호화 outbox로 구현·검증했다. SOCIAL은 카카오/네이버 계약·설정 UI와 자격증명 미설정 시 게시 거부까지 구현했으며 실제 OAuth는 외부 앱 자격증명·승인 callback/domain을 기다린다.
-- [~] 게시/일시중지/재개/승인/고정URL은 R09의 버전·hash·token 계약과 함께 검사한다. 승인 요청·결정 입력의 이탈 보호와 폼 dirty 잠금, 승인 409 입력 보존·최신 상태 복구를 구현하고 실제 Ego Lite 반려 경합→재요청→승인→게시→중지·재개·보관, production 재시작과 PostgreSQL 승인·게시·감사 지문을 확인했다. 고정 URL 편집도 dirty 보호·조회 재시도·409 입력 보존/저장 잠금·명시적 폐기 후 최신 version 적용과 실제 경합을 확인했다. [승인·게시 검증](../../qa/R08-T02/approval-publication/README.md), [고정 URL 편집 검증](../../qa/R08-T02/fixed-url-editor/README.md). 두 흐름의 결합 수용과 외부 성공 조건은 각각 미완료·`external_pending`으로 남긴다.
+- [~] 게시/일시중지/재개/승인/고정URL은 R09의 버전·hash·token 계약과 함께 검사한다. 승인 입력 이탈 보호·폼 dirty 잠금·409 입력 보존과 고정 URL 편집 경합 복구를 구현했다. Ego Lite에서 첫 승인·게시→고정 URL 생성→v2 초안 격리→두 번째 승인·재게시→같은 주소의 v2 자동 전환→중지·재개→production 재시작→사용 종료·보관까지 내부 결합 수용을 완료했다. 중지·기간 만료·응답 한도를 `closedReason`으로 분리해 원인별 다국어 마감 안내도 확인했다. [결합 수용](../../qa/R08-T02/combined-publication-fixed-url/README.md), [승인·게시 검증](../../qa/R08-T02/approval-publication/README.md), [고정 URL 편집 검증](../../qa/R08-T02/fixed-url-editor/README.md). 외부 OAuth·SMTP·본인확인·전자서명 성공 조건은 `external_pending`으로 남긴다.
 
 ## F6 템플릿과 입력 보호 — R08-T03/T04
 

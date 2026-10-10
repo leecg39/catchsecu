@@ -1,5 +1,7 @@
 # 2026-10-10 활성 구현 계획
 
+R08 F5 승인·게시·고정 URL 내부 결합 수용 완료: 실제 Ego Lite에서 첫 승인·게시→고정 URL 생성→v2 초안 격리→두 번째 승인·재게시→같은 주소의 v2 자동 전환→중지·재개→production 재시작→사용 종료·보관을 확인했다. 일시 중지에도 응답 한도 초과 문구가 표시되던 결함을 재현하고 `closedReason`을 중지·기간 만료·응답 한도로 분리해 기존 다국어 안내와 연결했다. PostgreSQL 재시작 지문 일치와 승인2·게시본2 보존, 활성 합성 폼0을 확인했다. [검증](docs/qa/R08-T02/combined-publication-fixed-url/README.md). F5 외부 OAuth·SMTP·본인확인·전자서명은 `external_pending`이며 F7 전수 수용이 남아 공식0/53/54를 유지한다.
+
 R08 F5 승인·게시 하위 범위 완료: 승인 요청 메시지·증빙 번호·검토 의견의 이탈 보호와 폼 dirty 잠금, 승인 409 입력 보존·최신 상태 복구를 구현했다. Ego Lite에서 반려 경합 뒤 재요청·승인·게시·중지·재개·보관을 실제 조작했고, PostgreSQL 승인2건·게시본1건·감사13건과 production 재시작 전후 지문 일치를 확인했다. 합성 폼은 보관하고 공개 접근410·활성 합성 폼0·브라우저 로그아웃401까지 정리했다. [검증](docs/qa/R08-T02/approval-publication/README.md). 고정 URL과 묶은 F5/F7 전수 수용 및 외부 OAuth·SMTP·본인확인·전자서명은 남아 공식0/53/54를 유지한다.
 
 R08 F5 고정 URL 편집 입력 보호 하위 범위 완료: 생성·수정 모달의 dirty/저장 중 상태를 공통 이탈 보호에 연결하고, 단일 저장 잠금·게시 폼 조회 재시도·409 입력 보존/저장 잠금·명시적 입력 폐기 후 최신 version 적용을 구현했다. 집중·게시 경합·통합 3파일21개, 타입·변경 린트·production82페이지를 통과했다. Ego Lite에서 닫기 취소 입력 유지, 별도 요청 version 경합, 409 입력 보존, 최신본 적용 취소/확정, version3 재저장과 production 재시작을 확인했다. PostgreSQL은 생성1·변경2·회수1 감사와 합성 active0·원본 게시 폼 보존을 대조했다. [검증](docs/qa/R08-T02/fixed-url-editor/README.md). 게시·중단·재개·승인과 묶은 F5/F7 전수 수용 및 외부 공급자 검증이 남아 공식0/53/54를 유지한다.
@@ -289,7 +291,7 @@ F3 질문 추가 설명: DB/API·편집·공개·정정·템플릿 연결, 고�
 - 작업: 권한과 정책에 따른 승인요청/반려/승인, 게시 토큰·만료·응답한도, 고정URL CRUD·연결변경을 구현한다.
 - 선행: P04-T02, P11-T01
 - 검증/완료: 승인전 공개 불가; 고정URL 변경과 구버전응답 보존; 만료/회수/한도 경합 검사
-- 증거: [승인·게시·고정 URL 현재 권한·재전송·경합 검증](docs/qa/P04-T03/README.md), [승인 입력·409·게시·중지·재개 Ego Lite 검증](docs/qa/R08-T02/approval-publication/README.md). 실제 PostgreSQL·production API·재시작과 승인·게시 화면 흐름을 확인했다. 선행·정상 원본·고정 URL 결합 수용과 외부 성공 조건이 남아 진행 중이다.
+- 증거: [승인·게시·고정 URL 현재 권한·재전송·경합 검증](docs/qa/P04-T03/README.md), [승인 입력·409·게시·중지·재개 Ego Lite 검증](docs/qa/R08-T02/approval-publication/README.md), [승인·재게시·고정 URL 내부 결합 수용](docs/qa/R08-T02/combined-publication-fixed-url/README.md). 실제 PostgreSQL·production API·재시작과 두 게시본의 승인·고정 URL 자동 전환 화면 흐름을 확인했다. 선행·정상 원본 전수 대조와 외부 성공 조건이 남아 진행 중이다.
 
 ### P04-T04 — 폼 목록·상세·삭제 화면
 

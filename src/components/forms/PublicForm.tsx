@@ -24,7 +24,7 @@ import { OwnedRichDocumentView } from "./OwnedRichDocumentView";
 
 type VerificationKind = "identity" | "signature";
 type ActivePublicFormData = { consentBundle?: FormConsentBundle; title: string; content: FormContent; closed: false; expiresAt: string | null; token?: string; verification?: { kinds: VerificationKind[] } };
-type ClosedPublicFormData = { title: string; closed: true; closedPage?: FormContent["closedPage"]; formLanguage?: FormContent["formLanguage"]; expiresAt: string | null; token?: string };
+type ClosedPublicFormData = { title: string; closed: true; closedReason: "paused" | "expired" | "response_limit"; closedPage?: FormContent["closedPage"]; formLanguage?: FormContent["formLanguage"]; expiresAt: string | null; token?: string };
 type ScheduledPublicFormData = { title: string; closed: true; scheduled: true; formLanguage?: FormContent["formLanguage"]; opensAt: string; expiresAt: string | null; token?: string };
 type AccessPublicFormData = { title: string; closed: true; accessRequired: true; closedPage?: undefined; formLanguage?: FormContent["formLanguage"]; expiresAt: string | null; token?: string;
   access: { enabled: true; method: "EMAIL" | "SOCIAL"; targetScope: "ALL" | "WHITELIST"; useOtp: boolean; socialProvider: "KAKAO" | "NAVER"; limitDuplicate: boolean } };
@@ -115,7 +115,7 @@ function ClosedForm({ data }: { data: ClosedPublicFormData }) {
   const locale = effectiveFormLanguage(data.formLanguage), direction = locale === "ar" ? "rtl" : "ltr", notice = data.closedPage;
   return <div className="cs-stack public-notice" lang={locale} dir={direction}><h1>{data.title}</h1>
     {notice?.mode === "custom" ? notice.bodyRich ? <OwnedRichDocumentView document={notice.bodyRich} className="public-form-body rich-document" />
-      : <p className="public-form-body">{notice.body}</p> : <p>{formPhrase(locale, "phrase9")}</p>}
+      : <p className="public-form-body">{notice.body}</p> : <p>{formPhrase(locale, data.closedReason === "paused" ? "phrase10" : data.closedReason === "expired" ? "phrase11" : "phrase9")}</p>}
   </div>;
 }
 type VerificationProof = { attemptId: string; receipt: string; name: string; kind: VerificationKind };

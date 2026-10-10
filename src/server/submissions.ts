@@ -48,13 +48,13 @@ export async function publicForm(token: string, participationProof?: string) {
       formVersion: { include: versionInclude }, form: { include: { service: { include: { tenant: { select: { status: true } } } } } },
     } });
     const full = contentDto(publication.formVersion);
-    const closed = () => ({ title: publication.formVersion.title, closed: true as const,
+    const closed = (closedReason: "paused" | "expired" | "response_limit") => ({ title: publication.formVersion.title, closed: true as const, closedReason,
       ...(full.formLanguage ? { formLanguage: full.formLanguage } : {}),
       ...(full.closedPage ? { closedPage: full.closedPage } : {}), expiresAt: publication.expiresAt });
     if (view.state === "scheduled") return { title: publication.formVersion.title, closed: true as const, scheduled: true as const,
       ...(full.formLanguage ? { formLanguage: full.formLanguage } : {}), opensAt: publication.opensAt!, expiresAt: publication.expiresAt,
       closedPage: undefined };
-    if (view.state === "closed") return closed();
+    if (view.state === "closed") return closed(view.closedReason);
     const participationAccess = storedParticipationPolicy(publication.formVersion);
     if (participationAccess.enabled && !participationProof) return {
       title: publication.formVersion.title, closed: true as const, accessRequired: true as const,
@@ -95,7 +95,7 @@ export async function publicForm(token: string, participationProof?: string) {
       verification = { kinds };
     }
     const final = await lockPublicPublicationView(tx, publication.id);
-    if (final.state === "closed") return closed();
+    if (final.state === "closed") return closed(final.closedReason);
     return { title: publication.formVersion.title, content, consentBundle: consentBundle(publication.formVersion),
       closed: false as const, expiresAt: publication.expiresAt, verification };
   }, { timeout: 15000 });
