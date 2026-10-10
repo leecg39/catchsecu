@@ -256,7 +256,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 - 완료 증거: [현재 보고서](../../qa/R03-T03/current/README.md), [상태 행렬](../../qa/R03-T03/current/state-matrix.json), [Ego Lite·PostgreSQL 대조](../../qa/R03-T03/current/ego-browser-postgresql.json), [19개 화면 계약 회귀](../../qa/R03-T03/current/ui-contract-regression.json), [반응형 요약](../../qa/R03-T03/current/responsive-summary.json). 여섯 경로와 25개 서비스의 2페이지 이동·정렬·검색, 접근요청·감사 저장, 390/768/1440폭을 확인했다.
 
-### [~] R03-T04 회사·서비스·초기 설정 — DB·브라우저·재시작 수용검증
+### [x] R03-T04 회사·서비스·초기 설정 — DB·브라우저·재시작 수용검증
 
 회사 A 생성→서비스2개→수정→보관→재로그인; B 회사 serviceId를 본문/URL에 주입해 거부; 같은 이름 동시생성 하나409; 사용 중 서비스 삭제 의존성 안내.
 
@@ -268,6 +268,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
   - 회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증
   - 브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과
   - 외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지.
+- 완료 증거: [현재 보고서](../../qa/R03-T04/current/README.md), [재시작 지문](../../qa/R03-T04/current/runtime-restart.json), [별도 브라우저 재로그인](../../qa/R03-T04/current/browser-relogin.json), [264개 회귀](../../qa/R03-T04/current/regression.json), [품질 게이트](../../qa/R03-T04/current/quality-gates.json). 회사·서비스 HTTP23개와 접근요청 HTTP19개를 재시작 전후 같은 PostgreSQL 지문으로 확인했고 main worker와 82페이지 production build를 통과했다.
 
 
 ## R04 구성원·초대·권한·전문가

@@ -12,6 +12,11 @@ assert.ok(["localhost", "127.0.0.1"].includes(database.hostname)); assert.equal(
 const privateFile = ".local/rea-fullstack/access-fixture.json", evidence = "docs/qa/R03-T04/access-flow";
 type Actor = { email: string; password: string; userId: string; memberId: string };
 type Fixture = { origin: string; tenantId: string; serviceId: string; owner: Actor; requester: Actor };
+if (process.argv.includes("--reset-auth-rate-limit")) {
+  // The acceptance run signs synthetic actors in repeatedly across a server restart.
+  // Reset only the localhost Better Auth sign-in bucket; business/API limits stay intact.
+  await db.rateLimit.deleteMany({ where: { key: "127.0.0.1|/sign-in/email" } });
+}
 async function request(path: string, method = "GET", value?: unknown, cookie = "", headers: Record<string, string> = {}) {
   return fetch(origin + "/api/v1" + path, { method, headers: { origin, cookie,
     ...(value === undefined ? {} : { "content-type": "application/json" }), ...headers },

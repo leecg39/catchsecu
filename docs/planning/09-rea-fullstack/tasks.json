@@ -942,29 +942,37 @@
     "legacy_tasks": [
       "P03-T01"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R03-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R03-T04/current/README.md",
+      "docs/qa/R03-T04/current/verification-summary.json",
+      "docs/qa/R03-T04/current/runtime-restart.json",
+      "docs/qa/R03-T04/current/browser-relogin.json",
+      "docs/qa/R03-T04/current/regression.json",
+      "docs/qa/R03-T04/current/quality-gates.json"
+    ],
     "dependency_gates": {
       "R03-T03": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "회사/서비스 HTTP23개·감사14건·파일바이트·재시작 지문 일치. 별도 접근요청 HTTP19개·요청4건/권한1건/감사8건·새로그인·브라우저·서버재시작 지문 일치. 전체 R03 수용과 구분.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "회사·서비스 HTTP23개와 접근요청 HTTP19개를 fresh login·실제 PostgreSQL 독립조회로 통과했고 서버 재시작 전후 상태 지문이 일치했다. Ego Lite 기존 세션과 별도 인앱 브라우저 재로그인, main worker, 21suite264시험·타입·린트·production82페이지를 확인했다.",
     "progress_evidence": [
-      "docs/qa/R03-T04/management-flow/README.md",
+      "docs/qa/R03-T04/current/README.md",
+      "docs/qa/R03-T04/current/runtime-restart.json",
+      "docs/qa/R03-T04/current/browser-relogin.json",
       "docs/qa/R03-T04/management-flow/verified-after-restart.json",
-      "docs/qa/R03-T04/access-flow/README.md",
       "docs/qa/R03-T04/access-flow/verified-after-restart.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
-      "ui": "partial_verified",
-      "external": "not_assessed"
+      "database": "verified",
+      "api": "verified",
+      "ui": "verified",
+      "external": "not_applicable"
     }
   },
   {

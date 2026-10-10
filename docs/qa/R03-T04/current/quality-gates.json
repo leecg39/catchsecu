@@ -1,0 +1,22 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T08:25:13+09:00",
+  "typecheck": {
+    "command": "npm run typecheck",
+    "exitCode": 0
+  },
+  "lint": {
+    "command": "npx eslint scripts/qa-rea-management.ts scripts/qa-rea-access-requests.ts tests/server/r03-acceptance-runtime-contract.test.ts tests/server/r03-management-ui-contract.test.ts",
+    "exitCode": 0
+  },
+  "build": {
+    "command": "ALLOW_LOCAL_MAIL=1 ALLOW_LOCAL_KAKAO=1 ALLOW_LOCAL_PAYMENT=1 npm run build",
+    "exitCode": 0,
+    "staticPages": 82,
+    "providerClaim": "local adapters explicitly allowed for build only"
+  },
+  "gitDiffCheck": {
+    "command": "git diff --check",
+    "exitCode": 0
+  }
+}

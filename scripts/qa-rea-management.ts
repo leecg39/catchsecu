@@ -12,6 +12,11 @@ const expectedService = JSON.parse(await readFile(serviceDirectory + "/restored.
 assert.equal(expectedCompany.id, "7d2f5f95-3493-4a30-8dcd-65220489d65e"); assert.equal(expectedService.id, "7c3d767e-0eaa-401a-934e-ad6fcd41917f");
 const credentials = JSON.parse(await readFile(".local/rea-fullstack/fixture.json", "utf8"));
 const cookies: Record<string, string> = {}, checks: { name: string; status: number }[] = [];
+if (process.argv.includes("--reset-auth-rate-limit")) {
+  // The acceptance run signs three synthetic actors in before and after a process restart.
+  // Reset only the localhost Better Auth sign-in bucket; business/API limits stay intact.
+  await db.rateLimit.deleteMany({ where: { key: "127.0.0.1|/sign-in/email" } });
+}
 async function request(path: string, actor = "", method = "GET", value?: unknown, headers: Record<string, string> = {}) {
   return fetch(origin + "/api/v1" + path, { method, headers: { origin, cookie: cookies[actor] ?? "", ...headers,
     ...(value === undefined ? {} : { "content-type": "application/json" }) }, ...(value === undefined ? {} : { body: JSON.stringify(value) }) });

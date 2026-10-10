@@ -1,5 +1,7 @@
 # 2026-10-10 활성 구현 계획
 
+R03-T04 회사·서비스 전체 수용 완료: 회사·서비스 HTTP23개와 접근요청 HTTP19개를 fresh login·실제 PostgreSQL 독립조회로 통과했고 production 서버 재시작 전후 상태 지문이 일치했다. Ego Lite 기존 세션과 별도 인앱 브라우저 재로그인, 격리 test DB main worker, 21suite264시험·타입·린트·production82페이지를 확인했다. 활성 계획은 완료16/진행39/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R03-T04/current/README.md).
+
 R03-T03 회사·서비스 화면 완료: 여섯 경로의 정상·빈·로딩·검증·권한/만료·409·재시도·새로고침 상태를 Ego Lite에서 대조했다. 25개 서비스의 2페이지 이동·서비스명 오름차순 정렬·검색 초기화와 조회자 접근요청을 PostgreSQL·감사에 연결했고, 390/768/1440폭 넘침0, 4suite19시험·타입·린트·production82페이지를 통과했다. 활성 계획은 완료15/진행40/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R03-T03/current/README.md).
 
 R03-T02 회사·서비스 서버 API 완료: 회사·서비스·사업자 파일·컨텍스트·접근요청 OpenAPI 9경로20작업을 현재 handler와 대조했다. 실제 PostgreSQL에서 tenant/role/session/MFA/version/구독한도, 동시 경합, 파일 정리, 요청·권한·멤버 version·감사 원자성과 보관 서비스의 후속 쓰기 차단을 12파일257시험으로 확인했다. 활성 계획은 완료14/진행41/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R03-T02/current/README.md).
