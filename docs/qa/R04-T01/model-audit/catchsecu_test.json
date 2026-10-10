@@ -1,16 +1,89 @@
 {
   "result": "passed",
   "database": "catchsecu_test",
-  "checkedAt": "2026-10-09T19:47:34.161Z",
-  "scope": "Five existing membership/invitation/expert models; read-only metadata, uniqueness, tenant relations, state constraints and last-owner trigger assertions. No new migration or claim of full R04 acceptance.",
+  "checkedAt": "2026-10-10T23:28:32.484Z",
+  "scope": "Six existing membership, invitation, access-request and expert models; read-only metadata, uniqueness, tenant relations, state constraints and last-owner trigger assertions. No new migration or claim of full R04 acceptance.",
   "tables": [
     "Membership",
     "ServiceGrant",
     "Invitation",
+    "AccessRequest",
     "ExpertAssignment",
     "ExpertAssignmentService"
   ],
   "columns": [
+    {
+      "table": "AccessRequest",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "requesterId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "reason",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "reviewerId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "decisionNote",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "resolvedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
     {
       "table": "ExpertAssignment",
       "column": "id",
@@ -272,6 +345,36 @@
   ],
   "constraints": [
     {
+      "table": "AccessRequest",
+      "name": "AccessRequest_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_requester_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"requesterId\") REFERENCES \"Membership\"(\"tenantId\", id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_reviewer_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"reviewerId\") REFERENCES \"Membership\"(\"tenantId\", id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_service_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_state_check",
+      "definition": "CHECK (((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'cancelled'::text])) AND (version > 0) AND (((status = 'pending'::text) AND (\"reviewerId\" IS NULL) AND (\"resolvedAt\" IS NULL) AND (\"decisionNote\" = ''::text)) OR ((status = 'cancelled'::text) AND (\"reviewerId\" IS NULL) AND (\"resolvedAt\" IS NOT NULL) AND (\"decisionNote\" = ''::text)) OR ((status = ANY (ARRAY['approved'::text, 'rejected'::text])) AND (\"reviewerId\" IS NOT NULL) AND (\"resolvedAt\" IS NOT NULL)))))"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT"
+    },
+    {
       "table": "ExpertAssignment",
       "name": "ExpertAssignment_assignedById_fkey",
       "definition": "FOREIGN KEY (\"assignedById\") REFERENCES \"User\"(id) ON DELETE RESTRICT"
@@ -373,6 +476,31 @@
     }
   ],
   "indexes": [
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_one_pending_key",
+      "definition": "CREATE UNIQUE INDEX \"AccessRequest_one_pending_key\" ON public.\"AccessRequest\" USING btree (\"tenantId\", \"requesterId\", \"serviceId\") WHERE (status = 'pending'::text)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_pkey",
+      "definition": "CREATE UNIQUE INDEX \"AccessRequest_pkey\" ON public.\"AccessRequest\" USING btree (id)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_requester_created_idx",
+      "definition": "CREATE INDEX \"AccessRequest_requester_created_idx\" ON public.\"AccessRequest\" USING btree (\"tenantId\", \"requesterId\", \"createdAt\", id)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_status_created_idx",
+      "definition": "CREATE INDEX \"AccessRequest_status_created_idx\" ON public.\"AccessRequest\" USING btree (\"tenantId\", status, \"createdAt\", id)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_tenant_id_key",
+      "definition": "CREATE UNIQUE INDEX \"AccessRequest_tenant_id_key\" ON public.\"AccessRequest\" USING btree (\"tenantId\", id)"
+    },
     {
       "table": "ExpertAssignment",
       "name": "ExpertAssignment_pkey",
@@ -524,11 +652,14 @@
     }
   ],
   "sourceFingerprints": {
-    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/schema.prisma": "1a780ed7caf074953ffa7f9139d35b272916f35d0c7892bd24c82a73a375aca3",
     "prisma/migrations/20261002110000_last_owner_guard/migration.sql": "94a060c6f642eb00a37170ea335f2392eead015b5da02fa4720f5fa87d539b10",
+    "prisma/migrations/20261003140000_service_access_requests/migration.sql": "fb97b6980807154a6862ce53d037c71d931e1f048ce13c05cf5cdd3adeefcd05",
     "prisma/migrations/20261003150000_expert_assignments/migration.sql": "378d1bd88bbae75f5737d48152cd557677a85a411c6ae8f80db3665a3ade0e1a",
-    "src/server/members.ts": "330c517b14138bddc4770191a1ab9ad688a96bf71c1a225dd167805735215162",
+    "src/server/members.ts": "fd47a2dca2693875273f7c2ed1294468b5e9dc7d873921617ebcd363163a7cc1",
+    "src/server/service-access.ts": "ff7665beb7ce38b1f2a8f61cbcc395b10ffc963aab47871b974e61fe13d3dc7d",
     "src/server/expert-assignments.ts": "43aa584944e4a53021082a5e210fd170208e7cbddd4dba6dc2148a6cab23b86e",
-    "src/contracts/members.ts": "f9e5d0182e147dbd158a0c2fe07c83497426e9a30e443b3ca88e49725e0da1e4"
+    "src/contracts/members.ts": "f9e5d0182e147dbd158a0c2fe07c83497426e9a30e443b3ca88e49725e0da1e4",
+    "src/contracts/expert-assignments.ts": "9fbad63315028d1e06759c2baf585cc37bf14a78374326f6446507c669ddcc7a"
   }
 }

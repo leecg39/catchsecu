@@ -1,4 +1,8 @@
-## 최신 작업: R03-T04 회사·서비스·초기 설정 전체 수용 완료
+## 최신 작업: R04-T01 구성원·초대·권한·전문가 모델 완료
+
+2026-10-11 dev/test PostgreSQL의 6모델55열·26제약·26인덱스·7트리거를 대조하고 구성원·서비스권한·초대·접근요청·전문가 범위와 마지막 owner 동시 보호를 10suite103시험으로 확인했다. migration148개 최신, 타입·린트·production82페이지 통과. 계획 상태 완료17/진행38/계획52, 전체 goal active. [증거](../../docs/qa/R04-T01/current/README.md).
+
+## 이전 작업: R03-T04 회사·서비스·초기 설정 전체 수용 완료
 
 2026-10-11 회사·서비스 HTTP23개와 접근요청 HTTP19개를 fresh login·실제 PostgreSQL 독립조회로 통과했고 production 서버 재시작 전후 두 상태 지문이 일치했다. Ego Lite 기존 세션과 별도 인앱 브라우저 재로그인, 격리 test DB main worker, 21suite264시험·타입·린트·production82페이지를 확인했다. 계획 상태 완료16/진행39/계획52, 전체 goal active. [증거](../../docs/qa/R03-T04/current/README.md).
 

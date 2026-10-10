@@ -273,7 +273,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
 
 ## R04 구성원·초대·권한·전문가
 
-### [~] R04-T01 구성원·초대·권한·전문가 — 모델·규칙 대조 및 보완
+### [x] R04-T01 구성원·초대·권한·전문가 — 모델·규칙 대조 및 보완
 
 회사별 멤버십·서비스 권한의 복합 FK 및 중복 초대 방지, 초대 만료/수락 1회, 전문가 배정 범위·기간·version을 확인한다. 마지막 owner 제거를 차단한다.
 
@@ -284,6 +284,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
 - 완료 조건:
   - C 초대/서비스 권한/전문가 배정; R 목록·초대미리보기; U 역할·담당범위·소유권 이전; D 초대취소/권한회수/배정해제.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
+- 완료 증거: [현재 보고서](../../qa/R04-T01/current/README.md), [모델 집계](../../qa/R04-T01/current/verification-summary.json), [103개 회귀](../../qa/R04-T01/current/model-regression.json), [migration 상태](../../qa/R04-T01/current/schema-migration.json). dev/test 6모델55열·26제약·26인덱스·7트리거와 구성원·초대·접근요청·전문가·마지막 owner 규칙을 확인했다.
 
 ### [~] R04-T02 구성원·초대·권한·전문가 — 서버 API·업무 처리
 

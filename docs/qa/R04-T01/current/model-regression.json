@@ -1,0 +1,18 @@
+{
+  "result": "passed",
+  "database": "catchsecu_test",
+  "suites": 10,
+  "tests": 103,
+  "passed": 103,
+  "failed": 0,
+  "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/member-management-gate.test.ts tests/server/member-current-authority.test.ts tests/server/invitation-current-authority.test.ts tests/server/expert-assignments.test.ts tests/server/expert-current-authority.test.ts tests/server/access-requests.test.ts tests/server/access-request-authority.test.ts tests/server/r04-member-model-contract.test.ts",
+  "coverage": [
+    "membership role/status/version and company-user uniqueness",
+    "service grant tenant-member-service composite FKs and uniqueness",
+    "invitation duplicate/expiry/single acceptance and strict DTO input",
+    "access request tenant-scoped requester/reviewer/service FKs, one pending request and lifecycle state",
+    "expert assignment tenant/service scope, expiry, revocation, reassignment and version",
+    "last active owner direct and concurrent mutation guard",
+    "current session, account, MFA, company and role authority rechecks"
+  ]
+}
