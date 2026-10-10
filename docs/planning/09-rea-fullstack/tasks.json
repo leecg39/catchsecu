@@ -595,28 +595,41 @@
       "P02-T04",
       "P02-T05"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R02-T02/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R02-T02/current/README.md",
+      "docs/qa/R02-T02/current/verification-summary.json",
+      "docs/qa/R02-T02/current/auth-api-regression.json",
+      "docs/qa/R02-T02/current/security-entitlements.json",
+      "docs/qa/R02-T02/current/restart-persistence-verification.json",
+      "docs/qa/R02-T02/current/source-fingerprints.json",
+      "docs/qa/R02-T02/current/quality-gates.json"
+    ],
     "dependency_gates": {
       "R02-T01": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "external_pending",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "인증 링크 재사용 성공3실패 재현→사용자 잠금 내 단일 성공/재사용 거부·안전 callback 유지 수정. 인증141개+정책경계64개, 총12파일205개 통과. 원자적 감사·만료·세션폐기 포함; 전체 수용은 후속.",
+    "progress_note": "실제 PostgreSQL에서 가입·인증링크 단일소비·로그인/로그아웃·암호 재설정·OTP/TOTP·복구코드·다중세션 폐기·정책 변경 집행과 DB·감사·outbox 원자성을 재검증했다. tenant/role/license 거부까지 13파일233시험을 통과했고 보존된 재시작 상태도 다시 확인했다. 공식 SMTP 수신은 로컬메일을 요구하는 이 서버 작업의 완료 조건이 아니며 R02-T04 external_pending으로 분리한다.",
     "progress_evidence": [
-      "docs/qa/R02-T02/authentication/README.md",
-      "docs/qa/R02-T02/authentication/verification-replay-after.json",
-      "docs/qa/R02-T02/authentication/policy-boundaries.json"
+      "docs/qa/R02-T02/current/README.md",
+      "docs/qa/R02-T02/current/verification-summary.json",
+      "docs/qa/R02-T02/current/auth-api-regression.json",
+      "docs/qa/R02-T02/current/security-entitlements.json",
+      "docs/qa/R02-T02/current/restart-persistence-verification.json",
+      "docs/qa/R02-T02/current/source-fingerprints.json",
+      "docs/qa/R02-T02/current/quality-gates.json",
+      "docs/qa/R02-T02/authentication/verification-replay-before.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
+      "database": "verified",
+      "api": "verified",
       "ui": "not_applicable",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {

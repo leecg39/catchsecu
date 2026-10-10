@@ -175,7 +175,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 - 완료 증거: [현재 보고서](../../qa/R02-T01/current/README.md), [검증 집계](../../qa/R02-T01/current/verification-summary.json), [dev/test 모델 감사](../../qa/R02-T01/model-audit/README.md), [148개 회귀](../../qa/R02-T01/current/auth-model-regression.json). 신규 migration 없이 8모델·73열·21제약·25인덱스·7트리거와 실제 상태 전이를 검증했다.
 
-### [~] R02-T02 계정 인증·세션·복구 — 서버 API·업무 처리
+### [x] R02-T02 계정 인증·세션·복구 — 서버 API·업무 처리
 
 이메일 가입→인증→로그인→로그아웃, 재설정, OTP/TOTP·복구코드 계약을 실제 handler와 대조한다. 재전송 rate limit, 계정 존재 노출 방지, returnTo 검증 및 정책 변경 후 기존 세션 집행을 확인한다.
 
@@ -186,6 +186,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
 - 완료 조건:
   - A 계정 가입 후 로컬 시험메일 링크를 한 번 사용, 재사용 거부; 틀린 암호·만료 OTP·복구코드 재사용 거부; 다른 브라우저 세션 폐기; 재시작 뒤 인증 유지/폐기 일치.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
+- 완료 증거: [현재 보고서](../../qa/R02-T02/current/README.md), [검증 집계](../../qa/R02-T02/current/verification-summary.json), [인증 API 206시험](../../qa/R02-T02/current/auth-api-regression.json), [구독·권한 27시험](../../qa/R02-T02/current/security-entitlements.json), [재시작 영속 상태 재검증](../../qa/R02-T02/current/restart-persistence-verification.json). 총13파일233시험과 typecheck·lint·production build가 통과했다.
 
 ### [~] R02-T03 계정 인증·세션·복구 — 전체 화면·모달 연결
 

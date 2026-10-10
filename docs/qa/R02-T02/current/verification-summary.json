@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-10-10T22:27:37.819050Z",
+  "result": "passed",
+  "task": "R02-T02",
+  "scope": "account authentication server APIs and PostgreSQL business transitions",
+  "testFiles": 13,
+  "testSuites": 25,
+  "tests": 233,
+  "passed": 233,
+  "failed": 0,
+  "pending": 0,
+  "acceptance": {
+    "signupVerificationLoginLogout": "verified",
+    "verificationSingleUseAndReplayRejection": "verified",
+    "wrongPasswordExpiredOtpRecoveryReplay": "verified",
+    "otherSessionRevocation": "verified",
+    "restartPersistenceAndRevocation": "verified",
+    "returnToOriginValidation": "verified",
+    "accountExistenceNonDisclosure": "verified",
+    "resendRateLimit": "verified",
+    "databaseAuditOutboxAtomicity": "verified",
+    "prohibitedUpdateDelete": "verified",
+    "tenantRoleIsolation": "verified",
+    "licenseRejection": "verified"
+  },
+  "surfaces": {
+    "database": "verified",
+    "api": "verified",
+    "ui": "not_applicable",
+    "external": "not_applicable"
+  },
+  "externalDependency": {
+    "officialSmtpReceipt": "not_run",
+    "reason": "R02-T02 explicitly accepts local test mail; official provider receipt remains R02-T04 external_pending"
+  },
+  "evidence": [
+    "auth-api-regression.json",
+    "security-entitlements.json",
+    "restart-persistence-verification.json",
+    "source-fingerprints.json",
+    "quality-gates.json",
+    "../authentication/verification-replay-before.json",
+    "../authentication/README.md",
+    "../../R02-T04/authentication/README.md"
+  ]
+}

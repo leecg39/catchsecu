@@ -1,0 +1,50 @@
+{
+  "checkedAt": "2026-10-10T22:27:37.819050Z",
+  "result": "passed",
+  "gates": {
+    "typecheck": {
+      "result": "passed",
+      "command": "node24 tsc --noEmit"
+    },
+    "lint": {
+      "result": "passed",
+      "command": "node24 eslint <R02 backend and test files>",
+      "errors": 0,
+      "warnings": 0
+    },
+    "productionBuild": {
+      "result": "passed",
+      "command": "ALLOW_LOCAL_MAIL=1 ALLOW_LOCAL_KAKAO=1 ALLOW_LOCAL_PAYMENT=1 node24 next build",
+      "staticPages": 82
+    },
+    "planBeforeStatusUpdate": {
+      "result": "passed",
+      "activeTasks": 107,
+      "legacyTasks": 72,
+      "dependencyCycles": 0
+    },
+    "planIntegrationBeforeStatusUpdate": {
+      "result": "passed",
+      "openapiPaths": 329,
+      "openapiOperations": 466,
+      "policyRows": 466
+    },
+    "planFinal": {
+      "result": "passed",
+      "command": "python3 scripts/verify-plan.py",
+      "activeTasks": 107,
+      "legacyTasks": 72,
+      "dependencyCycles": 0
+    },
+    "planIntegrationFinal": {
+      "result": "passed",
+      "command": "node24 --import tsx scripts/verify-plan-integration.ts",
+      "completed": 11,
+      "inProgress": 44,
+      "planned": 52,
+      "openapiPaths": 329,
+      "openapiOperations": 466,
+      "policyRows": 466
+    }
+  }
+}

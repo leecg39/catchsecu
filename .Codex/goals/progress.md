@@ -1,4 +1,8 @@
-## 최신 작업: R02-T01 계정 인증·세션·복구 모델·규칙 완료
+## 최신 작업: R02-T02 계정 인증·세션·복구 서버 API 완료
+
+2026-10-11 가입·인증링크 단일소비·로그인/로그아웃·암호 재설정·OTP/TOTP·복구코드·다중세션 폐기·정책 변경 집행을 실제 PostgreSQL에서 재검증했다. tenant/role/license 거부와 DB·감사·outbox 원자성을 포함한 13파일233시험, 보존된 재시작 상태 재검증, typecheck·lint·production build가 통과했다. 계획 상태 완료11/진행44/계획52, 전체 goal active. 공식 SMTP 수신은 R02-T04의 external_pending으로 유지한다. [증거](../../docs/qa/R02-T02/current/README.md).
+
+## 이전 작업: R02-T01 계정 인증·세션·복구 모델·규칙 완료
 
 2026-10-11 Better Auth 인증모델8개·73열·21제약·25인덱스·7트리거와 DTO를 dev/test PostgreSQL에서 대조했다. 실제 DB에서 이메일/credential unique, proof 동시1회소비·만료거부, 암호이력 최신9개, credential 변경의 세션·유예·proof·감사 원자성, 직접 계정삭제 거부를 확인했다. 8파일148시험·typecheck·lint·production build 통과. 계획 상태 완료10/진행45/계획52, 전체 goal active. [증거](../../docs/qa/R02-T01/current/README.md).
 

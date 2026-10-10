@@ -1,5 +1,7 @@
 # 2026-10-10 활성 구현 계획
 
+R02-T02 인증 서버 API 완료: 가입·로컬 시험메일 인증·로그인·로그아웃·암호 재설정·OTP/TOTP·복구코드·다중 세션 폐기·정책 변경 집행을 실제 PostgreSQL에서 확인했다. tenant/role/license 거부와 DB·감사·outbox 원자성을 포함해 13파일233시험·타입·린트·production build가 통과했다. 활성 계획은 완료11/진행44/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R02-T02/current/README.md).
+
 R02-T01 인증 모델·규칙 완료: Better Auth 인증모델8개·73열·21제약·25인덱스·7트리거와 DTO를 dev/test PostgreSQL에서 대조했다. unique/FK, proof 1회 소비, 암호이력9개, credential 변경의 세션·유예·proof 원자정리와 계정 hard delete 거부를 포함해 8파일148시험·타입·린트·production build가 통과했다. 활성 계획은 완료10/진행45/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R02-T01/current/README.md).
 
 R01-T05 자동 검증·관측·통합환경 완료: dev/test PostgreSQL·ClamAV·migration 148개 preflight, production 서버 health/ready와 보호 API requestId, main/export worker 실제 기동, 비밀 마스킹과 CI 실패·scanner blocked 집계 계약을 확인했다. 3파일36시험·typecheck·lint·production build가 통과했다. 활성 계획은 완료9/진행46/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R01-T05/current/README.md).
