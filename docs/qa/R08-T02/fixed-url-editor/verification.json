@@ -1,0 +1,153 @@
+{
+  "checkedAt": "2026-10-10T16:46:32.722872Z",
+  "scope": "R08 F5 / R09 fixed URL editor input protection and version-conflict recovery",
+  "result": "passed",
+  "completionClaim": "partial_checkpoint_only",
+  "implementation": {
+    "dirtyModalCloseProtection": true,
+    "navigationGuard": true,
+    "singleFlightSave": true,
+    "publishedFormLookupRetry": true,
+    "versionConflictPreservesInput": true,
+    "versionConflictLocksSave": true,
+    "latestReloadRequiresExplicitDiscard": true,
+    "revokedDuringReloadClosesEditor": true
+  },
+  "browser": {
+    "engine": "Ego Lite",
+    "productionOrigin": "http://localhost:3120",
+    "dirtyCloseWarningShown": true,
+    "continueEditingPreservedInput": true,
+    "created": {
+      "status": 201,
+      "version": 1
+    },
+    "concurrentUpdate": {
+      "status": 200,
+      "version": 2,
+      "name": "다른 탭 최신 변경"
+    },
+    "staleSave": {
+      "status": 409,
+      "inputNamePreserved": "내 화면 입력 보존",
+      "saveDisabled": true,
+      "reloadActionShown": true
+    },
+    "reloadCancelledInputPreserved": true,
+    "reloadConfirmed": {
+      "loadedVersion": 2,
+      "loadedName": "다른 탭 최신 변경",
+      "saveEnabled": true
+    },
+    "recoveredSave": {
+      "status": 200,
+      "version": 3,
+      "name": "충돌 복구 저장 완료"
+    },
+    "restart": {
+      "beforePid": 91413,
+      "afterPid": 96404,
+      "listVisible": true,
+      "detailStatus": 200,
+      "publicUrlStatus": 200,
+      "publicTitle": "REA 실제 응답 검증"
+    }
+  },
+  "postgresql": {
+    "beforeCleanup": {
+      "fixedUrlVersion": 3,
+      "status": "active",
+      "auditActions": [
+        "fixed_url.created",
+        "fixed_url.updated",
+        "fixed_url.updated"
+      ]
+    },
+    "cleanup": {
+      "method": "normal API revoke",
+      "status": 204,
+      "fixedUrlVersion": 4,
+      "statusAfter": "revoked",
+      "activeRows": 0,
+      "sourcePublishedFormPreserved": true,
+      "auditActions": [
+        "fixed_url.created",
+        "fixed_url.updated",
+        "fixed_url.updated",
+        "fixed_url.revoked"
+      ]
+    },
+    "immutableAuditPreserved": true
+  },
+  "automated": {
+    "focusedTestFiles": 3,
+    "focusedTests": 21,
+    "typecheck": "passed",
+    "changedLint": "passed",
+    "productionBuild": {
+      "status": "passed",
+      "staticPages": 82,
+      "localProviderOptIns": [
+        "ALLOW_LOCAL_MAIL",
+        "ALLOW_LOCAL_KAKAO",
+        "ALLOW_LOCAL_PAYMENT"
+      ]
+    },
+    "fullLint": {
+      "status": "passed",
+      "errors": 0,
+      "warnings": 29,
+      "changedFilesWarnings": 0
+    },
+    "planCheck": {
+      "status": "passed",
+      "sourcePaths": 186,
+      "additionalPaths": 21,
+      "taskCount": 107,
+      "legacyTasks": 72
+    }
+  },
+  "external": {
+    "requiredForThisCheckpoint": false,
+    "officialProviderSuccessClaimed": false
+  },
+  "credentialsRecorded": false,
+  "screenshots": [
+    {
+      "file": "01-dirty-close-warning.png",
+      "sha256": "066d7b9b0083df00a98c422f672f2733de9f1c2f5beafb5877a2b6eea6444f03",
+      "width": 1908,
+      "height": 917
+    },
+    {
+      "file": "02-conflict-input-preserved.png",
+      "sha256": "81107bd55aa016574c62c3de57ff3d69e67215b23db8413c3e807c63bd4c4c21",
+      "width": 1908,
+      "height": 917
+    },
+    {
+      "file": "03-latest-applied.png",
+      "sha256": "4c4cd38a71ae05c93ee0a69a9a0ea3117bd5f41f7108477ce6e72cde119eb664",
+      "width": 1908,
+      "height": 917
+    },
+    {
+      "file": "04-recovered-saved.png",
+      "sha256": "234d284ed1a782336eb7ec322d95138797d9399bff252e95088bbc4137160639",
+      "width": 1908,
+      "height": 917
+    },
+    {
+      "file": "05-after-restart.png",
+      "sha256": "234d284ed1a782336eb7ec322d95138797d9399bff252e95088bbc4137160639",
+      "width": 1908,
+      "height": 917
+    }
+  ],
+  "remaining": [
+    "combined publish/pause/resume/approval/fixed URL acceptance",
+    "role and cross-company browser matrix",
+    "external provider acceptance",
+    "R08 F7 full route acceptance"
+  ]
+}
