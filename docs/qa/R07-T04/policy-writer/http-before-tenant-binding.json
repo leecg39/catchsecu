@@ -1,0 +1,74 @@
+{
+  "checkedAt": "2026-10-10T01:13:10.108Z",
+  "actualHttpChecks": 13,
+  "checks": [
+    {
+      "action": "실제 HTTP 계정 생성",
+      "status": 200
+    },
+    {
+      "action": "실제 HTTP 비밀번호 로그인",
+      "status": 200
+    },
+    {
+      "action": "연결 계정만 있는 비밀번호 세션 거절",
+      "status": 403,
+      "code": "SSO_POLICY_REAUTH_REQUIRED"
+    },
+    {
+      "action": "정책·기능·인증·연결 영향 조회",
+      "status": 200
+    },
+    {
+      "action": "이메일 인증 요청",
+      "status": 201
+    },
+    {
+      "action": "중복 발급 간격 제한",
+      "status": 429,
+      "code": "SSO_POLICY_CHALLENGE_RATE_LIMITED"
+    },
+    {
+      "action": "오답 거절·실패 횟수 커밋",
+      "status": 422,
+      "code": "SSO_POLICY_CODE_INVALID"
+    },
+    {
+      "action": "정답 코드 소비와 GOOGLE 정책 저장",
+      "status": 200
+    },
+    {
+      "action": "동일 코드 재전송 버전 충돌",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "action": "저장된 정책 다시 조회",
+      "status": 200
+    },
+    {
+      "action": "원본 SSO 현황 경로",
+      "status": 200
+    },
+    {
+      "action": "원본 SSO 설정 경로",
+      "status": 200
+    },
+    {
+      "action": "분리된 공급자 관리 경로",
+      "status": 200
+    }
+  ],
+  "stateHash": "9469e02ffb64327cf53ad88128969b1c76ee762a23219a4043c2248f2889c86a",
+  "policyWriteApiVerified": true,
+  "emailTransport": "actual scoped local outbox; SMTP not tested",
+  "proofSetup": "explicit synthetic DB provenance; not acquired from Google",
+  "externalIdpVerified": false,
+  "browserVerified": false,
+  "policy": {
+    "mode": "GOOGLE",
+    "version": 1
+  },
+  "proofCount": 1,
+  "auditCount": 9
+}

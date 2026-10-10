@@ -15,11 +15,11 @@ const configs: Record<string, AuditConfig> = {
   "/log/service": { title: "서비스 이용 로그", kind: "service", description: "현재 회사의 서비스 생성·변경·보관 이력을 확인합니다.",
     columns: ["#", "처리자명", "처리일시", "접속 IP", "처리대상", "처리내용", "비고"] },
   "/log/info-monitoring": { title: "개인정보 처리로그", kind: "info",
-    columns: ["#", "서비스명", "캐치폼·개인정보 업로드명", "처리자명", "처리일시", "접속 IP", "고객번호", "처리내용", "사유"] },
+    columns: ["#", "서비스명", "캐치폼·개인정보 업로드명", "처리자명", "처리일시", "접속 IP", "응답 ID", "처리내용", "사유"] },
   "/log/ad-monitoring": { title: "광고성 정보 수신동의 처리로그", kind: "marketing",
     columns: ["#", "서비스명", "처리자명", "처리일시", "접속 IP", "고객번호", "처리내용", "사유"] },
   "/log/customer": { title: "고객 이용 로그", kind: "customer",
-    columns: ["#", "서비스 명", "캐치폼 명", "고객번호", "처리일시", "접속 IP", "수행내용"] },
+    columns: ["#", "서비스 명", "캐치폼 명", "응답 ID", "처리일시", "접속 IP", "수행내용"] },
   "/log/member": { title: "구성원 로그", kind: "member", columns: generic },
   "/log/authority": { title: "권한 변경 로그", kind: "authority", columns: generic },
   "/log/external-viewer": { title: "외부 열람자 로그", kind: "external", columns: generic },
@@ -44,6 +44,8 @@ function cell(column: string, row: AuditEventRecord, number: number) {
   if (["처리자명", "발신자"].includes(column)) return row.actorName ?? "비공개";
   if (["처리내용", "수행내용", "내용"].includes(column)) return row.action;
   if (column === "처리대상") return row.resourceId ? row.resource + " · " + row.resourceId.slice(0, 8) : row.resource;
+  if (["캐치폼·개인정보 업로드명", "캐치폼 명"].includes(column)) return row.formName ?? "-";
+  if (column === "응답 ID") return row.submissionId ? <span title={row.submissionId}>{row.submissionId.slice(0, 8)}</span> : "-";
   return "-";
 }
 
@@ -118,7 +120,7 @@ export function AuditLogs({ path, formId }: { path: string; formId?: string }) {
       </div>
       {error && <p role="alert">{error}</p>}
     </div>
-    <div className="mg-toolbar"><span>전체 {result.data?.total ?? 0}개</span>
+    <div className="mg-toolbar"><span>{result.error ? "조회 실패" : result.loading ? "조회 중…" : result.data ? `전체 ${result.data.total}개` : ""}</span>
       <ActionButton secondary onClick={result.reload}>새로고침</ActionButton>
       <ActionButton secondary disabled={exporting || !result.data?.total || result.data.total > 5000}
         onClick={download}>{exporting ? "내보내는 중…" : "CSV 내려받기"}</ActionButton></div>
@@ -126,14 +128,16 @@ export function AuditLogs({ path, formId }: { path: string; formId?: string }) {
     {result.loading && <p role="status">실제 감사 기록을 불러오는 중입니다.</p>}
     {result.error && <p role="alert">{result.error.message}</p>}
     {result.data && <>{!result.data.items.length && <EmptyState text="조회된 감사 기록이 없습니다." />}<div className="cs-table-wrap"><table className="cs-table"><thead><tr>
-      {config.columns.map((column, index) => <th key={index}>{column}</th>)}{formId && <th>상세</th>}{canReview && <th>검토</th>}</tr></thead><tbody>
+      {config.columns.map((column, index) => <th key={index}>{column}</th>)}<th>상세</th>{canReview && <th>검토</th>}</tr></thead><tbody>
       {result.data.items.length ? result.data.items.map((item, index) => <tr key={item.id}>
         {config.columns.map((column, columnIndex) => <td key={columnIndex}>{cell(column, item, (currentPage - 1) * pageSize + index + 1)}</td>)}
-        {formId && <td><details><summary>기록 상세</summary><dl style={{ minWidth: 180, overflowWrap: "anywhere" }}>
+        <td><details><summary>기록 상세</summary><dl style={{ minWidth: 180, overflowWrap: "anywhere" }}>
           <dt>이벤트 ID</dt><dd>{item.id}</dd><dt>처리일시</dt><dd>{new Date(item.createdAt).toLocaleString("ko-KR")}</dd>
           <dt>처리자</dt><dd>{item.actorName ?? "비공개"}</dd><dt>처리내용</dt><dd>{item.action}</dd>
           <dt>처리대상</dt><dd>{item.resource}</dd><dt>대상 ID</dt><dd>{item.resourceId ?? "비공개"}</dd>
-        </dl></details></td>}
+          {item.formName && <><dt>캐치폼·개인정보 업로드명</dt><dd>{item.formName}</dd></>}
+          {item.submissionId && <><dt>응답 ID</dt><dd>{item.submissionId}</dd></>}
+        </dl></details></td>
         {canReview && <td><button className="cs-link" aria-label={"활동 " + ((currentPage - 1) * pageSize + index + 1) + " 검토 요청"} onClick={() => setReviewEvent(item)}>검토 요청</button></td>}
       </tr>) : null}
     </tbody></table></div><nav className="cs-pagination" aria-label="로그 페이지">
@@ -143,6 +147,6 @@ export function AuditLogs({ path, formId }: { path: string; formId?: string }) {
         <span>{currentPage} / {pages}</span>
         <button disabled={currentPage >= pages} onClick={() => setPage(currentPage + 1)} aria-label="다음 페이지">›</button></div>
     </nav></>}
-    <p className="mg-description">감사 원장에 저장되지 않은 접속 IP·고객번호·사유는 표시하지 않습니다.</p>
+    <p className="mg-description">폼 이름과 응답 ID는 현재 회사의 연결된 기록에서 조회하며, 회사 전체 감사 권한이 있는 사용자에게 표시합니다. 응답 ID는 시스템 내부 식별자입니다. 접속 IP·외부 고객번호·사유 원문은 이 목록에 제공하지 않습니다.</p>
   </Panel>{reviewEvent && <ActivityReviewRequest event={reviewEvent} onClose={() => setReviewEvent(null)} />}</>;
 }

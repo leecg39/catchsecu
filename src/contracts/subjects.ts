@@ -6,9 +6,12 @@ export type SubjectRole = z.infer<typeof subjectRole>;
 export function normalizeSubjectName(value: string) { return subjectName.parse(value.normalize("NFC").replace(/\s+/g, " ")); }
 export function normalizeSubjectEmail(value: string) { return subjectEmail.parse(value); }
 export type SubjectQuestion = { subjectRole?: string | null; type: string; required: boolean };
+export function subjectQuestionTypeAllowed(role: string, type: string): boolean {
+  return role === "name" ? type === "단문형 답변" : role === "email" && ["단문형 답변", "이메일", "이메일 직접 입력"].includes(type);
+}
 export function checkSubjectQuestions(questions: SubjectQuestion[], publishing = false) {
   const chosen = questions.filter(q => q.subjectRole);
-  if (chosen.some(q => q.type !== "단문형 답변" || !q.required)) throw new Error("정보주체 이름·이메일은 필수 단문형 답변에 지정해주세요.");
+  if (chosen.some(q => !subjectQuestionTypeAllowed(q.subjectRole!, q.type) || !q.required)) throw new Error("정보주체 이름은 필수 단문형 답변에, 이메일은 필수 단문형 답변 또는 이메일 질문에 지정해주세요.");
   if (new Set(chosen.map(q => q.subjectRole)).size !== chosen.length) throw new Error("정보주체 이름과 이메일은 각각 한 번만 지정할 수 있습니다.");
   if (publishing && chosen.length === 1) throw new Error("정보주체 조회를 사용하려면 이름과 이메일을 모두 지정해주세요.");
 }

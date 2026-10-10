@@ -1,4 +1,8 @@
 "use client";
+import { AuthorAssetProvider } from "./AuthorAssetProvider";
+import { hasAuthorAssets } from "@/lib/author-assets";
+import { QuestionChoiceSummary } from "./QuestionChoiceSummary";
+import { formLanguageLabel } from "@/contracts/form-language";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { PageHeading, Panel, ActionButton, Modal } from "../shared";
@@ -117,13 +121,15 @@ function FormPreview({ id }: { id: string }) {
   const result = useResource<FormRecord>("/forms/" + id), form = result.data;
   if (result.error) return <p role="alert">{result.error.message}</p>;
   if (!form) return <p role="status">캐치폼을 불러오는 중입니다.</p>;
-  return <div className="cs-stack"><h3>{form.title}</h3><p>{formStatus[form.status]} · {form.hasDraft ? "현재 초안" : "게시 버전"} {form.draftNumber}</p>
+  return <AuthorAssetProvider scope={{ kind: "form", id: form.id, version: form.version }} enabled={hasAuthorAssets(form.content.questions)}><div className="cs-stack"><h3>{form.title}</h3><p>{formStatus[form.status]} · {form.hasDraft ? "현재 초안" : "게시 버전"} {form.draftNumber}</p>
+    <p>캐치폼 서비스 언어: {formLanguageLabel(form.content.formLanguage)}</p>
     <p style={{ whiteSpace: "pre-wrap" }}>{form.content.body}</p>{form.content.questions.map((question, index) => <section className="forms-note" key={question.id}>
       <h3>Q{index + 1}. {question.label} {question.required && "(필수)"}</h3><p>{question.type}</p>
-      {question.options?.length ? <ul>{question.options.map(option => <li key={option}>{option}</li>)}</ul> : null}<QuestionSummary question={question} questions={form.content.questions} />
+      <QuestionSummary question={question} questions={form.content.questions} language={form.content.formLanguage} /><QuestionChoiceSummary question={question} language={form.content.formLanguage} />
     </section>)}<p>보유 기간 {form.content.retentionDays === null ? "미지정 (회사 기본 보유 기간 적용)" : form.content.retentionDays + "일"} · 최대 응답 {form.content.maxResponses}건 · {form.content.verify ? "본인인증 사용" : "본인인증 미사용"}</p>
+    <p>응답 시작 {form.content.collectionOpenAt ? new Date(form.content.collectionOpenAt).toLocaleString("ko-KR") : "게시 즉시"} · 응답 종료 {form.content.collectionCloseAt ? new Date(form.content.collectionCloseAt).toLocaleString("ko-KR") : "직접 종료할 때까지"}</p>
     <p>개인정보 동의: {form.content.consentRequired ? "필수" : "선택"} · {form.content.consentPurpose || "별도 목적 없음"}</p>
-    <ConsentDisplay display={form.consentBundle?.display} /><ConsentDocuments bundle={form.consentBundle} /></div>;
+    <ConsentDisplay display={form.consentBundle?.display} /><ConsentDocuments bundle={form.consentBundle} /></div></AuthorAssetProvider>;
 }
 function DeleteForm({ form, busy, error, onDelete }: { form: FormRecord; busy: boolean; error: string; onDelete: (state: FormDeletionState) => void }) {
   const result = useResource<FormDeletionState>("/forms/" + form.id + "/deletion"), state = result.data;

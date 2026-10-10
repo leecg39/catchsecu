@@ -1,0 +1,119 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-09T15:16:20.522Z",
+  "fixture": {
+    "companyId": "91710366-5992-4132-8282-f65424417419",
+    "serviceId": "c8466aa3-dfdc-4305-b3c7-25fe51aa126b",
+    "ruleId": "646eaded-5ebe-4e9f-95a6-667c1053e733"
+  },
+  "checks": [
+    {
+      "name": "anonymous-read-denied",
+      "status": 401,
+      "code": "UNAUTHENTICATED"
+    },
+    {
+      "name": "viewer-read-denied",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "viewer-create-denied",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "invalid-days-rejected",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "missing-idempotency-key-rejected",
+      "status": 400,
+      "code": "IDEMPOTENCY_REQUIRED"
+    },
+    {
+      "name": "cross-company-create-denied",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "create",
+      "status": 201
+    },
+    {
+      "name": "create-idempotent",
+      "status": 201
+    },
+    {
+      "name": "duplicate-service-rule-conflict",
+      "status": 409,
+      "code": "RULE_EXISTS"
+    },
+    {
+      "name": "detail",
+      "status": 200
+    },
+    {
+      "name": "service-filter-pagination",
+      "status": 200
+    },
+    {
+      "name": "cross-company-read-denied",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "cross-company-update-denied",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "cross-company-delete-denied",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "update",
+      "status": 200
+    },
+    {
+      "name": "stale-update-conflict",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "stale-delete-conflict",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "archive",
+      "status": 204
+    },
+    {
+      "name": "archived-filter",
+      "status": 200
+    },
+    {
+      "name": "archived-update-conflict",
+      "status": 409,
+      "code": "RULE_ARCHIVED"
+    },
+    {
+      "name": "old-create-key-cannot-restore",
+      "status": 410,
+      "code": "RULE_ARCHIVED"
+    }
+  ],
+  "independentDb": {
+    "retentionDays": 60,
+    "version": 2,
+    "auditActions": [
+      "retention_rule.updated",
+      "retention_rule.archived",
+      "retention_rule.created"
+    ]
+  },
+  "externalProviderAcceptance": false
+}

@@ -1,0 +1,29 @@
+{
+  "mode": "share-revoke",
+  "runId": "ca47028a-2902-4d28-a700-91afc710a626",
+  "recordedAt": "2026-10-10T09:24:19.956Z",
+  "result": "passed",
+  "checks": [
+    {
+      "action": "revoke-only-lifecycle-share",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    },
+    {
+      "action": "revoked viewer image URL is 401",
+      "status": 401,
+      "expected": 401,
+      "source": "live",
+      "code": "VIEWER_SESSION_EXPIRED"
+    }
+  ],
+  "proof": {
+    "shareRevoked": true,
+    "previouslyAuthorizedImageNowRejected": true,
+    "originalVersionReceiptPinsAndBytesUnchanged": true,
+    "hash": "120a7b18eb01ca91458c9fdd1bee11c00085d7981ee3e3166492b441b4655ac1"
+  },
+  "boundary": "Actual local API and DB observations when invoked; OTP uses local outbox. No original-site or external delivery/provider success claim.",
+  "failurePolicy": "No automatic rollback/cleanup on failure; inspect private lifecycle state before continuing."
+}

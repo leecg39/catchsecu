@@ -1,0 +1,28 @@
+{
+  "mode": "viewer-auth",
+  "runId": "c6580013-07f7-4ac7-a221-66350c259e7a",
+  "recordedAt": "2026-10-10T09:23:38.276Z",
+  "result": "passed",
+  "checks": [
+    {
+      "action": "viewer-challenge",
+      "status": 202,
+      "expected": 202,
+      "source": "live"
+    },
+    {
+      "action": "viewer-verify-local-otp",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    }
+  ],
+  "proof": {
+    "authenticated": true,
+    "deliveryEvidence": "OTP read from local encrypted mail job; external email delivery not verified",
+    "originalVersionReceiptPinsAndBytesUnchanged": true,
+    "hash": "120a7b18eb01ca91458c9fdd1bee11c00085d7981ee3e3166492b441b4655ac1"
+  },
+  "boundary": "Actual local API and DB observations when invoked; OTP uses local outbox. No original-site or external delivery/provider success claim.",
+  "failurePolicy": "No automatic rollback/cleanup on failure; inspect private lifecycle state before continuing."
+}

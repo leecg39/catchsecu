@@ -1,4 +1,7 @@
 "use client";
+import { AuthorAssetProvider, useAuthorAsset } from "./AuthorAssetProvider";
+import { hasAuthorAssets } from "@/lib/author-assets";
+import { QuestionChoiceSummary } from "./QuestionChoiceSummary";
 import { QuestionSummary } from "./QuestionSummary";
 import { useRef, useState } from "react";
 import Link from "next/link";
@@ -9,16 +12,25 @@ import { useApplication } from "../ApplicationContext";
 import { api, ApiError, errorText, useResource } from "@/lib/api";
 import type { FormRecord, TemplateRecord, TemplatePage } from "@/contracts/forms";
 import sourceTemplates from "./templates.json";
+import { formLanguageLabel } from "@/contracts/form-language";
 
+function TemplateThumbnail({ id, title }: { id: string | null; title: string }) {
+  const { asset, loading } = useAuthorAsset(id);
+  if (!id) return <span className="forms-template-thumbnail-placeholder" aria-hidden="true" />;
+  if (!asset) return <span className="forms-template-thumbnail-placeholder" role="status">{loading ? "불러오는 중" : "이미지 없음"}</span>;
+  return <img className="forms-template-thumbnail" src={asset.url} alt={title + " 대표 이미지"} loading="lazy" referrerPolicy="no-referrer" />;
+}
 function Preview({ id }: { id: string }) {
   const result = useResource<TemplateRecord>("/templates/" + id), row = result.data;
-  if (result.error) return <p role="alert">{result.error.message}</p>;
+  if (result.error) return <div><p role="alert">{result.error.message}</p><ActionButton secondary onClick={result.reload}>미리보기 다시 불러오기</ActionButton></div>;
   if (!row) return <p role="status">템플릿을 불러오는 중입니다.</p>;
-  return <div className="cs-stack"><p style={{ whiteSpace: "pre-wrap" }}>{row.content.body}</p>
+  return <AuthorAssetProvider scope={{ kind: "template", id: row.id, version: row.version }} enabled={hasAuthorAssets(row.content.questions) || !!row.thumbnailAssetId}><div className="cs-stack">
+    <TemplateThumbnail id={row.thumbnailAssetId} title={row.title} />{row.description && <p style={{ whiteSpace: "pre-wrap" }}>{row.description}</p>}
+    <p>캐치폼 서비스 언어: {formLanguageLabel(row.content.formLanguage)}</p><p style={{ whiteSpace: "pre-wrap" }}>{row.content.body}</p>
     {row.content.questions.map((question, index) => <section className="forms-note" key={question.id}><h3>Q{index + 1}. {question.label} {question.required && "(필수)"}</h3>
-      <p>{question.type}</p>{question.options?.length ? <ul>{question.options.map(option => <li key={option}>{option}</li>)}</ul> : null}<QuestionSummary question={question} questions={row.content.questions} /></section>)}
+      <p>{question.type}</p><QuestionSummary question={question} questions={row.content.questions} language={row.content.formLanguage} /><QuestionChoiceSummary question={question} language={row.content.formLanguage} /></section>)}
     <p>개인정보 동의: {row.content.consentRequired ? "필수" : "선택"} · {row.content.consentPurpose || "별도 목적 없음"}</p>
-    <p>보유 기간 {row.content.retentionDays}일 · 최대 응답 {row.content.maxResponses}건</p></div>;
+    <p>보유 기간 {row.content.retentionDays}일 · 최대 응답 {row.content.maxResponses}건</p></div></AuthorAssetProvider>;
 }
 export function TemplateGallery() {
   const app = useApplication(), router = useRouter(), searchParams = useSearchParams();
@@ -35,13 +47,17 @@ export function TemplateGallery() {
     {result.data?.permissions.canCreate && <Link className="cs-button" href="/form/ai/create?templateEdit=new">템플릿 생성</Link>}</PageHeading>
     <div className="forms-tabs" role="tablist">{["캐치폼 템플릿", "서비스 템플릿"].map((label, index) => <button role="tab" aria-selected={company === (index === 1)}
       className={company === (index === 1) ? "active" : ""} key={label} onClick={() => { setCompany(index === 1); setPage(1); setError(""); }}>{label}</button>)}</div>
-    {(company || !!result.data?.items.length) && <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); setSearch(query); setPage(1); }}>
-      <input className="cs-input" aria-label="템플릿 검색" placeholder="제목 또는 분류" value={query} onChange={event => setQuery(event.target.value)} /><ActionButton secondary>검색</ActionButton></form>
+    {(company || !!result.data?.items.length || !!result.error) && <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); setSearch(query); setPage(1); }}>
+      <input className="cs-input" aria-label="템플릿 검색" placeholder="제목·분류·설명" value={query} onChange={event => setQuery(event.target.value)} /><ActionButton secondary>검색</ActionButton></form>
+      {result.error && <div><p role="alert">{result.error.message}</p><ActionButton secondary disabled={result.loading} onClick={result.reload}>템플릿 목록 다시 불러오기</ActionButton></div>}
       {!use && !remove && error && <p role="alert">{error}</p>}
-      <RemoteTable columns={["제목", "분류", "서비스", "질문 수", "수정일", "관리"]} rows={(result.data?.items ?? []).map(row => ({ id: row.id, cells: [
-        row.title, row.category, row.serviceName ?? "공용", row.content.questions.length, new Date(row.updatedAt).toLocaleDateString("ko-KR"),
+      <RemoteTable columns={["제목", "설명", "분류", "서비스", "이용 범위", "질문 수", "수정일", "관리"]} rows={(result.data?.items ?? []).map(row => ({ id: row.id, cells: [
+        row.title, row.description || "설명 없음", row.category, row.serviceName ?? "공용",
+        row.licenseScope === "ACTIVE_SUBSCRIPTION" ? row.licenseAvailable ? "유효 구독" : "유료 구독 필요" : "서비스 구성원",
+        row.content.questions.length, new Date(row.updatedAt).toLocaleDateString("ko-KR"),
         <div className="forms-row-actions" key="actions"><button onClick={() => setPreview(row)}>미리보기</button>
           {row.actions?.use && <button onClick={() => { setUse(row); setTarget(targets.find(service => service.id === app.data?.serviceId)?.id ?? targets[0]?.id ?? ""); setError(""); }}>사용하기</button>}
+          {!row.actions?.use && row.licenseScope === "ACTIVE_SUBSCRIPTION" && !row.licenseAvailable && <span className="cs-muted">구독 필요</span>}
           {row.actions?.edit && <Link href={"/form/ai/create?templateEdit=" + row.id}>편집</Link>}
           {row.actions?.remove && <button onClick={() => { setRemove(row); setError(""); }}>삭제</button>}</div>] }))}
         total={result.data?.total ?? 0} page={result.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={result.loading} error={result.error?.message} empty="등록된 템플릿이 없습니다." />

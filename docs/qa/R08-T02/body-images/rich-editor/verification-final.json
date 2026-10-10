@@ -1,0 +1,151 @@
+{
+  "result": "passed",
+  "checkpoint": "BI-05a",
+  "recordedAt": "2026-10-10T11:24:46Z",
+  "scope": "폼 본문의 typed rich editor와 FORM_CONTENT_IMAGE 작성자 자산 흐름",
+  "implementation": {
+    "documentBoundary": "RichDocumentV1만 저장하고 canonical HTML의 src/iframe은 영속화하지 않음",
+    "toolbar": [
+      "paragraph-h2-h3-h4-quote",
+      "bold-italic",
+      "font-size-color",
+      "ordered-unordered-list",
+      "indent-outdent",
+      "left-center-right",
+      "ltr-rtl",
+      "link-youtube-vimeo-table",
+      "undo-redo"
+    ],
+    "ownedImages": [
+      "upload",
+      "replace",
+      "delete",
+      "alt",
+      "caption",
+      "alignment",
+      "width",
+      "undo-redo",
+      "stale-completion-protection"
+    ],
+    "draftSafety": [
+      "upload-save-hold",
+      "unmount-cancellation",
+      "lost-response-retry",
+      "409-rich-document-and-asset-id-preservation"
+    ]
+  },
+  "automatedValidation": [
+    {
+      "command": "npx vitest run tests/server/rich-content-contract.test.ts tests/server/rich-content-html.test.ts tests/server/rich-content-render.test.ts tests/server/rich-editor-state.test.ts",
+      "files": 4,
+      "tests": 48,
+      "status": "passed"
+    },
+    {
+      "command": "npx vitest run tests/server/form-rich-body-persistence.test.ts tests/server/author-asset-references.test.ts tests/server/author-asset-ui-render.test.ts tests/server/author-asset-upload-events.test.ts tests/server/form-module-flow.test.ts",
+      "files": 5,
+      "tests": 54,
+      "status": "passed"
+    },
+    {
+      "command": "npx vitest run tests/server/form-draft-state.test.ts",
+      "files": 1,
+      "tests": 14,
+      "status": "passed"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "passed"
+    },
+    {
+      "command": "npx eslint <BI-05a changed source, tests, QA script>",
+      "status": "passed",
+      "errors": 0
+    },
+    {
+      "command": "ALLOW_LOCAL_MAIL=1 ALLOW_LOCAL_KAKAO=1 ALLOW_LOCAL_PAYMENT=1 ALLOW_LOCAL_SSO=1 npm run build",
+      "status": "passed",
+      "staticPages": 82,
+      "note": "외부 공급자 성공 검증이 아니라 로컬 production 빌드용 명시적 안전장치 해제"
+    },
+    {
+      "command": "BETTER_AUTH_URL=http://localhost:3112 node --env-file=.env.test.local --import tsx scripts/qa-rea-rich-editor-flow.ts verify",
+      "status": "passed",
+      "database": "catchsecu_test"
+    }
+  ],
+  "browserValidation": {
+    "browser": "Ego Lite TaskSpace 2",
+    "origin": "http://localhost:3112",
+    "formId": "cbd24ed1-082b-473a-a0f3-86dcc7037235",
+    "observed": [
+      "H2와 bold 저장",
+      "표 삽입 undo-redo-undo",
+      "파란 이미지 업로드와 초록 이미지 교체 undo-redo-undo",
+      "이미지 삭제 후 undo 복구",
+      "alt·right·75 percent 설정",
+      "자동저장 완료와 새로고침 복원",
+      "서버 재시작 후 문서와 이미지 복원",
+      "390·768·1440px 가로 넘침 0",
+      "최종 390px toolbar와 editable surface 가로 넘침 0"
+    ],
+    "finalViewport": {
+      "width": 390,
+      "documentOverflowPx": 0,
+      "toolbarOverflowPx": 0,
+      "editorSurfaceOverflowPx": 0,
+      "ownedImageVisible": true
+    }
+  },
+  "databaseValidation": {
+    "formVersion": 5,
+    "plainProjection": "브라우저 편집\n",
+    "richImages": 1,
+    "image": {
+      "alt": "파란 검증 이미지",
+      "alignment": "right",
+      "width": {
+        "unit": "percent",
+        "value": 75
+      },
+      "purpose": "FORM_CONTENT_IMAGE",
+      "assetStatus": "ready",
+      "scanStatus": "clean",
+      "pins": 1,
+      "referenceSlot": "form_content",
+      "documentKey": "form"
+    },
+    "restartDownloadSha256": "3cd6eb44f53252547fab736b48b005ab97860891434e22e31f9ce053b2b137fe"
+  },
+  "artifacts": {
+    "editor390Final": {
+      "path": "editor-390-final.png",
+      "sha256": "5172835017ede367b44e75823e2cc7164ac298b0aec60d1481012b6da685aeb9"
+    },
+    "restartedImage": {
+      "path": "restarted-image.png",
+      "sha256": "3cd6eb44f53252547fab736b48b005ab97860891434e22e31f9ce053b2b137fe"
+    },
+    "browserDatabase": "browser-db.json"
+  },
+  "sourceSha256": {
+    "src/contracts/rich-content-html.ts": "4ae55273d73ffad129fe74d5708f5ffaf73c821a6062bc9b3dbcb7a8f1b0a7f0",
+    "src/components/forms/rich-editor-state.ts": "014c7fe9ebfba78a0db688a4e91114a1ab6c5a2c8c205be7b33911fac38b1e53",
+    "src/components/forms/RichDocumentEditor.tsx": "a80b86bab0ac7d093fd203d46cecc2de27651f428b94a4a286bd49e08899c69f",
+    "src/components/forms/AuthorAssetProvider.tsx": "5df1aebde4487bc687fe748cc5acc2048634fe11b00972aa4e7903427069ab57",
+    "src/components/forms/FormEditor.tsx": "7c15306023029f32694fb8e95d25e8bd925805e8344de43a2367177eaefa7d0b",
+    "src/components/forms/forms.css": "d392f77c0e3318cdd5552da04be2a09fa43d53b029a40df523c4cf84dd036206"
+  },
+  "externalCredentials": [],
+  "notCompletedHere": [
+    "BI-05b page CRUD and public branching UI",
+    "BI-05c completion and closed page editors and read authorization",
+    "BI-06 evidence v2 and rich PDF",
+    "BI-07 four-slot full acceptance"
+  ],
+  "protectedState": {
+    "productionDatabaseTouched": false,
+    "frozenQuestionImageFixtureTouched": false,
+    "localhost3108Touched": false
+  }
+}

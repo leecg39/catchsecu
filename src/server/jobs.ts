@@ -17,7 +17,7 @@ import { roleCan, roleCapabilities } from "./permissions";
 import { audit, type MailOutcomeMetadata } from "./audit";
 
 const mailSchema = z.object({ to: z.email(), subject: z.string().max(200), text: z.string().max(100000) }).strict();
-type Mail = z.infer<typeof mailSchema>;
+export type Mail = z.infer<typeof mailSchema>;
 // A legacy worker must reject sender-bound jobs before parsing away their policy fields.
 export const SENDER_MAIL_JOB_TYPE = "mail.sender.v1";
 export async function enqueueMail(mail: Mail, key: string = randomUUID(), tx: Transaction = db, tenantId?: string) {
@@ -156,6 +156,10 @@ async function sendMail(job: ClaimedJob, workerId: string) {
     }, marketing);
   }
   if (!deliveryScope) {
+    if (job.dedupeKey.startsWith("mail:org-email:"))
+      return (await import("./org-email-mail")).deliverOrgEmailMail(job, workerId, mail);
+    if (job.dedupeKey.startsWith("mail:sso-policy:"))
+      return (await import("./sso-policy-mail")).deliverSsoPolicyMail(job, workerId, mail);
     if (job.dedupeKey.startsWith("mail:invitation:")) {
       const [, , id, rawVersion, ...rest] = job.dedupeKey.split(":");
       const version = Number(rawVersion);

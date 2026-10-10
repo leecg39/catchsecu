@@ -1,0 +1,792 @@
+[1/62] Building C object common/CMakeFiles/common.dir/getopt.c.o
+[2/62] Building C object common/CMakeFiles/common.dir/clamdcom.c.o
+[3/62] Building C object common/CMakeFiles/common.dir/cert_util.c.o
+[4/62] Building C object common/CMakeFiles/common.dir/actions.c.o
+[5/62] Building C object common/CMakeFiles/common.dir/idmef_logging.c.o
+[6/62] Building C object common/CMakeFiles/common.dir/hostid.c.o
+[7/62] Building C object common/CMakeFiles/common.dir/misc.c.o
+[8/62] Building C object common/CMakeFiles/common.dir/tar.c.o
+[9/62] Building C object common/CMakeFiles/common.dir/output.c.o
+[10/62] Building C object common/CMakeFiles/common.dir/optparser.c.o
+[11/62] Building C object libfreshclam/CMakeFiles/freshclam.dir/dns.c.o
+[12/62] Building C object libfreshclam/CMakeFiles/freshclam.dir/libfreshclam.c.o
+[13/62] Building C object clamconf/CMakeFiles/clamconf.dir/clamconf.c.o
+[14/62] Building C object common/CMakeFiles/common.dir/mac/cert_util_mac.m.o
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/common/mac/cert_util_mac.m:130:14: warning: 'SecKeychainOpen' is deprecated: first deprecated in macOS 10.10 - SecKeychain is deprecated [-Wdeprecated-declarations]
+  130 |     status = SecKeychainOpen(kc_info.file_path, &keychain);
+      |              ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Security.framework/Headers/SecKeychain.h:294:10: note: 'SecKeychainOpen' has been explicitly marked deprecated here
+  294 | OSStatus SecKeychainOpen(const char *pathName, SecKeychainRef * __nonnull CF_RETURNS_RETAINED keychain)
+      |          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/common/mac/cert_util_mac.m:140:14: warning: 'SecKeychainGetStatus' is deprecated: first deprecated in macOS 10.10 - SecKeychain is deprecated [-Wdeprecated-declarations]
+  140 |     status = SecKeychainGetStatus(keychain, &keychainStatus);
+      |              ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Security.framework/Headers/SecKeychain.h:462:10: note: 'SecKeychainGetStatus' has been explicitly marked deprecated here
+  462 | OSStatus SecKeychainGetStatus(SecKeychainRef __nullable keychain, SecKeychainStatus *keychainStatus)
+      |          ^
+2 warnings generated.
+[15/62] Building C object clamd/CMakeFiles/clamd.dir/clamd.c.o
+[16/62] Building C object libfreshclam/CMakeFiles/freshclam.dir/libfreshclam_internal.c.o
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/libfreshclam/libfreshclam_internal.c:227:118: warning: format specifies type 'long' but the argument has type 'off_t' (aka 'long long') [-Wformat]
+  227 |                 logg(LOGG_DEBUG, "freshclam.dat is smaller than expected: %zu != %ld\n", sizeof(freshclam_dat_v1_t), file_size);
+      |                                                                                  ~~~                                 ^~~~~~~~~
+      |                                                                                  %lld
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/libfreshclam/libfreshclam_internal.c:1333:21: warning: call to 'Wcurl_easy_setopt_err_cb_data' declared with 'warning' attribute: curl_easy_setopt expects a private data pointer as argument [-Wattribute-warning]
+ 1333 |     if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_HEADERDATA, g_lastRay)) {
+      |                     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/typecheck-gcc.h:132:13: note: expanded from macro 'curl_easy_setopt'
+  132 |             Wcurl_easy_setopt_err_cb_data();                            \
+      |             ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/libfreshclam/libfreshclam_internal.c:993:25: warning: call to 'Wcurl_easy_setopt_err_long' declared with 'warning' attribute: curl_easy_setopt expects a long argument [-Wattribute-warning]
+  993 |         if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_TIMEVALUE, ifModifiedSince)) {
+      |                         ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/typecheck-gcc.h:50:13: note: expanded from macro 'curl_easy_setopt'
+   50 |             Wcurl_easy_setopt_err_long();                               \
+      |             ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/libfreshclam/libfreshclam_internal.c:640:25: warning: call to 'Wcurl_easy_setopt_err_long' declared with 'warning' attribute: curl_easy_setopt expects a long argument [-Wattribute-warning]
+  640 |         if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, g_connectTimeout)) {
+      |                         ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/typecheck-gcc.h:50:13: note: expanded from macro 'curl_easy_setopt'
+   50 |             Wcurl_easy_setopt_err_long();                               \
+      |             ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/libfreshclam/libfreshclam_internal.c:643:25: warning: call to 'Wcurl_easy_setopt_err_long' declared with 'warning' attribute: curl_easy_setopt expects a long argument [-Wattribute-warning]
+  643 |         if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, g_requestTimeout)) {
+      |                         ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/typecheck-gcc.h:50:13: note: expanded from macro 'curl_easy_setopt'
+   50 |             Wcurl_easy_setopt_err_long();                               \
+      |             ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/libfreshclam/libfreshclam_internal.c:650:29: warning: call to 'Wcurl_easy_setopt_err_long' declared with 'warning' attribute: curl_easy_setopt expects a long argument [-Wattribute-warning]
+  650 |             if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, minimumSpeed)) {
+      |                             ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/typecheck-gcc.h:50:13: note: expanded from macro 'curl_easy_setopt'
+   50 |             Wcurl_easy_setopt_err_long();                               \
+      |             ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/libfreshclam/libfreshclam_internal.c:720:25: warning: call to 'Wcurl_easy_setopt_err_long' declared with 'warning' attribute: curl_easy_setopt expects a long argument [-Wattribute-warning]
+  720 |         if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_PROXYPORT, g_proxyPort)) {
+      |                         ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/typecheck-gcc.h:50:13: note: expanded from macro 'curl_easy_setopt'
+   50 |             Wcurl_easy_setopt_err_long();                               \
+      |             ^
+7 warnings generated.
+[17/62] Linking C static library common/libcommon.a
+[18/62] Building C object clamd/CMakeFiles/clamd.dir/clamd_others.c.o
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamd/clamd_others.c:175:11: warning: 'vfork' is deprecated: Use posix_spawn or fork [-Wdeprecated-declarations]
+  175 |     pid = vfork();
+      |           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h:618:1: note: 'vfork' has been explicitly marked deprecated here
+  618 | __deprecated_msg("Use posix_spawn or fork")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:227:48: note: expanded from macro '__deprecated_msg'
+  227 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamd/clamd_others.c:480:14: warning: variable 'fdsok' set but not used [-Wunused-but-set-variable]
+  480 |     unsigned fdsok = data->nfds;
+      |              ^
+2 warnings generated.
+[19/62] Building C object clamd/CMakeFiles/clamd.dir/localserver.c.o
+[20/62] Building C object clamd/CMakeFiles/clamd.dir/scanner.c.o
+[21/62] Building C object clamd/CMakeFiles/clamd.dir/session.c.o
+[22/62] Linking C shared library libfreshclam/libfreshclam.4.0.0.dylib
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[23/62] Creating library symlink libfreshclam/libfreshclam.4.dylib libfreshclam/libfreshclam.dylib
+[24/62] Building C object clamd/CMakeFiles/clamd.dir/tcpserver.c.o
+[25/62] Building C object clamd/CMakeFiles/clamd.dir/server-th.c.o
+[26/62] Building C object clamdscan/CMakeFiles/clamdscan.dir/clamdscan.c.o
+[27/62] Building C object clamdscan/CMakeFiles/clamdscan.dir/client.c.o
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamdscan/client.c:243:91: warning: format specifies type 'unsigned long' but the argument has type 'uint64_t' (aka 'unsigned long long') [-Wformat]
+  243 |                     logg(LOGG_DEBUG, "Could not connect, will try again in %lu second\n", interval);
+      |                                                                            ~~~            ^~~~~~~~
+      |                                                                            %llu
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamdscan/client.c:245:92: warning: format specifies type 'unsigned long' but the argument has type 'uint64_t' (aka 'unsigned long long') [-Wformat]
+  245 |                     logg(LOGG_DEBUG, "Could not connect, will try again in %lu seconds\n", interval);
+      |                                                                            ~~~             ^~~~~~~~
+      |                                                                            %llu
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamdscan/client.c:248:91: warning: format specifies type 'unsigned long' but the argument has type 'uint64_t' (aka 'unsigned long long') [-Wformat]
+  248 |                     logg(LOGG_INFO, "Could not connect, will PING again in %lu second\n", interval);
+      |                                                                            ~~~            ^~~~~~~~
+      |                                                                            %llu
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamdscan/client.c:250:92: warning: format specifies type 'unsigned long' but the argument has type 'uint64_t' (aka 'unsigned long long') [-Wformat]
+  250 |                     logg(LOGG_INFO, "Could not connect, will PING again in %lu seconds\n", interval);
+      |                                                                            ~~~             ^~~~~~~~
+      |                                                                            %llu
+4 warnings generated.
+[28/62] Building C object clamd/CMakeFiles/clamd.dir/thrmgr.c.o
+[29/62] Building C object clamdscan/CMakeFiles/clamdscan.dir/proto.c.o
+[30/62] Building C object clamscan/CMakeFiles/clamscan.dir/clamscan.c.o
+[31/62] Building C object sigtool/CMakeFiles/sigtool.dir/vba.c.o
+[32/62] Building C object clambc/CMakeFiles/clambc.dir/bcrun.c.o
+[33/62] Building C object clamscan/CMakeFiles/clamscan.dir/manager.c.o
+[34/62] Building C object freshclam/CMakeFiles/freshclam-bin.dir/execute.c.o
+[35/62] Building C object clamsubmit/CMakeFiles/clamsubmit.dir/clamsubmit.c.o
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:478:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  478 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "key", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:478:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  478 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "key", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:478:58: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  478 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "key", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:485:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  485 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "acl", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:485:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  485 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "acl", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:485:58: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  485 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "acl", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:492:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  492 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "policy", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:492:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  492 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "policy", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:492:61: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  492 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "policy", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                                             ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:499:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  499 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-meta-original-filename", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:499:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  499 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-meta-original-filename", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:499:83: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  499 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-meta-original-filename", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                                                                   ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:506:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  506 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-credential", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:506:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  506 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-credential", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:506:71: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  506 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-credential", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                                                       ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:513:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  513 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-algorithm", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:513:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  513 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-algorithm", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:513:70: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  513 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-algorithm", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                                                      ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:520:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  520 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-date", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:520:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  520 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-date", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:520:65: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  520 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-date", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                                                 ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:527:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  527 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-signature", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:527:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  527 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-signature", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:527:70: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  527 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "x-amz-signature", CURLFORM_COPYCONTENTS, json_str, CURLFORM_END);
+      |                                                                      ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:529:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  529 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "file", CURLFORM_FILE, filename, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:529:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  529 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "file", CURLFORM_FILE, filename, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:529:59: warning: 'CURLFORM_FILE' is deprecated: since 7.56.0. Use curl_mime_filedata() [-Wdeprecated-declarations]
+  529 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "file", CURLFORM_FILE, filename, CURLFORM_END);
+      |                                                           ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2596:28: note: 'CURLFORM_FILE' has been explicitly marked deprecated here
+ 2596 |   CURLFORM_FILE            CURL_DEPRECATED(7.56.0, "Use curl_mime_filedata()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:534:32: warning: 'CURLOPT_HTTPPOST' is deprecated: since 7.56.0. Use CURLOPT_MIMEPOST [-Wdeprecated-declarations]
+  534 |     curl_easy_setopt(aws_curl, CURLOPT_HTTPPOST, post);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:1248:3: note: 'CURLOPT_HTTPPOST' has been explicitly marked deprecated here
+ 1248 |   CURLOPTDEPRECATED(CURLOPT_HTTPPOST, CURLOPTTYPE_OBJECTPOINT, 24,
+      |   ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:1133:47: note: expanded from macro 'CURLOPTDEPRECATED'
+ 1133 | #define CURLOPTDEPRECATED(na, t, nu, v, m) na CURL_DEPRECATED(v, m) \
+      |                                               ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:534:32: warning: 'CURLOPT_HTTPPOST' is deprecated: since 7.56.0. Use CURLOPT_MIMEPOST [-Wdeprecated-declarations]
+  534 |     curl_easy_setopt(aws_curl, CURLOPT_HTTPPOST, post);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:1248:3: note: 'CURLOPT_HTTPPOST' has been explicitly marked deprecated here
+ 1248 |   CURLOPTDEPRECATED(CURLOPT_HTTPPOST, CURLOPTTYPE_OBJECTPOINT, 24,
+      |   ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:1133:47: note: expanded from macro 'CURLOPTDEPRECATED'
+ 1133 | #define CURLOPTDEPRECATED(na, t, nu, v, m) na CURL_DEPRECATED(v, m) \
+      |                                               ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:543:5: warning: 'curl_formfree' is deprecated: since 7.56.0. Use curl_mime_free() [-Wdeprecated-declarations]
+  543 |     curl_formfree(post);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2697:18: note: 'curl_formfree' has been explicitly marked deprecated here
+ 2697 | CURL_EXTERN void CURL_DEPRECATED(7.56.0, "Use curl_mime_free()")
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:563:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  563 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "utf8", CURLFORM_COPYCONTENTS, "\x27\x13", CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:563:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  563 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "utf8", CURLFORM_COPYCONTENTS, "\x27\x13", CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:563:59: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  563 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "utf8", CURLFORM_COPYCONTENTS, "\x27\x13", CURLFORM_END);
+      |                                                           ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:564:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  564 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "authenticity_token", CURLFORM_COPYCONTENTS, authenticity_token, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:564:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  564 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "authenticity_token", CURLFORM_COPYCONTENTS, authenticity_token, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:564:73: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  564 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "authenticity_token", CURLFORM_COPYCONTENTS, authenticity_token, CURLFORM_END);
+      |                                                                         ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:565:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  565 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "submissionID", CURLFORM_COPYCONTENTS, submissionID, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:565:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  565 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "submissionID", CURLFORM_COPYCONTENTS, submissionID, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:565:67: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  565 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "submissionID", CURLFORM_COPYCONTENTS, submissionID, CURLFORM_END);
+      |                                                                   ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:566:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  566 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "type", CURLFORM_COPYCONTENTS, malware ? "malware" : "fp", CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:566:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  566 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "type", CURLFORM_COPYCONTENTS, malware ? "malware" : "fp", CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:566:59: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  566 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "type", CURLFORM_COPYCONTENTS, malware ? "malware" : "fp", CURLFORM_END);
+      |                                                           ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:567:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  567 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "sendername", CURLFORM_COPYCONTENTS, name, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:567:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  567 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "sendername", CURLFORM_COPYCONTENTS, name, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:567:65: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  567 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "sendername", CURLFORM_COPYCONTENTS, name, CURLFORM_END);
+      |                                                                 ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:568:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  568 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "email", CURLFORM_COPYCONTENTS, email, CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:568:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  568 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "email", CURLFORM_COPYCONTENTS, email, CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:568:60: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  568 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "email", CURLFORM_COPYCONTENTS, email, CURLFORM_END);
+      |                                                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:570:9: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  570 |         curl_formadd(&post, &last, CURLFORM_COPYNAME, "shareSample", CURLFORM_COPYCONTENTS, "on", CURLFORM_END);
+      |         ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:570:36: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  570 |         curl_formadd(&post, &last, CURLFORM_COPYNAME, "shareSample", CURLFORM_COPYCONTENTS, "on", CURLFORM_END);
+      |                                    ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:570:70: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  570 |         curl_formadd(&post, &last, CURLFORM_COPYNAME, "shareSample", CURLFORM_COPYCONTENTS, "on", CURLFORM_END);
+      |                                                                      ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:572:9: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  572 |         curl_formadd(&post, &last, CURLFORM_COPYNAME, "virusname", CURLFORM_COPYCONTENTS, fpvname, CURLFORM_END);
+      |         ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:572:36: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  572 |         curl_formadd(&post, &last, CURLFORM_COPYNAME, "virusname", CURLFORM_COPYCONTENTS, fpvname, CURLFORM_END);
+      |                                    ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:572:68: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  572 |         curl_formadd(&post, &last, CURLFORM_COPYNAME, "virusname", CURLFORM_COPYCONTENTS, fpvname, CURLFORM_END);
+      |                                                                    ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:574:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  574 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "description", CURLFORM_COPYCONTENTS, "clamsubmit", CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:574:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  574 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "description", CURLFORM_COPYCONTENTS, "clamsubmit", CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:574:66: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  574 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "description", CURLFORM_COPYCONTENTS, "clamsubmit", CURLFORM_END);
+      |                                                                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:575:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  575 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "notify", CURLFORM_COPYCONTENTS, "on", CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:575:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  575 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "notify", CURLFORM_COPYCONTENTS, "on", CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:575:61: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  575 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "notify", CURLFORM_COPYCONTENTS, "on", CURLFORM_END);
+      |                                                             ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:576:5: warning: 'curl_formadd' is deprecated: since 7.56.0. Use curl_mime_init() [-Wdeprecated-declarations]
+  576 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "privacy", CURLFORM_COPYCONTENTS, "on", CURLFORM_END);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2661:26: note: 'curl_formadd' has been explicitly marked deprecated here
+ 2661 | CURL_EXTERN CURLFORMcode CURL_DEPRECATED(7.56.0, "Use curl_mime_init()")
+      |                          ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:576:32: warning: 'CURLFORM_COPYNAME' is deprecated: since 7.56.0. Use curl_mime_name() [-Wdeprecated-declarations]
+  576 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "privacy", CURLFORM_COPYCONTENTS, "on", CURLFORM_END);
+      |                                ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2587:28: note: 'CURLFORM_COPYNAME' has been explicitly marked deprecated here
+ 2587 |   CURLFORM_COPYNAME        CURL_DEPRECATED(7.56.0, "Use curl_mime_name()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:576:62: warning: 'CURLFORM_COPYCONTENTS' is deprecated: since 7.56.0. Use curl_mime_data() [-Wdeprecated-declarations]
+  576 |     curl_formadd(&post, &last, CURLFORM_COPYNAME, "privacy", CURLFORM_COPYCONTENTS, "on", CURLFORM_END);
+      |                                                              ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2590:28: note: 'CURLFORM_COPYCONTENTS' has been explicitly marked deprecated here
+ 2590 |   CURLFORM_COPYCONTENTS    CURL_DEPRECATED(7.56.0, "Use curl_mime_data()"),
+      |                            ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:579:33: warning: 'CURLOPT_HTTPPOST' is deprecated: since 7.56.0. Use CURLOPT_MIMEPOST [-Wdeprecated-declarations]
+  579 |     curl_easy_setopt(clam_curl, CURLOPT_HTTPPOST, post);
+      |                                 ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:1248:3: note: 'CURLOPT_HTTPPOST' has been explicitly marked deprecated here
+ 1248 |   CURLOPTDEPRECATED(CURLOPT_HTTPPOST, CURLOPTTYPE_OBJECTPOINT, 24,
+      |   ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:1133:47: note: expanded from macro 'CURLOPTDEPRECATED'
+ 1133 | #define CURLOPTDEPRECATED(na, t, nu, v, m) na CURL_DEPRECATED(v, m) \
+      |                                               ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:579:33: warning: 'CURLOPT_HTTPPOST' is deprecated: since 7.56.0. Use CURLOPT_MIMEPOST [-Wdeprecated-declarations]
+  579 |     curl_easy_setopt(clam_curl, CURLOPT_HTTPPOST, post);
+      |                                 ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:1248:3: note: 'CURLOPT_HTTPPOST' has been explicitly marked deprecated here
+ 1248 |   CURLOPTDEPRECATED(CURLOPT_HTTPPOST, CURLOPTTYPE_OBJECTPOINT, 24,
+      |   ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:1133:47: note: expanded from macro 'CURLOPTDEPRECATED'
+ 1133 | #define CURLOPTDEPRECATED(na, t, nu, v, m) na CURL_DEPRECATED(v, m) \
+      |                                               ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:624:9: warning: 'curl_formfree' is deprecated: since 7.56.0. Use curl_mime_free() [-Wdeprecated-declarations]
+  624 |         curl_formfree(post);
+      |         ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:2697:18: note: 'curl_formfree' has been explicitly marked deprecated here
+ 2697 | CURL_EXTERN void CURL_DEPRECATED(7.56.0, "Use curl_mime_free()")
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/curl.h:44:18: note: expanded from macro 'CURL_DEPRECATED'
+   44 |   __attribute__((deprecated("since " # version ". " message)))
+      |                  ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:312:5: warning: call to 'Wcurl_easy_setopt_err_long' declared with 'warning' attribute: curl_easy_setopt expects a long argument [-Wattribute-warning]
+  312 |     curl_easy_setopt(clam_curl, CURLOPT_HTTPGET, 1);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/typecheck-gcc.h:50:13: note: expanded from macro 'curl_easy_setopt'
+   50 |             Wcurl_easy_setopt_err_long();                               \
+      |             ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/clamsubmit/clamsubmit.c:378:5: warning: call to 'Wcurl_easy_setopt_err_long' declared with 'warning' attribute: curl_easy_setopt expects a long argument [-Wattribute-warning]
+  378 |     curl_easy_setopt(clam_curl, CURLOPT_HTTPGET, 1);
+      |     ^
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/tools/curl-openssl3/include/curl/typecheck-gcc.h:50:13: note: expanded from macro 'curl_easy_setopt'
+   50 |             Wcurl_easy_setopt_err_long();                               \
+      |             ^
+68 warnings generated.
+[36/62] Building C object freshclam/CMakeFiles/freshclam-bin.dir/notify.c.o
+[37/62] Building C object sigtool/CMakeFiles/sigtool.dir/sigtool.c.o
+[38/62] Building C object freshclam/CMakeFiles/freshclam-bin.dir/freshclam.c.o
+[39/62] Building C object unit_tests/CMakeFiles/check_clamd.dir/check_clamd.c.o
+[40/62] Building C object unit_tests/CMakeFiles/check_clamd.dir/__/clamd/thrmgr.c.o
+[41/62] Building C object unit_tests/CMakeFiles/check_clamav.dir/check_bytecode.c.o
+[42/62] Building C object clamdtop/CMakeFiles/clamdtop.dir/clamdtop.c.o
+[43/62] Building C object unit_tests/CMakeFiles/check_clamav.dir/check_disasm.c.o
+[44/62] Building C object unit_tests/CMakeFiles/check_clamav.dir/check_htmlnorm.c.o
+[45/62] Building C object unit_tests/CMakeFiles/check_clamav.dir/check_jsnorm.c.o
+[46/62] Building C object unit_tests/CMakeFiles/check_clamav.dir/check_matchers.c.o
+[47/62] Building C object unit_tests/CMakeFiles/check_clamav.dir/check_clamav.c.o
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/unit_tests/check_clamav.c:2113:72: warning: format specifies type 'long' but the argument has type 'off_t' (aka 'long long') [-Wformat]
+ 2113 |     ck_assert_msg(nread == siz, "short read, expected: %ld, was: %ld", siz, nread);
+      |                                                        ~~~             ^~~
+      |                                                        %lld
+/Users/user01/homebrew/include/check.h:541:78: note: expanded from macro 'ck_assert_msg'
+  541 |      _ck_assert_failed(__FILE__, __LINE__, "Assertion '"#expr"' failed" , ## __VA_ARGS__)
+      |                                                                              ^~~~~~~~~~~
+1 warning generated.
+[48/62] Building C object unit_tests/CMakeFiles/check_clamav.dir/check_regex.c.o
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/clamav-1.5.4/unit_tests/check_regex.c:297:22: warning: comparison of different enumeration types ('cl_error_t' (aka 'enum cl_error_t') and 'rtr_t' (aka 'enum rtest_result')) [-Wenum-compare]
+  297 |     ck_assert_msg(rc == rtest->result, "regex_list_match");
+      |                   ~~ ^  ~~~~~~~~~~~~~
+/Users/user01/homebrew/include/check.h:539:4: note: expanded from macro 'ck_assert_msg'
+  539 |   (expr) ? \
+      |    ^~~~
+1 warning generated.
+[49/62] cd /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/build/unit_tests/input && /Users/user01/homebrew/bin/cmake -E make_directory /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/build/unit_tests/input/clamav_hdb_scanfiles && /Users/user01/homebrew/bin/cmake -E make_directory /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/.local/clamav-source/build/unit_tests/input/signing/sign
+[50/62] Building C object unit_tests/CMakeFiles/check_clamav.dir/check_str.c.o
+[51/62] Linking C executable clamconf/clamconf
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[52/62] Linking C executable clamd/clamd
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[53/62] Building C object unit_tests/CMakeFiles/check_clamav.dir/check_uniq.c.o
+[54/62] Linking C executable clamdscan/clamdscan
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[55/62] Linking C executable clamscan/clamscan
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[56/62] Linking C executable sigtool/sigtool
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[57/62] Linking C executable clambc/clambc
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[58/62] Linking C executable clamsubmit/clamsubmit
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[59/62] Linking C executable freshclam/freshclam
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[60/62] Linking C executable clamdtop/clamdtop
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[61/62] Linking C executable unit_tests/check_clamd
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'
+[62/62] Linking C executable unit_tests/check_clamav
+ld: warning: ignoring duplicate libraries: '-lSystem', '-lm'

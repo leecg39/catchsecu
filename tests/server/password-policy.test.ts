@@ -1,3 +1,5 @@
+import { beforeEach as beforeSecurityCase } from "vitest";
+import { grantSecurityTestTrials } from "../fixtures/security-subscription";
 import { randomUUID } from "node:crypto";
 import { beforeAll, beforeEach, afterAll, describe, expect, test } from "vitest";
 import { db } from "@/server/db";
@@ -314,3 +316,5 @@ describe("password policy, expiry and credential transactions", () => {
       passwordChangedAt: new Date(), passwordRevision: 1, mode: "period", expiresAt: new Date() } })).rejects.toMatchObject({ code: "P2003" });
   });
 });
+
+beforeSecurityCase(grantSecurityTestTrials);

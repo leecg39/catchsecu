@@ -10,7 +10,10 @@ import { archiveForm, copyForm, designateFormRetention, formDeletionState, formD
 import { retentionDesignationInput } from "@/contracts/forms";
 import { listSubmissions } from "@/server/submissions";
 import { idempotent } from "@/server/idempotency";
+import { recheckFormAccess } from "@/server/form-access";
 import { submissionListQuery } from "@/contracts/submissions";
+import { participationTargetImportSchema } from "@/contracts/form-participation-access";
+import { deleteParticipationTargetBatch, importParticipationTargets, listParticipationTargetBatches } from "@/server/form-participation-targets";
 function parts(request: Request) {
   const [id, action, ...rest] = new URL(request.url).pathname.split("/").slice(4);
   const auditExport = request.method === "GET" && action === "audit-events" && rest.length === 1 && rest[0] === "export";
@@ -21,7 +24,7 @@ type FormReply = ReturnType<typeof formDto>;
 function draftReply(value: Omit<FormReply, "publication"> & { publication: Omit<NonNullable<FormReply["publication"]>, "token"> | null }) {
   const publication = value.publication;
   return { ...value, publication: publication ? { id: publication.id, responseCount: publication.responseCount,
-    maxResponses: publication.maxResponses, expiresAt: publication.expiresAt } : null };
+    maxResponses: publication.maxResponses, opensAt: publication.opensAt, expiresAt: publication.expiresAt } : null };
 }
 export const GET = route(async (request, requestId) => {
   const { id, action, auditExport } = parts(request);
@@ -44,6 +47,7 @@ export const GET = route(async (request, requestId) => {
     return json(await approvalForForm(ctx, id, query.page, query.pageSize));
   }
   if (action === "deletion") return json(await formDeletionState(ctx, id));
+  if (action === "participation-targets") return json(await listParticipationTargetBatches(ctx, id));
   if (action) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   return json(await readForm(ctx,id));
 });
@@ -60,7 +64,7 @@ export const PATCH = route(async (request, requestId) => {
     const result = await idempotent("form:draft:" + ctx.member.id + ":" + id, key, input,
       async tx => ({ status: 200, body: draftReply(formDto(await updateFormDraft(tx, ctx, id, input, requestId), ctx)),
         resource: { tenantId: ctx.tenantId, resourceType: "form", resourceId: id } }),
-      tx => lockCurrentForm(tx, ctx, id, "form.write"));
+      tx => lockCurrentForm(tx, ctx, id, "form.write"), undefined, tx => recheckFormAccess(tx, ctx, "form.write"));
     return json(draftReply(result.body), result.status);
   }
   return json(draftReply(formDto(await updateForm(ctx, id, input, requestId), ctx)));
@@ -72,14 +76,18 @@ export const POST = route(async (request, requestId) => {
     const input = await body(request, approvalRequestInput);
     const result = await idempotent("approval:request:" + ctx.member.id + ":" + id, request.headers.get("idempotency-key"), input,
       async tx => ({ status: 201, body: await requestApproval(tx, ctx, id, input, requestId) }),
-      tx => lockCurrentForm(tx,ctx,id,"form.write"));
+      tx => lockCurrentForm(tx,ctx,id,"form.write"), undefined, tx => recheckFormAccess(tx, ctx, "form.write"));
     return json(result.body, result.status);
+  }
+  if (action === "participation-targets") {
+    const input = await body(request, participationTargetImportSchema);
+    return json(await importParticipationTargets(ctx, id, input, requestId), 201);
   }
   if (action === "publish") {
     const input = await body(request, z.object({ version: z.number().int().positive(), expiresAt: z.iso.datetime().optional() }).strict());
     const result = await idempotent("form:publish:" + ctx.member.id + ":" + id, request.headers.get("idempotency-key"), input,
       async tx => ({ status: 201, body: await publishForm(tx, ctx, id, input, requestId) }),
-      tx => lockCurrentForm(tx,ctx,id,"form.publish"));
+      tx => lockCurrentForm(tx,ctx,id,"form.publish"), undefined, tx => recheckFormAccess(tx, ctx, "form.publish"));
     return json(result.body, result.status);
   }
   if (action === "copy") {
@@ -87,7 +95,7 @@ export const POST = route(async (request, requestId) => {
     const result = await idempotent("form:copy:" + ctx.member.id + ":" + id, request.headers.get("idempotency-key"), input, async tx => {
       const copied = await copyForm(tx, ctx, id, input.title, requestId);
       return { status: 201, body: copied, resource: { tenantId: ctx.tenantId, resourceType: "form", resourceId: copied.id } };
-    }, tx => lockCurrentForm(tx, ctx, id, "form.write", true));
+    }, tx => lockCurrentForm(tx, ctx, id, "form.write", true), undefined, tx => recheckFormAccess(tx, ctx, "form.write"));
     return json(result.body, result.status);
   }
   if (action === "revise") {
@@ -95,7 +103,7 @@ export const POST = route(async (request, requestId) => {
     const result = await idempotent("form:revise:" + ctx.member.id + ":" + id, request.headers.get("idempotency-key"), input, async tx => {
       const revised = await reviseForm(tx, ctx, id, input.version, requestId);
       return { status: 201, body: revised, resource: { tenantId: ctx.tenantId, resourceType: "form", resourceId: id } };
-    }, tx => lockCurrentForm(tx, ctx, id, "form.write", true));
+    }, tx => lockCurrentForm(tx, ctx, id, "form.write", true), undefined, tx => recheckFormAccess(tx, ctx, "form.write"));
     return json(result.body, result.status);
   }
   if (action === "pause" || action === "resume") {
@@ -110,6 +118,13 @@ export const DELETE = route(async (request, requestId) => {
   if (action === "favorite") {
     await setFormFavorite(ctx, id, false);
     return new Response(null, { status: 204 });
+  }
+  if (action === "participation-targets") {
+    const query = new URL(request.url).searchParams;
+    const batchId = z.uuid().parse(query.get("batchId"));
+    const version = z.coerce.number().int().positive().parse(request.headers.get("if-match"));
+    const batchVersion = z.coerce.number().int().positive().parse(request.headers.get("x-batch-version"));
+    return json(await deleteParticipationTargetBatch(ctx, id, batchId, version, batchVersion, requestId));
   }
   if (action && action !== "purge") fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   const version = z.coerce.number().int().positive().parse(request.headers.get("if-match"));

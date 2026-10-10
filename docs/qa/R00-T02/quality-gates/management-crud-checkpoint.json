@@ -1,0 +1,65 @@
+{
+  "checkedAt": "2026-10-10",
+  "node": "24.19.0",
+  "build": {
+    "result": "passed",
+    "directory": ".next-rea",
+    "localMail": true,
+    "localPayment": true,
+    "log": "management-build.log"
+  },
+  "typecheck": "passed",
+  "changedLint": {
+    "result": "passed",
+    "errors": 0,
+    "warnings": 1,
+    "existingWarning": "AppShell existing img @next/next/no-img-element",
+    "log": "management-lint-changed.log"
+  },
+  "databaseMigrations": 104,
+  "schemaUnexpectedDifferences": 0,
+  "fullTests": {
+    "result": "passed",
+    "files": 122,
+    "total": 1834,
+    "passed": 1834,
+    "failed": 0,
+    "pending": 0,
+    "report": "../full-tests-policy-final.json",
+    "scope": "structured-policy checkpoint before management changes"
+  },
+  "priorFullTests": {
+    "total": 1815,
+    "passed": 1814,
+    "failed": 1,
+    "repairRetestPassed": 41,
+    "report": "../full-tests-recipient-final.json"
+  },
+  "targetedTests": [
+    {
+      "files": 7,
+      "passed": 135,
+      "failed": 0,
+      "pending": 0,
+      "report": "../../R03-T02/authority/regression-final.json"
+    }
+  ],
+  "scope": "local implementation checkpoint; not all route CRUD or external provider acceptance",
+  "sourceFingerprints": {
+    "src/server/service-management.ts": "16c94f65e5e63f5bc3dfae89e5048c112af7ed3374a4ee37ebfb90b1a3283b39",
+    "src/server/company-management.ts": "9df1b5042cfa2b52ebbfa922a16ca0de193acb82f366a1eb47f4be753057f286",
+    "src/app/api/v1/services/route.ts": "7f2dc035d14d026ff350169f3bc36a8affae2afc1b1b244317253467323aa8d7",
+    "src/app/api/v1/services/[id]/route.ts": "8ffe0e8bd61a070986936df6fec9775f7afe75b4a27cb7423f5e70536289e44c",
+    "src/app/api/v1/companies/route.ts": "67f720b69b92f7d73706d9c6eb4b751b096aef00644c9e0837e8074a947b3cca",
+    "src/app/api/v1/companies/[id]/route.ts": "905e2c04b4ae5c4192175a13c4f2a53fbfa26d9df27e663c898ff2569482dcb9",
+    "src/components/management/live.tsx": "4a2bf395df3f3499e9b544080f1d0e5cdf94e8a7d48149ef411e20d3e2eb81c5",
+    "src/components/management/management.css": "8cc78e8fb23b04219f6b1e181ed1c304c35bc0caeff85e2145c5c9a84c2ee9c1",
+    "src/components/shell.css": "2cf61bc9bc8a222f3d4fb8bc254e3f2a537a2e3602d6f736be3ebe570902bec1",
+    "src/components/AppShell.tsx": "c8c1e234aabbe70f8ef981919bc3c5463d2d4d11e766ce18520403908e2f82fb",
+    "src/components/ux/navigation-guard.tsx": "0f047183ceb06a61778e055e78e30c2d9a73dbceada6a7dcb8a2b7668ba56fc1",
+    "tests/server/management-authority.test.ts": "403eeef65fc806b3f70730a549b47278459c701ca4d2ce5c21ce7692d9e7ff65",
+    "scripts/qa-rea-management.ts": "4a3afad8354b8bffe01065422bb3e7531a94e6143117a9f96c89035fc529cca5"
+  },
+  "checkpoint": "management CRUD before access-request follow-up",
+  "typecheckLog": "management-typecheck.log"
+}

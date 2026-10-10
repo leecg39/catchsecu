@@ -1,0 +1,98 @@
+{
+  "checkedAt": "2026-10-10T02:03:06.780Z",
+  "checks": [
+    {
+      "action": "소유자 HTTP 가입",
+      "status": 200
+    },
+    {
+      "action": "소유자 HTTP 로그인",
+      "status": 200
+    },
+    {
+      "action": "가상 조직 공급자 생성",
+      "status": 201
+    },
+    {
+      "action": "가상 공급자 활성화",
+      "status": 200
+    },
+    {
+      "action": "HTTP 디렉터리 생성",
+      "status": 201
+    },
+    {
+      "action": "EGO 디렉터리 생성",
+      "status": 201
+    },
+    {
+      "action": "공개 로그인 시작",
+      "status": 302
+    },
+    {
+      "action": "쿠키 없는 PIN 티켓 전환 거절",
+      "status": 401,
+      "code": "SSO_BROWSER_MISMATCH"
+    },
+    {
+      "action": "시작 브라우저 PIN 티켓 전환",
+      "status": 200
+    },
+    {
+      "action": "누락 쿠키 메일 발급 거절",
+      "status": 401,
+      "code": "SSO_BROWSER_MISMATCH"
+    },
+    {
+      "action": "변조 쿠키 메일 발급 거절",
+      "status": 401,
+      "code": "SSO_BROWSER_MISMATCH"
+    },
+    {
+      "action": "중복 쿠키 메일 발급 거절",
+      "status": 401,
+      "code": "SSO_BROWSER_MISMATCH"
+    },
+    {
+      "action": "시작 브라우저 메일 발급",
+      "status": 200
+    },
+    {
+      "action": "올바른 OTP라도 쿠키 누락 시 거절",
+      "status": 401,
+      "code": "SSO_BROWSER_MISMATCH"
+    },
+    {
+      "action": "시작 브라우저 OTP 완료",
+      "status": 200
+    },
+    {
+      "action": "등록 세션 조회",
+      "status": 200
+    },
+    {
+      "action": "소비한 티켓 재사용 거절",
+      "status": 401,
+      "code": "STATE_INVALID"
+    },
+    {
+      "action": "OIDC 취소 흐름 시작",
+      "status": 302
+    },
+    {
+      "action": "다른 브라우저 취소는 state 보존",
+      "status": 401,
+      "code": "SSO_BROWSER_MISMATCH"
+    },
+    {
+      "action": "문서 콜백의 안전한 오류 복귀",
+      "status": 303
+    },
+    {
+      "action": "시작 브라우저 취소 처리",
+      "status": 401,
+      "code": "PROVIDER_DENIED"
+    }
+  ],
+  "message": "\nInvalid `db.ssoProvider.create()` invocation in\n/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-rea-sso-browser-binding.ts:115:39\n\n  112 const cancel = await request(\"시작 브라우저 취소 처리\", callback, 401, undefined, f.bindingCookie);\n  113 check(cancel.value.error.code === \"PROVIDER_DENIED\", \"legitimate cancellation\");\n  114 check(await db.ssoState.count({ where: { tenantId: f.companyId } }) === 0, \"cancel consumes state\");\n→ 115 const saml = await db.ssoProvider.create(\nDatabase error. Code: `23514`. Message: `new row for relation \"SsoProvider\" violates check constraint \"SsoProvider_saml_cert_check\"`"
+}

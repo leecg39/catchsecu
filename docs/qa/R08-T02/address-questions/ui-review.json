@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-10T04:56:29.636Z",
+  "author": "/root/bundle_analysis",
+  "purpose": "R08-T02 국내·해외 주소 입력의 독립 읽기 전용 UI 코드 검토",
+  "repository": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone",
+  "method": {
+    "sourceReadOnly": true,
+    "implementationChanged": false,
+    "databaseAccessed": false,
+    "browserUsed": false,
+    "serverStarted": false,
+    "testsExecuted": false,
+    "onlyWrittenArtifact": "docs/qa/R08-T02/address-questions/ui-review.json",
+    "evidenceType": "현재 소스의 정적 제어·데이터 흐름; 실제 브라우저 재현은 미실행"
+  },
+  "summary": {
+    "confirmedStaticFindings": 1,
+    "resolvedByParentAndSourceRechecked": 1,
+    "remainingConfirmedFindings": 0,
+    "prioritiesOriginallyFound": {
+      "P2": 1
+    },
+    "runtimeVerification": "미실행; 부모가 실제 브라우저 타이밍 검증을 진행 예정"
+  },
+  "findings": [
+    {
+      "id": "ADDR-UI-01",
+      "priority": "P2",
+      "title": "제출 중 주소 검색 콜백이 화면과 제출 값을 다르게 만든다",
+      "classification": "현재 소스에서 확인한 결함 경로; 실제 브라우저 재현은 미실행",
+      "primaryLocation": {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/AddressQuestionInput.tsx",
+        "startLine": 57,
+        "endLine": 59
+      },
+      "observation": "found()는 상위 폼의 busy/pending 여부를 받거나 확인하지 않고 parts/stored를 먼저 갱신한다. 검색은 부모 fieldset 안에 임베드되지만 외부 iframe 자체와 메시지 콜백은 disabled 필드셋의 입력 잠금 대상이 아니다. PublicForm.change는 busy 또는 hasPending이면 새 값을 버린다. 따라서 로컬 표시값과 부모 values가 갈라진다.",
+      "impact": "공개 제출 중 선택한 새 주소 B가 화면에는 나타나지만 부모 상태/저장 payload는 A에 머문다. 업로드 실패나 확정 4xx 후 재제출하면 보이는 B가 아니라 A를 전송할 수 있다. 정정에서는 저장 snapshot을 만든 후에도 callback이 values를 갱신하므로 저장 성공·reload 때 뒤늦은 선택 B가 사라질 수 있다.",
+      "reproduction": [
+        "공개 폼에서 주소 A를 선택하고, 파일 첨부와 나머지 필수 항목을 채운다.",
+        "주소 검색을 다시 열어 둔 상태로 제출한다. 파일 업로드 응답을 지연하면 busy 상태를 확보할 수 있다.",
+        "열린 검색 iframe에서 주소 B를 선택한다. found()는 B를 표시하지만 PublicForm.change는 busy이므로 값을 받지 않는다.",
+        "첨부 업로드를 실패시키거나 최초 제출을 명시적 4xx로 종료한다. 폼이 다시 활성화된 뒤 주소를 더 편집하지 않고 재제출한다.",
+        "화면의 우편번호/기본주소는 B인데 요청 answers에는 A가 남는다. 제출 결과가 불확실한 pending 상태에서도 화면 B와 고정 재시도 payload A가 다르게 보일 수 있다.",
+        "정정 화면에서는 A와 사유를 입력하고 검색을 연 채 확인한 뒤 저장 중 B를 선택한다. PATCH snapshot은 A이고 성공 후 reload로 B가 사라지는 별도 경로도 확인 대상이다."
+      ],
+      "minimalFix": "PublicForm의 busy/pending 및 SubmissionDetail의 busy를 QuestionInput→DomesticAddressInput 검색 경로에 전달한다. 잠금 시작 시 검색 iframe을 제거/비활성화하고, 콜백에서도 현재 잠금 상태를 확인한 후에만 parts/stored와 부모 값을 함께 갱신한다. 시각적 overlay만 추가하면 이미 큐에 들어온 oncomplete는 막지 못하므로 콜백 guard도 필요하다.",
+      "regressionScenarios": [
+        "기존 A/검색 열림→busy→SDK B callback: 부모 값과 화면이 모두 A 유지, 저장 payload A 유지",
+        "업로드 실패 후 잠금 해제→검색 재실행→B 선택: 화면과 다음 payload 모두 B",
+        "불확실 제출 pending 상태에서 늦은 callback 및 같은 요청 재시도: 표시값·고정 payload 모두 동일",
+        "정정 busy 중 늦은 callback 차단; 실패 후 재검색과 성공 후 reload 정상"
+      ],
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/AddressQuestionInput.tsx",
+          "startLine": 18,
+          "endLine": 30,
+          "excerpt": "      new Postcode({ width: \"100%\", height: 500, minWidth: 200,\n        onresize: size => { if (active && Number.isFinite(size.height) && size.height >= 400) element.style.height = Math.min(size.height, 2000) + \"px\"; },\n        oncomplete: value => {\n          if (!active) return;\n          if (typeof value?.zonecode !== \"string\" || !/^\\d{5}$/.test(value.zonecode) || typeof value.address !== \"string\" || !value.address.trim() || value.address.length > 800) {\n            setError(\"선택한 주소를 확인할 수 없습니다. 다시 검색해주세요.\"); return;\n          }\n          found.current(value);\n        },\n      }).embed(element);\n      setLoading(false);\n    }).catch(cause => { if (active) { setLoading(false); setError(cause instanceof Error ? cause.message : \"주소 검색을 불러오지 못했습니다.\"); } });\n    return () => { active = false; element.replaceChildren(); };"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/AddressQuestionInput.tsx",
+          "startLine": 57,
+          "endLine": 60,
+          "excerpt": "  function found(result: PostcodeResult) {\n    if (disabled || searchButton.current?.matches(\":disabled\")) return;\n    const next = { zipcode: result.zonecode, address: result.address, detailAddress: stored ? \"\" : parts.detailAddress };\n    setParts(next); setStored(false); onChange(serializeDomesticAddress(next.zipcode, next.address, next.detailAddress)); setSearch(false);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/AddressQuestionInput.tsx",
+          "startLine": 71,
+          "endLine": 74,
+          "excerpt": "    </>}\n    <div className=\"forms-actions\"><button ref={searchButton} type=\"button\" className=\"cs-button secondary\" aria-expanded={search} onClick={() => setSearch(true)}>주소 검색</button>\n      {value && !question.required && <button type=\"button\" className=\"cs-button secondary\" onClick={() => { setParts({ zipcode: \"\", address: \"\", detailAddress: \"\" }); setStored(false); onChange(\"\"); setSearch(false); setTried(false); }}>주소 비우기</button>}</div>\n    {tried && error && <p role=\"alert\">{error}</p>}"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+          "startLine": 9,
+          "endLine": 10,
+          "excerpt": "export function QuestionInput({ question, value, onChange, onFileChange, disabled = false }: { question: Question; value: AnswerValue | undefined; disabled?: boolean;\n  onChange: (value: AnswerValue) => void; onFileChange?: (file?: File) => void }) {"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+          "startLine": 39,
+          "endLine": 42,
+          "excerpt": "  const common = { name: question.id, required: question.required, \"aria-label\": question.label };\n  const text = typeof value === \"string\" ? value : \"\";\n  if (question.type === \"주소\") return <DomesticAddressInput question={question} value={text} onChange={onChange} disabled={disabled} />;\n  if (question.type === \"해외 주소\") return <ForeignAddressInput question={question} value={value} onChange={onChange} />;"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 83,
+          "endLine": 87,
+          "excerpt": "  function change(id: string, value: AnswerValue) {\n    if (busy || session.current?.hasPending) return;\n    const next = { ...values, [id]: value }, shown = visibleQuestionIds(content.questions, next);\n    for (const question of content.questions) if (!shown.has(question.id)) { delete next[question.id]; uploadCache.current.delete(question.id); }\n    setValues(next);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 93,
+          "endLine": 117,
+          "excerpt": "    const formData = new FormData(event.currentTarget), answers: Answers = {};\n    setBusy(true);\n    try {\n    if (session.current!.hasPending) {\n      setUploadStatus(\"접수 결과를 확인하고 있습니다.\"); setReceipt(await session.current!.retry()); return;\n    }\n    const attachments: Record<string, { fileId: string; token: string }> = {};\n    for (const question of content.questions) {\n      if (!visible.has(question.id)) continue;\n      if (question.type === \"파일 업로드\") {\n        const file = formData.get(question.id);\n        if (file instanceof File && file.name) {\n          const uploaded = await uploadFile(file, { token, questionId: question.id }, uploadCache.current, setUploadStatus);\n          answers[question.id] = uploaded.id;\n          attachments[question.id] = { fileId: uploaded.id, token: uploaded.uploadToken! };\n        } else answers[question.id] = \"\";\n        continue;\n      }\n      answers[question.id] = values[question.id] ?? emptyAnswer(question.type);\n    }\n    const payload = JSON.stringify({ answers, marketingChannels: formData.getAll(\"marketingChannels\").map(String), consent: formData.get(\"consent\") === \"on\", documentConsents: formData.getAll(\"documentConsents\").map(String), attachments,\n      ...(verification ? { verification: { attemptId: verification.attemptId, receipt: verification.receipt } } : {}) });\n      setUploadStatus(\"응답을 제출하고 있습니다.\");\n      setReceipt(await session.current!.submit(payload));\n    } catch (cause) { setError(errorText(cause)); } finally { setPending(session.current!.hasPending); setBusy(false); setUploadStatus(\"\"); }"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 124,
+          "endLine": 127,
+          "excerpt": "    <fieldset className=\"public-response-fields\" disabled={busy || pending}>{content.questions.filter(question => visible.has(question.id)).map(question =>\n      <fieldset className=\"public-question\" key={question.id}><legend>{question.label} {question.required && <em>*</em>}</legend>\n        <QuestionInput question={question} value={values[question.id]} onChange={value => change(question.id, value)} disabled={busy || pending}\n          onFileChange={() => { if (!busy && !session.current!.hasPending) uploadCache.current.delete(question.id); }} />"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/public-submission.ts",
+          "startLine": 31,
+          "endLine": 35,
+          "excerpt": "    } catch (cause) {\n      const error = cause as { status?: unknown; code?: unknown };\n      const rejected = typeof error?.status === \"number\" && error.status >= 400 && error.status < 500 && error.code !== \"INVALID_RESPONSE\";\n      if (rejected && !this.uncertain) this.pending = undefined;\n      else this.uncertain = true;"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "startLine": 65,
+          "endLine": 71,
+          "excerpt": "  function change(id: string, value: AnswerValue) {\n    const next = { ...values, [id]: value }, shown = visibleQuestionIds(row.questions, next);\n    const nextFiles = { ...files };\n    for (const question of row.questions) if (!shown.has(question.id)) {\n      next[question.id] = emptyAnswer(question.type); delete nextFiles[question.id]; uploads.current.delete(question.id);\n    }\n    setValues(next); setFiles(nextFiles);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "startLine": 82,
+          "endLine": 100,
+          "excerpt": "  async function save(event: FormEvent) {\n    event.preventDefault(); if (busy || conflict) return; setBusy(true); setError(\"\");\n    try {\n      if (mode === \"edit\") {\n        const answers = { ...values };\n        for (const [questionId, file] of Object.entries(files)) {\n          const uploaded = await uploadFile(file, { submissionId: row.id, questionId }, uploads.current, setUploadStatus);\n          answers[questionId] = uploaded.id;\n        }\n        await api(\"/submissions/\" + row.id, { method: \"PATCH\", body: JSON.stringify({ version: row.version, reason, answers }) });\n      }\n      else if (mode === \"retention\") await api(\"/submissions/\" + row.id + \"/retention\", { method: \"PATCH\", body: JSON.stringify({\n        version: row.version, reason, retentionUntil: new Date(retention).toISOString(),\n      }) });\n      else await api(\"/submissions/\" + row.id + \"/\" + mode, { method: \"POST\", body: JSON.stringify({\n        version: row.version, reason, ...(mode === \"hold\" ? { hold: !row.legalHold } : {}),\n      }) });\n      reload();\n    } catch (cause) { failed(cause); } finally { setBusy(false); setUploadStatus(\"\"); }"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "startLine": 119,
+          "endLine": 128,
+          "excerpt": "      {mode === \"edit\" && row.questions.filter(question => visible.has(question.id)).map(question => <fieldset disabled={busy} className=\"cs-label forms-correction-field\" key={question.id}><legend>{question.label}</legend>\n        {question.type === \"파일 업로드\" ? <div><p>{answerView(question.id, values[question.id])}</p>\n          <input className=\"cs-input\" type=\"file\" accept={FILE_ACCEPT} aria-label={question.label} required={question.required && !values[question.id]}\n            disabled={busy || row.legalHold || !app.data?.capabilities.includes(\"file.read\")} onChange={event => {\n              const next = { ...files }; if (event.target.files?.[0]) next[question.id] = event.target.files[0]; else delete next[question.id];\n              setFiles(next); uploads.current.delete(question.id);\n            }} /><p className=\"cs-muted\">새 파일을 선택하면 검사 후 첨부파일을 교체합니다. 이전 파일은 정정 이력에 보관됩니다.</p>\n          {!question.required && <label><input type=\"checkbox\" disabled={busy || row.legalHold} checked={!values[question.id] && !files[question.id]}\n            onChange={event => { setValues({ ...values, [question.id]: event.target.checked ? \"\" : row.values[question.id] }); const next = { ...files }; delete next[question.id]; setFiles(next); }} />첨부파일 비우기</label>}\n        </div> : <QuestionInput question={question} value={values[question.id]} onChange={value => change(question.id, value)} disabled={busy || conflict} />}</fieldset>)}"
+        }
+      ],
+      "status": "resolved_in_source_runtime_recheck_pending",
+      "resolution": {
+        "recheckedAtUtc": "2026-10-10T04:56:54.282Z",
+        "implementedBy": "/root",
+        "reviewer": "/root/bundle_analysis",
+        "conclusion": "부모 busy/pending/conflict가 QuestionInput을 거쳐 국내 주소 컴포넌트로 전달된다. 잠금 상태에서는 SDK 자식이 unmount되고 active cleanup이 실행된다. found()는 disabled 또는 실제 :disabled 상태를 먼저 확인하므로 이전 closure가 남아 있어도 disabled fieldset 상태를 확인한 뒤 local/parent 값을 모두 변경하지 않는다. 보고한 공개·정정 제출 중 경로는 현재 소스상 해결됐다.",
+        "evidence": [
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/AddressQuestionInput.tsx",
+            "startLine": 40,
+            "endLine": 40,
+            "excerpt": "export function DomesticAddressInput({ question, value, onChange, disabled = false }: { question: Question; value: string; onChange: (value: string) => void; disabled?: boolean }) {"
+          },
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/AddressQuestionInput.tsx",
+            "startLine": 57,
+            "endLine": 61,
+            "excerpt": "  function found(result: PostcodeResult) {\n    if (disabled || searchButton.current?.matches(\":disabled\")) return;\n    const next = { zipcode: result.zonecode, address: result.address, detailAddress: stored ? \"\" : parts.detailAddress };\n    setParts(next); setStored(false); onChange(serializeDomesticAddress(next.zipcode, next.address, next.detailAddress)); setSearch(false);\n    requestAnimationFrame(() => detail.current?.focus());"
+          },
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/AddressQuestionInput.tsx",
+            "startLine": 74,
+            "endLine": 75,
+            "excerpt": "    {tried && error && <p role=\"alert\">{error}</p>}\n    {search && !disabled && <PostcodeSearch onFound={found} onClose={() => { setSearch(false); searchButton.current?.focus(); }} />}"
+          },
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/AddressQuestionInput.tsx",
+            "startLine": 20,
+            "endLine": 30,
+            "excerpt": "        oncomplete: value => {\n          if (!active) return;\n          if (typeof value?.zonecode !== \"string\" || !/^\\d{5}$/.test(value.zonecode) || typeof value.address !== \"string\" || !value.address.trim() || value.address.length > 800) {\n            setError(\"선택한 주소를 확인할 수 없습니다. 다시 검색해주세요.\"); return;\n          }\n          found.current(value);\n        },\n      }).embed(element);\n      setLoading(false);\n    }).catch(cause => { if (active) { setLoading(false); setError(cause instanceof Error ? cause.message : \"주소 검색을 불러오지 못했습니다.\"); } });\n    return () => { active = false; element.replaceChildren(); };"
+          },
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+            "startLine": 9,
+            "endLine": 10,
+            "excerpt": "export function QuestionInput({ question, value, onChange, onFileChange, disabled = false }: { question: Question; value: AnswerValue | undefined; disabled?: boolean;\n  onChange: (value: AnswerValue) => void; onFileChange?: (file?: File) => void }) {"
+          },
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+            "startLine": 39,
+            "endLine": 42,
+            "excerpt": "  const common = { name: question.id, required: question.required, \"aria-label\": question.label };\n  const text = typeof value === \"string\" ? value : \"\";\n  if (question.type === \"주소\") return <DomesticAddressInput question={question} value={text} onChange={onChange} disabled={disabled} />;\n  if (question.type === \"해외 주소\") return <ForeignAddressInput question={question} value={value} onChange={onChange} />;"
+          },
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+            "startLine": 124,
+            "endLine": 127,
+            "excerpt": "    <fieldset className=\"public-response-fields\" disabled={busy || pending}>{content.questions.filter(question => visible.has(question.id)).map(question =>\n      <fieldset className=\"public-question\" key={question.id}><legend>{question.label} {question.required && <em>*</em>}</legend>\n        <QuestionInput question={question} value={values[question.id]} onChange={value => change(question.id, value)} disabled={busy || pending}\n          onFileChange={() => { if (!busy && !session.current!.hasPending) uploadCache.current.delete(question.id); }} />"
+          },
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+            "startLine": 119,
+            "endLine": 128,
+            "excerpt": "      {mode === \"edit\" && row.questions.filter(question => visible.has(question.id)).map(question => <fieldset disabled={busy} className=\"cs-label forms-correction-field\" key={question.id}><legend>{question.label}</legend>\n        {question.type === \"파일 업로드\" ? <div><p>{answerView(question.id, values[question.id])}</p>\n          <input className=\"cs-input\" type=\"file\" accept={FILE_ACCEPT} aria-label={question.label} required={question.required && !values[question.id]}\n            disabled={busy || row.legalHold || !app.data?.capabilities.includes(\"file.read\")} onChange={event => {\n              const next = { ...files }; if (event.target.files?.[0]) next[question.id] = event.target.files[0]; else delete next[question.id];\n              setFiles(next); uploads.current.delete(question.id);\n            }} /><p className=\"cs-muted\">새 파일을 선택하면 검사 후 첨부파일을 교체합니다. 이전 파일은 정정 이력에 보관됩니다.</p>\n          {!question.required && <label><input type=\"checkbox\" disabled={busy || row.legalHold} checked={!values[question.id] && !files[question.id]}\n            onChange={event => { setValues({ ...values, [question.id]: event.target.checked ? \"\" : row.values[question.id] }); const next = { ...files }; delete next[question.id]; setFiles(next); }} />첨부파일 비우기</label>}\n        </div> : <QuestionInput question={question} value={values[question.id]} onChange={value => change(question.id, value)} disabled={busy || conflict} />}</fieldset>)}"
+          }
+        ],
+        "remainingVerification": "원래 회귀 시나리오의 실제 브라우저 실행은 미실행. 재시도 시 SDK 재마운트 및 실제 공급자 콜백 지연도 부모 QA에서 확인 필요.",
+        "newConfirmedFindings": []
+      }
+    }
+  ],
+  "coverage": [
+    {
+      "area": "저장된 국내 문자열 보존",
+      "status": "추가 결함 미발견",
+      "basis": "기존 저장값은 controlled 전체 주소 input으로 표시한다. 정정 취소는 QuestionInput을 unmount하고 row.values를 복원하며, 성공 reload는 version key로 다시 마운트한다. 합쳐진 문자열의 임의 공백 분리를 하지 않는 것은 승인된 결정이다."
+    },
+    {
+      "area": "기본 검증/선택 질문/부분 입력",
+      "status": "추가 결함 미발견",
+      "basis": "국내 필수값은 form capture submit listener로 검사한다. 해외는 공유 foreignAddressError와 streetAddress의 custom validity, 국가/도로명/도시 required를 사용한다. 선택 해외 질문에서 핵심 세 필드 모두 빈 상태의 부가 필드 단독 입력 허용은 보존 원본 관찰과 일치한다."
+    },
+    {
+      "area": "SDK 취소·실패·재시도",
+      "status": "잠금 경합 수정 확인; 추가 결함 미발견",
+      "basis": "unmount cleanup이 active=false 및 host 정리를 수행한다. SDK 실패/15초 timeout 후 pending을 초기화하며 재시도는 새 attempt로 effect를 다시 실행한다. 닫기/선택 완료 시 초점을 돌려준다.",
+      "remaining": "실제 공급자 iframe의 로드·검색·장애·재시도 동작은 브라우저에서 미확인"
+    },
+    {
+      "area": "접근성/모바일",
+      "status": "현재 소스에서 확정 결함 미발견",
+      "basis": "각 입력에 label과 aria-label, 검색 진행/실패에 status/alert가 있다. search minWidth 200, 폭 100%, 부모 min-width 0 규칙을 확인했다.",
+      "remaining": "실제 320px/모바일 Safari, iframe 키보드 탐색, 보조기술 알림·초점은 미실행. 정적 검토만으로 통과 판정하지 않음"
+    },
+    {
+      "area": "matrix union 영향",
+      "status": "주소 추가로 생긴 확정 결함 미발견",
+      "basis": "matrixAnswer는 UUID 키 record이고 해외 주소는 strict 7키 object다. 서버는 질문 타입별 해외 schema 검사 및 행렬 row membership을 따로 검사한다. UI도 question.type으로 분기하며 formatAnswer 호출은 questionType을 전달한다."
+    }
+  ],
+  "sourceContractBoundary": {
+    "originalEvidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "retainedSourceReview": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/address-questions/source-address-review.json",
+    "note": "원본 서버 스키마/강제 검증은 미관측. 국내 5자리 우편번호와 1000자, 해외 trim 및 국가 허용 목록은 독립 로컬 계약이다. 위 결함은 원본 분석이 아니라 현재 로컬 소스에 근거한다."
+  },
+  "sourceSnapshots": {
+    "src/components/forms/AddressQuestionInput.tsx": {
+      "sha256": "e0a95707c4034389e4aae452bfe5a476b90a496d76743bb7b029476226c42b28"
+    },
+    "src/components/forms/QuestionInput.tsx": {
+      "sha256": "6f60fa76893c54903459ecd961a259d9740f33f58d343d091fe58082f7755476"
+    },
+    "src/lib/postcode.ts": {
+      "sha256": "4c22353002ae44d775e33d5e00f9c309bd6c863816b0b97b2176441c922711b7"
+    },
+    "src/contracts/address-questions.ts": {
+      "sha256": "aa1ede87aa7fff806f826422ab9e613b1cfb8c7bdc60a59e03062b9852259f99"
+    },
+    "src/contracts/questions.ts": {
+      "sha256": "45747df3dcf7d09105c416e34d6f6237c0bec35b7ff83264412718aa7d11acfb"
+    },
+    "src/components/forms/PublicForm.tsx": {
+      "sha256": "d73afd4d6c0b50faf7fc3e0d4d2942b6d2eb2e92eec51b1029eb79ae92d89055"
+    },
+    "src/components/forms/SubmissionDetail.tsx": {
+      "sha256": "301e8e91d0c9bf476f10f3f70c78700d812c3a928f4ef876efcf32ebbe1d716a"
+    },
+    "src/lib/public-submission.ts": {
+      "sha256": "3770b82d568facfba1dcceb8201cdbbe21d2612a586304f3bafb93530e065730"
+    },
+    "src/lib/file-upload.ts": {
+      "sha256": "d3f1dd3c41f4d54dfbb5c78666bd8b45258db73df8dc999d4d5983ede58fd2d3"
+    },
+    "src/server/answer-validation.ts": {
+      "sha256": "40fc22e3a7baa7102543653f2b504a4eb8f1f7e82f41b964b59a27b7644ed99e"
+    },
+    "src/components/forms/forms.css": {
+      "sha256": "c043b4ea466d46a6ab66ca3e04531e29047eff1cb7f6ea1e41d882a32f0f3ed0"
+    }
+  },
+  "recheckSourceSnapshots": {
+    "src/components/forms/AddressQuestionInput.tsx": {
+      "sha256": "e0a95707c4034389e4aae452bfe5a476b90a496d76743bb7b029476226c42b28"
+    },
+    "src/components/forms/QuestionInput.tsx": {
+      "sha256": "6f60fa76893c54903459ecd961a259d9740f33f58d343d091fe58082f7755476"
+    },
+    "src/lib/postcode.ts": {
+      "sha256": "4c22353002ae44d775e33d5e00f9c309bd6c863816b0b97b2176441c922711b7"
+    },
+    "src/contracts/address-questions.ts": {
+      "sha256": "aa1ede87aa7fff806f826422ab9e613b1cfb8c7bdc60a59e03062b9852259f99"
+    },
+    "src/contracts/questions.ts": {
+      "sha256": "45747df3dcf7d09105c416e34d6f6237c0bec35b7ff83264412718aa7d11acfb"
+    },
+    "src/components/forms/PublicForm.tsx": {
+      "sha256": "d73afd4d6c0b50faf7fc3e0d4d2942b6d2eb2e92eec51b1029eb79ae92d89055"
+    },
+    "src/components/forms/SubmissionDetail.tsx": {
+      "sha256": "301e8e91d0c9bf476f10f3f70c78700d812c3a928f4ef876efcf32ebbe1d716a"
+    },
+    "src/lib/public-submission.ts": {
+      "sha256": "3770b82d568facfba1dcceb8201cdbbe21d2612a586304f3bafb93530e065730"
+    },
+    "src/lib/file-upload.ts": {
+      "sha256": "d3f1dd3c41f4d54dfbb5c78666bd8b45258db73df8dc999d4d5983ede58fd2d3"
+    },
+    "src/server/answer-validation.ts": {
+      "sha256": "40fc22e3a7baa7102543653f2b504a4eb8f1f7e82f41b964b59a27b7644ed99e"
+    },
+    "src/components/forms/forms.css": {
+      "sha256": "c043b4ea466d46a6ab66ca3e04531e29047eff1cb7f6ea1e41d882a32f0f3ed0"
+    }
+  }
+}

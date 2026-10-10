@@ -1,4 +1,11 @@
 "use client";
+import { AuthorAssetProvider } from "./AuthorAssetProvider";
+import { hasAuthorAssets } from "@/lib/author-assets";
+import { QuestionMaterials } from "./QuestionMaterials";
+import { QuestionImage } from "./QuestionImage";
+import { QuestionChoiceSummary } from "./QuestionChoiceSummary";
+import "./forms.css";
+import { isFileQuestion } from "@/contracts/drawing-questions";
 import { formatAnswer } from "@/contracts/questions";
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
@@ -8,8 +15,19 @@ import { api, errorText, useResource } from "@/lib/api";
 import { ActionButton, Panel } from "../shared";
 import type { SharedPage } from "@/contracts/sharing";
 import { sharedFileDownloadUrl } from "@/lib/file-upload";
+import { richDocumentImages } from "@/contracts/rich-content";
+import { OwnedRichDocumentView } from "./OwnedRichDocumentView";
 import "./sharing.css";
 const storageKey = "catchsecu.viewer.challenge";
+function viewerHasAssets(viewer: SharedPage["viewer"]) {
+  if (hasAuthorAssets(viewer.questions)) return true;
+  return [viewer.formBody?.bodyRich, ...viewer.pages.map(page => page.bodyRich)]
+    .some(document => document && richDocumentImages(document).length > 0);
+}
+function SharedPresentation({ value }: { value: { body: string; bodyRich?: unknown } }) {
+  return value.bodyRich ? <OwnedRichDocumentView document={value.bodyRich} className="shared-presentation rich-document" />
+    : value.body ? <p className="shared-presentation">{value.body}</p> : null;
+}
 export function SharedPrivacy({ path }: { path: string }) {
   return path === "/shared-privacy/view" ? <Viewer /> : <Verification path={path} />;
 }
@@ -64,13 +82,15 @@ function Viewer() {
       <p>인증 종료: {new Date(resource.data.viewer.expiresAt).toLocaleString("ko-KR")}<br />공유 종료: {new Date(resource.data.viewer.grantExpiresAt).toLocaleString("ko-KR")}</p>
       <p>허용된 항목: {resource.data.viewer.questions.map(q => q.label).join(", ")}</p>
       <p>총 {resource.data.total}개 응답</p>
-      {resource.data.items.length ? <div className="shared-responses">{resource.data.items.map(row => <article className="shared-response" key={row.id}>
-        <h3>{new Date(row.submittedAt).toLocaleString("ko-KR")}</h3><dl>{resource.data!.viewer.questions.map(q => <div key={q.id}><dt>{q.label}</dt><dd>{q.type === "파일 업로드" ? (() => {
+      {resource.data.items.length ? <div className="shared-responses">{resource.data.items.map(row => <AuthorAssetProvider key={row.id} scope={{ kind: "viewer", submissionId: row.id }} enabled={viewerHasAssets(resource.data!.viewer)}><article className="shared-response">
+        <h3>{new Date(row.submittedAt).toLocaleString("ko-KR")}</h3><dl>{resource.data!.viewer.questions.map(q => <div key={q.id}><dt>{q.label}<QuestionImage assetKey={q.questionImageKey} /><QuestionMaterials question={q} /><QuestionChoiceSummary question={q} imagesOnly /></dt><dd>{isFileQuestion(q.type) ? (() => {
           const file = row.attachments.find(f => f.questionId === q.id);
           return file ? <a className="cs-link" href={sharedFileDownloadUrl(file.id, row.id, q.id)}>{file.name} 다운로드</a> : "첨부파일 없음";
-        })() : formatAnswer(row.values[q.id], q.rows)}</dd></div>)}</dl>
+        })() : formatAnswer(row.values[q.id], q.rows, q.optionDefinitions, q.type)}</dd></div>)}</dl>
+        {resource.data!.viewer.formBody && <section className="shared-form-presentation"><h4>폼 안내</h4><SharedPresentation value={resource.data!.viewer.formBody} /></section>}
+        {resource.data!.viewer.pages.map(page => <section className="shared-form-presentation" key={page.id}><h4>{page.title || "페이지 안내"}</h4><SharedPresentation value={page} /></section>)}
         {!!row.attachments.length && <Link className="cs-link" href={`/file-view/${row.id}/shared`}>공유 첨부파일 보기</Link>}
-      </article>)}</div> : <p>현재 열람할 수 있는 응답이 없습니다.</p>}
+      </article></AuthorAssetProvider>)}</div> : <p>현재 열람할 수 있는 응답이 없습니다.</p>}
       <div className="cs-pagination"><button disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>이전</button><span>{currentPage} / {Math.max(1, Math.ceil(resource.data.total / 20))}</span><button disabled={currentPage * 20 >= resource.data.total} onClick={() => setPage(currentPage + 1)}>다음</button></div>
     </>}
   </Panel></div>;

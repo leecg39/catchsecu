@@ -1,0 +1,165 @@
+{
+  "checkedAt": "2026-10-09T17:02:30.002Z",
+  "result": "passed",
+  "httpChecks": [
+    {
+      "name": "clause owner read",
+      "status": 200
+    },
+    {
+      "name": "clause anonymous read",
+      "status": 401,
+      "code": "UNAUTHENTICATED"
+    },
+    {
+      "name": "clause ungranted viewer read",
+      "status": 403,
+      "code": "SERVICE_FORBIDDEN"
+    },
+    {
+      "name": "clause viewer create",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "clause other tenant GET",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "clause other tenant PATCH",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "clause other tenant DELETE",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "clause stale update",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "clause stale archive",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "clause invalid restore",
+      "status": 409,
+      "code": "INVALID_TRANSITION"
+    },
+    {
+      "name": "clause scope immutable",
+      "status": 422,
+      "code": "IMMUTABLE_DOCUMENT_SCOPE"
+    },
+    {
+      "name": "clause tenant injection",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "collection owner read",
+      "status": 200
+    },
+    {
+      "name": "collection anonymous read",
+      "status": 401,
+      "code": "UNAUTHENTICATED"
+    },
+    {
+      "name": "collection viewer read",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "collection viewer update",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "collection other tenant update",
+      "status": 403,
+      "code": "SERVICE_FORBIDDEN"
+    },
+    {
+      "name": "collection stale update",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "collection insecure URL",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "collection tenant injection",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "third_party owner read",
+      "status": 200
+    },
+    {
+      "name": "third_party anonymous read",
+      "status": 401,
+      "code": "UNAUTHENTICATED"
+    },
+    {
+      "name": "third_party viewer read",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "third_party viewer update",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "third_party other tenant update",
+      "status": 403,
+      "code": "SERVICE_FORBIDDEN"
+    },
+    {
+      "name": "third_party stale update",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "third_party insecure URL",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "third_party tenant injection",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "linked policy cannot be revoked",
+      "status": 409,
+      "code": "DOCUMENT_IN_USE"
+    }
+  ],
+  "clauseVersion": 6,
+  "documentVersion": 5,
+  "settingsVersions": [
+    {
+      "kind": "collection",
+      "version": 5
+    },
+    {
+      "kind": "third_party",
+      "version": 2
+    }
+  ],
+  "auditEvents": 18,
+  "clauseCopyIndependent": true,
+  "publicationSnapshotImmutable": true,
+  "stateHash": "297eebd1f92055687bede656b15dfbbfc88b7019ae0a5c15c3cc7096b095c281",
+  "restartVerified": false
+}

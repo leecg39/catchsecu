@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-10-10T04:08:38.984Z",
+  "sourcePath": "../outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+  "bundleSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+  "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+  "offsetUnit": "zero-based UTF-16 code units",
+  "observed": "Client option.value is a positional integer reassigned after reorder; stable UUID is the reconstruction data-integrity contract, not observed original backend behavior.",
+  "unknowns": [
+    "original server schema",
+    "original persistent option ID",
+    "original copy endpoint implementation"
+  ],
+  "excerpts": [
+    {
+      "topic": "option-create",
+      "start": 12677825,
+      "end": 12678280,
+      "text": "cloneDeep)(c),t=null===c||void 0===c?void 0:c.findIndex((e=>null===e||void 0===e?void 0:e.isCustomValue));t>-1?null===e||void 0===e||e.splice(t,0,{value:null===e||void 0===e?void 0:e.length,optionQuestionName:\"\",isCustomValue:!1,pageOffset:-2}):null===e||void 0===e||e.push({value:null===e||void 0===e?void 0:e.length,optionQuestionName:\"\",isCustomValue:!1,pageOffset:-2});const a=null===e||void 0===e?void 0:e.map(((e,t)=>({...e,value:t})));s(tY(r,a,n))}"
+    },
+    {
+      "topic": "option-label-edit",
+      "start": 12683613,
+      "end": 12683903,
+      "text": "t.optionQuestionName=e,O(t)})(e.target.value),onKeyDown:e=>{const t=((e,t,r,n)=>{if(\"Enter\"===e.key){var a;e.preventDefault(),e.stopPropagation(),null===(a=n.current[r])||void 0===a||a.dispatchEvent(R),setTimeout((()=>{var e;null===(e=n.current[r])||void 0===e||e.blur()}),0);const i=(0,tK."
+    },
+    {
+      "topic": "option-reorder",
+      "start": 12683903,
+      "end": 12684400,
+      "text": "cloneDeep)(C),s=(0,tK.cloneDeep)(S);if(null===i||void 0===i||!i.isCustomValue){null===s||void 0===s||s.splice(r+1,0,{value:r+1,optionQuestionName:\"\",isCustomValue:!1,pageOffset:-2});const e=null===s||void 0===s?void 0:s.map(((e,t)=>({...e,value:t})));setTimeout((()=>{h(tY(t,e,o))}),0);const a=r+1;setTimeout((()=>{var e;null===(e=n.current[a])||void 0===e||e.focus()}),10)}}})(e,n,r,a);g(e.key),w(t)},inputRef:e=>a.current[r]=e,sx:{\"& .MuiInputBase-root\":{\"&.Mui-focused:after\":{borderBottomColor"
+    },
+    {
+      "topic": "v3-option-reorder",
+      "start": 12741800,
+      "end": 12742240,
+      "text": "nonDragAreaSelector:\".non-drag\",onDrop:e=>{let{removedIndex:t,addedIndex:r,payload:n,element:a}=e;return((e,t)=>{var r;let{removedIndex:n,addedIndex:a}=e;const o=$u.getState().form.formModelV3.pageList[c].questionList[t].questionOptionList;if(a>=o.length-1&&null!==(r=o[o.length-1])&&void 0!==r&&r.isCustomValue)return alert(u(\"alert.phrase3\")),!1;const i=wEt([...o],n,a).map(((e,t)=>({...e,value:t})));d(tY(t,i,c))})({removedIndex:t,addedI"
+    },
+    {
+      "topic": "option-delete",
+      "start": 12679767,
+      "end": 12680090,
+      "text": "cloneDeep)($u.getState().form.formModelV3.pageList[o].questionList[e].questionOptionList),n=_G(null===r||void 0===r?void 0:r[t]);n&&h(XG(-n)),P_t($u.getState().form.formModelV3.catchformId,[SG(null===r||void 0===r?void 0:r[t])]),null===r||void 0===r||r.splice(t,1),h(tY(e,r,o));const a=$u.getState().form.formModelV3.pageLi"
+    },
+    {
+      "topic": "public-option-projection",
+      "start": 8179780,
+      "end": 8180108,
+      "text": "()=>{m(n||\"\")}),[n]);const f=e=>{const t=e.target.value||\"\";a(d,t),m(t)};return(0,nI.jsx)(\"div\",{className:\"flex flex-col gap-2 \"+(l?\"cursor-not-allowed\":\"cursor-auto\"),children:t.map(((e,t)=>(0,nI.jsx)(gY,{label:e.name,value:e.value,checked:d===e.value,onChange:()=>(e=>{let t=\"\",r=p;d===e.value?(t=\"\",r=\"\"):(t=e.value,\"Y\"!==e."
+    },
+    {
+      "topic": "question-clone",
+      "start": 12695579,
+      "end": 12696779,
+      "text": "e.push({...(0,tK.cloneDeep)(n),nlpFeedbackId:null,detectedItems:[]}),void k(e)}const o=$u.getState().form.assetUsage;if(!ad(a.totalBytes,o).allowed)return void((e,t,r)=>{E({show:!0,data:{title:s(\"assetQuota.copyExcludeFilesTitle\"),body:(0,nI.jsx)(cD,{type:\"warning\",icon:\"exclamation\",className:\"w-full\",secondText:s(\"assetQuota.copyExcludeFilesKeptQuestion\"),thirdText:s(\"assetQuota.copyExcludeFilesReason\",{limit:id(r.limitBytes),used:id(r.usedBytes),after:id(r.usedBytes+t)})}),cancelButtonText:s(\"assetQuota.copyExcludeFilesCancel\"),confirmButtonText:s(\"assetQuota.copyExcludeFilesConfirm\"),handleConfirm:()=>j(e,!0),isShowCancelButton:!0,confirmButtonType:\"primary\"}})})(e,a.totalBytes,o);A(!0),U$({catchformId:$u.getState().form.formModelV3.catchformId,assets:a.assets}).then((e=>{var t,r,a;d(KG(null===(t=e.data)||void 0===t?void 0:t.usedBytes,void 0,null===(r=e.data)||void 0===r?void 0:r.limitBytes));const o=null===(a=$u.getState().form.formModelV3.pageList[i])||void 0===a?void 0:a.questionList;if(!o)return;const s=(0,tK.cloneDeep)(o);s.push({...LNt(n,e.data),nlpFeedbackId:null,detectedItems:[]}),k(s)})).catch((e=>{var t;const r=fNt(e);d(ic({show:!0,type:\"fail\",text:r?null!==(t=r.serve"
+    },
+    {
+      "topic": "serialization",
+      "start": 12625323,
+      "end": 12626123,
+      "text": "C_t=e=>{const t=[];return e.pageList.forEach(((e,r)=>{t.push({page:e.page,pageTitle:0===r?\"\":e.pageTitle,pageContent:0===r?\"\":e.pageContent,pageOffset:e.pageOffset,questionList:e.questionList.map((e=>{return{nlpFeedbackId:e.nlpFeedbackId,title:e.title,additionalExplanation:e.description,catchFormQuestionType:e.elementType,questionOptionList:(t=kG(e.elementType,e.questionOptionList),Array.isArray(t)?t.map((e=>{const{optionImageUrl:t,imageUrl:r,optionImageFileSize:n,optionImageUploadToken:a,...o}=null!==e&&void 0!==e?e:{};return{...o,optionImageKey:SG(e)}})):[]),matrixOptionData:e.matrixOptionData,usePageOffset:e.usePageOffset,required:e.isRequired,useSecureKeyStroke:!1,...hG(e),...qY(e),materialList:lQ(e),...h_t(e),catchFormPersonalInformationRequests:w_t(e.detectedItems)};var t}))})})),t},"
+    }
+  ]
+}

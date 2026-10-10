@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": false,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next-rea-sso-https/types/**/*.ts",
+    ".next-rea-sso-https/dev/types/**/*.ts",
+    "tests/server/sso-transport.test.ts",
+    "tests/server/sso.test.ts",
+    "tests/server/sso-identity-proof.test.ts",
+    "tests/helpers/sso-browser.ts",
+    "scripts/qa-sso-transport-tls.ts",
+    "scripts/qa-rea-sso-outbound.ts",
+    "scripts/qa-rea-sso-browser-binding.ts",
+    "scripts/qa-rea-sso-browser-fixture.ts",
+    "scripts/qa-sso-https-environment.ts",
+    "scripts/qa-rea-sso-https.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".local",
+    ".next",
+    "docs"
+  ]
+}

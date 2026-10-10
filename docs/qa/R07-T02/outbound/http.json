@@ -1,0 +1,61 @@
+{
+  "checkedAt": "2026-10-10T02:15:05.121Z",
+  "actualHttpChecks": 9,
+  "checks": [
+    {
+      "action": "시험 소유자 가입",
+      "status": 200
+    },
+    {
+      "action": "시험 소유자 로그인",
+      "status": 200
+    },
+    {
+      "action": "127.0.0.1 공급자 생성/안전한 사전검사",
+      "status": 201
+    },
+    {
+      "action": "127.0.0.1 검사 실패 공급자 활성화 거절",
+      "status": 409,
+      "code": "PREFLIGHT_REQUIRED"
+    },
+    {
+      "action": "127.0.0.1 재검사도 연결 전 거절",
+      "status": 200
+    },
+    {
+      "action": "localhost 공급자 생성/안전한 사전검사",
+      "status": 201
+    },
+    {
+      "action": "localhost 검사 실패 공급자 활성화 거절",
+      "status": 409,
+      "code": "PREFLIGHT_REQUIRED"
+    },
+    {
+      "action": "localhost 재검사도 연결 전 거절",
+      "status": 200
+    },
+    {
+      "action": "검사 결과 목록 조회",
+      "status": 200
+    }
+  ],
+  "controlledTargetTcpConnections": 0,
+  "controlledTargetHttpRequests": 0,
+  "productionBuild": true,
+  "providers": [
+    {
+      "id": "6b02b2a6-3184-46dd-8687-970c40de47fe",
+      "version": 2,
+      "detail": "JWKS 조회 실패: 인증 제공자가 공개 인터넷 주소를 사용하지 않습니다."
+    },
+    {
+      "id": "23fa67ee-1a5e-4fb8-877b-9034d6ca0c5b",
+      "version": 2,
+      "detail": "JWKS 조회 실패: 인증 제공자가 공개 인터넷 주소를 사용하지 않습니다."
+    }
+  ],
+  "fixtureSetup": "Owner verification and company explicitly inserted; provider operations use actual application HTTP; target is our isolated local TLS server.",
+  "externalIdpVerified": false
+}

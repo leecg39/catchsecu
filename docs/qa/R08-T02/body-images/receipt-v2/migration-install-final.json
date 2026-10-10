@@ -1,0 +1,34 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-10T12:10:20.797Z",
+  "migrations": 139,
+  "fresh": {
+    "schema": "qa_receipt_v2_fresh_e3152347273e4f7285fd0743d8bdd816",
+    "v2CompleteReceiptAccepted": true,
+    "v2IncompleteReceiptRejected": true,
+    "constraints": [
+      {
+        "conname": "ConsentReceipt_evidence",
+        "definition": "CHECK ((((\"evidenceVersion\" = 0) AND (\"evidenceCipher\" IS NULL) AND (\"pdfCipher\" IS NULL) AND (\"pdfHash\" IS NULL)) OR ((\"evidenceVersion\" = ANY (ARRAY[1, 2])) AND (\"evidenceCipher\" IS NOT NULL) AND (\"evidenceCipher\" ~~ 'v1.%'::text) AND (\"pdfCipher\" IS NOT NULL) AND (\"pdfCipher\" ~~ 'v1.%'::text) AND (\"pdfHash\" IS NOT NULL) AND (\"pdfHash\" ~ '^[a-f0-9]{64}$'::text) AND (\"documentHash\" ~ '^[a-f0-9]{64}$'::text))))"
+      },
+      {
+        "conname": "FormVersion_consent_evidence",
+        "definition": "CHECK ((((\"receiptEvidenceVersion\" = 0) AND (\"consentDisplay\" IS NULL)) OR ((\"receiptEvidenceVersion\" = ANY (ARRAY[1, 2])) AND (\"consentDisplay\" IS NOT NULL) AND (jsonb_typeof(\"consentDisplay\") = 'object'::text))))"
+      }
+    ],
+    "formDocumentBindingAllowsEvidenceV2": true
+  },
+  "upgrade": {
+    "schema": "qa_receipt_v2_upgrade_e3152347273e4f7285fd0743d8bdd816",
+    "beforeMigrations": 138,
+    "afterMigrations": 139,
+    "legacyEvidenceCipherUnchanged": true,
+    "legacyPdfCipherUnchanged": true,
+    "legacyPdfBytesUnchanged": true,
+    "legacyDocumentHashUnchanged": true,
+    "legacyPdfHashUnchanged": true,
+    "v2AcceptedAfterUpgrade": true,
+    "v2IncompleteReceiptRejected": true
+  },
+  "scope": "Ephemeral schemas in catchsecu_test; fresh install and 138→139 upgrade; schemas removed after verification."
+}

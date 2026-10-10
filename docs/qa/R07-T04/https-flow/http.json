@@ -1,0 +1,220 @@
+{
+  "checkedAt": "2026-10-10T02:24:26.170Z",
+  "checks": [
+    {
+      "action": "fresh owner signup over HTTPS",
+      "status": 200
+    },
+    {
+      "action": "HTTPS owner login",
+      "status": 200
+    },
+    {
+      "action": "OIDC create and real HTTPS JWKS preflight",
+      "status": 201
+    },
+    {
+      "action": "SAML create and certificate preflight",
+      "status": 201
+    },
+    {
+      "action": "enable oidc",
+      "status": 200
+    },
+    {
+      "action": "enable saml",
+      "status": 200
+    },
+    {
+      "action": "oidc link valid start",
+      "status": 302
+    },
+    {
+      "action": "oidc account link",
+      "status": 302
+    },
+    {
+      "action": "oidc account link authenticated me",
+      "status": 200
+    },
+    {
+      "action": "oidc consumed callback rejected",
+      "status": 401,
+      "code": "STATE_INVALID"
+    },
+    {
+      "action": "oidc login valid start",
+      "status": 302
+    },
+    {
+      "action": "oidc linked account login",
+      "status": 302
+    },
+    {
+      "action": "oidc linked account login authenticated me",
+      "status": 200
+    },
+    {
+      "action": "oidc login valid start",
+      "status": 302
+    },
+    {
+      "action": "oidc missing browser binding rejected",
+      "status": 401,
+      "code": "SSO_BROWSER_MISMATCH"
+    },
+    {
+      "action": "oidc original browser binding succeeds",
+      "status": 302
+    },
+    {
+      "action": "oidc original browser binding succeeds authenticated me",
+      "status": 200
+    },
+    {
+      "action": "oidc login nonce start",
+      "status": 302
+    },
+    {
+      "action": "oidc malformed nonce",
+      "status": 401,
+      "code": "NONCE_MISMATCH"
+    },
+    {
+      "action": "oidc login issuer start",
+      "status": 302
+    },
+    {
+      "action": "oidc malformed issuer",
+      "status": 401,
+      "code": "ISSUER_MISMATCH"
+    },
+    {
+      "action": "oidc login audience start",
+      "status": 302
+    },
+    {
+      "action": "oidc malformed audience",
+      "status": 401,
+      "code": "AUDIENCE_MISMATCH"
+    },
+    {
+      "action": "oidc login expired start",
+      "status": 302
+    },
+    {
+      "action": "oidc malformed expired",
+      "status": 401,
+      "code": "TOKEN_EXPIRED"
+    },
+    {
+      "action": "oidc login signature start",
+      "status": 302
+    },
+    {
+      "action": "oidc malformed signature",
+      "status": 401,
+      "code": "BAD_SIGNATURE"
+    },
+    {
+      "action": "saml link valid start",
+      "status": 302
+    },
+    {
+      "action": "saml account link",
+      "status": 302
+    },
+    {
+      "action": "saml account link authenticated me",
+      "status": 200
+    },
+    {
+      "action": "saml consumed callback rejected",
+      "status": 401,
+      "code": "STATE_INVALID"
+    },
+    {
+      "action": "saml login valid start",
+      "status": 302
+    },
+    {
+      "action": "saml linked account login",
+      "status": 302
+    },
+    {
+      "action": "saml linked account login authenticated me",
+      "status": 200
+    },
+    {
+      "action": "saml login valid start",
+      "status": 302
+    },
+    {
+      "action": "saml missing browser binding rejected",
+      "status": 401,
+      "code": "SSO_BROWSER_MISMATCH"
+    },
+    {
+      "action": "saml original browser binding succeeds",
+      "status": 302
+    },
+    {
+      "action": "saml original browser binding succeeds authenticated me",
+      "status": 200
+    },
+    {
+      "action": "saml login recipient start",
+      "status": 302
+    },
+    {
+      "action": "saml malformed recipient",
+      "status": 401,
+      "code": "SUBJECT_CONFIRMATION_INVALID"
+    },
+    {
+      "action": "saml login issuer start",
+      "status": 302
+    },
+    {
+      "action": "saml malformed issuer",
+      "status": 401,
+      "code": "ISSUER_MISMATCH"
+    },
+    {
+      "action": "saml login audience start",
+      "status": 302
+    },
+    {
+      "action": "saml malformed audience",
+      "status": 401,
+      "code": "SAML_INVALID"
+    },
+    {
+      "action": "saml login expired start",
+      "status": 302
+    },
+    {
+      "action": "saml malformed expired",
+      "status": 401,
+      "code": "SAML_INVALID"
+    },
+    {
+      "action": "saml login signature start",
+      "status": 302
+    },
+    {
+      "action": "saml malformed signature",
+      "status": 401,
+      "code": "SAML_INVALID"
+    }
+  ],
+  "actualHttpChecks": 48,
+  "linkedAccounts": 2,
+  "proofs": 6,
+  "sessions": 7,
+  "audits": 19,
+  "setup": "Fresh owner email verification/company explicitly inserted. Real HTTPS app, IdP consent, token/JWKS and signed SAML POST requests.",
+  "nodeTrust": "NODE_EXTRA_CA_CERTS scoped to QA processes; CA and hostname verification enabled",
+  "browserVerified": false,
+  "externalIdpVerified": false
+}

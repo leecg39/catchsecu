@@ -23,7 +23,7 @@ async function withAdmin<T>(actor: Actor, operation: (tx: Transaction) => Promis
 type VersionInput = z.infer<typeof adminPlanCreate>["version"];
 const versionDto = (v: BillingPlanVersion) => ({ id: v.id, number: v.number, cycle: v.cycle, priceKrw: v.priceKrw,
   currency: v.currency, serviceLimit: v.serviceLimit, memberLimit: v.memberLimit, subjectLimit: v.subjectLimit,
-  formLimit: v.formLimit, features: v.features, orderable: v.orderable,
+  formLimit: v.formLimit, features: v.features, capabilities: v.capabilities, orderable: v.orderable,
   effectiveFrom: v.effectiveFrom.toISOString(), effectiveTo: v.effectiveTo?.toISOString() ?? null });
 const dto = (row: BillingPlan & { versions: BillingPlanVersion[]; _count?: { subscriptions: number } }) => ({
   id: row.id, name: row.name, description: row.description, createdAt: row.createdAt.toISOString(),
@@ -48,7 +48,7 @@ function versionData(planId: string, input: VersionInput) {
   return { planId, number: input.number, cycle: input.cycle, priceKrw: input.priceKrw ?? null,
     currency: input.currency, serviceLimit: input.serviceLimit ?? null, memberLimit: input.memberLimit ?? null,
     subjectLimit: input.subjectLimit ?? null, formLimit: input.formLimit ?? null, features: input.features,
-    orderable: input.orderable, effectiveFrom, effectiveTo };
+    capabilities: input.capabilities, orderable: input.orderable, effectiveFrom, effectiveTo };
 }
 export async function createAdminPlan(actor: Actor, input: z.infer<typeof adminPlanCreate>, requestId: string) {
   const row = await withAdmin(actor, async tx => {

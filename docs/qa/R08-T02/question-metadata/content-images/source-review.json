@@ -1,0 +1,1313 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-10T08:53:29.633Z",
+  "author": "bundle_analysis",
+  "scope": "F3 문항 설명 이미지와 폼/페이지 rich HTML 본문 이미지. 구현 범위 미확정, 원본 정적 조사만.",
+  "method": {
+    "sourceJavaScriptExecuted": false,
+    "sourceNetworkRequested": false,
+    "browserUsed": false,
+    "databaseUsed": false,
+    "testsOrBuildRun": false,
+    "productFilesChanged": false,
+    "rea": "기존 일치 SHA의 REA Evidence와 보존 번들을 재사용; 전체 재분석을 반복하지 않음.",
+    "staticParsing": "Node UTF-16 slice/indexOf와 Acorn string literal AST+JSON.parse만 사용. 원본 JS eval/import/require/실행 없음."
+  },
+  "source": {
+    "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+    "sha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "bytes": 15337385,
+    "utf16Length": 15329557,
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152"
+  },
+  "reusedEvidence": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/source-review.json",
+      "sha256": "c1db9b78e65314e4bb52a7d69127c2c594569d06b49103252e5e3ecc2dd7a556"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/remaining-source-review/source-review.json",
+      "sha256": "e9d3163c55ef9f6efaa439f9731d5ec9b24c30c2fc9f1994747731b03768cc30"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/source-review.json",
+      "sha256": "fd0dfaa04585db24ab8f51b39010bf5e3dabbf5dfb9212927874de3ca84ca0be"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/system-copy-source.json",
+      "sha256": "9c4bf9fb1ac196561f61b5fd182b21c5e3125a7ab9c9d42231f27b5e3166762c"
+    }
+  ],
+  "checklist": {
+    "wire": "answered-static",
+    "uiPlacement": "answered-static",
+    "limitsAndMime": "answered-static; body count/server restrictions unknown",
+    "deletionAndEditing": "answered-static; permanent server lifecycle unknown",
+    "copy": "partially answered; page HTML remap gap",
+    "render": "answered-static; runtime not observed",
+    "multilingual": "answered-static",
+    "consentPdf": "partially answered; server PDF embedding unknown"
+  },
+  "facts": [
+    {
+      "id": "CI01",
+      "status": "observed-static",
+      "topic": "별도 문항 이미지와 평문 추가 설명",
+      "summary": "문항 설명 이미지는 additionalExplanation HTML이 아니다. 편집기 description은 additionalExplanation에 별도로 직렬화되고 이미지에는 questionImageKey 단일 슬롯을 사용한다. qY는 빈 문자열/비문자열을 null로 만든 key만 반환한다. URL·size·upload token은 C_t의 문항 이미지 write DTO에 포함하지 않는다.",
+      "wire": {
+        "request": "questionImageKey: nonempty string | null",
+        "displayFallback": [
+          "questionImageUrl",
+          "imageUrl",
+          "serviceFormQuestionAssets의 assetType=QUESTION_IMAGE 항목.url"
+        ],
+        "size": "questionImageFileSize: finite number | null",
+        "toggle": "useQuestionImage: boolean; boolean이 없으면 실제 key 존재로 추론",
+        "description": "additionalExplanation <- editor description (plain text)"
+      },
+      "evidence": [
+        "question-read-wire",
+        "question-form-save-wire",
+        "question-load"
+      ]
+    },
+    {
+      "id": "CI02",
+      "status": "observed-static",
+      "topic": "문항 이미지 개수·기본값·유형",
+      "summary": "문항당 key 하나이며 badge count는 0/1이다. 빈 초기 질문에 boolean/key가 없으면 off로 해석한다. n_t는 빈/미정 문자열 및 IDV를 제외하며 RADIO/CHECKBOX/SELECTBOX와 다른 일반 유형에 questionImage를 허용한다. 추가 설명 텍스트나 required 여부와 별개 선택 기능이다. 원본 렌더 helper는 AI_V3가 아니면 questionImageUrl/imageUrl/serviceFormQuestionAssets를 지운다.",
+      "evidence": [
+        "question-feature-wire",
+        "v3-public-gate",
+        "question-form-save-wire"
+      ]
+    },
+    {
+      "id": "CI03",
+      "status": "observed-static",
+      "topic": "문항 업로드 검증",
+      "summary": "input accept는 넓은 image/*이지만 실제 handler는 JPEG/JPG/PNG MIME, 확장자 jpg/jpeg/png, 0보다 큰 파일, 선두 4 bytes 매직을 확인한다. 1,048,576 bytes 초과 거절; 정확히 한도인 값은 통과한다. vz는 allowLongName=true로 일반 100자 이름 검사를 건너뛴다. 픽셀/EXIF/ICC/APNG/완전한 디코딩 검증은 해당 경로에서 확인되지 않았다.",
+      "evidence": [
+        "limits-quota",
+        "image-byte-sniff",
+        "question-upload-handler"
+      ]
+    },
+    {
+      "id": "CI04",
+      "status": "observed-static",
+      "topic": "문항 업로드·교체 API",
+      "summary": "multipart POST asset/upload에 catchformId,assetType=QUESTION_IMAGE,file을 보낸다. 교체이면 replacedS3Key도 보낸다. response.data의 fileKey 필수, fileUrl 없으면 null, fileSize가 number이면 채택하고 없으면 입력 size를 사용한다. 저장 원문 key의 형식/서버 소유권은 추정하지 않는다.",
+      "api": {
+        "method": "POST",
+        "path": "${PE}/company-operated-service/catch-form/asset/upload",
+        "multipart": [
+          "catchformId",
+          "assetType",
+          "file",
+          "replacedS3Key?"
+        ],
+        "responseData": [
+          "fileKey",
+          "fileUrl",
+          "fileSize",
+          "usedBytes",
+          "limitBytes"
+        ]
+      },
+      "evidence": [
+        "asset-api",
+        "question-upload-handler",
+        "question-delete-replace-ui"
+      ]
+    },
+    {
+      "id": "CI05",
+      "status": "observed-static",
+      "topic": "문항 비동기 적용·실패·삭제",
+      "summary": "questionImageUploadToken을 생성하고 settle 시 현재 모든 pageList에서 같은 token을 가진 질문을 찾는다. 질문이 없거나 기능 off이면 새 key를 temp/discard하고 사용량을 되돌린다. 교체 도중 기존 key는 유지되며 실패 시 token을 제거한다. 변경/추가 버튼은 업로드 중 또는 question.disabled이면 차단된다. 개별 삭제 버튼의 표시된 disabled 조건은 업로드 중 M뿐이다. 삭제 확인 후 key/url/size를 모두 null로 하고 알려진 size를 차감한다.",
+      "evidence": [
+        "question-stale-token-normalization",
+        "question-upload-handler",
+        "question-delete-replace-ui",
+        "temp-discard"
+      ]
+    },
+    {
+      "id": "CI06",
+      "status": "observed-static",
+      "topic": "문항 기능 off·유형 전환·복제",
+      "summary": "기능 off는 기존 이미지가 있을 때 삭제 확인 후 null+discard한다. 일반 유형 간 전환은 questionImage가 계속 허용되어 보존한다. IDV처럼 지원하지 않는 유형으로 전환하면 기능 초기화 확인 후 제거한다. 질문 삭제는 등록된 key를 discard한다. 질문 복제는 QUESTION_IMAGE originS3Key를 copy API에 전달하고 newKey/fileUrl/fileSize를 새 질문에 매핑한다. 용량 부족 시 파일 제외 복제는 이미지와 FILE을 제거하고 LINK를 남긴다.",
+      "evidence": [
+        "question-feature-wire",
+        "question-type-change-confirm",
+        "feature-off-delete-question",
+        "question-copy-collect",
+        "copy-response-question-map",
+        "question-copy-pipeline"
+      ]
+    },
+    {
+      "id": "CI07",
+      "status": "observed-static",
+      "topic": "문항 이미지 표시·접근성·다국어",
+      "summary": "공개/관리자/응답 읽기 화면 순서는 제목 → 이미지 → 참고자료 → 평문 pre 추가설명 → 답변이다. 가운데 정렬, margin-top8, max-width:min(696px,100%), auto width/height, radius8이다. img alt는 빈 문자열, draggable=false. 추적된 렌더 경로에는 클릭 확대·alt 편집·onError fallback이 없다. 편집 미리보기 DTO도 questionImageUrl을 유지한다. 이미지 자체와 key는 폼 언어 변경으로 번역하거나 제거하지 않는다.",
+      "evidence": [
+        "question-public-image-placement",
+        "question-public-size",
+        "question-admin-render",
+        "question-admin-size",
+        "question-answer-read-render",
+        "question-preview-dto",
+        "language-change-preserves-fields"
+      ]
+    },
+    {
+      "id": "CI08",
+      "status": "observed-static",
+      "topic": "폼·페이지 본문 wire",
+      "summary": "폼 본문 editor description은 mainText HTML 문자열, 각 페이지는 pageContent HTML 문자열이다. 첫 페이지의 pageTitle/pageContent는 C_t에서 빈 문자열로 강제되며 폼 mainText가 첫 화면 안내 역할을 한다. 별도의 root image key 배열 대신 HTML img src를 유지한다. 본문에서 제거된 URL 탐색도 DOMParser로 img src 목록을 읽는다.",
+      "wire": {
+        "form": "mainText <- formModelV3.description || <p></p>",
+        "page": "pageList[i].pageContent (첫 페이지 i=0은 빈 문자열)",
+        "imageStorage": "HTML img src URL; width/alt/style 등 editor data에 직렬화"
+      },
+      "evidence": [
+        "question-form-save-wire",
+        "body-form-page-editors",
+        "html-image-extraction"
+      ]
+    },
+    {
+      "id": "CI09",
+      "status": "observed-static",
+      "topic": "본문 업로드 별도 adapter",
+      "summary": "SNt는 14,680,064 bytes 초과와 JPEG/JPG/PNG 이외 MIME를 거절한다. scoped 업로드는 form quota도 검사한다. question handler의 확장자/매직/vz를 호출하지 않는다. multipart의 파일 필드는 files이며 response.data.imgUrl을 CKEditor의 {default:url}로 반환한다. HTML 편집기 도구에는 이미지 업로드, 크기/정렬/대체텍스트, undo/redo가 있다. 이 adapter에는 명시 이미지 개수·HTML 길이·픽셀 상한이 관측되지 않았다.",
+      "api": {
+        "method": "POST",
+        "path": "${PE}/company-operated-service/formImage/upload",
+        "multipart": [
+          "files",
+          "catchformId?",
+          "assetType?"
+        ],
+        "responseData": [
+          "imgUrl",
+          "fileSize",
+          "usedBytes",
+          "limitBytes"
+        ],
+        "editorResult": "{default: imgUrl}"
+      },
+      "evidence": [
+        "body-upload-adapter",
+        "limits-quota",
+        "editor-upload-configuration"
+      ]
+    },
+    {
+      "id": "CI10",
+      "status": "observed-static",
+      "topic": "본문 asset type 구분",
+      "summary": "폼 본문 FORM_CONTENT_IMAGE, 둘째 이후 페이지 본문 PAGE_CONTENT_IMAGE를 같은 mkt adapter에 넘긴다. 인접 완료/마감 편집기는 END_PAGE_CONTENT_IMAGE/PRIVATE_PAGE_CONTENT_IMAGE를 별도로 넘긴다. 완료/마감 본문은 이번 폼/페이지 본문과 별도 위치이며 후속 범위 결정이 필요하다.",
+      "evidence": [
+        "body-form-page-editors",
+        "end-private-asset-scope"
+      ]
+    },
+    {
+      "id": "CI11",
+      "status": "observed-static",
+      "topic": "본문 크기·정렬·alt·RTL",
+      "summary": "image config는 resizeUnit:px, 왼쪽/전체/오른쪽 imageStyle, imageTextAlternative, 50/75/original resizeOptions를 설정한다. 추가 tkt는 image/media width를 HTML figure style로 downcast/upcast한다. 마우스 드래그는 컨테이너 대비10~100%로 clamp하고 width를 %로 저장한다. CSS는 img max-width100%,height:auto다. editor UI 언어는 en이며 content 언어는 RTL언어면 ar, 그 외 en; language prop에 따라 초기 dir와 RTL 토글을 적용한다. 실제 모바일/touch 동작은 실행하지 않았고 커스텀 드래그 경로는 mouse 이벤트다.",
+      "evidence": [
+        "editor-upload-configuration",
+        "editor-width-serialization",
+        "editor-resize-interaction",
+        "editor-responsive-css",
+        "editor-rtl-direction"
+      ]
+    },
+    {
+      "id": "CI12",
+      "status": "observed-static",
+      "topic": "본문 편집값 반영·삭제/복구 bookkeeping",
+      "summary": "mkt는 editor.getData를 사용하고 Ppt로 src 없는 img 태그만 제거한다. focus/blur와 onContentImageChange를 통해 이전/새 HTML을 넘긴다. O_t는 다른 본문에 남은 URL과 origin 집합을 대조해 saveData/deleteData를 POST formImage/temp/status에 보낸다. 초기 폼(isInitCatchform)은 deleteData 전송을 억제한다. URL별 size map으로 제거/되돌림 사용량을 조정하며 같은 URL이 다른 본문에 있으면 중복 차감하지 않는다. 요청 실패는 catch하여 무시하고 서버의 실제 파일 삭제/회복은 관측되지 않았다.",
+      "api": {
+        "method": "POST",
+        "path": "${PE}/company-operated-service/formImage/temp/status",
+        "json": [
+          "catchformId",
+          "saveData?:url[]",
+          "deleteData?:url[]"
+        ]
+      },
+      "evidence": [
+        "editor-change-readonly",
+        "html-image-extraction",
+        "content-url-set-helpers",
+        "body-status-delete",
+        "body-origin-reducer"
+      ]
+    },
+    {
+      "id": "CI13",
+      "status": "observed-static",
+      "topic": "본문 URL 관리 경계",
+      "summary": "자산 관리/복제 대상으로 계산하는 kNt는 data:를 제외하고 query/hash 제거 후 마지막 경로가 UUID.확장자인 URL만 인정한다. 원본 HTML 렌더 자체는 이 필터와 분리되어 있다. 기존 본문 img의 모든 외부 URL을 자산 관리 대상으로 단정할 수 없다. 저장 성공 시 origin URL 집합을 갱신하고 초기 플래그를 해제한다.",
+      "evidence": [
+        "content-image-key-filter",
+        "body-origin-load-usage",
+        "body-origin-reducer",
+        "body-upload-pending-save"
+      ]
+    },
+    {
+      "id": "CI14",
+      "status": "observed-static",
+      "topic": "공통 quota와 진행 중 작업",
+      "summary": "문항 이미지·본문·보기 이미지·자료 파일이 assetUsage.usedBytes/limitBytes를 공유한다. 클라이언트는 quotaApplied=false 또는 limitBytes<=0이면 quota검사를 통과시킨다. gauge의 limit 미지정 표시 기본값은100MiB지만 이를 서버의 보편 상한으로 확정할 수 없다. SNt의 scoped 업로드는 vNt pending set에 등록되며 공유 Promise queue에서 실행된다. 저장/페이지 복제 진입은 bNt가 true이면 막는 분기를 가진다.",
+      "evidence": [
+        "limits-quota",
+        "upload-queue-errors",
+        "body-upload-adapter",
+        "body-asset-gauge",
+        "body-upload-pending-save",
+        "page-copy-pipeline"
+      ]
+    },
+    {
+      "id": "CI15",
+      "status": "observed-static-with-gap",
+      "topic": "페이지 복제와 본문 이미지 remap 갭",
+      "summary": "MNt는 페이지의 question assets와 HTML의 관리 대상 URL을 중복 제거하고 PAGE_CONTENT_IMAGE copy item을 만든다. 페이지 복제 caller는 asset/copy 응답을 LNt로 질문에만 매핑하고 {...u,questionList:...}로 삽입한다. 조사한 H/W 전체 경로에서는 pageContent HTML의 새 URL 치환이 없다. 파일 제외 복제 DNt도 질문 자산만 비우며 pageContent는 그대로다. 따라서 요청 존재는 확정하지만 새 본문 이미지 URL이 실제 적용되는지, copy API가 이 경우 어떤 값을 반환하는지는 미관측이다.",
+      "evidence": [
+        "page-copy-collect",
+        "copy-response-question-map",
+        "page-copy-pipeline"
+      ]
+    },
+    {
+      "id": "CI16",
+      "status": "observed-static",
+      "topic": "본문 공개·미리보기 렌더",
+      "summary": "공개 첫 페이지 content와 후속 pageContent는 ck-content 컨테이너에서 QO()(CY(html.replace(newline,...)))로 렌더한다. 일부 관리자 응답/미리보기는 QO()(raw pageContent) 경로도 있다. CY는 oembed/YouTube 변환과 상대처럼 보이는 링크의 https 보완이며 이미지 자산 소유권/무해화 검증기로 확인된 것은 아니다. 실제 XSS 안전성/브라우저 동작은 이번 정적 조사에서 평가하지 않았다.",
+      "evidence": [
+        "body-public-html-render",
+        "body-preview-html-render",
+        "html-render-transform",
+        "body-admin-preview-raw-html",
+        "body-admin-reply-raw-html"
+      ]
+    },
+    {
+      "id": "CI17",
+      "status": "observed-static-with-gap",
+      "topic": "동의 문서와 PDF 경계",
+      "summary": "비한국어 동의 editor도 mkt(imageUpload=true)를 사용하지만 확인된 call site에는 catchform assetScope가 없다. 내용은 Mpt를 거쳐 content/agreementContent와 태그 제거한 mainPurpose 일부에 반영된다. 이는 질문 이미지 또는 mainText를 동의 문서로 자동 복사하는 증거가 아니다. 답변 PDF 요청은 customerIds/pageIds/includeConsent 등의 서버 생성 요청으로, image key/HTML bytes를 직접 전송하지 않는다. 서버 생성 PDF에서 질문/본문 이미지 포함·래스터화·버전 고정·hash 보존은 미관측이다.",
+      "evidence": [
+        "consent-editor-html",
+        "consent-editor-upload",
+        "consent-html-cleaning",
+        "pdf-async-request",
+        "pdf-direct-request"
+      ]
+    },
+    {
+      "id": "CI18",
+      "status": "observed-static-with-gap",
+      "topic": "버전/게시 이후 수명",
+      "summary": "편집 진입 오류 mapping에는 active form cannot update 및 reply exist form cannot update가 있다. 임시 자산 cleanup DELETE도 있다. 프런트는 catchformId 중심 API와 temp bookkeeping을 보여줄 뿐 immutable FormVersion/승인 snapshot pin, 영구 삭제 시점, 바이러스 검사, 기한/권한 재검사, object store key ownership을 증명하지 않는다. 독립 구현은 기존 author-assets의 역사 보존 정책과 별도 조정해야 한다.",
+      "evidence": [
+        "edit-rejection-temp-cleanup",
+        "body-status-delete",
+        "asset-api"
+      ]
+    },
+    {
+      "id": "CI19",
+      "status": "observed-static",
+      "topic": "다국어 범위",
+      "summary": "원본 보존16언어 literal을 정적으로 확인했다. aiQuestions.questionImage와 uploadAdapter admin copy는 ko만 있고 나머지15언어 namespace에는 없다. 공개 문항 이미지는 텍스트 label/alt가 없는 장식 img여서 별도 번역 문자열이 없다. formLanguage 변경은 주소 유형을 바꾸지만 기존 이미지 field/HTML을 번역하는 mutation은 관측하지 않았다. 본문 문구는 작성자가 입력한 HTML로 유지된다.",
+      "evidence": [
+        "ko-questionImage",
+        "ko-uploadAdapter",
+        "language-change-preserves-fields",
+        "question-public-image-placement",
+        "body-form-page-editors"
+      ],
+      "localeEvidence": "localeInventory"
+    }
+  ],
+  "koCopy": {
+    "namespace": "translate",
+    "literalStart": 202523,
+    "literalEnd": 1399448,
+    "literalRawUtf8Sha256": "375758d3d702ee085895f91bcdc82a9c6513e0e05ca7f5b413903ce46b9fc4e9",
+    "questionImage": {
+      "addImage": "문항 설명 이미지 추가",
+      "changeImage": "변경",
+      "deleteImage": "삭제",
+      "imageUploading": "이미지 업로드 중",
+      "deleteImageTitle": "이미지를 삭제할까요?",
+      "deleteImageBody": "삭제하면 되돌릴 수 없습니다.",
+      "deleteImageDone": "문항 이미지를 삭제했습니다.",
+      "imageSizeExceeded": "이미지는 1MB 이하만 첨부할 수 있습니다.<br />용량을 줄인 뒤 다시 첨부해 주세요.",
+      "imageMimeNotAllowed": "JPG·JPEG·PNG 이미지만 첨부할 수 있습니다.<br />다른 형식은 변환한 뒤 첨부해 주세요.",
+      "imageUploadFailed": "이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+      "cancel": "취소",
+      "quotaExceeded": "이 캐치폼의 남은 용량이 부족합니다. (남은 용량 {{remain}})"
+    },
+    "uploadAdapterAlert": {
+      "phrase1": "14MB이상의 파일을 올릴 수 없습니다. 현재 파일은",
+      "phrase2": "MB 입니다.",
+      "phrase3": "허용하지 않는 포맷의 파일입니다.jpeg, jpg, png 파일만 업로드 해주세요.",
+      "phrase4": "14MB이상의 파일을 올릴 수 없습니다.",
+      "phrase5": "파일을 읽을 수 없습니다.",
+      "phrase6": "jpeg, jpg, png  파일만 업로드 가능합니다.",
+      "quotaExceeded1": "이 캐치폼의 남은 용량이 부족합니다. (남은 용량 ",
+      "quotaExceeded2": ")",
+      "uploadFailed": "이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "featureToggle": {
+      "questionImage": "문항 설명 이미지",
+      "offBodyQuestionImage": "넣어 둔 이미지 1장이 삭제됩니다. 다시 켜도 복구되지 않습니다."
+    },
+    "assetGauge": {
+      "label": "업로드 용량",
+      "nearNote": "한도까지 {{remain}} 남았습니다.",
+      "fullNote": "한도를 모두 채웠습니다. 파일을 지우면 다시 올릴 수 있어요.",
+      "tooltipIntro": "캐치폼 하나에 등록할 수 있는 파일은 모두 합쳐 {{limit}}입니다.",
+      "tooltipItemContentImage": "· 본문 삽입 이미지",
+      "tooltipItemQuestionImage": "· 문항 설명 이미지",
+      "tooltipItemMaterial": "· 참고 자료 파일",
+      "tooltipItemOptionImage": "· 답변별 이미지",
+      "tooltipToggle": "업로드 용량 안내 보기",
+      "tooltipFootnote": "다운로드 링크는 용량을 차지하지 않습니다."
+    }
+  },
+  "localeInventory": [
+    {
+      "locale": "ko",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "fileSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "literalStart": 202523,
+      "literalEnd": 1399448,
+      "literalRawUtf8Sha256": "375758d3d702ee085895f91bcdc82a9c6513e0e05ca7f5b413903ce46b9fc4e9",
+      "hasQuestionImageAdminCopy": true,
+      "hasUploadAdapterAdminCopy": true,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "en",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-en-translate-json.bc2c6659.chunk.js",
+      "fileSha256": "362e5417b4355e9f134dd79c5190718bcab6256bac6bfb78529a1f1f71265d1a",
+      "literalStart": 139,
+      "literalEnd": 44067,
+      "literalRawUtf8Sha256": "bc0606778c625a9f94a9ec84534d0fce5f9974b3a6faf34fa4da1af6c2aa8a84",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "ja",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-ja-translate-json.31388508.chunk.js",
+      "fileSha256": "db4720165d9a453f310610033a52d591a0eaf96338d60276dab0fcdbda442afe",
+      "literalStart": 137,
+      "literalEnd": 76330,
+      "literalRawUtf8Sha256": "c3813d0e5f99943ebc2464b1e6fa5d7c8f1a0bbb0d50381170e7218bbee8cd61",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "zh-CN",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-zh-CN-translate-json.ac3d029e.chunk.js",
+      "fileSha256": "60ea1a832b46c618560f80f4f0529b4a61d6986ebb7da49350bef20b91eed6f3",
+      "literalStart": 139,
+      "literalEnd": 53858,
+      "literalRawUtf8Sha256": "da5e0b18645a7c030bc113a0b640b6ffa6e0f03f63b2a4f3b9cc56b96b10157e",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "zh-TW",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-zh-TW-translate-json.920ebddb.chunk.js",
+      "fileSha256": "a22dacf3b8da4a86b79dad91232205c0867342278aa043f0e3114c75cd5c0303",
+      "literalStart": 139,
+      "literalEnd": 54598,
+      "literalRawUtf8Sha256": "dec4a779f19d395b42c81f398133d11cb238524d6fa7ed81a53d1a74c03ddb4d",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "de",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-de-translate-json.9f2d6bd7.chunk.js",
+      "fileSha256": "e2bb0b2b7dd84cfadadbec1d3127e03bcbb7fc9da51e86c13bea1c043729fe71",
+      "literalStart": 139,
+      "literalEnd": 45426,
+      "literalRawUtf8Sha256": "00f649dec111dfb785f9c39df3aadaa53ee40a6fc6cddf546dcc135a64218a98",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "fr",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-fr-translate-json.bc33f4ad.chunk.js",
+      "fileSha256": "ef3f73832065f1d776d80505020f585d75e462929f0f6cf4f9684be54ff745a2",
+      "literalStart": 139,
+      "literalEnd": 48898,
+      "literalRawUtf8Sha256": "6b149385f70ecf75a468ab9bf4c4734a671105072dc3a05b95e9c79c7aaf6e4a",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "ru",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-ru-translate-json.c503a077.chunk.js",
+      "fileSha256": "e5ea5647a0f21e5e97407b0e4d32e6a186ac14ea8eb121868e763c1a979ac825",
+      "literalStart": 139,
+      "literalEnd": 145579,
+      "literalRawUtf8Sha256": "4f7d191a98245d67949e18be0e078a4930e0a7701255447aaf9b2a84ee927b69",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "es",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-es-translate-json.f8d1618d.chunk.js",
+      "fileSha256": "e1149a175863972d6669d32b2398dd392474ca9233ef630d9063645437c176e1",
+      "literalStart": 139,
+      "literalEnd": 46221,
+      "literalRawUtf8Sha256": "2d68be3d6735d2c260ed2f21c068a1b5eb9678fd7b880e7da402899ba713da28",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "pt",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-pt-translate-json.b6488d46.chunk.js",
+      "fileSha256": "ee3441b7ca7317f41328754ddcc64eb47323606145e7141254a88c902392ecbd",
+      "literalStart": 138,
+      "literalEnd": 45936,
+      "literalRawUtf8Sha256": "859faae612524eaafe7ac39169d8f2030d30a7b57749de13021ccb8991f279da",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "id",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-id-translate-json.c3631122.chunk.js",
+      "fileSha256": "bf366f137092bde07a42ce619b4a89fe601eb6c81fb7c772cbd02e9e455d9b9a",
+      "literalStart": 139,
+      "literalEnd": 40839,
+      "literalRawUtf8Sha256": "327939e37811638dd3853020db8e00cccb9bf30285db46a03ceaa33d7816223b",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "th",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-th-translate-json.8127ba6f.chunk.js",
+      "fileSha256": "29a3428bd87721d3a8e597ab0751bbe4a6953df7ef566a1c41a5e9cbd89d97de",
+      "literalStart": 139,
+      "literalEnd": 131456,
+      "literalRawUtf8Sha256": "203c812ad6d58fb58fbac924f3ddb6abf60f04258c5a98d83e9cabad560370b1",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "vi",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-vi-translate-json.b2074a51.chunk.js",
+      "fileSha256": "b0c75d8b2e0c0b86b60bc252b9ad725d5945d4b21b259b32b1aac5c02e4dbb4e",
+      "literalStart": 139,
+      "literalEnd": 59112,
+      "literalRawUtf8Sha256": "478ce2698681439f85657ec72252def0182a4dfaa0eedf3462516a80fc8fd2ee",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "tr",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-tr-translate-json.43084700.chunk.js",
+      "fileSha256": "daf78da88bc6be9358bbd985b050f7f5438f35a1457d4f0ff8b5b5a818f22382",
+      "literalStart": 139,
+      "literalEnd": 46544,
+      "literalRawUtf8Sha256": "c128832d83844a6279ed5cde352404350ff88cb03a649949f3ef68a4213f7bee",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "it",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-it-translate-json.7da229cd.chunk.js",
+      "fileSha256": "8946d53998dc336754605efa0a9905554c9ff74fbae903abf3bbc7ab35fa1292",
+      "literalStart": 139,
+      "literalEnd": 43848,
+      "literalRawUtf8Sha256": "959e8583bcf8439f82a72e0597dafd37e792fa7ba61e8f3fa308ece1d44084a9",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    },
+    {
+      "locale": "ar",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/locales/i18n-ar-translate-json.b7f54e9c.chunk.js",
+      "fileSha256": "676a877869706bd28f15b520ca48dd8aab9ce830fb4ac90f90f9107e23e7711b",
+      "literalStart": 139,
+      "literalEnd": 123479,
+      "literalRawUtf8Sha256": "885641cce05d5a378827fa4699fed61e9b13aefc8f1ed25d09ac9e24cf9b301b",
+      "hasQuestionImageAdminCopy": false,
+      "hasUploadAdapterAdminCopy": false,
+      "hasPublicInfoOwnerForm": true
+    }
+  ],
+  "unknowns": [
+    "원본 서버의 실제 DTO validation, key 형식/소유권, 파일 스캐너, 디코딩/픽셀 상한, 저장 암호화, quota 원자성, 영구 삭제·TTL·object URL 권한은 미관측.",
+    "본문 이미지 전체 개수 및 HTML 문자열 최대 길이는 검사한 adapter·serializer·editor caller에 명시 상한이 없었다. 서버 상한이 없다는 뜻은 아니다.",
+    "페이지 copy response에서 PAGE_CONTENT_IMAGE 새 URL을 HTML에 치환하는 경로는 해당 H/W/LNt 체인에서 미발견. 라이브 복제/서버 응답은 미관측.",
+    "전체 폼 복제·템플릿 사용 시 서버의 본문 자산 키 재발급/버전 pin은 기존 UI만으로 확정할 수 없다.",
+    "답변 PDF 및 동의 증거 PDF가 문항/본문 이미지를 포함하는지, 저장 당시 bytes를 고정하는지, 기존 PDF를 재생성하는지는 미관측.",
+    "본문의 external URL/data URI 허용/렌더 결과와 editor paste/drag-drop 경로 전체의 유효성은 미실행이며 서버 인증·CORS·CSP도 미관측.",
+    "언어별 editor UI/화면·이미지 크기·touch·실제 실패·취소/지연 레이스는 정적 호출 근거만 있고 브라우저 실행 증거는 없다."
+  ],
+  "implementationBoundary": {
+    "notAPlan": "이번 조사로 구현 범위를 확정하지 않는다.",
+    "separableUnits": [
+      "질문 image 단일 metadata: QUESTION_IMAGE 1MiB, 질문 field+public/admin decoration. plain additionalExplanation 유지.",
+      "폼/페이지 rich HTML + img URL: FORM_CONTENT_IMAGE/PAGE_CONTENT_IMAGE 14MiB, root/page 자산 슬롯·HTML renderer/editor·size/style/alt·참조 수명 별도 설계.",
+      "완료/마감 HTML과 동의 본문은 같은 editor를 사용하지만 별도 위치/권한/문서 증거 범위로 후속 결정."
+    ],
+    "preserve": "기존 additionalExplanation 평문, 참고자료 FILE/LINK, 보기 이미지, 응답 FILE/DRAW의 wire/권한/한도와 혼합하지 않는다. 기존 버전·영수증 bytes 보존 여부는 로컬 독립 계약으로 결정해야 한다."
+  },
+  "boundedNegativeSearch": {
+    "terms": [
+      "questionImageKey",
+      "questionImageUrl",
+      "useQuestionImage",
+      "contentImage",
+      "FORM_CONTENT_IMAGE",
+      "PAGE_CONTENT_IMAGE",
+      "END_PAGE_CONTENT_IMAGE",
+      "PRIVATE_PAGE_CONTENT_IMAGE",
+      "SNt(",
+      "HY(",
+      "jpt(",
+      "bNt()",
+      "formImage",
+      "compress/replies/pdf",
+      "compress/reply/pdf"
+    ],
+    "boundary": "동일 전체 bundle의 정확 문자열 검색 후 관련 함수/호출 체인만 정적 열람. 타 chunk app code, 서버, 라이브 상태는 범위 밖.",
+    "notes": [
+      "문항 이미지 확대 handler는 HY 렌더 및 editor 미리보기/관리자 표시 체인에서 미발견. 보기 이미지 lightbox와 구별.",
+      "본문 이미지 수 상한은 SNt/mkt/S_t/C_t 및 본문 caller에서 미발견.",
+      "본문 페이지 copy HTML 새 URL 재매핑은 MNt/LNt/H/W 체인에서 미발견."
+    ]
+  },
+  "excerpts": [
+    {
+      "id": "limits-quota",
+      "symbol": "Jc/Zc/od/ad/nd",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 6912700,
+      "endExclusive": 6914080,
+      "excerptUtf8Sha256": "b0a1d9ff848187fb0748163ca57125a22ce3dc4aeb3c5abc7ca9a098cde29a7a",
+      "raw": ")=>{e.error=t.payload}}}),{actions:Kc}=Qc,Xc=(Qc.reducer,{usedBytes:0,limitBytes:0,enforced:!0,quotaApplied:!0,contentImageSizes:{}}),Jc={contentImage:14680064,questionImage:1048576,optionImage:1048576,material:5242880},Zc=[\"image/jpeg\",\"image/jpg\",\"image/png\"],ed=[\"pdf\",\"docx\",\"ai\"],td=[\"jpg\",\"jpeg\",\"png\"],rd=/^(\\d{4}-\\d{2}-\\d{2})[T ](\\d{2}:\\d{2}:\\d{2})/;function nd(e){if(!e)return!0;const t=rd.exec(e.trim());return!t||`${t[1]} ${t[2]}`>=\"2026-09-22 06:30:00\"}function ad(e,t){const r=(e=>Math.max(0,e.limitBytes-e.usedBytes))(t);return!1===t.quotaApplied||t.limitBytes<=0?{allowed:!0,remainBytes:r}:t.usedBytes+e>t.limitBytes?{allowed:!1,reason:\"total\",remainBytes:r}:{allowed:!0,remainBytes:r}}function od(e,t){var r;if(!e)return{allowed:!1,reason:\"type\"};return(\"material\"===t?ed.includes((e=>{const t=e.lastIndexOf(\".\");return t<0||t===e.length-1?\"\":e.slice(t+1).toLowerCase()})(null!==(r=e.name)&&void 0!==r?r:\"\")):Zc.includes(e.type))?e.size>Jc[t]?{allowed:!1,reason:\"size\"}:{allowed:!0}:{allowed:!1,reason:\"type\"}}function id(e){return!Number.isFinite(e)||e<=0?\"0KB\":e<1048576?`${Math.max(1,Math.round(e/1024))}KB`:`${(e/1048576).toFixed(1).replace(/\\.0$/,\"\")}MB`}function sd(e,t){return{...e,usedBytes:Math.max(0,e.usedBytes+t)}}const ld={listLoading:!1,actionsLoading:!1,entities:null,templates:null,lastError:null,elementList:null,replyCount:0,formMarketing:null,fo"
+    },
+    {
+      "id": "asset-api",
+      "symbol": "M$/F$/U$",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 7918240,
+      "endExclusive": 7919079,
+      "excerptUtf8Sha256": "075568813704b0c7c6bbe1e44375d3c110d58bc05a83ef73a885794b45a8187d",
+      "raw": "-operated-service/behavior/form/${e}`)}const M$=\"QUESTION_IMAGE\",L$=\"OPTION_IMAGE\",D$=\"QUESTION_MATERIAL\";function F$(e,t,r,n){if(null===r||void 0===r||!r.name)return Promise.reject(new Error(\"uploadCatchFormAsset: file name is required \\u2014 append the Blob with a file name (FormData.append(field, blob, name))\"));const a=new FormData;return a.append(\"catchformId\",String(e)),a.append(\"assetType\",t),a.append(\"file\",r),n&&a.append(\"replacedS3Key\",n),At.post(`${PE}/company-operated-service/catch-form/asset/upload`,a,{headers:{\"Check-Multipart\":!0}})}function B$(e,t){const r=new FormData;return r.append(\"file\",t),At.post(`${PE}/company-operated-service/access-control/whitelist/catchforms/${e}`,r,{headers:{\"Check-Multipart\":!0}})}function U$(e){return At.post(`${PE}/company-operated-service/catch-form/asset/copy`,e)}const z$={regDt"
+    },
+    {
+      "id": "image-byte-sniff",
+      "symbol": "vz/xz",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 7860228,
+      "endExclusive": 7861740,
+      "excerptUtf8Sha256": "c5a0a695ba1a9aca462e9cd10a2f0bfca928105e43c3f85e7747aed5a9a1cb32",
+      "raw": "vz=async function(e,t){let r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};if(!e||0===e.size)return{valid:!1,reason:\"empty\"};if(!r.allowLongName&&e.name.length>100)return{valid:!1,reason:\"nameLength\"};const n=e.name.split(\".\").pop().toLowerCase();if(!t.includes(n))return{valid:!1,reason:\"ext\"};try{if(!await xz(e,n))return{valid:!1,reason:\"signature\"}}catch(Ovr){return{valid:!1,reason:\"read\"}}return{valid:!0,reason:null}},bz=async(e,t,r)=>{const{valid:n,reason:a}=await vz(e,t);return!!n||(\"empty\"===a?alert(QN(\"fileCheck.alert.phrase5\")):\"nameLength\"===a?alert(QN(\"fileCheck.alert.phrase3\")):\"ext\"===a?alert(`${QN(\"fileCheck.alert.phrase6\")} ${t.join(\", \")} ${QN(\"fileCheck.alert.phrase7\")}`):\"signature\"===a&&alert(QN(\"fileCheck.alert.phrase8\")),!1)},xz=(e,t)=>new Promise((r=>{const n=new FileReader;n.onloadend=e=>{const n=new Uint8Array(e.target.result).subarray(0,4);let a=\"\";for(let t=0;t<n.length;t++)a+=n[t].toString(16).padStart(2,\"0\");const o={\"89504e47\":\"png\",ffd8ff:\"jpg\",25504446:\"pdf\",\"504b0304\":\"docx\",d0cf11e0:\"hwp\"},i=o[Object.keys(o).find((e=>a.startsWith(e)))];r(\"jpeg\"===t||\"jpg\"===t?\"jpg\"===i:\"docx\"===t||\"pdf\"===t||\"png\"===t?i===t||\"docx\"===t&&a.startsWith(\"504b\"):\"ai\"===t?\"pdf\"===i||a.startsWith(\"25215053\"):\"hwp\"===t?\"hwp\"===i:\"hwpx\"!==t||a.startsWith(\"504b\"))},n.readAsArrayBuffer(e.slice(0,4))}));function Az(e){let{open:t,onClose:r,data:n,fetchFormInfo:a}=e;const{t:o}=fa(\"translate\",{keyPrefix:\"formApprovalRejectModal\"}),i=Wu(),{formApprovalOptionData:s}=Ut((e=>e.co"
+    },
+    {
+      "id": "question-read-wire",
+      "symbol": "HY/WY/qY/GY",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8195191,
+      "endExclusive": 8196100,
+      "excerptUtf8Sha256": "cbfe1202be6f8becdcfa315434f722d7f9eaf28da03c886799d7051b53be8322",
+      "raw": "HY(e){var t,r;const n=null!==(t=null!==(r=null===e||void 0===e?void 0:e.questionImageUrl)&&void 0!==r?r:null===e||void 0===e?void 0:e.imageUrl)&&void 0!==t?t:(e=>{var t;const r=null===e||void 0===e?void 0:e.serviceFormQuestionAssets;if(!Array.isArray(r))return null;const n=r.find((e=>\"QUESTION_IMAGE\"===(null===e||void 0===e?void 0:e.assetType)&&\"string\"===typeof(null===e||void 0===e?void 0:e.url)&&\"\"!==e.url.trim()));return null!==(t=null===n||void 0===n?void 0:n.url)&&void 0!==t?t:null})(e);return\"string\"===typeof n&&\"\"!==n.trim()?n:null}function WY(e){const t=null===e||void 0===e?void 0:e.questionImageKey;return\"string\"===typeof t&&\"\"!==t.trim()?t:null}function qY(e){return{questionImageKey:WY(e)}}function GY(e){const t=null===e||void 0===e?void 0:e.questionImageFileSize;return\"number\"===typeof t&&Number.isFinite(t)?t:null}const YY=(0,yt.createContext)(!1);function QY(e){let{enabled:t,children:"
+    },
+    {
+      "id": "v3-public-gate",
+      "symbol": "wQ",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8201888,
+      "endExclusive": 8202330,
+      "excerptUtf8Sha256": "637466e8e67eae3c8badf4e7aa77b465003213a97ab5b07911aff0e506b07286",
+      "raw": "onst AQ=[\"questionOptionList\",\"formQuestionOptionDataList\"],yQ=e=>e&&\"object\"===typeof e?{...e,optionImageUrl:null,imageUrl:null,optionImageKey:null}:e;function wQ(e,t){return(e=>\"AI_V3\"===e)(t)?e:function(e){if(!e||\"object\"!==typeof e)return e;const t={...e,selectLimitMode:null,selectLimitCount:null,questionImageUrl:null,imageUrl:null,materialList:null,serviceFormQuestionAssets:null};for(const r of AQ){const n=e[r];Array.isArray(n)&&(t[r"
+    },
+    {
+      "id": "question-public-render",
+      "symbol": "s1",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8327670,
+      "endExclusive": 8327800,
+      "excerptUtf8Sha256": "5aab6a05c284334ea36d4b952aa18f70e50759e8da86335e20baeec18593b50d",
+      "raw": "0,yt.useMemo)((()=>wQ(o,a)),[o,a]),O=HY(P),M=x?AG(P):null,L=zY(UY(j,\"INFO_OWNER\"===w&&!_)),D=(0,yt.useMemo)((()=>[{infoPatternId:1"
+    },
+    {
+      "id": "question-public-image-placement",
+      "symbol": "s1",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8329280,
+      "endExclusive": 8330500,
+      "excerptUtf8Sha256": "20d42ff92436095cb54f498e10626415ea9ced33321c8f10710190175b89c313",
+      "raw": ")(\"div\",{id:`question-${P.htmlFormInputName}`,className:\"form-group\",children:[(0,nI.jsxs)(iI,{className:\"subhead-strong relative\",color:ej,children:[(0,nI.jsx)(iI,{span:!0,className:\"absolute top-[0px] [inset-inline-start:-10px] subhead-strong\",color:\"#F24E4E\",children:\"MS\"!==P.questionElementType&&\"*\"}),\"AI_V3\"===R&&null!=(null===P||void 0===P?void 0:P.orderNumber)&&\"SIGNATURE\"!==(null===P||void 0===P?void 0:P.questionType)?`${Number(P.orderNumber)+1}.\\u200e`:\"\",\" \",\"AI_V3\"===R&&\"SIGNATURE\"===(null===P||void 0===P?void 0:P.questionType)?I(C>1?\"idv\":\"signature\"):P.questionName]}),O&&(0,nI.jsx)(d1,{children:(0,nI.jsx)(u1,{src:O,alt:\"\",draggable:!1})}),(0,nI.jsx)(xQ,{item:P}),P.additionalExplanation&&(0,nI.jsx)(iI,{className:\"body-1 mt-2\",color:sj,children:(0,nI.jsx)(\"pre\",{style:{margin:\"5 0 5 0\"},children:P.additionalExplanation})}),(0,nI.jsx)(\"div\",{className:\"mt-3\",style:T?{pointerEvents:\"none\"}:void 0,children:(()=>{switch(P.questionType){case\"TEXTBOX\":case\"EMAIL_DIRECT\":return(0,nI.jsx)(a1,{item:P,onUpdate:i,elementGuideGroup:D,authCompleted:d||(null===P||void 0===P?void 0:P.authCompleted),disabled:P.disabled||u,readOnly:h,matchQuestionMapping:c});case\"TEXTAREA\":return(0,nI.jsx)(r1,{item:P,onUpda"
+    },
+    {
+      "id": "question-public-size",
+      "symbol": "d1/u1",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8335075,
+      "endExclusive": 8335414,
+      "excerptUtf8Sha256": "7f57ec990f0bacb044749f1c99d2bd8a9f099226e72bab759c013f22fe6c5b91",
+      "raw": "d1=as.div`\n  display: flex;\n  /* 가운데 정렬 — 이미지가 원본 폭을 따라 제각각이 되므로 시작선이 아니라 카드 중앙을 기준으로 잡는다.\n     (종전 flex-start 좌측 정렬을 대체한다. center 라서 RTL 폼에서도 기준이 같다) */\n  justify-content: center;\n  margin-top: 8px;\n`,u1=as.img`\n  display: block;\n  max-width: min(696px, 100%);\n  width: auto;\n  height: auto;\n  border-radius: 8px;\n`,h1=as.div`\n  display: "
+    },
+    {
+      "id": "question-admin-render",
+      "symbol": "QuestionElement admin",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8459190,
+      "endExclusive": 8459980,
+      "excerptUtf8Sha256": "e682cfe7e226e28ca95a15f34d01fd971c987388f5de7cab519b660d173eeae4",
+      "raw": "className:\"subhead-strong relative\",color:ej,children:[(0,nI.jsx)(iI,{span:!0,className:\"absolute top-[0px] [inset-inline-start:-9px] subhead-strong\",color:\"#F24E4E\",children:\"MS\"!==x.questionElementType||ce(x)?\"*\":\"\"}),\"AI_V3\"!==(null===p||void 0===p?void 0:p.formCreateType)&&!q||null==(null===x||void 0===x?void 0:x.orderNumber)?\"\":`${Number(x.orderNumber)+1}. `,\" \",x.questionName]}),HY(x)&&(0,nI.jsx)(Z2,{children:(0,nI.jsx)(e5,{src:HY(x),alt:\"\",draggable:!1})}),(0,nI.jsx)(xQ,{item:x}),x.additionalExplanation&&(0,nI.jsx)(iI,{className:\"body-1 mt-2\",color:sj,children:(0,nI.jsx)(\"pre\",{style:{margin:\"5 0 5 0\"},children:x.additionalExplanation})}),(0,nI.jsx)(\"div\",{className:\"mt-3\"}),(0,nI.jsx)(fK,{item:x}),(\"TEXTBOX\"===x.questionType||\"EMAIL_DIRECT\"===x.questionType)&&(0,nI.jsx)(K"
+    },
+    {
+      "id": "question-admin-size",
+      "symbol": "Z2/e5",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8446889,
+      "endExclusive": 8447175,
+      "excerptUtf8Sha256": "32cdb593659e996f5c0e6c82c4353fb8085be90d44bf007d8dd73e5536806d6d",
+      "raw": "Z2=as.div`\n  display: flex;\n  /* 응답자 화면(QuestionElement)과 같은 가운데 정렬 */\n  justify-content: center;\n  margin-top: 8px;\n`,e5=as.img`\n  display: block;\n  max-width: min(696px, 100%);\n  width: auto;\n  height: auto;\n  border-radius: 8px;\n`,t5=as.div`\n  background: ${e=>e.color?e.color:Kk};\n "
+    },
+    {
+      "id": "question-answer-read-render",
+      "symbol": "reply display",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8494460,
+      "endExclusive": 8495200,
+      "excerptUtf8Sha256": "32105f961765ff2f1aeb806122bc8f2df7573b9e06ab5d2986a248a0df43ed7e",
+      "raw": "6:12,...i?{border:`2px solid ${Ij}`}:{}},children:[i&&(0,nI.jsx)($5,{children:b(\"branchCondition\")}),(0,nI.jsxs)(\"div\",{children:[(0,nI.jsxs)(iI,{className:\"subhead-strong relative\",color:ej,children:[s&&(0,nI.jsx)(iI,{span:!0,className:\"absolute top-[0px] [inset-inline-start:-10px] subhead-strong\",color:\"#F24E4E\",children:\"*\"}),a.orderNumber+1,\". \",a.questionName]}),HY(a)&&(0,nI.jsx)(z5,{children:(0,nI.jsx)(V5,{src:HY(a),alt:\"\",draggable:!1})}),(0,nI.jsx)(xQ,{item:a,t:B}),a.additionalExplanation&&(0,nI.jsx)(iI,{className:\"body-1 mt-2\",color:sj,children:(0,nI.jsx)(\"pre\",{style:{margin:\"5 0 5 0\"},children:a.additionalExplanation})})]}),u&&ne(a,t,o),\"FILE\"===a.questionType?ae(a,t,{filePreview:o,isFilePdf:c,isFilePreviewable:d}):re(a"
+    },
+    {
+      "id": "question-feature-wire",
+      "symbol": "e_t/n_t/i_t/u_t/h_t",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12618669,
+      "endExclusive": 12621176,
+      "excerptUtf8Sha256": "66272ed92f83f745f73866015c27c36b13a1b6a929f53087dadd18da89f49dbb",
+      "raw": "_t={questionImage:\"useQuestionImage\",questionMaterial:\"useQuestionMaterial\",optionImage:\"useOptionImage\",pageOffset:\"usePageOffset\"},t_t=[\"questionImage\",\"questionMaterial\",\"optionImage\"],r_t=e=>{var t,r;return null!==(t=null!==(r=null===e||void 0===e?void 0:e.elementType)&&void 0!==r?r:null===e||void 0===e?void 0:e.catchFormQuestionType)&&void 0!==t?t:null===e||void 0===e?void 0:e.questionType};function n_t(e){return\"string\"!==typeof e||\"\"===e||\"IDV\"===e?[]:\"RADIO\"===e?[\"questionImage\",\"questionMaterial\",\"optionImage\",\"pageOffset\"]:\"CHECKBOX\"===e?[\"questionImage\",\"questionMaterial\",\"optionImage\"]:\"SELECTBOX\"===e?[\"questionImage\",\"questionMaterial\",\"pageOffset\"]:[\"questionImage\",\"questionMaterial\"]}const a_t=e=>n_t(e).length>0,o_t=(e,t)=>n_t(e).includes(t);function i_t(e,t){const r=null===e||void 0===e?void 0:e[e_t[t]];return\"boolean\"===typeof r?r:\"pageOffset\"!==t&&c_t(e,t)}function s_t(e,t){if(\"questionImage\"===t)return null!==WY(e)?1:0;if(\"questionMaterial\"===t)return sQ(e).length;const r=Array.isArray(null===e||void 0===e?void 0:e.questionOptionList)?e.questionOptionList:[];return\"optionImage\"===t?r.filter((e=>null!=(null===e||void 0===e?void 0:e.optionImageKey))).length:r.filter((e=>\"number\"===typeof(null===e||void 0===e?void 0:e.pageOffset)&&-2!==e.pageOffset)).length}function l_t(e){return sQ(e).reduce(((e,t)=>\"link\"===(null===t||void 0===t?void 0:t.type)?{...e,linkCount:e.linkCount+1}:{...e,fileCount:e.fileCount+1}),{fileCount:0,linkCount:0})}function c_t(e,t){return\"optionImage\"===t?(r=null===e||void 0===e?void 0:e.questionOptionList,Array.isArray(r)&&r.some(NG)):s_t(e,t)>0;var r}const d_t=(e,t)=>(Array.isArray(null===e||void 0===e?void 0:e.questionOptionList)?e.questionOptionList:[]).map((e=>({...e,...t(e)})));function u_t(e,t,r){const n=r?e:function(e,t){if(\"questionImage\"===t)return{...e,questionImageKey:null,questionImageUrl:null,questionImageFileSize:null};if(\"questionMaterial\"===t){const{materialList:t,...r}=null!==e&&void 0!==e?e:{};return{...r,materials:[]}}return\"optionImage\"===t?{...e,questionOptionList:d_t(e,(()=>({optionImageKey:null,optionImageUrl:null,optionImageFileSize:null})))}:{...e,questionOptionList:d_t(e,(()=>({pageOffset:-2})))}}(e,t);return{...n,[e_t[t]]:r}}function h_t(e){const t=r_t(e);return t_t.reduce(((r,n)=>{const a=o_t(t,n)&&i_t(e,n);return{...r,[e_t[n]]:a}}),{})}function p_t(e){return h_t(e)}const m_t=e=>null==e||e<1?1:e,f_t=e=>{if(!e||0===e.length)return[];const t=[],r=new Array(e.length).fill(!1);!function n(a,o){if(a>=e.l"
+    },
+    {
+      "id": "question-form-save-wire",
+      "symbol": "C_t/S_t",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12625330,
+      "endExclusive": 12626786,
+      "excerptUtf8Sha256": "211adf52a2fa14d99ffad73288c61cd1c7e888b69ca6387d83115aca9b9d8006",
+      "raw": "{const t=[];return e.pageList.forEach(((e,r)=>{t.push({page:e.page,pageTitle:0===r?\"\":e.pageTitle,pageContent:0===r?\"\":e.pageContent,pageOffset:e.pageOffset,questionList:e.questionList.map((e=>{return{nlpFeedbackId:e.nlpFeedbackId,title:e.title,additionalExplanation:e.description,catchFormQuestionType:e.elementType,questionOptionList:(t=kG(e.elementType,e.questionOptionList),Array.isArray(t)?t.map((e=>{const{optionImageUrl:t,imageUrl:r,optionImageFileSize:n,optionImageUploadToken:a,...o}=null!==e&&void 0!==e?e:{};return{...o,optionImageKey:SG(e)}})):[]),matrixOptionData:e.matrixOptionData,usePageOffset:e.usePageOffset,required:e.isRequired,useSecureKeyStroke:!1,...hG(e),...qY(e),materialList:lQ(e),...h_t(e),catchFormPersonalInformationRequests:w_t(e.detectedItems)};var t}))})})),t},S_t=(e,t)=>{var r;const n=$u.getState().form.constraint;let a={};return a={constraint:{chooseCollectLimitAmount:n.chooseCollectLimitAmount,collectLimitAmount:n.collectLimitAmount,chooseCollectOpenTime:n.chooseCollectOpenTime,collectOpenTime:n.collectOpenTime,collectOpenHour:\"none\"==n.collectOpenHour?null:n.collectOpenHour,chooseCollectEndTime:n.chooseCollectEndTime,collectEndTime:n.collectEndTime,collectEndHour:\"none\"==n.collectEndHour?null:n.collectEndHour,allowPageBack:n.allowPageBack},accessControl:Gvt(n),catchformId:e.catchformId,serviceId:t,title:e.title,mainText:e.description||\"<p></p>\",formLanguage:null!==(r=e.formLanguage)&&void 0!==r?r:\"ko\",pageL"
+    },
+    {
+      "id": "question-upload-editor-size",
+      "symbol": "HPt/WPt/qPt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12716500,
+      "endExclusive": 12718680,
+      "excerptUtf8Sha256": "1c51700cf8e6565b5315ae11cceb5bac812a3c4b0cf538910e73fbddfdc3cbb6",
+      "raw": " justify-content: center;\n  align-items: center;\n  background: rgba(255, 255, 255, 0.8);\n  z-index: 9999;\n  border-radius: 12px;\n`,$Pt=as.div`\n  display: flex;\n  align-items: center;\n  gap: 8px;\n`,HPt=as.div`\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 6px;\n`,WPt=as.img`\n  display: block;\n  max-width: min(696px, 100%);\n  width: auto;\n  height: auto;\n  border-radius: 8px;\n`,qPt=as.div`\n  width: 420px;\n  max-width: 100%;\n  height: 150px;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n  background-color: ${bj};\n  border: 1px solid ${hj};\n  border-radius: 8px;\n`,GPt=as.div`\n  display: flex;\n  align-items: flex-start;\n  gap: 4px;\n  padding: 4px;\n  background-color: ${Sj};\n  border: 1px solid ${pj};\n  border-radius: 8px;\n  overflow: hidden;\n`,YPt=as.button`\n  padding: 4px 8px;\n  border-radius: 4px;\n  color: ${e=>e.$danger?Uj:ej};\n\n  &:hover:not(:disabled) {\n    background-color: ${bj};\n  }\n  &:disabled {\n    cursor: default;\n    opacity: 0.4;\n  }\n`,QPt=(e,t)=>e.questionIndex===t.questionIndex&&(e.isFocus===t.isFocus&&(e.isDefaultQuestionDetectLoading===t.isDefaultQuestionDetectLoading&&(e.questionListLength===t.questionListLength&&e.pageIndex===t.pageIndex))),KPt=(0,yt.memo)((function(e){var t,r,n;let{questionListLength:a,questionIndex:o,isDefaultQuestionDetectLoading:i,questionExplainMaxLength:s,handleCopyQuestion:l,pageIndex:c}=e;const d=Wu(),{t:u}=fa(\"translate\",{keyPrefix:\"aiQuestions\"}),h=Ut((e=>e.form.formModelV3.catchformId),uk),p=Ut((e=>e.form.formModelV3.pageList[c].questionList[o]),uk),m=Ut((e=>e.form.formModelV3.formLanguage||SV),uk),[f,g]=(0,yt.useState)({show:!1}),[v,b]=(0,yt.useState)(!1),[x,A]=(0,yt.useState)(p),{user:y,expertSelectCompanyId:w}=Ut((e=>e.auth),uk),C=JO(wT),[S,T]=(0,yt.useState)(null),{customTextField:E,inputUnderlineRoot:N,inputPhoneRoot:k,selectPhoneRoot:j}=J_t(),[I,_]=(0,yt.useState)(!1),[R,P]=(0,yt.useState)(!1),O=(0,yt.useRef)(null),[M,L]=(0,yt.useState)(!1),D=(e,t)=>t||u(\"size\"===e?\"questionImage.imageSizeExceeded\":\"mime\"===e?\"questionImage.imageMimeNotAllowed\":\"questionImage.imageUploadFailed\"),F=(e,t)=>{d(ic({show:!0,type:\"fa"
+    },
+    {
+      "id": "question-stale-token-normalization",
+      "symbol": "ee/te/re/ne/ae",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12720540,
+      "endExclusive": 12721930,
+      "excerptUtf8Sha256": "ba7e63a81c2f9bad8ccf0a1ad46c7af202386f9f24bc1c507b2802ee55d2ffd2",
+      "raw": ",yt.useMemo)((()=>({countryCodePlaceholder:u(\"internationalContact.countryCodePlaceholder\"),numberPlaceholder:u(\"internationalContact.numberPlaceholder\")})),[u]),Z=()=>{var e,t;return(0,tK.cloneDeep)(null===(e=$u.getState().form.formModelV3.pageList[c])||void 0===e||null===(t=e.questionList)||void 0===t?void 0:t[o])},ee=e=>{const t=function(e){return`${\"questionImage\"===e?\"qiu\":\"qmu\"}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`}(e);return z_t(),se({...Z(),[V_t[e]]:t}),t},te=(e,t)=>(z_t(),function(e,t,r){if(!Array.isArray(e)||!r)return null;const n=V_t[t];for(let o=0;o<e.length;o+=1){var a;const t=null===(a=e[o])||void 0===a?void 0:a.questionList;if(!Array.isArray(t))continue;const i=t.findIndex((e=>(null===e||void 0===e?void 0:e[n])===r));if(i>=0)return{pageIndex:o,questionIndex:i,question:t[i]}}return null}($u.getState().form.formModelV3.pageList,e,t)),re=(e,t)=>{d(ZG(e.questionIndex,t,e.pageIndex))},ne=(e,t)=>{t>0&&d(XG(-t)),P_t(h,[e])},ae=function(e){let t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:e;const r=function(e){const t=r_t(e),r=t_t.filter((r=>!o_t(t,r)&&i_t(e,r)));return 0===r.length?e:r.reduce(((e,t)=>u_t(e,t,!1)),e)}((e=>nG(iG(e))?e:(e=>({...e,selectLimitMode:null,selectLimitCount:null}))(e))({...e,questionOptionList:kG(e.elementType,e.questionOptionList)})),n=PNt(t,r);n>0&&d(XG(-n)),P_t(h,ONt(t,r)),se(r)},oe=(0,yt.us"
+    },
+    {
+      "id": "question-type-change-confirm",
+      "symbol": "de",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12727825,
+      "endExclusive": 12728775,
+      "excerptUtf8Sha256": "0ac32b11d23a6ce71d95807cd815bf9692c84d7cc63bae7ccd3e2f32b7ab243b",
+      "raw": ")},de=(e,t)=>{const r=CQ(e,m);if(\"IDV\"===r&&G)return P(!1),void b(!0);const n=!nG(r)&&\"NONE\"!==dG(x).mode,a=zPt.filter((e=>!o_t(r,e)&&c_t(x,e)));if(n||a.length>0){const e=[...n?[u(\"selectLimit.title\")]:[],...a.map((e=>u(`featureToggle.${e}`)))].join(\", \");return P(!1),void H({show:!0,data:{title:u(\"selectLimit.resetConfirmTitle\"),body:(0,nI.jsx)(cD,{type:\"secondary\",icon:\"exclamation\",secondText:u(\"selectLimit.resetConfirmFeatures\",{names:e}),className:\"w-full\"}),cancelButtonText:u(\"selectLimit.resetConfirmCancel\"),confirmButtonText:u(\"selectLimit.resetConfirmOk\"),isShowCancelButton:!0,bodyHeader:\"\",confirmButtonType:\"warning\",handleConfirm:()=>ce(r)}})}ce(r)},ue=(null===x||void 0===x?void 0:x.disabled)||!1,he=()=>{var e;M||ue||null===(e=O.current)||void 0===e||e.click()},pe=sQ(x),me=(0,yt.useCallback)((e=>{se({...Z(),materials:e})}),[x]),fe=(0,yt.useCallback)(((e,t)=>{H({show:!0,data:{title:u(\"questionMaterial.deleteTitle\"),body:(0,nI."
+    },
+    {
+      "id": "question-upload-handler",
+      "symbol": "KPt onChange",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12737470,
+      "endExclusive": 12739744,
+      "excerptUtf8Sha256": "1781dec9410c750daebcc244de9b66c792706fd634c947de437690180e9fa57b",
+      "raw": "I.Fragment,{children:[(0,nI.jsx)(DXe,{onClick:he,type:\"secondary\",size:\"md\",disabled:M||ue,icon:\"/img/google-icons-v2/graphic/image.svg\",ariaLabel:u(\"questionImage.addImage\"),title:u(\"questionImage.addImage\"),className:\" shrink-0\"}),(0,nI.jsx)(\"input\",{ref:O,type:\"file\",accept:\"image/*\",className:\"hidden\",onChange:async e=>{var t,r;const n=e.target,a=null===(t=n.files)||void 0===t?void 0:t[0];if(n.value=\"\",!a)return;const o=Z(),i=WY(o),s=null!==i&&null!==(r=GY(o))&&void 0!==r?r:0,l=od(a,\"questionImage\");if(!l.allowed){var c;const e=\"type\"===l.reason?\"mime\":null!==(c=l.reason)&&void 0!==c?c:\"mime\";return F(e),void oE(e)}const p=ee(\"questionImage\"),m=()=>{const e=te(\"questionImage\",p);e&&re(e,H_t(e.question,\"questionImage\"))},{valid:f}=await vz(a,td,{allowLongName:!0});if(!f)return F(\"mime\"),oE(\"mime\"),void m();L(!0);try{var g,v,b;const e=await yNt((()=>{const e=sd($u.getState().form.assetUsage,-s),{allowed:t,remainBytes:r}=ad(a.size,e);return t?null:r}),(()=>function(e,t,r){return F$(e,M$,t,r)}(h,a,i)));if(!e.ok)return F(\"total\",u(\"questionImage.quotaExceeded\",{remain:id(e.reason)})),oE(\"total\"),void m();const{fileKey:t,fileUrl:r,fileSize:n,usedBytes:o,limitBytes:l}=null!==(g=null===(v=e.result)||void 0===v?void 0:v.data)&&void 0!==g?g:{};if(!t)throw new Error(\"fileKey is missing in upload response\");d(KG(o,a.size-s,l));const c=\"number\"===typeof n?n:a.size,f=te(\"questionImage\",p);if(!f)return void ne(t,c);if(!i_t(f.question,\"questionImage\"))return ne(t,c),void re(f,H_t(f.question,\"questionImage\"));re(f,{...H_t(f.question,\"questionImage\"),questionImageKey:t,questionImageUrl:null!==r&&void 0!==r?r:null,questionImageFileSize:c}),y=null===(b=f.question)||void 0===b?void 0:b.elementType,Tt().dataLayer({dataLayer:{event:\"insert_question_image\",question_type:y}})}catch(w){var x,A;const e=fNt(w);F(gNt(w)?\"mime\":\"upload\",e?null!==(x=e.serverMessage)&&void 0!==x?x:u(`assetError.${e.messageKey}`):null),oE(null!==(A=null===e||void 0===e?void 0:e.category)&&void 0!==A?A:gNt(w)?\"mime\":\"unknown\"),m()}finally{L(!1)}var y}})]})]})}),U&&(B||M)&&(0,nI.jsxs)(HPt,{className:\"non-drag mb-2 mt-2\",children:[M?(0,nI.jsxs)(qPt,{children:[(0,nI.jsx)(xB,{size:24}),(0,nI.jsx)(iI,{className:\"body-2\",color:sj,children:u(\"questionImage.imageUploading\")})]}):(0,nI.jsx"
+    },
+    {
+      "id": "question-delete-replace-ui",
+      "symbol": "GPt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12739700,
+      "endExclusive": 12740710,
+      "excerptUtf8Sha256": "e5338a1e38628a7a0694ce80ebda533e89716c6669e9bcf4262e3ad598c1a64e",
+      "raw": "uestionImage.imageUploading\")})]}):(0,nI.jsx)(WPt,{src:null!==B&&void 0!==B?B:void 0,alt:\"\",draggable:!1}),(0,nI.jsxs)(GPt,{children:[(0,nI.jsx)(YPt,{className:\"body-2\",type:\"button\",onClick:he,disabled:M||ue,children:u(\"questionImage.changeImage\")}),(0,nI.jsx)(YPt,{className:\"body-2\",type:\"button\",$danger:!0,onClick:()=>{H({show:!0,data:{title:u(\"questionImage.deleteImageTitle\"),body:(0,nI.jsx)(cD,{type:\"secondary\",icon:\"exclamation\",secondText:u(\"questionImage.deleteImageBody\"),className:\"w-full\"}),cancelButtonText:u(\"questionImage.cancel\"),confirmButtonText:u(\"questionImage.deleteImage\"),isShowCancelButton:!0,bodyHeader:\"\",confirmButtonType:\"warning\",handleConfirm:()=>{const e=Z(),t=GY(e);t&&d(XG(-t));const r=WY(e);r&&P_t(h,[r]),se({...Z(),questionImageKey:null,questionImageUrl:null,questionImageFileSize:null}),d(ic({show:!0,type:\"success\",text:u(\"questionImage.deleteImageDone\")}))}}})},disabled:M,children:u(\"questionImage.deleteImage\")})]})]}),z&&(0,nI.jsx)(xPt,{materials:pe,catchformId:h,qu"
+    },
+    {
+      "id": "feature-off-delete-question",
+      "symbol": "R/onToggle",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12697800,
+      "endExclusive": 12701640,
+      "excerptUtf8Sha256": "a0f1224a7379134a9e2a4abc972c59038dcf68141efa9fbdb7e3d86d343778fe",
+      "raw": "lButton:!1}})},R=(e,t)=>{var r,s,l;z_t();const c=null!==(r=null===(s=$u.getState().form.formModelV3.pageList[i])||void 0===s||null===(l=s.questionList)||void 0===l?void 0:l[n])&&void 0!==r?r:a,u=u_t(c,e,t),h=PNt(c,u);return h>0&&d(XG(-h)),P_t($u.getState().form.formModelV3.catchformId,ONt(c,u)),o(u),z_t(),h},P=n_t(t).map((e=>{const t=\"pageOffset\"===e&&I;return{key:e,label:c(e),checked:i_t(a,e),disabled:t,badgeCount:s_t(a,e),infoTooltip:t?[c(\"blockedPageOffsetBody1\"),c(\"blockedPageOffsetBody2\"),c(\"blockedPageOffsetBody3\")]:void 0}}));return(0,yt.useEffect)((()=>{const e=(e=>{let t=0;return e.forEach((e=>{e.questionList.forEach((e=>{t++}))})),t})($u.getState().form.formModelV3.pageList);b(e>1)}),[$u.getState().form.formModelV3.pageList]),(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsx)(BL,{className:\"center p-2\",content:s(\"copy\"),placement:\"bottom\",theme:\"light\",children:(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(DXe,{onClick:()=>j(n),type:\"secondary\",size:\"md\",disabled:x,icon:\"/img/google-icons-v2/document/file-copy.svg\",className:\" !bg-transparent\"})})}),v&&(0,nI.jsx)(BL,{className:\"center p-2\",content:s(\"delete\"),placement:\"bottom\",theme:\"light\",children:(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(DXe,{onClick:()=>(e=>{var t;z_t();const r=(0,tK.cloneDeep)($u.getState().form.formModelV3.pageList[i].questionList),n=(0,tK.cloneDeep)($u.getState().form.formModelV3.pageList);S({show:!0,data:{...C.data,body:r[e].usePageOffset?(0,nI.jsx)(eRt,{children:(0,nI.jsx)(iI,{className:\"body-1-strong\",color:Uj,children:\"\\ubcf8 \\ubb38\\ud56d\\uc744 \\uc0ad\\uc81c\\ud558\\uc2dc\\uba74 \\ub2f5\\ubcc0\\uc5d0 \\ub530\\ub978 \\ud398\\uc774\\uc9c0 \\uc774\\ub3d9 \\uc124\\uc815\\uc774 \\uc0ad\\uc81c \\ub429\\ub2c8\\ub2e4.\"})}):(0,nI.jsxs)(eRt,{children:[(0,nI.jsx)(iI,{className:\"body-1-strong\",color:Uj,children:`'Q${r[e].questionNumber}. ${null===(t=r[e])||void 0===t?void 0:t.title}' \\ubb38\\ud56d\\uc744 \\uc0ad\\uc81c\\ud558\\uc2dc\\uaca0\\uc2b5\\ub2c8\\uae4c?`}),(0,nI.jsx)(iI,{className:\"body-1-strong\",color:Uj,children:\"\\uc0ad\\uc81c\\ub41c \\ubb38\\ud56d\\uc740 \\ubcf5\\uad6c\\ud560 \\uc218 \\uc5c6\\uc2b5\\ub2c8\\ub2e4.\"})]}),handleConfirm:()=>{const t=_Nt(r[e]).totalBytes;t>0&&d(XG(-t)),P_t($u.getState().form.formModelV3.catchformId,RNt(r[e])),r.splice(e,1),n[i].questionList=r;const a=A_t(n);d(QG({...$u.getState().form.formModelV3,pageList:a}))}}})})(n),type:\"secondary\",size:\"md\",disabled:!1,icon:\"/img/google-icons-v2/system/delete.svg\",className:\" !bg-transparent\"})})}),a_t(t)&&(0,nI.jsx)(E4,{className:\"center p-2\",content:s(\"featureNudge\"),placement:\"bottom-end\",theme:\"light\",children:(0,nI.jsxs)(QRt,{children:[(0,nI.jsxs)(KRt,{\"aria-controls\":\"simple-menu\",\"aria-haspopup\":\"true\",onClick:e=>{h(e.currentTarget)},children:[(0,nI.jsx)(cP,{src:\"/media/catchsecu/more-icon.svg\",color:Zk}),(0,nI.jsx)(jgt,{})]}),(0,nI.jsx)(XRt,{id:\"simple-menu\",anchorEl:u,keepMounted:!0,open:Boolean(u),onClose:()=>{h(null)},anchorOrigin:{vertical:\"bottom\",horizontal:\"right\"},transformOrigin:{vertical:\"top\",horizontal:\"right\"},className:\"!z-100000\",children:(0,nI.jsx)(GRt,{items:P,onToggle:(e,r)=>{if(\"pageOffset\"===e&&I)return void _();const n=String(null!==t&&void 0!==t?t:\"\"),o=c_t(a,e);if(r||!o)return uE(e,r?\"on\":\"off\",n,o),void R(e,r);const i=c(e),s=s_t(a,e);E({show:!0,data:{title:c(\"offTitle\",{name:i}),body:(0,nI.jsx)(cD,{type:\"warning\",icon:\"exclamation\",secondText:c(YRt[e],{count:s,...l_t(a)}),className:\"w-full\"}),cancelButtonText:c(\"offCancel\"),confirmButtonText:c(\"offConfirm\"),isShowCancelButton:!0,confirmButtonType:\"warning\",handleConfirm:()=>{uE(e,\"off\",n,!0);const t=R(e,!1);!function(e,t){let r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:0;Tt().dataLayer({dataLayer:{event:\"toggle_off_discarded\",feature:dE(e),discarded_count:t,discarded_bytes:r}})}(e,s,t),d(ic({show:!0,type:\"success\",text:c(\"offDoneToast\",{name:i})}))}}})}})})]})}),C.show&&(0,nI.jsx)(t"
+    },
+    {
+      "id": "temp-discard",
+      "symbol": "P_t",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12628833,
+      "endExclusive": 12629197,
+      "excerptUtf8Sha256": "02cb4dbc3c15bdb73828b775c1cfe93499d844712c40ece70aea537f638d24c2",
+      "raw": "n,page:r})},__t=e=>null!==e&&void 0!==e&&\"\"!==e&&0!==e,R_t=new Map;function P_t(e,t){if(!__t(e))return;const r=Array.from(new Set(t.filter((e=>\"string\"===typeof e&&\"\"!==e.trim()))));var n;if(0!==r.length)try{Promise.resolve((n={catchformId:e,s3Keys:r},At.post(`${PE}/company-operated-service/catch-form/asset/temp/discard`,n))).catch((()=>{}))}catch{}}function O_t"
+    },
+    {
+      "id": "question-load",
+      "symbol": "RLt c",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12888010,
+      "endExclusive": 12888732,
+      "excerptUtf8Sha256": "b66d24832dfc4bfab015c85c9d51b17838e073cce6901c58cf103adb4a1357bf",
+      "raw": ".catchFormPersonalInformationRequests);t.push({usePageOffset:e.usePageOffset,nlpFeedbackId:e.nlpFeedbackId,disabled:!!o.find((e=>\"RESIDENT\"===e.detectedType)),isRequired:e.required,currentTitle:e.title,title:e.title,description:e.additionalExplanation||\"\",elementType:e.catchFormQuestionType,questionOptionList:(null!==(r=e.questionOptionList)&&void 0!==r?r:[]).map((e=>({...e,optionImageFileSize:_G(e)}))),useSecureKeyStroke:!1,matrixOptionData:e.matrixOptionData,selectLimitMode:null!==(n=e.selectLimitMode)&&void 0!==n?n:null,selectLimitCount:null!==(a=e.selectLimitCount)&&void 0!==a?a:null,questionImageKey:WY(e),questionImageUrl:HY(e),questionImageFileSize:GY(e),materials:sQ(e),...p_t(e),detectedItems:o})})),t};ret"
+    },
+    {
+      "id": "question-preview-dto",
+      "symbol": "wLt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12876290,
+      "endExclusive": 12876915,
+      "excerptUtf8Sha256": "e6cfff2d15db7658a32afe16601ae94a28a59dc5e7add515189a752f406683cc",
+      "raw": "er;\n`),bLt=as.div`\n  height: 1px;\n  background-color: ${uj};\n`,xLt=\"step1_preview_contents\",ALt=\"step1_preview_mobile_contents\",yLt=e=>\"number\"===typeof e&&e>=1?e:1,wLt=e=>e.map((e=>({...e,questionList:e.questionList.map((e=>({title:e.title,description:e.description,elementType:e.elementType,questionOptionList:e.questionOptionList,matrixOptionData:e.matrixOptionData,isRequired:e.isRequired,usePageOffset:e.usePageOffset,questionNumber:e.questionNumber,selectLimitMode:e.selectLimitMode,selectLimitCount:e.selectLimitCount,questionImageUrl:e.questionImageUrl,materials:e.materials})))})));function CLt(e){let{open:t,onClose"
+    },
+    {
+      "id": "upload-queue-errors",
+      "symbol": "hNt/fNt/ANt/yNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12341014,
+      "endExclusive": 12342900,
+      "excerptUtf8Sha256": "088371473ee9caf3d1b3ac67dd52ead7e80621158c012d9d937265c3cc070d97",
+      "raw": "const hNt={OVER_LIMIT_QUESTION_IMAGE_SIZE:\"questionImageSize\",OVER_LIMIT_OPTION_IMAGE_SIZE:\"optionImageSize\",OVER_LIMIT_MATERIAL_FILE_SIZE:\"materialSize\",OVER_LIMIT_MATERIAL_COUNT:\"materialCount\",INVALID_MATERIAL_URL_SCHEME:\"materialUrlScheme\",OPTION_IMAGE_NOT_ALLOWED_TYPE:\"optionImageNotAllowedType\",OPTION_IMAGE_NOT_ALLOWED_CUSTOM:\"optionImageNotAllowedCustom\",OVER_LIMIT_OPTION_IMAGE_COUNT:\"optionImageCount\",OVER_LIMIT_CATCHFORM_ASSET_SIZE:\"formTotal\",INVALID_CATCHFORM_ASSET_TYPE:\"assetTypeInvalid\",NOT_FOUND_CATCHFORM_ASSET:\"assetNotFound\",OVER_LIMIT_MATERIAL_LINK_COUNT:\"materialLinkCount\",INVALID_MATERIAL_PAYLOAD:\"materialPayload\",OVER_LIMIT_MATERIAL_LINK_LABEL:\"materialLinkLabel\",NOT_FOUND_FORM:\"notFoundForm\",FORBIDDEN:\"forbidden\"},pNt={331:\"emptyFile\",332:\"assetTypeNotAllowed\"},mNt=new Set([\"OVER_LIMIT_CATCHFORM_ASSET_SIZE\"]);function fNt(e){const t=(e=>{var t,r,n,a;return null!==(t=null!==(r=null!==(n=null===e||void 0===e||null===(a=e.response)||void 0===a?void 0:a.data)&&void 0!==n?n:null===e||void 0===e?void 0:e.data)&&void 0!==r?r:e)&&void 0!==t?t:{}})(e),r=\"string\"===typeof t.category?t.category:\"\",n=\"string\"===typeof t.message&&\"\"!==t.message.trim()?t.message:null;if(!r||!(r in hNt)){const e=\"number\"===typeof t.code?t.code:null,n=null!==e?pNt[e]:void 0;return n?{category:r||`code_${e}`,messageKey:n,serverMessage:null}:null}return mNt.has(r)&&n?{category:r,messageKey:null,serverMessage:n}:{category:r,messageKey:hNt[r],serverMessage:null}}function gNt(e){var t;return 415===(null===e||void 0===e||null===(t=e.response)||void 0===t?void 0:t.status)}const vNt=new Set;function bNt(){return vNt.size>0}let xNt=Promise.resolve();function ANt(e){const t=xNt.then(e,e);return xNt=t.catch((()=>{})),t}async function yNt(e,t){return ANt((async()=>{const r=e();return null!==r&&void 0!==r?{ok:!1,reason:r}:{ok:!0,result:await t()}}))}const wNt=e=>null!==(null===e"
+    },
+    {
+      "id": "body-upload-adapter",
+      "symbol": "SNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12342997,
+      "endExclusive": 12344854,
+      "excerptUtf8Sha256": "500296bd166102d0ad0a7e84d9ba65acb2c541ace280d18c72792e133465253d",
+      "raw": "atchformId&&\"\"!==e.catchformId,CNt=[\"image/jpeg\",\"image/jpg\",\"image/png\"];function SNt(e,t){const r=e=>{throw void(wNt(t)?$u.dispatch(ic({show:!0,type:\"fail\",text:e})):alert(e))};return{upload:async()=>{const n=wNt(t)?function(){const e=Symbol(\"contentImageUpload\");return vNt.add(e),()=>{vNt.delete(e)}}():()=>{};return ANt((async()=>{try{const n=await e.file;if(n.size>Jc.contentImage&&r(QN(\"uploadAdapter.alert.phrase1\")+(n.size/1048576).toFixed(2)+QN(\"uploadAdapter.alert.phrase2\")),CNt.includes(n.type)||r(QN(\"uploadAdapter.alert.phrase6\")),wNt(t)){const{allowed:e,remainBytes:t}=ad(n.size,$u.getState().form.assetUsage);e||r(QN(\"uploadAdapter.alert.quotaExceeded1\")+id(t)+QN(\"uploadAdapter.alert.quotaExceeded2\"))}const c=new FormData;c.append(\"files\",n),wNt(t)&&(c.append(\"catchformId\",String(t.catchformId)),c.append(\"assetType\",t.assetType));try{var a,o;const e=await At.post(`${PE}/company-operated-service/formImage/upload`,c,{headers:{\"Check-Multipart\":!0}}),{imgUrl:r,fileSize:i,usedBytes:s,limitBytes:l}=null!==(a=e.data)&&void 0!==a?a:{};return null===t||void 0===t||null===(o=t.onUploaded)||void 0===o||o.call(t,{url:r,fileSize:\"number\"===typeof i?i:n.size,usedBytes:s,limitBytes:l}),{default:r}}catch(l){var i,s;const e=((e,t)=>{var r,n;const a=fNt(e);return a?null!==(r=a.serverMessage)&&void 0!==r?r:t(null!==(n=a.messageKey)&&void 0!==n?n:\"\"):null})(l,(e=>QN(`aiQuestions.assetError.${e}`)));e&&r(e);const t=null!==(i=null===l||void 0===l||null===(s=l.response)||void 0===s?void 0:s.data)&&void 0!==i?i:{},n=\"string\"===typeof t.message?t.message:\"\",a=gNt(l)||n.startsWith(\"not allowed format\")?QN(\"uploadAdapter.alert.phrase3\"):QN(\"size too big\"===n?\"uploadAdapter.alert.phrase4\":\"can not read file\"===n?\"uploadAdapter.alert.phrase5\":\"uploadAdapter.alert.uploadFailed\");r(a)}}finally{n()}}))}}}const TNt=e=>\"string\"===typeof e&&\"\"!==e.tr"
+    },
+    {
+      "id": "html-image-extraction",
+      "symbol": "jpt/Ipt/Rpt/Ppt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 11578370,
+      "endExclusive": 11579460,
+      "excerptUtf8Sha256": "d51c52802de7a947fd22e7e261cb9fb560f03195bf3ce7903725254547c2169e",
+      "raw": "function jpt(e){if(\"string\"!==typeof e||\"\"===e.trim())return[];const t=(new DOMParser).parseFromString(e,\"text/html\");return Array.from(t.querySelectorAll(\"img\")).map((e=>{var t;return null!==(t=e.getAttribute(\"src\"))&&void 0!==t?t:\"\"})).filter((e=>\"\"!==e.trim()))}function Ipt(e,t,r){const n=new Set(jpt(t)),a=new Set(r);return Array.from(new Set(jpt(e).filter((e=>!n.has(e)&&!a.has(e)))))}function _pt(e,t){return e.reduce(((e,r)=>{const n=null===t||void 0===t?void 0:t[r];return\"number\"===typeof n&&Number.isFinite(n)?e+n:e}),0)}function Rpt(e){return Array.isArray(e)?e.reduce(((e,t)=>(\"string\"===typeof(null===t||void 0===t?void 0:t.url)&&\"number\"===typeof(null===t||void 0===t?void 0:t.fileSize)&&Number.isFinite(t.fileSize)&&(e[t.url]=t.fileSize),e)),{}):{}}function Ppt(e){return\"string\"!==typeof e?\"\":e.replace(/<img\\b[^>]*>/gi,(e=>function(e){var t;const r=null===(t=(new DOMParser).parseFromString(e,\"text/html\").querySelector(\"img\"))||void 0===t?void 0:t.getAttribute(\"src\");return\"string\"===typeof r&&\"\"!==r.trim()}(e)?e:\"\"))}const Opt=e=>{if(null===e||void 0===e)return!1;retu"
+    },
+    {
+      "id": "content-image-key-filter",
+      "symbol": "kNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12344854,
+      "endExclusive": 12345165,
+      "excerptUtf8Sha256": "e36e454cc669fdb22fd8e453735ba8a59d333896384060f411e043703c9e2309",
+      "raw": "im()?e:null,ENt=e=>\"number\"===typeof e&&Number.isFinite(e)?e:0,NNt=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.[a-z0-9]+$/i;function kNt(e){if(\"string\"!==typeof e||\"\"===e.trim())return!1;if(/^data:/i.test(e.trim()))return!1;const t=e.split(/[?#]/)[0];return NNt.test(t.slice(t.lastIndexOf(\"/"
+    },
+    {
+      "id": "question-copy-collect",
+      "symbol": "INt/_Nt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12345164,
+      "endExclusive": 12346272,
+      "excerptUtf8Sha256": "f480c22bd8cec22d8d913ac3f11d9e1d109eee4f1a31edd44a7d424b78972c4a",
+      "raw": "/\")+1))}const jNt=(e,t)=>({assetType:e,originS3Key:t,targetAssetType:e});function INt(e){const t={},r=TNt(null===e||void 0===e?void 0:e.questionImageKey);r&&(t[r]=ENt(null===e||void 0===e?void 0:e.questionImageFileSize));for(const a of null!==(n=null===e||void 0===e?void 0:e.questionOptionList)&&void 0!==n?n:[]){var n;const e=TNt(null===a||void 0===a?void 0:a.optionImageKey);e&&(t[e]=ENt(null===a||void 0===a?void 0:a.optionImageFileSize))}for(const a of sQ(e)){const e=TNt(null===a||void 0===a?void 0:a.fileKey);\"file\"===(null===a||void 0===a?void 0:a.type)&&e&&(t[e]=ENt(null===a||void 0===a?void 0:a.size))}return t}function _Nt(e){const t=INt(e),r=[],n=new Set,a=(e,t)=>{t&&!n.has(t)&&(n.add(t),r.push(jNt(e,t)))};a(\"QUESTION_IMAGE\",TNt(null===e||void 0===e?void 0:e.questionImageKey));for(const s of null!==(o=null===e||void 0===e?void 0:e.questionOptionList)&&void 0!==o?o:[]){var o;a(\"OPTION_IMAGE\",TNt(null===s||void 0===s?void 0:s.optionImageKey))}for(const s of sQ(e))\"file\"===(null===s||void 0===s?void 0:s.type)&&a(\"QUESTION_MATERIAL\",TNt(null===s||void 0===s?void 0:s.fileKey));const i=r.redu"
+    },
+    {
+      "id": "page-copy-collect",
+      "symbol": "MNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12346308,
+      "endExclusive": 12347376,
+      "excerptUtf8Sha256": "c6379d51c0216b1de611a625cb124d3dd8062144b07fd46c011cd655e46dde1f",
+      "raw": "n=t[r.originS3Key])&&void 0!==n?n:0)}),0);return{assets:r,totalBytes:i,contentImageBytes:0}}function RNt(e){return Object.keys(INt(e))}function PNt(e,t){const r=INt(e),n=new Set(Object.keys(INt(t)));return Object.entries(r).reduce(((e,t)=>{let[r,a]=t;return n.has(r)?e:e+a}),0)}function ONt(e,t){const r=new Set(Object.keys(INt(t)));return Object.keys(INt(e)).filter((e=>!r.has(e)))}function MNt(e,t){var r;let n=arguments.length>2&&void 0!==arguments[2]?arguments[2]:[];const a=null!==(r=null===e||void 0===e?void 0:e.questionList)&&void 0!==r?r:[],o=[],i=new Set;for(const h of a)for(const e of _Nt(h).assets)i.has(e.originS3Key)||(i.add(e.originS3Key),o.push(e));const s=a.reduce(((e,t)=>({...e,...INt(t)})),{}),l=o.reduce(((e,t)=>{var r;return e+(null!==(r=s[t.originS3Key])&&void 0!==r?r:0)}),0),c=Array.from(new Set(jpt(null===e||void 0===e?void 0:e.pageContent))).filter(kNt),d=new Set(n),u=c.reduce(((e,r)=>d.has(r)?e:e+ENt(null===t||void 0===t?void 0:t[r])),0);return{assets:[...o,...c.map((e=>jNt(\"PAGE_CONTENT_IMAGE\",e)))],totalBytes:l,contentImageBytes:u}}"
+    },
+    {
+      "id": "copy-response-question-map",
+      "symbol": "LNt/DNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12347376,
+      "endExclusive": 12348517,
+      "excerptUtf8Sha256": "80fa81bf953d6d24b0b6b80214e410d2bec7fcd43db9d757cd4d4896ebd8baa5",
+      "raw": "function LNt(e,t){var r,n;const a=new Map((null!==(r=null===t||void 0===t?void 0:t.assets)&&void 0!==r?r:[]).map((e=>[e.originKey,e]))),o=a.get(null===e||void 0===e?void 0:e.questionImageKey),i=sQ(e).map((e=>{const t=\"file\"===e.type?a.get(e.fileKey):void 0;return t?{...e,fileKey:t.newKey,url:t.fileUrl,size:t.fileSize}:{...e}}));return{...e,...o?{questionImageKey:o.newKey,questionImageUrl:o.fileUrl,questionImageFileSize:o.fileSize}:{},questionOptionList:(null!==(n=null===e||void 0===e?void 0:e.questionOptionList)&&void 0!==n?n:[]).map((e=>{const t=a.get(null===e||void 0===e?void 0:e.optionImageKey);return t?{...e,optionImageKey:t.newKey,optionImageUrl:t.fileUrl,optionImageFileSize:t.fileSize}:{...e}})),materials:i,materialList:void 0}}function DNt(e){var t;const r=sQ(e).filter((e=>\"file\"!==e.type)).map(((e,t)=>({...e,sequence:t})));return{...e,questionImageKey:null,questionImageUrl:null,questionImageFileSize:null,questionOptionList:(null!==(t=null===e||void 0===e?void 0:e.questionOptionList)&&void 0!==t?t:[]).map((e=>({...e,optionImageKey:null,optionImageUrl:null,optionImageFileSize:null}))),materials:r,materialList:void 0}}"
+    },
+    {
+      "id": "content-url-set-helpers",
+      "symbol": "FNt/BNt/UNt/zNt/VNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12348517,
+      "endExclusive": 12349707,
+      "excerptUtf8Sha256": "f390a8d33c8c76b2dd326da67f4aeedb989e22799907edf605c095d6478c9575",
+      "raw": "function FNt(e,t){const r=[];null!==t&&void 0!==t&&t.excludeDescription||\"string\"!==typeof(null===e||void 0===e?void 0:e.description)||r.push(e.description);return(Array.isArray(null===e||void 0===e?void 0:e.pageList)?e.pageList:[]).forEach(((e,n)=>{(null===t||void 0===t?void 0:t.excludePageIndex)!==n&&\"string\"===typeof(null===e||void 0===e?void 0:e.pageContent)&&r.push(e.pageContent)})),r}function BNt(e,t,r){const n=\"END\"===r?null===t||void 0===t?void 0:t.privatePageContent:null===t||void 0===t?void 0:t.endPageContent,a=FNt(e);return\"string\"===typeof n&&\"\"!==n.trim()?[...a,n]:a}function UNt(e,t){let r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:[];const n=new Set([...jpt(t),...r.flatMap((e=>jpt(e)))]),a=jpt(e).filter((e=>!n.has(e)));return Array.from(new Set(a)).filter(kNt)}function zNt(e){const t=[e,...arguments.length>1&&void 0!==arguments[1]?arguments[1]:[]].flatMap((e=>jpt(e)));return Array.from(new Set(t)).filter(kNt)}function VNt(e,t){const r=zNt(e),n=zNt(t);if(r.length!==n.length)return!0;const a=new Set(n);return r.some((e=>!a.has(e)))}const $Nt=new Set([\"ar\",\"he\",\"fa\",\"ur\",\"ps\",\"ku\",\"sd\",\"yi\"]);function HNt(e){return function(t){t.ui.componentFactory."
+    },
+    {
+      "id": "editor-rtl-direction",
+      "symbol": "HNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12349707,
+      "endExclusive": 12350533,
+      "excerptUtf8Sha256": "3915babbf68cc3a4e321f0097c73d19454fbde007e7d8564397925d16e59d766",
+      "raw": "add(\"rtlToggle\",(r=>{const n=t.ui.componentFactory.create(\"bold\"),a=n.constructor;n.destroy();const o=new a(r);return o.set({label:\"Toggle text direction (RTL/LTR)\",tooltip:!0,icon:'<svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10v5h2V4h2v11h2V4h2V2h-8C7.79 2 6 3.79 6 6s1.79 4 4 4zm-2 7v-3l-4 4 4 4v-3h12v-2H8z\"/></svg>',isToggleable:!0}),o.set(\"isOn\",e),o.on(\"execute\",(()=>{const e=!o.isOn;o.set(\"isOn\",e),t.editing.view.change((r=>{const n=t.editing.view.document.getRoot();r.setAttribute(\"dir\",e?\"rtl\":\"ltr\",n)}))})),o}))}}const WNt=Ak,qNt=$k,GNt=Gk,YNt=zk,QNt=mk,KNt=yk,XNt=[\"image\",\"media\"];let JNt=0;const ZNt=[{position:\"tl\",cursor:\"nwse-resize\"},{position:\"tr\",cursor:\"nesw-resize\"},{position:\"bl\",cursor:\"nesw-resize\"},{position:\"br\",cursor:\"nwse-resize\"}],ekt=[{name:\"left\",label:\"Align "
+    },
+    {
+      "id": "editor-width-serialization",
+      "symbol": "tkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12351300,
+      "endExclusive": 12353520,
+      "excerptUtf8Sha256": "4530b5140360ef635f0efb5313dcacf5a56e25181c2320f1260d1bd6fe4b2942",
+      "raw": "ibutes:\"width\"})})),t.isRegistered(\"media\")&&t.extend(\"media\",{allowAttributes:\"alignment\"}),XNt.forEach((t=>{e.conversion.for(\"downcast\").add((e=>{e.on(`attribute:width:${t}`,((e,t,r)=>{if(!r.consumable.consume(t.item,e.name))return;const n=r.mapper.toViewElement(t.item);if(!n)return;const a=r.writer;null!==t.attributeNewValue&&void 0!==t.attributeNewValue?a.setStyle(\"width\",t.attributeNewValue,n):a.removeStyle(\"width\",n)}))}))})),e.conversion.for(\"downcast\").add((e=>{e.on(\"attribute:alignment:media\",((e,t,r)=>{if(!r.consumable.consume(t.item,e.name))return;const n=r.mapper.toViewElement(t.item);if(!n)return;const a=r.writer;a.removeClass([\"media-align-left\",\"media-align-center\",\"media-align-right\"],n);const o=t.attributeNewValue;\"left\"!==o&&\"center\"!==o&&\"right\"!==o||a.addClass(`media-align-${o}`,n)}))})),e.conversion.for(\"upcast\").add((e=>{e.on(\"element:figure\",((e,t,r)=>{var n;const a=t.viewItem;if(!a||null===(n=a.hasStyle)||void 0===n||!n.call(a,\"width\"))return;const o=a.getStyle(\"width\");if(t.modelRange)for(const s of t.modelRange.getItems())if(s.is&&s.is(\"element\",\"image\"))return void r.writer.setAttribute(\"width\",o,s);const i=t.modelCursor;if(i){const e=i.parent;if(e&&e.getChildren){const t=Array.from(e.getChildren());for(let e=t.length-1;e>=0;e--){const n=t[e];if(n.is&&n.is(\"element\",\"media\"))return void r.writer.setAttribute(\"width\",o,n)}}}}),{priority:\"lowest\"})})),e.conversion.for(\"upcast\").add((e=>{e.on(\"element:figure\",((e,t,r)=>{const n=t.viewItem;if(!n||!n.hasClass)return;let a=null;if(n.hasClass(\"media-align-left\")?a=\"left\":n.hasClass(\"media-align-right\")?a=\"right\":n.hasClass(\"media-align-center\")&&(a=\"center\"),!a)return;const o=t.modelCursor;if(!o)return;const i=o.parent;if(i&&i.getChildren){const e=Array.from(i.getChildren());for(let t=e.length-1;t>=0;t--){const n=e[t];if(n.is&&n.is(\"element\",\"media\"))return void r.writer.setAttribute(\"alignment\",a,n)}}}),{priority:\"lowest\"})}));const{container:r,handles:n,alignToolbar:a,alignButtons:o}=function(){let e=document.getElementById(\"cs-ck-resize-overlay\");const t=new Map,r=new Map;if(e){ZNt.forEach((r=>{const n=e.querySelector(`[data-handle=\"${r.position}\"]`);n&&t.set(r.position,n)}));const n=document.getElementById(\""
+    },
+    {
+      "id": "editor-resize-interaction",
+      "symbol": "tkt mouse handlers",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12357580,
+      "endExclusive": 12358783,
+      "excerptUtf8Sha256": "c1211da56af7d55500165507ceee9d9e61a3605eaac84abad6633f8191adbdae",
+      "raw": "er(\"mousedown\",(t=>{if(!i||!s)return;t.preventDefault(),t.stopPropagation(),l=!0;const n=t.clientX,a=i.offsetWidth,o=i.parentElement,d=o?o.offsetWidth:a,u=\"tl\"===r||\"bl\"===r,h=e=>{if(!i)return;let t=e.clientX-n;u&&(t=-t);const r=a+t,o=Math.max(10,Math.min(100,r/d*100));i.style.width=`${o.toFixed(1)}%`,c()},p=()=>{if(window.removeEventListener(\"mousemove\",h),window.removeEventListener(\"mouseup\",p),l=!1,!i||!s)return;const t=i.style.width;t&&e.model.change((e=>{e.setAttribute(\"width\",t,s)})),c()};window.addEventListener(\"mousemove\",h),window.addEventListener(\"mouseup\",p)}))})),e.on(\"destroy\",(()=>{window.removeEventListener(\"scroll\",c,{capture:!0}),window.removeEventListener(\"resize\",c),i=null,s=null,l=!1,JNt=Math.max(0,JNt-1),0===JNt&&(r.remove(),a.remove())}))}const rkt=new Set([\"image\",\"media\"]);function nkt(e){var t,r;const n=null===(t=(r=e.model.document.selection).getSelectedElement)||void 0===t?void 0:t.call(r);return n&&rkt.has(n.name)?n:null}function akt(e){setTimeout((()=>function(e){let t;try{t=e.commands.get(\"imageUpload\")}catch{return}if(!t)return;let r=!1;t.on(\"change:isEnabled\",((n,a,o)=>{r||!o&&nkt(e)&&(r=!0,t.isEnabled=!0,r=!1)}));const n=setInterval((()=>{!t.isEnabled&"
+    },
+    {
+      "id": "editor-upload-configuration",
+      "symbol": "mkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12373418,
+      "endExclusive": 12375340,
+      "excerptUtf8Sha256": "5706ef5b81d05420ba583923e77f245e4d0224336320ac5083efa64ffdcb9e07",
+      "raw": ",r;const n=e.height||300,a=(0,yt.useRef)(e.assetScope);a.current=e.assetScope;const o=(0,yt.useRef)(void 0);var i;e.assetScope&&!o.current&&(o.current=(i=()=>a.current,{get catchformId(){var e;return null===(e=i())||void 0===e?void 0:e.catchformId},get assetType(){var e;return null===(e=i())||void 0===e?void 0:e.assetType},onUploaded:e=>{var t,r;return null===(t=i())||void 0===t||null===(r=t.onUploaded)||void 0===r?void 0:r.call(t,e)}}));const s=function(e){const t=(e||\"\").toLowerCase().split(\"-\")[0];return $Nt.has(t)}(e.language||\"en\"),l=s?\"ar\":\"en\",c={extraPlugins:[(d=o.current,function(e){e.plugins.get(\"FileRepository\").createUploadAdapter=e=>SNt(e,d)}),HNt(s),tkt,akt,ukt],placeholder:e.placeholder,toolbar:{items:[\"heading\",\"|\",\"bold\",\"italic\",\"link\",\"bulletedList\",\"numberedList\",\"|\",\"outdent\",\"indent\",\"|\",e.imageUpload&&\"imageUpload\",\"blockQuote\",\"mediaEmbed\",\"insertTable\",\"undo\",\"redo\"]},mediaEmbed:{previewsInData:!0,extraProviders:[{name:\"youtubeShorts\",url:/^(?:www\\.|m\\.)?youtube\\.com\\/shorts\\/([\\w-]+)/,html:e=>{let[,t]=e;return`<div style=\"position:relative;padding-bottom:56.2493%;height:0;\"><iframe src=\"https://www.youtube.com/embed/${t}\" style=\"position:absolute;width:100%;height:100%;top:0;left:0;border:0;\" frameborder=\"0\" allow=\"accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture\" allowfullscreen></iframe></div>`}}]},image:{resizeUnit:\"px\",toolbar:[\"imageStyle:alignLeft\",\"imageStyle:full\",\"imageStyle:alignRight\",\"|\",\"imageTextAlternative\",\"resizeImage:50\"],styles:[\"full\",\"alignLeft\",\"alignRight\",\"resizeImage:50\",\"alignBlockLeft\"],type:[\"jpeg\",\"png\",\"jpg\"],resizeOptions:[{name:\"resizeImage:original\",value:null},{name:\"resizeImage:50\",value:\"50\"},{name:\"resizeImage:75\",value:\"75\"}]},language:{ui:\"en\",content:l},link:{defaultProtocol:\"https://\",decorators:{addTargetToExternalLinks:{mode:\"automatic\",callback:e=>/^(https?:)?\\/\\//.test(e),attributes:{t"
+    },
+    {
+      "id": "editor-change-readonly",
+      "symbol": "mkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12375600,
+      "endExclusive": 12377646,
+      "excerptUtf8Sha256": "33eb7b76a4d4637f57ec6fa3f797f1143161e4aba5ee0f751a5088a425c2976b",
+      "raw": "a)&&void 0!==t?t:\"\"),g=(0,yt.useRef)(Ppt(null!==(r=e.data)&&void 0!==r?r:\"\"));return(0,yt.useEffect)((()=>{e.onChangeEditor(Ppt(u))}),[u]),(0,yt.useEffect)((()=>{var t,r,n;Ppt(null!==(t=null===p||void 0===p||null===(r=p.getData)||void 0===r?void 0:r.call(p))&&void 0!==t?t:u)!==Ppt(e.data)&&(g.current=Ppt(null!==(n=e.data)&&void 0!==n?n:\"\"),h(e.data))}),[e.data]),(0,yt.useEffect)((()=>{if(p)try{\"function\"===typeof p.enableReadOnlyMode?e.disabled?p.enableReadOnlyMode(\"disabled-prop\"):p.disableReadOnlyMode(\"disabled-prop\"):p.isReadOnly=!!e.disabled}catch(Ovr){p.isReadOnly=!!e.disabled}}),[e.disabled,p]),(0,nI.jsx)(nI.Fragment,{children:(0,nI.jsx)(pkt,{className:\"no-tailwindcss-base\",$minHeight:e.minHeight,$disabled:e.disabled,children:(0,nI.jsx)(uNt,{editor:dNt,config:{...c,height:`${n}px`},data:u,onReady:t=>{if(t.setData(u||\"<p></p>\"),t.editing.view.focus(),f.current=u||\"<p></p>\",t.editing.view.change((e=>{const r=t.editing.view.document.getRoot();e.setStyle(\"height\",`${n}px`,r),s&&e.setAttribute(\"dir\",\"rtl\",r)})),e.disabled)try{\"function\"===typeof t.enableReadOnlyMode?t.enableReadOnlyMode(\"disabled-prop\"):t.isReadOnly=!0}catch(Ovr){t.isReadOnly=!0}m(t)},onChange:(t,r)=>{var n;const a=r.getData();null===(n=e.onLiveChangeEditor)||void 0===n||n.call(e,Ppt(a));const o=Ppt(a);if(VNt(g.current,o)){var i;const t=g.current;g.current=o,null===(i=e.onContentImageChange)||void 0===i||i.call(e,{prevHtml:t,nextHtml:o})}a.includes(\"<img>\")||r.editing.view.focus(),e.immediate&&h(a)},onFocus:(e,t)=>{f.current=t.getData(),h(t.getData()||\"<p></p>\")},onBlur:(t,r)=>{var n;const a=r.getData();e.onChangeEditor(Ppt(a)),null===(n=e.onBlurEditor)||void 0===n||n.call(e,{prevHtml:f.current,nextHtml:Ppt(a)}),f.current=a,h(a)}})})})}),\"widget:ck-editor\",{minHeight:300}),fkt=as.div`\n  padding: 20px;\n  background: ${Nj};\n  border-radius: 8px;\n  margin-top: 16px;\n`;function gkt(e){let{open:t,onClose:r,confirmClick:n}=e;const{t:a}=fa(\"translate\",{keyPrefix:\"collectItemChangeModal\"});return(0,nI.jsxs)(vP,{open:t,title:a(\"title\"),hideClose:!0,onC"
+    },
+    {
+      "id": "editor-responsive-css",
+      "symbol": "pkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12370100,
+      "endExclusive": 12371027,
+      "excerptUtf8Sha256": "d89b4a007128b4f6ff48546eb558b401a188675b83973478f5be0ae6b6b6c36d",
+      "raw": "ej};\n  }\n\n  ${e=>{if(e.$minHeight)return`\\n        .ck-editor__editable_inline {\\n          min-height: ${e.$minHeight}px;\\n        }\\n      `}};\n\n  /*\n   * 이미지 반응형 보장:\n   * - CKEditor 5 v23의 ImageResize 플러그인은 드래그 핸들을 기본 제공하지만,\n   *   이미지가 에디터 폭을 넘어가면 핸들 동작이 어색해진다.\n   *   ck-content img 의 max-width:100% 로 폭을 강제해 핸들 사용성을 보장.\n   */\n  .ck-content img {\n    max-width: 100%;\n    height: auto;\n  }\n\n  /*\n   * 미디어 임베드(YouTube 등) 16:9 비율 보존 + 드래그 리사이즈 지원 CSS:\n   * - figure.media 자체는 너비 가변 (drag-resize 시 inline style width 부여됨), aspect-ratio로 16:9 비율 자동 유지\n   * - 기본 너비 100% — drag 시 % 단위로 축소 가능\n   * - iframe은 figure를 꽉 채워서 비율 유지\n   */\n  .ck-content .media,\n  .ck-content figure.media {\n    width: 100%;\n    aspect-ratio: 16 / 9;\n    margin: 1em 0;\n    max-width: 100%;\n    position: relative; /* resize handle 절대 좌표 기준 */\n  }\n  .ck-content .media iframe,\n  .ck-content figure.media iframe,\n  .ck-content .media .ck-media__wrapper"
+    },
+    {
+      "id": "body-form-page-editors",
+      "symbol": "mkt call sites",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12779400,
+      "endExclusive": 12782328,
+      "excerptUtf8Sha256": "936129dd2fc792f086ce497097c75dfde385f965a9be06f87436e0f81d21a243",
+      "raw": ":()=>{k_t(t,!1),l(!0)},children:[s||o?(0,nI.jsxs)(nI.Fragment,{children:[0===t&&(0,nI.jsxs)(\"div\",{children:[(0,nI.jsx)(dOt,{}),(0,nI.jsxs)(hOt,{className:\"mt-6 min-w-[540px]\",children:[(0,nI.jsxs)(\"div\",{className:\"flex flex-col mb-6\",id:\"catchform-description\",children:[(0,nI.jsx)(iI,{className:\"subtitle-1 mb-2\",color:tj,children:\"\\uce90\\uce58\\ud3fc \\ubcf8\\ubb38\"}),(0,nI.jsx)(iI,{className:\"body-2\",color:ej,children:\"\\uc751\\ub2f5\\uc744 \\uc2dc\\uc791\\ud558\\uae30 \\uc804, \\uce90\\uce58\\ud3fc\\uc5d0 \\ub300\\ud55c \\uc0c1\\uc138\\ud55c \\uc548\\ub0b4\\ub97c \\uc790\\uc720\\ub86d\\uac8c \\uc791\\uc131\\ud574 \\uc8fc\\uc138\\uc694. (\\uc608: \\uc124\\ubb38 \\ubaa9\\uc801, \\ucc38\\uc5ec\\uae30\\uac04, \\uc774\\ubca4\\ud2b8 \\uacbd\\ud488 \\uc548\\ub0b4 \\ub4f1)\"})]}),(0,nI.jsx)(\"div\",{dir:u,children:(0,nI.jsx)(mkt,{language:null===c||void 0===c?void 0:c.formLanguage,data:(null===c||void 0===c?void 0:c.description)||\"<p></p>\",onChangeEditor:e=>{a(QG({...$u.getState().form.formModelV3,description:e}))},imageUpload:!0,onContentImageChange:E,onBlurEditor:C,assetScope:{catchformId:d,assetType:\"FORM_CONTENT_IMAGE\",onUploaded:e=>{let{url:t,fileSize:r,usedBytes:n,limitBytes:o}=e;a(KG(n,r,o)),a(JG(t,r))}}},`form-description-${null===c||void 0===c?void 0:c.formLanguage}`)})]})]}),t>0&&(0,nI.jsxs)(uOt,{className:\"drag-border mt-6 p-6 border-radius-10 bg-white\",children:[(0,nI.jsxs)(\"div\",{className:\"flex row-line-center justify-between mb-5\",children:[(0,nI.jsx)(iI,{className:\"subtitle-3\",color:aj,children:`${t+1} ${r(\"page\")}`}),(0,nI.jsxs)(\"div\",{className:\"flex row-line-center gap-x-2\",children:[(0,nI.jsx)(BL,{className:\"center p-2\",content:r(\"pageCopy\"),placement:\"bottom\",theme:\"light\",children:(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(DXe,{onClick:()=>q(t),type:\"secondary\",size:\"md\",disabled:P,icon:\"/img/google-icons-v2/document/file-copy.svg\",className:\" !bg-transparent\"})})}),(0,nI.jsx)(BL,{className:\"center p-2\",content:r(\"pageDelete\"),placement:\"bottom\",theme:\"light\",children:(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(DXe,{onClick:()=>V(t),type:\"secondary\",size:\"md\",disabled:!1,icon:\"/img/google-icons-v2/system/delete.svg\",className:\" !bg-transparent\"})})})]})]}),(0,nI.jsx)(\"div\",{dir:u,children:(0,nI.jsx)(fD,{value:null===A||void 0===A?void 0:A.pageTitle,maxLength:200,onChange:e=>{F({...A,pageTitle:e.target.value})}})}),(0,nI.jsx)(\"div\",{className:\"mt-5\",dir:u,children:(0,nI.jsx)(mkt,{language:null===c||void 0===c?void 0:c.formLanguage,data:(null===A||void 0===A?void 0:A.pageContent)||\"<p></p>\",onChangeEditor:e=>{F({...A,pageContent:e})},imageUpload:!0,onContentImageChange:N,onBlurEditor:S,assetScope:{catchformId:d,assetType:\"PAGE_CONTENT_IMAGE\",onUploaded:e=>{let{url:t,fileSize:r,usedBytes:n,limitBytes:o}=e;a(KG(n,r,o)),a(JG(t,r))}}},`page-content-${t}-${null===c||void 0===c?void 0:c.formLanguage}`)})]}),(0,nI.jsx)(oOt,{isDefaultQuestionDetectLoading:!1,pageIndex:t})]}):(0,nI.jsx)(\"div\",{className:\"mt-6\",children:(0,nI.jsx)(l"
+    },
+    {
+      "id": "body-public-html-render",
+      "symbol": "b.content/V[k].pageContent",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8518700,
+      "endExclusive": 8520710,
+      "excerptUtf8Sha256": "a0c1f2840dbb0359966a30374149a98f10378f97ac0892cb0a1243fc3facf521",
+      "raw": "ull===b||void 0===b?void 0:b.subject}),0===k&&((null===(n=b.catchformConstraintResponse)||void 0===n?void 0:n.collectOpenTime)||(null===(a=b.catchformConstraintResponse)||void 0===a?void 0:a.collectEndTime))&&(0,nI.jsx)(\"div\",{style:{background:wj},className:\"px-[12px] py-[6px] rounded-[8px] inline-flex self-start\",children:(0,nI.jsx)(iI,{className:\"body-1\",color:ej,children:Se})}),0===k?b.content&&\"<p></p>\"!==b.content&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base\",style:{color:ej},children:b.content&&\"<p></p>\"!==b.content&&QO()(CY(b.content.replace(/\\n/g,\"\")))}):((null===(o=V[k])||void 0===o?void 0:o.pageTitle)||(null===(i=V[k])||void 0===i?void 0:i.pageContent)&&\"<p></p>\"!==(null===(s=V[k])||void 0===s?void 0:s.pageContent))&&(0,nI.jsxs)(\"div\",{children:[((null===(l=V[k])||void 0===l?void 0:l.pageTitle)||(null===(c=V[k])||void 0===c?void 0:c.pageContent)&&\"<p></p>\"!==(null===(d=V[k])||void 0===d?void 0:d.pageContent))&&(0,nI.jsx)(\"div\",{style:{background:uj},className:(Te=ae,Te?\"mb-6\":\"mb-4\")+\" w-full h-[1px]\"}),(0,nI.jsx)(iI,{className:\"subtitle-2 !break-normal\",color:tj,children:null===(u=V[k])||void 0===u?void 0:u.pageTitle}),(null===(h=V[k])||void 0===h?void 0:h.pageContent)&&\"<p></p>\"!==(null===(p=V[k])||void 0===p?void 0:p.pageContent)&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base\",style:{color:ej},children:(null===(m=V[k])||void 0===m?void 0:m.pageContent)&&\"<p></p>\"!==(null===(f=V[k])||void 0===f?void 0:f.pageContent)&&QO()(CY(null===(g=V[k])||void 0===g?void 0:g.pageContent.replace(/\\n/g,\"\")))})]})]})}),(0,nI.jsxs)(\"div\",{className:\"flex flex-col gap-[10px] mt-6\",children:[(0,nI.jsx)(iI,{className:\"body-2\",color:\"#F24E4E\",children:K(\"phrase.phrase78\")}),(()=>{let e=!1;return x&&(null===x||void 0===x?void 0:x.map(((t,r)=>{var n,a,o;let i=!1;return\"IDV\"!==(null===t||void 0===t?void 0:t.questionSubType)||e||(i=!0,e=!0),(0,nI.jsx)(s1,{questionIndex:r,item:t,onUpdate:ye,onUpdateObject:\"INFO_OWNER\"===W?we:Ce,onUpdateList:Ae,authCompleted:J,"
+    },
+    {
+      "id": "body-preview-html-render",
+      "symbol": "CLt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12881180,
+      "endExclusive": 12882104,
+      "excerptUtf8Sha256": "5a0694f55724bcce4c325c44dcb486b92912a461a53b8987511908fac3285cf8",
+      "raw": ".jsx)(iI,{className:\"body-1\",color:ej,children:H})}),0===f&&p&&\"<p></p>\"!==p&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base body-1  \"+(u?\"mt-6\":\"\"),style:{color:ej},children:p&&\"<p></p>\"!==p&&QO()(CY(p.replace(/\\n/g,\"\")))}),f>0&&(E||k)&&(0,nI.jsxs)(\"div\",{className:\"mt-6\",children:[(0,nI.jsx)(bLt,{className:\"mb-6\"}),(0,nI.jsx)(iI,{className:\"subtitle-2\",color:tj,children:E}),k&&\"<p></p>\"!==k&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base body-1  \"+(E?\"mt-4\":\"\"),style:{color:ej},children:QO()(CY(k.replace(/\\n/g,\"\")))})]})]}),(0,nI.jsx)(iI,{className:\"body-2 mb-2\",color:\"#F24E4E\",children:U(\"requiredQuestionNotice\")}),(0,nI.jsx)(fLt,{children:(0,nI.jsx)(sLt,{pageIndex:f,device:v,errorFocus:R,onPendingInput:M},L)}),(0,nI.jsxs)(\"div\",{className:\"mt-10 center gap-3\",children:[f>0&&(z||a.allowPageBack)&&(0,nI.jsx)(DY,{text:U(\"prevPage\"),className:\"min-w-[144px]\",onClick:()=>{if(f>0){P(!1),"
+    },
+    {
+      "id": "html-render-transform",
+      "symbol": "CY",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8182533,
+      "endExclusive": 8183626,
+      "excerptUtf8Sha256": "c07c2e1e9379f46a86b2b6ad4489777aecfac29538a6540eb05d575e2f587fea",
+      "raw": "function CY(e){if(!e)return\"\";let t=e.replace(/<figure[^>]*\\bclass=\"[^\"]*\\bmedia\\b[^\"]*\"[^>]*>\\s*<div[^>]*\\bdata-oembed-url=[\"']([^\"']+)[\"'][^>]*>[\\s\\S]*?<\\/figure>/gi,((e,t)=>{const r=AY(t);return r?`<figure class=\"media\">${yY(r)}</figure>`:e}));return t=t.replace(/<oembed\\b([^>]*?)\\/?>(?:\\s*<\\/oembed>)?/gi,((e,t)=>{const r=/url\\s*=\\s*[\"']([^\"']+)[\"']/i.exec(t||\"\");if(!r)return e;const n=AY(r[1]);return n?yY(n):e})),function(e){return e.replace(/<a\\b[^>]*>/gi,(e=>{const t=/\\bhref\\s*=\\s*(\"[^\"]*\"|'[^']*')/i.exec(e);if(!t)return e;const r=t[1],n=r[0],a=r.slice(1,-1);if(!a||wY.test(a))return e;const o=t.index+t[0].length-r.length;let i=e.slice(0,o)+`${n}https://${a}${n}`+e.slice(o+r.length),s=\"\";return/\\btarget\\s*=/i.test(i)||(s+=' target=\"_blank\"'),/\\brel\\s*=/i.test(i)||(s+=' rel=\"noopener noreferrer\"'),s&&(i=`${i.slice(0,-1)}${s}>`),i}))}(t)}const SY=as(BU)`\n  position: absolute;\n  inset-inline-end: 10px;\n  top: 50%;\n  width: 20px;\n  height: 20px;\n  pointer-events: none;\n  transform: translateY(-50%);\n`,TY=as.div`\n  position: relative;\n  width: 100%;\n  cursor: ${e=>e.readOnly||"
+    },
+    {
+      "id": "body-status-delete",
+      "symbol": "O_t/M_t/L_t/D_t",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12629197,
+      "endExclusive": 12631588,
+      "excerptUtf8Sha256": "cecc67eda5dc06259fb3570b4ef945162eb1d72e3343603f3ef54bf58c6f251c",
+      "raw": "(e,t){let{removed:r,present:n,origin:a=[],sendDelete:o=!0}=t;if(!__t(e))return;const i=e=>Array.from(new Set(e.filter((e=>\"string\"===typeof e&&\"\"!==e.trim())))),s=new Set(qG(e)),l=i(r).filter((e=>!s.has(e))),c=i(n),d=c.filter((e=>s.has(e))),u=new Set(GG(e)),h=c.filter((e=>u.has(e)));if(0===l.length&&0===d.length&&0===h.length)return;const p=new Set(i(a)),m=c.filter((e=>!p.has(e))),f=new Set(c),g=i(a).filter((e=>!f.has(e)));l.length>0&&function(e,t){var r;const n=HG(e);if(!n)return;const a=WG(t);if(0===a.length)return;const o=null!==(r=VG.get(n))&&void 0!==r?r:new Set;a.forEach((e=>o.add(e))),VG.set(n,o)}(e,l),d.length>0&&function(e,t){const r=HG(e);if(!r)return;const n=VG.get(r);n&&(WG(t).forEach((e=>n.delete(e))),0===n.size&&VG.delete(r))}(e,d),h.length>0&&function(e,t){const r=HG(e);if(!r)return;const n=$G.get(r);n&&(WG(t).forEach((e=>n.delete(e))),0===n.size&&$G.delete(r))}(e,h);try{!function(e,t){const r=String(e),n=R_t.get(r),a=n?n.then(t,t):t(),o=Promise.resolve(a).catch((()=>{})).then((()=>{R_t.get(r)===o&&R_t.delete(r)}));R_t.set(r,o)}(e,(()=>{return Promise.resolve((t={catchformId:e,...m.length>0?{saveData:m}:{},...o&&g.length>0?{deleteData:g}:{}},At.post(`${PE}/company-operated-service/formImage/temp/status`,t))).catch((()=>{}));var t}))}catch{}}function M_t(e,t){let{isInitCatchform:r,getOrigin:n}=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};return a=>{var o;let{prevHtml:i,nextHtml:s}=a;if(!VNt(i,s)&&!function(e){var t,r,n,a;const o=HG(e);return!!o&&((null!==(t=null===(r=VG.get(o))||void 0===r?void 0:r.size)&&void 0!==t?t:0)>0||(null!==(n=null===(a=$G.get(o))||void 0===a?void 0:a.size)&&void 0!==n?n:0)>0)}(e))return;const l=t();O_t(e,{removed:UNt(i,s,l),present:zNt(s,l),origin:null!==(o=null===n||void 0===n?void 0:n())&&void 0!==o?o:[],sendDelete:!(null!==r&&void 0!==r&&r())})}}function L_t(e,t,r){let{getSizeMap:n,patchUsedBytes:a}=r;return r=>{let{prevHtml:o,nextHtml:i}=r;const s=zNt(null,t()),l=n(),c=[...qG(e),...GG(e)],d=function(e,t,r){return _pt(Ipt(e,t,arguments.length>3&&void 0!==arguments[3]?arguments[3]:[]),r)}(o,i,l,s),u=function(e,t,r){let n=arguments.length>3&&void 0!==arguments[3]?arguments[3]:[];const a=new Set(arguments.length>4&&void 0!==arguments[4]?arguments[4]:[]);return 0===a.size?0:_pt(Ipt(t,e,n).filter((e=>a.has(e))),r)}(o,i,l,s,c),h=u-d;0!==h&&a(h)}}function D_t(e,t){return r=>{e(r),t(r)}}const F_t={page"
+    },
+    {
+      "id": "page-delete-assets",
+      "symbol": "z",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12769308,
+      "endExclusive": 12769985,
+      "excerptUtf8Sha256": "dba7ade3b255ad334f3f9e642c0cb1524b0893c92686a07949cd3229ab50afc3",
+      "raw": "ntent:r}))}),300),[]);(0,yt.useEffect)((()=>U_t(\"page\",(()=>U.flush()))),[U]);const z=e=>{var t;const r=$u.getState(),n=r.form.formModelV3.pageList[e],o=zNt(null,FNt(r.form.formModelV3,{excludePageIndex:e})),i=MNt(n,r.form.assetUsage.contentImageSizes,o),s=i.totalBytes+i.contentImageBytes;s>0&&a(XG(-s)),P_t(r.form.formModelV3.catchformId,function(e){var t;const r=null!==(t=null===e||void 0===e?void 0:e.questionList)&&void 0!==t?t:[];return Array.from(new Set(r.flatMap((e=>RNt(e)))))}(n));M_t(r.form.formModelV3.catchformId,(()=>FNt($u.getState().form.formModelV3,{excludePageIndex:e})),w)({prevHtml:null!==(t=null===n||void 0===n?void 0:n.pageContent)&&void 0!==t?t:\"\",nex"
+    },
+    {
+      "id": "page-copy-pipeline",
+      "symbol": "H/W",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12771440,
+      "endExclusive": 12774721,
+      "excerptUtf8Sha256": "0e40a60c4c52f72583934ccc0d24de54d908bcf157d62cb1229c3012a9f7dd16",
+      "raw": "()}finally{O(!1)}},n=500-(Date.now()-e);n>0?setTimeout(r,n):r()},H=(e,t,n,o)=>{var i;const s=$u.getState().form.formModelV3,l=e=>n?{...e,pageOffset:-2,questionList:e.questionList.map((e=>{var t;return{...e,usePageOffset:!1,questionOptionList:null===(t=e.questionOptionList)||void 0===t?void 0:t.map((e=>({...e,pageOffset:-2})))}}))}:e,c=(null!==(i=null===e||void 0===e?void 0:e.questionList)&&void 0!==i?i:[]).map((e=>W_t(e))),d=[...s.pageList.slice(0,t+1).map(((e,t)=>({...l(e),page:t+1,pageIndex:t+1}))),{...e,questionList:c,page:t+2,pageIndex:t+2},...s.pageList.slice(t+1).map(((e,r)=>({...l(e),page:t+3+r,pageIndex:t+3+r})))];a(QG({...s,pageList:A_t(d)})),requestAnimationFrame((()=>requestAnimationFrame((()=>{$(o,(()=>{k_t(t+1),a(ic({show:!0,type:\"success\",text:r(\"pageCopied\")}))}))}))))},W=async function(e,t){let o=arguments.length>2&&void 0!==arguments[2]&&arguments[2];if(!o){z_t();const n=$u.getState().form.assetUsage,a=MNt($u.getState().form.formModelV3.pageList[e],n.contentImageSizes);if(a.assets.length>0&&!ad(a.totalBytes,n).allowed)return void((e,t,n,a)=>{L({show:!0,data:{title:r(\"assetQuota.copyExcludeFilesTitle\"),body:(0,nI.jsx)(cD,{type:\"warning\",icon:\"exclamation\",className:\"w-full\",secondText:r(\"assetQuota.copyExcludeFilesKeptPage\"),thirdText:r(\"assetQuota.copyExcludeFilesReason\",{limit:id(a.limitBytes),used:id(a.usedBytes),after:id(a.usedBytes+n)})}),cancelButtonText:r(\"assetQuota.copyExcludeFilesCancel\"),confirmButtonText:r(\"assetQuota.copyExcludeFilesConfirm\"),handleConfirm:()=>W(e,t,!0),isShowCancelButton:!0,confirmButtonType:\"primary\"}})})(e,t,a.totalBytes,n)}O(!0);const i=Date.now();let s=!1;try{z_t();const l=$u.getState().form.formModelV3.pageList[e],c=l._dragKey,d=o?function(e){var t;return{...e,questionList:(null!==(t=null===e||void 0===e?void 0:e.questionList)&&void 0!==t?t:[]).map(DNt)}}(l):l,u=(e=>{const{_dragKey:t,...r}=(0,tK.cloneDeep)(e);return{...r,pageOffset:-2,questionList:r.questionList.map((e=>{var t;return{...e,usePageOffset:!1,nlpFeedbackId:null,detectedItems:[],questionOptionList:null===(t=e.questionOptionList)||void 0===t?void 0:t.map((e=>({...e,pageOffset:-2})))}}))}})(d),h=MNt(d,$u.getState().form.assetUsage.contentImageSizes);if(($u.getState().form.formModelV3.formLanguage||SV)!==SV)u.questionList=u.questionList.map((e=>({...e,currentTitle:e.title})));else{(await Promise.all(u.questionList.map((e=>e.title?Dkt(u.catchformId,e.title,JN([\"EXPERT\"],I)?_:I.companyIdx,I.userIdx).catch((()=>null)):Promise.resolve(null))))).forEach(((e,t)=>{Array.isArray(e)&&e.length>0&&(u.questionList[t].currentTitle=u.questionList[t].title,u.questionList[t].nlpFeedbackId=e[0].nlpFeedbackId,u.questionList[t].detectedItems=e)}))}const p=$u.getState().form.formModelV3,m=p.pageList.findIndex((e=>c?e._dragKey===c:e===l));if(m<0)return;if(0===h.assets.length)return H(u,m,t,i),void(s=!0);U$({catchformId:p.catchformId,assets:h.assets}).then((e=>{var r,n;a(KG(null===(r=e.data)||void 0===r?void 0:r.usedBytes,void 0,null===(n=e.data)||void 0===n?void 0:n.limitBytes));const o={...u,questionList:u.questionList.map((t=>LNt(t,e.data)))};H(o,m,t,i)})).catch((e=>{var t;const o=fNt(e);a(ic({show:!0,type:\"fail\",text:o?null!==(t=o.serverMessage)&&void 0!==t?t:n(o.messageKey):r(\"assetQuota.copyFailed\")})),$(i)})),s=!0}finally{s||O"
+    },
+    {
+      "id": "question-copy-pipeline",
+      "symbol": "j",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12695300,
+      "endExclusive": 12697200,
+      "excerptUtf8Sha256": "a494d1158a84ef1e28358cca29fa3922505b351a33c2327798b65e1aa9df8e4b",
+      "raw": "lementType)return alert(`${s(\"alert.phrase9\")} 10${s(\"alert.phrase10\")}`),!1;const r=$u.getState().form.formModelV3.pageList[i].questionList[e],n=t?DNt(r):r,a=_Nt(n);if(0===a.assets.length){const e=(0,tK.cloneDeep)($u.getState().form.formModelV3.pageList[i].questionList);return e.push({...(0,tK.cloneDeep)(n),nlpFeedbackId:null,detectedItems:[]}),void k(e)}const o=$u.getState().form.assetUsage;if(!ad(a.totalBytes,o).allowed)return void((e,t,r)=>{E({show:!0,data:{title:s(\"assetQuota.copyExcludeFilesTitle\"),body:(0,nI.jsx)(cD,{type:\"warning\",icon:\"exclamation\",className:\"w-full\",secondText:s(\"assetQuota.copyExcludeFilesKeptQuestion\"),thirdText:s(\"assetQuota.copyExcludeFilesReason\",{limit:id(r.limitBytes),used:id(r.usedBytes),after:id(r.usedBytes+t)})}),cancelButtonText:s(\"assetQuota.copyExcludeFilesCancel\"),confirmButtonText:s(\"assetQuota.copyExcludeFilesConfirm\"),handleConfirm:()=>j(e,!0),isShowCancelButton:!0,confirmButtonType:\"primary\"}})})(e,a.totalBytes,o);A(!0),U$({catchformId:$u.getState().form.formModelV3.catchformId,assets:a.assets}).then((e=>{var t,r,a;d(KG(null===(t=e.data)||void 0===t?void 0:t.usedBytes,void 0,null===(r=e.data)||void 0===r?void 0:r.limitBytes));const o=null===(a=$u.getState().form.formModelV3.pageList[i])||void 0===a?void 0:a.questionList;if(!o)return;const s=(0,tK.cloneDeep)(o);s.push({...LNt(n,e.data),nlpFeedbackId:null,detectedItems:[]}),k(s)})).catch((e=>{var t;const r=fNt(e);d(ic({show:!0,type:\"fail\",text:r?null!==(t=r.serverMessage)&&void 0!==t?t:l(r.messageKey):s(\"assetQuota.copyFailed\")}))})).finally((()=>A(!1)))}else alert(`${e+1}${s(\"alert.phrase8\")}`)},I=((e,t)=>{const r=null!==(e=null===(t=$u.getState().form.formModelV3.pageList[i])||void 0===t?void 0:t.questionList)&&void 0!==e?e:[];return!i_t(a,\"pageOffset\")&&r.some(((e,t)=>(null===e||void 0===e?void 0:e.usePageOffset)&&t!==n))})(),_=()=>{!function(e){let t=arguments.length>1&&v"
+    },
+    {
+      "id": "body-upload-pending-save",
+      "symbol": "I",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12789934,
+      "endExclusive": 12790300,
+      "excerptUtf8Sha256": "3e100cc7a7179d8ff78b5e701e753df63f0e5eb382835da47cf7e60406a32d64",
+      "raw": "allback)((()=>{if(bNt())return void t(ic({show:!0,type:\"fail\",text:k(\"aiQuestions.assetQuota.saveUploadPending\")}));z_t();const e=$u.getState().form.formModelV3;g$(S_t(e,u)).then((r=>{t(aY(e.catchformId,zNt(null,FNt(e)))),alert(E(\"phrase.phrase69\"))})).catch((t=>{var r,n;const a=fNt(t);var o;if(a)alert(null!==(o=a.serverMessage)&&void 0!==o?o:N(String(a.messageKey"
+    },
+    {
+      "id": "body-origin-load-usage",
+      "symbol": "RLt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12889340,
+      "endExclusive": 12890200,
+      "excerptUtf8Sha256": "40d25ccef13de2657fb7b86187abe49f6b7a2014a2c1ea672d660a858f37ca3c",
+      "raw": "atchformId:e.catchFormId,catchFormProgress:e.catchFormProgress,pageList:A_t(e.pages),serviceId:null!==(o=a.state)&&void 0!==o&&o.serviceId?null===(l=a.state)||void 0===l?void 0:l.serviceId:e.serviceId,title:e.title,description:e.mainText,formLanguage:null!==(d=e.formLanguage)&&void 0!==d?d:\"ko\",detectedPurposeSuccess:null,detectedPurpose:\"\",systemSetQuestion:{useSignature:e.useSignature,useAuthentication:e.useAuthentication,systemSetQuestionList:e.systemSetQuestionResponses}})),i((f=zNt(e.mainText,(null!==(u=e.pages)&&void 0!==u?u:[]).map((e=>null===e||void 0===e?void 0:e.pageContent))),e=>e(YG.contentImageOriginLoadedV3({urls:f})))),i((g={...null!==(h=e.assetUsage)&&void 0!==h?h:{},contentImageSizes:Rpt(null===(p=e.assetUsage)||void 0===p?void 0:p.contentImages),quotaApplied:nd(e.createAt)},e=>e(YG.assetUsageLoadedV3({assetUsage:g}))))})).catch((e"
+    },
+    {
+      "id": "body-origin-reducer",
+      "symbol": "contentImageOriginLoadedV3",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 6926830,
+      "endExclusive": 6927470,
+      "excerptUtf8Sha256": "9b0adb1f149a6592a77a78a819712da9965d2b7b380e83fd38c76ab9dd7f22eb",
+      "raw": "questionList[r].matrixOptionData=n},fetchPrevCollectItemsV3:(e,t)=>{const{collectItems:r}=t.payload;e.prevCollectItems=r},fetchFormTitleV3:(e,t)=>{const{formTitle:r}=t.payload;e.formTitle=r},contentImageOriginLoadedV3:(e,t)=>{const{urls:r}=t.payload;e.originContentImageUrls=Array.isArray(r)?r:[]},catchformSavedV3:(e,t)=>{e.isInitCatchform=!1},fetchInitFormModelV3:(e,t)=>{var r;e.formModelV3=(r=e.initFormModelV3,JSON.parse(JSON.stringify(r))),e.isInitCatchform=!0,e.originContentImageUrls=[],e.assetUsage={...Xc,contentImageSizes:{}}},fetchFormOpenSettingV3:(e,t)=>{const{formOpenSetting:r}=t.payload;e.constraint=r},fetchStep1PreviewDat"
+    },
+    {
+      "id": "language-change-preserves-fields",
+      "symbol": "setFormLanguageV3",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 6925225,
+      "endExclusive": 6925689,
+      "excerptUtf8Sha256": "c3ff77184b0ecc05170084b69a7eb8c810e22e4034f6e67054b0a2bff8b38aec",
+      "raw": "setFormLanguageV3:(e,t)=>{var r;const{formLanguage:n}=t.payload;e.formModelV3.formLanguage=n;const a=\"ko\"===n?\"ADDRESS\":\"FOREIGN_ADDRESS\";null===(r=e.formModelV3.pageList)||void 0===r||r.forEach((e=>{var t;null===e||void 0===e||null===(t=e.questionList)||void 0===t||t.forEach((e=>{\"ADDRESS\"!==(null===e||void 0===e?void 0:e.elementType)&&\"FOREIGN_ADDRESS\"!==(null===e||void 0===e?void 0:e.elementType)||(e.elementType=a)}))}))},formAnswerUploadResultFetchedV3:(e,"
+    },
+    {
+      "id": "body-asset-gauge",
+      "symbol": "GOt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12815200,
+      "endExclusive": 12817640,
+      "excerptUtf8Sha256": "6be331772c12a5facfcc9c30bfe28c9f670e3debe30e82c0173f8eaf01269747",
+      "raw": "a(\"translate\",{keyPrefix:\"aiQuestions.assetGauge\"}),[n,a]=(0,yt.useState)(!1),o=(0,yt.useRef)(null),i=(0,yt.useRef)(null),s=Ut((e=>e.form.assetUsage)),l=(0,yt.useMemo)((()=>function(e){const t=Number.isFinite(e.limitBytes)&&e.limitBytes>0?e.limitBytes:104857600,r=Number.isFinite(e.usedBytes)?Math.max(0,e.usedBytes):0,n=r/t,a=(e=>e>=1?\"full\":e>=.9?\"near\":e>=.7?\"caution\":\"default\")(n);return{level:a,percent:Math.min(100,Math.max(0,100*n)),usedText:id(r),limitText:id(t),remainText:id(Math.max(0,t-r)),showNote:\"near\"===a||\"full\"===a}}(null!==s&&void 0!==s?s:Xc)),[s]),c=!1===(null===s||void 0===s?void 0:s.quotaApplied);return(0,yt.useEffect)((()=>{a(!1)}),[t]),(0,yt.useEffect)((()=>{if(!n)return;const e=e=>{var t;\"Escape\"===e.key&&(a(!1),null===(t=o.current)||void 0===t||t.focus())},t=e=>{var t,r;const n=e.target;null!==(t=o.current)&&void 0!==t&&t.contains(n)||null!==(r=i.current)&&void 0!==r&&r.contains(n)||a(!1)};return document.addEventListener(\"keydown\",e),document.addEventListener(\"mousedown\",t),()=>{document.removeEventListener(\"keydown\",e),document.removeEventListener(\"mousedown\",t)}}),[n]),c?null:(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(LOt,{\"data-testid\":\"form-asset-gauge\",children:[(0,nI.jsxs)(DOt,{children:[(0,nI.jsx)(FOt,{className:\"caption-strong\",children:r(\"label\")}),(0,nI.jsx)(BOt,{className:\"body-2-medium\",$emphasized:l.showNote,children:`${l.usedText} / ${l.limitText}`}),(0,nI.jsx)($Ot,{ref:o,type:\"button\",\"aria-expanded\":n,\"aria-controls\":\"form-asset-gauge-tip\",\"aria-label\":r(\"tooltipToggle\"),onClick:()=>a((e=>!e)),children:(0,nI.jsx)(cP,{width:16,src:\"/media/google-icons/question_v2.svg\",color:ij})})]}),(0,nI.jsx)(UOt,{children:(0,nI.jsx)(zOt,{$percent:l.percent,$color:qOt[l.level]})}),l.showNote&&(0,nI.jsxs)(VOt,{className:\"body-2\",children:[(0,nI.jsx)(cP,{width:16,src:\"/media/google-icons/warning.svg\",color:Uj}),(0,nI.jsx)(\"span\",{children:\"full\"===l.level?r(\"fullNote\"):r(\"nearNote\",{remain:l.remainText})})]})]}),n&&(0,nI.jsxs)(HOt,{ref:i,id:\"form-asset-gauge-tip\",className:\"body-2\",\"data-testid\":\"form-asset-gauge-tip\",children:[(0,nI.jsx)(\"p\",{children:r(\"tooltipIntro\",{limit:l.limitText})}),(0,nI.jsxs)(\"div\",{children:[(0,nI.jsx)(\"p\",{children:r(\"tooltipItemContentImage\")}),(0,nI.jsx)(\"p\",{children:r(\"tooltipItemQuestionImage\")}),(0,nI.jsx)(\"p\",{children:r(\"tooltipItemMaterial\")}),(0,nI.jsx)(\"p\",{children:r(\"tooltipItemOptionImage\")})]}),(0,nI.jsx)(WOt,{children:r(\"toolti"
+    },
+    {
+      "id": "end-private-asset-scope",
+      "symbol": "END/PRIVATE mkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 13190430,
+      "endExclusive": 13193100,
+      "excerptUtf8Sha256": "32c778edc0ca7423777c9fd3a74b25be52cbf92b38406c43d13e756ebbed1f4d",
+      "raw": "3\",children:[(0,nI.jsx)(iI,{className:\"label-1\",color:tj,style:{display:\"flex\",alignItems:\"end\"},children:l(\"endScreenBody\")}),(0,nI.jsx)(M_,{size:\"sm\",type:\"secondary\",text:l(\"resetEndScreenBody\"),disabled:T,onClick:()=>{if(T)return void alert(l(\"phrase.phrase44\"));const e=aUt(m.formLanguage);g.current=e,z(e),f({...m,endPageContent:e})}})]}),(0,nI.jsx)(mkt,{language:m.formLanguage,data:m.endPageContent,immediate:!0,onChangeEditor:e=>{T?alert(l(\"phrase.phrase44\")):(g.current=e,z(e),f({...m,endPageContent:e}))},onLiveChangeEditor:e=>{g.current=e,z(e)},imageUpload:!0,disabled:V,onContentImageChange:C,onBlurEditor:A,assetScope:{catchformId:m.catchformId,assetType:\"END_PAGE_CONTENT_IMAGE\",onUploaded:e=>{let{url:t,fileSize:r,usedBytes:n,limitBytes:a}=e;d(KG(n,r,a)),d(JG(t,r))}}},`end-page-content-${m.formLanguage}`)]}),(0,nI.jsx)(\"div\",{className:\"END\"===N?\"mt-4\":\"mt-6\",children:D&&(0,nI.jsx)(ga,{i18n:M,children:(0,nI.jsx)(\"div\",{dir:F,children:(0,nI.jsx)(_V,{width:40,height:480,title:m.title,content:U,logoFlag:m.activateLogoView,servicePricingType:h.servicePricingType,formLanguage:m.formLanguage,type:\"PREVIEW\"})})})})]}):(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(\"div\",{className:\"mt-6\",children:[(0,nI.jsx)(\"div\",{className:\"mb-2\",children:(0,nI.jsxs)(iI,{className:\"label-1\",color:tj,children:[l(\"privateMessageLabel\"),\" \",(0,nI.jsx)(iI,{span:!0,className:\"label-1-strong\",color:Uj,children:\"*\"})]})}),(0,nI.jsx)(jXe,{value:j,row:!0,size:\"md\",fontStyle:\"label-1-weak\",disabled:V,labelList:[{value:\"BASIC\",label:l(\"useDefaultMessage\")},{value:\"DIRECT\",label:l(\"editCustomMessage\")}],onChange:e=>{if(T)return void alert(l(\"phrase.phrase44\"));const t=e.target.value;I(t);const r={};\"DIRECT\"!==t||_.current||(r.privatePageContent=P,v.current=P,_.current=!0),f({...m,...r}),d(ic({show:!0,type:\"success\",text:l(\"BASIC\"===t?\"defaultPrivateToastOn\":\"defaultPrivateToastOff\"),duration:2500}))}})]}),\"DIRECT\"===j&&(0,nI.jsx)(\"div\",{className:\"mt-4 ai-form-content flex flex-col\",id:\"ck-editor-private\",children:(0,nI.jsx)(mkt,{data:null!==(i=m.privatePageContent)&&void 0!==i?i:\"\",placeholder:R,minHeight:104,immediate:!0,onChangeEditor:e=>{T?alert(l(\"phrase.phrase44\")):(v.current=e,f((t=>({...t,privatePageContent:e}))))},onLiveChangeEditor:e=>{v.current=e},imageUpload:!0,disabled:V,onContentImageChange:S,onBlurEditor:y,assetScope:{catchformId:m.catchformId,assetType:\"PRIVATE_PAGE_CONTENT_IMAGE\",onUploaded:e=>{let{url:t,fileSize:r,usedBytes:n,limitBytes:a}=e;d(KG(n,r,a)),d(JG(t,r))}}})}),(0,nI.jsx)(\"div\",{className:\"mt-6\",children:D&&(0,nI.jsx)(ga,{i18n:M,children:(0,nI.jsx)(\"div\",{dir:F,children:(0,nI.jsx)(UV,{width:40,height:480,title:m.title,useD"
+    },
+    {
+      "id": "consent-editor-html",
+      "symbol": "S/mkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 13041900,
+      "endExclusive": 13042400,
+      "excerptUtf8Sha256": "7cded5cf63f829aefc520dc1d42f8ff7373fdf47fd8f0dd47c2119a7b0596a03",
+      "raw": "egory||n.agreementCategory||\"\",x=\"CLOSE\"!==n.agreementViewType,A=n.title||n.agreementTitle||\"\",[y,w]=(0,yt.useState)(A);(0,yt.useEffect)((()=>{w(A)}),[A]);const C=(0,yt.useCallback)((()=>{y!==A&&l(t,r,{title:y,agreementTitle:y})}),[y,A,l,t,r]),S=(0,yt.useCallback)((e=>{const n=Mpt(e);l(t,r,{content:n,agreementContent:n,mainPurpose:n.replace(/<[^>]*>/g,\"\").replace(/&nbsp;/g,\" \").slice(0,300)})}),[l,t,r]),T=(0,yt.useCallback)((e=>{const n=e.target.value,a={consentCategory:n,agreementCategory:n,..."
+    },
+    {
+      "id": "consent-editor-upload",
+      "symbol": "mkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 13045000,
+      "endExclusive": 13046155,
+      "excerptUtf8Sha256": "329090ccb83b83fff755b6aac90cd2c4f1a64e9e2e53e7065e41baac4f72a6bc",
+      "raw": "r:()=>d(v),onFocus:()=>d(v),onClick:j,children:(0,nI.jsx)(cP,{src:\"/img/google-icons-v2/marks/help_black.svg\",width:16,color:sj})})]}),o&&(0,nI.jsxs)($Ft,{children:[(0,nI.jsx)(iI,{className:\"body-2-strong\",color:ej,children:g(\"content.guideTitle\")}),(0,nI.jsx)(HFt,{children:m.map((e=>(0,nI.jsx)(\"li\",{children:(0,nI.jsx)(iI,{className:\"body-2\",color:ej,children:e})},e)))}),(0,nI.jsx)(iI,{className:\"body-2-strong\",color:ej,children:g(\"content.guideExampleLabel\")}),(0,nI.jsx)(WFt,{children:f.map(((e,t)=>(0,nI.jsx)(qFt,{children:e.map((e=>(0,nI.jsx)(iI,{className:\"body-2\",color:ej,children:e},e)))},t)))})]}),(0,nI.jsx)(\"div\",{dir:i,children:(0,nI.jsx)(mkt,{height:200,minHeight:200,imageUpload:!0,language:s,data:n.content||n.agreementContent||\"\",onChangeEditor:S,onContentImageChange:e=>{let{nextHtml:t}=e;return S(t)}},`${t}-${r}-${s}`)})]})]}),(0,nI.jsxs)(iI,{className:\"label-1 cursor-pointer flex items-center gap-2\",color:sj,onClick:N,children:[(0,nI.jsx)(BU,{src:x?\"/img/google-icons-v2/arrows/caret-up.svg\":\"/img/google-icons-v2/arrows/caret-down.svg\",width:24,color:sj}),g(x?\"collapse\":\"expand\")]})]})})]})})),dBt=(0,yt.memo)((function(e){let"
+    },
+    {
+      "id": "consent-html-cleaning",
+      "symbol": "Mpt/Fpt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 11579615,
+      "endExclusive": 11580790,
+      "excerptUtf8Sha256": "064455974842db7bf40cf5a24530525ba4ca9158766b242e8b50ed595424df9b",
+      "raw": "e(/<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>/gi,\"\").replace(/<iframe\\b[^<]*(?:(?!<\\/iframe>)<[^<]*)*<\\/iframe>/gi,\"\").replace(/<\\/?iframe\\b[^>]*>/gi,\"\").replace(/\\son\\w+\\s*=\\s*\"[^\"]*\"/gi,\"\").replace(/\\son\\w+\\s*=\\s*'[^']*'/gi,\"\").replace(/\\son\\w+\\s*=\\s*[^\\s>]+/gi,\"\");do{t=r,r=r.replace(/javascript:/gi,\"\").replace(/vbscript:/gi,\"\").replace(/data\\s*:\\s*text\\/html/gi,\"\")}while(r!==t);return r},Lpt=e=>\"string\"===typeof e&&\"ko\"!==e&&mH.includes(e),Dpt=e=>\"NOTICE\"===(null===e||void 0===e?void 0:e.consentCategory)||\"NOTICE\"===(null===e||void 0===e?void 0:e.agreementCategory),Fpt=e=>{const t=(null===e||void 0===e?void 0:e.consentCategory)||(null===e||void 0===e?void 0:e.agreementCategory),r=(null===e||void 0===e?void 0:e.title)||(null===e||void 0===e?void 0:e.agreementTitle)||(null===e||void 0===e?void 0:e.name),n=(null===e||void 0===e?void 0:e.content)||(null===e||void 0===e?void 0:e.agreementContent)||(null===e||void 0===e?void 0:e.contents)||(null===e||void 0===e?void 0:e.body);return!!t&&(!!(Dpt(e)||null!==e&&void 0!==e&&e.consentType)&&(!!Opt(r)&&!!(Opt(a=n)||\"string\"===typeof a&&jpt(a).length>0)));var a},Bpt=e=>{var t,r,n,a,o,i;const s=Lpt(e.formLangua"
+    },
+    {
+      "id": "pdf-async-request",
+      "symbol": "Re",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12198805,
+      "endExclusive": 12199428,
+      "excerptUtf8Sha256": "eb569a68704d9154595da4bcc027cbf910dd8e35623fd0d711f2e249341a8b1b",
+      "raw": "0),function(e,t,r,n,a){return At.post(`${PE}/company-operated-service/form/${e}/compress/replies/pdf`,{customerIds:[t],rrnMaskingOption:r,pdfFormat:MAe,pageIds:Array.isArray(n)?n:[],includeConsent:!!a})}(null===Le||void 0===Le||null===(r=Le.formBasicInfo)||void 0===r?void 0:r.formId,q,t,null===e||void 0===e?void 0:e.pageIds,null===e||void 0===e?void 0:e.includeConsent).then((()=>(Ce({show:!1}),Te({show:!1}),Ne({show:!0}),!0))).catch((e=>{const t=Agt(e);return\"importantIp\"===t.kind?(Ce({show:!1}),Te({show:!1}),ae({show:!0,data:{firstText:L(\"phrase.phrase1\"),secondText:L(\"phrase.phrase2\"),title:L(\"phrase.phrase3\")}}),"
+    },
+    {
+      "id": "pdf-direct-request",
+      "symbol": "HAt onConfirm",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12208640,
+      "endExclusive": 12209210,
+      "excerptUtf8Sha256": "7a899ac04d6cb5283c1ff0f0681b09e7e31ecbc3c2709957a2527572678f22b2",
+      "raw": "==Le||void 0===Le||null===(y=Le.formBasicInfo)||void 0===y?void 0:y.formId},onConfirm:e=>{var t;let{reason:r,rrnMaskingOption:n}=e;return function(e,t,r,n){return At.post(`${PE}/company-operated-service/form/${e}/compress/reply/pdf/${t}`,{reason:r,rrnMaskingOption:n},{responseType:\"blob\"})}(null===Le||void 0===Le||null===(t=Le.formBasicInfo)||void 0===t?void 0:t.formId,q,r,n).then((e=>{var t,r,n;const a=null!==(t=null===(r=e.headers)||void 0===r?void 0:r[\"content-disposition\"])&&void 0!==t?t:\"\",o=/filename\\*?=(?:UTF-8'')?[\"']?([^;\"'\\n]+)/i.exec(a),i=o?decodeURICom"
+    },
+    {
+      "id": "edit-rejection-temp-cleanup",
+      "symbol": "v$/k",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12893358,
+      "endExclusive": 12894220,
+      "excerptUtf8Sha256": "45fcb5abdcf9b6982ba0b49515c93c8f26abe839520866f4f4acfc5d57b9e0fc",
+      "raw": ",N(t,n)})).finally((()=>{b(!0)}))}})),tk(\"isEnterprise\")&&r(qM()),()=>{r(nY())};v$(C.state.catchformId).then((e=>{const{catchFormProgress:t,catchFormId:r}=e.data;b(!0),N(t,r)})).catch((e=>{let r=400!==e.response.status&&t(\"alert.phrase4\");const n=e.response.data.message;\"not exists required question\"===n?r=t(\"alert.phrase5\"):\"active form cannot update\"===n?(r=t(\"alert.phrase6\"),o(\"/form/manage\")):\"reply exist form cannot update\"===n&&(r=t(\"alert.phrase7\"),o(\"/form/manage\")),alert(r)}))}),[]);const k=()=>{var e;h(!1),function(e){return At.delete(`${PE}/company-operated-service/catch-form/asset/temp`,{params:{catchformId:e}})}(f).catch((()=>{}));const t=null===(e=C.state)||void 0===e?void 0:e.isEdit;switch(x){case\"V3_BASIC_SAVE\":case\"V3_AGREEMENT_TEMP\":o(\"/form/ai/agreement\",{state:{catchformId:f,version:\"v3\",isEdit:t}});break;case\"V3_AGREEMENT_SAVE\":L"
+    },
+    {
+      "id": "basic-temp-endpoint",
+      "symbol": "g$/v$",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 7916080,
+      "endExclusive": 7916410,
+      "excerptUtf8Sha256": "392011f4c9a74037fd244a3e510fe20e40b829928d7eaa4084fc7b16b31eabd9",
+      "raw": "}function f$(e){return At.get(`${PE}/company-operated-service/v3/catch-form/basic/paths?catchformId=${e}`)}function g$(e){return At.post(`${PE}/company-operated-service/v3/catch-form/basic/temp`,e)}function v$(e){return At.get(`${PE}/company-operated-service/v3/catch-form/basic`,{params:{catchformId:e}})}function b$(e){return At"
+    },
+    {
+      "id": "ko-questionImage",
+      "symbol": "translate.questionImage",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 266901,
+      "endExclusive": 268175,
+      "raw": "\"questionImage\":{\"addImage\":\"\\ubb38\\ud56d \\uc124\\uba85 \\uc774\\ubbf8\\uc9c0 \\ucd94\\uac00\",\"changeImage\":\"\\ubcc0\\uacbd\",\"deleteImage\":\"\\uc0ad\\uc81c\",\"imageUploading\":\"\\uc774\\ubbf8\\uc9c0 \\uc5c5\\ub85c\\ub4dc \\uc911\",\"deleteImageTitle\":\"\\uc774\\ubbf8\\uc9c0\\ub97c \\uc0ad\\uc81c\\ud560\\uae4c\\uc694?\",\"deleteImageBody\":\"\\uc0ad\\uc81c\\ud558\\uba74 \\ub418\\ub3cc\\ub9b4 \\uc218 \\uc5c6\\uc2b5\\ub2c8\\ub2e4.\",\"deleteImageDone\":\"\\ubb38\\ud56d \\uc774\\ubbf8\\uc9c0\\ub97c \\uc0ad\\uc81c\\ud588\\uc2b5\\ub2c8\\ub2e4.\",\"imageSizeExceeded\":\"\\uc774\\ubbf8\\uc9c0\\ub294 1MB \\uc774\\ud558\\ub9cc \\ucca8\\ubd80\\ud560 \\uc218 \\uc788\\uc2b5\\ub2c8\\ub2e4.<br />\\uc6a9\\ub7c9\\uc744 \\uc904\\uc778 \\ub4a4 \\ub2e4\\uc2dc \\ucca8\\ubd80\\ud574 \\uc8fc\\uc138\\uc694.\",\"imageMimeNotAllowed\":\"JPG\\xb7JPEG\\xb7PNG \\uc774\\ubbf8\\uc9c0\\ub9cc \\ucca8\\ubd80\\ud560 \\uc218 \\uc788\\uc2b5\\ub2c8\\ub2e4.<br />\\ub2e4\\ub978 \\ud615\\uc2dd\\uc740 \\ubcc0\\ud658\\ud55c \\ub4a4 \\ucca8\\ubd80\\ud574 \\uc8fc\\uc138\\uc694.\",\"imageUploadFailed\":\"\\uc774\\ubbf8\\uc9c0 \\uc5c5\\ub85c\\ub4dc\\uc5d0 \\uc2e4\\ud328\\ud588\\uc2b5\\ub2c8\\ub2e4. \\uc7a0\\uc2dc \\ud6c4 \\ub2e4\\uc2dc \\uc2dc\\ub3c4\\ud574 \\uc8fc\\uc138\\uc694.\",\"cancel\":\"\\ucde8\\uc18c\",\"quotaExceeded\":\"\\uc774 \\uce90\\uce58\\ud3fc\\uc758 \\ub0a8\\uc740 \\uc6a9\\ub7c9\\uc774 \\ubd80\\uc871\\ud569\\ub2c8\\ub2e4. (\\ub0a8\\uc740 \\uc6a9\\ub7c9 {{remain}})\"}",
+      "excerptUtf8Sha256": "7c97d3c7308551ac6572a21d67245e4aa27584e3d7047051ee6883a34fa50961"
+    },
+    {
+      "id": "ko-uploadAdapter",
+      "symbol": "translate.uploadAdapter",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 1110970,
+      "endExclusive": 1112197,
+      "raw": "\"uploadAdapter\":{\"alert\":{\"phrase1\":\"14MB\\uc774\\uc0c1\\uc758 \\ud30c\\uc77c\\uc744 \\uc62c\\ub9b4 \\uc218 \\uc5c6\\uc2b5\\ub2c8\\ub2e4. \\ud604\\uc7ac \\ud30c\\uc77c\\uc740\",\"phrase2\":\"MB \\uc785\\ub2c8\\ub2e4.\",\"phrase3\":\"\\ud5c8\\uc6a9\\ud558\\uc9c0 \\uc54a\\ub294 \\ud3ec\\ub9f7\\uc758 \\ud30c\\uc77c\\uc785\\ub2c8\\ub2e4.jpeg, jpg, png \\ud30c\\uc77c\\ub9cc \\uc5c5\\ub85c\\ub4dc \\ud574\\uc8fc\\uc138\\uc694.\",\"phrase4\":\"14MB\\uc774\\uc0c1\\uc758 \\ud30c\\uc77c\\uc744 \\uc62c\\ub9b4 \\uc218 \\uc5c6\\uc2b5\\ub2c8\\ub2e4.\",\"phrase5\":\"\\ud30c\\uc77c\\uc744 \\uc77d\\uc744 \\uc218 \\uc5c6\\uc2b5\\ub2c8\\ub2e4.\",\"phrase6\":\"jpeg, jpg, png  \\ud30c\\uc77c\\ub9cc \\uc5c5\\ub85c\\ub4dc \\uac00\\ub2a5\\ud569\\ub2c8\\ub2e4.\",\"quotaExceeded1\":\"\\uc774 \\uce90\\uce58\\ud3fc\\uc758 \\ub0a8\\uc740 \\uc6a9\\ub7c9\\uc774 \\ubd80\\uc871\\ud569\\ub2c8\\ub2e4. (\\ub0a8\\uc740 \\uc6a9\\ub7c9 \",\"quotaExceeded2\":\")\",\"uploadFailed\":\"\\uc774\\ubbf8\\uc9c0 \\uc5c5\\ub85c\\ub4dc\\uc5d0 \\uc2e4\\ud328\\ud588\\uc2b5\\ub2c8\\ub2e4. \\uc7a0\\uc2dc \\ud6c4 \\ub2e4\\uc2dc \\uc2dc\\ub3c4\\ud574 \\uc8fc\\uc138\\uc694.\"},\"cancelDeliveryReservation\":\"\\ubc1c\\uc1a1 \\uc608\\uc57d \\ucde8\\uc18c\",\"writer\":\"\\uc791\\uc131\\uc790\",\"reservationSchedule\":\"\\uc608\\uc57d \\uc77c\\uc815\",\"title\":\"\\uc81c\\ubaa9\",\"cancelReservation\":\"\\uc608\\uc57d \\ucde8\\uc18c\",\"cancel\":\"\\ucde8\\uc18c\"}",
+      "excerptUtf8Sha256": "ac7954b75b20e9ecaf38b30b53adcc2297622f697b17a2d814068edd686c894b"
+    },
+    {
+      "id": "body-admin-preview-raw-html",
+      "symbol": "PREVIEW pageContent QO renderer",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; end exclusive",
+      "start": 8457040,
+      "endExclusive": 8458400,
+      "excerptUtf8Sha256": "38fde13c930b7ab71e4212f9f368e2d40d6ac75ae4532e9cb67a2f596fa6e1f5",
+      "raw": ",nI.jsxs)(iI,{className:\"body-2\",color:Ij,children:[\"\\u203b \",_(\"phrase.phrase22\")]}),(0,nI.jsxs)(iI,{className:\"body-2\",color:Ij,children:[\"\\u203b \",_(\"phrase.phrase23\")]})]}),\"PREVIEW\"===b?N&&M&&Array.isArray(null===p||void 0===p?void 0:p.pages)&&p.pages.length>0?(()=>{const e=p.pages.reduce(((e,t)=>{var r;return e+((null===t||void 0===t||null===(r=t.questions)||void 0===r?void 0:r.length)||0)}),0);let t=0,r=Math.max(0,((null===M||void 0===M?void 0:M.length)||0)-e);return p.pages.map(((e,n)=>{const a=!(null===e||void 0===e||!e.pageTitle),o=(null===e||void 0===e?void 0:e.pageContent)&&\"<p></p>\"!==e.pageContent,i=n>0&&(a||o);return(0,nI.jsxs)(yt.Fragment,{children:[n>0&&(0,nI.jsx)(iI,{className:\"body-2-strong\",color:sj,style:{marginTop:14},children:_(\"pageLabel\",{number:te(e,n)})}),i&&(0,nI.jsxs)(n5,{children:[a&&(0,nI.jsx)(iI,{className:\"subtitle-1 !break-normal\",color:tj,children:e.pageTitle}),a&&o&&(0,nI.jsx)(\"div\",{style:{background:uj,height:1,width:\"100%\",marginTop:24,marginBottom:24}}),o&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base\",style:{color:ej,marginTop:0},children:QO()(e.pageContent.replace(/\\n/g,\"\"))})]}),((null===e||void 0===e?void 0:e.questions)||[]).map((e=>{var a;const o=null!==(a=null===M||void 0===M?void 0:M[r])&&void 0!==a?a:e;if(r++,\"SIGNATURE\"===e.questionType)return null;const i=t++;return(0,nI.jsx)"
+    },
+    {
+      "id": "body-admin-reply-raw-html",
+      "symbol": "admin reply content/pageContent useMemo",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; end exclusive",
+      "start": 8484140,
+      "endExclusive": 8485000,
+      "excerptUtf8Sha256": "1fb1fbd73df0f4737871772128e0b022f5d23918e7784c55c7ee715b98474bb2",
+      "raw": ",yt.useMemo)((()=>{const e={};return null===A||void 0===A||A.forEach(((t,r)=>{var n;const a=null===t||void 0===t||null===(n=t[0])||void 0===n?void 0:n.questionId;void 0!==a&&null!==a&&(e[String(a)]=r)})),e}),[A]),Z=(0,yt.useMemo)((()=>{const e=null===r||void 0===r?void 0:r.content;return e&&\"<p></p>\"!==e?QO()(CY(e.replace(/\\n/g,\"\"))):null}),[null===r||void 0===r?void 0:r.content]),ee=(0,yt.useMemo)((()=>Y.map((e=>{var t;const r=null!==(t=null===e||void 0===e?void 0:e.pageContent)&&void 0!==t?t:null===e||void 0===e?void 0:e.content;return r&&\"<p></p>\"!==r?QO()(r.replace(/\\n/g,\"\")):null}))),[Y]),te=e=>{const{mode:t,count:r}=dG(e),n=pG(oG(e),t);return n?(0,nI.jsx)(iI,{className:\"body-2 mb-2\",color:aj,children:B(n,{count:r})}):null},re=(e,t)=>{var r,n,a,o,i;switch(e.questionType){case\"FOREIGN_ADDRESS\":return(0,nI.jsx)(v5,{variant:\"input\",reply:null!==("
+    }
+  ],
+  "verification": {
+    "sourceSha256Matched": true,
+    "excerptCount": 61,
+    "coordinate": "Each raw = source.slice(start,endExclusive); hash is UTF-8 encoding of raw, not UTF-16 bytes.",
+    "integrity": "보고서 저장 전 모든 발췌를 동일 보존 소스의 slice와 해시로 재확인함.",
+    "runtimeClaims": false
+  },
+  "planComparison": {
+    "file": "docs/qa/R08-T02/question-metadata/content-images/PLAN.md",
+    "sha256": "4d22b9686d4354b12aaa2e5c0e05314b734b4d13ac126490d9645d50427cd97e",
+    "status": "no-observed-source-blocker",
+    "reviewBoundary": "정적 원본 계약 대조만 수행. 구현·실행·DB 보안 리뷰가 아님.",
+    "aligned": [
+      "문항 단일 questionImageKey/1MiB와 본문 rich HTML/14MiB 수직 단위 분리",
+      "현재 일반 질문 유형에서 이미지 보존, 원본 IDV 예외는 현재 로컬 enum에 없어 후속 조건으로 명시",
+      "제목→이미지→참고자료→평문 설명→답변, max696px/radius8/별도 클릭 확대 없음",
+      "본문 FORM/PAGE/END/PRIVATE 네 위치와 HTML 복제/문서 보존을 후속 별도 범위로 유지"
+    ],
+    "localDecisionsNotOriginalGuarantees": [
+      "UUID key 형식, 누락 시 같은 현재 논리 질문 값 보존 및 null 명시 삭제",
+      "QUESTION_IMAGE와 OPTION_IMAGE의 서버 purpose 강제 및 DB FK/reference slot/pin 무결성",
+      "ClamAV/완전한 decode·바이트 불변·암호화·소유권/역사 version·권한 재검사",
+      "읽기 실패/로딩 UI 및 readOnly의 모든 수정 조작 차단",
+      "동의 증거/영수증에 신규 이미지 포함 정책 및 과거 bytes 보존"
+    ],
+    "remainingClarifications": [
+      "원본 body 페이지 copy는 요청에서 PAGE_CONTENT_IMAGE를 수집하지만 추적한 client chain에 HTML URL remap이 없어 BI 후속에서 독립 계약으로 정해야 함.",
+      "원본 PDF 이미지 포함과 역사 pin은 서버 미관측이므로 원본 동등성 주장의 근거로 사용하지 않음."
+    ]
+  }
+}

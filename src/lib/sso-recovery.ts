@@ -1,4 +1,8 @@
 const failures = {
+  SSO_BROWSER_MISMATCH: { message: "로그인을 시작한 브라우저를 확인할 수 없습니다.", help: "쿠키를 허용한 같은 브라우저에서 회사 SSO 로그인을 다시 시작해주세요.", action: "restart" },
+  SSO_HTTPS_REQUIRED: { message: "회사 SSO 로그인에는 HTTPS 주소가 필요합니다.", help: "관리자에게 올바른 HTTPS 접속 주소를 확인해주세요.", action: "contact" },
+  SSO_GOOGLE_REQUIRED: { message: "이 회사는 Google 로그인만 허용합니다.", help: "해당 회사의 Google SSO 주소로 로그인해주세요. 기존 이메일 계정은 로그인 후 SSO 연결 관리에서 연결할 수 있습니다.", action: "restart" },
+  SSO_MICROSOFT_REQUIRED: { message: "이 회사는 Microsoft 로그인만 허용합니다.", help: "해당 회사의 Microsoft SSO 주소로 로그인해주세요. 기존 이메일 계정은 로그인 후 SSO 연결 관리에서 연결할 수 있습니다.", action: "restart" },
   SSO_CANCELLED: { message: "회사 계정 로그인이 취소되었거나 거절되었습니다.", help: "로그인하려면 회사 SSO 주소로 다시 시작해주세요.", action: "restart" },
   SSO_EXPIRED: { message: "회사 로그인 요청이 만료되었거나 이미 사용되었습니다.", help: "이전 인증 응답을 새로고침하지 말고 새 로그인을 시작해주세요.", action: "restart" },
   SSO_CHANGED: { message: "회사 로그인 설정이 변경되었습니다.", help: "새 설정으로 다시 시작해주세요. 문제가 계속되면 회사 관리자에게 문의해주세요.", action: "restart" },
@@ -16,6 +20,8 @@ export function ssoFailure(code: string | null | undefined) {
 }
 
 const codes: Record<string, SsoFailureCode> = {
+  SSO_BROWSER_MISMATCH: "SSO_BROWSER_MISMATCH", SSO_HTTPS_REQUIRED: "SSO_HTTPS_REQUIRED",
+  GOOGLE_OAUTH_POLICY: "SSO_GOOGLE_REQUIRED", MS_OAUTH_POLICY: "SSO_MICROSOFT_REQUIRED",
   PROVIDER_DENIED: "SSO_CANCELLED", STATE_INVALID: "SSO_EXPIRED", STATE_REPLAYED: "SSO_EXPIRED",
   TOKEN_EXPIRED: "SSO_EXPIRED", SSO_CONFIGURATION_CHANGED: "SSO_CHANGED",
   SSO_REAUTH_REQUIRED: "SSO_LINK_NEEDED", SSO_LINK_REQUIRED: "SSO_LINK_NEEDED", LINK_SESSION_REQUIRED: "SSO_LINK_NEEDED", SESSION_EXPIRED: "SSO_LINK_NEEDED",

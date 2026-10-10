@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-10T04:58:10.488Z",
+  "checks": [
+    {
+      "action": "read Ego-saved address types",
+      "status": 200
+    },
+    {
+      "action": "publish address questions",
+      "status": 201
+    },
+    {
+      "action": "reject domestic malformed",
+      "status": 422,
+      "code": "INVALID_ADDRESS"
+    },
+    {
+      "action": "reject foreign country only",
+      "status": 422,
+      "code": "INVALID_ADDRESS"
+    },
+    {
+      "action": "reject foreign scalar injection",
+      "status": 422,
+      "code": "INVALID_ADDRESS"
+    },
+    {
+      "action": "reject foreign extra key",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    }
+  ]
+}

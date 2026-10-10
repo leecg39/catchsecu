@@ -1,54 +1,61 @@
+"""Validate active plan coverage; this is not a runtime CRUD test."""
 from pathlib import Path
-import csv, json, re
 from datetime import datetime, timezone
-from collections import Counter
+import json
+import re
 root = Path(__file__).resolve().parents[1]
-def csvread(path):
-    with path.open(encoding='utf-8-sig') as f: return list(csv.DictReader(f))
-source = csvread(root.parent / 'outputs/catchsecu-pages/catchsecu-pages.csv')
-matrix = csvread(root / 'docs/planning/03-route-matrix.csv')
-coverage = csvread(root / 'docs/research/route-coverage.csv')
-manifest = json.loads((root/'src/data/route-manifest.json').read_text())
-tasks = json.loads((root/'docs/planning/tasks.json').read_text())
-menu = json.loads((root/'src/data/menu.json').read_text())
-paths = {r['path'] for r in matrix}
-assert len(source) == len(matrix) == len(manifest) == 181
-assert len(paths) == 181
-assert paths == {r['경로'] for r in source} == {r['path'] for r in manifest} == {r['path'] for r in coverage}
-assert len({r['test_id'] for r in matrix}) == 181
-assert {r['task_id'] for r in matrix} <= {t['id'] for t in tasks}
-menus = [i for group in menu for i in group['items']]
-assert {m['path'] for m in menus} <= paths
-visited, active = set(), set()
-byid = {t['id']: t for t in tasks}
-def visit(t):
-    assert t not in active, 'dependency cycle'
-    if t in visited: return
-    active.add(t)
-    for d in byid[t]['dependencies']: visit(d)
-    active.remove(t); visited.add(t)
-for task in byid: visit(task)
-unknown = [r for r in coverage if r['status'] != 'source-based']
+def read(path): return json.loads((root / path).read_text())
+active = read('docs/planning/active-plan.json')
+source, matrix, tasks = [read(active[key]) for key in ['sourceRoutes', 'routeMatrix', 'tasks']]
+legacy, additional = read(active['legacyTasks']), read(active['additionalRoutes'])
+manifest, menu = read('src/data/route-manifest.json'), read('src/data/menu.json')
+paths = {row['path'] for row in source}
+by_id = {task['id']: task for task in tasks}
+assert len(source) == len(paths), 'duplicate source routes'
+assert paths == {row['path'] for row in matrix} == {row['path'] for row in manifest}, 'route coverage gap'
+assert len(matrix) == len(manifest) == len(paths), 'duplicate route mappings'
+assert len(by_id) == len(tasks), 'duplicate task IDs'
+assert len({row['e2e_id'] for row in matrix}) == len(paths), 'duplicate E2E IDs'
+assert {item['path'] for group in menu for item in group['items']} <= paths, 'unmapped menu'
+assert {row['path'] for row in additional}.isdisjoint(paths), 'additional/source overlap'
+assert all(row['task'] in by_id and row['gate'] in by_id for row in additional)
+assert {key for task in tasks for key in task['legacy_tasks']} == {task['id'] for task in legacy}, 'legacy mapping gap'
+visited, visiting = set(), set()
+def visit(task_id):
+    assert task_id not in visiting, 'dependency cycle: ' + task_id
+    if task_id in visited: return
+    visiting.add(task_id)
+    for dependency in by_id[task_id]['dependencies']:
+        assert dependency in by_id, 'unknown dependency: ' + dependency
+        visit(dependency)
+    visiting.remove(task_id)
+    visited.add(task_id)
+for task_id in by_id: visit(task_id)
+models = set(re.findall(r'^model (\w+) ', (root / 'prisma/schema.prisma').read_text(), re.M))
 for row in matrix:
-    assert all(row[key] for key in ['models','actor_scope','acceptance','common_checks','api_contract'])
-out = root/'docs/qa/P00-T01'
-out.mkdir(parents=True, exist_ok=True)
+    assert set(row['models']) <= models, 'unknown model: ' + row['path']
+    assert all(row[key] in by_id for key in ['data_task', 'api_task', 'ui_task', 'gate_task'])
+    assert row['screen_work'] and row['page_acceptance'] and row['actors']
+    if '*' in row['path']:
+        assert row['route_kind'] == 'fallback' and not row['api_operations'], 'wildcard cannot be CRUD page'
+for task in tasks:
+    assert task['scope'] and task['acceptance'] and task['files']
+    assert set(task['dependencies']) == set(task['dependency_gates'])
+    if task['status'] == 'completed':
+        assert task['completion_evidence'], 'completed without evidence: ' + task['id']
+        assert all((root / evidence).exists() for evidence in task['completion_evidence'])
+output = root / 'docs/qa/R00-T01'
+output.mkdir(parents=True, exist_ok=True)
 report = {'checkedAt': datetime.now(timezone.utc).isoformat(), 'result': 'passed',
-          'paths': len(paths), 'menuEntries': len(menus), 'missingPaths': [],
-          'uniqueTestIds': 181, 'taskCount': len(tasks), 'dependencyCycles': 0,
-          'sourceStatus': dict(Counter(r['status'] for r in coverage)),
-          'sourceLimitations': len(unknown), 'sourceRevisited': False}
-(out/'route-contract-check.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
-(out/'README.md').write_text('''# P00-T01 경로·계약 대조
-원본 CSV, 라우트 manifest, 조사 근거 CSV, 구현 계획 CSV의 181개 경로가 정확히 일치한다. 메뉴 항목은 모두 이 집합에 포함된다. 각 행에 모델·API·권한·정상/오류/권한 거부 검증 조건과 고유 E2E ID가 있다.
-
-실행: `python3 scripts/verify-plan.py`. 결과: `route-contract-check.json`.
-이 검사는 경로와 계약의 완전성을 검사한다. 181개 CRUD 동작 시험을 통과했다는 의미는 아니다.
-
-## 원본 상태가 확인되지 않은 범위
-기존 조사자료를 재검토했다. 아래 경로의 정상 동작은 관찰하지 못했으며, 계획 CSV의 독립 구현 계약을 사용한다. 기능을 실제 시험할 때까지 완료로 표시하지 않는다. 문서 P/C/OC 약어의 원본 의미, 기관 인증과 결제 공급자 계약은 별도 결정이 필요하다.
-
-| 경로 | 관찰 분류 | 독립 구현 작업 |
-|---|---|---|
-'''+'\n'.join('| `'+r['path']+'` | '+r['status_ko']+' | '+next(m['task_id'] for m in matrix if m['path']==r['path'])+' |' for r in unknown)+'\n')
+          'scope': 'active plan coverage and dependency validation only; not runtime CRUD acceptance',
+          'sourcePaths': len(paths), 'concretePatterns': sum('*' not in path for path in paths),
+          'fallbackPatterns': sum('*' in path for path in paths), 'additionalPatterns': len(additional),
+          'taskCount': len(tasks), 'legacyTasksPreserved': len(legacy),
+          'menuEntries': sum(len(group['items']) for group in menu), 'dependencyCycles': 0,
+          'modelsReferenced': len({model for row in matrix for model in row['models']}), 'sourceRevisited': False}
+(output / 'route-contract-check.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+(output / 'README.md').write_text('# R00-T01 active route and task coverage\n\n'
+    'Source inventory, active plan and app manifest match. Wildcards remain fallback descriptors, not unrestricted page allowlist entries. '
+    'All legacy tasks are mapped. Command: `python3 scripts/verify-plan.py`. Evidence: `route-contract-check.json`. '
+    'This check proves plan consistency only, not runtime CRUD acceptance.\n')
 print(json.dumps(report, ensure_ascii=False))

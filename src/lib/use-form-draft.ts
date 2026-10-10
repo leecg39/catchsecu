@@ -11,7 +11,7 @@ function validate(value: FormDraftValue) {
   const result = formInput.safeParse(value);
   if (!result.success) throw new Error("제목·질문·선택 항목과 설정 범위를 확인해주세요.");
   const content = result.data.content;
-  validateQuestionDefinitions(content.questions, false, content.marketing ? [content.marketing.nameQuestionId, content.marketing.emailQuestionId, content.marketing.smsQuestionId].filter((id): id is string => !!id) : []);
+  validateQuestionDefinitions(content.questions, false, content.marketing ? [content.marketing.nameQuestionId, content.marketing.emailQuestionId, content.marketing.smsQuestionId, content.marketing.kakaoQuestionId].filter((id): id is string => !!id) : []);
   return result.data;
 }
 export function useFormDraft(initial: FormRecord | undefined, seed: FormDraftValue, enabled = true) {
@@ -42,7 +42,7 @@ export function useFormDraft(initial: FormRecord | undefined, seed: FormDraftVal
     window.addEventListener("beforeunload", unload); document.addEventListener("click", navigate, true);
     return () => { window.removeEventListener("beforeunload", unload); document.removeEventListener("click", navigate, true); };
   }, [enabled, router, session]);
-  return { ...snapshot, creationPending: session.hasPendingCreation(), saving: snapshot.phase === "saving", edit: (value: FormDraftValue | ((current: FormDraftValue) => FormDraftValue)) => session.edit(typeof value === "function" ? value(session.getSnapshot().value) : value),
+  return { ...snapshot, getSnapshot: session.getSnapshot, pauseSaving: session.pauseSaving, creationPending: session.hasPendingCreation(), saving: snapshot.phase === "saving", edit: (value: FormDraftValue | ((current: FormDraftValue) => FormDraftValue)) => session.edit(typeof value === "function" ? value(session.getSnapshot().value) : value),
     save: (force = false) => session.save(force), navigationTarget,
     discardNavigation: () => { session.stop(); router.push(navigationTarget); },
     cancelNavigation: () => setNavigationTarget(""),

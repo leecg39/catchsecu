@@ -2,5 +2,6 @@ export type AuditEventKind = "all" | "service" | "info" | "marketing" | "custome
 export type AuditEventRecord = {
   id: string; createdAt: string; action: string; resource: string; resourceId: string | null;
   serviceId: string | null; serviceName: string | null; actorName: string | null;
+  formName: string | null; submissionId: string | null;
 };
 export type AuditEventList = { items: AuditEventRecord[]; total: number; page: number; pageSize: number };

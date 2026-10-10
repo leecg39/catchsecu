@@ -1,0 +1,67 @@
+{
+  "checkedAt": "2026-10-10T13:36:41.000Z",
+  "result": "passed",
+  "browser": "Ego Lite",
+  "origin": "http://localhost:3118",
+  "database": "catchsecu_test",
+  "formId": "ebdf7e73-66f1-4bb4-b15b-36bcd5e6fbfb",
+  "steps": [
+    {
+      "surface": "form/ai/setting",
+      "assertions": {
+        "startEnabled": true,
+        "startLocalValue": "2026-10-11T22:35",
+        "closeEnabled": true,
+        "closeLocalValue": "2026-10-12T22:35",
+        "timezoneGuidanceVisible": true,
+        "publishActionVisible": true
+      }
+    },
+    {
+      "surface": "form/ai/share",
+      "assertions": {
+        "publishedMessage": "캐치폼이 게시되었습니다.",
+        "publicLinkVisible": true
+      }
+    },
+    {
+      "surface": "public-before-open",
+      "assertions": {
+        "title": "응답 수집 일정 브라우저 검증",
+        "status": "아직 응답 수집이 시작되지 않았습니다.",
+        "startText": "2026. 10. 11. 오후 10:35:00",
+        "questionVisible": false,
+        "submitVisible": false
+      }
+    },
+    {
+      "surface": "public-after-open",
+      "assertions": {
+        "body": "예약된 수집 일정 브라우저 검증",
+        "requiredQuestion": "확인 메모",
+        "submittedValue": "일정 경계 실제 제출",
+        "completionVisible": true
+      }
+    },
+    {
+      "surface": "public-after-close",
+      "assertions": {
+        "title": "응답 수집 일정 브라우저 검증",
+        "customClosedText": "수집 일정이 종료되었습니다.",
+        "questionVisible": false,
+        "submitVisible": false
+      }
+    },
+    {
+      "surface": "public-after-production-restart",
+      "previousServerPid": 60335,
+      "serverPid": 62009,
+      "assertions": {
+        "customClosedText": "수집 일정이 종료되었습니다.",
+        "databaseStateHash": "aa1fc891301293d7907cfa44d1b72d486675172f4c16b8e27ba7c927ffa1aec5"
+      }
+    }
+  ],
+  "publicTokenRecorded": false,
+  "credentialsRecorded": false
+}

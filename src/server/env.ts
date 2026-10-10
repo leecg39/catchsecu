@@ -3,6 +3,7 @@ import { z } from "zod";
 const schema = z.object({
   DATABASE_URL: z.url().refine(value => value.startsWith("postgresql://") || value.startsWith("postgres://")),
   BETTER_AUTH_URL: z.url(),
+  ALLOW_LOCAL_SSO: z.enum(["0", "1"]).default("0"),
   BETTER_AUTH_SECRET: z.string().min(32),
   DATA_ENCRYPTION_KEY: z.string().regex(/^[a-f0-9]{64}$/i),
   DATA_ENCRYPTION_KEY_PREVIOUS: z.string().regex(/^[a-f0-9]{64}$/i).optional(),

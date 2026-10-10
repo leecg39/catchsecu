@@ -1,0 +1,175 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 전체 구현 검증"(2): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    anchor [ref=1034, loc=href:/security/sso#main, url=http://localhost:3100/security/sso#main]
+      text "본문으로 건너뛰기"
+    container
+      button [ref=1035]
+        container
+          text "서비스명"
+          text "SSO 문맥 시험 A"
+        container
+          text "외부 ⓘ"
+          text "-"
+          image
+      container
+        anchor [ref=1036, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        button [ref=1037]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=1038]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=1039]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=1040]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=1041]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=1042]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=1043]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=1044]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=1045, loc=href:/shared-privacy/view, url=http://localhost:3100/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=1046, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=1047, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          anchor [ref=1048, loc=href:https://catchsecu.com/, url=https://catchsecu.com/]
+            text "홈페이지"
+          anchor [ref=1049, loc=href:/legal/privacy, url=http://localhost:3100/legal/privacy]
+            text "개인정보"
+            text "처리방침"
+          anchor [ref=1050, loc=href:/legal/terms, url=http://localhost:3100/legal/terms]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          button "회사 선택" [ref=1051, loc=css:button[aria-label="회사 선택"]]
+            text "SSO 문맥 시험 A"
+            text "⌄"
+        container
+          button [ref=1052]
+            svg_root
+            text "검색"
+            text "Ctrl K"
+          button "키보드 단축키 안내" [ref=1053, loc=css:button[aria-label="키보드 단축키 안내"]]
+            svg_root
+          button [ref=1054]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=1055, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+            image
+          button "문의" [ref=1056, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=1057, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+            image
+          button [ref=1058]
+            image
+            text "MY"
+      container [ref=1059]
+        container "이동 경로"
+          ordered_list
+            list_item
+              text "관리"
+            list_item
+              text "/"
+              text "SSO 로그인 정책"
+        container
+          container
+            heading
+              text "SSO 로그인 정책"
+            container
+              anchor [ref=1060, loc=href:/security/sso/setting, url=http://localhost:3100/security/sso/setting]
+                text "정책 설정"
+              anchor [ref=1061, loc=href:/security/sso/providers, url=http://localhost:3100/security/sso/providers]
+                text "SSO 공급자 관리"
+          paragraph
+            text "회사에서 허용할 로그인 방식을 선택합니다. 저장 후 모든 구성원의 다음 회사 요청부터 적용됩니다."
+          status
+            paragraph
+              text "구독이 없어 설정을 변경할 수 없습니다."
+            paragraph
+              text "현재 설정은 조회할 수 있으며, 적용 중인 보안 보호는 계속 유지됩니다."
+              anchor [ref=1062, loc=href:/pay/license-service, url=http://localhost:3100/pay/license-service]
+                text "구독 확인"
+          container
+            heading
+              text "현재 정책"
+            text "아이디 및 SSO 로그인 허용"
+            paragraph
+              text "현재 인증:"
+              text "이메일 로그인"
+            paragraph
+              text "정책 변경에는 해당 SSO의 최근 5분 이내 인증과 이메일 인증번호가 필요합니다."
+            container
+              anchor [ref=1063, loc=href:/link/oauth2, url=http://localhost:3100/link/oauth2]
+                text "내 SSO 계정 연결"
+              anchor [ref=1064, loc=href:/login/oauth2, url=http://localhost:3100/login/oauth2]
+                text "SSO로 다시 로그인"
+          container
+            heading
+              text "연결 현황"
+            form
+              group [ref=1065]
+                text "회사 로그인 정책"
+                container
+                  radio [ref=1066]
+                  text "아이디 및 SSO 로그인 허용"
+                container
+                  radio [ref=1067]
+                  text "Microsoft 로그인만 허용"
+                  paragraph
+                    text "공급자"
+                    text "미설정"
+                    text "· 내 계정"
+                    text "미연결"
+                    text "· 활성 직접 소속 구성원"
+                    text "1"
+                    text "명 중 연결"
+                    text "0"
+                    text "명 / 미연결"
+                    text "1"
+                    text "명"
+                container
+                  radio [ref=1068]
+                  text "Google 로그인만 허용"
+                  paragraph
+                    text "공급자"
+                    text "미설정"
+                    text "· 내 계정"
+                    text "미연결"
+                    text "· 활성 직접 소속 구성원"
+                    text "1"
+                    text "명 중 연결"
+                    text "0"
+                    text "명 / 미연결"
+                    text "1"
+                    text "명"
+  alert

@@ -7,5 +7,6 @@ export type AuthMutationScope = {
   changed: boolean; failed: boolean;
   proofDeadline: Date | null; createdResetProofs: Set<string>;
   ssoMfa?: import("./sso-mfa").SsoMfaAuthorization;
+  rotatedSsoProof?: { source: import("./sso-session-proof").SsoProofSource; activeCompanyId: string | null };
 };
 export const authMutationScope = new AsyncLocalStorage<AuthMutationScope>();

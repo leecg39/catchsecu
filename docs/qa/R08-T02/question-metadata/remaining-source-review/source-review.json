@@ -1,0 +1,1007 @@
+{
+  "schemaVersion": 1,
+  "author": "bundle_analysis",
+  "purpose": "F3 남은 질문 메타데이터: 개인정보 분류 및 기타 직접입력 원본 정적 대조와 도입 계획",
+  "evidenceType": "retained-source-static-only",
+  "scope": {
+    "outputDirectory": "docs/qa/R08-T02/question-metadata/remaining-source-review",
+    "writes": [
+      "source-review.json",
+      "PLAN-draft.md"
+    ],
+    "productChanged": false,
+    "testsRun": false,
+    "originalExecuted": false,
+    "networkRequested": false,
+    "dbAccessed": false,
+    "browserUsed": false
+  },
+  "provenance": {
+    "bundle": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+    "expectedSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "originalReaEvidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+    "method": "보존 REA 근거 재사용. Node readFile/indexOf/slice 및 로컬 소스 읽기. locale 문자열은 acorn literal AST 및 JSON.parse만 사용; 원본 JS 실행 없음.",
+    "priorReports": [
+      "docs/qa/R08-T02/question-metadata/source-review.json",
+      "docs/qa/R08-T02/question-metadata/reference-link/source-review.json",
+      "docs/qa/R08-T02/international-contact/system-copy-source.json"
+    ],
+    "actualSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "bytes": 15337385,
+    "utf16Length": 15329557
+  },
+  "correctionsToEarlierReport": [
+    {
+      "claim": "분류 이름 상한 미확인",
+      "updated": "한국어/비한국어 모두 입력 maxLength:50, 한국어 문구에도 ‘50자 이내’가 확인됨. 서버 강제 상한은 미관측.",
+      "evidence": [
+        "pi_manual",
+        "pi_ko_input"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "PI01",
+      "classification": "observed",
+      "title": "5개 분류와 question-level array wire",
+      "details": [
+        "PERSONAL_INFORMATION=개인정보, SENSITIVE=민감정보, IDENTIFICATION=고유식별정보, RESIDENT=주민등록번호, NON_PERSONAL_INFORMATION=개인정보 없음. 빈 문자열은 선택 전 UI 값이다.",
+        "detectedItems UI 항목의 type/name/nlpFeedbackId/personalInformationSource를 w_t가 catchFormPersonalInformationRequests[]의 personalInformationType/detectedPersonalInformation/nlpFeedbackId/personalInformationSource로 투영한다.",
+        "isConfirm, detectedType, detectedName, 오류 스타일은 C_t의 해당 요청 배열에 포함되지 않는다. name을 trim하여 보내는 코드는 w_t에 없다.",
+        "관측한 source 값은 NLP와 USER이며 비어 있는 source를 처리하는 UI도 있다. 서버가 다른 값을 허용하는지는 미관측."
+      ],
+      "evidence": [
+        "pi_enum",
+        "question_serializer",
+        "pi_default",
+        "pi_ko_list"
+      ]
+    },
+    {
+      "id": "PI02",
+      "classification": "observed",
+      "title": "한국어 편집은 복수 분류와 확인·편집 상태",
+      "details": [
+        "한국어 jRt는 p.map으로 모든 항목을 표시하고 플러스 버튼으로 빈 USER 항목을 추가한다. 수동(USER) 항목 또는 detectedName/type이 모두 없는 항목만 삭제 버튼이 표시된다.",
+        "분류별 입력은 확인 전만 편집 가능; 이름 maxLength 50. NONE은 이름 input이 없고 변경할 때 name/detectedName을 비운다.",
+        "확인은 type 필수, NONE 이외 name.trim() 비어 있음 거절. 행렬 두 유형은 NONE 이외 분류를 확인할 수 없다.",
+        "RESIDENT 선택/확인은 question.isRequired=true와 disabled=true로 연결된다. 필수 스위치도 RESIDENT가 있으면 해제를 거절한다. NLP 결과 첫 항목이 RESIDENT이면 TEXTBOX, 옵션/행렬 초기화까지 수행한다.",
+        "일반 분류로 다시 바꿀 때 기존 true였던 required를 자동 false로 되돌리지 않는다.",
+        "항목 개수 상한은 jRt 추가 UI에서 확인하지 못했다. 무한대라고 단정하지 않는다."
+      ],
+      "evidence": [
+        "pi_ko_list",
+        "pi_ko_input",
+        "pi_confirm",
+        "pi_title_detection",
+        "resident_required"
+      ]
+    },
+    {
+      "id": "PI03",
+      "classification": "observed",
+      "title": "비한국어는 수동 수집 여부 및 단일 확인",
+      "details": [
+        "formLanguage !== ko이면 manualPrivacy UI: YES/NO, 분류/항목명, 확인/편집. YES용 select는 NONE을 제외한다.",
+        "NO는 이름 빈 문자열의 확인된 NONE/USER 항목 한 개로 즉시 바꾸고 feedback API를 시도한다. YES는 NONE을 제거한 기존 목록 또는 빈 USER 항목을 사용한다.",
+        "표시용 w는 p[0]이다. 타입/이름 수정과 최종 확인은 [w] 한 항목 배열로 갱신한다. 언어 변경 reducer는 주소 타입만 정규화하며 detectedItems를 초기화하지 않는다.",
+        "확인은 type 및 name.trim() 필수, 이름 input maxLength 50. feedback POST에는 formLanguage 및 questionType도 포함한다.",
+        "특정 400 category는 EMAIL/CONTACT로 전환하며 questionOptionList=[], matrixOptionData=null, isConfirm=false. MATRIX_TYPE_CANNOT_BE_PERSONAL_INFORMATION은 alert 후 return.",
+        "이 경로의 그 외 catch는 확인 처리를 계속한다. 이를 원본 서버가 모든 입력을 승인한다는 근거로 사용할 수 없다."
+      ],
+      "evidence": [
+        "pi_manual",
+        "language_reducer",
+        "pi_select_options"
+      ]
+    },
+    {
+      "id": "PI04",
+      "classification": "observed",
+      "title": "NLP·제목·유형·복제 전환",
+      "details": [
+        "한국어 제목 변경 시 Dkt -> POST company-operated-service/nlp, NER 응답을 detectedItems로 바꾸며 확인되지 않은 상태로 만든다. 비한국어 제목 변경은 이 자동 NLP 요청을 건너뛴다.",
+        "수동 피드백은 POST company-operated-service/nlp/user_input_personal_information. 이 보고서는 요청 코드만 관측했으며 호출하지 않았다.",
+        "EMAIL/CONTACT/이름으로 추정된 분류명은 유형 변경을 제한하거나 EMAIL/CONTACT/TEXTBOX 전환을 요구하는 클라이언트 코드가 있다. 이 휴리스틱 또는 서버 오류 응답을 정확한 분류 엔진으로 재현할 수는 없다.",
+        "질문/페이지 복제는 nlpFeedbackId=null, detectedItems=[]로 재시작하고 한국어 페이지 복제는 Dkt를 다시 시도한다. 옵션은 spread하여 기타 플래그를 보존하고 페이지 복제는 pageOffset=-2로 초기화한다.",
+        "저장 응답 로더는 wire 배열을 type/name으로 복원하며 모든 항목 isConfirm=true로 둔다."
+      ],
+      "evidence": [
+        "pi_nlp_api",
+        "pi_feedback_api",
+        "pi_title_detection",
+        "pi_type_transition",
+        "question_copy",
+        "page_copy",
+        "question_loader"
+      ]
+    },
+    {
+      "id": "PI05",
+      "classification": "observed",
+      "title": "다음 단계 검사 및 동의서 입력과 연결",
+      "details": [
+        "다음 단계 전 detectedItems가 없거나 하나라도 !isConfirm이면 해당 질문으로 이동하는 모달 후 return false. NONE 이외 분류의 빈 이름도 별도 거절한다.",
+        "g_t는 각 도달 경로에 PERSON/SENSITIVE/IDENTIFICATION/RESIDENT 중 하나가 있는지 검사한다. 이는 모든 문항에 개인정보 분류를 강제하는 것과 다르다.",
+        "T_t는 NONE을 제외한 type/name 쌍을 모으고 기존 수집 항목과 비교한다. basic POST 성공 뒤 기존 agreement가 있고 항목이 달라졌는지에 따라 다른 후속 UI로 간다.",
+        "행렬 개인정보/이메일/전화/단문 분리 관련 서버 오류 메시지를 처리하는 클라이언트 분기가 있지만, 해당 서버 검증 실행과 정확한 오류 발생 조건은 미관측."
+      ],
+      "evidence": [
+        "pi_next_confirmation",
+        "pi_next_names",
+        "pi_path_check",
+        "pi_consent_projection",
+        "basic_save"
+      ]
+    },
+    {
+      "id": "OT01",
+      "classification": "observed",
+      "title": "기타는 RADIO/CHECKBOX/SELECTBOX의 option 플래그",
+      "details": [
+        "별도 질문 유형이 아니며 편집 옵션은 value:number(0-based 재정렬 값), optionQuestionName:string, isCustomValue:boolean, pageOffset:number를 사용한다.",
+        "기타 추가는 빈 optionQuestionName, isCustomValue=true, value=현재 길이, pageOffset=-2. 이미 기타가 있으면 추가 버튼이 숨겨진다. 다음 단계에서도 기타 2개 이상을 명시적으로 거절한다.",
+        "새 일반 보기는 기존 기타 앞에 삽입하고 전체 value를 다시 0-based로 매긴다. 기타 행은 non-drag 클래스이며 Enter 추가도 일반 행에서만 수행된다.",
+        "보기 라벨(기타 포함)은 직접 수정 가능하고 maxLength250. placeholder는 optionInputText.other, 일반은 optionInputText.optional+번호다. 다음 단계는 기타를 포함한 모든 보기의 빈/공백 라벨을 거절한다.",
+        "삭제는 목록 길이>1일 때 보이며 선택수 제한이 남은 보기 수보다 커지면 제한값을 초기화한다. 조사한 편집/검증 함수에서 전체 보기 개수 최대값은 확인하지 못했다."
+      ],
+      "evidence": [
+        "other_add",
+        "other_editor",
+        "other_remove",
+        "other_next_labels",
+        "other_next_count",
+        "other_delete_button"
+      ]
+    },
+    {
+      "id": "OT02",
+      "classification": "observed",
+      "title": "답변 UI와 선택 해제",
+      "details": [
+        "응답용 옵션에는 customValueYn='Y'/'N', value(문자열 비교), name을 사용한다. 편집용 isCustomValue/optionQuestionName과 다른 DTO다. 양 DTO를 바꾸는 서버 구현은 미관측.",
+        "UG 체크박스, vY 라디오, EY 드롭다운은 기타 선택 때만 텍스트 입력을 표시하고 maxLength100을 전달한다. 선택 여부와 직접입력 텍스트는 별개 state이다.",
+        "체크박스의 기타 해제는 text를 비우고, 라디오 일반 보기 선택 및 드롭다운 선택 변경도 text를 비운다. readOnly/disabled 동작은 위젯별 구현을 보고 그대로 분리하여 보존한다.",
+        "기타의 이미지 첨부는 편집 UI에서 표시되지 않고 kG serializer 정규화도 기존 option image 메타데이터를 제거한다. SELECTBOX도 이미지 지원 대상이 아니다."
+      ],
+      "evidence": [
+        "other_checkbox_input",
+        "other_radio_input",
+        "other_dropdown_input",
+        "option_image_boundary"
+      ]
+    },
+    {
+      "id": "OT03",
+      "classification": "observed",
+      "title": "AI_V3 상태 codec와 최종 제출 wire는 서로 다름",
+      "details": [
+        "AI_V3 CHECKBOX 상태: {optionValue:number[],isCustomValue:boolean,text:string}. codec는 일반 배열에서 기타 ID를 분리하고 숫자 정렬한다. parse 때 플래그가 true이면 해당 기타 value를 UI 선택 목록에 복원한다.",
+        "AI_V3 RADIO/SELECTBOX 상태: {optionValue:number,isCustomValue:boolean,text:string} 또는 미선택 null.",
+        "최종 CHECKBOX 제출은 [{optionValue:number,customValue:boolean,text:string|null}]이며 일반 선택은 false/null, 기타는 true/입력문자열이다. RADIO/SELECTBOX 최종 제출은 단일 동일 object 또는 null. isCustomValue와 customValue를 혼동하지 않는다.",
+        "필수(MM)는 미선택 거절. 선택사항이어도 기타를 선택했는데 text가 없거나 trim()===''이면 codec validate=false. maxLength100은 UI에서 확인했으며 codec validate나 이 serializer가 길이100을 재검사하는 것은 관측되지 않는다.",
+        "select-limit gG는 기타를 한 선택으로 세며 optionValue에 기타 ID가 이미 들어 있어도 중복 가산하지 않는다.",
+        "legacy NEW/AI/AI_V2의 RADIO/SELECTBOX는 value|text string codec이다. 새 로컬 구조를 레거시 pipe 문자열로 합치면 임의 pipe 텍스트/ID/기존 DTO 정합 문제가 생기므로 혼합하지 않는다."
+      ],
+      "evidence": [
+        "other_codecs",
+        "other_legacy_codecs",
+        "other_submit",
+        "other_selection_count"
+      ]
+    },
+    {
+      "id": "OT04",
+      "classification": "observed",
+      "title": "보기 및 언어/질문 유형 전환",
+      "details": [
+        "UPt는 RADIO/CHECKBOX/SELECTBOX 사이에서 기존 optionList를 spread 보존하고, FILE에서 넘어오면 새 기본 일반 옵션을 만든다. 비선택 유형은 []이며 FILE은 파일 개수용 별도 기본 옵션이다.",
+        "formLanguage reducer는 주소 유형만 전환하므로 기존 기타 설정/라벨을 번역하거나 비우지 않는다. 공개 직접입력 UI는 전달된 번역 placeholder를 사용한다.",
+        "기타 pageOffset은 일반 보기와 같은 옵션 객체 필드로 저장된다. 원본 페이지 분기와 로컬 question.condition은 서로 다른 모델이므로 원본 숫자 index를 로컬 안정 ID 대신 쓰지 않는다.",
+        "원본 템플릿 서버 내부 복제 및 저장 후 ID 안정성은 이 읽기 조사로 확인할 수 없다."
+      ],
+      "evidence": [
+        "choice_type_transition",
+        "language_reducer",
+        "question_serializer",
+        "page_copy"
+      ]
+    }
+  ],
+  "comparison": [
+    {
+      "area": "개인정보 분류 모델/DTO",
+      "status": "missing",
+      "local": [
+        {
+          "file": "prisma/schema.prisma",
+          "start": 1314,
+          "end": 1337
+        },
+        {
+          "file": "src/contracts/questions.ts",
+          "start": 18,
+          "end": 25
+        },
+        {
+          "file": "src/server/forms.ts",
+          "start": 42,
+          "end": 58
+        },
+        {
+          "file": "src/server/forms.ts",
+          "start": 153,
+          "end": 174
+        }
+      ],
+      "detail": "Question/strict questionSchema/명시적 DTO·write 투영에 catchFormPersonalInformationRequests 또는 동등 분류 필드가 없다. subjectRole은 정보주체 조회 name/email 바인딩으로 다른 기능이다."
+    },
+    {
+      "area": "개인정보 분류 편집/문서",
+      "status": "missing-distinct-existing-feature",
+      "local": [
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "start": 120,
+          "end": 152
+        },
+        {
+          "file": "src/components/forms/PublicForm.tsx",
+          "start": 141,
+          "end": 147
+        },
+        {
+          "file": "src/contracts/documents.ts",
+          "start": 47,
+          "end": 53
+        }
+      ],
+      "detail": "현재 필수/정보주체/별도 동의문 연결은 존재하지만 원본 jRt 분류 확인과 자동 수집항목 변경 흐름은 없다. 별도 문서의 카탈로그를 question 분류로 간주하지 않는다."
+    },
+    {
+      "area": "기타 플래그/ID/보기 UI",
+      "status": "missing-but-stable-identity-base-present",
+      "local": [
+        {
+          "file": "src/contracts/questions.ts",
+          "start": 10,
+          "end": 25
+        },
+        {
+          "file": "src/contracts/option-identities.ts",
+          "start": 6,
+          "end": 25
+        },
+        {
+          "file": "src/server/question-options.ts",
+          "start": 5,
+          "end": 10
+        },
+        {
+          "file": "prisma/schema.prisma",
+          "start": 1338,
+          "end": 1349
+        },
+        {
+          "file": "src/components/forms/QuestionOptions.tsx",
+          "start": 5,
+          "end": 26
+        }
+      ],
+      "detail": "현재 id/label/value stable identity는 기반으로 유지한다. custom flag가 없고 일반 라벨500, 전체100개는 로컬 기존 계약이다. 원본 label250을 소급 강제하여 기존 데이터/지문을 바꾸지 않는다."
+    },
+    {
+      "area": "기타 답변/조건/표시",
+      "status": "missing",
+      "local": [
+        {
+          "file": "src/contracts/questions.ts",
+          "start": 28,
+          "end": 32
+        },
+        {
+          "file": "src/contracts/questions.ts",
+          "start": 78,
+          "end": 112
+        },
+        {
+          "file": "src/server/answer-validation.ts",
+          "start": 66,
+          "end": 76
+        },
+        {
+          "file": "src/components/forms/QuestionInput.tsx",
+          "start": 14,
+          "end": 53
+        },
+        {
+          "file": "src/server/export-renderer.ts",
+          "start": 42,
+          "end": 51
+        }
+      ],
+      "detail": "선택형 답변은 string 또는 string[]만 지원하고 객체를 서버에서 거절한다. visibility는 value===조건 또는 array.includes만 처리한다. generic object format은 행렬 취급, CSV는 객체를 빈 문자열로 출력하므로 새 union을 넣을 때 한 묶음으로 수정해야 한다."
+    },
+    {
+      "area": "복제·개정·템플릿/하위 출력",
+      "status": "base-present-needs-propagation",
+      "local": [
+        {
+          "file": "src/contracts/form-copy.ts",
+          "start": 4,
+          "end": 22
+        },
+        {
+          "file": "src/server/forms.ts",
+          "start": 81,
+          "end": 86
+        },
+        {
+          "file": "src/server/forms.ts",
+          "start": 175,
+          "end": 196
+        },
+        {
+          "file": "src/server/templates.ts",
+          "start": 94,
+          "end": 108
+        },
+        {
+          "file": "src/server/submissions.ts",
+          "start": 134,
+          "end": 140
+        },
+        {
+          "file": "src/components/forms/SharedPrivacy.tsx",
+          "start": 64,
+          "end": 72
+        },
+        {
+          "file": "src/components/forms/Workflow.tsx",
+          "start": 88,
+          "end": 94
+        }
+      ],
+      "detail": "structuredClone와 ID 재생성은 기존 기반. 새 metadata의 명시적 DTO/Prisma/write/storedOptionDefinitions 누락을 막아야 한다. 구버전 옵션 DTO/승인 지문을 보존하는 분기도 현재 존재한다. 기존 저장 PDF는 재생성하지 않는다."
+    }
+  ],
+  "unknowns": [
+    {
+      "id": "U01",
+      "question": "원본 서버 분류 enum 전체·필수조건·배열 개수/중복/이름50 강제",
+      "boundary": "클라이언트 UI/직렬화와 오류 처리만 확인. 서버 스키마/실행 미관측."
+    },
+    {
+      "id": "U02",
+      "question": "NLP 엔진/분류명→EMAIL·CONTACT 규칙 및 서비스 정확도",
+      "boundary": "요청/응답 소비 코드만 확인. 엔진·사전·실제 서버 판단 미관측."
+    },
+    {
+      "id": "U03",
+      "question": "분류와 자동 동의서의 전체 법률/기간/경로 정책",
+      "boundary": "T_t 수집항목 및 후속 UI 연결만 확인. 현재 조사에서 자동 문서 전체를 재현하지 않음."
+    },
+    {
+      "id": "U04",
+      "question": "전체 일반 보기 개수 상한",
+      "boundary": "URt/zRt/다음 단계 검사 내 확인 못함. 현재 로컬100은 독립 기존 계약."
+    },
+    {
+      "id": "U05",
+      "question": "원본 서버 custom text100·option label250 강제/trim/저장 정규화",
+      "boundary": "maxLength/trim-empty 검사/serializer만 관측. 서버 원본 저장 값이나 API 반례 실행 없음."
+    },
+    {
+      "id": "U06",
+      "question": "관리자 정정에서 모든 세대의 응답 DTO와 템플릿 서버 복제",
+      "boundary": "AI_V3 codec와 최종 제출, retained loader를 확인했으나 모든 관리자 화면/세대별 live round trip은 미관측."
+    },
+    {
+      "id": "U07",
+      "question": "한국어 복수 분류→비한국어 단일 편집의 제품 의도",
+      "boundary": "reducer 보존 및 첫 항목 편집/단일 배열 저장 코드 관측. 자동 축소가 의도인지 결함인지 정적 근거로 단정하지 않음."
+    }
+  ],
+  "recommendation": {
+    "first": "수동 개인정보 분류 metadata 저장/편집 단위",
+    "reason": "답변 union·분기·CSV를 그대로 유지하면서 nullable metadata와 기존 버전 불변성 위주로 경계를 좁힐 수 있다. 원본 NLP/자동 동의문 완료로 홍보하지 않는 전제가 필요하다.",
+    "next": "기타 보기 플래그 + structured answer 계약/codec + 조건/정정/조회/CSV를 하나의 수직 단위로 도입. UI 먼저 노출하지 않는다.",
+    "deferred": "NLP·자동 문서 연동, 보기 이미지, 참고 FILE, 일반 pattern은 독립 후속. 기존 설명/LINK 완료 영역을 되돌리지 않는다."
+  },
+  "verification": {
+    "kind": "static artifact integrity only; no product/test execution",
+    "status": "passed",
+    "bundleShaMatches": true,
+    "excerptCount": 38,
+    "localFileCount": 17,
+    "allExcerptReferencesResolved": true,
+    "allLocalPathsExist": true,
+    "planFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/remaining-source-review/PLAN-draft.md",
+    "planSha256": "8309d8a3a36a72003131ec1f74954f83481d1ef7c512e02a868c517fd04c6ac7",
+    "planLocalLinksExist": true,
+    "allExcerptsReslicedAndHashed": true,
+    "localSnapshotsStillMatch": true
+  },
+  "recordedAtUtc": "2026-10-10T06:47:33.821Z",
+  "excerpts": [
+    {
+      "id": "pi_enum",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 7824331,
+      "end": 7824731,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "c263406825e95f878c73fa246139de93c45c4dbc52ede37a704f02bcbb09abd4",
+      "raw": "BB=[{text:\"\\uac1c\\uc778\\uc815\\ubcf4 \\ubd84\\ub958 \\uc120\\ud0dd\",value:\"\"},{text:\"\\uac1c\\uc778\\uc815\\ubcf4\",value:\"PERSONAL_INFORMATION\"},{text:\"\\ubbfc\\uac10\\uc815\\ubcf4\",value:\"SENSITIVE\"},{text:\"\\uace0\\uc720\\uc2dd\\ubcc4\\uc815\\ubcf4\",value:\"IDENTIFICATION\"},{text:\"\\uc8fc\\ubbfc\\ub4f1\\ub85d\\ubc88\\ud638\",value:\"RESIDENT\"},{text:\"\\uac1c\\uc778\\uc815\\ubcf4 \\uc5c6\\uc74c\",value:\"NON_PERSONAL_INFORMATION\"}]"
+    },
+    {
+      "id": "question_serializer",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12625116,
+      "end": 12626800,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "a259d2e54335d6eab7fdff7f66877c2d1a1b09477d6da0ccb284976dbd26f2f0",
+      "raw": "w_t=e=>{const t=[];return e.forEach((e=>{t.push({nlpFeedbackId:e.nlpFeedbackId,personalInformationType:e.type,detectedPersonalInformation:e.name,personalInformationSource:e.personalInformationSource})})),t},C_t=e=>{const t=[];return e.pageList.forEach(((e,r)=>{t.push({page:e.page,pageTitle:0===r?\"\":e.pageTitle,pageContent:0===r?\"\":e.pageContent,pageOffset:e.pageOffset,questionList:e.questionList.map((e=>{return{nlpFeedbackId:e.nlpFeedbackId,title:e.title,additionalExplanation:e.description,catchFormQuestionType:e.elementType,questionOptionList:(t=kG(e.elementType,e.questionOptionList),Array.isArray(t)?t.map((e=>{const{optionImageUrl:t,imageUrl:r,optionImageFileSize:n,optionImageUploadToken:a,...o}=null!==e&&void 0!==e?e:{};return{...o,optionImageKey:SG(e)}})):[]),matrixOptionData:e.matrixOptionData,usePageOffset:e.usePageOffset,required:e.isRequired,useSecureKeyStroke:!1,...hG(e),...qY(e),materialList:lQ(e),...h_t(e),catchFormPersonalInformationRequests:w_t(e.detectedItems)};var t}))})})),t},S_t=(e,t)=>{var r;const n=$u.getState().form.constraint;let a={};return a={constraint:{chooseCollectLimitAmount:n.chooseCollectLimitAmount,collectLimitAmount:n.collectLimitAmount,chooseCollectOpenTime:n.chooseCollectOpenTime,collectOpenTime:n.collectOpenTime,collectOpenHour:\"none\"==n.collectOpenHour?null:n.collectOpenHour,chooseCollectEndTime:n.chooseCollectEndTime,collectEndTime:n.collectEndTime,collectEndHour:\"none\"==n.collectEndHour?null:n.collectEndHour,allowPageBack:n.allowPageBack},accessControl:Gvt(n),catchformId:e.catchformId,serviceId:t,title:e.title,mainText:e.description||\"<p></p>\",formLanguage:null!==(r=e.formLanguage)&&void 0!==r?r:\"ko\",pageList:C_t(e)},a}"
+    },
+    {
+      "id": "pi_default",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12657811,
+      "end": 12658260,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "74b6889824a4f874f662bb8345ab8b7da076028e054fc72bdc085f8dabb0cad0",
+      "raw": "kRt=function(){let e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:\"\";return{detectedTypeErrorStyle:!1,detectedNameErrorStyle:!1,confirmErrorStyle:!1,detectedType:\"\",detectedName:e,isConfirm:arguments.length>2&&void 0!==arguments[2]&&arguments[2],name:e,nlpFeedbackId:null,type:arguments.length>0&&void 0!==arguments[0]?arguments[0]:\"\",personalInformationSource:\"USER\"}};function jRt(e){var t;let{detectQuestionLoadingIndex:r,questionIndex:"
+    },
+    {
+      "id": "pi_confirm",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12658900,
+      "end": 12661080,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "086fad6a9ee1e0eac48770c9f36778ccc6b905e8a539e68b238b6e2bc46ca74a",
+      "raw": "}),300),[]),v=function(e,t,r){let n=arguments.length>3&&void 0!==arguments[3]&&arguments[3];if(d!==SV){const a={...u},s=(0,tK.cloneDeep)(p);return s[t].type=r.personalInformationType,s[t].isConfirm=n,s[t].confirmErrorStyle=!n,\"NON_PERSONAL_INFORMATION\"===r.personalInformationType&&(s[t].name=\"\",s[t].detectedName=\"\"),s[t].detectedType!==r.personalInformationType?s[t].detectedTypeErrorStyle=!1:s[t].detectedName!==r.userInputContent&&(s[t].detectedNameErrorStyle=!1),i(ZG(e,{...a,disabled:\"RESIDENT\"===r.personalInformationType,isRequired:\"RESIDENT\"===r.personalInformationType||a.isRequired,detectedItems:s},o)),void m(s)}a$({id:u.nlpFeedbackId,originalText:u.title,analysisType:\"NER\",isChange:!0,catchformId:c,companyId:l.companyIdx,userId:l.userIdx,userInputContent:r}).then((a=>{if(a.data.success){const s=a.data.response,l={...u},c=(0,tK.cloneDeep)(p);c[t].nlpFeedbackId=s.id,c[t].type=r.personalInformationType,c[t].isConfirm=n,c[t].confirmErrorStyle=!n,\"NON_PERSONAL_INFORMATION\"===r.personalInformationType&&(c[t].name=\"\",c[t].detectedName=\"\"),c[t].detectedType!==r.personalInformationType?c[t].detectedTypeErrorStyle=!1:c[t].detectedName!==r.userInputContent&&(c[t].detectedNameErrorStyle=!1),i(ZG(e,{...l,nlpFeedbackId:s.id,disabled:\"RESIDENT\"===r.personalInformationType,isRequired:\"RESIDENT\"===r.personalInformationType||l.isRequired,detectedItems:c},o)),m(c)}}))},b=(e,t)=>{const r=(0,tK.cloneDeep)(p);r[t].isConfirm=!p[t].isConfirm,f(r)},x=(e,t)=>{if(!p[t].type)return alert(s(\"alert.phrase6\")),!1;if(\"NON_PERSONAL_INFORMATION\"!==p[t].type&&!p[t].name.trim())return alert(s(\"alert.phrase7\")),!1;if((\"MATRIX_CHECKBOX\"===u.elementType||\"MATRIX_RADIO\"===u.elementType)&&\"NON_PERSONAL_INFORMATION\"!==p[t].type)return alert(s(\"alert.phrase46\")),!1;const r=\"\"!==u.title,n=p[t].name.trim()!==p[t].detectedName.trim();if(r&&n)v(e,t,{personalInformationType:p[t].type,userInputContent:p[t].name},!0);else{const e=(0,tK.cloneDeep)(p);e[t].isConfirm=!0,e[t].confirmErrorStyle=!1,f(e)}};(0,yt.useEffect)((()=>{m(h)}),[u]);const A=d!==SV,y=0===p.length?\"\":\"NON_PERSONAL_INFORMATION\"===(null===(t=p[0])||void 0===t?void 0:t.type)?\"NO\":\"YES\",w=\"YES\"===y&&p[0]||kRt(),C=(e,t)=>({id"
+    },
+    {
+      "id": "pi_manual",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12661000,
+      "end": 12665090,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "3287c0c675d7ab68b23ecac476ced967fe77cef075488b1ea222ea8d9c32ff2f",
+      "raw": "0])||void 0===t?void 0:t.type)?\"NO\":\"YES\",w=\"YES\"===y&&p[0]||kRt(),C=(e,t)=>({id:u.nlpFeedbackId,originalText:u.title,analysisType:\"NER\",isChange:!0,catchformId:c,companyId:l.companyIdx,userId:l.userIdx,userInputContent:{personalInformationType:e,userInputContent:t},formLanguage:d,questionType:u.elementType}),S=function(){let e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:u.nlpFeedbackId;const t=[{...kRt(\"NON_PERSONAL_INFORMATION\",\"\",!0),nlpFeedbackId:e,personalInformationSource:\"USER\"}];i(ZG(n,{...u,nlpFeedbackId:e,detectedItems:t},o)),m(t)},T=async e=>{if(\"YES\"!==e){g.cancel(),S();try{var t;const e=await a$(C(\"NON_PERSONAL_INFORMATION\",\"\"));null!==e&&void 0!==e&&null!==(t=e.data)&&void 0!==t&&t.success&&S(e.data.response.id)}catch(r){}}else{const e=p.filter((e=>\"NON_PERSONAL_INFORMATION\"!==e.type));f(e.length>0?e:[kRt()])}},E=e=>{const t=[{...w,isConfirm:!1}];i(ZG(n,{...u,elementType:e,questionOptionList:[],matrixOptionData:null,detectedItems:t},o)),m(t)},N=async()=>{if(g.cancel(),!w.type)return void alert(s(\"alert.phrase6\"));if(!w.name||!w.name.trim())return void alert(s(\"alert.phrase7\"));const e=C(w.type,w.name);let t=u.nlpFeedbackId;try{var r;const n=await a$(e);null!==n&&void 0!==n&&null!==(r=n.data)&&void 0!==r&&r.success&&(t=n.data.response.id)}catch(v){var a,l,c,d,h;const e=null===v||void 0===v||null===(a=v.response)||void 0===a||null===(l=a.data)||void 0===l?void 0:l.category;if(400===(null===v||void 0===v||null===(c=v.response)||void 0===c?void 0:c.status)&&\"PI_TEXT_IDENTIFIED_AS_EMAIL\"===e)return alert(`'${w.name}' ${s(\"alert.phrase55\")}`),void E(\"EMAIL\");if(400===(null===v||void 0===v||null===(d=v.response)||void 0===d?void 0:d.status)&&\"PI_TEXT_IDENTIFIED_AS_CONTACT\"===e)return alert(`'${w.name}' ${s(\"alert.phrase56\")}`),void E(\"CONTACT\");if(400===(null===v||void 0===v||null===(h=v.response)||void 0===h?void 0:h.status)&&\"MATRIX_TYPE_CANNOT_BE_PERSONAL_INFORMATION\"===e)return void alert(s(\"alert.phrase60\"))}const p=\"RESIDENT\"===w.type,f=[{...w,nlpFeedbackId:t,isConfirm:!0,confirmErrorStyle:!1}];i(ZG(n,{...u,nlpFeedbackId:t,disabled:!!p,isRequired:!!p||u.isRequired,detectedItems:f},o)),m(f)},k=()=>{f([{...w,isConfirm:!1}])};return A?(0,nI.jsxs)(fRt,{className:\"non-drag\",children:[(0,nI.jsxs)(gRt,{children:[(0,nI.jsx)(iI,{className:\"label-1-strong\",color:aj,children:s(\"manualPrivacy.title\")}),(0,nI.jsx)(E4,{content:s(\"manualPrivacy.tooltip\"),placement:\"top\",theme:\"light\",iconColor:aj,iconWidth:20,maxWidth:\"315\"})]}),(0,nI.jsxs)(vRt,{children:[(0,nI.jsx)(iI,{className:\"label-1\",color:tj,children:s(\"manualPrivacy.question\")}),(0,nI.jsxs)(bRt,{children:[(0,nI.jsxs)(xRt,{type:\"button\",onClick:()=>T(\"YES\"),children:[(0,nI.jsx)(ARt,{checked:\"YES\"===y}),(0,nI.jsx)(iI,{className:\"label-1-weak\",color:ej,children:s(\"manualPrivacy.collectYes\")})]}),(0,nI.jsxs)(xRt,{type:\"button\",onClick:()=>T(\"NO\"),children:[(0,nI.jsx)(ARt,{checked:\"NO\"===y}),(0,nI.jsx)(iI,{className:\"label-1-weak\",color:ej,children:s(\"manualPrivacy.collectNo\")})]})]})]}),\"YES\"===y&&(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(yRt,{children:[(0,nI.jsxs)(wRt,{children:[(0,nI.jsxs)(CRt,{children:[(0,nI.jsx)(iI,{className:\"label-1\",color:tj,children:s(\"manualPrivacy.fieldLabel\")}),(0,nI.jsx)(iI,{className:\"label-1-strong\",color:Uj,children:\"*\"})]}),(0,nI.jsx)(yB,{width:\"237px\",labelList:NRt,disabled:w.isConfirm,value:w.type||\"\",onChange:e=>(e=>{const t={...w,type:e,detectedTypeErrorStyle:!1,confirmErrorStyle:!1,isConfirm:!1,personalInformationSource:\"USER\"};f([t])})(e.target.value)})]}),(0,nI.jsx)(SRt,{children:(0,nI.jsx)(fD,{maxLength:50,value:w.name||\"\",placeholder:s(\"manualPrivacy.namePlaceholder\"),onChange:e=>(e=>{const t={...w,name:e,detectedName:e,detectedNameErrorStyle:!1,isConfirm:!1,personalInformationSource:\"USER\"};f([t])})(e.target.value),disabled:w.isConfirm,inputSize:\"lg\"})})]}),(0,nI.jsx)(ERt,{children:w.isConfirm?(0,nI.jsx)(M_,{size:\"md\",type:\"secondary\",text:s(\"edit\"),disabled:!1,onClick:k}):(0,nI.jsx)(M_,{size:\"md\",type:\"primary\",text:s(\"check\"),disabled:!1,onClick:N})})]}),\"NO\"===y&&(0,nI.jsx)(TRt,{children:(0,nI.jsx)(iI"
+    },
+    {
+      "id": "pi_ko_list",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12665090,
+      "end": 12667500,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "667754feb3f9592b1d8e51a5981bf146a5c9aead104dc38688c5f0df0af51705",
+      "raw": ",{className:\"label-1-weak\",color:ej,children:s(\"manualPrivacy.nonCollectMessage\")})})]}):(0,nI.jsx)(\"div\",{className:\"mt-8 non-drag\",children:r===n||a?(0,nI.jsx)(\"div\",{className:\"flex justify-center\",children:p.personalInformationSource}):(0,nI.jsx)(nI.Fragment,{children:p.map(((e,t)=>(0,nI.jsxs)(Q_t,{personalInformationSource:e.personalInformationSource,detectedItem:e,children:[(0,nI.jsxs)(\"div\",{className:\"\"+(\"NON_PERSONAL_INFORMATION\"===e.type&&e.personalInformationSource,\"flex justify-between items-center flex-wrap\"),children:[(0,nI.jsxs)(\"div\",{className:\"flex gap-1 items-center\",children:[(0,nI.jsxs)(iI,{className:\"label-1-strong mb-4 flex items-center\",color:\"NON_PERSONAL_INFORMATION\"!==e.type&&\"NLP\"===e.personalInformationSource?aj:ej,children:[\"NON_PERSONAL_INFORMATION\"!==e.type&&\"NLP\"===e.personalInformationSource&&s(\"alert.phrase25\"),\" \",\"NON_PERSONAL_INFORMATION\"===e.type&&\"NLP\"===e.personalInformationSource&&s(\"alert.phrase26\"),\" \",(void 0===e.personalInformationSource||null===e.personalInformationSource)&&s(\"alert.phrase26\"),\" \",\"USER\"===e.personalInformationSource&&s(\"alert.phrase27\"),\" \"]}),\"NON_PERSONAL_INFORMATION\"!==e.type&&\"NLP\"===e.personalInformationSource&&(0,nI.jsxs)(\"div\",{className:\"mb-[18px]\",children:[(0,nI.jsx)(LEt,{title:s(\"alert.phrase28\"),content:s(\"alert.phrase29\"),placement:\"top\",theme:\"light\"}),\" \"]}),\"USER\"===e.personalInformationSource&&s(\"alert.phrase27\")&&(0,nI.jsxs)(\"div\",{className:\"mb-[18px]\",children:[(0,nI.jsx)(E4,{title:\"\",content:s(\"alert.phrase30\"),placement:\"top\",theme:\"light\"}),\" \"]})]}),(0,nI.jsxs)(\"div\",{className:\"mb-4 flex items-center\",children:[(0,nI.jsx)(BU,{src:\"/img/google-icons-v2/marks/plus.svg\",onClick:()=>(()=>{const e=(0,tK.cloneDeep)(p);e.push({detectedTypeErrorStyle:!1,detectedNameErrorStyle:!1,confirmErrorStyle:!1,detectedType:\"\",detectedName:\"\",isConfirm:!1,name:\"\",nlpFeedbackId:u.nlpFeedbackId,type:\"\",personalInformationSource:\"USER\"}),f(e)})(),color:sj}),(!e.detectedName&&!e.detectedType||\"USER\"===e.personalInformationSource)&&(0,nI.jsx)(\"div\",{className:\"\",children:(0,nI.jsx)(\"div\",{className:\"btn btn-xs btn-icon btn-light btn-hover-primary mb-0\",onClick:()=>((e,t)=>{const r=(0,tK.cloneDeep)(p);r.splice(t,1),f(r)})(0,t),children:(0,nI.jsx)(BU,{src:\"/img/google-icons-v2/system/delete.svg\",color:sj})})})]})]}),(0,nI.jsxs)(\"div\",{className:\"\",children:[(0,nI.jsxs)(\"div\",{className:\"row-line-center  \"+"
+    },
+    {
+      "id": "pi_ko_input",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12667500,
+      "end": 12669520,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "8a75613842d2841b492952f9be21b97bd00fc9bd6063cd3c3faf0bdc5a2587dc",
+      "raw": "(\"NON_PERSONAL_INFORMATION\"!==e.type?\"\":\"align-middle\"),children:[(0,nI.jsx)(yB,{width:\"145px\",labelList:BB,disabled:e.isConfirm,value:e.type,error:e.detectedTypeErrorStyle,onChange:e=>((e,t,r)=>{if(e&&p[r].detectedType)v(t,r,{personalInformationType:e,userInputContent:\"NON_PERSONAL_INFORMATION\"===e?\"\":p[r].detectedName});else{const n=(0,tK.cloneDeep)(p);n[r]={...n[r],type:e||\"\",name:\"NON_PERSONAL_INFORMATION\"===e?\"\":n[r].name,detectedName:\"NON_PERSONAL_INFORMATION\"===e?\"\":n[r].detectedName,detectedTypeErrorStyle:!1,confirmErrorStyle:!1,isConfirm:!1};const a={...u};i(ZG(t,{...a,isRequired:\"RESIDENT\"===e||a.isRequired,disabled:\"RESIDENT\"===e,detectedItems:n},o))}})(e.target.value,n,t)}),\"NON_PERSONAL_INFORMATION\"!==e.type&&(0,nI.jsx)(\"div\",{className:\"w-full ms-2\",children:(0,nI.jsx)(fD,{maxLength:50,className:\"bg-white\",value:e.name,error:e.detectedNameErrorStyle,placeholder:s(\"alert.phrase31\"),onChange:e=>((e,t,r)=>{const n=(0,tK.cloneDeep)(p);n[r].name=e,n[r].detectedNameErrorStyle=!1,f(n)})(e.target.value,0,t),disabled:e.isConfirm,inputSize:\"lg\"})})]}),\"NON_PERSONAL_INFORMATION\"!==e.type?(0,nI.jsx)(\"div\",{className:\"mt-2\",children:e.isConfirm?(0,nI.jsx)(M_,{style:{backgroundColor:\"#FFFFFF\"},size:\"md\",type:\"secondary\",text:s(\"edit\"),disabled:!1,onClick:()=>b(0,t)}):(0,nI.jsx)(M_,{size:\"md\",type:\"primary\",text:s(\"check\"),disabled:!1,onClick:()=>x(n,t)})}):(0,nI.jsx)(nI.Fragment,{children:(0,nI.jsx)(\"div\",{className:`inline-flex question-detected-item question-detected-item-${n}-${t} mt-2`,children:e.isConfirm?(0,nI.jsx)(M_,{style:{backgroundColor:\"#FFFFFF\"},size:\"md\",type:\"secondary\",text:s(\"edit\"),disabled:!1,onClick:()=>b(0,t)}):(0,nI.jsx)(M_,{size:\"md\",type:\"primary\",text:s(\"check\"),disabled:!1,onClick:()=>x(n,t)})})})]}),e.isConfirm&&(0,nI.jsxs)(iI,{className:\"body-1 mt-2\",color:ej,children:[s(\"alert.phrase32\"),\" \"]}),!e.isConfirm&&(0,nI.jsx)(\"div\",{className:\"flex\",children:\"NON_PERSONAL_INFORMATION\"===e.type&&\"NLP\"===e.personalInformationSource?(0,nI.jsx)(\"div\",{className:\"mt-2 "
+    },
+    {
+      "id": "language_reducer",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 6925225,
+      "end": 6925672,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "daa0993448288ef76a6d842ca67c760ff9f46b9b30aa7dc5ef8e22ca026bb2f1",
+      "raw": "setFormLanguageV3:(e,t)=>{var r;const{formLanguage:n}=t.payload;e.formModelV3.formLanguage=n;const a=\"ko\"===n?\"ADDRESS\":\"FOREIGN_ADDRESS\";null===(r=e.formModelV3.pageList)||void 0===r||r.forEach((e=>{var t;null===e||void 0===e||null===(t=e.questionList)||void 0===t||t.forEach((e=>{\"ADDRESS\"!==(null===e||void 0===e?void 0:e.elementType)&&\"FOREIGN_ADDRESS\"!==(null===e||void 0===e?void 0:e.elementType)||(e.elementType=a)}))}))},formAnswerUploadRe"
+    },
+    {
+      "id": "pi_nlp_api",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12413645,
+      "end": 12414610,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "1588c3b2188e59eb7ed0329127572e7824386067b9791d745f70b552adecb114",
+      "raw": "et e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null,t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:\"\",r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:null,n=arguments.length>3&&void 0!==arguments[3]?arguments[3]:null;return new Promise((async(a,o)=>{let i=[];const s={originalText:t,analysisType:\"NER\",catchformId:e,companyId:r,userId:n,userInputContent:null};var l;await(l=s,At.post(`${PE}/company-operated-service/nlp`,l)).then((e=>{if(e.data.success){const t=e.data.response;0===t.verifiedNLPResponses.length?i=[{nlpFeedbackId:t.id,type:\"NON_PERSONAL_INFORMATION\",name:\"\",detectedType:\"NON_PERSONAL_INFORMATION\",detectedName:\"\",isConfirm:!1}]:t.verifiedNLPResponses.map((e=>i.push({nlpFeedbackId:t.id,type:e.personalInformation,name:e.detectedPersonalInformation,detectedType:e.personalInformation,detectedName:e.detectedPersonalInformation,personalInformationSource:\"NLP\",isConfirm:!1}))),a(i)}})).catch((e=>o(e)))}))}),Fkt=(e,t)"
+    },
+    {
+      "id": "pi_feedback_api",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 7914352,
+      "end": 7914469,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "2eba744971d0bacc1cf9084bb294e7dad9f9699690ceb43436a023a4761d1ca4",
+      "raw": "function a$(e){return At.post(`${PE}/company-operated-service/nlp/user_input_personal_information`,e)}function o$(e){"
+    },
+    {
+      "id": "pi_title_detection",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12729400,
+      "end": 12730870,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "8adb35f1c8eb909fd72cec905342b3436579a24036f5f8ec87800bbad8682825",
+      "raw": "r:\"\",confirmButtonType:\"warning\",handleConfirm:e}})}),[u]),ve=(e,t)=>{const r=\"\"!==x.title.trim(),n=x.currentTitle.trim()!==x.title.trim();if(r&&n){if(G){const e=(0,tK.cloneDeep)(x);return e.currentTitle=e.title,e.nlpFeedbackId=null,ie(e),void _(!1)}const r=x.title;T(t),Dkt(e,r,JN([\"EXPERT\"],y)?w:y.companyIdx,y.userIdx).then((e=>{var t;const n=e.map((e=>({...e,detectedTypeErrorStyle:!1,detectedNameErrorStyle:!1,confirmErrorStyle:!1}))),a=Z();if(!a)return void T(null);const o=(0,tK.cloneDeep)(a);o.currentTitle=r,o.nlpFeedbackId=e[0].nlpFeedbackId,o.detectedItems=n,\"RESIDENT\"==(null===(t=e[0])||void 0===t?void 0:t.detectedType)?(d(ic({show:!0,type:\"fail\",text:u(\"alert.phrase45\")})),o.isRequired=!0,o.disabled=!0,o.elementType=\"TEXTBOX\",o.questionOptionList=[],o.matrixOptionData=null):o.disabled=!1,\"MATRIX_CHECKBOX\"!==(null===o||void 0===o?void 0:o.elementType)&&\"MATRIX_RADIO\"!==(null===o||void 0===o?void 0:o.elementType)||o.detectedItems.filter((e=>\"NON_PERSONAL_INFORMATION\"!==e.type)).length>0&&alert(u(\"alert.phrase46\"));const i=ye(o);i&&(o.elementType=i),ae(o,a),T(null)})).catch((e=>{var t,r;const n=400===(null===e||void 0===e||null===(t=e.response)||void 0===t?void 0:t.status)?null===(r=e.response.data)||void 0===r?void 0:r.message:u(\"alert.phrase2\");alert(n);const a=Z();a?(a.title=\"\",a.nlpFeedbackId=null,a.detectedItems=[],ie(a),T(null)):T(null)})).finally((()=>{_(!1)}))}},be=[\"\\uc774\\uba54\\uc77c\",\"\\uba54\\uc77c\",\"\\ub9e4\\uc77c\",\"mail\"],xe=[\"\\uc80"
+    },
+    {
+      "id": "pi_type_transition",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12725740,
+      "end": 12728850,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "017ee0e737f9846ebd33c83f8f3606598a64d9985303b3baad7d60ed15f52e79",
+      "raw": "st:n.questionOptionList,withPageOffset:!0}),\"MATRIX_CHECKBOX\"===e||\"MATRIX_RADIO\"===e)?(n.detectedItems.find((e=>\"NON_PERSONAL_INFORMATION\"!==e.type))&&alert(u(\"alert.phrase46\")),n.matrixOptionData=(null===(a=n.matrixOptionData)||void 0===a?void 0:a.rows)>0?n.matrixOptionData:{colHeaders:[],rowHeaders:[],cols:2,rows:1}):n.matrixOptionData=null;const i=n.detectedItems.filter((e=>{const t=String((null===e||void 0===e?void 0:e.detectedName)||(null===e||void 0===e?void 0:e.name)).toLowerCase();return be.some((e=>t.includes(e.toLowerCase())))})),s=n.detectedItems.filter((e=>{const t=String((null===e||void 0===e?void 0:e.detectedName)||(null===e||void 0===e?void 0:e.name)).toLowerCase();return xe.some((e=>t.includes(e.toLowerCase())))})),l=n.detectedItems.filter((e=>{const t=String((null===e||void 0===e?void 0:e.detectedName)||(null===e||void 0===e?void 0:e.name)).toLowerCase();return\"name\"===t||Ae.some((e=>t.includes(e.toLowerCase())))})),h=i.length>0,p=s.length>0,m=l.length>0;if((h||p)&&m){const e=[...i,...s,...l],t=[...new Set(e)].map((e=>e.detectedName||(null===e||void 0===e?void 0:e.name))).join(\", \");return T(null),void alert(`'${t}' ${u(\"alert.phrase54\")}`)}if(\"TEXTAREA\"===e&&m){const e=l.map((e=>e.detectedName||(null===e||void 0===e?void 0:e.name))).join(\", \");return T(null),void alert(`'${e}' ${u(\"alert.phrase53\")}`)}if(h&&!p&&!m&&\"EMAIL\"!==e&&\"EMAIL_DIRECT\"!==e){if(i.length>1){const e=i.map((e=>e.detectedName||(null===e||void 0===e?void 0:e.name))).join(\", \");alert(`'${e}' ${u(\"alert.phrase54\")}`)}else alert(`'${i[0].detectedName||i[0].name}' ${u(\"alert.phrase55\")}`);return void T(null)}if(p&&!h&&!m&&\"CONTACT\"!==e){if(s.length>1){const e=s.map((e=>e.detectedName||(null===e||void 0===e?void 0:e.name))).join(\", \");alert(`'${e}' ${u(\"alert.phrase54\")}`)}else alert(`'${s[0].detectedName||s[0].name}' ${u(\"alert.phrase56\")}`);return void T(null)}$u.getState().form.formModel.questionList.filter((e=>\"FILE\"===(null===e||void 0===e?void 0:e.elementType))).length>=10&&\"FILE\"===e?n.elementType=\"TEXTBOX\":n.elementType=e,setTimeout((()=>{T(null)}),400),ae(n,r)},de=(e,t)=>{const r=CQ(e,m);if(\"IDV\"===r&&G)return P(!1),void b(!0);const n=!nG(r)&&\"NONE\"!==dG(x).mode,a=zPt.filter((e=>!o_t(r,e)&&c_t(x,e)));if(n||a.length>0){const e=[...n?[u(\"selectLimit.title\")]:[],...a.map((e=>u(`featureToggle.${e}`)))].join(\", \");return P(!1),void H({show:!0,data:{title:u(\"selectLimit.resetConfirmTitle\"),body:(0,nI.jsx)(cD,{type:\"secondary\",icon:\"exclamation\",secondText:u(\"selectLimit.resetConfirmFeatures\",{names:e}),className:\"w-full\"}),cancelButtonText:u(\"selectLimit.resetConfirmCancel\"),confirmButtonText:u(\"selectLimit.resetConfirmOk\"),isShowCancelButton:!0,bodyHeader:\"\",confirmButtonType:\"warning\",handleConfirm:()=>ce(r)}})}ce(r)},ue=(null===x||void 0===x?void 0:x.disabled)||!1,he=()=>{var e;M||ue||null===(e=O.current)||void 0===e||e.click()},pe=sQ(x),me=(0,yt.useCallback)((e=>{se({...Z(),materials:e})}),[x]),fe=(0,yt.useCallback)(((e,t)=>{H({show:!0,data:{title:u(\"questionMaterial.deleteTitle\"),body:(0,nI.jsx)(Z_t,{children:u(\"questionMaterial.deleteBody\",{name:e.name})}),cancelB"
+    },
+    {
+      "id": "resident_required",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12736010,
+      "end": 12736500,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "7c605b7fce8a935c4f847dd0da6c0ec6f1546f4facb44dbf7da1b8eb308c35e8",
+      "raw": "entType)&&(0,nI.jsx)(\"div\",{className:\"subtitle-1\",children:(0,nI.jsx)(Zbe,{checked:null===x||void 0===x?void 0:x.isRequired,onChange:e=>(e=>{if(x.detectedItems.filter((e=>\"RESIDENT\"===e.type)).length>0)return alert(u(\"alert.phrase1\")),!1;const t=(0,tK.cloneDeep)(x);t.isRequired=e,d(ZG(o,t,c))})(e.target.checked),disabled:(null===x||void 0===x?void 0:x.disabled)||!1,size:\"md\",text:u(\"required\"),fontSize:\"14\",fontWeight:\"400\",fontColor:`${ej}`,className:`${!(null!==x&&void 0!==x&&x.isRe"
+    },
+    {
+      "id": "question_copy",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12695390,
+      "end": 12695730,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "6694ed817ab49f2e4c656f33dac2bb25c7cc8831f71ee6794cb9adb14d333a6f",
+      "raw": "tState().form.formModelV3.pageList[i].questionList[e],n=t?DNt(r):r,a=_Nt(n);if(0===a.assets.length){const e=(0,tK.cloneDeep)($u.getState().form.formModelV3.pageList[i].questionList);return e.push({...(0,tK.cloneDeep)(n),nlpFeedbackId:null,detectedItems:[]}),void k(e)}const o=$u.getState().form.assetUsage;if(!ad(a.totalBytes,o).allowed)ret"
+    },
+    {
+      "id": "page_copy",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12773000,
+      "end": 12774200,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "6ef5e4ffc4fb78b54ec52584429453ba95aac0bab14a89401c103a4cafb063be",
+      "raw": "ype:\"primary\"}})})(e,t,a.totalBytes,n)}O(!0);const i=Date.now();let s=!1;try{z_t();const l=$u.getState().form.formModelV3.pageList[e],c=l._dragKey,d=o?function(e){var t;return{...e,questionList:(null!==(t=null===e||void 0===e?void 0:e.questionList)&&void 0!==t?t:[]).map(DNt)}}(l):l,u=(e=>{const{_dragKey:t,...r}=(0,tK.cloneDeep)(e);return{...r,pageOffset:-2,questionList:r.questionList.map((e=>{var t;return{...e,usePageOffset:!1,nlpFeedbackId:null,detectedItems:[],questionOptionList:null===(t=e.questionOptionList)||void 0===t?void 0:t.map((e=>({...e,pageOffset:-2})))}}))}})(d),h=MNt(d,$u.getState().form.assetUsage.contentImageSizes);if(($u.getState().form.formModelV3.formLanguage||SV)!==SV)u.questionList=u.questionList.map((e=>({...e,currentTitle:e.title})));else{(await Promise.all(u.questionList.map((e=>e.title?Dkt(u.catchformId,e.title,JN([\"EXPERT\"],I)?_:I.companyIdx,I.userIdx).catch((()=>null)):Promise.resolve(null))))).forEach(((e,t)=>{Array.isArray(e)&&e.length>0&&(u.questionList[t].currentTitle=u.questionList[t].title,u.questionList[t].nlpFeedbackId=e[0].nlpFeedbackId,u.questionList[t].detectedItems=e)}))}const p=$u.getState().form.formModelV3,m=p.pageList.findIndex((e=>c?e._dr"
+    },
+    {
+      "id": "question_loader",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12887600,
+      "end": 12888750,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "4c7c5aee6fdcbdd99cf6b3db903571c9ee62dcbe29e9bf3fa8842644d367c455",
+      "raw": " t=[];return e.map((e=>{var r,n,a;const o=(e=>{const t=[];return e.map((e=>t.push({nlpFeedbackId:e.nlpFeedbackId,type:e.personalInformationType,name:e.detectedPersonalInformation,detectedType:e.personalInformationType,detectedName:e.detectedPersonalInformation,personalInformationSource:e.personalInformationSource,detectedTypeErrorStyle:!1,detectedNameErrorStyle:!1,confirmErrorStyle:!1,isConfirm:!0}))),t})(e.catchFormPersonalInformationRequests);t.push({usePageOffset:e.usePageOffset,nlpFeedbackId:e.nlpFeedbackId,disabled:!!o.find((e=>\"RESIDENT\"===e.detectedType)),isRequired:e.required,currentTitle:e.title,title:e.title,description:e.additionalExplanation||\"\",elementType:e.catchFormQuestionType,questionOptionList:(null!==(r=e.questionOptionList)&&void 0!==r?r:[]).map((e=>({...e,optionImageFileSize:_G(e)}))),useSecureKeyStroke:!1,matrixOptionData:e.matrixOptionData,selectLimitMode:null!==(n=e.selectLimitMode)&&void 0!==n?n:null,selectLimitCount:null!==(a=e.selectLimitCount)&&void 0!==a?a:null,questionImageKey:WY(e),questionImageUrl:HY(e),questionImageFileSize:GY(e),materials:sQ(e),...p_t(e),detectedItems:o})})),t};return(0,yt.useEffect"
+    },
+    {
+      "id": "pi_next_confirmation",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12797200,
+      "end": 12798430,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "add27cc65732262d79b7d0003446701e21c749f785c683074fbc927db2414d15",
+      "raw": "confirmButtonText:E(\"phrase.phrase75\"),handleConfirm:()=>{T({show:!1})},isShowCancelButton:!1}}),!1}const A=(e=>{const t=[];return e.pageList.forEach(((e,r)=>{e.questionList.forEach(((e,n)=>{var a;e.detectedItems.length<=0&&t.push({title:`Q${e.questionNumber}. ${e.title}`,pageIndex:r,questionIndex:n}),null!==(a=e.detectedItems)&&void 0!==a&&a.some((e=>!e.isConfirm))&&t.push({title:`Q${e.questionNumber}. ${e.title}`,pageIndex:r,questionIndex:n})}))})),t})(e);if(A.length>0){const e=A[0];return T({show:!0,data:{title:E(\"phrase.phrase92\"),bodyHeader:\"\",body:(0,nI.jsxs)(Z_t,{children:[(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:E(\"phrase.phrase93\",{title:e.title})}),(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:E(\"phrase.phrase94\")})]}),cancelButtonText:\"\",confirmButtonText:E(\"phrase.phrase75\"),handleConfirm:()=>{const t=window.document.getElementById(`question-${null===e||void 0===e?void 0:e.pageIndex}-${null===e||void 0===e?void 0:e.questionIndex}`);null===t||void 0===t||t.classList.add(\"active\"),setTimeout((()=>{k_t(null===e||void 0===e?void 0:e.pageIndex,!1),null===t||void 0===t||t.scrollIntoView({behavior:\"smooth\",block:\"start\"})}),0),T({show:!1})},isShowCancelButton:!1}}),!1}const y"
+    },
+    {
+      "id": "pi_next_names",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12798430,
+      "end": 12798800,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "40eae6501430b60a4417746252b0928ce06f295aff2ef6acdcac0e0fdd12e0fe",
+      "raw": "=(e=>{const t=[];return e.pageList.forEach(((e,r)=>{e.questionList.forEach(((e,n)=>{var a;(null===(a=e.detectedItems)||void 0===a?void 0:a.some((e=>e.type&&\"NON_PERSONAL_INFORMATION\"!==e.type&&(!e.name||\"\"===String(e.name).trim()))))&&t.push({title:`Q${e.questionNumber}. ${e.title}`,pageIndex:r,questionIndex:n})}))})),t})(e);if(y.length>0){const e=y[0];return T({show:"
+    },
+    {
+      "id": "pi_path_check",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12621688,
+      "end": 12622021,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "27e699411506c4057e5eb0f961165099964de131931eea5da0b815d5c8e07b29",
+      "raw": "function g_t(e,t){const r=[\"PERSONAL_INFORMATION\",\"SENSITIVE\",\"IDENTIFICATION\",\"RESIDENT\"],n=[];return t.forEach(((t,a)=>{let o=!1;for(const n of t){const t=e.pageList[n];if(t){for(const e of t.questionList)if(e.detectedItems){for(const t of e.detectedItems)if(r.includes(t.type)){o=!0;break}if(o)break}if(o)break}}o||n.push(a)})),n}"
+    },
+    {
+      "id": "pi_consent_projection",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12626800,
+      "end": 12627080,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "875e07a332466dfb73fca28c2faa3188a09f1e00d52e5be7315f4d47432bfc28",
+      "raw": ",T_t=e=>e.flatMap((e=>e.questionList.flatMap((e=>e.catchFormPersonalInformationRequests.filter((e=>\"NON_PERSONAL_INFORMATION\"!==e.personalInformationType)).map((e=>({type:e.personalInformationType,name:e.detectedPersonalInformation}))))))),E_t=e=>e.sort(((e,t)=>{const r=e.path.in"
+    },
+    {
+      "id": "basic_save",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12806570,
+      "end": 12808070,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "469f393b1c5390d35c83a76f04c62b992ae285bdc976d354d6fdfe8c755b3b00",
+      "raw": "(Xvt)})}),cancelButtonText:\"\",confirmButtonText:E(\"phrase.phrase75\"),handleConfirm:()=>{},isShowCancelButton:!1}}),!1;const L=S_t(e,u),D=((e,t)=>{const r=e=>e.map((e=>JSON.stringify([e.type,e.name]))).sort(),n=r(T_t(e)),a=r(t);return n.length!==a.length||n.some(((e,t)=>e!==a[t]))})(L.pageList,h);var F;(F=L,At.post(`${PE}/company-operated-service/v3/catch-form/basic`,F)).then((r=>{t(aY(e.catchformId,zNt(null,FNt(e)))),A$(e.catchformId).then((e=>{var t,r,n,i;((null===(t=e.data)||void 0===t||null===(r=t.paths)||void 0===r||null===(n=r[0])||void 0===n||null===(i=n.agreements)||void 0===i?void 0:i.length)||0)>0&&!0===D?o({...a,show:!0}):w({show:!0})}))})).catch((r=>{var n,a,o,i,s,l;const c=fNt(r);var d;if(c)alert(null!==(d=c.serverMessage)&&void 0!==d?d:N(String(c.messageKey)));else if(400===r.response.status&&\"\\ud589\\ub82c\\ud615 \\ub2f5\\ubcc0\\uc740 \\uac1c\\uc778\\uc815\\ubcf4\\ub97c \\uc218\\uc9d1\\ud560 \\uc218 \\uc5c6\\uc2b5\\ub2c8\\ub2e4.\"===r.response.data.message)alert(E(\"phrase.phrase54\"));else if(\"must collect email type\"===r.response.data.message)alert(`'${r.response.data.arg}' ${E(\"phrase.phrase67\")}`);else if(\"must collect phone type\"===r.response.data.message)alert(`'${r.response.data.arg}' ${E(\"phrase.phrase68\")}`);else if(\"bad request use textarea\"===r.response.data.message)alert(`'${r.response.data.arg}' ${E(\"phrase.phrase65\")}`);else if(\"must collect them individually\"===r.response.data.message)alert(`'${r.response.data.arg}' ${E(\"phrase.phrase66\")}`);else if(\"bad request open "
+    },
+    {
+      "id": "other_add",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12676950,
+      "end": 12678710,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "e8e519cee9868312153504bd27ed02b8b2c53c09956aed015dade72cecc26f0c",
+      "raw": "URt(e){let{elementType:t,questionIndex:r,pageIndex:n,onRequestDeleteOptionImage:a,useOptionImageFeature:o}=e;const{t:i}=fa(\"translate\",{keyPrefix:\"aiQuestions\"}),s=Wu(),l=(0,yt.useRef)([]),c=Ut((e=>{var t;return null===(t=e.form.formModelV3.pageList[n].questionList[r])||void 0===t?void 0:t.questionOptionList}),uk),[d,u]=(0,yt.useState)(!0),h=null===c||void 0===c?void 0:c.some((e=>null===e||void 0===e?void 0:e.isCustomValue));return(0,yt.useEffect)((()=>{u(!1)}),[]),(0,nI.jsxs)(nI.Fragment,{children:[!d&&(null===c||void 0===c?void 0:c.map(((e,i)=>(0,nI.jsx)(nI.Fragment,{children:(0,nI.jsx)(zRt,{elementType:t,optionItemIndex:i,questionIndex:r,inputRefs:l,pageIndex:n,onRequestDeleteOptionImage:a,useOptionImageFeature:o})})))),(0,nI.jsxs)(\"div\",{className:\"mt-4 flex\",children:[(0,nI.jsx)(iI,{className:\"label-2 cursor-pointer\",color:aj,onClick:()=>(()=>{const e=(0,tK.cloneDeep)(c),t=null===c||void 0===c?void 0:c.findIndex((e=>null===e||void 0===e?void 0:e.isCustomValue));t>-1?null===e||void 0===e||e.splice(t,0,{value:null===e||void 0===e?void 0:e.length,optionQuestionName:\"\",isCustomValue:!1,pageOffset:-2}):null===e||void 0===e||e.push({value:null===e||void 0===e?void 0:e.length,optionQuestionName:\"\",isCustomValue:!1,pageOffset:-2});const a=null===e||void 0===e?void 0:e.map(((e,t)=>({...e,value:t})));s(tY(r,a,n))})(),children:i(\"addItem\")}),!h&&(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(iI,{className:\"label-2-weak mx-1 cursor-default\",children:[\" \",i(\"or\"),\" \"]}),(0,nI.jsx)(iI,{className:\"label-2 cursor-pointer\",color:aj,onClick:()=>(()=>{const e=(0,tK.cloneDeep)(c);null===e||void 0===e||e.push({value:null===e||void 0===e?void 0:e.length,optionQuestionName:\"\",isCustomValue:!0,pageOffset:-2}),s(tY(r,e,n))})(),children:i(\"addEtcItem\""
+    },
+    {
+      "id": "other_editor",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12682500,
+      "end": 12684690,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "08fe5dd0d19b2af41216323bdf7d138e684f40d739bc2fc74a150efce310d32d",
+      "raw": "a=r[n])||void 0===a?void 0:a.questionOptionList,e)},q=(e,t)=>{if(e.index===r&&L.current)return O(t),void M.flush();h(eY(n,e.index,t,o))};return(0,nI.jsx)(CEt.Draggable,{children:(0,nI.jsxs)(\"div\",{className:`w-full  ${null!==N&&void 0!==N&&N.isCustomValue?\"non-drag\":\"cursor-grab active:cursor-grabbing \"} bg-white/60`,children:[(0,nI.jsxs)(\"div\",{className:\"flex items-center mt-2 \"+(x?\"\":\"w-[80%]\"),children:[(0,nI.jsx)(PRt,{src:FEt,alt:\"\",className:\"me-2\"}),(null===N||void 0===N?void 0:N.isCustomValue)&&(0,nI.jsx)(QZ,{className:\"item-dnd-icon\",showIconOnly:!0,name:\"dnd\"}),\"RADIO\"===t&&(0,nI.jsx)(Hte,{className:`${m} me-2`,color:\"primary\",disabled:!0,size:\"small\"}),\"CHECKBOX\"===t&&(0,nI.jsx)(Ite,{className:`${p} me-2 mx-0`}),\"SELECTBOX\"===t&&(0,nI.jsxs)(\"span\",{className:\"me-1\",children:[r+1,\".\"]}),(0,nI.jsx)(bU,{autoComplete:\"off\",inputProps:{maxLength:250,dir:E},className:\"w-[80%] me-2 question-option !ms-2\",variant:\"standard\",placeholder:`${null!==N&&void 0!==N&&N.isCustomValue?l(\"other\"):`${l(\"optional\")} ${r+1}`}`,value:N.optionQuestionName,onChange:e=>(e=>{const t=(0,tK.cloneDeep)(j.current);t.optionQuestionName=e,O(t)})(e.target.value),onKeyDown:e=>{const t=((e,t,r,n)=>{if(\"Enter\"===e.key){var a;e.preventDefault(),e.stopPropagation(),null===(a=n.current[r])||void 0===a||a.dispatchEvent(R),setTimeout((()=>{var e;null===(e=n.current[r])||void 0===e||e.blur()}),0);const i=(0,tK.cloneDeep)(C),s=(0,tK.cloneDeep)(S);if(null===i||void 0===i||!i.isCustomValue){null===s||void 0===s||s.splice(r+1,0,{value:r+1,optionQuestionName:\"\",isCustomValue:!1,pageOffset:-2});const e=null===s||void 0===s?void 0:s.map(((e,t)=>({...e,value:t})));setTimeout((()=>{h(tY(t,e,o))}),0);const a=r+1;setTimeout((()=>{var e;null===(e=n.current[a])||void 0===e||e.focus()}),10)}}})(e,n,r,a);g(e.key),w(t)},inputRef:e=>a.current[r]=e,sx:{\"& .MuiInputBase-root\":{\"&.Mui-focused:after\":{borderBottomColor:\"#4624d6\"}}}},r),x&&(0,nI.jsx)(\"div\",{className:\"ms-2 me-1\",children:(0,nI.jsx)(yB,{width:\"200px\",labelList:v,value:I,onChange:e=>{_(e.target.value)}})}),$&&(0,nI.jsxs)(\"div\",{className:\"non-drag shrink-0 ms-2 me-2\",children:[(0,nI.jsx)(DXe,{onClick:H,type:\"secondary\",size:\"md\",disabled:F"
+    },
+    {
+      "id": "other_remove",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12679500,
+      "end": 12680820,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "76c70fad11c0182d52432f4ef6c982057f4abee5bee3f103f7ee99b9efdc1a8e",
+      "raw": "T=Ut((e=>e.form.formModelV3.formLanguage),uk),E=EV(T),[N,k]=(0,yt.useState)(C),j=(0,yt.useRef)(C),[I,_]=(0,yt.useState)(C.pageOffset||-2),R=new KeyboardEvent(\"keydown\",{key:\"ArrowRight\",code:\"ArrowRight\",keyCode:39,which:39,bubbles:!0}),P=(e,t)=>{z_t();const r=(0,tK.cloneDeep)($u.getState().form.formModelV3.pageList[o].questionList[e].questionOptionList),n=_G(null===r||void 0===r?void 0:r[t]);n&&h(XG(-n)),P_t($u.getState().form.formModelV3.catchformId,[SG(null===r||void 0===r?void 0:r[t])]),null===r||void 0===r||r.splice(t,1),h(tY(e,r,o));const a=$u.getState().form.formModelV3.pageList[o].questionList[e];if((e=>{if(!nG(iG(e)))return!1;if(\"NONE\"===aG(null===e||void 0===e?void 0:e.selectLimitMode))return!1;const t=lG(e);if(t<=0)return!1;const r=Number(null===e||void 0===e?void 0:e.selectLimitCount);return Number.isFinite(r)&&r>t})(a)){const{mode:t}=dG(a);h(ZG(e,uG(a,{mode:t}),o)),h(ic({show:!0,type:\"fail\",text:u(\"countReset\")}))}},O=e=>{j.current=e,k(e),M(e)},M=(0,yt.useCallback)((0,tK.debounce)((e=>{h(eY(n,r,e,o))}),300),[]);(0,yt.useEffect)((()=>{const e=U_t(\"questionOption\",(()=>M.flush()));return()=>{e(),M.cancel()}}),[M]);const L=(0,yt.useRef)(!0);(0,yt.useEffect)((()=>(L.current=!0,()=>{L.current=!1})),[]),(0,yt.useEffect)((()=>{(()=>{var e;\"Enter\"===f&&(g(null),null===(e=a.current[y])||void 0=="
+    },
+    {
+      "id": "other_next_labels",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12800470,
+      "end": 12801715,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "8a8c779a2eb75e0c7ff774804aace849f853f06c4d368ecd5470cfbb0ee14170",
+      "raw": "utton:!1}}),!1}const I=(e=>{const t=[];return e.pageList.forEach(((e,r)=>{e.questionList.forEach(((e,n)=>{var a;[\"CHECKBOX\",\"RADIO\",\"SELECTBOX\"].includes(e.elementType)&&((null===(a=e.questionOptionList)||void 0===a?void 0:a.some((e=>!e.optionQuestionName||\"\"===e.optionQuestionName.trim())))&&t.push({title:`Q${e.questionNumber}. ${e.title}`,pageIndex:r,questionIndex:n}))}))})),t})(e);if(I.length>0){const e=I[0];return T({show:!0,data:{title:E(\"phrase.phrase98\"),bodyHeader:\"\",body:(0,nI.jsxs)(Z_t,{children:[(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:E(\"phrase.phrase99\",{title:e.title})}),(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:E(\"phrase.phrase97\")})]}),cancelButtonText:\"\",confirmButtonText:E(\"phrase.phrase75\"),handleConfirm:()=>{const t=window.document.getElementById(`question-${null===e||void 0===e?void 0:e.pageIndex}-${null===e||void 0===e?void 0:e.questionIndex}`);null===t||void 0===t||t.classList.add(\"active\"),setTimeout((()=>{k_t(null===e||void 0===e?void 0:e.pageIndex,!1),null===t||void 0===t||t.scrollIntoView({behavior:\"smooth\",block:\"start\"})}),0),T({show:!1})},isShowCancelButton:!1}}),!1}const _=(e=>{const t=[];return e.pageList.forEach(((e,r)=>{e.questionList.forEach(((e,n)=>{if([\"M"
+    },
+    {
+      "id": "other_next_count",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12802900,
+      "end": 12804040,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "1230054578978291f821a403163bce73a6b46ddaabb9b06d43cb05de625c8920",
+      "raw": "const t=[];return e.pageList.forEach(((e,r)=>{e.questionList.forEach(((e,n)=>{[\"CHECKBOX\",\"RADIO\",\"SELECTBOX\"].includes(e.elementType)&&Array.isArray(e.questionOptionList)&&e.questionOptionList.filter((e=>e.isCustomValue)).length>=2&&t.push({pageIndex:r,questionIndex:n,questionTitle:e.title})}))})),t.slice(0,1)})(e);if(R.length>0){const e=R[0];return T({show:!0,data:{title:E(\"phrase.phrase101\"),bodyHeader:\"\",body:(0,nI.jsxs)(Z_t,{children:[(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:E(\"phrase.phrase102\",{questionNumber:e.questionIndex+1,title:e.questionTitle})}),(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:E(\"phrase.phrase103\")})]}),cancelButtonText:\"\",confirmButtonText:E(\"phrase.phrase75\"),handleConfirm:()=>{const t=window.document.getElementById(`question-${null===e||void 0===e?void 0:e.pageIndex}-${null===e||void 0===e?void 0:e.questionIndex}`);null===t||void 0===t||t.classList.add(\"active\"),setTimeout((()=>{null===t||void 0===t||t.scrollIntoView({behavior:\"smooth\",block:\"start\"})}),0),T({show:!1})},isShowCancelButton:!1}}),!1}const P=(e=>{let t=!1;return\"\"===e.title.trim()&&(t=!0),t})(e);if"
+    },
+    {
+      "id": "other_checkbox_input",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 8172460,
+      "end": 8173670,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "cb1aad61d47ef1f2ea2356e41bf709b4f678bea3d8d097f164409f6d91256735",
+      "raw": "isabled:o,placeholder:i,id:s,readOnly:l=!1,maxSelectable:c,onImageZoom:d}=e;const[u,h]=(0,yt.useState)([]),p=EG(t),[m,f]=(0,yt.useState)(\"\");(0,yt.useEffect)((()=>{h(r||[])}),[r]),(0,yt.useEffect)((()=>{f(n||\"\")}),[n]);const g=e=>{const t=e.target.value||\"\";f(t),a(u,t)};return(0,nI.jsx)(\"div\",{className:\" flex flex-col gap-2  \"+(l?\"cursor-not-allowed\":\"cursor-auto\"),children:t.map(((e,t)=>{const r=u.includes(e.value),n=fG({cap:c,selectedCount:u.length,isSelected:r});return(0,nI.jsx)(BG,{label:e.name,value:e.value,checked:r,onChange:()=>(e=>{let t=[...u],r=m;const n=u.includes(e.value);!n&&fG({cap:c,selectedCount:u.length,isSelected:!1})||(n?(t=t.filter((t=>t!==e.value)),\"Y\"===e.customValueYn&&(r=\"\")):(t.push(e.value),t.sort()),h(t),\"Y\"===e.customValueYn&&n&&f(\"\"),a(t,r))})(e),disabled:o||n,dimmed:!!o,isCustomValue:\"Y\"===e.customValueYn,readOnly:l,imageUrl:CG(e),reserveImageSlot:p,onImageClick:d,children:\"Y\"===e.customValueYn&&r&&(0,nI.jsx)(\"div\",{className:\"px-4 w-full\",children:l?(0,nI.jsx)(RG,{value:m,placeholder:i}):(0,nI.jsx)(Kq,{id:`${s}-input`,className:\"inline-block \"+(o?\" \":\"!bg-white \"),placeholder:i,maxLength:100,value:m||\"\",onChange:g,disabled:o,readOnly:l,type:\"text\"})})},t)}))})"
+    },
+    {
+      "id": "other_radio_input",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 8179620,
+      "end": 8180700,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "d2a352d1243c11aaa2c4c6cffc6e1d873daa7d20e068340077b02b57d522990c",
+      "raw": ",readOnly:l=!1,onImageZoom:c}=e;const[d,u]=(0,yt.useState)(r||\"\"),h=EG(t),[p,m]=(0,yt.useState)(n||\"\");(0,yt.useEffect)((()=>{u(r||\"\")}),[r]),(0,yt.useEffect)((()=>{m(n||\"\")}),[n]);const f=e=>{const t=e.target.value||\"\";a(d,t),m(t)};return(0,nI.jsx)(\"div\",{className:\"flex flex-col gap-2 \"+(l?\"cursor-not-allowed\":\"cursor-auto\"),children:t.map(((e,t)=>(0,nI.jsx)(gY,{label:e.name,value:e.value,checked:d===e.value,onChange:()=>(e=>{let t=\"\",r=p;d===e.value?(t=\"\",r=\"\"):(t=e.value,\"Y\"!==e.customValueYn&&(r=\"\")),a(t,r),u(t),m(r)})(e),disabled:o,isCustomValue:\"Y\"===e.customValueYn,readOnly:l,imageUrl:CG(e),reserveImageSlot:h,onImageClick:c,children:\"Y\"===e.customValueYn&&d===e.value&&(0,nI.jsx)(\"div\",{className:\"px-4 w-full\",children:l?(0,nI.jsx)(lY,{value:p,placeholder:i}):(0,nI.jsx)(Kq,{id:`${s}-input`,className:\"inline-block \"+(o?\" \":\"!bg-white \"),placeholder:i,maxLength:100,value:p||\"\",onChange:f,disabled:o,readOnly:l,type:\"text\"})})},t)))})},bY=e=>{let{items:t,usePageOffset:r,selectedValue:n,stringValue:a,onChange:o,disabled:i,pageIndex:s,placeholder:l,id:c,readOnly:"
+    },
+    {
+      "id": "other_dropdown_input",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 8184310,
+      "end": 8187020,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "6306955c1f80cd0e5bad9d2f62843f2478530f0277560e6cb66986bdd8b4e491",
+      "raw": "r !rounded-[6px] !border-[var(--GREY300)] text-[var(--GREY400)] placeholder:text-[var(--GREY300)] !bg-[var(--GREY200)]\"} ${r?\"!border !rounded-[6px] !border-[var(--RED500)]\":\"!border w-full !rounded-[6px] !border-[var(--GREY300)] text-gray-700 shadow-[var(--GREY300)] ring-4 ring-transparent placeholder:text-[var(--GREY500)] hover:!border-[var(--GREY500)] focus:!border-[var(--GREY900)]\"} ${n}`,value:v,onChange:e=>{const t=e.target.value;b(t),d(t,\"\")},onOpen:()=>g(!0),onClose:()=>g(!1),disabled:t,readOnly:p,MenuProps:{PaperProps:{sx:{marginTop:\"8px\",boxShadow:\"0px 4px 20px 0px #0000001a !important\",border:`1px solid ${hj}`,cursor:p||t?\"not-allowed !important\":\"pointer\",\"& .MuiMenuItem-root\":{color:`${ej} !important`,fontSize:\"15px !important\",margin:\"0 8px !important\",paddingLeft:\"8px !important\",paddingRight:\"8px !important\",borderRadius:\"6px !important\",height:\"37px !important\"},\"& .Mui-selected\":{backgroundColor:`${xj} !important`,color:`${tj} !important`},\"& .Mui-selected:hover\":{backgroundColor:`${bj} !important`},\"& .MuiMenuItem-root:hover\":{backgroundColor:`${bj} !important`},\"& .placeholder\":{color:`${Zk} !important`},\"&.Mui-disabled .MuiSelect-select\":{backgroundColor:`${uj} !important`},\"&.Mui-disabled .MuiOutlinedInput-notchedOutline\":{borderColor:`${hj} !important`}}}},sx:{height:\"45px\",cursor:p||t?\"not-allowed !important\":\"pointer\",\"& .MuiSelect-icon\":{display:\"none\"},\"& .MuiOutlinedInput-notchedOutline\":{borderColor:\"transparent !important\",paddingLeft:\"0 !important\"},\"&.Mui-focused .MuiOutlinedInput-notchedOutline\":{borderColor:\"transparent !important\"},\"&:hover .MuiOutlinedInput-notchedOutline\":{borderColor:\"transparent !important\"},\"& .MuiSelect-select\":{paddingInlineEnd:\"32px !important\",color:v?\"inherit\":\"var(--GREY500)\",fontSize:\"15px !important\",paddingInlineStart:\"16px !important\",height:\"100% !important\",minHeight:\"45px !important\",boxSizing:\"border-box !important\",paddingTop:\"0 !important\",paddingBottom:\"0 !important\",display:\"flex\",alignItems:\"center\",cursor:p||t?\"not-allowed !important\":\"pointer\"},\"& .MuiInputBase-root\":{paddingLeft:\"0 !important\"},\"& .MuiOutlinedInput-root\":{height:\"45px !important\"}},children:[(0,nI.jsx)(bB,{value:\"\",className:\"placeholder\",children:u}),i.map(((e,t)=>(0,nI.jsx)(bB,{value:e.value,children:e.name},t)))]}),(0,nI.jsx)(SY,{src:`/img/google-icons-v2/arrows/caret-${f?\"up\":\"down\"}.svg`,width:20,color:ej})]}),-1!==(null===i||void 0===i?void 0:i.findIndex((e=>e.value==l&&\"Y\"===e.customValueYn)))&&(0,nI.jsx)(\"div\",{className:\"mt-3\",children:(0,nI.jsx)(Kq,{ref:y,id:`${s}-input`,className:`${a}`,inputClassName:`${o}`,maxLength:100,placeholder:h,value:x||\"\",onChange:e=>{A(e.target.value),d(v,e.target.value)},type:\"te"
+    },
+    {
+      "id": "option_image_boundary",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 8168000,
+      "end": 8169160,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "9a5a6ac66a9348d1c4b3e546c02d752369e61d417e2ac47ad32b24cf73d489b5",
+      "raw": "l},wG=[\"image/jpeg\",\"image/jpg\",\"image/png\"];function CG(e){var t;const r=null!==(t=null===e||void 0===e?void 0:e.optionImageUrl)&&void 0!==t?t:null===e||void 0===e?void 0:e.imageUrl;return\"string\"===typeof r&&\"\"!==r.trim()?r:null}function SG(e){const t=null===e||void 0===e?void 0:e.optionImageKey;return\"string\"===typeof t&&\"\"!==t.trim()?t:null}function TG(e,t){return Array.isArray(e)?e.filter(((e,r)=>r!==t&&(null!==CG(e)||null!==SG(e)))).length:0}function EG(e){return Array.isArray(e)&&e.some((e=>null!==CG(e)))}function NG(e){return null!==CG(e)||null!==SG(e)}function kG(e,t){if(!Array.isArray(t))return[];const r=(e=>\"RADIO\"===e||\"CHECKBOX\"===e)(e),n=e=>NG(e)&&(!r||(e=>!0===(null===e||void 0===e?void 0:e.isCustomValue)||\"Y\"===(null===e||void 0===e?void 0:e.customValueYn))(e));return t.some(n)?t.map((e=>n(e)?{...e,optionImageKey:null,optionImageUrl:null,imageUrl:null,optionImageFileSize:null}:e)):t}const jG=\"optionImageUploadToken\";function IG(e){const{[jG]:t,...r}=null!==e&&void 0!==e?e:{};return r}function _G(e){const t=null===e||void 0===e?void 0:e.optionImageFileSize;return\"number\"===typeof t&&Number.isFinite(t)?t:null}const RG=e=>{let{va"
+    },
+    {
+      "id": "other_codecs",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 8221674,
+      "end": 8223900,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "2529be4584e66b7fc83dfa6770d34c77b0dcdfd4f6870f4abbd3b2b0a48de4d4",
+      "raw": "pK={CHECKBOX:{NEW:nK,AI:nK,AI_V2:nK,AI_V3:{getInitialValue:e=>e||null,parse:(e,t)=>{if(!e||\"object\"!==typeof e||Array.isArray(e))return{checkboxValues:[],stringValue:\"\"};const r=(e.optionValue||[]).map(String),n=e.text||\"\";if(e.isCustomValue){var a;const e=null===t||void 0===t||null===(a=t.formQuestionOptionDataList)||void 0===a?void 0:a.find((e=>\"Y\"===e.customValueYn));e&&e.value&&!r.includes(e.value)&&r.push(e.value)}return{checkboxValues:r,stringValue:n}},format:(e,t,r)=>{const n=[];let a=!1,o=null;if(null!==r&&void 0!==r&&r.formQuestionOptionDataList){const e=r.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));e&&(o=e.value)}for(const i of e)i===o?a=!0:n.push(parseInt(i,10));return n.sort(((e,t)=>e-t)),{optionValue:n,isCustomValue:a,text:t}},validate:(e,t)=>{if(\"MM\"===t.questionElementType){if(!e)return!1;if(0===e.optionValue.length&&!e.isCustomValue)return!1}if(!e)return!0;return!(e.isCustomValue&&(!e.text||\"\"===e.text.trim()))}}},RADIO:{NEW:uK,AI:uK,AI_V2:uK,AI_V3:{parse:e=>{if(!e||\"object\"!==typeof e||Array.isArray(e)){const t=\"number\"===typeof e||\"string\"===typeof e?parseInt(String(e),10):null;return{selected:null!==t?String(t):null,text:\"\"}}return{selected:null!==e.optionValue&&void 0!==e.optionValue?String(e.optionValue):null,text:e.text||\"\"}},format:(e,t)=>{const{selected:r,text:n}=e;if(!r)return null;const a=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn)),o=a&&a.value===r;return{optionValue:parseInt(r,10),isCustomValue:o,text:n||\"\"}},validate:(e,t)=>!(\"MM\"===t.questionElementType&&!e)&&(!e||!(e.isCustomValue&&(!e.text||\"\"===e.text.trim())))}},SELECTBOX:{NEW:hK,AI:hK,AI_V2:hK,AI_V3:{parse:e=>{if(!e||\"object\"!==typeof e||Array.isArray(e))return{selected:null,text:\"\"};return{selected:null!==e.optionValue&&void 0!==e.optionValue?String(e.optionValue):null,text:e.text||\"\"}},format:(e,t)=>{const{selected:r,text:n}=e;if(!r)return null;const a=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn)),o=a&&a.value===r;return{optionValue:parseInt(r,10),isCustomValue:o,text:n||\"\"}},validate:(e,t)=>!(\"MM\"===t.questionElementType&&!e)&&(!e||!(e.isCustomValue&&(!e.text||\"\"===e.text.trim())))}},FILE:{NEW:sK,AI:sK,AI_V2:sK,AI_V3:{filesProp:\"value\",getFileName:e=>("
+    },
+    {
+      "id": "other_legacy_codecs",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 8220410,
+      "end": 8221674,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "174384812fad29b90a50a4276f009e873be97d817fbc0d6f4fc15fee3e312f79",
+      "raw": "rray.isArray(e)?e.map((e=>{const t=e.split(\",\");return{row:parseInt(t[0],10),col:parseInt(t[1],10)}})):[],validate:(e,t)=>lK(e,t,(e=>null===e||void 0===e?void 0:e.row))},uK={parse:e=>{if(!e||\"string\"!==typeof e)return{selected:null,text:\"\"};const[t=null,r=\"\"]=e.split(\"|\");return{selected:t,text:r}},format:(e,t)=>{const{selected:r,text:n}=e;if(!r)return\"\";const a=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));return a&&a.value===r?`${r}|${n||\"\"}`:r},validate:(e,t)=>{if(\"MM\"===t.questionElementType&&(!e||\"\"===e.trim()))return!1;const r=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));if(!r||!e)return!0;const{selected:n,text:a}=uK.parse(e);return!(n===r.value&&(!a||\"\"===a.trim()))}},hK={parse:e=>{if(!e||\"string\"!==typeof e)return{selected:null,text:\"\"};const[t=null,r=\"\"]=e.split(\"|\");return{selected:t,text:r}},format:(e,t)=>{const{selected:r,text:n}=e;if(!r)return\"\";const a=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));return a&&a.value===r?`${r}|${n||\"\"}`:r},validate:(e,t)=>{if(\"MM\"===t.questionElementType&&(!e||\"\"===e.trim()))return!1;const r=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));if(!r||!e)return!0;const{selected:n,text:a}=hK.parse(e);return!(n===r.value&&(!a||\"\"===a.trim()))}},"
+    },
+    {
+      "id": "other_submit",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 10057077,
+      "end": 10058066,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "6c9aa10eff63d9dbe0241114ff8143344efbefb16aba8f008920d90aa4b875fc",
+      "raw": "case\"CHECKBOX\":y=function(e){var t;const r=null===e||void 0===e?void 0:e.value;if(!r||\"object\"!==typeof r||!Array.isArray(r.optionValue))return[];const n=[],a=null===e||void 0===e||null===(t=e.formQuestionOptionDataList)||void 0===t?void 0:t.find((e=>\"Y\"===e.customValueYn)),o=a?parseInt(a.value,10):null;return(r.optionValue||[]).forEach((t=>{const r=\"string\"===typeof t?parseInt(t,10):t;var a;isNaN(r)||r===o||(null===e||void 0===e||null===(a=e.formQuestionOptionDataList)||void 0===a?void 0:a.find((e=>parseInt(e.value,10)===r&&\"N\"===e.customValueYn)))&&n.push({optionValue:r,customValue:!1,text:null})})),r.isCustomValue&&a&&null!==o&&n.push({optionValue:o,customValue:!0,text:r.text||null}),n}(e);break;case\"RADIO\":case\"SELECTBOX\":y={optionValue:null===(b=e.value)||void 0===b?void 0:b.optionValue,customValue:null===(x=e.value)||void 0===x?void 0:x.isCustomValue,text:(null===(A=e.value)||void 0===A?void 0:A.text)||null},null!==y.optionValue&&void 0!==y.optionValue||(y=null);break;"
+    },
+    {
+      "id": "other_selection_count",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 8165438,
+      "end": 8165955,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "d1ddb29714ca31dee7cf4303b44c428a29b31b023cb53be6b29bfa7c8efeb251",
+      "raw": ")&&r>=t},gG=(e,t)=>{if(!e)return 0;if(\"string\"===typeof e){const[t=\"\"]=e.split(\"|\");return t.split(\",\").filter((e=>\"\"!==e.trim())).length}if(Array.isArray(e))return e.length;const r=Array.isArray(e.optionValue)?e.optionValue:[];if(!e.isCustomValue)return r.length;const n=(e=>{const t=sG(e).find((e=>\"Y\"===(null===e||void 0===e?void 0:e.customValueYn)));if(!t)return null;const r=parseInt(t.value,10);return Number.isFinite(r)?r:null})(t),a=null!==n&&r.some((e=>parseInt(String(e),10)===n));return r.length+(a?0:1)},v"
+    },
+    {
+      "id": "choice_type_transition",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12715818,
+      "end": 12716400,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "f6b1edb0c71db07606df6f7455039cde6a7b43632deeb008fe389028f2e9ec87",
+      "raw": "CTBOX\"],FPt=function(){return{value:arguments.length>0&&void 0!==arguments[0]?arguments[0]:1,optionQuestionName:\"\\ud30c\\uc77c \\uc5c5\\ub85c\\ub4dc \\uc218\",isCustomValue:!1}},BPt=e=>({value:0,optionQuestionName:\"\",isCustomValue:!1,...e?{pageOffset:-2}:{}}),UPt=e=>{let{prevElementType:t,nextElementType:r,prevOptionList:n,withPageOffset:a=!1}=e;if(i=r,DPt.includes(i)){var o;return\"FILE\"!==t&&(null!==(o=null===n||void 0===n?void 0:n.length)&&void 0!==o?o:0)>0?[...n]:[BPt(a)]}var i;return\"FILE\"===r?[FPt()]:[]},zPt=[\"questionImage\",\"questionMaterial\",\"optionImage\"],VPt=as.div`\n  posi"
+    },
+    {
+      "id": "option_copy_name_namespace",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12678750,
+      "end": 12679190,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "35942350288fabeb3bb71eaef80b5ddf9115dd4c34965327ff58f743667105a9",
+      "raw": "tion(e){let{elementType:t,optionItemIndex:r,questionIndex:n,inputRefs:a,pageIndex:o,onRequestDeleteOptionImage:i,useOptionImageFeature:s}=e;const{t:l}=fa(\"translate\",{keyPrefix:\"optionInputText\"}),{t:c}=fa(\"translate\",{keyPrefix:\"aiQuestions.optionImage\"}),{t:d}=fa(\"translate\",{keyPrefix:\"aiQuestions.assetError\"}),{t:u}=fa(\"translate\",{keyPrefix:\"aiQuestions.selectLimit\"}),h=Wu(),{checkboxRoot:p,radioRoot:m}=BRt(),[f,g]=(0,yt.useState)("
+    },
+    {
+      "id": "pi_select_options",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12657754,
+      "end": 12657890,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "4053bfa8b5e33d143ecbc53c099101e913540f045b6107700eceadc945728813",
+      "raw": "NRt=BB.filter((e=>\"NON_PERSONAL_INFORMATION\"!==e.value)),kRt=function(){let e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:\"\";"
+    },
+    {
+      "id": "other_delete_button",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 12687211,
+      "end": 12687561,
+      "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "c758a14d3b95e083997d19b2e7ace09d4cc5c10d44a9d6ac86bff8970c3daa55",
+      "raw": "nally{B(!1)}var P,L,D}})]}),(null===S||void 0===S?void 0:S.length)>1&&(0,nI.jsx)(\"div\",{className:\"cursor-pointer w-[40px] \",onClick:()=>P(n,r),children:(0,nI.jsx)(BU,{width:24,src:\"/img/google-icons-v2/marks/x.svg\",color:sj})})]}),$&&(V||F)&&(0,nI.jsxs)(ORt,{className:\"non-drag\",children:[F?(0,nI.jsx)(LRt,{title:c(\"imageUploading\"),children:(0,nI."
+    }
+  ],
+  "localSnapshots": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/schema.prisma",
+      "relative": "prisma/schema.prisma",
+      "sha256": "bd85fa7b4f8640c21a0e560e88b87d604d936afb8e46ad8b854bf3509b84f80c",
+      "bytes": 94740,
+      "lines": 2583
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+      "relative": "src/contracts/questions.ts",
+      "sha256": "652571db0b325c4a494b070d8a6af785d0996b17cfeb53662a323dfa91279db8",
+      "bytes": 11180,
+      "lines": 126
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts",
+      "relative": "src/server/forms.ts",
+      "sha256": "271289f7fb5a6753e5e2bf5b83ac76fc3cbe566fcf49a0f6fbf7ebf29555457b",
+      "bytes": 42477,
+      "lines": 478
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+      "relative": "src/components/forms/FormEditor.tsx",
+      "sha256": "11130436b87b8ca6f9a2aa34fdad2f70a1d1b0042d5842f29d72a5c1fa9fde3a",
+      "bytes": 19188,
+      "lines": 169
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+      "relative": "src/components/forms/PublicForm.tsx",
+      "sha256": "54d5865a0590f43cbf444571c9342d4e937069a1f240c80e7e63a852753f7af9",
+      "bytes": 14751,
+      "lines": 162
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/documents.ts",
+      "relative": "src/contracts/documents.ts",
+      "sha256": "dd1e5b0482ac9d177f03ac76562225259bc0045e6a7dee90a4a96c76c40bdbd5",
+      "bytes": 6518,
+      "lines": 56
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/option-identities.ts",
+      "relative": "src/contracts/option-identities.ts",
+      "sha256": "f8af42eb5d67c93cfd03e0b4d07f7cd17954fb50745d1fa0fbd81623529d85b0",
+      "bytes": 1952,
+      "lines": 28
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/question-options.ts",
+      "relative": "src/server/question-options.ts",
+      "sha256": "2889cdff7285f80604323fdda87132172aeb2cdda0cd031b7fa5066447df27c6",
+      "bytes": 805,
+      "lines": 12
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionOptions.tsx",
+      "relative": "src/components/forms/QuestionOptions.tsx",
+      "sha256": "792f0a21170d2051ec0d5c8659671b37ee296e7384d7c14d1967f86bacab351a",
+      "bytes": 2399,
+      "lines": 29
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+      "relative": "src/server/answer-validation.ts",
+      "sha256": "97e9d3fc9499dcad45f803762833ea637e82dccf5f41400b0fca4ba5f2404892",
+      "bytes": 9105,
+      "lines": 100
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+      "relative": "src/components/forms/QuestionInput.tsx",
+      "sha256": "44a09aaac8c0b9b348715ca0e0735b0335ef661f2bd1a53e11c6ecf2fc8da8d1",
+      "bytes": 8059,
+      "lines": 72
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/export-renderer.ts",
+      "relative": "src/server/export-renderer.ts",
+      "sha256": "0b3669e761ee4c5e6589d4d66027b6adfd6a41bea46a913d184aa8a8eb4a21df",
+      "bytes": 5245,
+      "lines": 60
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-copy.ts",
+      "relative": "src/contracts/form-copy.ts",
+      "sha256": "f7116f6021716937822e1eb5074d8ec1b21323e7d24fe558829ea99c7074f260",
+      "bytes": 1553,
+      "lines": 24
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/templates.ts",
+      "relative": "src/server/templates.ts",
+      "sha256": "6c5cd5d2b198c88d6d375c6925cef4a4976313f6223aa362a4629f3216ce2ac5",
+      "bytes": 11451,
+      "lines": 136
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+      "relative": "src/server/submissions.ts",
+      "sha256": "f6c6f1ff6d34cb90d339a56c1d1fe78113b1999edfa563695fd8db81e63bab0b",
+      "bytes": 10562,
+      "lines": 140
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SharedPrivacy.tsx",
+      "relative": "src/components/forms/SharedPrivacy.tsx",
+      "sha256": "c0cb5ec4fda800d82c52e4f8b383e48a5f62afdadc5661495e86491c7cef728c",
+      "bytes": 8044,
+      "lines": 79
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/Workflow.tsx",
+      "relative": "src/components/forms/Workflow.tsx",
+      "sha256": "23c7c3ba329cb4c9d5c0b3bf5b448aaf35f9fbba93eaace4a4b32ce0e1fa91b5",
+      "bytes": 19306,
+      "lines": 202
+    }
+  ],
+  "koCopy": {
+    "namespace": "translate",
+    "sourceLiteral": {
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "start": 202523,
+      "end": 1399448,
+      "sha256OfUtf8Excerpt": "375758d3d702ee085895f91bcdc82a9c6513e0e05ca7f5b413903ce46b9fc4e9"
+    },
+    "keys": {
+      "aiQuestions.manualPrivacy": {
+        "title": "개인정보를 수집하는 문항인가요?",
+        "question": "본 문항으로 개인정보를 수집하시나요?",
+        "collectYes": "예(수집함)",
+        "collectNo": "아니오(수집안함)",
+        "fieldLabel": "개인정보 분류 및 항목명 입력",
+        "namePlaceholder": "개인정보 항목명을 입력해주세요. 예) 이름, 휴대폰번호, 주소, 여권번호 등",
+        "nonCollectMessage": "이 문항은 개인정보를 수집하지 않는 일반 문항으로 분류됩니다.",
+        "tooltip": "본 문항의 '개인정보 수집 여부'와 '개인정보 분류'를 직접 선택해 주세요."
+      },
+      "aiQuestions.addEtcItem": "기타 항목 추가",
+      "optionInputText.other": "기타",
+      "optionInputText.optional": "선택사항",
+      "aiQuestions.alert.phrase1": "주민등록번호가 포함된 질문은 필수 질문이어야 합니다.",
+      "aiQuestions.alert.phrase6": "개인정보 분류를 선택해 주세요.",
+      "aiQuestions.alert.phrase7": "수집 항목을 입력해 주세요.",
+      "aiQuestions.alert.phrase31": "50자 이내로 입력해 주세요.",
+      "aiQuestions.alert.phrase45": "주민등록번호 수집 문항은 필수 질문으로 설정됩니다.",
+      "aiQuestions.alert.phrase46": "행렬형 답변은 개인정보를 수집할 수 없습니다.",
+      "aiQuestions.alert.phrase60": "행렬형 문항은 개인정보로 분류할 수 없습니다.",
+      "aiCatchForm.phrase.phrase92": "수집 항목을 확인해 주세요.",
+      "aiCatchForm.phrase.phrase94": "수집하려는 항목(개인정보 분류 선택)을 확인 후 시도해 주세요.",
+      "aiCatchForm.phrase.phrase101": "기타 항목 중복 설정 발견",
+      "aiCatchForm.phrase.phrase103": "1개만 남기고 삭제해 주세요."
+    },
+    "note": "Retained whole string-literal range; keys are projections of statically decoded JSON. No runtime translation/network call."
+  }
+}

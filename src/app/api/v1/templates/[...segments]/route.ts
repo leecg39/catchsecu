@@ -3,7 +3,7 @@ import { requireContext } from "@/server/context";
 import { body, fail, json, route } from "@/server/http";
 import { idempotent } from "@/server/idempotency";
 import { deleteTemplate, getTemplate, templatePatch, updateTemplate, useTemplate } from "@/server/templates";
-import { lockFormService } from "@/server/form-access";
+import { lockFormService, recheckFormAccess } from "@/server/form-access";
 function parts(request: Request) {
   const [rawId, action, ...rest] = new URL(request.url).pathname.split("/").slice(4);
   if (rest.length) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
@@ -33,6 +33,6 @@ export const POST = route(async (request, requestId) => {
     }, async tx => {
       await getTemplate(ctx, id, false, tx);
       await lockFormService(tx, ctx, input.serviceId, "form.write");
-    });
+    }, undefined, tx => recheckFormAccess(tx, ctx, "form.write"));
   return json(result.body, result.status);
 });

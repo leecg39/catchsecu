@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-10-09T21:15:49.180Z",
+  "database": "catchsecu_test",
+  "readOnly": true,
+  "columns": [
+    {
+      "column_name": "capabilities",
+      "data_type": "ARRAY",
+      "is_nullable": "NO",
+      "column_default": "'{}'::text[]"
+    }
+  ],
+  "constraints": [
+    {
+      "conname": "BillingPlanVersion_capabilities_check",
+      "convalidated": true,
+      "definition": "CHECK (((capabilities <@ ARRAY['security.company_policy'::text, 'security.ip_access'::text, 'security.mfa_management'::text]) AND (array_position(capabilities, NULL::text) IS NULL) AND (cardinality(capabilities) = ((\nCASE\n    WHEN ('security.company_policy'::text = ANY (capabilities)) THEN 1\n    ELSE 0\nEND +\nCASE\n    WHEN ('security.ip_access'::text = ANY (capabilities)) THEN 1\n    ELSE 0\nEND) +\nCASE\n    WHEN ('security.mfa_management'::text = ANY (capabilities)) THEN 1\n    ELSE 0\nEND))))"
+    }
+  ],
+  "triggers": [
+    {
+      "tgname": "billing_plan_version_immutable",
+      "tgenabled": "O",
+      "definition": "CREATE TRIGGER billing_plan_version_immutable BEFORE DELETE OR UPDATE ON public.\"BillingPlanVersion\" FOR EACH ROW EXECUTE FUNCTION billing_plan_version_immutable()"
+    }
+  ],
+  "plans": [
+    {
+      "id": "policy-management-month-v1",
+      "capabilities": [
+        "security.mfa_management"
+      ]
+    },
+    {
+      "id": "policy-management-year-v1",
+      "capabilities": [
+        "security.mfa_management"
+      ]
+    },
+    {
+      "id": "privacy-lifecycle-month-v1",
+      "capabilities": [
+        "security.mfa_management"
+      ]
+    },
+    {
+      "id": "privacy-lifecycle-year-v1",
+      "capabilities": [
+        "security.mfa_management"
+      ]
+    },
+    {
+      "id": "trial-v1",
+      "capabilities": [
+        "security.company_policy",
+        "security.ip_access",
+        "security.mfa_management"
+      ]
+    }
+  ],
+  "migrations": 105,
+  "passed": true
+}

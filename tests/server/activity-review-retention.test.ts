@@ -1,3 +1,5 @@
+import { beforeEach as beforeSecurityCase } from "vitest";
+import { grantSecurityTestTrials } from "../fixtures/security-subscription";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, beforeEach, expect, test } from "vitest";
 import { auth } from "@/server/auth";
@@ -172,3 +174,5 @@ test("승인 트랜잭션 밖의 메시지 삭제와 진행 중 검토의 파기
   await expect(db.activityReview.update({ where: { id }, data: { destructionStatus: "destroyed", destroyedAt: new Date(), destroyApproverId: actors.owner.member.id, version: 2 } })).rejects.toThrow();
   await db.activityReviewMessage.deleteMany({ where: { reviewId: randomUUID() } });
 });
+
+beforeSecurityCase(grantSecurityTestTrials);

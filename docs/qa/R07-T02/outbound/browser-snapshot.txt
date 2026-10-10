@@ -1,0 +1,175 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 전체 구현 검증"(2): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=333]
+        container
+          text "서비스명"
+          text "REA SSO 통신 검증"
+        container
+          text "외부 ⓘ"
+          text "-"
+          image
+      container
+        anchor [ref=334, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        button [ref=335]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=336]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=337]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=338]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=339]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=340]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=341]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=342]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=343, loc=href:/shared-privacy/view, url=http://localhost:3100/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=344, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=345, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          anchor [ref=346, loc=href:https://catchsecu.com/, url=https://catchsecu.com/]
+            text "홈페이지"
+          anchor [ref=347, loc=href:/legal/privacy, url=http://localhost:3100/legal/privacy]
+            text "개인정보"
+            text "처리방침"
+          anchor [ref=348, loc=href:/legal/terms, url=http://localhost:3100/legal/terms]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          text "REA SSO 통신 검증"
+        container
+          button [ref=349]
+            svg_root
+            text "검색"
+            text "Ctrl K"
+          button "키보드 단축키 안내" [ref=350, loc=css:button[aria-label="키보드 단축키 안내"]]
+            svg_root
+          button [ref=351]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=352, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+            image
+          button "문의" [ref=353, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=354, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+            image
+          button [ref=355]
+            image
+            text "MY"
+      container [ref=356]
+        container
+          heading
+            text "SSO 연결 관리"
+          container
+            anchor [ref=357, loc=href:/security/sso, url=http://localhost:3100/security/sso]
+              text "로그인 정책"
+            button [ref=358]
+              text "SSO 연결 등록"
+        paragraph
+          text "OIDC 또는 SAML 공급자로 회사 구성원의 로그인을 연결합니다. 등록 후 사전검사를 통과해야 활성화할 수 있습니다. 사용 중지·인증 정보 교체는 새 로그..."
+        container
+          container
+            container
+              text "SSO 연결 검색"
+              textbox [ref=359, loc=css:input[placeholder="이름·프로토콜·Issuer"]]
+                text "이름·프로토콜·Issuer"
+            container
+              text "SSO 연결 정렬"
+              combobox [ref=360]
+                text "등록일순"
+          region "SSO 연결 목록" [ref=361, loc=role:region[name="SSO 연결 목록"]]
+            table
+              table_row
+                table_cell
+                  text "이름"
+                table_cell
+                  text "프로토콜"
+                table_cell
+                  text "Issuer"
+                table_cell
+                  text "로그인 주소"
+                table_cell
+                  text "사전검사"
+                table_cell
+                  text "사용 상태"
+                table_cell
+                  text "등록일"
+              table_row
+                table_cell
+                  text "차단된 시험 IdP 127.0.0.1"
+                table_cell
+                  text "OIDC"
+                table_cell
+                  text "https://127.0.0.1:63429"
+                table_cell
+                  text "/api/v1/auth/sso/6b02b2a6-3184-46dd-8687-970c40de47fe?mode=login"
+                table_cell
+                  text "미통과 —"
+                  text "JWKS 조회 실패: 인증 제공자가 공개 인터넷 주소를 사용하지 않습니다."
+                table_cell
+                  text "사용 안 함"
+                table_cell
+                  text "2026. 10. 10."
+              table_row
+                table_cell
+                  text "차단된 시험 IdP localhost"
+                table_cell
+                  text "OIDC"
+                table_cell
+                  text "https://localhost:63429"
+                table_cell
+                  text "/api/v1/auth/sso/23fa67ee-1a5e-4fb8-877b-9034d6ca0c5b?mode=login"
+                table_cell
+                  text "미통과 —"
+                  text "JWKS 조회 실패: 인증 제공자가 공개 인터넷 주소를 사용하지 않습니다."
+                table_cell
+                  text "사용 안 함"
+                table_cell
+                  text "2026. 10. 10."
+          container
+            container
+              text "총"
+              text "2"
+              text "개 ·"
+              text "1"
+              text "/"
+              text "1"
+              text "쪽"
+            container
+              button [ref=362]
+                text "이전"
+              button [ref=363]
+                text "다음"

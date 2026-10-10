@@ -9,6 +9,7 @@ import { db, type Transaction } from "./db";
 import { assertFileDeadlines } from "./file-access";
 import { fail, route } from "./http";
 import { enqueueMail } from "./jobs";
+import { currentSsoSessionProof } from "./sso-session-proof";
 
 type SessionSnapshot = { session: Pick<Session, "id" | "userId" | "expiresAt" | "updatedAt" | "activeCompanyId">; user: Pick<User, "id"> };
 type SessionLookup = (headers: Headers) => Promise<SessionSnapshot | null>;
@@ -139,6 +140,10 @@ export function guardAuthMutations(handler: (request: Request) => Promise<Respon
               const policy = current.activeCompanyId && await tx.securityPolicy.findUnique({ where: { tenantId: current.activeCompanyId } });
               deadline = new Date(Math.min(current.expiresAt.getTime(), policy ? current.updatedAt.getTime() + policy.sessionMinutes * 60000 : Infinity));
               assertFileDeadlines({ session: deadline, expert: null, password: null });
+              if (operation) {
+                const proof = await currentSsoSessionProof(tx, current.id, current.userId);
+                if (proof) state.rotatedSsoProof = { source: proof, activeCompanyId: current.activeCompanyId };
+              }
             }
           }
           const response = await handler(request);

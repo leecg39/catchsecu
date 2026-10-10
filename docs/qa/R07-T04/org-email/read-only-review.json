@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-10-10T01:33:27.802758+00:00",
+  "reviewer": "/root/bundle_analysis",
+  "readOnly": true,
+  "initialFinding": {
+    "severity": "P2",
+    "issue": "Expired tickets/cooldown retries could spend the member mail allowance before current ticket checks.",
+    "fixed": true,
+    "fix": "Move member limiter after locked ticket validation and resend cooldown.",
+    "regression": "tests/server/org-auth.test.ts:511"
+  },
+  "followup": "No additional confirmed issue in the bounded email ownership/server/UI review. Browser execution not performed.",
+  "knownOpen": [
+    "SSO callback lacks initiating-browser binding (login CSRF).",
+    "SSO native fetch lacks DNS/private-IP pinning; notification transport protection is not currently applied."
+  ]
+}

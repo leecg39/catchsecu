@@ -1,0 +1,162 @@
+{
+  "verifiedAt": "2026-10-10T19:17:39+09:00",
+  "checkpoint": "BI-03a",
+  "status": "passed",
+  "scope": {
+    "included": [
+      "four separate rich-body author asset purposes with a 14 MiB byte contract",
+      "bounded HTTP streaming, encrypted local storage, S3 response and ClamAV transport",
+      "PostgreSQL blob, asset purpose, size and MIME constraints",
+      "legacy 1 MiB question images, 5 MiB question materials and 10 MiB respondent files",
+      "OpenAPI purpose limits and upload metadata"
+    ],
+    "excluded": [
+      "body-image pixel, dimension and decode limits specific to BI-03b",
+      "rich document ownership pins and garbage collection",
+      "page, completion and closed-screen models",
+      "editor UI and browser acceptance"
+    ],
+    "stagedSafety": "The upload pipeline accepts the four body-image purposes, but FormContent still rejects rich image nodes with RICH_BODY_IMAGES_UNAVAILABLE until BI-04b installs the complete ownership graph."
+  },
+  "limits": {
+    "FORM_CONTENT_IMAGE": 14680064,
+    "PAGE_CONTENT_IMAGE": 14680064,
+    "END_PAGE_CONTENT_IMAGE": 14680064,
+    "PRIVATE_PAGE_CONTENT_IMAGE": 14680064,
+    "QUESTION_MATERIAL": 5242880,
+    "OPTION_IMAGE": 1048576,
+    "QUESTION_IMAGE": 1048576,
+    "respondentFile": 10485760,
+    "encryptedObjectOverhead": 32
+  },
+  "database": {
+    "target": "postgresql://localhost:5432/catchsecu_test",
+    "migration": "20261025016000_rich_body_asset_purposes",
+    "migrationCount": 126,
+    "status": "up to date",
+    "productionDatabaseTouched": false,
+    "guardVerification": "docs/qa/R08-T02/body-images/schema-126/catchsecu_test-contract.json"
+  },
+  "actualBoundaryUpload": {
+    "purpose": "FORM_CONTENT_IMAGE",
+    "mime": "image/png",
+    "size": 14680064,
+    "sha256": "1a749928a588ed3c3c933b63356976a4542c68fbe12e6471a714025126b444e0",
+    "path": "HTTP init -> streamed PUT -> AES-256-GCM private object -> ClamAV INSTREAM -> ready -> authorized download",
+    "result": "the downloaded plaintext hash matched the reserved and uploaded hash"
+  },
+  "scanner": {
+    "engine": "ClamAV 1.5.4/28148/Fri Oct  9 06:25:40 2026",
+    "streamMaxLength": "15M",
+    "maxFileSize": "15M",
+    "maxScanSize": "32M",
+    "clean14MiBAccepted": true,
+    "eicarBlocked": true,
+    "runtimeEvidence": "docs/qa/R01-T03/scanner-runtime/source-build/runtime-final.json"
+  },
+  "initialFailuresResolved": [
+    "author asset blobs and encrypted storage were capped below the observed 14 MiB body-image limit",
+    "HTTP body reading and scanner transport used the respondent-file 10 MiB constant",
+    "the local ClamAV daemon StreamMaxLength and MaxFileSize were only 11M",
+    "S3 downloads buffered an object before checking its encrypted length",
+    "the schema verifier still described the pre-question-image author asset guard chain"
+  ],
+  "checks": [
+    {
+      "command": "node --env-file=.env.test.local node_modules/prisma/build/index.js migrate deploy",
+      "exitCode": 0,
+      "result": "migration126 applied only to catchsecu_test; 126 migrations up to date"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/author-asset-uploads.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 16 tests passed; exact 14 MiB HTTP/storage/real ClamAV/download hash plus malicious DOCX rejection"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/author-asset-database.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 21 tests passed; four DB purposes, exact boundary, legacy limits and MIME trigger"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/author-asset-contract.test.ts tests/server/author-asset-validation.test.ts tests/server/author-asset-api-contract.test.ts tests/server/question-image-validation.test.ts tests/server/form-rich-body-openapi.test.ts",
+      "exitCode": 0,
+      "result": "5 files, 97 tests passed"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/files.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 19 tests passed; respondent file 10 MiB contract unchanged"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/question-image-backend.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 15 tests passed; question image 1 MiB lifecycle unchanged"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/author-asset-references.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 20 tests passed"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/author-asset-reads.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 8 tests passed"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/form-rich-body-persistence.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 6 tests passed; rich image nodes remain closed before ownership pins"
+    },
+    {
+      "command": "node --env-file=.env.test.local --import tsx scripts/verify-s3-storage.ts",
+      "exitCode": 0,
+      "result": "14 MiB encrypted S3 round trip, oversized request and oversized response checks passed"
+    },
+    {
+      "command": "node --env-file=.env.test.local --import tsx scripts/qa-rea-scanner.ts",
+      "exitCode": 0,
+      "result": "project-local ClamAV configuration, clean probe, EICAR and signed definitions passed"
+    },
+    {
+      "command": "node --env-file=.env.test.local --import tsx scripts/verify-schema-contract.ts docs/qa/R08-T02/body-images/schema-126",
+      "exitCode": 0,
+      "result": "4 immutable migrations, 10 checks, 1 index, 14 functions and 15 triggers verified; no unexpected schema drift"
+    },
+    {
+      "command": "python3 scripts/verify-contracts.py && python3 scripts/verify-plan.py",
+      "exitCode": 0,
+      "result": "323 paths, 458 operations, 45 policies; active plan 107 tasks and 186 source paths valid"
+    },
+    {
+      "command": "eslint related files && tsc --noEmit && git diff --check",
+      "exitCode": 0,
+      "result": "0 lint errors, 0 type errors and clean diff whitespace"
+    }
+  ],
+  "files": {
+    "src/contracts/storage-limits.ts": "852fdf9d7343bf2609a2503600be30663275cf7ff0c42e8f091dad7785765a3d",
+    "src/contracts/author-assets.ts": "0228b0dc98a0b9f72a86c95131cab0246d5cf59c55a5b50fb9864956424f58f5",
+    "src/server/file-validation.ts": "a46c02d550c3f3821ada1b839817e03bd6002d1f3d8f617ec6c80e3e69632250",
+    "src/server/file-scanner.ts": "0a81a687763a6cb9cc5bb0d0df3d28c77a4c35c1c8692c8263d5e50d9f8f8270",
+    "src/server/file-storage.ts": "d344e5a4c4cbee88887a60de42de56ade7ee19378cc36ead2aa25edecdff6511",
+    "src/server/s3-storage.ts": "2fc728d55622e6dfd1cc639ab2ee18fe96f324acc8562cdc4e2e1c959a9617e5",
+    "src/server/author-asset-validation.ts": "f49a5840de48fefbe09180bd5a3ee9cec86b0a5a0938249ef1798c7705d8be59",
+    "src/server/author-asset-uploads.ts": "83bf549e1b62670dad841d253e00f509d41799a231fe76f46babe0336d7d99cb",
+    "src/server/author-asset-system-import.ts": "a4a2c0cf541b96c0a85b23275ec4c7943a27373cbbbebef9e938c056333e79a0",
+    "prisma/migrations/20261025016000_rich_body_asset_purposes/migration.sql": "629b62be3df90cc2304a3babf6a6c014fc95380bdcc8bcc3f4dcf47480060368",
+    "scripts/clamav-local.ts": "c0b384275aabbf9afe195bbbeeebf181a01f1cd183267a3a07a308b847e4fb34",
+    "scripts/verify-s3-storage.ts": "4a7a50889f4bafb7f7e1e2c23388634286b9301efe91c699a630637f2ac18b4a",
+    "scripts/verify-schema-contract.ts": "31bc1c3326dea296848454c2b336ac77a70e0d9c7db4d936b3829586a618377a",
+    "tests/server/author-asset-validation.test.ts": "e4f792c8425a417ace511d694dd80923492365272e0384b5efdfda608ba0c987",
+    "tests/server/author-asset-uploads.test.ts": "dd80560e590650dc5eb352201edd8872495ffb10a25d74036b7acf2d18231b47",
+    "tests/server/author-asset-database.test.ts": "275311b0269085a837b3472ec1abcfc1999b47e04f05051641a02bce4f38c5e6",
+    "tests/server/author-asset-api-contract.test.ts": "3fb4ee5578dde7a2c38ddb81033269a8836fd885a755a9554a8db6121b44635a",
+    "docs/planning/contracts/openapi.json": "22dc9e00925e41e4123615571193ddfea89afc3c0a00da318711754f7c56502c"
+  },
+  "fixturePolicy": {
+    "existingFrozenFixtureRead": false,
+    "existingProductionRuntimeTouched": false,
+    "browserRun": false,
+    "reason": "BI-03a changes only transport boundaries; editor and owned document reads begin after BI-04b and BI-05a."
+  }
+}

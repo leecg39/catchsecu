@@ -1,0 +1,39 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:31726) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso-login-policy.test.ts (41 tests | 1 failed | 40 skipped) 831ms
+   × 오답 5회는 각각 커밋되며 이후 정답도 소비하지 못한다 828ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-login-policy.test.ts > 오답 5회는 각각 커밋되며 이후 정답도 소비하지 못한다
+AssertionError: expected Error: 인증번호가 올바르지 않습니다. 5회 실패하면 다시 요청해야 합… { …(2) } to match object { Object (code) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "code": "SSO_POLICY_CHALLENGE_INVALID",
++ HttpError {
++   "code": "SSO_POLICY_CODE_INVALID",
+  }
+
+ ❯ tests/server/sso-login-policy.test.ts:104:40
+    102|   const f = await fixture(), c = await f.challenge(), bad = c.code ===…
+    103|   for (let i = 1; i <= 5; i++) {
+    104|     await expect(c.save({ code: bad })).rejects.toMatchObject({ code: …
+       |                                        ^
+    105|     expect((await db.ssoPolicyChallenge.findUniqueOrThrow({ where: { i…
+    106|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 40 skipped (41)
+   Start at  10:46:09
+   Duration  1.71s (tests 51%, import 30%, transform 18%)
+

@@ -1,0 +1,579 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-09T20:05:16.327Z",
+  "stateHash": "2e863d4e187da32216f47a8ca029f0e9db2b3d7293981433b4b76fdbd6af980a",
+  "actionCounts": {
+    "company.created": 1,
+    "service.created": 1,
+    "session.created": 8,
+    "invitation.created": 3,
+    "email.local_delivered": 4,
+    "invitation.resent": 2,
+    "invitation.accepted": 2,
+    "analytics.dashboard_viewed": 3,
+    "member.updated": 7,
+    "expert.assigned": 1,
+    "expert.updated": 4,
+    "context.company_selected": 1,
+    "expert.reassigned": 2,
+    "expert.revoked": 2,
+    "member.removed": 1,
+    "company.ownership_transferred": 2,
+    "invitation.revoked": 1
+  },
+  "httpCases": [
+    {
+      "label": "members persisted including revoked",
+      "status": 200
+    },
+    {
+      "label": "member version persisted",
+      "status": 200
+    },
+    {
+      "label": "owner version persisted",
+      "status": 200
+    },
+    {
+      "label": "invitations persisted",
+      "status": 200
+    },
+    {
+      "label": "expert assignment persisted",
+      "status": 200
+    },
+    {
+      "label": "expert sees revoked assignment",
+      "status": 200
+    },
+    {
+      "label": "expert service A denied",
+      "status": 403
+    },
+    {
+      "label": "expert service B denied",
+      "status": 403
+    },
+    {
+      "label": "foreign tenant member hidden",
+      "status": 404
+    },
+    {
+      "label": "removed old member session remains invalid",
+      "status": 401
+    },
+    {
+      "label": "revoked invitation remains invalid",
+      "status": 410
+    }
+  ],
+  "data": {
+    "tenantId": "db186874-74a8-4d8d-b5b8-6fb48d133ecb",
+    "memberships": [
+      {
+        "id": "15d67fd7-291c-4316-aac8-5bacc9c30b1f",
+        "userId": "f6ded1a9-3984-4ce9-8e11-ff8f6edec5f1",
+        "role": "viewer",
+        "status": "revoked",
+        "version": 8,
+        "accessKind": "expert",
+        "expertAssignmentId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "grants": []
+      },
+      {
+        "id": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "userId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "role": "admin",
+        "status": "active",
+        "version": 12,
+        "accessKind": "direct",
+        "expertAssignmentId": null,
+        "grants": [
+          {
+            "serviceId": "6ca35076-9b36-4275-94e2-326890630175",
+            "capabilities": [
+              "service.read",
+              "form.read",
+              "document.read"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ade0afdc-bcc1-4f3b-aea1-6d156e333693",
+        "userId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "role": "owner",
+        "status": "active",
+        "version": 3,
+        "accessKind": "direct",
+        "expertAssignmentId": null,
+        "grants": []
+      }
+    ],
+    "invitations": [
+      {
+        "id": "8833286e-93ba-4f4a-8316-7cdc14880cd0",
+        "email": "rea-members-member-eca7dc2b-fd0b-480a-bc1c-e274042c6791@catchsecu.test",
+        "role": "viewer",
+        "serviceIds": [
+          "6ca35076-9b36-4275-94e2-326890630175"
+        ],
+        "status": "accepted",
+        "version": 2,
+        "expiresAt": "2026-10-16T20:00:22.497Z"
+      },
+      {
+        "id": "90c46eed-91e8-40bd-88ec-6197fed5df5c",
+        "email": "rea-members-foreign-eca7dc2b-fd0b-480a-bc1c-e274042c6791@catchsecu.test",
+        "role": "viewer",
+        "serviceIds": [
+          "6ca35076-9b36-4275-94e2-326890630175"
+        ],
+        "status": "revoked",
+        "version": 3,
+        "expiresAt": "2026-10-09T20:01:02.259Z"
+      },
+      {
+        "id": "c7849e76-d5f1-4a10-902a-b5ff3e5b315c",
+        "email": "rea-members-member-eca7dc2b-fd0b-480a-bc1c-e274042c6791@catchsecu.test",
+        "role": "viewer",
+        "serviceIds": [
+          "6ca35076-9b36-4275-94e2-326890630175"
+        ],
+        "status": "accepted",
+        "version": 3,
+        "expiresAt": "2026-10-16T19:46:24.096Z"
+      }
+    ],
+    "assignments": [
+      {
+        "id": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "expertUserId": "f6ded1a9-3984-4ce9-8e11-ff8f6edec5f1",
+        "status": "revoked",
+        "version": 9,
+        "expiresAt": "2026-10-16T09:00:00.000Z",
+        "services": [
+          {
+            "serviceId": "c07e3adf-2710-421f-ad6c-f8b95ed77883"
+          }
+        ]
+      }
+    ],
+    "outbox": [
+      {
+        "id": "439675ae-4145-42e8-8be4-e5f5034b2ea6",
+        "dedupeKey": "mail:invitation:90c46eed-91e8-40bd-88ec-6197fed5df5c:1",
+        "status": "cancelled",
+        "attempts": 0,
+        "attemptsLog": []
+      },
+      {
+        "id": "6b6708c8-f4f9-4ba4-9076-a0bf713d793b",
+        "dedupeKey": "mail:invitation:c7849e76-d5f1-4a10-902a-b5ff3e5b315c:2",
+        "status": "done",
+        "attempts": 1,
+        "attemptsLog": [
+          {
+            "id": "6d5ff5d0-56c5-4078-8cbe-dc0f302a07d7"
+          }
+        ]
+      },
+      {
+        "id": "94ac9a87-8739-4ce8-8079-cf61bec3d83f",
+        "dedupeKey": "mail:invitation:90c46eed-91e8-40bd-88ec-6197fed5df5c:2",
+        "status": "done",
+        "attempts": 1,
+        "attemptsLog": [
+          {
+            "id": "34099345-c23b-4410-9849-33d5e4770eab"
+          }
+        ]
+      },
+      {
+        "id": "ce6e67ec-3bcf-4d94-b6ed-c77a2ec36aea",
+        "dedupeKey": "mail:invitation:8833286e-93ba-4f4a-8316-7cdc14880cd0:1",
+        "status": "done",
+        "attempts": 1,
+        "attemptsLog": [
+          {
+            "id": "206ecc38-d206-44b2-9ea8-b04e13600292"
+          }
+        ]
+      },
+      {
+        "id": "f1b7472d-060f-4206-850d-d610fdfd6ae4",
+        "dedupeKey": "mail:invitation:c7849e76-d5f1-4a10-902a-b5ff3e5b315c:1",
+        "status": "done",
+        "attempts": 1,
+        "attemptsLog": [
+          {
+            "id": "5c639456-1614-4164-a5c5-f9f9830ca7f7"
+          }
+        ]
+      }
+    ],
+    "audits": [
+      {
+        "id": "89a6758c-5e12-4416-9dc3-4490c72ed722",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "company.created",
+        "resource": "company",
+        "resourceId": "db186874-74a8-4d8d-b5b8-6fb48d133ecb",
+        "requestId": "cae8afbd-311c-491d-9ae7-bf310f4dfd18"
+      },
+      {
+        "id": "f82d9c83-c441-4520-9646-d0d130d7d280",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "service.created",
+        "resource": "service",
+        "resourceId": "c07e3adf-2710-421f-ad6c-f8b95ed77883",
+        "requestId": "032dafac-37a9-438d-b77b-357f029c3a8a"
+      },
+      {
+        "id": "9dcb0a12-e3b9-43d1-a16f-f6f6232d60c0",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "session.created",
+        "resource": "session",
+        "resourceId": "70e07b5a-0245-49a0-9fa6-1c53762ad511",
+        "requestId": "740c3bb2-0dfa-4293-a883-005e8aeed606"
+      },
+      {
+        "id": "37290bd8-4482-4c4b-b826-c6daa872a38b",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "invitation.created",
+        "resource": "invitation",
+        "resourceId": "c7849e76-d5f1-4a10-902a-b5ff3e5b315c",
+        "requestId": "99f304fa-bc76-42da-b4d4-32a93c7ba405"
+      },
+      {
+        "id": "d8656901-c56e-4c46-8b59-5948131a6655",
+        "actorId": null,
+        "action": "email.local_delivered",
+        "resource": "job",
+        "resourceId": "f1b7472d-060f-4206-850d-d610fdfd6ae4",
+        "requestId": "5c639456-1614-4164-a5c5-f9f9830ca7f7"
+      },
+      {
+        "id": "07515b3d-9ef2-44a1-9c32-35f65d7bc84f",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "invitation.resent",
+        "resource": "invitation",
+        "resourceId": "c7849e76-d5f1-4a10-902a-b5ff3e5b315c",
+        "requestId": "ab0c95e7-47e6-40bb-bb85-4f307641b8dd"
+      },
+      {
+        "id": "010df837-317f-4fa4-94b2-f95f9b85498b",
+        "actorId": null,
+        "action": "email.local_delivered",
+        "resource": "job",
+        "resourceId": "6b6708c8-f4f9-4ba4-9076-a0bf713d793b",
+        "requestId": "6d5ff5d0-56c5-4078-8cbe-dc0f302a07d7"
+      },
+      {
+        "id": "faea417a-4ecc-44a1-be0e-985c65bad0dd",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "invitation.accepted",
+        "resource": "invitation",
+        "resourceId": "c7849e76-d5f1-4a10-902a-b5ff3e5b315c",
+        "requestId": "b37ef0df-685e-4a8e-89e9-ae8b7d5c6fb4"
+      },
+      {
+        "id": "9fdb4146-bcdf-4f65-b91f-d9723db2dd14",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "analytics.dashboard_viewed",
+        "resource": "analytics",
+        "resourceId": null,
+        "requestId": "146305a3-68cf-4521-b6a5-f5157b472c36"
+      },
+      {
+        "id": "208efc0d-3768-4d95-b18c-f45f449f3217",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "session.created",
+        "resource": "session",
+        "resourceId": "18bc9442-2644-4695-89a6-637eccb883e8",
+        "requestId": "3243d959-aec8-4313-b2be-334f0b3381aa"
+      },
+      {
+        "id": "dbc19793-ae08-46fe-a0d0-87323c229377",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "member.updated",
+        "resource": "membership",
+        "resourceId": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "requestId": "d55228ed-4a87-4382-8c84-cdebca457427"
+      },
+      {
+        "id": "322be8f0-1cde-44ae-adac-6afd150ffef1",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "member.updated",
+        "resource": "membership",
+        "resourceId": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "requestId": "78964ad2-9013-48d4-b2b8-79d93f299d2c"
+      },
+      {
+        "id": "77307fe6-1d0e-449c-9e8d-3af911e54f3e",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "member.updated",
+        "resource": "membership",
+        "resourceId": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "requestId": "355051cc-20c7-4473-b898-b03da6ef0d78"
+      },
+      {
+        "id": "59afd190-859b-422e-a91f-c0bc9b5a59f7",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "member.updated",
+        "resource": "membership",
+        "resourceId": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "requestId": "19044814-0e83-4c1e-8838-d35f7aeecac3"
+      },
+      {
+        "id": "79d448ad-2237-4629-97e0-6af3fc188668",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "member.updated",
+        "resource": "membership",
+        "resourceId": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "requestId": "073f3b54-c41b-4203-a11e-02513a049324"
+      },
+      {
+        "id": "0711a3e4-3fd9-4328-9eef-975fa84e425c",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "member.updated",
+        "resource": "membership",
+        "resourceId": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "requestId": "8a7ee6b5-8dbe-4826-aebd-1d3b7ea2ec96"
+      },
+      {
+        "id": "f9c856e2-030e-42d6-bc1e-b1520ae6562e",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "session.created",
+        "resource": "session",
+        "resourceId": "ad3252c4-0f3b-46f8-a119-86f61f6962ae",
+        "requestId": "26bfdfc2-479d-4ee6-9959-0ed478c64313"
+      },
+      {
+        "id": "01c998ac-d56c-493c-bb3c-204a06345deb",
+        "actorId": "c9562118-563b-4b20-a1dd-fe80f6e43647",
+        "action": "expert.assigned",
+        "resource": "expert_assignment",
+        "resourceId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "requestId": "15fd25b2-a461-4a0e-8207-5d1e34fa413d"
+      },
+      {
+        "id": "a4625fd9-9955-4b5a-9048-dbb2869cc508",
+        "actorId": "c9562118-563b-4b20-a1dd-fe80f6e43647",
+        "action": "expert.updated",
+        "resource": "expert_assignment",
+        "resourceId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "requestId": "8d14f65a-bfd1-41d7-b5bf-8f89a0b067b3"
+      },
+      {
+        "id": "9dccd440-c21f-406c-b7b5-1a71e2d8d5e6",
+        "actorId": "c9562118-563b-4b20-a1dd-fe80f6e43647",
+        "action": "expert.updated",
+        "resource": "expert_assignment",
+        "resourceId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "requestId": "81367111-8a72-4502-a8f1-a309a80d4e1c"
+      },
+      {
+        "id": "5bb737f8-d25c-4e7b-b514-ebb5c57e90b4",
+        "actorId": "f6ded1a9-3984-4ce9-8e11-ff8f6edec5f1",
+        "action": "session.created",
+        "resource": "session",
+        "resourceId": "0897649c-9c88-44d0-811d-ddaa187a2242",
+        "requestId": "1c0fde74-4253-4ddd-8f8c-273329d49af4"
+      },
+      {
+        "id": "b9915494-d2cd-421a-ac3c-cf65f178e837",
+        "actorId": "f6ded1a9-3984-4ce9-8e11-ff8f6edec5f1",
+        "action": "context.company_selected",
+        "resource": "session",
+        "resourceId": "0897649c-9c88-44d0-811d-ddaa187a2242",
+        "requestId": "5821a744-f1a3-45b3-af97-d44875189aba"
+      },
+      {
+        "id": "df5f1279-8844-423a-928a-f76a68a4130f",
+        "actorId": "f6ded1a9-3984-4ce9-8e11-ff8f6edec5f1",
+        "action": "analytics.dashboard_viewed",
+        "resource": "analytics",
+        "resourceId": null,
+        "requestId": "da546276-4533-4a77-a175-d0eace427f33"
+      },
+      {
+        "id": "1c141fd2-2882-433b-959b-3949ae1737d0",
+        "actorId": "c9562118-563b-4b20-a1dd-fe80f6e43647",
+        "action": "expert.reassigned",
+        "resource": "expert_assignment",
+        "resourceId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "requestId": "bf7d02be-395c-470a-87a5-82209804442d"
+      },
+      {
+        "id": "571f07ad-1acf-4cdf-bf78-e8b01912b6dc",
+        "actorId": "c9562118-563b-4b20-a1dd-fe80f6e43647",
+        "action": "expert.updated",
+        "resource": "expert_assignment",
+        "resourceId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "requestId": "5b9e5942-517a-4cae-852c-bb80b0f4c8a5"
+      },
+      {
+        "id": "ecda1c41-dede-4147-b0bb-bb709ab79c4a",
+        "actorId": "c9562118-563b-4b20-a1dd-fe80f6e43647",
+        "action": "expert.updated",
+        "resource": "expert_assignment",
+        "resourceId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "requestId": "8e39bbe2-71d1-4d96-ae04-189fa4f47c54"
+      },
+      {
+        "id": "595fbb74-aef2-4cef-b882-c093c26c2614",
+        "actorId": "c9562118-563b-4b20-a1dd-fe80f6e43647",
+        "action": "expert.revoked",
+        "resource": "expert_assignment",
+        "resourceId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "requestId": "a92c19a2-fffe-4be5-9ff7-7611c74bf3d9"
+      },
+      {
+        "id": "e302a234-dee0-4ab2-9760-265f788b42b9",
+        "actorId": "c9562118-563b-4b20-a1dd-fe80f6e43647",
+        "action": "expert.reassigned",
+        "resource": "expert_assignment",
+        "resourceId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "requestId": "e0b1a7af-4ce8-497d-88a8-a671654e55db"
+      },
+      {
+        "id": "c8b4de07-27c8-46bd-8af8-683a36756ff7",
+        "actorId": "c9562118-563b-4b20-a1dd-fe80f6e43647",
+        "action": "expert.revoked",
+        "resource": "expert_assignment",
+        "resourceId": "8940a025-3cba-4788-9d0b-0946ef7b8c4c",
+        "requestId": "fa46a9b4-fed3-47b4-94e2-78c559a08f53"
+      },
+      {
+        "id": "b80c6ee7-e9e5-4fd7-b0e3-ff8df5e480ff",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "session.created",
+        "resource": "session",
+        "resourceId": "f6d0299a-f281-4c0f-9013-0cb54df30262",
+        "requestId": "5d8b7b7e-8b96-43c7-ad44-352f150475ae"
+      },
+      {
+        "id": "794c37ad-8893-4ba5-982e-e1e126f1abf3",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "member.updated",
+        "resource": "membership",
+        "resourceId": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "requestId": "3c7dcde5-f352-4c5e-9875-db5810d2e1fe"
+      },
+      {
+        "id": "15469c8d-0ce0-49f0-b1bf-f940688634a2",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "member.removed",
+        "resource": "membership",
+        "resourceId": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "requestId": "704f8609-3981-48d1-a285-c005d774d692"
+      },
+      {
+        "id": "2eaf1019-788a-4fb7-a27e-78c1ed91293a",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "invitation.created",
+        "resource": "invitation",
+        "resourceId": "8833286e-93ba-4f4a-8316-7cdc14880cd0",
+        "requestId": "bc5de9ad-a936-4767-a736-9db4f8929e3e"
+      },
+      {
+        "id": "f4f49064-5d6b-43fd-92da-eaf620216245",
+        "actorId": null,
+        "action": "email.local_delivered",
+        "resource": "job",
+        "resourceId": "ce6e67ec-3bcf-4d94-b6ed-c77a2ec36aea",
+        "requestId": "206ecc38-d206-44b2-9ea8-b04e13600292"
+      },
+      {
+        "id": "7fa9af50-30fc-4f5d-b9bd-fd378dfb52cd",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "invitation.accepted",
+        "resource": "invitation",
+        "resourceId": "8833286e-93ba-4f4a-8316-7cdc14880cd0",
+        "requestId": "4ed9a011-6209-4642-9fc1-8e83c6f75ba0"
+      },
+      {
+        "id": "40a2f78f-63f4-450f-b1fa-d1015d8465fa",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "analytics.dashboard_viewed",
+        "resource": "analytics",
+        "resourceId": null,
+        "requestId": "ef5fc650-0757-47b2-9ac6-b43da96b9225"
+      },
+      {
+        "id": "09205e16-ad08-43a8-865d-1a9ea148ba93",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "session.created",
+        "resource": "session",
+        "resourceId": "7b435208-5d0f-439e-bab0-a0335c651620",
+        "requestId": "f489bfdc-15f3-4f07-9645-4262d3dc269b"
+      },
+      {
+        "id": "7c940c85-6dc8-45fa-8715-0d1a77134610",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "company.ownership_transferred",
+        "resource": "membership",
+        "resourceId": "389aba41-2b3a-48c9-826b-6e38bc016b5d",
+        "requestId": "18459116-dd19-4f2c-8819-c6a5de0974ef"
+      },
+      {
+        "id": "822d4f0a-ed7e-403f-a2cd-093c9129d8a9",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "session.created",
+        "resource": "session",
+        "resourceId": "ce766d25-30b1-4fad-a585-a00b60f23e44",
+        "requestId": "ff727b12-ae6b-425c-8874-7051d57cf4fb"
+      },
+      {
+        "id": "dfdfca23-b8f0-43b9-93d5-d75706f814a7",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "company.ownership_transferred",
+        "resource": "membership",
+        "resourceId": "ade0afdc-bcc1-4f3b-aea1-6d156e333693",
+        "requestId": "de21db5b-6f27-4f41-96ea-a4f7486f698c"
+      },
+      {
+        "id": "23c3b9bf-512c-4205-a5eb-1b7b3fda08ea",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "invitation.created",
+        "resource": "invitation",
+        "resourceId": "90c46eed-91e8-40bd-88ec-6197fed5df5c",
+        "requestId": "4bb6eb9f-e3f2-4e5f-8319-7c0e6a7b415c"
+      },
+      {
+        "id": "2d70ac3c-8908-41db-bf7b-ef4d6c71ba71",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "invitation.resent",
+        "resource": "invitation",
+        "resourceId": "90c46eed-91e8-40bd-88ec-6197fed5df5c",
+        "requestId": "731b8b00-b384-4c0a-bca7-3b6be48f0cd0"
+      },
+      {
+        "id": "09e94bb0-9aac-49bb-ac58-1ca0ad6cf68e",
+        "actorId": null,
+        "action": "email.local_delivered",
+        "resource": "job",
+        "resourceId": "94ac9a87-8739-4ce8-8079-cf61bec3d83f",
+        "requestId": "34099345-c23b-4410-9849-33d5e4770eab"
+      },
+      {
+        "id": "f9ece06f-1672-42b5-8387-9716b37d1c9f",
+        "actorId": "2c7a80fe-d0cd-4765-b8c3-8cb056fceebe",
+        "action": "invitation.revoked",
+        "resource": "invitation",
+        "resourceId": "90c46eed-91e8-40bd-88ec-6197fed5df5c",
+        "requestId": "77815a27-2ff3-4443-8b13-0800449d659a"
+      },
+      {
+        "id": "6991f8b6-2851-411a-a6d9-67c44c504e2a",
+        "actorId": "a9dc0440-970e-42c5-bb8f-9ceb8ec0c9ea",
+        "action": "session.created",
+        "resource": "session",
+        "resourceId": "3817e2c8-8fc6-4c64-ba12-c4da08b49ae0",
+        "requestId": "1f13df01-62a8-4b55-8f05-19916f8e3312"
+      }
+    ]
+  },
+  "externalProviderVerified": false
+}

@@ -8,6 +8,8 @@ import { requireContext } from "@/server/context";
 import { roleCapabilities } from "@/server/permissions";
 import { encrypt, opaqueToken, tokenHash } from "@/server/crypto";
 import { renderPdf, sha256, PDF_FONT_HASH } from "@/server/pdf-renderer";
+import { PDF_V2_FONT_HASH } from "@/server/pdf-font-loader";
+import { pdfActualText } from "../fixtures/pdf-actual-text";
 import { privateDocumentPdf } from "@/server/document-pdf";
 import { GET as internal } from "@/app/api/v1/documents/[id]/versions/[number]/pdf/route";
 import { GET as external } from "@/app/api/v1/public/documents/[token]/pdf/route";
@@ -66,6 +68,21 @@ beforeEach(async () => { await db.apiRateLimit.deleteMany(); await db.rateLimit.
 afterAll(async () => { await db.$disconnect(); });
 
 describe("stored document PDF with real PostgreSQL", () => {
+  test.each(["مرحبا بالعالم", "ข้อมูลส่วนบุคคล", "İstanbul kişisel şıİŞğ"])("stores multilingual document PDF v2 without rewriting bytes: %s", async text => {
+    const row = await ready({ title: text, body: text });
+    const response = await download(row.document.id); expect(response.status).toBe(200);
+    const bytes = new Uint8Array(await response.arrayBuffer()), stored = await db.documentPdf.findFirstOrThrow({ where: { documentId: row.document.id } });
+    expect(stored).toMatchObject({ rendererVersion: 2, fontHash: PDF_V2_FONT_HASH, pdfHash: sha256(bytes) });
+    expect(new Uint8Array(stored.bytes)).toEqual(bytes);
+    expect(pdfActualText(bytes).join("\n")).toContain(text);
+    const task = getDocument({ data: new Uint8Array(bytes), useSystemFonts: false });
+    try { expect((await (await task.promise).getMetadata()).info).toMatchObject({ Creator: "Catchsecu document renderer v2", Keywords: expect.stringContaining(PDF_V2_FONT_HASH) }); }
+    finally { await task.destroy(); }
+    const external = await publicDownload(row.url); expect(external.status).toBe(200);
+    expect(new Uint8Array(await external.arrayBuffer())).toEqual(bytes);
+    expect(new Uint8Array(await (await download(row.document.id)).arrayBuffer())).toEqual(bytes);
+    expect(await db.documentPdf.findUniqueOrThrow({ where: { documentVersionId: stored.documentVersionId } })).toEqual(stored);
+  });
   test("produces actual PDF bytes and returns the identical file through authorized and public routes", async () => {
     const row = await ready(), response = await download(row.document.id); expect(response.status).toBe(200);
     const bytes = Buffer.from(await response.arrayBuffer()), hash = sha256(bytes);

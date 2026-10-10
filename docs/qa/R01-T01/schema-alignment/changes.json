@@ -1,0 +1,730 @@
+{
+  "basis": "read-only introspection plus original SQL constraints",
+  "sourceBeforeSha256": "424fb35a714e1ba548da13b4143e3dd3c6aff3d41765e16ae3c07c43243197be",
+  "sourceAfterSha256": "b104cbc8df4909f94a57bd3f2220e4e5b4068d2e3837905334d3c98b386a9768",
+  "databaseModified": false,
+  "migrationsModified": false,
+  "changes": [
+    {
+      "model": "User",
+      "before": "id               String    @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id               String    @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "AccountClosure",
+      "before": "id          String   @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id          String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "AccountClosure",
+      "before": "user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)",
+      "after": "user        User     @relation(fields: [userId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "Notice",
+      "before": "id          String   @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id          String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "Notice",
+      "before": "updatedAt   DateTime @updatedAt",
+      "after": "updatedAt   DateTime @updatedAt @default(now())"
+    },
+    {
+      "model": "NoticeAttachment",
+      "before": "notice     Notice   @relation(fields: [noticeId], references: [id], onDelete: Restrict)",
+      "after": "notice     Notice   @relation(fields: [noticeId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "NoticeAttachment",
+      "before": "updatedAt  DateTime @updatedAt",
+      "after": "updatedAt  DateTime @updatedAt @default(now())"
+    },
+    {
+      "model": "NoticeAttachment",
+      "before": "@@index([noticeId, status, createdAt, id])",
+      "after": "@@index([noticeId, status, createdAt, id], map: \"NoticeAttachment_notice_status_created_idx\")"
+    },
+    {
+      "model": "NoticeAttachment",
+      "before": "@@index([status, createdAt, id])",
+      "after": "@@index([status, createdAt, id], map: \"NoticeAttachment_status_created_idx\")"
+    },
+    {
+      "model": "Guide",
+      "before": "id            String   @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id            String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "Guide",
+      "before": "updatedAt     DateTime @updatedAt",
+      "after": "updatedAt     DateTime @updatedAt @default(now())"
+    },
+    {
+      "model": "SupportTicket",
+      "before": "id            String   @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id            String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "SupportTicket",
+      "before": "tenant        Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant        Company  @relation(fields: [tenantId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "SupportTicket",
+      "before": "service       Service? @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service       Service? @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction)"
+    },
+    {
+      "model": "SupportTicket",
+      "before": "author        User     @relation(\"SupportAuthor\", fields: [authorId], references: [id], onDelete: Restrict)",
+      "after": "author        User     @relation(\"SupportAuthor\", fields: [authorId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "SupportTicket",
+      "before": "answeredBy    User?    @relation(\"SupportResponder\", fields: [answeredById], references: [id], onDelete: Restrict)",
+      "after": "answeredBy    User?    @relation(\"SupportResponder\", fields: [answeredById], references: [id], onDelete: Restrict, onUpdate: NoAction)"
+    },
+    {
+      "model": "SupportTicket",
+      "before": "updatedAt     DateTime @updatedAt",
+      "after": "updatedAt     DateTime @updatedAt @default(now())"
+    },
+    {
+      "model": "SupportTicket",
+      "before": "@@index([tenantId, authorId, status, createdAt, id])",
+      "after": "@@index([tenantId, authorId, status, createdAt, id], map: \"SupportTicket_tenant_author_status_created_idx\")"
+    },
+    {
+      "model": "SupportTicket",
+      "before": "@@index([status, createdAt, id])",
+      "after": "@@index([status, createdAt, id], map: \"SupportTicket_status_created_idx\")"
+    },
+    {
+      "model": "Session",
+      "before": "id              String   @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id              String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "Session",
+      "before": "activeCompany   Company? @relation(fields: [activeCompanyId], references: [id], onDelete: SetNull)",
+      "after": "activeCompany   Company? @relation(fields: [activeCompanyId], references: [id])"
+    },
+    {
+      "model": "Account",
+      "before": "id                    String   @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id                    String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "Verification",
+      "before": "id         String   @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id         String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "TwoFactor",
+      "before": "id                      String   @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id                      String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "RateLimit",
+      "before": "id          String @id @default(dbgenerated(\"gen_random_uuid()::text\"))",
+      "after": "id          String @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "CompanyBusinessFile",
+      "before": "tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant Company @relation(fields: [tenantId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "BillingPlanVersion",
+      "before": "plan BillingPlan @relation(fields: [planId], references: [id], onDelete: Restrict)",
+      "after": "plan BillingPlan @relation(fields: [planId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "BillingSubscription",
+      "before": "tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant Company @relation(fields: [tenantId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "BillingSubscription",
+      "before": "plan BillingPlan @relation(fields: [planId], references: [id], onDelete: Restrict)",
+      "after": "plan BillingPlan @relation(fields: [planId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "BillingSubscription",
+      "before": "planVersion BillingPlanVersion @relation(fields: [planVersionId, planId], references: [id, planId], onDelete: Restrict)",
+      "after": "planVersion BillingPlanVersion @relation(fields: [planVersionId, planId], references: [id, planId], onUpdate: NoAction)"
+    },
+    {
+      "model": "PaymentMethod",
+      "before": "tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant Company @relation(fields: [tenantId], references: [id], map: \"PaymentMethod_tenant_fkey\")"
+    },
+    {
+      "model": "PaymentOrder",
+      "before": "subscription BillingSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)",
+      "after": "subscription BillingSubscription @relation(fields: [subscriptionId], references: [id], map: \"PaymentOrder_subscription_fkey\")"
+    },
+    {
+      "model": "PaymentOrder",
+      "before": "method PaymentMethod? @relation(fields: [tenantId, methodId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "method PaymentMethod? @relation(fields: [tenantId, methodId], references: [tenantId, id], map: \"PaymentOrder_method_fkey\")"
+    },
+    {
+      "model": "PaymentEvent",
+      "before": "order PaymentOrder @relation(fields: [orderId], references: [id], onDelete: Restrict)",
+      "after": "order PaymentOrder @relation(fields: [orderId], references: [id], map: \"PaymentEvent_order_fkey\")"
+    },
+    {
+      "model": "PaymentRefund",
+      "before": "id String @id @default(uuid())",
+      "after": "id String @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "PaymentRefund",
+      "before": "order PaymentOrder @relation(fields: [tenantId, orderId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "order PaymentOrder @relation(fields: [tenantId, orderId], references: [tenantId, id], map: \"PaymentRefund_order_fkey\")"
+    },
+    {
+      "model": "PaymentRefund",
+      "before": "updatedAt DateTime @updatedAt",
+      "after": "updatedAt DateTime @updatedAt @default(now())"
+    },
+    {
+      "model": "PaymentRefund",
+      "before": "@@unique([tenantId, id])",
+      "after": "@@unique([tenantId, id], map: \"PaymentRefund_tenant_id\")"
+    },
+    {
+      "model": "PaymentRefund",
+      "before": "@@index([tenantId, orderId, status])",
+      "after": "@@index([tenantId, orderId, status], map: \"PaymentRefund_order\")"
+    },
+    {
+      "model": "BillingMonthClose",
+      "before": "id String @id @default(uuid())",
+      "after": "id String @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "BillingMonthClose",
+      "before": "tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant Company @relation(fields: [tenantId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "BillingMonthClose",
+      "before": "@@unique([tenantId, month, currency])",
+      "after": "@@unique([tenantId, month, currency], map: \"BillingMonthClose_key\")"
+    },
+    {
+      "model": "BillingSubscriptionEvent",
+      "before": "subscription BillingSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)",
+      "after": "subscription BillingSubscription @relation(fields: [subscriptionId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "CreditAccount",
+      "before": "tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant Company @relation(fields: [tenantId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "CreditAccount",
+      "before": "updatedAt DateTime @updatedAt",
+      "after": "updatedAt DateTime @updatedAt @default(now())"
+    },
+    {
+      "model": "LedgerTransaction",
+      "before": "id String @id @default(uuid())",
+      "after": "id String @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "LedgerTransaction",
+      "before": "tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant Company @relation(fields: [tenantId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "LedgerTransaction",
+      "before": "service Service? @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service Service? @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction)"
+    },
+    {
+      "model": "LedgerTransaction",
+      "before": "reservation LedgerTransaction? @relation(\"LedgerReservation\", fields: [reservationId], references: [id], onDelete: Restrict)",
+      "after": "reservation LedgerTransaction? @relation(\"LedgerReservation\", fields: [reservationId], references: [id], onDelete: Restrict, onUpdate: NoAction)"
+    },
+    {
+      "model": "LedgerTransaction",
+      "before": "@@index([tenantId, currency, createdAt, id])",
+      "after": "@@index([tenantId, currency, createdAt, id], map: \"LedgerTransaction_tenant_currency_created_idx\")"
+    },
+    {
+      "model": "LedgerTransaction",
+      "before": "@@index([tenantId, serviceId, createdAt, id])",
+      "after": "@@index([tenantId, serviceId, createdAt, id], map: \"LedgerTransaction_tenant_service_created_idx\")"
+    },
+    {
+      "model": "LedgerTransaction",
+      "before": "@@index([reservationId])",
+      "after": "@@index([reservationId], map: \"LedgerTransaction_reservation_idx\")"
+    },
+    {
+      "model": "LedgerEntry",
+      "before": "id String @id @default(uuid())",
+      "after": "id String @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "LedgerEntry",
+      "before": "transaction LedgerTransaction @relation(fields: [transactionId], references: [id], onDelete: Restrict)",
+      "after": "transaction LedgerTransaction @relation(fields: [transactionId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "Membership",
+      "before": "tenant      Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant      Company  @relation(fields: [tenantId], references: [id])"
+    },
+    {
+      "model": "Membership",
+      "before": "user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)",
+      "after": "user        User     @relation(fields: [userId], references: [id])"
+    },
+    {
+      "model": "Membership",
+      "before": "expertAssignment ExpertAssignment? @relation(fields: [tenantId, expertAssignmentId, userId], references: [tenantId, id, expertUserId], onDelete: Restrict)",
+      "after": "expertAssignment ExpertAssignment? @relation(fields: [tenantId, expertAssignmentId, userId], references: [tenantId, id, expertUserId], onUpdate: NoAction, map: \"Membership_expertAssignment_fkey\")"
+    },
+    {
+      "model": "Membership",
+      "before": "@@unique([tenantId, expertAssignmentId, userId])",
+      "after": "@@unique([tenantId, expertAssignmentId, userId], map: \"Membership_tenant_assignment_user_key\")"
+    },
+    {
+      "model": "Membership",
+      "before": null,
+      "after": "messageTemplateRevisions MessageTemplateRevision[] @relation(\"MessageTemplateRevisionActor\")"
+    },
+    {
+      "model": "Subprocessor",
+      "before": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: \"Subprocessor_service_fkey\")"
+    },
+    {
+      "model": "SubprocessorNotice",
+      "before": "subprocessor Subprocessor @relation(fields: [tenantId, subprocessorId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "subprocessor Subprocessor @relation(fields: [tenantId, subprocessorId], references: [tenantId, id], map: \"SubprocessorNotice_subprocessor_fkey\")"
+    },
+    {
+      "model": "SubprocessorNotice",
+      "before": "actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onDelete: Restrict)",
+      "after": "actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], map: \"SubprocessorNotice_actor_fkey\")"
+    },
+    {
+      "model": "PurposeRevision",
+      "before": "purpose ProcessingPurpose @relation(fields: [tenantId, purposeId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "purpose ProcessingPurpose @relation(fields: [tenantId, purposeId], references: [tenantId, id])"
+    },
+    {
+      "model": "PurposeRevision",
+      "before": "actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onDelete: Restrict, map: \"PurposeRevision_actor_fkey\")",
+      "after": "actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onUpdate: NoAction, map: \"PurposeRevision_actor_fkey\")"
+    },
+    {
+      "model": "RecipientRevision",
+      "before": "recipient Recipient @relation(fields: [tenantId, recipientId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "recipient Recipient @relation(fields: [tenantId, recipientId], references: [tenantId, id])"
+    },
+    {
+      "model": "RecipientRevision",
+      "before": "actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onDelete: Restrict, map: \"RecipientRevision_actor_fkey\")",
+      "after": "actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onUpdate: NoAction, map: \"RecipientRevision_actor_fkey\")"
+    },
+    {
+      "model": "AccessRequest",
+      "before": "tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant Company @relation(fields: [tenantId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "AccessRequest",
+      "before": "requester Membership @relation(\"AccessRequester\", fields: [tenantId, requesterId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "requester Membership @relation(\"AccessRequester\", fields: [tenantId, requesterId], references: [tenantId, id], onUpdate: NoAction, map: \"AccessRequest_requester_fkey\")"
+    },
+    {
+      "model": "AccessRequest",
+      "before": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction, map: \"AccessRequest_service_fkey\")"
+    },
+    {
+      "model": "AccessRequest",
+      "before": "reviewer Membership? @relation(\"AccessReviewer\", fields: [tenantId, reviewerId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "reviewer Membership? @relation(\"AccessReviewer\", fields: [tenantId, reviewerId], references: [tenantId, id], onUpdate: NoAction, map: \"AccessRequest_reviewer_fkey\")"
+    },
+    {
+      "model": "AccessRequest",
+      "before": "updatedAt DateTime @updatedAt",
+      "after": "updatedAt DateTime @updatedAt @default(now())"
+    },
+    {
+      "model": "AccessRequest",
+      "before": "@@unique([tenantId, id])",
+      "after": "@@unique([tenantId, id], map: \"AccessRequest_tenant_id_key\")"
+    },
+    {
+      "model": "AccessRequest",
+      "before": "@@index([tenantId, requesterId, createdAt, id])",
+      "after": "@@index([tenantId, requesterId, createdAt, id], map: \"AccessRequest_requester_created_idx\")"
+    },
+    {
+      "model": "AccessRequest",
+      "before": "@@index([tenantId, status, createdAt, id])",
+      "after": "@@index([tenantId, status, createdAt, id], map: \"AccessRequest_status_created_idx\")"
+    },
+    {
+      "model": "ExpertAssignment",
+      "before": "tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant Company @relation(fields: [tenantId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "ExpertAssignment",
+      "before": "expertUser User @relation(\"ExpertUser\", fields: [expertUserId], references: [id], onDelete: Restrict)",
+      "after": "expertUser User @relation(\"ExpertUser\", fields: [expertUserId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "ExpertAssignment",
+      "before": "assignedBy User @relation(\"ExpertAssigner\", fields: [assignedById], references: [id], onDelete: Restrict)",
+      "after": "assignedBy User @relation(\"ExpertAssigner\", fields: [assignedById], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "ExpertAssignment",
+      "before": "updatedAt DateTime @updatedAt",
+      "after": "updatedAt DateTime @updatedAt @default(now())"
+    },
+    {
+      "model": "ExpertAssignment",
+      "before": "@@unique([tenantId, id])",
+      "after": "@@unique([tenantId, id], map: \"ExpertAssignment_tenant_id_key\")"
+    },
+    {
+      "model": "ExpertAssignment",
+      "before": "@@unique([tenantId, id, expertUserId])",
+      "after": "@@unique([tenantId, id, expertUserId], map: \"ExpertAssignment_tenant_id_user_key\")"
+    },
+    {
+      "model": "ExpertAssignment",
+      "before": "@@unique([tenantId, expertUserId])",
+      "after": "@@unique([tenantId, expertUserId], map: \"ExpertAssignment_tenant_user_key\")"
+    },
+    {
+      "model": "ExpertAssignment",
+      "before": "@@index([expertUserId, status, expiresAt])",
+      "after": "@@index([expertUserId, status, expiresAt], map: \"ExpertAssignment_user_status_expiry_idx\")"
+    },
+    {
+      "model": "ExpertAssignmentService",
+      "before": "assignment ExpertAssignment @relation(fields: [tenantId, assignmentId], references: [tenantId, id], onDelete: Cascade)",
+      "after": "assignment ExpertAssignment @relation(fields: [tenantId, assignmentId], references: [tenantId, id], onDelete: Cascade, onUpdate: NoAction, map: \"ExpertAssignmentService_assignment_fkey\")"
+    },
+    {
+      "model": "ExpertAssignmentService",
+      "before": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction, map: \"ExpertAssignmentService_service_fkey\")"
+    },
+    {
+      "model": "ExpertAssignmentService",
+      "before": "@@unique([tenantId, assignmentId, serviceId])",
+      "after": "@@unique([tenantId, assignmentId, serviceId], map: \"ExpertAssignmentService_scope_key\")"
+    },
+    {
+      "model": "ExpertAssignmentService",
+      "before": "@@index([tenantId, serviceId])",
+      "after": "@@index([tenantId, serviceId], map: \"ExpertAssignmentService_service_idx\")"
+    },
+    {
+      "model": "ComplianceExportJob",
+      "before": "close ComplianceClose @relation(fields: [tenantId, closeId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "close ComplianceClose @relation(fields: [tenantId, closeId], references: [tenantId, id], map: \"ComplianceExportJob_close_fkey\")"
+    },
+    {
+      "model": "ComplianceExportJob",
+      "before": "requester Membership @relation(fields: [tenantId, memberId, requesterId], references: [tenantId, id, userId], onDelete: Restrict)",
+      "after": "requester Membership @relation(fields: [tenantId, memberId, requesterId], references: [tenantId, id, userId], map: \"ComplianceExportJob_requester_fkey\")"
+    },
+    {
+      "model": "ComplianceClose",
+      "before": "tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant Company @relation(fields: [tenantId], references: [id], map: \"ComplianceClose_tenant_fkey\")"
+    },
+    {
+      "model": "RetentionRule",
+      "before": "tenant        Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant        Company  @relation(fields: [tenantId], references: [id], map: \"RetentionRule_tenant_fkey\")"
+    },
+    {
+      "model": "RetentionRule",
+      "before": "service       Service  @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service       Service  @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: \"RetentionRule_service_fkey\")"
+    },
+    {
+      "model": "SsoProvider",
+      "before": "id           String   @id @default(uuid())",
+      "after": "id           String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "SsoProvider",
+      "before": "tenant       Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant       Company  @relation(fields: [tenantId], references: [id])"
+    },
+    {
+      "model": "SsoProvider",
+      "before": "updatedAt    DateTime @updatedAt",
+      "after": "updatedAt    DateTime @updatedAt @default(now())"
+    },
+    {
+      "model": "SsoState",
+      "before": "id          String   @id @default(uuid())",
+      "after": "id          String   @id @default(dbgenerated(\"(gen_random_uuid())::text\"))"
+    },
+    {
+      "model": "MfaException",
+      "before": "member Membership @relation(\"MfaExceptionMember\", fields: [tenantId, memberId], references: [tenantId, id], onDelete: Cascade)",
+      "after": "member Membership @relation(\"MfaExceptionMember\", fields: [tenantId, memberId], references: [tenantId, id], onDelete: Cascade, onUpdate: NoAction)"
+    },
+    {
+      "model": "MfaException",
+      "before": "createdBy Membership @relation(\"MfaExceptionCreator\", fields: [tenantId, createdById], references: [tenantId, id], onDelete: Restrict)",
+      "after": "createdBy Membership @relation(\"MfaExceptionCreator\", fields: [tenantId, createdById], references: [tenantId, id], onUpdate: NoAction)"
+    },
+    {
+      "model": "FileObject",
+      "before": "campaign Campaign? @relation(fields: [tenantId, serviceId, campaignId], references: [tenantId, serviceId, id], onDelete: Restrict)",
+      "after": "campaign Campaign? @relation(fields: [tenantId, serviceId, campaignId], references: [tenantId, serviceId, id], onUpdate: NoAction, map: \"FileObject_campaign_fkey\")"
+    },
+    {
+      "model": "FileObject",
+      "before": "sender Sender? @relation(fields: [tenantId, serviceId, senderId], references: [tenantId, serviceId, id], onDelete: Restrict)",
+      "after": "sender Sender? @relation(fields: [tenantId, serviceId, senderId], references: [tenantId, serviceId, id])"
+    },
+    {
+      "model": "FileObject",
+      "before": "tenant       Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)",
+      "after": "tenant       Company  @relation(fields: [tenantId], references: [id])"
+    },
+    {
+      "model": "FileObject",
+      "before": "service      Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service      Service @relation(fields: [tenantId, serviceId], references: [tenantId, id])"
+    },
+    {
+      "model": "FileObject",
+      "before": "owner        Membership? @relation(fields: [tenantId, ownerId], references: [tenantId, userId], onDelete: Restrict)",
+      "after": "owner        Membership? @relation(fields: [tenantId, ownerId], references: [tenantId, userId])"
+    },
+    {
+      "model": "FileObject",
+      "before": "publication Publication? @relation(fields: [tenantId, publicationId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)",
+      "after": "publication Publication? @relation(fields: [tenantId, publicationId, formVersionId], references: [tenantId, id, formVersionId])"
+    },
+    {
+      "model": "FileObject",
+      "before": "question Question? @relation(fields: [tenantId, formVersionId, questionId], references: [tenantId, formVersionId, id], onDelete: Restrict)",
+      "after": "question Question? @relation(fields: [tenantId, formVersionId, questionId], references: [tenantId, formVersionId, id])"
+    },
+    {
+      "model": "FileObject",
+      "before": "submission Submission? @relation(fields: [tenantId, submissionId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)",
+      "after": "submission Submission? @relation(fields: [tenantId, submissionId, formVersionId], references: [tenantId, id, formVersionId])"
+    },
+    {
+      "model": "FileObject",
+      "before": null,
+      "after": "@@index([campaignId, status], map: \"FileObject_campaign\")"
+    },
+    {
+      "model": "FileObject",
+      "before": null,
+      "after": "@@index([senderId, status], map: \"FileObject_sender\")"
+    },
+    {
+      "model": "Job",
+      "before": null,
+      "after": "@@index([campaignDeliveryId], map: \"Job_campaign_delivery\")"
+    },
+    {
+      "model": "Job",
+      "before": null,
+      "after": "@@index([marketingPreferenceId], map: \"Job_marketing_preference\")"
+    },
+    {
+      "model": "Job",
+      "before": null,
+      "after": "@@index([marketingSubmissionId], map: \"Job_marketing_source\")"
+    },
+    {
+      "model": "Job",
+      "before": null,
+      "after": "@@index([senderId, status], map: \"Job_sender\")"
+    },
+    {
+      "model": "KakaoChannel",
+      "before": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: \"KakaoChannel_service_fkey\")"
+    },
+    {
+      "model": "KakaoTemplate",
+      "before": "channel KakaoChannel @relation(fields: [tenantId, channelId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "channel KakaoChannel @relation(fields: [tenantId, channelId], references: [tenantId, id], map: \"KakaoTemplate_channel_fkey\")"
+    },
+    {
+      "model": "MessageTemplateRevision",
+      "before": "template MessageTemplate @relation(fields: [tenantId, serviceId, templateId], references: [tenantId, serviceId, id], onDelete: Restrict)",
+      "after": "template MessageTemplate @relation(fields: [tenantId, serviceId, templateId], references: [tenantId, serviceId, id])"
+    },
+    {
+      "model": "MessageTemplateRevision",
+      "before": null,
+      "after": "actor Membership @relation(\"MessageTemplateRevisionActor\", fields: [tenantId, actorId], references: [tenantId, userId], onDelete: Restrict, onUpdate: NoAction, map: \"MessageTemplateRevision_actor\")"
+    },
+    {
+      "model": "EmailFeedback",
+      "before": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction, map: \"EmailFeedback_service_fkey\")"
+    },
+    {
+      "model": "EmailFeedback",
+      "before": "job Job @relation(fields: [jobId], references: [id], onDelete: Restrict)",
+      "after": "job Job @relation(fields: [jobId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "EmailFeedback",
+      "before": "delivery CampaignDelivery @relation(fields: [tenantId, deliveryId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "delivery CampaignDelivery @relation(fields: [tenantId, deliveryId], references: [tenantId, id], onUpdate: NoAction, map: \"EmailFeedback_delivery_fkey\")"
+    },
+    {
+      "model": "EmailFeedback",
+      "before": "@@unique([tenantId, serviceId, contactHash, id])",
+      "after": "@@unique([tenantId, serviceId, contactHash, id], map: \"EmailFeedback_scope_key\")"
+    },
+    {
+      "model": "EmailFeedback",
+      "before": "@@index([tenantId, serviceId, contactHash, kind, occurredAt])",
+      "after": "@@index([tenantId, serviceId, contactHash, kind, occurredAt], map: \"EmailFeedback_contact_kind_time\")"
+    },
+    {
+      "model": "EmailFeedback",
+      "before": "@@index([jobId, kind])",
+      "after": "@@index([jobId, kind], map: \"EmailFeedback_job_kind\")"
+    },
+    {
+      "model": "EmailFeedback",
+      "before": "@@index([deliveryId, createdAt, id])",
+      "after": "@@index([deliveryId, createdAt, id], map: \"EmailFeedback_delivery_time\")"
+    },
+    {
+      "model": "NotificationIntegration",
+      "before": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction)"
+    },
+    {
+      "model": "NotificationIntegration",
+      "before": "creator Membership @relation(fields: [tenantId, creatorId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "creator Membership @relation(fields: [tenantId, creatorId], references: [tenantId, id], onUpdate: NoAction)"
+    },
+    {
+      "model": "NotificationSubscription",
+      "before": "integration NotificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onDelete: Restrict)",
+      "after": "integration NotificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onUpdate: NoAction)"
+    },
+    {
+      "model": "NotificationEvent",
+      "before": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction)"
+    },
+    {
+      "model": "NotificationDelivery",
+      "before": "integration NotificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onDelete: Restrict)",
+      "after": "integration NotificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onUpdate: NoAction)"
+    },
+    {
+      "model": "NotificationDelivery",
+      "before": "event NotificationEvent @relation(fields: [tenantId, serviceId, eventId], references: [tenantId, serviceId, id], onDelete: Restrict)",
+      "after": "event NotificationEvent @relation(fields: [tenantId, serviceId, eventId], references: [tenantId, serviceId, id], onUpdate: NoAction)"
+    },
+    {
+      "model": "NotificationAttempt",
+      "before": "delivery NotificationDelivery @relation(fields: [deliveryId], references: [id], onDelete: Restrict)",
+      "after": "delivery NotificationDelivery @relation(fields: [deliveryId], references: [id], onUpdate: NoAction)"
+    },
+    {
+      "model": "EmailSuppression",
+      "before": "sourceEvent EmailFeedback @relation(fields: [tenantId, serviceId, contactHash, sourceEventId], references: [tenantId, serviceId, contactHash, id], onDelete: Restrict)",
+      "after": "sourceEvent EmailFeedback @relation(fields: [tenantId, serviceId, contactHash, sourceEventId], references: [tenantId, serviceId, contactHash, id], onUpdate: NoAction, map: \"EmailSuppression_scope_event_fkey\")"
+    },
+    {
+      "model": "EmailSuppression",
+      "before": "@@unique([tenantId, serviceId, contactHash, reason])",
+      "after": "@@unique([tenantId, serviceId, contactHash, reason], map: \"EmailSuppression_identity_key\")"
+    },
+    {
+      "model": "EmailSuppression",
+      "before": "@@index([tenantId, serviceId, createdAt, id])",
+      "after": "@@index([tenantId, serviceId, createdAt, id], map: \"EmailSuppression_service_time\")"
+    },
+    {
+      "model": "ActivityReview",
+      "before": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: \"ActivityReview_service_fkey\")"
+    },
+    {
+      "model": "ActivityReview",
+      "before": "auditEvent AuditEvent @relation(fields: [tenantId, serviceId, auditEventId, recipientUserId], references: [tenantId, serviceId, id, actorId], onDelete: Restrict)",
+      "after": "auditEvent AuditEvent @relation(fields: [tenantId, serviceId, auditEventId, recipientUserId], references: [tenantId, serviceId, id, actorId], map: \"ActivityReview_auditEvent_fkey\")"
+    },
+    {
+      "model": "ActivityReview",
+      "before": "requester Membership @relation(\"ActivityRequester\", fields: [tenantId, requesterId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "requester Membership @relation(\"ActivityRequester\", fields: [tenantId, requesterId], references: [tenantId, id], map: \"ActivityReview_requester_fkey\")"
+    },
+    {
+      "model": "ActivityReview",
+      "before": "recipient Membership @relation(\"ActivityRecipient\", fields: [tenantId, recipientId, recipientUserId], references: [tenantId, id, userId], onDelete: Restrict)",
+      "after": "recipient Membership @relation(\"ActivityRecipient\", fields: [tenantId, recipientId, recipientUserId], references: [tenantId, id, userId], map: \"ActivityReview_recipient_fkey\")"
+    },
+    {
+      "model": "ActivityReview",
+      "before": "destroyApprover Membership? @relation(\"ActivityReviewDestroyer\", fields: [tenantId, destroyApproverId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "destroyApprover Membership? @relation(\"ActivityReviewDestroyer\", fields: [tenantId, destroyApproverId], references: [tenantId, id], map: \"ActivityReview_destroyApprover_fkey\")"
+    },
+    {
+      "model": "ActivityReviewMessage",
+      "before": "review ActivityReview @relation(fields: [tenantId, reviewId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "review ActivityReview @relation(fields: [tenantId, reviewId], references: [tenantId, id], map: \"ActivityReviewMessage_review_fkey\")"
+    },
+    {
+      "model": "ActivityReviewMessage",
+      "before": "author Membership @relation(fields: [tenantId, authorId], references: [tenantId, id], onDelete: Restrict)",
+      "after": "author Membership @relation(fields: [tenantId, authorId], references: [tenantId, id], map: \"ActivityReviewMessage_author_fkey\")"
+    }
+  ],
+  "introspectionCaveats": [
+    "Did not apply partial index preview or change User account/2FA relation cardinalities.",
+    "Company_closure_requested_by_fkey stays SQL-only; checked explicitly by verify-schema-contract.ts."
+  ],
+  "revertedExperiments": [
+    {
+      "changes": [
+        {
+          "model": "Company",
+          "before": null,
+          "after": "closureRequester Membership? @relation(\"CompanyClosureRequester\", fields: [id, closureRequestedById], references: [tenantId, userId], onDelete: Restrict, onUpdate: NoAction, map: \"Company_closure_requested_by_fkey\")"
+        },
+        {
+          "model": "Membership",
+          "before": null,
+          "after": "closureRequestedCompanies Company[] @relation(\"CompanyClosureRequester\")"
+        }
+      ],
+      "reason": "Nested Company create PK null regression persisted with @ignore; keep validated SQL FK only.",
+      "evidence": [
+        "regression-before-repair.json",
+        "repair-tests.json",
+        "regression-final.json"
+      ]
+    }
+  ]
+}

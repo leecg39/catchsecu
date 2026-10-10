@@ -1,5 +1,7 @@
+import { ssoPolicySelection, ssoPolicySave, ssoPolicyView, ssoPolicyChallengeDto } from "../src/contracts/sso-login-policy";
+import { paymentProviderEvent } from "../src/contracts/payment-events";
 import { paymentMethodCreate, paymentMethodUpdate, paymentMethodRemove } from "../src/contracts/payment-methods";
-import { ssoAccountUnlink, ssoInvitationToken, ssoInvitationStart, ssoProviderCreate, ssoProviderPatch, ssoProviderRemove, ssoProviderRecord, ssoProviderCheckedRecord, ownSsoAccounts, orgMemberCreate, orgMemberRemove, orgLoginBody, orgEmailRegisterBody } from "../src/contracts/sso";
+import { ssoAccountUnlink, ssoInvitationToken, ssoInvitationStart, ssoProviderCreate, ssoProviderPatch, ssoProviderRemove, ssoProviderRecord, ssoProviderCheckedRecord, ssoProviderList, ownSsoAccounts, orgMemberCreate, orgMemberPatch, orgMemberRemove, orgMemberRecord, orgMemberList, orgLoginBody, orgEmailRegisterBody, orgEmailChallengeBody, orgEmailChallengeResult, orgLoginResult } from "../src/contracts/sso";
 import { reviewCreate, reviewAction, reviewQuery, reviewNotify, reviewDestruction } from "../src/contracts/activity-reviews";
 import { contextSelectionInput } from "../src/contracts/context";
 import { mfaPolicyChange,mfaExceptionCreate,mfaExceptionPatch,mfaExceptionDelete,mfaMemberQuery } from "../src/contracts/mfa-policy";
@@ -38,6 +40,10 @@ import { campaignFileInput } from "../src/contracts/campaign-files";
 import { messageTemplateCreate, messageTemplatePatch, messageTemplateVersion, messageTemplateApply, messageTemplateList } from "../src/contracts/message-templates";
 import { campaignCreate, campaignPatch, campaignTargets, campaignSchedule, campaignReschedule, campaignRetry, campaignVersion, campaignList, campaignSourceList, deliveryList } from "../src/contracts/campaigns";
 import { z } from "zod";
+import { authorAssetPurposeByteLimits, authorAssetUploadInput, authorAssetReadScopeSchema, authorAssetMimeSchema, authorAssetPurposeSchema, authorAssetNameSchema,
+  MAX_BODY_IMAGE_BYTES, MAX_MATERIAL_FILE_BYTES, MAX_OPTION_IMAGE_BYTES, MAX_QUESTION_IMAGE_BYTES, MAX_OPTION_IMAGES } from "../src/contracts/author-assets";
+import { questionMaterialsSchema } from "../src/contracts/question-materials";
+import { AUTHOR_ASSET_VALIDATION_LIMITS } from "../src/server/author-asset-validation";
 import { companyInput, serviceInput, servicePatch, profilePatch } from "../src/server/schemas";
 import { retentionDesignationInput } from "../src/contracts/forms";
 import { formContentSchema, formInput, documentInput, invitationInput, submissionInput, fileInput } from "../src/contracts/domains";
@@ -48,13 +54,54 @@ import { memberUploadInput, publicUploadInput } from "../src/contracts/files";
 import { destructionAction, destructionSchedule, destructionStatuses, retentionInput } from "../src/contracts/destruction";
 import { purposeInput, purposePatch, recipientInput, recipientPatch, catalogAction } from "../src/contracts/processing-catalog";
 import regionCodes from "../src/data/region-codes.json";
-import { rowSchema } from "../src/contracts/questions";
+import { optionDefinitionSchema, rowSchema } from "../src/contracts/questions";
 import { verificationCreate, verificationPatch, verificationStateSchema } from "../src/contracts/verification";
+import { richDocumentSchema } from "../src/contracts/rich-content";
+import { participationChallengeInput, participationChallengeVerifyInput, participationTargetImportSchema } from "../src/contracts/form-participation-access";
 
 type Operation = Record<string, unknown>;
 type PathItem = { parameters?: Record<string, unknown>[] } & Record<string, unknown>;
 const paths: Record<string, PathItem> = {};
 const schemas: Record<string, unknown> = {};
+type JsonSchema = Record<string, unknown>;
+
+function rewriteRichReferences(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(rewriteRichReferences);
+  if (!value || typeof value !== "object") return value;
+  const output: JsonSchema = {};
+  for (const [key, child] of Object.entries(value))
+    output[key] = key === "$ref" && child === "#/$defs/__schema0" ? "#/components/schemas/RichBlock" : rewriteRichReferences(child);
+  return output;
+}
+
+const rawRichDocument = z.toJSONSchema(richDocumentSchema) as JsonSchema;
+const rawRichDefinitions = rawRichDocument.$defs as Record<string, unknown> | undefined;
+if (!rawRichDefinitions?.__schema0) throw new Error("RichDocument JSON schema definition was not generated");
+delete rawRichDocument.$defs;
+schemas.RichBlock = rewriteRichReferences(rawRichDefinitions.__schema0);
+schemas.RichDocumentV1 = rewriteRichReferences(rawRichDocument);
+
+const richBodyProperty = {
+  anyOf: [{ $ref: "#/components/schemas/RichDocumentV1" }, { type: "null" }],
+  description: "Optional rich body snapshot. Its text projection must exactly equal body. Omission preserves the locked current value only when body is unchanged; null explicitly removes it. Image nodes remain unavailable until the owned-asset graph is enabled.",
+};
+
+function openApiSchema(schema: z.ZodType, options?: Parameters<typeof z.toJSONSchema>[1]): JsonSchema {
+  const generated = z.toJSONSchema(schema, options) as JsonSchema;
+  function visit(value: unknown): unknown {
+    if (Array.isArray(value)) return value.map(visit);
+    if (!value || typeof value !== "object") return value;
+    const output: JsonSchema = {};
+    for (const [key, child] of Object.entries(value)) {
+      if (key === "bodyRich") output[key] = richBodyProperty;
+      else if (key === "$defs" && child && typeof child === "object"
+        && Object.keys(child).length === 1 && Object.hasOwn(child, "__schema0")) continue;
+      else output[key] = visit(child);
+    }
+    return output;
+  }
+  return visit(generated) as JsonSchema;
+}
 schemas.ApiError = {
   type: "object", additionalProperties: false, required: ["error"],
   properties: { error: { type: "object", additionalProperties: false, required: ["code", "message", "requestId"],
@@ -94,16 +141,16 @@ function add(path: string, method: string, permission: string, description: stri
     summary: description, "x-permission": permission, "x-implementation": status,
     responses: { ...errors, [success]: { description } },
   };
-  if (schema) operation.requestBody = { required: true, content: { "application/json": { schema: z.toJSONSchema(schema) } } };
+  if (schema) operation.requestBody = { required: true, content: { "application/json": { schema: openApiSchema(schema) } } };
   if (["post", "patch", "put", "delete"].includes(method)) operation["x-origin-check"] = "exact configured application Origin";
   paths[path][method] = operation;
 }
 for (const resource of resources) {
-  schemas[resource.name + "Input"] = z.toJSONSchema(resource.schema);
+  schemas[resource.name + "Input"] = openApiSchema(resource.schema);
   add(resource.path, "get", resource.permission, resource.name + " 목록: items/total/page/pageSize", undefined, resource.status);
   add(resource.path, "post", resource.permission, resource.name + " 생성", resource.schema, resource.status, "201");
   add(resource.path + "/{id}", "get", resource.permission, resource.name + " 안전 DTO", undefined, resource.status);
-  add(resource.path + "/{id}", "patch", resource.permission, resource.name + " 변경: optimistic version", resource.schema.partial().extend({ version: z.number().int().positive() }), resource.status);
+  add(resource.path + "/{id}", "patch", resource.permission, resource.name + " 변경: optimistic version", resource.schema === documentInput ? documentPatch : resource.schema.partial().extend({ version: z.number().int().positive() }), resource.status);
   add(resource.path + "/{id}", "delete", resource.permission, resource.lifecycle, undefined, resource.status, "204");
   for (const endpoint of [resource.path, resource.path + "/{id}"]) paths[endpoint]["x-tenant-scope"] = resource.scope;
 }
@@ -358,7 +405,7 @@ schemas.FormRead = { type: "object", additionalProperties: false,
   required: ["id", "serviceId", "serviceName", "ownerName", "title", "status", "version", "sourceType", "createdAt", "updatedAt", "content", "consentBundle", "hasDraft", "published", "favorite", "publication", "actions"],
   properties: { id: { type: "string", format: "uuid" }, serviceId: { type: "string", format: "uuid" }, serviceName: { type: "string" }, ownerName: { type: "string" },
     title: { type: "string" }, status: { type: "string", enum: formStatuses }, version: { type: "integer", minimum: 1 }, sourceType: { type: "string", enum: ["form", "import"] },
-    createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" }, content: { anyOf: [z.toJSONSchema(formContentSchema), { type: "null" }] },
+    createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" }, content: { anyOf: [openApiSchema(formContentSchema), { type: "null" }] },
     consentBundle: { type: ["object", "null"] }, draftNumber: { type: "integer", minimum: 1 }, hasDraft: { type: "boolean" }, published: { type: "boolean" }, favorite: { type: "boolean" },
     actions: { $ref: "#/components/schemas/FormReadActions" }, publication: { anyOf: [{ type: "null" }, { type: "object", additionalProperties: false,
       required: ["id", "responseCount", "maxResponses", "expiresAt"], properties: { id: { type: "string", format: "uuid" }, responseCount: { type: "integer", minimum: 0 }, maxResponses: { type: "integer", minimum: 1 },
@@ -418,14 +465,28 @@ for (const [path, query] of [["/forms/{id}/submissions", submissionListQuery], [
 }
 (paths["/forms/{id}/submissions/export"].get as Operation).responses = { ...errors, "200": { description: "attachment CSV; private no-store; masked unavailable content; safe file names with file.read",
   headers: { "X-Export-Row-Count": { schema: { type: "integer", minimum: 0 } } }, content: { "text/csv": { schema: { type: "string" } } } } };
-add("/public/forms/{token}", "get", "current active company/service/publication grant", "현재 공개 상태를 잠금 후 재확인해 게시 당시 질문·동의만 제공; 응답 한도 도달은 closed 표시", undefined, "implemented");
-add("/public/forms/{token}/submissions", "post", "current active publication + idempotency + rate limit", "한도·필수항목·동의·파일 검증 후 원자 저장; 성공 재전송은 현재 공개 상태 재검사와 기존 응답만 반환", submissionInput, "implemented", "201");
+add("/forms/{id}/participation-targets", "get", "form.read + current service grant", "지정 참여 명단 파일과 등록·제외 건수 조회", undefined, "implemented");
+add("/forms/{id}/participation-targets", "post", "form.write + current service grant + version", "CSV 첫 열의 이메일을 정규화해 암호화 등록하고 파일내·기등록 중복과 잘못된 형식을 제외", participationTargetImportSchema, "implemented", "201");
+add("/forms/{id}/participation-targets", "delete", "form.write + current service grant + If-Match", "명단 파일과 해당 대상자를 원자 삭제해 공개 폼 진입 권한을 즉시 회수", undefined, "implemented");
+(paths["/forms/{id}/participation-targets"].delete as Operation).parameters = [
+  { in: "query", name: "batchId", required: true, schema: { type: "string", format: "uuid" } },
+  { in: "header", name: "If-Match", required: true, schema: { type: "integer", minimum: 1 } },
+  { in: "header", name: "X-Batch-Version", required: true, schema: { type: "integer", minimum: 1 } },
+];
+add("/public/forms/{token}", "get", "current company/service/publication grant + participation session when enabled", "일정·마감 상태를 먼저 판정하고, 참여 인증 사용 시 인증 전 본문을 숨긴다. 인증 세션은 대상 명단과 중복 참여 상태를 매 요청 재검사한다", undefined, "implemented");
+add("/public/forms/{token}/participation-challenges", "post", "current active publication + rate limit", "이메일 대상 확인 후 선택적 6자리 인증번호 발송 또는 지정 명단 세션 발급", participationChallengeInput, "implemented", "201");
+add("/public/forms/{token}/participation-challenges-verify", "post", "current active publication + rate limit", "요청 브라우저에 묶인 인증번호를 최대 5회 확인하고 30분 참여 세션 발급", participationChallengeVerifyInput.extend({ challengeId: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict(), "implemented");
+add("/public/forms/{token}/submissions", "post", "current active publication + participation session when enabled + idempotency + rate limit", "한도·참여 대상·중복·필수항목·동의·파일을 잠금 아래 검증하고 원자 저장; 성공 재전송은 기존 응답만 반환", submissionInput, "implemented", "201");
 schemas.PublicSubmissionReceipt = z.toJSONSchema(submissionReceiptSchema);
 (paths["/public/forms/{token}/submissions"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true,
   schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
 paths["/public/forms/{token}"].parameters = paths["/public/forms/{token}/submissions"].parameters = [{ in: "path", name: "token", required: true,
   schema: { type: "string", pattern: "^[A-Za-z0-9_-]{43}$" } }];
-(paths["/public/forms/{token}/submissions"].post as Operation).responses = { ...errors, "201": { description: "접수 당시 ID·시각·상태; 같은 키의 정상 재시도는 같은 값", content: { "application/json": { schema: { $ref: "#/components/schemas/PublicSubmissionReceipt" } } } } };
+(paths["/public/forms/{token}"].get as Operation).parameters = [{ in: "header", name: "X-Participation-Proof", required: false,
+  schema: { type: "string", pattern: "^[A-Za-z0-9_-]{43}$" } }];
+for (const path of ["/public/forms/{token}/participation-challenges", "/public/forms/{token}/participation-challenges-verify"])
+  paths[path].parameters = [{ in: "path", name: "token", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{43}$" } }];
+(paths["/public/forms/{token}/submissions"].post as Operation).responses = { ...errors, "201": { description: "접수 당시 ID·시각·상태, 해당 게시본 완료 안내와 짧은 열람 증명; 같은 키의 정상 재시도는 같은 값", content: { "application/json": { schema: { $ref: "#/components/schemas/PublicSubmissionReceipt" } } } } };
 add("/submissions/{id}", "get", "submission.read + service grant", "응답·변경 이력·메모·동의 영수증; contentAvailable=false이면 원문·첨부 제외", undefined, "implemented");
 add("/submissions/{id}", "patch", "submission.write + service grant", "응답 정정; 암호화된 이전 값 보존", correctionInput, "implemented");
 for (const action of ["withdraw", "destruction-request", "hold"]) add("/submissions/{id}/" + action, "post",
@@ -492,7 +553,7 @@ add("/templates", "post", "form.write + service grant", "완전한 질문·동�
 add("/templates/{id}", "get", "form.read + service grant", "템플릿 전체 내용 조회", undefined, "implemented");
 add("/templates/{id}", "patch", "form.write + service grant; public read-only", "템플릿 편집", templatePatch, "implemented");
 const templateUpdateSchema = (paths["/templates/{id}"].patch as Operation).requestBody as { content: { "application/json": { schema: Record<string, unknown> } } };
-templateUpdateSchema.content["application/json"].schema.anyOf = ["title", "category", "content"].map(name => ({ required: [name] }));
+templateUpdateSchema.content["application/json"].schema.anyOf = ["title", "category", "description", "thumbnailAssetId", "content"].map(name => ({ required: [name] }));
 add("/templates/{id}", "delete", "form.write + service grant; public read-only", "템플릿 물리 삭제; 기존 복제 폼 유지", undefined, "implemented", "204");
 add("/templates/{id}/use", "post", "form.write + target service grant", "전체 내용 복제와 새 질문 ID 생성", version.extend({ serviceId: z.uuid(), title: z.string().trim().min(1).max(200).optional() }), "implemented", "201");
 (paths["/templates"].post as Operation).description += "; 생성 캐시는 회사·템플릿에 연결; 삭제 후 기존 생성 키는410";
@@ -501,12 +562,15 @@ add("/templates/{id}/use", "post", "form.write + target service grant", "전체 
   const querySchema = z.toJSONSchema(templateListQuery);
   (paths["/templates"].get as Operation).parameters = Object.entries(querySchema.properties ?? {}).map(([name, schema]) => ({ in: "query", name, required: false, schema }));
   schemas.TemplateReadActions = { type: "object", additionalProperties: false, required: ["preview", "use", "edit", "remove"], properties: Object.fromEntries(["preview", "use", "edit", "remove"].map(name => [name, { type: "boolean" }])) };
-  schemas.TemplatePermissions = { type: "object", additionalProperties: false, required: ["canCreate", "targets"], properties: {
-    canCreate: { type: "boolean" }, targets: { type: "array", items: { type: "object", additionalProperties: false, required: ["id", "name"], properties: { id: { type: "string", format: "uuid" }, name: { type: "string" } } } },
+  schemas.TemplatePermissions = { type: "object", additionalProperties: false, required: ["canCreate", "subscriptionActive", "targets"], properties: {
+    canCreate: { type: "boolean" }, subscriptionActive: { type: "boolean" }, targets: { type: "array", items: { type: "object", additionalProperties: false, required: ["id", "name"], properties: { id: { type: "string", format: "uuid" }, name: { type: "string" } } } },
   } };
-  schemas.TemplateRead = { type: "object", required: ["id", "serviceId", "serviceName", "scope", "title", "category", "content", "version", "createdAt", "updatedAt", "actions"], properties: {
+  schemas.TemplateRead = { type: "object", required: ["id", "serviceId", "serviceName", "scope", "title", "category", "description", "thumbnailAssetId", "licenseScope", "licenseAvailable", "content", "version", "createdAt", "updatedAt", "actions"], properties: {
     id: { type: "string", format: "uuid" }, serviceId: { anyOf: [{ type: "string", format: "uuid" }, { type: "null" }] }, serviceName: { type: ["string", "null"] }, scope: { enum: ["company", "public"] },
-    title: { type: "string" }, category: { type: "string" }, content: z.toJSONSchema(formContentSchema), version: { type: "integer", minimum: 1 }, createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" }, actions: { $ref: "#/components/schemas/TemplateReadActions" },
+    title: { type: "string" }, category: { type: "string" }, description: { type: "string", maxLength: 2000 },
+    thumbnailAssetId: { anyOf: [{ type: "string", format: "uuid" }, { type: "null" }] },
+    licenseScope: { enum: ["SERVICE", "ACTIVE_SUBSCRIPTION"] }, licenseAvailable: { type: "boolean" },
+    content: openApiSchema(formContentSchema), version: { type: "integer", minimum: 1 }, createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" }, actions: { $ref: "#/components/schemas/TemplateReadActions" },
   } };
   schemas.TemplatePage = { type: "object", required: ["items", "total", "page", "pageSize", "permissions"], properties: {
     items: { type: "array", items: { $ref: "#/components/schemas/TemplateRead" } }, total: { type: "integer", minimum: 0 }, page: { type: "integer", minimum: 1 }, pageSize: { type: "integer", minimum: 1, maximum: 100 }, permissions: { $ref: "#/components/schemas/TemplatePermissions" },
@@ -648,7 +712,7 @@ add("/services/{id}/subprocessors/{subId}", "patch", "service.manage + current s
 add("/services/{id}/subprocessor-notices", "get", "service.manage + current service grant", "재위탁 안내 발송 이력. 본문 암호문 제외", undefined, "implemented");
 add("/services/{id}/subprocessor-notices", "post", "service.manage + current service grant", "확인한 수신자 version으로 재위탁 안내를 메일 대기열에 기록. 주소 변경 충돌과 같은 수신자·제목·본문 재발송 거부", subprocessorNoticeInput, "implemented", "201");
 schemas.DocumentInput = z.toJSONSchema(documentInput); schemas.ClauseInput = z.toJSONSchema(clauseInput); schemas.ServiceConsentDisplayInput = z.toJSONSchema(displayInput);
-schemas.DocumentRecord = z.toJSONSchema(documentInput.extend({ id: z.uuid(), version: z.number().int().positive(), draftRevision: z.number().int().positive(),
+schemas.DocumentRecord = z.toJSONSchema(documentInput.safeExtend({ id: z.uuid(), version: z.number().int().positive(), draftRevision: z.number().int().positive(),
   status: z.enum(["draft", "published", "private", "archived"]), serviceName: z.string(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(),
   latestNumber: z.number().int().nonnegative(), hasUnpublishedChanges: z.boolean(), hasActivePublication: z.boolean().describe("최신 게시 버전에 활성·미만료 공개 링크가 있는지 여부") }));
 const documentRef = { $ref: "#/components/schemas/DocumentRecord" };
@@ -675,10 +739,10 @@ add("/submissions/{id}/receipts/{receiptId}/pdf", "get", "submission.read + curr
 (paths["/submissions/{id}/receipts/{receiptId}/pdf"].get as Operation).responses = { ...errors, "200": { description: "저장한 PDF 바이트. no-store, X-PDF-SHA256, X-Document-SHA256", content: { "application/pdf": { schema: { type: "string", format: "binary" } } } } };
 
 add("/share-grants", "get", "share.manage + submission.read + current session/service grant", "formId의 외부 공유 목록; 이메일 전체 일치 검색·상태·페이지 보정·현재 작업 권한; 중복/미지정 쿼리422", undefined, "implemented");
-add("/share-grants", "post", "share.manage + submission.read (+ file.read for file fields) + active form/service/current session", "지정 게시 버전/필드의 초대; 재전송도 현재 권한/기한 검사; 변경·재발송·회수 후 신규/이전 캐시 원문 제거", shareCreateInput, "implemented", "201");
+add("/share-grants", "post", "share.manage + submission.read (+ file.read for file fields) + active form/service/current session", "지정 게시 버전/필드의 초대; 폼 본문은 shareFormBody=true일 때만 포함; 선택 질문이 속한 페이지 안내만 공유", shareCreateInput, "implemented", "201");
 add("/share-grants/options", "get", "share.manage + submission.read + current session/service grant", "게시 버전·질문 선택 목록; 현재 초대/파일 권한과 선택 가능 여부", undefined, "implemented");
 add("/share-grants/{id}", "get", "share.manage + submission.read + current service grant", "외부 공유 안전 DTO", undefined, "implemented");
-add("/share-grants/{id}", "patch", "share.manage + submission.read + current service grant", "이메일·필드·기한 변경, 초대 코드 교체·세션 무효화·새 메일", shareUpdateInput, "implemented");
+add("/share-grants/{id}", "patch", "share.manage + submission.read + current service grant", "이메일·필드·폼 본문 공유 여부·기한 변경, 초대 코드 교체·세션 무효화·새 메일", shareUpdateInput, "implemented");
 add("/share-grants/{id}", "delete", "share.manage + submission.read + If-Match", "공유 회수; 현재 세션·인증코드·파일 접근 차단", undefined, "implemented");
 add("/share-grants/{id}/resend", "post", "share.manage + submission.read (+ file.read for file fields) + active form/service/current session", "초대 재발송·이전 코드와 세션/생성 캐시 무효화; 성공 감사 저장 후 실제 세션/공유 기한 검사", shareVersionInput, "implemented");
 add("/share-grants/{id}/events", "get", "share.manage + submission.read", "개인정보 값·코드 없는 열람 로그 페이지", undefined, "implemented");
@@ -691,16 +755,16 @@ const sharingPagination = [{ in: "query", name: "page", schema: { type: "integer
   { in: "query", name: "status", schema: { type: "string", enum: ["all", "active", "expired", "revoked"], default: "all" } },
   { in: "query", name: "search", schema: { type: "string", maxLength: 254, default: "" } }];
 (paths["/share-grants/{id}/events"].get as Operation).parameters = sharingPagination;
-const sharedQuestionProperties = { id: { type: "string", format: "uuid" }, label: { type: "string" }, type: { type: "string" }, rows: z.toJSONSchema(rowSchema.array(), { target: "draft-7" }) };
+const sharedQuestionProperties = { materialList: z.toJSONSchema(questionMaterialsSchema), id: { type: "string", format: "uuid" }, label: { type: "string" }, type: { type: "string" }, rows: z.toJSONSchema(rowSchema.array(), { target: "draft-7" }), optionDefinitions: z.toJSONSchema(optionDefinitionSchema.array(), { target: "draft-7" }) };
 schemas.SharedQuestion = { type: "object", additionalProperties: false, required: ["id", "label", "type"], properties: sharedQuestionProperties };
 schemas.SharePermissions = { type: "object", additionalProperties: false, required: ["canCreate", "canSelectFiles", "reason"],
   properties: { canCreate: { type: "boolean" }, canSelectFiles: { type: "boolean" }, reason: { type: ["string", "null"] } } };
 schemas.ShareActions = { type: "object", additionalProperties: false, required: ["edit", "resend", "revoke"],
   properties: { edit: { type: "boolean" }, resend: { type: "boolean" }, revoke: { type: "boolean" } } };
-schemas.ShareRecord = { type: "object", additionalProperties: false, required: ["id", "formId", "formVersionId", "formTitle", "formNumber", "email", "questionIds", "questions", "expiresAt", "status", "version", "createdAt", "actions"],
+schemas.ShareRecord = { type: "object", additionalProperties: false, required: ["id", "formId", "formVersionId", "formTitle", "formNumber", "email", "questionIds", "questions", "shareFormBody", "expiresAt", "status", "version", "createdAt", "actions"],
   properties: { id: { type: "string", format: "uuid" }, formId: { type: "string", format: "uuid" }, formVersionId: { type: "string", format: "uuid" },
     formTitle: { type: "string" }, formNumber: { type: "integer", minimum: 1 }, email: { type: "string", format: "email" }, questionIds: { type: "array", uniqueItems: true, items: { type: "string", format: "uuid" } },
-    questions: { type: "array", items: { $ref: "#/components/schemas/SharedQuestion" } }, expiresAt: { type: "string", format: "date-time" }, createdAt: { type: "string", format: "date-time" },
+    questions: { type: "array", items: { $ref: "#/components/schemas/SharedQuestion" } }, shareFormBody: { type: "boolean", description: "폼 루트 본문을 외부 열람자에게 명시적으로 공유하는지 여부. 기본 false." }, expiresAt: { type: "string", format: "date-time" }, createdAt: { type: "string", format: "date-time" },
     status: { type: "string", enum: ["active", "expired", "revoked"] }, version: { type: "integer", minimum: 1 }, actions: { $ref: "#/components/schemas/ShareActions" } } };
 schemas.SharePage = { type: "object", additionalProperties: false, required: ["items", "total", "page", "pageSize", "permissions"], properties: {
   items: { type: "array", items: { $ref: "#/components/schemas/ShareRecord" } }, total: { type: "integer", minimum: 0 }, page: { type: "integer", minimum: 1 }, pageSize: { type: "integer", minimum: 1, maximum: 100 }, permissions: { $ref: "#/components/schemas/SharePermissions" } } };
@@ -781,7 +845,10 @@ add("/marketing/preferences/{id}", "patch", "marketing.write + current version",
 add("/marketing/preferences/{id}", "delete", "marketing.write + current version", "연락처·근거·메일 큐/로컬 사본 삭제, 최소 발송 거부 기록 유지", z.object({ serviceId: z.uuid(), version: z.number().int().positive() }), "implemented");
 add("/marketing/preferences/withdrawals", "post", "marketing.write + service grant + versions", "최대 100개 원자 철회, 같은 철회 반복은 멱등", z.object({ serviceId: z.uuid(), items: marketingVersions }), "implemented");
 add("/marketing/preferences/export", "get", "marketing.read + service grant", "동일 검색 조건 CSV, 5000건 상한·수식 무해화", undefined, "implemented");
-add("/marketing/sources", "get", "marketing.write + submission.read + service grant", "유효한 원본 응답의 텍스트 항목 선택, 20개 페이지", undefined, "implemented");
+add("/marketing/sources", "get", "marketing.write + submission.read + service grant", "유효한 원본 응답의 이름·이메일·연락처 후보와 질문 유형, 20개 페이지. 이름은 기존 텍스트, 이메일은 텍스트/이메일 두 유형, SMS·알림톡은 텍스트/연락처만 연결 가능", undefined, "implemented");
+schemas.MarketingSourcePage = z.toJSONSchema(z.object({ items: z.object({ id: z.uuid(), title: z.string(), createdAt: z.iso.datetime(), retentionUntil: z.iso.datetime(),
+  questions: z.object({ id: z.uuid(), type: z.string(), label: z.string(), value: z.string() }).strict().array() }).strict().array(), total: z.number().int().nonnegative(), page: z.number().int().positive(), pageSize: z.number().int().positive() }).strict());
+((paths["/marketing/sources"].get as Operation).responses as Record<string, Record<string, unknown>>)["200"].content = { "application/json": { schema: { $ref: "#/components/schemas/MarketingSourcePage" } } };
 add("/marketing/summary", "get", "marketing.read + current service grants", "동일 DB 시점의 현재 동의·철회·삭제·수신 차단·발송 가능과 기간 내 변경 이력 집계", undefined, "implemented");
 (paths["/marketing/summary"].get as Operation).parameters = [
   { in: "query", name: "serviceId", schema: { type: "string", format: "uuid" }, description: "접근 가능한 단일 활성 서비스" },
@@ -962,7 +1029,10 @@ add("/billing/orders", "post", "billing.write + current tenant", "현재 권한�
 (paths["/billing/orders"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
 add("/billing/orders/{id}", "get", "billing.read", "결제 상태. result=success 쿼리는 무시하고 paid로 바꾸지 않음", undefined, "implemented");
 add("/billing/orders/{id}/return", "post", "billing.write", "성공 복귀 주소는 결제를 확정하지 않음", z.object({ result: z.enum(["success", "fail"]) }).strict(), "implemented");
-add("/billing/provider-events", "post", "signed payment webhook", "서명된 결제 결과만 반영. 중복은 같은 상태, 종료 후 다른 결과는 409", z.object({ orderId: z.uuid(), eventId: z.string(), outcome: z.enum(["paid", "failed"]) }).strict(), "implemented", "202");
+add("/billing/provider-events", "post", "signed payment webhook", "서명된 결제/환불 결과. 환불 식별자 필수, 승인·실패에는 환불 식별자 금지. 동일 이벤트는 최신 상태, 종료 후 다른 결과와 취소 구독 승인은409", paymentProviderEvent, "implemented", "202");
+(paths["/billing/provider-events"].post as Operation).security = [];
+(paths["/billing/provider-events"].post as Operation)["x-origin-check"] = "not used; rawBody HMAC-SHA256 authentication";
+(paths["/billing/provider-events"].post as Operation).parameters = [{ in: "header", name: "X-Payment-Signature", required: true, schema: { type: "string", pattern: "^[a-f0-9]{64}$" } }];
 add("/billing/orders/{id}/virtual-checkout", "post", "billing.write + PAYMENT_PROVIDER=local", "가상 PG 체크아웃(mock) — 내부 서명 이벤트를 실제 서명 검증 경로(applyPaymentEvent)에 적용. providerEventId는 vpg: 접두사", z.object({ outcome: z.enum(["paid", "failed"]) }).strict(), "implemented");
 add("/billing/refunds/{id}/virtual-settle", "post", "billing.write + PAYMENT_PROVIDER=local", "가상 환불 정산(mock) — 요청 중인 환불을 내부 서명 이벤트로 확정/거절", z.object({ outcome: z.enum(["refunded", "refund_rejected"]) }).strict(), "implemented");
 add("/subscriptions/entitlement", "get", "billing.read + current tenant", "회사별 실제 entitlement", undefined, "implemented");
@@ -1063,6 +1133,9 @@ for (const path of ["/activity-reviews", "/activity-reviews/{id}/actions", "/act
   (paths[path].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
   (paths[path].post as Operation).responses = { ...errors, [path.endsWith("notifications") ? "202" : path === "/activity-reviews" ? "201" : "200"]: { description: "저장된 접수 식별자. 최신 상태는 상세 조회.", content: { "application/json": { schema: { type: "object", required: ["id"], properties: { id: { type: "string", format: "uuid" }, messageId: { type: "string", format: "uuid" }, jobId: { type: "string", format: "uuid" } } } } } } };
 }
+add("/security/sso-policy", "get", "current direct membership + security.read", "회사 로그인 정책·현재 구독·SSO 인증 시각·구성원 연결 영향 조회", undefined, "implemented");
+add("/security/sso-policy", "put", "current direct owner/security + security.write + current subscription + recent SSO proof + email code", "회사/사용자/세션/mode/version에 묶인 코드 1회 소비·정책·감사 원자 저장. 오답 최대 5회. 회사 잠금 후 현재 권한과 기한 재검사", ssoPolicySave, "implemented");
+add("/security/sso-policy/challenge", "post", "current direct owner/security + security.write + current subscription + recent SSO proof", "5분 이메일 재인증 요청. 분당 1회/시간당 10회; 이전 코드 폐기와 암호화 메일/감사 원자 저장", ssoPolicySelection, "implemented", "201");
 // SSO contracts reflect the concrete handlers, including browser redirects and signed SAML POST.
 add("/security/sso", "get", "current direct membership + security.read", "현재 회사 SSO 공급자 목록; secret/certificate 원문 제외", undefined, "implemented");
 add("/security/sso", "post", "current direct owner + security.write", "비활성 공급자 등록 및 사전검사; 외부 검사 뒤 현재 권한 재확인", ssoProviderCreate, "implemented", "201");
@@ -1070,10 +1143,17 @@ add("/security/sso/{id}", "patch", "current direct owner + security.write", "ver
 add("/security/sso/{id}", "delete", "current direct owner + security.write + login within 5 minutes", "대체 로그인 검사 후 공급자·연결 계정·영향 사용자 세션/대기 인증을 원자 정리", ssoProviderRemove, "implemented");
 add("/security/sso/{id}/preflight", "post", "current direct owner + security.write", "JWKS 또는 인증서 사전검사, 검사 전후 version·권한 확인; 실패하면 비활성화", undefined, "implemented");
 add("/security/sso/{id}/directory", "get", "current direct membership + security.read", "가상 조직 인증(gpki·saeol·groupware) mock 디렉터리 구성원 목록", undefined, "implemented");
-add("/security/sso/{id}/directory", "post", "current direct membership + security.write", "가상 디렉터리 구성원 등록; 조직 식별자+사번 전역 유일, PIN은 해시만 저장", orgMemberCreate, "implemented", "201");
-add("/security/sso/{id}/directory/{memberId}", "delete", "current direct membership + security.write", "version 확인 후 디렉터리 구성원 삭제", orgMemberRemove, "implemented");
+add("/security/sso/{id}/directory", "post", "current direct owner + security.write", "가상 디렉터리 구성원 등록; 조직 식별자+사번 전역 유일, PIN은 해시만 저장", orgMemberCreate, "implemented", "201");
+add("/security/sso/{id}/directory/{memberId}", "patch", "current direct owner + security.write", "version 확인 후 이름·이메일·PIN 수정과 대기 티켓 무효화; 조직 식별자/사번 변경 불가, 기존 User와 로그인 세션은 유지", orgMemberPatch, "implemented");
+add("/security/sso/{id}/directory/{memberId}", "delete", "current direct owner + security.write", "version 확인 후 디렉터리 구성원·대기 티켓 삭제, 생성 응답 캐시 폐기. 기존 연결 계정과 세션은 유지", orgMemberRemove, "implemented");
+for (const path of ["/security/sso", "/security/sso/{id}/directory"]) {
+  (paths[path].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: false,
+    schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" },
+    description: "제공 시 같은 키/내용은 한 번 생성 후 현재 DTO 반환. 다른 내용은409, 삭제/보관기간 종료는410. 기존 키 없는 호출도 허용." }];
+}
 add("/auth/org/login", "post", "public + rate limit", "가상 조직 인증 로그인 — mock 디렉터리 자격 확인 후 completeSso 실제 경로. 이메일 미등록은 email-register 티켓", orgLoginBody, "implemented");
-add("/auth/org/email-register", "post", "one-time unexpired ticket + rate limit", "디렉터리 이메일 등록 후 completeSso 실제 경로로 완료", orgEmailRegisterBody, "implemented");
+add("/auth/org/email-register", "post", "one-time ticket + email OTP + rate limit", "이메일 소유 확인 후 디렉터리·계정·세션을 원자적으로 등록", orgEmailRegisterBody, "implemented");
+add("/auth/org/email-register/challenge", "post", "PIN-authenticated ticket + rate limit", "티켓에 결합된 5분 이메일 인증번호 발송; 재발급 60초·5회 실패 제한", orgEmailChallengeBody, "implemented");
 add("/auth/sso/{providerId}", "get", "login: public; link: current direct member + login within 5 minutes", "회사 OIDC/SAML 인증 시작; invite는 토큰 POST API를 사용", undefined, "implemented", "302");
 (paths["/auth/sso/{providerId}"].get as Operation).parameters = [{ in: "query", name: "mode", schema: { type: "string", enum: ["login", "link"], default: "login" } }];
 paths["/auth/sso/{providerId}"].parameters = [{ in: "path", name: "providerId", required: true, schema: { type: "string", format: "uuid" } }];
@@ -1094,11 +1174,21 @@ function ssoJsonResponse(path: string, method: string, schema: z.ZodType, status
   const responses = operation.responses as Record<string, { description: string; content?: unknown }>;
   responses[status].content = { "application/json": { schema: z.toJSONSchema(schema) } };
 }
-ssoJsonResponse("/security/sso", "get", z.object({ items: z.array(ssoProviderRecord) }).strict());
+ssoJsonResponse("/security/sso-policy", "get", ssoPolicyView);
+ssoJsonResponse("/security/sso-policy", "put", ssoPolicySelection);
+ssoJsonResponse("/security/sso-policy/challenge", "post", ssoPolicyChallengeDto, "201");
+ssoJsonResponse("/auth/org/login", "post", orgLoginResult);
+ssoJsonResponse("/auth/org/email-register", "post", orgLoginResult);
+ssoJsonResponse("/auth/org/email-register/challenge", "post", orgEmailChallengeResult);
+ssoJsonResponse("/security/sso", "get", ssoProviderList);
 ssoJsonResponse("/security/sso", "post", ssoProviderCheckedRecord, "201");
 ssoJsonResponse("/security/sso/{id}", "patch", ssoProviderRecord);
 ssoJsonResponse("/security/sso/{id}", "delete", z.object({ deleted: z.literal(true), removedAccounts: z.number().int().nonnegative(), endedSessions: z.number().int().nonnegative(), signedOut: z.boolean() }).strict());
 ssoJsonResponse("/security/sso/{id}/preflight", "post", ssoProviderCheckedRecord);
+ssoJsonResponse("/security/sso/{id}/directory", "get", orgMemberList);
+ssoJsonResponse("/security/sso/{id}/directory", "post", orgMemberRecord, "201");
+ssoJsonResponse("/security/sso/{id}/directory/{memberId}", "patch", orgMemberRecord);
+ssoJsonResponse("/security/sso/{id}/directory/{memberId}", "delete", z.object({ deleted: z.literal(true) }).strict());
 ssoJsonResponse("/me/sso-accounts", "get", ownSsoAccounts);
 ssoJsonResponse("/me/sso-accounts/{id}", "delete", z.object({ unlinked: z.literal(true), signedOut: z.literal(true) }).strict());
 ssoJsonResponse("/invitations/sso/options", "post", z.object({ providers: z.array(z.object({ id: z.uuid(), name: z.string(), protocol: z.string() }).strict()) }).strict());
@@ -1117,6 +1207,113 @@ for (const [path, method] of [["/auth/sso/{providerId}", "get"], ["/auth/sso/cal
     headers: { Location: { required: true, schema: { type: "string" } }, "Set-Cookie": { schema: { type: "string" }, description: "콜백: 세션 또는 개인 2FA 쿠키; HttpOnly/SameSite=Lax. HTTPS에서는 Secure." } } };
   operation["x-response-cache"] = "private, no-store; Referrer-Policy: no-referrer";
 }
+
+const auditRecord = z.object({ id: z.uuid(), createdAt: z.iso.datetime(), action: z.string(), resource: z.string(),
+  resourceId: z.uuid().nullable(), serviceId: z.uuid().nullable(), serviceName: z.string().nullable(), actorName: z.string().nullable(),
+  formName: z.string().nullable().describe("현재 회사·서비스가 일치하는 연결 기록의 현재 폼 이름. 회사 전체 감사 권한이 없거나 연결이 없으면 null."),
+  submissionId: z.uuid().nullable().describe("응답 또는 첨부파일과 연결된 내부 응답 ID. 외부 고객번호가 아니며 회사 전체 감사 권한이 없으면 null."),
+}).strict();
+schemas.AuditEventRecord = z.toJSONSchema(auditRecord);
+schemas.AuditEventList = z.toJSONSchema(z.object({ items: z.array(auditRecord), total: z.number().int().nonnegative(),
+  page: z.number().int().positive(), pageSize: z.number().int().positive() }).strict());
+for (const path of ["/audit-events", "/me/audit-events", "/forms/{id}/audit-events"]) {
+  (paths[path].get as Operation).responses = { ...errors, "200": { description: "동일 권한 필터의 감사 기록. 원문·토큰·임의 detail을 반환하지 않음.",
+    content: { "application/json": { schema: { $ref: "#/components/schemas/AuditEventList" } } } } };
+}
+
+schemas.SecurityFeatureAccess = z.toJSONSchema(z.object({ available: z.boolean(),
+  state: z.enum(["included", "not_included", "expired", "pending", "unsubscribed"]), expiresAt: z.iso.datetime().nullable() }).strict());
+for (const [prefix, feature] of [["/security/policy", "security.company_policy"], ["/security/ip-rules", "security.ip_access"], ["/security/mfa-policy", "security.mfa_management"]]) {
+  for (const [path, item] of Object.entries(paths)) if (path === prefix || path.startsWith(prefix + "/")) {
+    for (const method of ["post", "patch", "delete"]) if (item[method]) {
+      const operation = item[method] as Operation;
+      operation["x-feature-entitlement"] = feature;
+      operation.description = (operation.description ?? "") + " 현재 구독의 명시적 기능 권한을 검사하고 구독 행을 잠근 뒤 커밋/재시도 반환 직전에 기한을 다시 검사합니다. 만료는 기존 보안 보호를 해제하지 않습니다."
+        + (prefix === "/security/policy" ? " requireMfa 변경에는 security.mfa_management도 필요합니다." : "");
+      (operation.responses as Record<string, unknown>)["402"] = { description: "FEATURE_NOT_INCLUDED 또는 SUBSCRIPTION_REQUIRED; 변경·감사 추가 없음",
+        content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } };
+    }
+  }
+}
+// Author assets have their own namespace; respondent FILE/DRAW uploads retain their existing contract.
+schemas.QuestionMaterials = z.toJSONSchema(questionMaterialsSchema);
+schemas.QuestionOption = { ...z.toJSONSchema(optionDefinitionSchema),
+  description: "optionImageKey is an owned immutable asset UUID. Omitted keys preserve only the current logical option; explicit null removes. Images are ordinary radio/checkbox only, max20 per question, never custom/dropdown/matrix." };
+schemas.AuthorAssetUploadInput = { ...z.toJSONSchema(authorAssetUploadInput), "x-purpose-byte-limits": authorAssetPurposeByteLimits,
+  description: "QUESTION_MATERIAL is 1..5242880 bytes; OPTION_IMAGE and QUESTION_IMAGE are 1..1048576 bytes; FORM_CONTENT_IMAGE, PAGE_CONTENT_IMAGE, END_PAGE_CONTENT_IMAGE, and PRIVATE_PAGE_CONTENT_IMAGE are 1..14680064 bytes. Images are JPG/JPEG/PNG. Canonical AI MIME is application/postscript even for PDF-backed AI. Original filename <=255 UTF-16; no path/control/ill-formed Unicode. SHA-256 is lowercase hex. No parent ID required." };
+const authorAssetInfo = z.object({ id: z.uuid(), purpose: authorAssetPurposeSchema, name: authorAssetNameSchema, mime: authorAssetMimeSchema,
+  size: z.number().int().min(1).max(MAX_BODY_IMAGE_BYTES), sha256: z.string().regex(/^[a-f0-9]{64}$/),
+  status: z.enum(["pending", "uploaded", "ready", "rejected", "deleting", "deleted"]), version: z.number().int().positive(), expiresAt: z.iso.datetime().nullable() }).strict();
+const authorUsage = z.object({ usedBytes: z.number().int().nonnegative(), limitBytes: z.number().int().nonnegative() }).strict();
+schemas.AuthorAssetInfo = { ...z.toJSONSchema(authorAssetInfo), "x-purpose-byte-limits": authorAssetPurposeByteLimits,
+  description: "Safe logical asset metadata only; no storageKey/blobId/ciphertext/owner/issuer. Unbound expiry is <=1hour; pinned expiry is null. A manifest contains only ready/clean/live referenced items." };
+schemas.AuthorAssetUsage = z.toJSONSchema(authorUsage);
+schemas.AuthorAssetUploadInfo = z.toJSONSchema(authorAssetInfo.extend({ usage: authorUsage }));
+schemas.AuthorAssetManifest = { type: "object", additionalProperties: false, required: ["items"], properties: {
+  items: { type: "array", items: { $ref: "#/components/schemas/AuthorAssetInfo" }, description: "Deduplicated assets of this exact parent and currently allowed questions." } } };
+schemas.AuthorAssetReadScope = z.toJSONSchema(authorAssetReadScopeSchema);
+const authorAssetResponses = (schema: string, status = "200") => ({ ...errors, [status]: { description: "현재 권한·기한을 다시 확인한 작성자 자산 DTO. private, no-store.", content: { "application/json": { schema: { $ref: "#/components/schemas/" + schema } } } } });
+const authorBinaryResponse = { ...errors, "200": { description: "Original hash-checked bytes. QUESTION_MATERIAL attachment; OPTION_IMAGE and QUESTION_IMAGE inline. Every read checks current parent/session/grant/publication and natural expiry after I/O.",
+  headers: { "Cache-Control": { schema: { const: "private, no-store" } }, "X-Content-Type-Options": { schema: { const: "nosniff" } },
+    "Referrer-Policy": { schema: { const: "no-referrer" } }, "Cross-Origin-Resource-Policy": { schema: { const: "same-origin" } },
+    "Content-Security-Policy": { schema: { const: "sandbox; default-src 'none'" } }, "Content-Disposition": { schema: { type: "string" }, description: "Safe fallback plus RFC5987 original display name." } },
+  content: Object.fromEntries(authorAssetMimeSchema.options.map(mime => [mime, { schema: { type: "string", format: "binary" } }])) } };
+add("/author-assets/uploads", "post", "form.write + current active service + issuing member", "부모 없는 작성자 파일 예약·현재 회사 공용 용량·Idempotency-Key·ClamAV 사용 가능 여부 검사", authorAssetUploadInput, "implemented", "201");
+(paths["/author-assets/uploads"].post as Operation).requestBody = { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/AuthorAssetUploadInput" } } } };
+(paths["/author-assets/uploads"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", minLength: 16, maxLength: 128 } }];
+(paths["/author-assets/uploads"].post as Operation).responses = authorAssetResponses("AuthorAssetUploadInfo", "201");
+add("/author-assets/uploads/{id}", "get", "form.write + current issuing member/service", "예약/업로드/검사 상태; 재요청에도 현재 권한·기한 확인", undefined, "implemented");
+add("/author-assets/uploads/{id}", "delete", "form.write + current issuing member/service + version", "미참조 업로드 discard. pin은409, 물리정리는 durable worker", undefined, "implemented", "204");
+(paths["/author-assets/uploads/{id}"].delete as Operation).parameters = [{ in: "query", name: "version", required: true, schema: { type: "integer", minimum: 1 } }];
+add("/author-assets/uploads/{id}/content", "put", "form.write + current issuing member/service", "선언된 정확한 MIME/크기/hash와 bounded 실제 형식 검사 후 암호화 보관; 같은 bytes 재전송 지원", undefined, "implemented");
+(paths["/author-assets/uploads/{id}/content"].put as Operation).requestBody = { required: true, content: Object.fromEntries(authorAssetMimeSchema.options.map(mime => [mime, { schema: { type: "string", format: "binary" } }])),
+  "x-max-bytes": MAX_BODY_IMAGE_BYTES, "x-material-max-bytes": MAX_MATERIAL_FILE_BYTES,
+  "x-option-image-max-bytes": MAX_OPTION_IMAGE_BYTES, "x-question-image-max-bytes": MAX_QUESTION_IMAGE_BYTES,
+  "x-body-image-max-bytes": MAX_BODY_IMAGE_BYTES };
+add("/author-assets/uploads/{id}/complete", "post", "form.write + current issuing member/service", "실제 내용 재검증·ClamAV 검사·현재 권한/기한 재확인. ready는 기존 검사 증거 반환", undefined, "implemented");
+add("/author-assets/uploads/{id}/download", "get", "form.write + current issuing member/service + ready/clean", "작성자 임시 미리보기·다운로드", undefined, "implemented");
+add("/author-assets/usage", "get", "form.write + current requested service", "회사 공용 FileObject+CompanyBusinessFile+nondeleted AuthorAsset 논리 용량", undefined, "implemented");
+(paths["/author-assets/usage"].get as Operation).parameters = [{ in: "query", name: "serviceId", required: true, schema: { type: "string", format: "uuid" } }];
+(paths["/author-assets/usage"].get as Operation).responses = authorAssetResponses("AuthorAssetUsage");
+for (const [path, method] of [["/author-assets/uploads/{id}", "get"], ["/author-assets/uploads/{id}/content", "put"], ["/author-assets/uploads/{id}/complete", "post"]])
+  (paths[path][method] as Operation).responses = authorAssetResponses("AuthorAssetUploadInfo");
+const authorMemberQuery = [
+  { in: "query", name: "kind", required: true, schema: { type: "string", enum: ["form", "template", "approval", "submission"] } },
+  { in: "query", name: "id", required: true, schema: { type: "string", format: "uuid" }, description: "Exact parent ID, distinct from the path asset ID." },
+  { in: "query", name: "version", schema: { type: "integer", minimum: 1 }, description: "Required only for form/template. Forbidden for approval/submission. Unknown/duplicate query keys rejected." },
+];
+for (const path of ["/author-assets", "/author-assets/{id}/download"]) {
+  add(path, "get", "form/template/approval: form.read; submission: submission.read; current scoped parent access", "지정 부모의 현재 허용 작성자 자산 조회; form/template version 불일치409", undefined, "implemented");
+  const operation = paths[path].get as Operation; operation.parameters = authorMemberQuery; operation["x-query-schema"] = { $ref: "#/components/schemas/AuthorAssetReadScope" }; operation["x-strict-query"] = true;
+  operation.responses = path === "/author-assets" ? authorAssetResponses("AuthorAssetManifest") : authorBinaryResponse;
+}
+for (const path of ["/public/forms/{token}/author-assets", "/public/forms/{token}/author-assets/{id}/download"]) {
+  add(path, "get", "surface-specific current publication + exact published version/asset", "active는 폼·페이지·질문, closed는 마감 안내, completion은 성공 응답 증명에 묶인 완료 안내 자산만 제공", undefined, "implemented");
+  const operation = paths[path].get as Operation; operation.security = []; operation["x-strict-query"] = true;
+  operation.parameters = [
+    { in: "query", name: "surface", schema: { type: "string", enum: ["active", "closed", "completion"], default: "active" } },
+    { in: "query", name: "proof", schema: { type: "string", minLength: 1, maxLength: 2048 }, description: "surface=completion일 때만 필수인 제출 완료 열람 증명" },
+  ];
+  paths[path].parameters = paths[path].parameters?.map(parameter => parameter.name === "token" ? { ...parameter, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{43}$" } } : parameter);
+  operation.responses = path.endsWith("/download") ? authorBinaryResponse : authorAssetResponses("AuthorAssetManifest");
+}
+for (const path of ["/viewer/author-assets", "/viewer/author-assets/{id}/download"]) {
+  add(path, "get", "current viewer session/grant/issuer + live submission + selected question/page/body scope", "선택 질문과 그 질문이 속한 페이지 안내 자산, shareFormBody=true인 경우에만 폼 루트 본문 자산 제공", undefined, "implemented");
+  const operation = paths[path].get as Operation; operation.security = [{ viewerSession: [] }]; operation["x-strict-query"] = true;
+  operation.parameters = [{ in: "query", name: "submissionId", required: true, schema: { type: "string", format: "uuid" } }];
+  operation.responses = path.endsWith("/download") ? authorBinaryResponse : authorAssetResponses("AuthorAssetManifest");
+}
+(paths["/author-assets/uploads/{id}/download"].get as Operation).responses = authorBinaryResponse;
+for (const [path, item] of Object.entries(paths)) if (path.startsWith("/author-assets") || path.includes("/author-assets")) {
+  item["x-author-asset-limits"] = { mixedMaterialsPerQuestion: 3, optionImagesPerQuestion: MAX_OPTION_IMAGES, questionImagesPerQuestion: 1,
+    materialBytes: MAX_MATERIAL_FILE_BYTES, imageBytes: MAX_OPTION_IMAGE_BYTES, bodyImageBytes: MAX_BODY_IMAGE_BYTES,
+    imagePixels: AUTHOR_ASSET_VALIDATION_LIMITS.imagePixels, imageDimension: AUTHOR_ASSET_VALIDATION_LIMITS.imageDimension,
+    bodyImagePixels: AUTHOR_ASSET_VALIDATION_LIMITS.bodyImagePixels, bodyImageDimension: AUTHOR_ASSET_VALIDATION_LIMITS.bodyImageDimension,
+    imageFrames: AUTHOR_ASSET_VALIDATION_LIMITS.imageFrames, concurrentImageDecodes: AUTHOR_ASSET_VALIDATION_LIMITS.concurrentImageDecodes };
+  item["x-handler"] = path.startsWith("/author-assets") ? "src/app/api/v1/author-assets/[[...segments]]/route.ts"
+    : path.startsWith("/viewer/") ? "src/app/api/v1/viewer/[...segments]/route.ts" : "src/app/api/v1/public/forms/[...segments]/route.ts";
+}
+// Trusted system template ingest intentionally has no HTTP endpoint or caller-supplied ownerKind/tenantId.
 
 const policies = JSON.parse(await readFile("docs/planning/contracts/domain-policies.json", "utf8")) as { rules: PolicyRule[] };
 for (const [path, item] of Object.entries(paths)) {

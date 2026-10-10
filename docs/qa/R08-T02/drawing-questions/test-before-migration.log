@@ -1,0 +1,70 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:23228) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/question-drawing-types.test.ts (15 tests | 14 failed) 6217ms
+   × real PNG and legacy FILE bytes scan, encrypt, attach once and download with private headers 438ms
+   × optional DRAW omissions normalize to null while visible non-DRAW null and invalid DRAW shapes are rejected 400ms
+   × DRAW upload MIME and direct DB bindings enforce PNG while legacy FILE stays compatible 475ms
+   × forged metadata, raw storage keys, missing proofs and other question/publication files fail without consuming uploads 361ms
+   × correction replacement, clearing and restoration keep prior evidence; canonical metadata order is NO_CHANGES 583ms
+   × invalid mixed corrections and stale versions roll back answers, audit, version and file attachment together 383ms
+   × without file.read list/detail/history mask DRAW metadata, preserve omitted baseline and reject direct UUID writes 362ms
+   × hidden drawing rejects nonempty metadata and correction clears the value while preserving the old file 375ms
+   × response-bound drawing filenames cannot be renamed through API or DB, and scalar corrections preserve metadata 365ms
+   × sync/worker CSV resolve authorized names and use the existing attachment placeholder without file.read 382ms
+   × external viewers read only current drawing bytes and issuer file permission is checked again 362ms
+   × copy/template/revision preserve question types without copying files or changing published answer and consent evidence 350ms
+   × cancelled and expired unattached PNG uploads are physically removed without exposing metadata 388ms
+   × response destruction erases current and old drawing bytes plus encrypted answers, corrections and receipt payloads 354ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/question-drawing-types.test.ts > real PNG and legacy FILE bytes scan, encrypt, attach once and download with private headers
+ FAIL  tests/server/question-drawing-types.test.ts > optional DRAW omissions normalize to null while visible non-DRAW null and invalid DRAW shapes are rejected
+ FAIL  tests/server/question-drawing-types.test.ts > DRAW upload MIME and direct DB bindings enforce PNG while legacy FILE stays compatible
+ FAIL  tests/server/question-drawing-types.test.ts > forged metadata, raw storage keys, missing proofs and other question/publication files fail without consuming uploads
+ FAIL  tests/server/question-drawing-types.test.ts > correction replacement, clearing and restoration keep prior evidence; canonical metadata order is NO_CHANGES
+ FAIL  tests/server/question-drawing-types.test.ts > invalid mixed corrections and stale versions roll back answers, audit, version and file attachment together
+ FAIL  tests/server/question-drawing-types.test.ts > without file.read list/detail/history mask DRAW metadata, preserve omitted baseline and reject direct UUID writes
+ FAIL  tests/server/question-drawing-types.test.ts > hidden drawing rejects nonempty metadata and correction clears the value while preserving the old file
+ FAIL  tests/server/question-drawing-types.test.ts > response-bound drawing filenames cannot be renamed through API or DB, and scalar corrections preserve metadata
+ FAIL  tests/server/question-drawing-types.test.ts > sync/worker CSV resolve authorized names and use the existing attachment placeholder without file.read
+ FAIL  tests/server/question-drawing-types.test.ts > external viewers read only current drawing bytes and issuer file permission is checked again
+ FAIL  tests/server/question-drawing-types.test.ts > copy/template/revision preserve question types without copying files or changing published answer and consent evidence
+ FAIL  tests/server/question-drawing-types.test.ts > cancelled and expired unattached PNG uploads are physically removed without exposing metadata
+ FAIL  tests/server/question-drawing-types.test.ts > response destruction erases current and old drawing bytes plus encrypted answers, corrections and receipt payloads
+PrismaClientKnownRequestError: 
+Invalid `tx.question.createMany()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts:180:46
+
+  177     }
+  178   }
+  179 }
+→ 180 if (newQuestions.length) await tx.question.createMany(
+Database error. Code: `23514`. Message: `new row for relation "Question" violates check constraint "Question_type_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ writeQuestions src/server/forms.ts:180:28
+    178|     }
+    179|   }
+    180|   if (newQuestions.length) await tx.question.createMany({ data: newQue…
+       |                            ^
+    181|   if (removedOptions.length) await tx.questionOption.deleteMany({ wher…
+    182|   // One bounded statement avoids thousands of round trips for a large…
+ ❯ createVersion src/server/forms.ts:144:3
+ ❯ src/server/forms.ts:202:5
+ ❯ withFormAccess src/server/form-access.ts:13:18
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/src/runtime/getPrismaClient.ts:861:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  14 failed | 1 passed (15)
+   Start at  14:15:08
+   Duration  7.61s (tests 83%, import 9%, transform 8%)
+

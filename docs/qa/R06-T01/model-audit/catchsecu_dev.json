@@ -1,0 +1,446 @@
+{
+  "result": "passed",
+  "database": "catchsecu_dev",
+  "checkedAt": "2026-10-09T20:57:31.228Z",
+  "scope": "Four existing company security policy/IP/MFA models; read-only metadata, unique keys, tenant relations, CIDR normalization, encrypted reasons, bounded lifetime and version guards. No new migration or claim of full R06 acceptance.",
+  "tables": [
+    "SecurityPolicy",
+    "IpRule",
+    "IpAccessPolicy",
+    "MfaException"
+  ],
+  "columns": [
+    {
+      "table": "IpAccessPolicy",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpAccessPolicy",
+      "column": "enabled",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpAccessPolicy",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpAccessPolicy",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpAccessPolicy",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpRule",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpRule",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpRule",
+      "column": "cidr",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpRule",
+      "column": "description",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpRule",
+      "column": "enabled",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpRule",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpRule",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "IpRule",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "MfaException",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "MfaException",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "MfaException",
+      "column": "memberId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "MfaException",
+      "column": "createdById",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "MfaException",
+      "column": "reasonCipher",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "MfaException",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "MfaException",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "MfaException",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "MfaException",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "minPassword",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "sessionMinutes",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "requireMfa",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "requireApproval",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "retentionDays",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "approvalReferenceRequired",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "approvalRequestTemplate",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "approvalRevision",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "approvalRoles",
+      "type": "ARRAY",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "passwordDeferral",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "passwordMonths",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "passwordReuse",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "passwordRevision",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "allowRetentionAdjustment",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "automaticDestruction",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "allowRetentionDesignation",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "SecurityPolicy",
+      "column": "activityReviewRetentionDays",
+      "type": "integer",
+      "nullable": "YES"
+    }
+  ],
+  "constraints": [
+    {
+      "table": "IpAccessPolicy",
+      "name": "IpAccessPolicy_pkey",
+      "definition": "PRIMARY KEY (\"tenantId\")"
+    },
+    {
+      "table": "IpAccessPolicy",
+      "name": "IpAccessPolicy_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "IpAccessPolicy",
+      "name": "IpAccessPolicy_version_check",
+      "definition": "CHECK ((version > 0))"
+    },
+    {
+      "table": "IpRule",
+      "name": "IpRule_cidr_canonical",
+      "definition": "CHECK ((cidr = ((cidr)::cidr)::text))"
+    },
+    {
+      "table": "IpRule",
+      "name": "IpRule_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "IpRule",
+      "name": "IpRule_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "IpRule",
+      "name": "IpRule_version_positive",
+      "definition": "CHECK ((version > 0))"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_lifetime",
+      "definition": "CHECK (((\"expiresAt\" > \"createdAt\") AND (\"expiresAt\" <= (\"createdAt\" + '24:00:00'::interval))))"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_other_owner",
+      "definition": "CHECK ((\"memberId\" <> \"createdById\"))"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_reason_encrypted",
+      "definition": "CHECK ((\"reasonCipher\" ~~ 'v1.%'::text))"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_tenantId_createdById_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"createdById\") REFERENCES \"Membership\"(\"tenantId\", id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_tenantId_memberId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"memberId\") REFERENCES \"Membership\"(\"tenantId\", id) ON DELETE CASCADE"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_version_check",
+      "definition": "CHECK ((version > 0))"
+    },
+    {
+      "table": "SecurityPolicy",
+      "name": "SecurityPolicy_activityReviewRetentionDays",
+      "definition": "CHECK (((\"activityReviewRetentionDays\" IS NULL) OR ((\"activityReviewRetentionDays\" >= 1) AND (\"activityReviewRetentionDays\" <= 36500))))"
+    },
+    {
+      "table": "SecurityPolicy",
+      "name": "SecurityPolicy_approval_revision_check",
+      "definition": "CHECK ((\"approvalRevision\" > 0))"
+    },
+    {
+      "table": "SecurityPolicy",
+      "name": "SecurityPolicy_approval_roles_check",
+      "definition": "CHECK ((((cardinality(\"approvalRoles\") >= 1) AND (cardinality(\"approvalRoles\") <= 3)) AND ('owner'::\"Role\" = ANY (\"approvalRoles\")) AND (\"approvalRoles\" <@ ARRAY['owner'::\"Role\", 'admin'::\"Role\", 'security'::\"Role\"])))"
+    },
+    {
+      "table": "SecurityPolicy",
+      "name": "SecurityPolicy_password_rules",
+      "definition": "CHECK ((((\"minPassword\" >= 12) AND (\"minPassword\" <= 128)) AND ((\"passwordMonths\" >= 0) AND (\"passwordMonths\" <= 12)) AND (\"passwordReuse\" = ANY (ARRAY[0, 1, 10])) AND (\"passwordDeferral\" = ANY (ARRAY['never'::text, 'session'::text, 'period'::text])) AND (\"passwordRevision\" > 0)))"
+    },
+    {
+      "table": "SecurityPolicy",
+      "name": "SecurityPolicy_pkey",
+      "definition": "PRIMARY KEY (\"tenantId\")"
+    },
+    {
+      "table": "SecurityPolicy",
+      "name": "SecurityPolicy_ranges",
+      "definition": "CHECK ((((\"minPassword\" >= 12) AND (\"minPassword\" <= 128)) AND ((\"sessionMinutes\" >= 5) AND (\"sessionMinutes\" <= 10080)) AND ((\"retentionDays\" >= 1) AND (\"retentionDays\" <= 36500))))"
+    },
+    {
+      "table": "SecurityPolicy",
+      "name": "SecurityPolicy_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "IpAccessPolicy",
+      "name": "IpAccessPolicy_pkey",
+      "definition": "CREATE UNIQUE INDEX \"IpAccessPolicy_pkey\" ON public.\"IpAccessPolicy\" USING btree (\"tenantId\")"
+    },
+    {
+      "table": "IpRule",
+      "name": "IpRule_pkey",
+      "definition": "CREATE UNIQUE INDEX \"IpRule_pkey\" ON public.\"IpRule\" USING btree (id)"
+    },
+    {
+      "table": "IpRule",
+      "name": "IpRule_tenantId_cidr_key",
+      "definition": "CREATE UNIQUE INDEX \"IpRule_tenantId_cidr_key\" ON public.\"IpRule\" USING btree (\"tenantId\", cidr)"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_pkey",
+      "definition": "CREATE UNIQUE INDEX \"MfaException_pkey\" ON public.\"MfaException\" USING btree (id)"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_tenantId_expiresAt_idx",
+      "definition": "CREATE INDEX \"MfaException_tenantId_expiresAt_idx\" ON public.\"MfaException\" USING btree (\"tenantId\", \"expiresAt\")"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_tenantId_memberId_key",
+      "definition": "CREATE UNIQUE INDEX \"MfaException_tenantId_memberId_key\" ON public.\"MfaException\" USING btree (\"tenantId\", \"memberId\")"
+    },
+    {
+      "table": "SecurityPolicy",
+      "name": "SecurityPolicy_pkey",
+      "definition": "CREATE UNIQUE INDEX \"SecurityPolicy_pkey\" ON public.\"SecurityPolicy\" USING btree (\"tenantId\")"
+    }
+  ],
+  "triggers": [
+    {
+      "table": "IpAccessPolicy",
+      "name": "IpAccessPolicy_guard",
+      "definition": "CREATE TRIGGER \"IpAccessPolicy_guard\" BEFORE INSERT OR UPDATE ON public.\"IpAccessPolicy\" FOR EACH ROW EXECUTE FUNCTION guard_ip_access_policy()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_ip_access_policy()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  PERFORM id FROM \"Company\" WHERE id=NEW.\"tenantId\" FOR UPDATE;\n  IF TG_OP='INSERT' AND NEW.version<>1 THEN RAISE EXCEPTION 'IP policy initial version' USING ERRCODE='23514'; END IF;\n  IF TG_OP='UPDATE' AND (NEW.\"tenantId\"<>OLD.\"tenantId\" OR NEW.version<>OLD.version+1) THEN\n    RAISE EXCEPTION 'IP policy version or scope' USING ERRCODE='23514';\n  END IF;\n  IF NEW.enabled AND NOT EXISTS(SELECT 1 FROM \"IpRule\" WHERE \"tenantId\"=NEW.\"tenantId\" AND enabled) THEN\n    RAISE EXCEPTION 'Enabled IP restriction needs an enabled rule' USING ERRCODE='23514';\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "IpRule",
+      "name": "IpRule_guard",
+      "definition": "CREATE TRIGGER \"IpRule_guard\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"IpRule\" FOR EACH ROW EXECUTE FUNCTION guard_ip_rule()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_ip_rule()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE company_id TEXT; remaining INTEGER;\nBEGIN\n  company_id := CASE WHEN TG_OP='DELETE' THEN OLD.\"tenantId\" ELSE NEW.\"tenantId\" END;\n  PERFORM id FROM \"Company\" WHERE id=company_id FOR UPDATE;\n  IF TG_OP='INSERT' THEN\n    IF NEW.version<>1 THEN RAISE EXCEPTION 'IP rule initial version' USING ERRCODE='23514'; END IF;\n  ELSIF TG_OP='UPDATE' THEN\n    IF NEW.id<>OLD.id OR NEW.\"tenantId\"<>OLD.\"tenantId\" OR NEW.version<>OLD.version+1 THEN\n      RAISE EXCEPTION 'IP rule version or scope' USING ERRCODE='23514';\n    END IF;\n  END IF;\n  IF TG_OP<>'INSERT' AND EXISTS(SELECT 1 FROM \"IpAccessPolicy\" WHERE \"tenantId\"=company_id AND enabled) THEN\n    SELECT count(*) INTO remaining FROM \"IpRule\" WHERE \"tenantId\"=company_id AND enabled AND id<>OLD.id;\n    IF remaining=0 AND (TG_OP='DELETE' OR NOT NEW.enabled) THEN\n      RAISE EXCEPTION 'Enabled IP restriction needs an enabled rule' USING ERRCODE='23514';\n    END IF;\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "MfaException",
+      "name": "MfaException_guard",
+      "definition": "CREATE TRIGGER \"MfaException_guard\" BEFORE INSERT OR UPDATE ON public.\"MfaException\" FOR EACH ROW EXECUTE FUNCTION guard_mfa_exception()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_mfa_exception()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  PERFORM id FROM \"Company\" WHERE id=NEW.\"tenantId\" FOR UPDATE;\n  IF TG_OP='INSERT' AND NEW.version<>1 THEN RAISE EXCEPTION 'MFA exception initial version' USING ERRCODE='23514'; END IF;\n  IF TG_OP='UPDATE' AND (NEW.id<>OLD.id OR NEW.\"tenantId\"<>OLD.\"tenantId\" OR NEW.\"memberId\"<>OLD.\"memberId\" OR NEW.\"createdById\"<>OLD.\"createdById\" OR NEW.\"createdAt\"<>OLD.\"createdAt\" OR NEW.version<>OLD.version+1) THEN\n    RAISE EXCEPTION 'MFA exception scope or version' USING ERRCODE='23514';\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "SecurityPolicy",
+      "name": "export_policy_access",
+      "definition": "CREATE TRIGGER export_policy_access BEFORE DELETE OR UPDATE ON public.\"SecurityPolicy\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+      "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+    }
+  ],
+  "sourceFingerprints": {
+    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/migrations/20261004150000_ip_access_control/migration.sql": "5c5129289438e07c06367db8471bc923fcb72c8d2bd209cf1fea77f8d077adad",
+    "prisma/migrations/20261004160000_mfa_exceptions/migration.sql": "70cb577d2a247196586f2f6ab4d36aa281b4e9bcbd29ccebf257c96e5a6ca824",
+    "src/server/security-policy.ts": "409f5847b93f356530fc748ff0e2acce6cc2dadc1a8c46a2c98933fe62fb678c",
+    "src/server/ip-access.ts": "569de0451131038bbe6d89d0414532b8db2e69440703af590b228371419af653",
+    "src/server/mfa-policy.ts": "396865d993efad2e3ecc4603d9d36b1130f9c744d9d780a72674650ec934f969",
+    "src/server/client-ip.ts": "7db04bcc6e43fd2bc4c3d2ef781ada21ae165c0f35aa11932e5b11cd67c4bd6b",
+    "src/server/context.ts": "2c99515461d05ca976cba6aaa434b3e4ff07a66e79ae7402f9fabd856c233030"
+  }
+}

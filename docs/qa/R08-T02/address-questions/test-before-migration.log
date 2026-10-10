@@ -1,0 +1,97 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:98922) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/question-address-types.test.ts (15 tests | 14 failed) 8688ms
+   × both address types publish and store only encrypted normalized scalar/object answers 434ms
+   × optional omission is an empty seven-field object while required omissions and partial core fields fail atomically 417ms
+   × optional foreign core fields are all-or-none but detail/state/postal-only values remain permitted 383ms
+   × foreign strings, arrays, empty/incomplete objects, extra keys and unknown countries never create submissions 467ms
+   × all foreign field maxima are accepted and one character beyond each limit is rejected without side effects 482ms
+   × domestic addresses require five postal digits and a nonblank address within the fixed 1000-character limit 399ms
+   × foreign addresses and UUID-key matrix objects cannot be injected into each other's question type 355ms
+   × hidden address inputs reject nonempty payloads, preserve legacy empty payloads and clear earlier values on correction 429ms
+   × failed mixed corrections keep the complete snapshot, version, ciphertext, audit and correction records unchanged 349ms
+   × key-order, whitespace or country-label-only corrections are canonical NO_CHANGES 375ms
+   × copy, template and revision preserve address types and retain the historical publication, approval fingerprint and answer bytes 2033ms
+   × sync and worker CSV emit canonical seven-key JSON or an empty cell without changing scalar/choice/matrix output 537ms
+   × authenticated external sharing returns only selected canonical address objects and the original question types 431ms
+   × existing scalar and choice publications remain unchanged when a draft later switches to address types 884ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/question-address-types.test.ts > both address types publish and store only encrypted normalized scalar/object answers
+ FAIL  tests/server/question-address-types.test.ts > optional omission is an empty seven-field object while required omissions and partial core fields fail atomically
+ FAIL  tests/server/question-address-types.test.ts > optional foreign core fields are all-or-none but detail/state/postal-only values remain permitted
+ FAIL  tests/server/question-address-types.test.ts > foreign strings, arrays, empty/incomplete objects, extra keys and unknown countries never create submissions
+ FAIL  tests/server/question-address-types.test.ts > all foreign field maxima are accepted and one character beyond each limit is rejected without side effects
+ FAIL  tests/server/question-address-types.test.ts > domestic addresses require five postal digits and a nonblank address within the fixed 1000-character limit
+ FAIL  tests/server/question-address-types.test.ts > foreign addresses and UUID-key matrix objects cannot be injected into each other's question type
+ FAIL  tests/server/question-address-types.test.ts > hidden address inputs reject nonempty payloads, preserve legacy empty payloads and clear earlier values on correction
+ FAIL  tests/server/question-address-types.test.ts > failed mixed corrections keep the complete snapshot, version, ciphertext, audit and correction records unchanged
+ FAIL  tests/server/question-address-types.test.ts > key-order, whitespace or country-label-only corrections are canonical NO_CHANGES
+ FAIL  tests/server/question-address-types.test.ts > copy, template and revision preserve address types and retain the historical publication, approval fingerprint and answer bytes
+ FAIL  tests/server/question-address-types.test.ts > sync and worker CSV emit canonical seven-key JSON or an empty cell without changing scalar/choice/matrix output
+ FAIL  tests/server/question-address-types.test.ts > authenticated external sharing returns only selected canonical address objects and the original question types
+PrismaClientKnownRequestError: 
+Invalid `tx.question.createMany()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts:179:46
+
+  176     }
+  177   }
+  178 }
+→ 179 if (newQuestions.length) await tx.question.createMany(
+Database error. Code: `23514`. Message: `new row for relation "Question" violates check constraint "Question_type_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ writeQuestions src/server/forms.ts:179:28
+    177|     }
+    178|   }
+    179|   if (newQuestions.length) await tx.question.createMany({ data: newQue…
+       |                            ^
+    180|   if (removedOptions.length) await tx.questionOption.deleteMany({ wher…
+    181|   // One bounded statement avoids thousands of round trips for a large…
+ ❯ createVersion src/server/forms.ts:143:3
+ ❯ src/server/forms.ts:201:5
+ ❯ withFormAccess src/server/form-access.ts:13:18
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/src/runtime/getPrismaClient.ts:861:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+ FAIL  tests/server/question-address-types.test.ts > existing scalar and choice publications remain unchanged when a draft later switches to address types
+PrismaClientKnownRequestError: 
+Invalid `tx.question.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts:164:25
+
+  161 else if (!isDeepStrictEqual({ ...data, condition: question.condition ?? null, matrixRows: question.rows ?? null, selectionLimits: question.selectionLimits ?? null },
+  162   { type: prior.type, label: prior.label, required: prior.required, subjectRole: prior.subjectRole, textMaxLength: prior.textMaxLength, order: prior.order,
+  163     condition: prior.condition, matrixRows: prior.matrixRows, selectionLimits: prior.selectionLimits }))
+→ 164   await tx.question.update(
+Database error. Code: `23514`. Message: `new row for relation "Question" violates check constraint "Question_type_check"`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ writeQuestions src/server/forms.ts:164:7
+    162|       { type: prior.type, label: prior.label, required: prior.required…
+    163|         condition: prior.condition, matrixRows: prior.matrixRows, sele…
+    164|       await tx.question.update({ where: { id }, data });
+       |       ^
+    165|     const definitions = question.optionDefinitions ?? [];
+    166|     const retained = (prior?.options ?? []).filter(option => definitio…
+ ❯ src/server/forms.ts:230:9
+ ❯ withFormAccess src/server/form-access.ts:13:18
+ ❯ withFormAccess src/server/form-access.ts:13:18
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/src/runtime/getPrismaClient.ts:861:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  14 failed | 1 passed (15)
+   Start at  13:55:17
+   Duration  10.41s (tests 85%, import 8%, transform 7%)
+

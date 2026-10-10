@@ -1,0 +1,90 @@
+{
+  "verifiedAt": "2026-10-10T19:20:45+09:00",
+  "checkpoint": "BI-03b",
+  "status": "passed",
+  "scope": {
+    "included": [
+      "purpose-specific decoded pixel and dimension ceilings",
+      "single-frame and four-channel limits",
+      "one shared two-slot decoder concurrency gate",
+      "bounded metadata and native decoder execution",
+      "resource rejection followed by explicit cancel or expiry cleanup",
+      "quota, encrypted object, database blob and reference cleanup"
+    ],
+    "excluded": [
+      "aggregate rich documents and form-wide image budgets",
+      "owned rich document references and garbage collection races with pins",
+      "page models and editor UI",
+      "browser acceptance"
+    ]
+  },
+  "limits": {
+    "bodyImagePixels": 25165824,
+    "bodyImageDimension": 16384,
+    "legacyImagePixels": 8388608,
+    "legacyImageDimension": 8192,
+    "imageFrames": 1,
+    "imageChannels": 4,
+    "concurrentImageDecodes": 2,
+    "decodeTimeoutSeconds": 3
+  },
+  "cleanupEvidence": {
+    "failure": "a structurally valid PNG envelope declaring width 16,385 was rejected as AUTHOR_ASSET_COMPLEXITY before storage",
+    "immediateCancel": "discard transitioned the reservation and blob to deleted, left zero refs and reduced logical quota to zero",
+    "abandonedUpload": "expiry plus cleanupAuthorAssets deleted the reservation and blob and reduced logical quota to zero",
+    "storageBytesAfterValidationFailure": false
+  },
+  "checks": [
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/author-asset-contract.test.ts tests/server/author-asset-validation.test.ts tests/server/author-asset-api-contract.test.ts tests/server/question-image-validation.test.ts tests/server/author-asset-upload-events.test.ts",
+      "exitCode": 0,
+      "result": "5 files, 106 tests passed; exact body ceilings, legacy ceilings, frame, metadata, mixed-purpose concurrency and UI cancellation"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/author-asset-uploads.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 17 tests passed; real PostgreSQL quota/blob/ref cleanup after resource rejection"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/question-image-backend.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 15 tests passed; legacy question-image lifecycle remains valid"
+    },
+    {
+      "command": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/files.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 19 tests passed; respondent file lifecycle and 10 MiB boundary remain valid"
+    },
+    {
+      "command": "node --env-file=.env.test.local --import tsx scripts/qa-rich-body-image-resources.ts",
+      "exitCode": 0,
+      "result": "64 validation tests completed in 878ms under a 30,000ms SIGKILL watchdog"
+    },
+    {
+      "command": "generate-openapi.ts && python3 scripts/verify-contracts.py && python3 scripts/verify-plan.py",
+      "exitCode": 0,
+      "result": "resource limits published; 323 paths, 458 operations, 45 policies and 107-task plan passed"
+    },
+    {
+      "command": "eslint related files && tsc --noEmit && git diff --check",
+      "exitCode": 0,
+      "result": "0 lint errors, 0 type errors and clean diff whitespace"
+    }
+  ],
+  "files": {
+    "src/server/author-asset-validation.ts": "5a397e905cd37e3d6b8e20b27a7a1fd7ef758e4ba730eb7a03747a1f3f006557",
+    "scripts/generate-openapi.ts": "01058e8be15cc90f5c5893da08606bb6bbe9abb8e28ed8c671c28f6e26c4e275",
+    "scripts/qa-rich-body-image-resources.ts": "4f2e6854da3f1490c729f76cb3ce3a77f8da484ed3a20b77806185a95a4b9482",
+    "tests/server/author-asset-validation.test.ts": "0188379046a61e34d332bc2b4bc0687634cb5ae8d2afa97333f97b61a5db1d92",
+    "tests/server/author-asset-uploads.test.ts": "612592acdf63943938f3b5e732071022c3256b30166807e58cf915e909af49d4",
+    "tests/server/author-asset-api-contract.test.ts": "92d0070548d6d06681b16de9410d93543de7fab8a2e14a862a26a87546360c3b",
+    "docs/planning/contracts/openapi.json": "d735c8fdfa37ab40a4cc66992f61f61d1d71f9fd45b82e08002bb828424a8265",
+    "docs/qa/R08-T02/body-images/resources/watchdog-final.json": "b385cea83e2b1a752ca4ae6c956e1c6ea0d201da31ff326c4f2a9643236732bc"
+  },
+  "fixturePolicy": {
+    "existingFrozenFixtureRead": false,
+    "existingProductionRuntimeTouched": false,
+    "browserRun": false,
+    "reason": "BI-03b is an upload-resource and cleanup checkpoint. Aggregate document budgets and UI acceptance follow the page and ownership model."
+  }
+}

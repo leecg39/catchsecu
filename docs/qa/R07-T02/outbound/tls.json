@@ -1,0 +1,78 @@
+{
+  "checkedAt": "2026-10-10T02:12:52.423Z",
+  "actualTlsChecks": 6,
+  "checks": [
+    {
+      "action": "trusted CA + hostname GET",
+      "result": {
+        "ok": true,
+        "status": 200,
+        "accepted": true
+      }
+    },
+    {
+      "action": "trusted CA + hostname token POST",
+      "result": {
+        "ok": true,
+        "status": 200,
+        "accepted": true
+      }
+    },
+    {
+      "action": "untrusted CA rejected",
+      "result": {
+        "ok": false,
+        "code": "CONNECTION_FAILED"
+      }
+    },
+    {
+      "action": "SAN mismatch rejected",
+      "result": {
+        "ok": false,
+        "code": "CONNECTION_FAILED"
+      }
+    },
+    {
+      "action": "expired server certificate rejected",
+      "result": {
+        "ok": false,
+        "code": "CONNECTION_FAILED"
+      }
+    },
+    {
+      "action": "production localhost blocked despite explicit local flag",
+      "result": {
+        "ok": false,
+        "code": "UNSAFE_DNS"
+      }
+    }
+  ],
+  "received": [
+    {
+      "host": "localhost:63037",
+      "path": "/jwks",
+      "authorizationPresent": false,
+      "bodyBytes": 0
+    },
+    {
+      "host": "localhost:63037",
+      "path": "/token",
+      "authorizationPresent": true,
+      "bodyBytes": 33
+    }
+  ],
+  "sni": [
+    "localhost",
+    "localhost"
+  ],
+  "certificate": {
+    "fingerprint256": "E7:D8:24:C5:82:95:C5:F4:C4:13:06:08:30:0F:11:F9:6D:F8:53:BA:8B:80:19:C0:B0:3D:72:16:62:22:70:FB",
+    "subjectAltName": "DNS:localhost",
+    "validFrom": "Oct 10 02:12:51 2026 GMT",
+    "validTo": "Oct 12 02:12:51 2026 GMT"
+  },
+  "expiredValidTo": "Jan  2 00:00:00 2020 GMT",
+  "caSha256": "2708a46f5987f3db95ecc95ba7e043091ee4e6b6e2cda765e3ed47ace11018c2",
+  "isolation": "Fresh private QA CA, NODE_EXTRA_CA_CERTS only in child clients, no system trust changes, TLS verification never disabled.",
+  "scope": "Actual SSO transport HTTPS requests. No complete OIDC/SAML browser flow or external provider acceptance."
+}

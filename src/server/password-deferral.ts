@@ -5,6 +5,7 @@ import { fail, rateLimit } from "./http";
 import { audit } from "./audit";
 import type { z } from "zod";
 import type { passwordDeferralInput } from "@/contracts/security";
+import { assertSsoSession } from "./sso-policy-enforcement";
 
 async function currentMember(userId: string, companyId?: string | null) {
   return db.membership.findFirst({ where: { userId, status: "active", tenant: { status: "active" }, ...(companyId ? { tenantId: companyId } : {}) },
@@ -37,6 +38,7 @@ export async function deferPassword(headers: Headers, input: z.infer<typeof pass
     if (!session || session.expiresAt <= new Date() || Date.now() - session.updatedAt.getTime() > policy.sessionMinutes * 60000 || user.status !== "active")
       fail(401, "SESSION_EXPIRED", "다시 로그인해주세요.");
     if (session.activeCompanyId !== actor.session.activeCompanyId) fail(409, "COMPANY_CHANGED", "현재 회사의 정책을 다시 불러와주세요.");
+    await assertSsoSession(tx, member.tenantId, user.id, session.id);
     const status = await passwordState(user, session, member, new Date(), tx);
     if (!status.expired || !user.passwordChangedAt || !policy.passwordMonths) fail(409, "PASSWORD_NOT_DUE", "지금은 변경을 미룰 필요가 없습니다.");
     if (policy.passwordDeferral === "never") fail(403, "DEFERRAL_FORBIDDEN", "회사 정책에 따라 비밀번호를 바로 변경해야 합니다.");

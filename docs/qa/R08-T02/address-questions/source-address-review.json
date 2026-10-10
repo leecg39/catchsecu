@@ -1,0 +1,865 @@
+{
+  "checkedAt": "2026-10-10T04:50:23.739Z",
+  "sourcePath": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+  "bundleSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+  "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+  "offsetUnit": "zero-based Node.js UTF-16 code units; half-open [start,end)",
+  "scope": {
+    "mode": "retained bundle static read only",
+    "originalApplicationExecuted": false,
+    "networkCalls": false,
+    "browserChanged": false,
+    "databaseChanged": false,
+    "originalServerSchemaObserved": false,
+    "onlyCreatedArtifact": "docs/qa/R08-T02/address-questions/source-address-review.json"
+  },
+  "observations": [
+    {
+      "id": "O01",
+      "status": "observed",
+      "topic": "domestic-ui-initial",
+      "conclusion": "XQ는 기존 item.value를 그대로 읽고 각 zipcode/address/detailAddress의 표시 기본값은 빈 문자열이다. zipcode/address 입력은 disabled이고 주소검색으로만 채운다. 상세주소는 zipcode가 생기기 전 disabled다. 세 입력 모두 maxLength 100 속성이다. 제공자 값의 문자열 길이를 별도로 잘라내는 코드는 없다.",
+      "evidence": [
+        "A03"
+      ]
+    },
+    {
+      "id": "O02",
+      "status": "observed",
+      "topic": "domestic-required-partial",
+      "conclusion": "XQ 초기 memo: zipcode/address 둘 다 없으면 MM만 invalid, MS는 valid. 둘 중 하나가 있으면 supplied patternRegex가 있으면 합친 문자열.trim() 검증, 없으면 valid. 상세주소 변경 callback은 MM에만 zipcode와 address 둘 다 요구하고 patternRegex를 재검사하지 않는다. 검색완료 callback은 무조건 isValid=true이며 기존 detailAddress를 보존한다. 일반 검색 UI는 zipcode/address를 동시에 채운다.",
+      "evidence": [
+        "A03"
+      ]
+    },
+    {
+      "id": "O03",
+      "status": "observed",
+      "topic": "foreign-fields-initial-lengths",
+      "conclusion": "country,countryName,streetAddress,addressDetail,city,state,postalCode의 7필드 객체. XQ 최초 표시에는 기존 value 또는 각 빈 문자열 fallback을 사용하며 첫 변경에서 7개 빈 기본필드와 기존값/patch를 합친다. country selector와 나머지 5개 텍스트 필드. streetAddress/addressDetail=255, city/state=100, postalCode=20의 UI maxlength. 국가 변경은 다른 필드를 초기화하지 않는다.",
+      "evidence": [
+        "A03",
+        "A04",
+        "A05"
+      ]
+    },
+    {
+      "id": "O04",
+      "status": "observed",
+      "topic": "foreign-required-partial",
+      "conclusion": "MM은 country && streetAddress && city를 모두 요구. MS는 이 3개 핵심 필드가 모두 falsy이거나 셋 모두 truthy일 때만 valid. addressDetail/state/postalCode만 입력한 경우는 핵심 필드가 모두 비어 있으므로 MS가 valid. 공백 trim, country catalog membership, 국가별 우편번호, 정규식 검사는 이 validator에 없다.",
+      "evidence": [
+        "A03",
+        "A30"
+      ]
+    },
+    {
+      "id": "O05",
+      "status": "observed",
+      "topic": "country-catalog-name",
+      "conclusion": "181개 ISO 국가 배열. LQ는 dropdownLabel[formLanguage] -> en -> ko -> iso 순으로 표시하고 value는 ISO. 유효한 기존 ISO는 대문자로 표시하고 알 수 없는 코드는 빈 선택값. 국가 변경 시 countryName=Wq(ISO, formLanguage || ko). Wq의 names fallback은 requested -> en -> ko -> original ISO. 표시 v5는 보존된 countryName 대신 country 코드와 현재 표시 언어에서 명칭을 다시 계산한다.",
+      "evidence": [
+        "A05",
+        "A06",
+        "A24"
+      ]
+    },
+    {
+      "id": "O06",
+      "status": "observed",
+      "topic": "search-provider",
+      "conclusion": "Kakao Postcode CDN을 script로 로드. window.kakao.Postcode를 우선, window.daum.Postcode를 fallback으로 조회. Postcode.embed를 modal 내부에 실행하는 구현이며 callback data.zonecode와 data.address만 주소 객체에 복사한다. provider의 addressType/roadAddress/jibunAddress를 별도로 보존하지 않는다. 이번 조사에서는 SDK를 실행하거나 네트워크에 접근하지 않았다.",
+      "evidence": [
+        "A07",
+        "A08",
+        "A09",
+        "A10",
+        "A03"
+      ]
+    },
+    {
+      "id": "O07",
+      "status": "observed",
+      "topic": "submission-serialization",
+      "conclusion": "현재 V3 BRe: ADDRESS는 존재하는 zipcode에 괄호와 공백, 존재하는 address에 공백, detailAddress를 붙인 단일 문자열. 최종 trim 없음. FOREIGN_ADDRESS는 7개 키 객체이며 falsy 값을 빈 문자열로 대체한다. 다른 구형 응답 helper에는 countryName을 제외한 6키를 JSON.stringify하는 경로도 있어 타입/버전을 혼동하면 안 된다.",
+      "evidence": [
+        "A11",
+        "A12",
+        "A13",
+        "A26"
+      ]
+    },
+    {
+      "id": "O08",
+      "status": "observed",
+      "topic": "domestic-response-parse",
+      "conclusion": "de/ue, e3/t3 및 별도 ADDRESS 표시 분기를 확인. 모두 첫 괄호 속 숫자 우편번호 추출 또는 해당 부분 제거 뒤 나머지 전체 trim만 수행한다. detailedAddress라는 placeholder가 있어도 값은 합쳐진 기본+상세 주소이고 저장응답에서는 disabled다. base/detail 경계 복원 코드는 이 경로들에 없다.",
+      "evidence": [
+        "A16",
+        "A17",
+        "A18",
+        "A19",
+        "A20",
+        "A21",
+        "A22"
+      ]
+    },
+    {
+      "id": "O09",
+      "status": "observed",
+      "topic": "foreign-response-parse",
+      "conclusion": "foreignAddressReply가 있으면 우선하고 아니면 replyContents를 사용한다. b5는 object 또는 JSON 문자열을 수용하고 파싱 실패는 null. v5는 파싱 결과 없으면 7개 빈 필드를 표시한다. r4 요약은 JSON 문자열/객체를 받아 country,streetAddress,addressDetail,city,state,postalCode를 공백으로 결합하고 JSON parse 실패 문자열은 그대로 표시한다. 이들은 편집 setter가 없는 표시 함수다.",
+      "evidence": [
+        "A23",
+        "A24",
+        "A25"
+      ]
+    },
+    {
+      "id": "O10",
+      "status": "observed",
+      "topic": "draft-edit-restoration",
+      "conclusion": "현재 공개 임시저장은 현재 페이지 질문들을 포함한 pageList를 JSON.stringify(data)에 저장하고 GET 응답 data를 JSON.parse하여 Redux/page questions로 복구한다. 따라서 주소 입력 value 객체의 필드 경계가 임시저장에서는 유지되며 제출 ADDRESS 문자열을 역파싱하지 않는다.",
+      "evidence": [
+        "A14",
+        "A15"
+      ]
+    },
+    {
+      "id": "O11",
+      "status": "observed",
+      "topic": "language-bridge",
+      "conclusion": "CQ는 ADDRESS이고 formLanguage가 truthy/non-ko이면 FOREIGN_ADDRESS로 바꾼다. V3 작성기 타입변경에서 CQ를 호출한다. 공개 XQ 자체는 formLanguage만으로 자동 전환하지 않고 questionType === FOREIGN_ADDRESS로 UI를 분기한다.",
+      "evidence": [
+        "A01",
+        "A02",
+        "A03",
+        "A29"
+      ]
+    },
+    {
+      "id": "O12",
+      "status": "observed",
+      "topic": "source-quirks-not-required-to-copy",
+      "conclusion": "XQ 국내 상세주소 disabled는 zipcode 부재만 검사하고 readOnly/disabled props를 반영하지 않는다. PMt 작성기 샘플의 주소검색완료는 새 상태를 u({...d,...})로 설정하면서 부모 r(d)에는 기존 상태를 전달한다. 이는 현재 공개 XQ의 올바른 검색완료 S와 별개다. 원본의 이런 클라이언트 비일관성을 독립 구현의 수용 규칙으로 가져오지 않는다.",
+      "evidence": [
+        "A03",
+        "A27",
+        "A28"
+      ]
+    }
+  ],
+  "requiredPartialTruthTable": {
+    "foreign": {
+      "required": [
+        {
+          "core": "country/streetAddress/city 모두 truthy",
+          "valid": true
+        },
+        {
+          "core": "그 외",
+          "valid": false
+        }
+      ],
+      "optional": [
+        {
+          "core": "모두 falsy; extra 필드 여부 무관",
+          "valid": true
+        },
+        {
+          "core": "모두 truthy",
+          "valid": true
+        },
+        {
+          "core": "1~2개만 truthy",
+          "valid": false
+        }
+      ],
+      "note": "원문 boolean 검사이며 trim하지 않는다. 원본 서버 규칙은 미관측."
+    },
+    "domestic": {
+      "initial": "zip/address 모두 falsy -> required만 거절; 나머지는 supplied patternRegex 있으면 검사, 없으면 허용",
+      "detailChange": "required이면 zip && address; optional이면 허용",
+      "searchComplete": "무조건 true; 기존 detailAddress 보존"
+    }
+  },
+  "foreignFieldMaxLength": {
+    "streetAddress": 255,
+    "addressDetail": 255,
+    "city": 100,
+    "state": 100,
+    "postalCode": 20
+  },
+  "domesticFieldMaxLength": {
+    "zipcode": 100,
+    "address": 100,
+    "detailAddress": 100
+  },
+  "lengthScope": "HTML input maxLength props only; no claim of server validation",
+  "countryCatalog": {
+    "symbol": "$q",
+    "start": 7961254,
+    "end": 8159361,
+    "count": 181,
+    "isoUniqueCount": 181,
+    "languages": [
+      "ko",
+      "en",
+      "zh-CN",
+      "zh-TW",
+      "ja",
+      "de",
+      "fr",
+      "ru",
+      "es",
+      "pt",
+      "id",
+      "th",
+      "vi",
+      "tr",
+      "it",
+      "ar"
+    ],
+    "fields": [
+      "iso",
+      "flagEmoji",
+      "dialCode",
+      "names",
+      "dropdownLabel"
+    ],
+    "countryCodes": [
+      "US",
+      "CA",
+      "RU",
+      "KZ",
+      "EG",
+      "ZA",
+      "GR",
+      "NL",
+      "BE",
+      "FR",
+      "ES",
+      "HU",
+      "IT",
+      "RO",
+      "CH",
+      "AT",
+      "GB",
+      "DK",
+      "SE",
+      "NO",
+      "PL",
+      "DE",
+      "PE",
+      "MX",
+      "CU",
+      "AR",
+      "BR",
+      "CL",
+      "CO",
+      "VE",
+      "MY",
+      "AU",
+      "ID",
+      "PH",
+      "NZ",
+      "SG",
+      "TH",
+      "JP",
+      "KR",
+      "VN",
+      "CN",
+      "TR",
+      "IN",
+      "PK",
+      "AF",
+      "LK",
+      "MM",
+      "IR",
+      "SS",
+      "MA",
+      "DZ",
+      "TN",
+      "LY",
+      "GM",
+      "SN",
+      "MR",
+      "ML",
+      "GN",
+      "BF",
+      "NE",
+      "TG",
+      "BJ",
+      "MU",
+      "SL",
+      "GH",
+      "NG",
+      "TD",
+      "CF",
+      "CM",
+      "CV",
+      "CG",
+      "CD",
+      "AO",
+      "GW",
+      "SC",
+      "SD",
+      "RW",
+      "ET",
+      "SO",
+      "DJ",
+      "KE",
+      "TZ",
+      "UG",
+      "BI",
+      "MZ",
+      "ZM",
+      "MG",
+      "ZW",
+      "NA",
+      "MW",
+      "LS",
+      "BW",
+      "SZ",
+      "AW",
+      "GI",
+      "PT",
+      "LU",
+      "IE",
+      "IS",
+      "AL",
+      "MT",
+      "CY",
+      "FI",
+      "BG",
+      "LT",
+      "LV",
+      "EE",
+      "MD",
+      "AM",
+      "BY",
+      "AD",
+      "MC",
+      "SM",
+      "VA",
+      "UA",
+      "RS",
+      "ME",
+      "HR",
+      "SI",
+      "BA",
+      "MK",
+      "CZ",
+      "SK",
+      "LI",
+      "PS",
+      "BZ",
+      "GT",
+      "SV",
+      "HN",
+      "NI",
+      "CR",
+      "PA",
+      "HT",
+      "BO",
+      "GY",
+      "EC",
+      "PY",
+      "MQ",
+      "SR",
+      "UY",
+      "TL",
+      "BN",
+      "NR",
+      "PG",
+      "TO",
+      "SB",
+      "VU",
+      "FJ",
+      "PW",
+      "WS",
+      "FM",
+      "MH",
+      "KP",
+      "HK",
+      "MO",
+      "KH",
+      "LA",
+      "BD",
+      "TW",
+      "MV",
+      "LB",
+      "JO",
+      "SY",
+      "IQ",
+      "KW",
+      "SA",
+      "YE",
+      "OM",
+      "AE",
+      "IL",
+      "BH",
+      "QA",
+      "BT",
+      "MN",
+      "NP",
+      "TJ",
+      "TM",
+      "AZ",
+      "GE",
+      "KG",
+      "UZ"
+    ],
+    "samples": [
+      {
+        "iso": "US",
+        "flagEmoji": "🇺🇸",
+        "dialCode": "+1",
+        "names": {
+          "ko": "미국",
+          "en": "United States",
+          "zh-CN": "美国",
+          "zh-TW": "美國",
+          "ja": "アメリカ合衆国",
+          "de": "Vereinigte Staaten",
+          "fr": "États-Unis",
+          "ru": "США",
+          "es": "Estados Unidos",
+          "pt": "Estados Unidos",
+          "id": "Amerika Serikat",
+          "th": "สหรัฐอเมริกา",
+          "vi": "Hoa Kỳ",
+          "tr": "Amerika Birleşik Devletleri",
+          "it": "Stati Uniti",
+          "ar": "الولايات المتحدة"
+        },
+        "dropdownLabel": {
+          "ko": "US 미국 (+1)",
+          "en": "US United States (+1)",
+          "zh-CN": "US 美国 (+1)",
+          "zh-TW": "US 美國 (+1)",
+          "ja": "US アメリカ合衆国 (+1)",
+          "de": "US Vereinigte Staaten (+1)",
+          "fr": "US États-Unis (+1)",
+          "ru": "US США (+1)",
+          "es": "US Estados Unidos (+1)",
+          "pt": "US Estados Unidos (+1)",
+          "id": "US Amerika Serikat (+1)",
+          "th": "US สหรัฐอเมริกา (+1)",
+          "vi": "US Hoa Kỳ (+1)",
+          "tr": "US Amerika Birleşik Devletleri (+1)",
+          "it": "US Stati Uniti (+1)",
+          "ar": "US الولايات المتحدة (+1)"
+        }
+      },
+      {
+        "iso": "GB",
+        "flagEmoji": "🇬🇧",
+        "dialCode": "+44",
+        "names": {
+          "ko": "영국",
+          "en": "United Kingdom",
+          "zh-CN": "英国",
+          "zh-TW": "英國",
+          "ja": "イギリス",
+          "de": "Vereinigtes Königreich",
+          "fr": "Royaume-Uni",
+          "ru": "Великобритания",
+          "es": "Reino Unido",
+          "pt": "Reino Unido",
+          "id": "Britania Raya",
+          "th": "สหราชอาณาจักร",
+          "vi": "Vương quốc Anh",
+          "tr": "Birleşik Krallık",
+          "it": "Regno Unito",
+          "ar": "المملكة المتحدة"
+        },
+        "dropdownLabel": {
+          "ko": "GB 영국 (+44)",
+          "en": "GB United Kingdom (+44)",
+          "zh-CN": "GB 英国 (+44)",
+          "zh-TW": "GB 英國 (+44)",
+          "ja": "GB イギリス (+44)",
+          "de": "GB Vereinigtes Königreich (+44)",
+          "fr": "GB Royaume-Uni (+44)",
+          "ru": "GB Великобритания (+44)",
+          "es": "GB Reino Unido (+44)",
+          "pt": "GB Reino Unido (+44)",
+          "id": "GB Britania Raya (+44)",
+          "th": "GB สหราชอาณาจักร (+44)",
+          "vi": "GB Vương quốc Anh (+44)",
+          "tr": "GB Birleşik Krallık (+44)",
+          "it": "GB Regno Unito (+44)",
+          "ar": "GB المملكة المتحدة (+44)"
+        }
+      },
+      {
+        "iso": "JP",
+        "flagEmoji": "🇯🇵",
+        "dialCode": "+81",
+        "names": {
+          "ko": "일본",
+          "en": "Japan",
+          "zh-CN": "日本",
+          "zh-TW": "日本",
+          "ja": "日本",
+          "de": "Japan",
+          "fr": "Japon",
+          "ru": "Япония",
+          "es": "Japón",
+          "pt": "Japão",
+          "id": "Jepang",
+          "th": "ญี่ปุ่น",
+          "vi": "Nhật Bản",
+          "tr": "Japonya",
+          "it": "Giappone",
+          "ar": "اليابان"
+        },
+        "dropdownLabel": {
+          "ko": "JP 일본 (+81)",
+          "en": "JP Japan (+81)",
+          "zh-CN": "JP 日本 (+81)",
+          "zh-TW": "JP 日本 (+81)",
+          "ja": "JP 日本 (+81)",
+          "de": "JP Japan (+81)",
+          "fr": "JP Japon (+81)",
+          "ru": "JP Япония (+81)",
+          "es": "JP Japón (+81)",
+          "pt": "JP Japão (+81)",
+          "id": "JP Jepang (+81)",
+          "th": "JP ญี่ปุ่น (+81)",
+          "vi": "JP Nhật Bản (+81)",
+          "tr": "JP Japonya (+81)",
+          "it": "JP Giappone (+81)",
+          "ar": "JP اليابان (+81)"
+        }
+      },
+      {
+        "iso": "KR",
+        "flagEmoji": "🇰🇷",
+        "dialCode": "+82",
+        "names": {
+          "ko": "대한민국",
+          "en": "Republic of Korea",
+          "zh-CN": "韩国",
+          "zh-TW": "韓國",
+          "ja": "韓国",
+          "de": "Republik Korea",
+          "fr": "République de Corée",
+          "ru": "Республика Корея",
+          "es": "República de Corea",
+          "pt": "República da Coreia",
+          "id": "Republik Korea",
+          "th": "สาธารณรัฐเกาหลี",
+          "vi": "Hàn Quốc",
+          "tr": "Kore Cumhuriyeti",
+          "it": "Repubblica di Corea",
+          "ar": "جمهورية كوريا"
+        },
+        "dropdownLabel": {
+          "ko": "KR 대한민국 (+82)",
+          "en": "KR Republic of Korea (+82)",
+          "zh-CN": "KR 韩国 (+82)",
+          "zh-TW": "KR 韓國 (+82)",
+          "ja": "KR 韓国 (+82)",
+          "de": "KR Republik Korea (+82)",
+          "fr": "KR République de Corée (+82)",
+          "ru": "KR Республика Корея (+82)",
+          "es": "KR República de Corea (+82)",
+          "pt": "KR República da Coreia (+82)",
+          "id": "KR Republik Korea (+82)",
+          "th": "KR สาธารณรัฐเกาหลี (+82)",
+          "vi": "KR Hàn Quốc (+82)",
+          "tr": "KR Kore Cumhuriyeti (+82)",
+          "it": "KR Repubblica di Corea (+82)",
+          "ar": "KR جمهورية كوريا (+82)"
+        }
+      }
+    ],
+    "extraction": "Acorn ArrayExpression/ObjectExpression/Literal conversion only; not eval or bundle execution"
+  },
+  "koreanCopy": {
+    "country": "국가",
+    "countryPlaceholder": "국가를 선택하세요",
+    "city": "도시",
+    "cityPlaceholder": "도시",
+    "postalCode": "우편번호",
+    "postalCodePlaceholder": "우편번호",
+    "streetAddress": "주소 1",
+    "streetAddressPlaceholder": "번지, 동(읍/면), 구(군)",
+    "addressDetail": "주소 2 (선택 사항)",
+    "addressDetailPlaceholder": "아파트, 동/호수 등",
+    "state": "주/지역",
+    "statePlaceholder": "도/광역시"
+  },
+  "inferences": [
+    {
+      "id": "I01",
+      "status": "inference",
+      "conclusion": "ADDRESS 단일 문자열은 기본/상세 경계를 보존하지 않는다. 예를 들어 address=\"A B\",detailAddress=\"C\"와 address=\"A\",detailAddress=\"B C\"는 같은 (12345) A B C를 만든다. 따라서 임의 공백분리로 완전한 재편집 객체를 복원할 수 없다.",
+      "evidence": [
+        "A11",
+        "A17",
+        "A20",
+        "A22"
+      ]
+    },
+    {
+      "id": "I02",
+      "status": "inference",
+      "conclusion": "독립 구현에서 정정 가능성을 보장하려면 국내 주소 구성요소를 별도로 보존하거나 기존 단일 문자열을 원문으로 유지하는 명시적 legacy 표시/수정 계약이 필요하다. 이는 원본 서버 저장 구조의 관측이 아니다.",
+      "evidence": [
+        "A11",
+        "A14",
+        "A15"
+      ]
+    }
+  ],
+  "decisions": [
+    "독립 저장 계약: 국내 주소 객체(구성요소)와 표시/내보내기 문자열을 분리할지 결정. legacy 제출 문자열에서 base/detail을 추측하지 않기.",
+    "국내 필수/부분입력: 원본의 초기/상세변경 validation 불일치를 복제할지보다 zip+address를 일관되게 요구하는 독립 규칙을 문서화할지 결정.",
+    "해외 optional extra-only 및 whitespace: 원본은 선택 사항의 부가필드만 입력하거나 공백 truthy를 허용하므로, trim 및 전체 미입력/부분입력 기준을 독립 서버 계약으로 명확히 결정.",
+    "국가 코드는 catalog membership과 canonical uppercase를 서버에서 검증할지, countryName은 서버가 formLanguage로 파생할지 결정. 원본 서버 처리는 미관측.",
+    "주소 재검색 시 상세주소 보존 여부: 현재 공개 XQ는 보존하고 다른 구형 경로는 빈 문자열로 재설정한다. 대상 제품 동작을 명시.",
+    "F5에서 formLanguage 변경/선택시 ADDRESS->FOREIGN_ADDRESS 타입 변환과 기존 답변/게시본 유지 경계를 함께 설계.",
+    "현재 V3 foreign object와 다른 경로의 JSON string을 같은 외부 제출 계약으로 혼용하지 않기."
+  ],
+  "unknowns": [
+    "원본 서버의 실제 주소 DB 저장 형태 및 구성요소 별도 보관 여부",
+    "원본 ADDRESS patternRegex의 실제 값과 서버 강제규칙",
+    "기본/상세를 손실 없이 복구하는 별도 API/서버 로직: 관측한 클라이언트에는 근거 없음",
+    "국가/우편번호 실재성 검증과 원본 서버 국가별 규칙",
+    "현재 실제 브라우저에서 SDK 성공/실패·검색결과의 동작: 이번 조사 미실행"
+  ],
+  "searchCoverage": {
+    "terms": [
+      "detailAddress",
+      "detailedAddress",
+      "zipcode",
+      "foreignAddressReply",
+      "case\"ADDRESS\"",
+      "case\"FOREIGN_ADDRESS\"",
+      "CQ("
+    ],
+    "note": "세 국내 표시 parser 및 두 별도 detailedAddress 표시 branch를 검토했다. 문자열 역직렬화 부재를 원본 서버 부재로 확장하지 않는다."
+  },
+  "excerpts": [
+    {
+      "id": "A01",
+      "label": "언어별 ADDRESS -> FOREIGN_ADDRESS 변환",
+      "start": 8202362,
+      "end": 8202418,
+      "source": "CQ=(e,t)=>\"ADDRESS\"===e&&t&&\"ko\"!==t?\"FOREIGN_ADDRESS\":e"
+    },
+    {
+      "id": "A02",
+      "label": "V3 작성기의 유형 변경 호출",
+      "start": 12727800,
+      "end": 12728085,
+      "source": ")=>{T(null)}),400),ae(n,r)},de=(e,t)=>{const r=CQ(e,m);if(\"IDV\"===r&&G)return P(!1),void b(!0);const n=!nG(r)&&\"NONE\"!==dG(x).mode,a=zPt.filter((e=>!o_t(r,e)&&c_t(x,e)));if(n||a.length>0){const e=[...n?[u(\"selectLimit.title\")]:[],...a.map((e=>u(`featureToggle.${e}`)))].join(\", \");retu"
+    },
+    {
+      "id": "A03",
+      "label": "공개 주소 입력 XQ 전체",
+      "start": 8211532,
+      "end": 8215887,
+      "source": "XQ=(0,yt.memo)((e=>{var t,r,n,a,o,i;let{item:s,onUpdate:l,elementGuideGroup:c,type:d,formLanguage:u,disabled:h,readOnly:p}=e;const{t:m}=fa(\"translate\",{keyPrefix:\"infoOwnerForm\"}),f=(0,nP.useMediaQuery)({maxWidth:480}),g=(0,nP.useMediaQuery)({maxWidth:580}),v=u||SV,b=\"FOREIGN_ADDRESS\"===(null===s||void 0===s?void 0:s.questionType),[x,A]=(0,yt.useState)({show:!1,id:null}),y=(0,yt.useMemo)((()=>{if(!b)return!0;const e=s.value||{},t=!e.country&&!e.streetAddress&&!e.city;return\"MM\"===s.questionElementType?!!(e.country&&e.streetAddress&&e.city):!!t||!!(e.country&&e.streetAddress&&e.city)}),[b,s.value,s.questionElementType]),w=(0,yt.useMemo)((()=>{if(b)return y;const{zipcode:e,address:t,detailAddress:r}=s.value||{},n=!e&&!t;if(\"MM\"===s.questionElementType&&n)return!1;if(n)return!0;if(s.patternRegex){const n=`${e?`(${e}) `:\"\"}${t?`${t} `:\"\"}${r||\"\"}`;return new RegExp(s.patternRegex).test(n.trim())}return!0}),[b,y,s.value,s.patternRegex,s.questionElementType]);(0,yt.useEffect)((()=>{l(s.htmlFormInputName,s.value,w)}),[]);const C=(0,yt.useCallback)((e=>{const t=e.target.value,r={...s.value,detailAddress:t},n=\"MM\"!==s.questionElementType||!(!r.zipcode||!r.address);l(s.htmlFormInputName,r,n)}),[s,l]),S=(0,yt.useCallback)((e=>{var t;const r={zipcode:e.zonecode,address:e.address,detailAddress:(null===(t=s.value)||void 0===t?void 0:t.detailAddress)||\"\"};l(s.htmlFormInputName,r,!0)}),[s,l]),T=(0,yt.useCallback)((e=>{const t={country:\"\",countryName:\"\",streetAddress:\"\",addressDetail:\"\",city:\"\",state:\"\",postalCode:\"\",...s.value,...e},r=!t.country&&!t.streetAddress&&!t.city,n=!!(t.country&&t.streetAddress&&t.city),a=\"MM\"===s.questionElementType?n:r||n;l(s.htmlFormInputName,t,a)}),[s,l]),E=(0,yt.useCallback)(((e,t)=>T({[e]:t})),[T]),N=(0,yt.useCallback)((e=>T({country:e,countryName:Wq(e,v)})),[T,v]);var k;if(b)return(0,nI.jsxs)(ZQ,{children:[(0,nI.jsxs)(eK,{children:[(0,nI.jsx)(iI,{className:\"body-2\",color:Zk,children:m(\"internationalAddress.country\")}),(0,nI.jsx)(LQ,{value:null===(k=s.value)||void 0===k?void 0:k.country,lang:v,disabled:h||p||s.disabled,placeholder:m(\"internationalAddress.countryPlaceholder\"),onChange:N})]}),(0,nI.jsx)(kQ,{copy:{country:m(\"internationalAddress.country\"),countryPlaceholder:m(\"internationalAddress.countryPlaceholder\"),streetAddress:m(\"internationalAddress.streetAddress\"),streetAddressPlaceholder:m(\"internationalAddress.streetAddressPlaceholder\"),addressDetail:m(\"internationalAddress.addressDetail\"),addressDetailPlaceholder:m(\"internationalAddress.addressDetailPlaceholder\"),city:m(\"internationalAddress.city\"),cityPlaceholder:m(\"internationalAddress.cityPlaceholder\"),state:m(\"internationalAddress.state\"),statePlaceholder:m(\"internationalAddress.statePlaceholder\"),postalCode:m(\"internationalAddress.postalCode\"),postalCodePlaceholder:m(\"internationalAddress.postalCodePlaceholder\")},value:s.value,disabled:h||p||s.disabled,showCountry:!1,onChange:(e,t)=>E(e,t)})]});const j=(null===(t=s.value)||void 0===t?void 0:t.detailAddress)&&!w;return(0,nI.jsxs)(\"div\",{children:[(0,nI.jsxs)(\"div\",{children:[(0,nI.jsx)(\"div\",{className:\"flex flex-wrap gap-3\",children:(0,nI.jsxs)(\"div\",{className:`inline-flex align-bottom ${g||d.includes(\"PREVIEW\")?\"w-full\":\"w-[50%] pe-[6px]\"} `,children:[(0,nI.jsx)(Kq,{disabled:!0,placeholder:m(\"zipCode\"),error:j,value:(null===(r=s.value)||void 0===r?void 0:r.zipcode)||\"\",maxLength:100}),(0,nI.jsx)(JQ,{className:\"ms-3 whitespace-nowrap\",onClick:()=>A({show:!0,id:s.htmlFormInputName}),disabled:h||p,children:m(\"addressSearch\")})]})}),(0,nI.jsxs)(\"div\",{className:`${(f||d.includes(\"PREVIEW\"))&&\"flex-col \"} flex gap-3 mt-3`,children:[(0,nI.jsx)(Kq,{className:\"flex-1 me-3\",placeholder:m(\"address\"),error:j,value:(null===(n=s.value)||void 0===n?void 0:n.address)||\"\",maxLength:100,disabled:!0}),(0,nI.jsx)(Kq,{disabled:!(null!==(a=s.value)&&void 0!==a&&a.zipcode),id:s.htmlFormInputName,placeholder:m(\"phrase.phrase41\"),error:j,value:(null===(o=s.value)||void 0===o?void 0:o.detailAddress)||\"\",onChange:C,maxLength:100})]})]}),(0,nI.jsx)(\"span\",{className:\"custom-font-10 !text-[#f64e60]\",children:j?(null===(i=c.find((e=>e.infoPatternId===s.infoPatternId)))||void 0===i?void 0:i.helperText)||\"\":null}),x.show&&(0,nI.jsx)(KQ,{open:x.show,onClose:()=>A({show:!1,id:null}),onFind:S,onFocus:()=>{const e=document.getElementById(s.htmlFormInputName);e&&e.focus()}})]})}))"
+    },
+    {
+      "id": "A04",
+      "label": "해외 주소 필드 및 maxlength",
+      "start": 8203920,
+      "end": 8205022,
+      "source": "function kQ(e){let{copy:t,value:r={},disabled:n=!1,showCountry:a=!0,onChange:o}=e;const i=[...a?[{key:\"country\",label:t.country,placeholder:t.countryPlaceholder,isSelect:!0}]:[],{key:\"streetAddress\",label:t.streetAddress,placeholder:t.streetAddressPlaceholder,maxLength:255},{key:\"addressDetail\",label:t.addressDetail,placeholder:t.addressDetailPlaceholder,maxLength:255},{key:\"city\",label:t.city,placeholder:t.cityPlaceholder,maxLength:100},{key:\"state\",label:t.state,placeholder:t.statePlaceholder,maxLength:100},{key:\"postalCode\",label:t.postalCode,placeholder:t.postalCodePlaceholder,maxLength:20}];return(0,nI.jsx)(IQ,{children:i.map((e=>(0,nI.jsxs)(_Q,{$isSelect:e.isSelect,children:[(0,nI.jsx)(iI,{className:\"body-2\",color:Zk,children:e.label}),(0,nI.jsxs)(OQ,{$disabled:n,children:[(0,nI.jsx)(MQ,{$hasArrow:e.isSelect,value:(null===r||void 0===r?void 0:r[e.key])||\"\",placeholder:e.placeholder,disabled:n,maxLength:e.maxLength,onChange:t=>null===o||void 0===o?void 0:o(e.key,t.target.value)}),e.isSelect&&(0,nI.jsx)(RQ,{src:\"/media/google-icons/keyboard-arrow-down.svg\",alt:\"\"})]})]},e.key)))})}"
+    },
+    {
+      "id": "A05",
+      "label": "국가 selector",
+      "start": 8206811,
+      "end": 8207429,
+      "source": "function LQ(e){let{value:t,lang:r,disabled:n=!1,placeholder:a=\"\",onChange:o}=e;const i=(0,yt.useMemo)((()=>$q.map((e=>{const t=e.dropdownLabel[r]||e.dropdownLabel.en||e.dropdownLabel.ko||e.iso;return{iso:e.iso,label:t}}))),[r]),s=t&&Hq(t)?t.toUpperCase():\"\";return(0,nI.jsxs)(DQ,{$disabled:n,children:[(0,nI.jsxs)(FQ,{value:s,disabled:n,onChange:e=>o(e.target.value),\"aria-label\":a||\"country\",children:[(0,nI.jsx)(\"option\",{value:\"\",disabled:!0,hidden:!0,children:a}),i.map((e=>(0,nI.jsx)(\"option\",{value:e.iso,children:e.label},e.iso)))]}),(0,nI.jsx)(BQ,{src:\"/media/google-icons/keyboard-arrow-down.svg\",alt:\"\"})]})}"
+    },
+    {
+      "id": "A06",
+      "label": "국가 ISO 조회와 국가명 fallback",
+      "start": 8159362,
+      "end": 8159490,
+      "source": "Hq=e=>e?$q.find((t=>t.iso===e.toUpperCase())):void 0,Wq=(e,t)=>{const r=Hq(e);return r&&(r.names[t]||r.names.en||r.names.ko)||e}"
+    },
+    {
+      "id": "A07",
+      "label": "SDK URL",
+      "start": 8209071,
+      "end": 8209144,
+      "source": "HQ=\"https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js\""
+    },
+    {
+      "id": "A08",
+      "label": "SDK namespace 로딩",
+      "start": 8209145,
+      "end": 8209744,
+      "source": "WQ=($Q=null,function(e){return void 0===e&&(e=HQ),$Q||($Q=new Promise((function(t,r){var n=document.createElement(\"script\");n.src=e,n.onload=function(){var e,n,a,o=null!==(n=null===(e=null===window||void 0===window?void 0:window.kakao)||void 0===e?void 0:e.Postcode)&&void 0!==n?n:null===(a=null===window||void 0===window?void 0:window.daum)||void 0===a?void 0:a.Postcode;if(o)return t(o);r(new Error(\"Script is loaded successfully, but cannot find Postcode module. Check your scriptURL property.\"))},n.onerror=function(e){return r(e)},n.id=\"kakao_postcode_script\",document.body.appendChild(n)})))})"
+    },
+    {
+      "id": "A09",
+      "label": "SDK embed",
+      "start": 8210045,
+      "end": 8211353,
+      "source": "QQ=function(e){function t(){var t=null!==e&&e.apply(this,arguments)||this;return t.mounted=!1,t.wrap=(0,yt.createRef)(),t.state={hasError:!1,completed:!1},t.initiate=function(e){if(t.wrap.current){var r=t.props;r.scriptUrl,r.className,r.style;var n=r.defaultQuery,a=r.autoClose;r.errorMessage;var o=r.onComplete,i=r.onClose,s=r.onResize,l=r.onSearch,c=VQ(r,[\"scriptUrl\",\"className\",\"style\",\"defaultQuery\",\"autoClose\",\"errorMessage\",\"onComplete\",\"onClose\",\"onResize\",\"onSearch\"]);new e(zQ(zQ({},c),{oncomplete:function(e){o&&o(e),t.setState({completed:!0})},onsearch:l,onresize:s,onclose:i,width:\"100%\",height:\"100%\"})).embed(t.wrap.current,{q:n,autoClose:a})}},t.onError=function(e){console.error(e),t.setState({hasError:!0})},t}return function(e,t){function r(){this.constructor=e}UQ(e,t),e.prototype=null===t?Object.create(t):(r.prototype=t.prototype,new r)}(t,e),t.prototype.componentDidMount=function(){var e=this.initiate,t=this.onError,r=this.props.scriptUrl;r&&(this.mounted||(WQ(r).then(e).catch(t),this.mounted=!0))},t.prototype.render=function(){var e=this.props,t=e.className,r=e.style,n=e.errorMessage,a=e.autoClose,o=this.state,i=o.hasError,s=o.completed;return!0===a&&!0===s?null:yt.createElement(\"div\",{ref:this.wrap,className:t,style:zQ(zQ({},GQ),r)},i&&n)},t.defaultProps=YQ,t}(yt.Component)"
+    },
+    {
+      "id": "A10",
+      "label": "SDK modal onComplete",
+      "start": 8211354,
+      "end": 8211526,
+      "source": "function KQ(e){let{open:t,onFind:r,onClose:n,onFocus:a}=e;return(0,nI.jsx)(vP,{open:t,onClose:n,title:\"\",headerNone:!0,children:(0,nI.jsx)(QQ,{onComplete:e=>{r(e),n()}})})}"
+    },
+    {
+      "id": "A11",
+      "label": "V3 국내 주소 제출 직렬화",
+      "start": 10055263,
+      "end": 10055554,
+      "source": "case\"ADDRESS\":y=`${null!==(t=e.value)&&void 0!==t&&t.zipcode?`(${null===(r=e.value)||void 0===r?void 0:r.zipcode}) `:\"\"}${null!==(n=e.value)&&void 0!==n&&n.address?`${null===(a=e.value)||void 0===a?void 0:a.address} `:\"\"}${(null===(o=e.value)||void 0===o?void 0:o.detailAddress)||\"\"}`;break;"
+    },
+    {
+      "id": "A12",
+      "label": "V3 해외 주소 제출 직렬화",
+      "start": 10055554,
+      "end": 10056048,
+      "source": "case\"FOREIGN_ADDRESS\":y={country:(null===(i=e.value)||void 0===i?void 0:i.country)||\"\",countryName:(null===(s=e.value)||void 0===s?void 0:s.countryName)||\"\",streetAddress:(null===(l=e.value)||void 0===l?void 0:l.streetAddress)||\"\",addressDetail:(null===(c=e.value)||void 0===c?void 0:c.addressDetail)||\"\",city:(null===(u=e.value)||void 0===u?void 0:u.city)||\"\",state:(null===(p=e.value)||void 0===p?void 0:p.state)||\"\",postalCode:(null===(m=e.value)||void 0===m?void 0:m.postalCode)||\"\"};break;"
+    },
+    {
+      "id": "A13",
+      "label": "V3 질문 응답 envelope",
+      "start": 10058517,
+      "end": 10058880,
+      "source": "return{questionId:e.questionId,questionType:e.questionType,\"@type\":e.questionType,subType:e.questionSubType,questionIndex:e.orderNumber,required:e.questionElementType,value:y}}));return{pageId:e.pageId,pageIndex:t,replies:r}}));return{formId:t.formId,passedPath:m,requestUser:l,userMTxId:c||null,pages:g,agreeTokenList:p}}const URe={\"License has been Expired\":\"ph"
+    },
+    {
+      "id": "A14",
+      "label": "임시저장 객체 보존",
+      "start": 10060000,
+      "end": 10060455,
+      "source": "((e,t)=>r=>{const n={agreementTokens:e,nonAgreementTokens:t};r(g0.savedAgreementsFetched(n))})(c,d)),!0;t=(0,tK.cloneDeep)(i),t[s].questions=l,m(b0(s,t[s]))}catch(u){return!1}const r=null!==(e=t)&&void 0!==e?e:{};try{const e={...a,data:JSON.stringify(r)};return await function(e,t){const r=vH(fH.headers,t);return At.put(`${PE}/company-operated-service/v3/outer/forms/temp-reply`,e,r)}(e,null===n||void 0===n?void 0:n.formLanguage),m(iu({timestamp:Date.no"
+    },
+    {
+      "id": "A15",
+      "label": "임시저장 객체 복구",
+      "start": 10061010,
+      "end": 10061535,
+      "source": "n||void 0===n?void 0:n.version,m,p,h]),T=(0,yt.useCallback)((()=>{var e;(e=a,At.get(`${PE}/company-operated-service/v3/outer/forms/temp-reply`,{params:e,...fH})).then((e=>{let{data:t}=e;if(!t)return;const a=JSON.parse(t.data),o=g.find((e=>e.formToken===r));var i;(null!==n&&void 0!==n&&n.version&&n.version!==(null===o||void 0===o?void 0:o.version)&&(alert(f(\"phrase.phrase82\")),S()),a&&Object.keys(a).length>0)&&(m(v0(a)),u(null===(i=a[0])||void 0===i?void 0:i.questions),b(!0))})).catch((()=>{p((e=>({...e,show:!0,message:f"
+    },
+    {
+      "id": "A16",
+      "label": "관리자 우편번호 추출",
+      "start": 8451727,
+      "end": 8451819,
+      "source": "de=e=>{if(e){const t=/\\((\\d+)\\)/g,r=e.match(t);if(r){return(r[0].match(/\\d+/)||[])[0]||\"\"}}}"
+    },
+    {
+      "id": "A17",
+      "label": "관리자 합쳐진 주소 표시",
+      "start": 8451820,
+      "end": 8451909,
+      "source": "ue=e=>{if(!e)return\"\";const t=e.match(/\\((\\d+)\\)/g);return t?e.replace(t[0],\"\").trim():e}"
+    },
+    {
+      "id": "A18",
+      "label": "관리자 입력 모양의 읽기 전용 주소 표시",
+      "start": 8462550,
+      "end": 8463335,
+      "source": "ottom w-full \",children:[(0,nI.jsx)(Kq,{disabled:\"PREVIEW\"!==b,placeholder:_(\"zipCode\"),value:\"PREVIEW\"===b?\"\":de(x.replyContents)}),(0,nI.jsx)(J2,{className:\"ml-3 whitespace-nowrap\",disabled:\"PREVIEW\"!==b,readOnly:\"PREVIEW\"===b,children:_(\"addressSearch\")})]})}),\"PREVIEW\"===b?(0,nI.jsxs)(\"div\",{className:\"flex gap-3 mt-3\",children:[(0,nI.jsx)(Kq,{className:\"flex-1 mr-3\",placeholder:_(\"address\"),value:\"\",disabled:\"PREVIEW\"!==b}),(0,nI.jsx)(Kq,{disabled:\"PREVIEW\"!==b,placeholder:_(\"detailedAddress\"),value:\"\"})]}):(0,nI.jsx)(\"div\",{className:\"flex gap-3 mt-3\",children:(0,nI.jsx)(Kq,{disabled:\"PREVIEW\"!==b,placeholder:_(\"detailedAddress\"),value:ue(x.replyContents)})})]})}),\"FOREIGN_ADDRESS\"===x.questionType&&(e=>{const t=\"PREVIEW\"===b||\"TEMPLATE_PREVIEW\"===b,r=t?{country:\"\",cou"
+    },
+    {
+      "id": "A19",
+      "label": "다른 응답 화면 우편번호 추출",
+      "start": 8538861,
+      "end": 8538964,
+      "source": "e3=e=>{var t;return(null===e||void 0===e||null===(t=e.match(/\\((\\d+)\\)/))||void 0===t?void 0:t[1])||\"\"}"
+    },
+    {
+      "id": "A20",
+      "label": "다른 응답 화면 합쳐진 주소 표시",
+      "start": 8538965,
+      "end": 8539035,
+      "source": "t3=e=>(null===e||void 0===e?void 0:e.replace(/\\(\\d+\\)/,\"\").trim())||\"\""
+    },
+    {
+      "id": "A21",
+      "label": "다른 입력 모양의 읽기 전용 주소 표시",
+      "start": 8556650,
+      "end": 8557435,
+      "source": "bottom w-full \",children:[(0,nI.jsx)(Kq,{disabled:\"PREVIEW\"!==u,placeholder:T(\"zipCode\"),value:\"PREVIEW\"===u?\"\":e3(e.replyContents)}),(0,nI.jsx)(X4,{className:\"ml-3 whitespace-nowrap\",disabled:\"PREVIEW\"!==u,readOnly:\"PREVIEW\"===u,children:T(\"addressSearch\")})]})}),\"PREVIEW\"===u?(0,nI.jsxs)(\"div\",{className:\"flex gap-3 mt-3\",children:[(0,nI.jsx)(Kq,{className:\"flex-1 mr-3\",placeholder:T(\"address\"),value:\"\",disabled:\"PREVIEW\"!==u}),(0,nI.jsx)(Kq,{disabled:\"PREVIEW\"!==u,placeholder:T(\"detailedAddress\"),value:\"\"})]}):(0,nI.jsx)(\"div\",{className:\"flex gap-3 mt-3\",children:(0,nI.jsx)(Kq,{disabled:\"PREVIEW\"!==u,placeholder:T(\"detailedAddress\"),value:t3(e.replyContents)})})]})}),\"FOREIGN_ADDRESS\"===e.questionType&&(t=>{const r=\"PREVIEW\"===u||\"TEMPLATE_PREVIEW\"===u,n=r?{country:\"\",co"
+    },
+    {
+      "id": "A22",
+      "label": "ADDRESS 표시의 세 번째 우편번호/나머지 분리",
+      "start": 8487308,
+      "end": 8488123,
+      "source": "case\"ADDRESS\":{const t=(e=>{var t;const r=null===e||void 0===e?void 0:e.match(/\\((\\d+)\\)/g);return r&&(null===(t=r[0].match(/\\d+/))||void 0===t?void 0:t[0])||\"\"})(e.replyContents),r=(e=>{const t=null===e||void 0===e?void 0:e.match(/\\((\\d+)\\)/g);return(t?e.replace(t[0],\"\").trim():e)||\"\"})(e.replyContents);return(0,nI.jsxs)(\"div\",{className:\"flex flex-col gap-2\",children:[(0,nI.jsxs)(\"div\",{className:\"flex gap-2\",children:[(0,nI.jsx)(R5,{style:{flex:1,minWidth:0},children:(0,nI.jsx)(Y5,{value:t,placeholder:F(\"zipCode\")})}),(0,nI.jsx)(M5,{children:(0,nI.jsx)(iI,{className:\"subhead-weak\",color:sj,style:{fontWeight:700},children:F(\"addressSearch\")})})]}),(0,nI.jsx)(\"div\",{className:\"flex gap-2\",children:(0,nI.jsx)(R5,{style:{flex:1,minWidth:0},children:(0,nI.jsx)(Y5,{value:r,placeholder:F(\"address\")})})})]})}"
+    },
+    {
+      "id": "A23",
+      "label": "해외 저장응답 JSON/object parser",
+      "start": 8474046,
+      "end": 8474208,
+      "source": "b5=e=>{if(!e)return null;if(\"string\"===typeof e)try{const t=JSON.parse(e);return t&&\"object\"===typeof t?t:null}catch{return null}return\"object\"===typeof e?e:null}"
+    },
+    {
+      "id": "A24",
+      "label": "해외 저장응답 표시 및 국가명 계산",
+      "start": 8472051,
+      "end": 8474040,
+      "source": "function v5(e){let{reply:t,formLanguage:r,variant:n=\"card\"}=e;const a=(0,yt.useMemo)((()=>b5(t)),[t]),o=r&&\"string\"===typeof r?r:zN.language||\"ko\",[i,s]=(0,yt.useState)((()=>zN.hasResourceBundle(o,\"translate\")));(0,yt.useEffect)((()=>{let e=!1;if(!zN.hasResourceBundle(o,\"translate\"))return s(!1),GN(o).then((()=>{e||s(zN.hasResourceBundle(o,\"translate\"))})),()=>{e=!0};s(!0)}),[o]);const l=(0,yt.useMemo)((()=>x5(o)),[o,i]);if(!a&&\"input\"!==n)return(0,nI.jsx)(iI,{className:\"body-1\",color:ej,children:\"-\"});const c=null!==a&&void 0!==a?a:{country:\"\",countryName:\"\",streetAddress:\"\",addressDetail:\"\",city:\"\",state:\"\",postalCode:\"\"},d=c.country?Wq(c.country,o):\"\",u=[{key:\"country\",label:l.country,display:d,placeholder:l.placeholders.country},{key:\"streetAddress\",label:l.streetAddress,display:c.streetAddress||\"\",placeholder:l.placeholders.streetAddress},{key:\"addressDetail\",label:l.addressDetail,display:c.addressDetail||\"\",placeholder:l.placeholders.addressDetail},{key:\"city\",label:l.city,display:c.city||\"\",placeholder:l.placeholders.city},{key:\"state\",label:l.state,display:c.state||\"\",placeholder:l.placeholders.state},{key:\"postalCode\",label:l.postalCode,display:c.postalCode||\"\",placeholder:l.placeholders.postalCode}];if(\"input\"===n)return(0,nI.jsx)(w5,{children:u.map((e=>{const t=\"country\"===e.key;return(0,nI.jsxs)(C5,{children:[(0,nI.jsx)(iI,{className:\"body-1\",color:sj,children:e.label}),(0,nI.jsxs)(S5,{as:t?T5:void 0,children:[(0,nI.jsx)(iI,{className:\"subhead-weak\",color:e.display?ej:ij,style:{wordBreak:\"break-word\"},children:e.display||e.placeholder}),t&&(0,nI.jsx)(BU,{src:\"/img/google-icons-v2/arrows/caret-down.svg\",color:sj,width:20})]})]},e.key)}))});const h=u.filter((e=>e.display));return 0===h.length?(0,nI.jsx)(iI,{className:\"body-1\",color:ej,children:\"-\"}):(0,nI.jsx)(A5,{children:h.map((e=>(0,nI.jsxs)(y5,{children:[(0,nI.jsx)(iI,{className:\"body-1\",color:Zk,children:e.label}),(0,nI.jsx)(iI,{className:\"body-1\",color:ej,children:e.display})]},e.key)))})}"
+    },
+    {
+      "id": "A25",
+      "label": "해외 요약 표시 JSON parser",
+      "start": 8498493,
+      "end": 8498764,
+      "source": "r4=e=>{if(!e)return\"-\";let t=null;if(\"string\"===typeof e)try{t=JSON.parse(e)}catch{return e||\"-\"}else\"object\"===typeof e&&(t=e);var r;return((r=t)?[r.country,r.streetAddress,r.addressDetail,r.city,r.state,r.postalCode].filter((e=>e&&String(e).trim())).join(\" \"):\"\")||\"-\"}"
+    },
+    {
+      "id": "A26",
+      "label": "다른 응답 경로의 FOREIGN_ADDRESS JSON 문자열 직렬화",
+      "start": 10038470,
+      "end": 10039040,
+      "source": "{let t=\"\";var r,a,i,s,l;if(\"ADDRESS\"===e.questionType)t=`${null!==(r=e.value)&&void 0!==r&&r.zipcode?`(${null===(a=e.value)||void 0===a?void 0:a.zipcode}) `:\"\"}${null!==(i=e.value)&&void 0!==i&&i.address?`${null===(s=e.value)||void 0===s?void 0:s.address} `:\"\"}${(null===(l=e.value)||void 0===l?void 0:l.detailAddress)||\"\"}`;else if(\"FOREIGN_ADDRESS\"===e.questionType){const r=e.value||{};t=JSON.stringify({country:r.country||\"\",streetAddress:r.streetAddress||\"\",addressDetail:r.addressDetail||\"\",city:r.city||\"\",state:r.state||\"\",postalCode:r.postalCode||\"\"})}else if(\""
+    },
+    {
+      "id": "A27",
+      "label": "작성기 주소 샘플 입력 및 초기값",
+      "start": 12848543,
+      "end": 12851731,
+      "source": "function PMt(e){let{item:t,handleChange:r}=e;const{t:n}=fa(\"translate\",{keyPrefix:\"infoOwnerForm\"}),a=(0,nP.useMediaQuery)({maxWidth:480}),o=(0,nP.useMediaQuery)({maxWidth:580}),i=Ut((e=>e.form.formModelV3.formLanguage||SV)),s=\"FOREIGN_ADDRESS\"===(null===t||void 0===t?void 0:t.questionType)||i!==SV,[l,c]=(0,yt.useState)({show:!1,id:null}),[d,u]=(0,yt.useState)(t.value||(s?{country:\"\",countryName:\"\",streetAddress:\"\",addressDetail:\"\",city:\"\",state:\"\",postalCode:\"\"}:{zipcode:\"\",address:\"\",detailAddress:\"\"})),h=(0,yt.useCallback)((e=>{const t=e.target.value,n={...d,detailAddress:t};u(n),r(n)}),[d,r]),p=(0,yt.useCallback)((e=>{const t={country:\"\",countryName:\"\",streetAddress:\"\",addressDetail:\"\",city:\"\",state:\"\",postalCode:\"\",...d,...e};u(t),r(t)}),[d,r]),m=(0,yt.useCallback)(((e,t)=>p({[e]:t})),[p]),f=(0,yt.useCallback)((e=>p({country:e,countryName:Wq(e,i)})),[p,i]);return s?(0,nI.jsxs)(MMt,{children:[(0,nI.jsxs)(LMt,{children:[(0,nI.jsx)(iI,{className:\"body-2\",color:Zk,children:n(\"internationalAddress.country\")}),(0,nI.jsx)(LQ,{value:null===d||void 0===d?void 0:d.country,lang:i,disabled:t.disabled,placeholder:n(\"internationalAddress.countryPlaceholder\"),onChange:f})]}),(0,nI.jsx)(kQ,{copy:{country:n(\"internationalAddress.country\"),countryPlaceholder:n(\"internationalAddress.countryPlaceholder\"),streetAddress:n(\"internationalAddress.streetAddress\"),streetAddressPlaceholder:n(\"internationalAddress.streetAddressPlaceholder\"),addressDetail:n(\"internationalAddress.addressDetail\"),addressDetailPlaceholder:n(\"internationalAddress.addressDetailPlaceholder\"),city:n(\"internationalAddress.city\"),cityPlaceholder:n(\"internationalAddress.cityPlaceholder\"),state:n(\"internationalAddress.state\"),statePlaceholder:n(\"internationalAddress.statePlaceholder\"),postalCode:n(\"internationalAddress.postalCode\"),postalCodePlaceholder:n(\"internationalAddress.postalCodePlaceholder\")},value:d,disabled:t.disabled,showCountry:!1,onChange:(e,t)=>m(e,t)})]}):(0,nI.jsxs)(\"div\",{children:[(0,nI.jsxs)(\"div\",{children:[(0,nI.jsx)(\"div\",{className:\"flex flex-wrap gap-3\",children:(0,nI.jsxs)(\"div\",{className:`inline-flex align-bottom ${o?\"w-full\":\"w-[50%] pe-[6px]\"} `,children:[(0,nI.jsx)(Kq,{disabled:!0,placeholder:n(\"zipCode\"),error:!1,value:(null===d||void 0===d?void 0:d.zipcode)||\"\",maxLength:100}),(0,nI.jsx)(OMt,{className:\"ms-3 whitespace-nowrap\",onClick:()=>{var e;return c({show:!0,id:null!==(e=t.htmlFormInputName)&&void 0!==e?e:null})},children:n(\"addressSearch\")})]})}),(0,nI.jsxs)(\"div\",{className:`${a&&\"flex-col \"} flex gap-3 mt-3`,children:[(0,nI.jsx)(Kq,{className:\"flex-1 me-3\",placeholder:n(\"address\"),error:!1,value:(null===d||void 0===d?void 0:d.address)||\"\",maxLength:100,disabled:!0}),(0,nI.jsx)(Kq,{disabled:!(null!==d&&void 0!==d&&d.zipcode),id:t.htmlFormInputName,placeholder:n(\"phrase.phrase41\"),error:!1,value:(null===d||void 0===d?void 0:d.detailAddress)||\"\",onChange:h,maxLength:100})]})]}),l.show&&(0,nI.jsx)(KQ,{open:l.show,onClose:()=>c({show:!1,id:null}),onFind:e=>{u({...d,zipcode:e.zonecode,address:e.address}),r(d),c({show:!1,id:null})},onFocus:()=>{var e;const r=document.getElementById(null!==(e=t.htmlFormInputName)&&void 0!==e?e:\"\");r&&r.focus()}})]})}"
+    },
+    {
+      "id": "A28",
+      "label": "작성기 샘플 입력의 호출",
+      "start": 12872360,
+      "end": 12872710,
+      "source": "nt)&&void 0!==t?t:s);n[r].value=[...e],h(n)}}),(\"ADDRESS\"===e.elementType||\"FOREIGN_ADDRESS\"===e.elementType)&&(0,nI.jsx)(PMt,{item:e,handleChange:e=>{var t;const n=(0,tK.cloneDeep)(null!==(t=d.current)&&void 0!==t?t:s);n[r].value=e,h(n)}}),\"CONTACT\"===e.elementType&&(0,nI.jsx)(UMt,{item:e,handleChange:e=>{var t;const n=(0,tK.cloneDeep)(null!==(t=d"
+    },
+    {
+      "id": "A29",
+      "label": "공개 주소 renderer",
+      "start": 8331032,
+      "end": 8331226,
+      "source": "case\"ADDRESS\":case\"FOREIGN_ADDRESS\":return(0,nI.jsx)(XQ,{item:P,onUpdate:i,elementGuideGroup:D,disabled:P.disabled||u,readOnly:h,type:w,formLanguage:null===f||void 0===f?void 0:f.formLanguage});"
+    },
+    {
+      "id": "A30",
+      "label": "기본 isValid 검사 및 선택 빈값 건너뛰기",
+      "start": 7960471,
+      "end": 7960727,
+      "source": "zq=e=>e.find((e=>{if(e.isValid)return!1;if(\"MS\"===e.questionElementType){let t=!1;if(e.value&&(\"object\"!==typeof e.value||Array.isArray(e.value)||0!==Object.keys(e.value).length)?Array.isArray(e.value)&&0===e.value.length&&(t=!0):t=!0,t)return!1}return!0})"
+    },
+    {
+      "id": "A31",
+      "label": "공개 최종제출 전 검증 호출",
+      "start": 10072635,
+      "end": 10072700,
+      "source": "))},Ae=()=>{if(!be())return void F(!0);if(N>104857600)return void"
+    }
+  ]
+}

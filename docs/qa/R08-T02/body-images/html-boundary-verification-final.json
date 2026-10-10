@@ -1,0 +1,54 @@
+{
+  "verifiedAt": "2026-10-10T18:57:45+09:00",
+  "checkpoint": "BI-02b",
+  "status": "passed",
+  "implemented": [
+    "strict HTML-to-RichDocument parser for the observed editor vocabulary",
+    "owned image identity without persisted source URLs",
+    "provider media canonicalization with discarded iframe previews",
+    "React-node renderer without raw HTML insertion",
+    "same-origin relative image route enforcement",
+    "bounded table and image layout styles"
+  ],
+  "initialFailuresResolved": [
+    "schema failures escaped the HTML boundary error type",
+    "DOM find results were not narrowed to Element",
+    "the renderer test extension was outside the Vitest include pattern",
+    "RTL direction was emitted as CSS instead of the semantic dir attribute"
+  ],
+  "checks": [
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/rich-content-contract.test.ts tests/server/form-rich-content-contract.test.ts tests/server/rich-content-html.test.ts tests/server/rich-content-render.test.ts",
+      "exitCode": 0,
+      "result": "4 files, 55 tests passed"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/eslint/bin/eslint.js src/contracts/rich-content.ts src/contracts/form-rich-content.ts src/contracts/rich-content-html.ts src/components/forms/RichDocumentView.tsx tests/server/rich-content-contract.test.ts tests/server/form-rich-content-contract.test.ts tests/server/rich-content-html.test.ts tests/server/rich-content-render.test.ts",
+      "exitCode": 0,
+      "result": "0 errors and 0 warnings"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit --pretty false",
+      "exitCode": 0,
+      "result": "0 errors"
+    },
+    {
+      "command": "git diff --check -- rich contract, parser, renderer, tests and evidence files",
+      "exitCode": 0,
+      "result": "clean"
+    }
+  ],
+  "files": {
+    "src/contracts/rich-content-html.ts": "45ae48974073da2198cfd7d0eb87cc230fe860b7f743727f77ce19978223d008",
+    "src/components/forms/RichDocumentView.tsx": "f18a4c89449662da6ba5e9cd60aca1c2cdac6764ba4a21174940cae45449f18c",
+    "src/components/forms/forms.css": "408588fbb9a126a230924a11dee259abcc4f072cf08c0185091ea523f15158d2",
+    "tests/server/rich-content-html.test.ts": "328352661203f351ca8d8180f610ba1e0a777f05df64bf18580517d0f1e840ba",
+    "tests/server/rich-content-render.test.ts": "4df7a3c761c8ef7b2f233eebd29ba30c7a5ff546df9ee0df6b4d7639dd05949f"
+  },
+  "notVerifiedHere": [
+    "database persistence and API DTOs",
+    "editor toolbar and upload UX",
+    "private asset manifest authorization",
+    "browser layout and external provider behavior"
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "checkedAt": "2026-10-10T14:05:52.611Z",
+  "result": "passed",
+  "migrations": 145,
+  "expectedMigrations": 145,
+  "tables": [
+    {
+      "table_name": "FormAccessTarget"
+    },
+    {
+      "table_name": "FormAccessTargetBatch"
+    },
+    {
+      "table_name": "ParticipationChallenge"
+    },
+    {
+      "table_name": "ParticipationSession"
+    },
+    {
+      "table_name": "PublicationParticipant"
+    }
+  ],
+  "versionColumns": [
+    {
+      "column_name": "participationAccessMethod",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'EMAIL'::text"
+    },
+    {
+      "column_name": "participationAccessSchemaVersion",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "column_name": "participationSocialProvider",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'KAKAO'::text"
+    },
+    {
+      "column_name": "participationTargetScope",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'ALL'::text"
+    },
+    {
+      "column_name": "participationUseOtp",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "column_name": "restrictDuplicateReplies",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "column_name": "useParticipationAccess",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    }
+  ],
+  "constraints": [
+    {
+      "conname": "FormVersion_participation_access_check",
+      "definition": "CHECK ((((\"participationAccessSchemaVersion\" = 0) AND (\"useParticipationAccess\" = false) AND (\"participationAccessMethod\" = 'EMAIL'::text) AND (\"participationTargetScope\" = 'ALL'::text) AND (\"participationUseOtp\" = false) AND (\"participationSocialProvider\" = 'KAKAO'::text) AND (\"restrictDuplicateReplies\" = false)) OR ((\"participationAccessSchemaVersion\" = 1) AND (((\"useParticipationAccess\" = false) AND (\"participationAccessMethod\" = 'EMAIL'::text) AND (\"participationTargetScope\" = 'ALL'::text) AND (\"participationUseOtp\" = false) AND (\"participationSocialProvider\" = 'KAKAO'::text) AND (\"restrictDuplicateReplies\" = false)) OR ((\"useParticipationAccess\" = true) AND (((\"participationAccessMethod\" = 'EMAIL'::text) AND (\"participationTargetScope\" = ANY (ARRAY['ALL'::text, 'WHITELIST'::text])) AND ((\"participationTargetScope\" = 'WHITELIST'::text) OR (\"participationUseOtp\" = true)) AND (\"participationSocialProvider\" = 'KAKAO'::text)) OR ((\"participationAccessMethod\" = 'SOCIAL'::text) AND (\"participationTargetScope\" = 'ALL'::text) AND (\"participationUseOtp\" = false) AND (\"participationSocialProvider\" = ANY (ARRAY['KAKAO'::text, 'NAVER'::text])))))))))"
+    },
+    {
+      "conname": "ParticipationChallenge_attempts_check",
+      "definition": "CHECK (((attempts >= 0) AND (attempts <= 5)))"
+    },
+    {
+      "conname": "ParticipationChallenge_expiry_check",
+      "definition": "CHECK ((\"expiresAt\" > \"createdAt\"))"
+    },
+    {
+      "conname": "ParticipationSession_expiry_check",
+      "definition": "CHECK ((\"expiresAt\" > \"createdAt\"))"
+    },
+    {
+      "conname": "PublicationParticipant_method_check",
+      "definition": "CHECK ((((method = 'EMAIL'::text) AND (provider IS NULL)) OR ((method = 'SOCIAL'::text) AND (provider = ANY (ARRAY['KAKAO'::text, 'NAVER'::text])))))"
+    },
+    {
+      "conname": "PublicationParticipant_submission_count_check",
+      "definition": "CHECK ((\"submissionCount\" >= 0))"
+    }
+  ],
+  "foreignKeys": [
+    {
+      "conname": "FormAccessTargetBatch_tenantId_formId_fkey"
+    },
+    {
+      "conname": "FormAccessTarget_tenantId_formId_batchId_fkey"
+    },
+    {
+      "conname": "FormAccessTarget_tenantId_formId_fkey"
+    },
+    {
+      "conname": "ParticipationChallenge_tenantId_publicationId_fkey"
+    },
+    {
+      "conname": "ParticipationSession_participantId_fkey"
+    },
+    {
+      "conname": "ParticipationSession_tenantId_publicationId_challengeId_fkey"
+    },
+    {
+      "conname": "ParticipationSession_tenantId_publicationId_fkey"
+    },
+    {
+      "conname": "PublicationParticipant_tenantId_formId_fkey"
+    },
+    {
+      "conname": "Submission_participantId_fkey"
+    }
+  ],
+  "schemaWasDropped": true,
+  "scope": "Fresh isolated PostgreSQL schema; every migration applied and participation-access tables, columns, checks and foreign keys inspected."
+}

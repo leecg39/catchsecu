@@ -1,3 +1,5 @@
+import { beforeEach as beforeSecurityCase } from "vitest";
+import { grantSecurityTestTrials } from "../fixtures/security-subscription";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createServer } from "node:http";
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from "vitest";
@@ -183,3 +185,5 @@ describe("PostgreSQL IP CRUD and enforcement",()=>{
     await expect(db.ipAccessPolicy.update({where:{tenantId:a},data:{enabled:false}})).rejects.toBeDefined();
   });
 });
+
+beforeSecurityCase(grantSecurityTestTrials);

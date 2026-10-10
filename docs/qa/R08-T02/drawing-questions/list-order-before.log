@@ -1,0 +1,39 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:32658) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/question-drawing-types.test.ts (15 tests | 1 failed | 14 skipped) 1230ms
+   × real PNG and legacy FILE bytes scan, encrypt, attach once and download with private headers 1225ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/question-drawing-types.test.ts > real PNG and legacy FILE bytes scan, encrypt, attach once and download with private headers
+AssertionError: expected [ …(3) ] to deeply equal [ …(3) ]
+
+- Expected
++ Received
+
+  [
+    "c360c870-f6c1-4beb-9ef6-cc6ba89ed5a4",
+-   "d54e265f-9eb3-445c-bc93-4a102068df59",
+    "3302057c-e7d3-4e93-a59e-fed0fc6a1953",
++   "d54e265f-9eb3-445c-bc93-4a102068df59",
+  ]
+
+ ❯ tests/server/question-drawing-types.test.ts:140:67
+    138|   const detail = await getSubmission(ctx, created.body.id, randomUUID(…
+    139|   const listing = await listSubmissions(ctx, f.form.id, 1, 20, randomU…
+    140|   expect(listing.items[0].questions.map(question => question.id)).toEq…
+       |                                                                   ^
+    141|   expect(detail.values[f.questions[1].id]).toBe(legacy.id); expect(det…
+    142|   const stored = await db.fileObject.findUniqueOrThrow({ where: { id: …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 14 skipped (15)
+   Start at  14:23:40
+   Duration  3.09s (tests 41%, transform 32%, import 27%)
+

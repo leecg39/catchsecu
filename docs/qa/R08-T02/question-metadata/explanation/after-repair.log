@@ -1,0 +1,27 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:412) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/question-explanations.test.ts (14 tests) 8135ms
+   ✓ accepts literal text, whitespace and exact UTF-16 boundaries while rejecting invalid wire values 523ms
+   ✓ stores literal explanation unchanged and exposes the published version through the public DTO 616ms
+   ✓ legacy null metadata is absent from DTO and keeps the pre-extension approval fingerprint shape 420ms
+   ✓ description-only update preserves physical identities, changes the fingerprint and supersedes approval 558ms
+   ✓ omitted draft metadata is preserved, explicit empty removes it and never returns on a later omitted save 515ms
+   ✓ omitted metadata survives the implicit new draft path and new logical questions inherit nothing 652ms
+   ✓ explicit revise and form/template copies preserve values while allocating only the intended new identities 1157ms
+   ✓ template updates preserve omitted descriptions and explicit clearing stays cleared when used 426ms
+   ✓ legacy template JSON is read without adding empty description keys or rewriting its stored payload 386ms
+   ✓ database counts supplementary code points as two UTF-16 units and protects published metadata 485ms
+   ✓ stale versions and revoked current authority never alter descriptions or create update audits 478ms
+   ✓ form explanation changes and version increments roll back when audit insertion fails 449ms
+   ✓ template explanation changes and version increments roll back when audit insertion fails 493ms
+   ✓ old response corrections and receipt evidence/bytes stay bound to the original published form 971ms
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  15:23:09
+   Duration  9.51s (tests 86%, import 9%, transform 5%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/explanation/after-repair.json

@@ -3003,5 +3003,95 @@
   ],
   "observedUrl": "https://app.catchsecu.com/sms/nonumber",
   "limitation": "모듈 조사 기록: docs/research/services/services-coverage.json 실제 백엔드·인증·결제·발송 없음. 쓰기 동작은 로컬 데모 또는 안내. 모든 상태와 181개 화면의 픽셀 단위 일치 검증은 수행하지 않았다. 확인된 권한·라이선스·발신자 조건 제한 화면까지만 재현. 제한 뒤 업무 화면은 미검증."
+ },
+ {
+  "id": 182,
+  "category": "개인정보 모니터링·이력",
+  "name": "보유기간 규칙",
+  "path": "/log/retention",
+  "sourceUrl": "https://app.catchsecu.com/log/retention",
+  "dynamic": false,
+  "status": "static-declaration",
+  "requiresFixture": true,
+  "statusLabel": "최신 원본 정적 경로 확인·실제 동작 검증 중",
+  "sourceObserved": false,
+  "evidence": [
+   "docs/planning/09-rea-fullstack/source-routes.json"
+  ],
+  "observedUrl": "",
+  "limitation": "",
+  "routeKind": "page"
+ },
+ {
+  "id": 183,
+  "category": "로그인·인증",
+  "name": "GPKI 인증 결과",
+  "path": "/login/gpki/callback",
+  "sourceUrl": "https://app.catchsecu.com/login/gpki/callback",
+  "dynamic": false,
+  "status": "static-declaration",
+  "requiresFixture": true,
+  "statusLabel": "최신 원본 정적 경로 확인·실제 동작 검증 중",
+  "sourceObserved": false,
+  "evidence": [
+   "docs/planning/09-rea-fullstack/source-routes.json"
+  ],
+  "observedUrl": "",
+  "limitation": "로그아웃·상태 변경·인증/결제 결과 경로는 실행하지 않음",
+  "routeKind": "page"
+ },
+ {
+  "id": 184,
+  "category": "로그인·인증",
+  "name": "새올 인증 결과",
+  "path": "/login/saeol/callback",
+  "sourceUrl": "https://app.catchsecu.com/login/saeol/callback",
+  "dynamic": false,
+  "status": "static-declaration",
+  "requiresFixture": true,
+  "statusLabel": "최신 원본 정적 경로 확인·실제 동작 검증 중",
+  "sourceObserved": false,
+  "evidence": [
+   "docs/planning/09-rea-fullstack/source-routes.json"
+  ],
+  "observedUrl": "",
+  "limitation": "로그아웃·상태 변경·인증/결제 결과 경로는 실행하지 않음",
+  "routeKind": "page"
+ },
+ {
+  "id": 185,
+  "category": "공통·오류",
+  "name": "알 수 없는 경로",
+  "path": "/*",
+  "sourceUrl": "https://app.catchsecu.com/*",
+  "dynamic": false,
+  "status": "static-declaration",
+  "requiresFixture": true,
+  "statusLabel": "최신 원본 정적 경로 확인·실제 동작 검증 중",
+  "sourceObserved": false,
+  "evidence": [
+   "docs/planning/09-rea-fullstack/source-routes.json"
+  ],
+  "observedUrl": "",
+  "limitation": "와일드카드/라우터 분기",
+  "routeKind": "fallback"
+ },
+ {
+  "id": 186,
+  "category": "보안",
+  "name": "알 수 없는 보안 경로",
+  "path": "/security/*",
+  "sourceUrl": "https://app.catchsecu.com/security/*",
+  "dynamic": false,
+  "status": "static-declaration",
+  "requiresFixture": true,
+  "statusLabel": "최신 원본 정적 경로 확인·실제 동작 검증 중",
+  "sourceObserved": false,
+  "evidence": [
+   "docs/planning/09-rea-fullstack/source-routes.json"
+  ],
+  "observedUrl": "",
+  "limitation": "와일드카드/라우터 분기",
+  "routeKind": "fallback"
  }
 ]

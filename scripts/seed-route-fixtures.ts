@@ -29,7 +29,9 @@ export async function seedRouteFixtures() {
   const owner = await db.user.findUnique({ where: { id: users.ownerA } });
   if (!company || !owner) throw new Error("회사 A와 역할 계정이 없습니다. npm run db:seed를 먼저 실행하세요.");
   const hashes = subjectHashes(subjectContact.name, subjectContact.email);
+  let fileCreated = false;
   await db.$transaction(async tx => {
+    const formExisted = !!await tx.form.findUnique({ where: { id: records.form }, select: { id: true } });
     await tx.form.upsert({ where: { id: records.form }, update: {}, create: {
       id: records.form, tenantId: companies.a, serviceId: services.a, ownerId: users.ownerA,
       title: "라우트 fixture 폼", status: "draft", sourceType: "form",
@@ -48,7 +50,7 @@ export async function seedRouteFixtures() {
       } });
       return tx.formVersion.update({ where: { id: version.id }, data: { status: "published", publishedAt: new Date("2026-10-03T00:00:00.000Z") } });
     });
-    await tx.form.update({ where: { id: records.form }, data: { status: "published", publishedVersionId: records.formVersion } });
+    if (!formExisted) await tx.form.update({ where: { id: records.form }, data: { status: "published", publishedVersionId: records.formVersion } });
     await once(() => tx.publication.findUnique({ where: { id: records.publication } }), async () => {
       const policy = await tx.securityPolicy.findUniqueOrThrow({ where: { tenantId: companies.a } });
       let approvalId: string | null = null;
@@ -77,6 +79,7 @@ export async function seedRouteFixtures() {
     await tx.fixedUrl.upsert({ where: { id: records.fixedUrl }, update: {}, create: {
       id: records.fixedUrl, tenantId: companies.a, publicationId: records.publication, slug: fixedSlug, name: "라우트 fixture 고정 URL", status: "active",
     } });
+    const submissionExisted = !!await tx.submission.findUnique({ where: { id: records.submission }, select: { id: true } });
     await tx.submission.upsert({ where: { id: records.submission }, update: {}, create: {
       id: records.submission, tenantId: companies.a, formVersionId: records.formVersion, publicationId: records.publication,
       status: "submitted", retentionUntil: retention, originalRetentionUntil: retention,
@@ -99,7 +102,7 @@ export async function seedRouteFixtures() {
         nameHash: hashes.nameHash, emailHash: hashes.emailHash, contactCipher: encrypt(hashes.normalized),
       },
     });
-    await tx.submission.update({ where: { id: records.submission }, data: { subjectId: subject.id } });
+    if (!submissionExisted) await tx.submission.update({ where: { id: records.submission }, data: { subjectId: subject.id } });
     await once(() => tx.subjectAccessRequest.findUnique({ where: { id: records.subjectAccess } }), () => tx.subjectAccessRequest.create({ data: {
       id: records.subjectAccess, tokenHash: tokenHash(tokens.subjectAccess), browserHash: tokenHash(tokens.subjectBrowser), expiresAt: subjectAccessExpiry,
     } }));
@@ -107,12 +110,12 @@ export async function seedRouteFixtures() {
       where: { requestId_subjectId: { requestId: records.subjectAccess, subjectId: subject.id } },
       update: {}, create: { requestId: records.subjectAccess, tenantId: companies.a, subjectId: subject.id },
     });
-    await once(() => tx.fileObject.findUnique({ where: { id: records.file } }), () => tx.fileObject.create({ data: {
+    await once(() => tx.fileObject.findUnique({ where: { id: records.file } }), () => { fileCreated = true; return tx.fileObject.create({ data: {
       id: records.file, tenantId: companies.a, serviceId: services.a, ownerKind: "public", storageKey: records.file,
       mime: "text/plain", size: fileBytes.length, sha256: fileHash, nameCipher: encrypt("fixture.txt"),
       publicationId: records.publication, formVersionId: records.formVersion, questionId: records.questionFile,
       uploadTokenHash: tokenHash(tokens.fileUpload), expiresAt: retention, status: "pending", scanStatus: "pending",
-    } }));
+    } }); });
     const documents = [
       ["consent", records.consentDocument, records.consentVersion, records.consentPublication, tokens.documentConsent, "수집 동의 fixture"],
       ["privacy_policy", records.policyDocument, records.policyVersion, records.policyPublication, tokens.documentPolicy, "처리방침 fixture"],
@@ -150,7 +153,7 @@ export async function seedRouteFixtures() {
       return row;
     });
   }, { timeout: 30000 });
-  await privateFiles.write(records.file, fileBytes);
+  if (fileCreated) await privateFiles.write(records.file, fileBytes);
   const emptyCompanyForms = await db.form.count({ where: { tenantId: companies.b } });
   const restrictedServiceForms = await db.form.count({ where: { serviceId: services.aRestricted } });
   const roleCount = await db.user.count({ where: { id: { in: actors.map(actor => actor.userId) } } });

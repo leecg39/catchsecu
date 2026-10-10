@@ -1,0 +1,26 @@
+[
+  {
+    "operation": "registration",
+    "kind": "expire",
+    "holderPid": 16006,
+    "blocked": [
+      {
+        "pid": 16004,
+        "query": "UPDATE \"public\".\"Session\" SET \"activeCompanyId\" = $1, \"activeServiceId\" = $2, \"updatedAt\" = $3 WHERE (\"public\".\"Session\".\"id\" = $4 AND 1=1) RETURNING \"public\".\"Session\".\"id\", \"public\".\"Session\".\"expiresAt\", \"public\".\"Session\".\"token\", \"public\".\"Session\".\"createdAt\", \"public\".\"Session\".\"updatedAt\", \"public\".\"Session\".\"ipAddress\", \"public\".\"Session\".\"userAgent\", \"public\".\"Session\".\"userId\", \"public\".\"Session\".\"activeCompanyId\", \"public\".\"Session\".\"activeServiceId\""
+      }
+    ],
+    "status": 201
+  },
+  {
+    "operation": "registration",
+    "kind": "delete",
+    "holderPid": 16007,
+    "blocked": [
+      {
+        "pid": 15999,
+        "query": "UPDATE \"public\".\"Session\" SET \"activeCompanyId\" = $1, \"activeServiceId\" = $2, \"updatedAt\" = $3 WHERE (\"public\".\"Session\".\"id\" = $4 AND 1=1) RETURNING \"public\".\"Session\".\"id\", \"public\".\"Session\".\"expiresAt\", \"public\".\"Session\".\"token\", \"public\".\"Session\".\"createdAt\", \"public\".\"Session\".\"updatedAt\", \"public\".\"Session\".\"ipAddress\", \"public\".\"Session\".\"userAgent\", \"public\".\"Session\".\"userId\", \"public\".\"Session\".\"activeCompanyId\", \"public\".\"Session\".\"activeServiceId\""
+      }
+    ],
+    "status": 404
+  }
+]

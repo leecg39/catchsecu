@@ -1,0 +1,4342 @@
+[
+  {
+    "id": "R00-T01",
+    "title": "186 경로·메뉴·모달 근거 기준선 확정",
+    "scope": "현 계획의 source evidence와 10월2일 181경로를 대조하고, 3개 새 구체경로+2개 wildcard를 구분한다. 메뉴 밖 생성/편집/인증/공개/결과와 부가 운영경로를 별도 register에 넣는다.",
+    "dependencies": [],
+    "acceptance": [
+      "186 source entries 고유·누락0; 기존181 모두포함; wildcard2를 업무화면 수에 합산하지 않음",
+      "메뉴 action→route/API/모달 trace와 미확인상태 목록; 리디렉션·403을 정상 CRUD 성공으로 집계하지 않음"
+    ],
+    "files": [
+      "src/data/route-manifest.json",
+      "src/data/menu.json",
+      "scripts/verify-plan.py",
+      "docs/planning/03-route-matrix.csv"
+    ],
+    "legacy_tasks": [
+      "P00-T01"
+    ],
+    "status": "in_progress",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R00-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {},
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "최신186경로·manifest 일치, fallback2개와 부가20경로 분리. 전체 메뉴 action 대조 진행.",
+    "updatedOn": "2026-10-10",
+    "progress_evidence": [
+      "docs/qa/R00-T01/route-contract-check.json",
+      "docs/qa/R00-T01/menu-runtime/inventory.json"
+    ]
+  },
+  {
+    "id": "R00-T02",
+    "title": "현재 구현·계약·증거 유효성 감사",
+    "scope": "128 Prisma 모델·308 계약path·440 operation·154 handler파일·116 test파일 기준을 다시 수집하고 호출 가능한 API와 미연결 UI를 분류한다. 문서 및 테스트 파일 존재만으로 구현 완료 판정하지 않는다.",
+    "dependencies": [
+      "R00-T01"
+    ],
+    "acceptance": [
+      "operation별 handler/서버함수/DTO/정책/실행증거 연결",
+      "현재 수정중 payment 관련 코드·문서 변경을 보존하고 근거 commit/time 기록; 과거181 검증의 한계 표시"
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/v1",
+      "src/server",
+      "src/components",
+      "tests",
+      "docs/qa"
+    ],
+    "legacy_tasks": [
+      "P00-T03",
+      "P14-T01"
+    ],
+    "status": "in_progress",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R00-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R00-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "전체 서버 회귀시험 실행 중. 모델·계약·핸들러·화면 코드 재대조.",
+    "updatedOn": "2026-10-10",
+    "progress_evidence": [
+      "docs/qa/R00-T02/README.md",
+      "docs/qa/R00-T02/full-tests-policy-final.json",
+      "docs/qa/R00-T02/quality-gates/current.json",
+      "docs/qa/R03-T02/authority/regression-final.json",
+      "docs/qa/R03-T02/access-authority/regression-complete.json"
+    ]
+  },
+  {
+    "id": "R00-T03",
+    "title": "TASKS·역할·기능범위·새 경로 계약 통합",
+    "scope": "별도 계획107 task를 기존72 task와 연결하고 새 baseline으로 적용한다. unknown 원본 기능은 독립제품 설계로 라벨한다. 역할 owner/admin/editor/viewer/privacy/sender/billing/security/auditor와 license·service를 함께 명세한다.",
+    "dependencies": [
+      "R00-T02"
+    ],
+    "acceptance": [
+      "root TASKS/tasks.json/goals를 사용자 기존수정과 병합; 181 hardcode 제거·186+부가경로 구분",
+      "API/DB/UI/외부검증 상태 분리; 존재하지 않는 구형 Delivery/MonthlyClose 등 모델명 정정"
+    ],
+    "files": [
+      "TASKS.md",
+      "docs/planning/tasks.json",
+      ".Codex/goals",
+      "docs/planning/contracts"
+    ],
+    "legacy_tasks": [
+      "P00-T03"
+    ],
+    "status": "in_progress",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R00-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R00-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "active-plan.json 및 root TASKS/goals 연결. 기존72개 작업과 결제 수정 보존.",
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R00-T04",
+    "title": "fixture·페이지별 행동표·QA 재현계약 확정",
+    "scope": "회사A/B, 역할9종, 전문가/외부열람자/정보주체, license/토큰/상태/파일·외부실패 fixture를 선언하고 RR별 실제 URL을 생성한다.",
+    "dependencies": [
+      "R00-T03"
+    ],
+    "acceptance": [
+      "각 RR 경로의 구체fixture와 정상/권한거부/실패 최소 시나리오 존재",
+      "동적경로 demo 치환 금지; callback은 사전state; wildcard는 알수없는URL fixture; 외부비용 발생 시험은 전용시험수신자/계정"
+    ],
+    "files": [
+      "scripts/seed-route-fixtures.ts",
+      "scripts/verify-route-fixtures.ts",
+      "docs/qa",
+      "tests"
+    ],
+    "legacy_tasks": [
+      "P00-T04"
+    ],
+    "status": "in_progress",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R00-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R00-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "보유기간·채널·월마감용 독립 dev회사A/B와 허용/거부 사용자 fixture 생성.",
+    "updatedOn": "2026-10-10",
+    "progress_evidence": [
+      "docs/qa/R00-T04/active-fixtures/README.md",
+      "docs/qa/R00-T04/active-fixtures/result.json"
+    ]
+  },
+  {
+    "id": "R01-T01",
+    "title": "실행환경·DB 변경 이력·스키마 정합성",
+    "scope": "현재 채택된 Node/Next/Prisma/PostgreSQL 환경을 확인하고 설치문서를 기준으로 변경한다. 마이그레이션 누적과 과거 checksum 불일치를 백업/증거로 대조하며 기존SQL 덮어쓰기를 금지한다.",
+    "dependencies": [
+      "R00-T04"
+    ],
+    "acceptance": [
+      "빈 DB migrate+seed와 기존시험DB upgrade 모두 통과; FK/unique/index 점검",
+      "현재102 migration 파일과 실행DB 이력은 별도 검증; checksum 차이 해소 근거 보존"
+    ],
+    "files": [
+      "package.json",
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "scripts/seed.ts"
+    ],
+    "legacy_tasks": [
+      "P00-T02",
+      "P01-T01"
+    ],
+    "status": "in_progress",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R01-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R00-T04": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "dev/test104개 checksum 일치. 격리DB 빈설치·업그레이드·seed반복·FK/unique·131테이블/암호화파일 복구 통과. 스키마 예상밖 차이0·SQL전용FK1개 실제검사·최종 회귀88개 통과.",
+    "progress_evidence": [
+      "docs/qa/R01-T01/db-rehearsal/result.json",
+      "docs/qa/R01-T01/schema-alignment/README.md",
+      "docs/qa/R01-T01/schema-alignment/regression-final.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R01-T02",
+    "title": "API·권한·경합·멱등 공통 경계",
+    "scope": "HttpError/DTO·requestId·pagination·최대크기·401/403/404/409/410/422/429 정책, optimistic version과 create/action idempotency 범위를 통일한다.",
+    "dependencies": [
+      "R01-T01"
+    ],
+    "acceptance": [
+      "tenantId는 세션context에서 결정; body/URL 참조 tenant FK까지검증",
+      "경쟁PATCH409·동일키재시도1회·다른payload동일키409; create/update/delete 모두읽기와독립권한검증"
+    ],
+    "files": [
+      "src/server/http.ts",
+      "src/server/context.ts",
+      "src/server/permissions.ts",
+      "src/server/idempotency.ts",
+      "src/contracts"
+    ],
+    "legacy_tasks": [
+      "P01-T02",
+      "P02-T03"
+    ],
+    "status": "planned",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R01-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R01-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R01-T03",
+    "title": "파일·비공개 저장소·다운로드 공통 경계",
+    "scope": "DB metadata/비공개 binary/검사status·용량·확장자·파일형식검증, 로컬/S3 adapter 및 한글PDF 생성 기반을 재검증한다.",
+    "dependencies": [
+      "R01-T02"
+    ],
+    "acceptance": [
+      "파일완료전열람불가·악성파일격리·다른tenant파일bind거부",
+      "다운로드 시 최신권한/보유기한 확인; 분리저장 실패정리 및 파일hash실제대조"
+    ],
+    "files": [
+      "src/server/file-storage.ts",
+      "src/server/files.ts",
+      "src/server/file-access.ts",
+      "src/server/file-scanner.ts",
+      "src/server/s3-storage.ts"
+    ],
+    "legacy_tasks": [
+      "P01-T03"
+    ],
+    "status": "in_progress",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R01-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R01-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "서명 검증 ClamAV1.5.4·curl8.22.0 사용자폴더 설치. TLS 경고 해결·공식6개 시험·실제 파일/EICAR/권한41개 통과. 실제 HTTPS 공식정의 다운로드·서명·최신성·socket0600 검증. 관리자 설치 불필요.",
+    "progress_evidence": [
+      "docs/qa/R01-T03/scanner-runtime/source-build/runtime-final.json",
+      "docs/qa/R01-T03/scanner-runtime/files-restored-tests.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R01-T04",
+    "title": "Outbox·worker·플랫폼 인증메일·감사 기반",
+    "scope": "Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원자성, 인증용 로컬메일/SMTP transport를 제공한다. 캠페인메일과 순환의존을 만들지 않는다.",
+    "dependencies": [
+      "R01-T02"
+    ],
+    "acceptance": [
+      "worker강제종료→재시작시 이벤트유실/이중발송 방지; 시도이력 보존",
+      "비즈니스 실패 rollback이면 감사/외부job 성공기록도 없음; 인증메일은 마케팅동의 기능에 의존하지 않음"
+    ],
+    "files": [
+      "src/server/jobs.ts",
+      "src/server/audit.ts",
+      "scripts/worker.ts",
+      "scripts/export-worker.ts",
+      "src/server/auth.ts"
+    ],
+    "legacy_tasks": [
+      "P01-T04",
+      "P01-T05"
+    ],
+    "status": "planned",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R01-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R01-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R01-T05",
+    "title": "자동 검증·관측·통합환경",
+    "scope": "전용dev/test/shadow DB 가드, request/job 상관ID·secret마스킹, type/lint/build/DB통합/브라우저 증거 디렉터리를 정비한다.",
+    "dependencies": [
+      "R01-T03",
+      "R01-T04"
+    ],
+    "acceptance": [
+      "실패한검사를 성공처럼집계하지않는검증명령; 서버기동/workerready확인",
+      "기존fixture정리 범위명확; 운영·원본DB/발송/결제 사용안함; screenshot/HTTP/DB 증거상호추적"
+    ],
+    "files": [
+      "scripts",
+      "tests",
+      "docs/qa",
+      "src/server/env.ts"
+    ],
+    "legacy_tasks": [
+      "P01-T05"
+    ],
+    "status": "in_progress",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R01-T05/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R01-T03": "task_complete",
+      "R01-T04": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "Node/DB/검사 서비스/마이그레이션 사전점검 명령. ClamAV 복구 후 dev 런타임 검사 통과. 운영 외부연동 수용과 구분.",
+    "progress_evidence": [
+      "docs/qa/R01-T05/preflight/catchsecu_dev.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R02-T01",
+    "title": "계정 인증·세션·복구 — 모델·규칙 대조 및 보완",
+    "scope": "현재 Better Auth 테이블을 재사용한다. 이메일 중복·만료·한 번만 쓰는 인증, 암호 이력, 복구코드 소비, 세션 폐기를 DB 제약과 트랜잭션으로 대조한다.",
+    "dependencies": [
+      "R01-T05"
+    ],
+    "acceptance": [
+      "C 가입·인증 challenge; R 세션/암호정책; U 암호·2FA; D 세션 폐기·2FA 해제. 계정 삭제는 R05.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/auth.ts",
+      "src/server/auth-adapter.ts",
+      "src/server/auth-mutations.ts",
+      "src/server/credential-lock.ts",
+      "src/server/password-policy.ts",
+      "src/server/password-deferral.ts"
+    ],
+    "legacy_tasks": [
+      "P02-T01",
+      "P02-T02",
+      "P02-T04",
+      "P02-T05"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R02-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R01-T05": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "dev/test8개 인증모델73컬럼21제약24인덱스7트리거 실제 대조. 이메일/계정/세션 unique·유예 복합FK·credential 이력/세션폐기/감사 트리거 확인, 신규 migration 없음.",
+    "progress_evidence": [
+      "docs/qa/R02-T01/model-audit/README.md",
+      "docs/qa/R02-T01/model-audit/catchsecu_dev.json",
+      "docs/qa/R02-T01/model-audit/catchsecu_test.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R02-T02",
+    "title": "계정 인증·세션·복구 — 서버 API·업무 처리",
+    "scope": "이메일 가입→인증→로그인→로그아웃, 재설정, OTP/TOTP·복구코드 계약을 실제 handler와 대조한다. 재전송 rate limit, 계정 존재 노출 방지, returnTo 검증 및 정책 변경 후 기존 세션 집행을 확인한다.",
+    "dependencies": [
+      "R02-T01"
+    ],
+    "acceptance": [
+      "A 계정 가입 후 로컬 시험메일 링크를 한 번 사용, 재사용 거부; 틀린 암호·만료 OTP·복구코드 재사용 거부; 다른 브라우저 세션 폐기; 재시작 뒤 인증 유지/폐기 일치.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/auth.ts",
+      "src/server/auth-adapter.ts",
+      "src/server/auth-mutations.ts",
+      "src/server/credential-lock.ts",
+      "src/server/password-policy.ts",
+      "src/server/password-deferral.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P02-T01",
+      "P02-T02",
+      "P02-T04",
+      "P02-T05"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R02-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R02-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "인증 링크 재사용 성공3실패 재현→사용자 잠금 내 단일 성공/재사용 거부·안전 callback 유지 수정. 인증141개+정책경계64개, 총12파일205개 통과. 원자적 감사·만료·세션폐기 포함; 전체 수용은 후속.",
+    "progress_evidence": [
+      "docs/qa/R02-T02/authentication/README.md",
+      "docs/qa/R02-T02/authentication/verification-replay-after.json",
+      "docs/qa/R02-T02/authentication/policy-boundaries.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R02-T03",
+    "title": "계정 인증·세션·복구 — 전체 화면·모달 연결",
+    "scope": "로그인/가입/이메일·OTP/복구/암호변경/2단계/만료 경로 각각 서버 상태에 연결한다. 전송 중·잘못된 코드·만료·재전송 대기·로그아웃 완료를 표시한다.",
+    "dependencies": [
+      "R02-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/auth/AuthPages.tsx",
+      "src/components/auth/LiveAuth.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P02-T01",
+      "P02-T02",
+      "P02-T04",
+      "P02-T05"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R02-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R02-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "실제UI 가입/링크인증/암호재설정/OTP·TOTP·복구코드/해제/암호변경 확인. 영문 복구오류·3화면 재시도·정책 미확인 폼·모바일 약관 줄바꿈 보완. 인증15경로45폭관측·키보드 확인. 모든 정책/원본 조합은 후속.",
+    "progress_evidence": [
+      "docs/qa/R02-T03/authentication/README.md",
+      "docs/qa/R02-T03/authentication/routes-responsive.json",
+      "docs/qa/R02-T03/authentication/resource-failure-after.json",
+      "docs/qa/R02-T03/authentication/signup-final-check.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R02-T04",
+    "title": "계정 인증·세션·복구 — DB·브라우저·재시작 수용검증",
+    "scope": "A 계정 가입 후 로컬 시험메일 링크를 한 번 사용, 재사용 거부; 틀린 암호·만료 OTP·복구코드 재사용 거부; 다른 브라우저 세션 폐기; 재시작 뒤 인증 유지/폐기 일치.",
+    "dependencies": [
+      "R02-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R02-T04"
+    ],
+    "legacy_tasks": [
+      "P02-T01",
+      "P02-T02",
+      "P02-T04",
+      "P02-T05"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R02-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R02-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "새합성계정 UI·개별메일job5건 실제 로컬전달·독립HTTP 다른세션 폐기·DB암호이력2/MFA해제/감사67건·서버재시작 지문 일치. 단위/통합205개·타입/린트/빌드 통과. 실제외부메일·별도브라우저프로필/전체조합 수용은 남음.",
+    "progress_evidence": [
+      "docs/qa/R02-T04/authentication/README.md",
+      "docs/qa/R02-T04/authentication/verified-after-restart.json",
+      "docs/qa/R02-T04/authentication/revoked-second-session.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R03-T01",
+    "title": "회사·서비스·초기 설정 — 모델·규칙 대조 및 보완",
+    "scope": "Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceGrant 관계, 사업자 파일 소유권과 version을 검사한다. 회사 종료와 구성원 탈퇴를 구분한다.",
+    "dependencies": [
+      "R02-T04"
+    ],
+    "acceptance": [
+      "C 회사/서비스/접근요청; R 목록·상세·현재 컨텍스트; U 기본정보/이름/요청결정; D 서비스 보관·회사 종료요청. 참조 데이터 즉시 cascade 삭제 금지.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/company-management.ts",
+      "src/server/service-management.ts",
+      "src/server/context-selection.ts",
+      "src/server/service-access.ts",
+      "src/server/access-requests.ts"
+    ],
+    "legacy_tasks": [
+      "P03-T01"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R03-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R02-T04": "local_acceptance_pass"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "dev/test6모델66컬럼29제약24인덱스 대조. 회사·서비스·멤버·권한·접근요청·사업자파일의 tenant FK/unique/상태/삭제 규칙을 실제 메타데이터와 검사. 신규 migration 없음. 운영 폐쇄·전체 조합은 후속.",
+    "progress_evidence": [
+      "docs/qa/R03-T01/model-audit/README.md",
+      "docs/qa/R03-T01/model-audit/catchsecu_dev.json",
+      "docs/qa/R03-T01/model-audit/catchsecu_test.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R03-T02",
+    "title": "회사·서비스·초기 설정 — 서버 API·업무 처리",
+    "scope": "회사·서비스 CRUD, 사업자 파일, 컨텍스트 전환 및 서비스 접근 요청 API에 tenant·활성 상태·version·권한 재검사를 적용한다. 서비스 폐기 시 게시·예약·공유 접근과의 일관성을 확인한다.",
+    "dependencies": [
+      "R03-T01"
+    ],
+    "acceptance": [
+      "회사 A 생성→서비스2개→수정→보관→재로그인; B 회사 serviceId를 본문/URL에 주입해 거부; 같은 이름 동시생성 하나409; 사용 중 서비스 삭제 의존성 안내.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/company-management.ts",
+      "src/server/service-management.ts",
+      "src/server/context-selection.ts",
+      "src/server/service-access.ts",
+      "src/server/access-requests.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P03-T01"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R03-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R03-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "회사/서비스 잠금 대기 중 세션·멤버·MFA 변경과 최종 만료 재검사·회사등록 경합 수정, 관련135개 통과. 접근요청에도 현재 권한/최종 만료·원자성·페이지 보정·승인대상 활성 검사, 관련89개 통과. 전체 조합 수용은 후속.",
+    "progress_evidence": [
+      "docs/qa/R03-T02/authority/README.md",
+      "docs/qa/R03-T02/authority/regression-final.json",
+      "docs/qa/R03-T02/access-authority/README.md",
+      "docs/qa/R03-T02/access-authority/regression-complete.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R03-T03",
+    "title": "회사·서비스·초기 설정 — 전체 화면·모달 연결",
+    "scope": "회사 조회/편집, 서비스 목록·추가 모달·편집/보관, 회사 최초 등록, 서비스 없음→접근요청 흐름. 전환 시 목록·권한·선택값 캐시를 함께 갱신한다.",
+    "dependencies": [
+      "R03-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/management/live.tsx",
+      "src/components/ServiceAccessPage.tsx",
+      "src/components/ApplicationContext.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P03-T01"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R03-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R03-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "회사/서비스 CRUD·첨부·폐쇄요청/취소·409·입력보호·컨텍스트전환·모바일 확인. 접근요청4건 생성/취소/거절/충돌복구/승인·답변보호·회원표 즉시갱신·실패재시도·조회자거부·390/768/1440폭 확인. 전체 역할/다중페이지는 후속.",
+    "progress_evidence": [
+      "docs/qa/R03-T03/company-flow/README.md",
+      "docs/qa/R03-T03/service-flow/README.md",
+      "docs/qa/R03-T03/access-flow/README.md"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R03-T04",
+    "title": "회사·서비스·초기 설정 — DB·브라우저·재시작 수용검증",
+    "scope": "회사 A 생성→서비스2개→수정→보관→재로그인; B 회사 serviceId를 본문/URL에 주입해 거부; 같은 이름 동시생성 하나409; 사용 중 서비스 삭제 의존성 안내.",
+    "dependencies": [
+      "R03-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R03-T04"
+    ],
+    "legacy_tasks": [
+      "P03-T01"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R03-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R03-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "회사/서비스 HTTP23개·감사14건·파일바이트·재시작 지문 일치. 별도 접근요청 HTTP19개·요청4건/권한1건/감사8건·새로그인·브라우저·서버재시작 지문 일치. 전체 R03 수용과 구분.",
+    "progress_evidence": [
+      "docs/qa/R03-T04/management-flow/README.md",
+      "docs/qa/R03-T04/management-flow/verified-after-restart.json",
+      "docs/qa/R03-T04/access-flow/README.md",
+      "docs/qa/R03-T04/access-flow/verified-after-restart.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R04-T01",
+    "title": "구성원·초대·권한·전문가 — 모델·규칙 대조 및 보완",
+    "scope": "회사별 멤버십·서비스 권한의 복합 FK 및 중복 초대 방지, 초대 만료/수락 1회, 전문가 배정 범위·기간·version을 확인한다. 마지막 owner 제거를 차단한다.",
+    "dependencies": [
+      "R03-T04"
+    ],
+    "acceptance": [
+      "C 초대/서비스 권한/전문가 배정; R 목록·초대미리보기; U 역할·담당범위·소유권 이전; D 초대취소/권한회수/배정해제.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/members.ts",
+      "src/server/permissions.ts",
+      "src/server/service-access.ts",
+      "src/server/expert-assignments.ts"
+    ],
+    "legacy_tasks": [
+      "P02-T03",
+      "P03-T02",
+      "P03-T05"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R04-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R03-T04": "local_acceptance_pass"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "dev/test5모델43컬럼20제약21인덱스7트리거 대조. tenant 복합FK·멤버/권한/전문가 unique·pending 초대 lower(email) 부분unique·마지막 owner 잠금 확인. 신규 migration 없음.",
+    "progress_evidence": [
+      "docs/qa/R04-T01/model-audit/README.md",
+      "docs/qa/R04-T01/model-audit/catchsecu_dev.json",
+      "docs/qa/R04-T01/model-audit/catchsecu_test.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R04-T02",
+    "title": "구성원·초대·권한·전문가 — 서버 API·업무 처리",
+    "scope": "초대·재전송·수락·취소, 멤버 변경/삭제/owner 이전, 서비스 접근요청 결정과 전문가 배정 API를 역할 허용표에 대조한다. 회수 후 세션과 진행 중 작업에서 권한을 다시 검사한다.",
+    "dependencies": [
+      "R04-T01"
+    ],
+    "acceptance": [
+      "A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 실패; owner2명이 동시탈퇴/이전해도 최소1명 보장; 초대 중복·만료·전문가 기간 만료/재배정409.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/members.ts",
+      "src/server/permissions.ts",
+      "src/server/service-access.ts",
+      "src/server/expert-assignments.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P02-T03",
+      "P03-T02",
+      "P03-T05"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R04-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R04-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "현재 권한·세션·MFA/기한·테넌트·마지막 owner·초대 중복/만료/재수락·전문가 범위/회수 PostgreSQL5파일68개 통과. 새HTTP 권한11개·최종11개와 DB감사 대조; 서버 계약 유지.",
+    "progress_evidence": [
+      "docs/qa/R04-T02/members/README.md",
+      "docs/qa/R04-T02/members/baseline.json",
+      "docs/qa/R04-T04/members-flow/boundaries.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R04-T03",
+    "title": "구성원·초대·권한·전문가 — 전체 화면·모달 연결",
+    "scope": "구성원 목록/검색/초대/편집/삭제와 /set/authority 서비스별 범위 편집, 전문가 회사 선택을 연결한다. 관리자용 배정 페이지는 별도 부가 경로로 관리한다.",
+    "dependencies": [
+      "R04-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/management/members.tsx",
+      "src/components/auth/InvitationAccept.tsx",
+      "src/components/ExpertSelectPage.tsx",
+      "src/components/ExpertAssignmentsAdmin.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P02-T03",
+      "P03-T02",
+      "P03-T05"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R04-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R04-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "구성원/전문가 입력보호·수락조회 재시도/토큰별 상태·제외/이전/초대409 복구 보완. 실제 초대/재초대·정지/회수·소유권 왕복·전문가 배정/만료/재배정/회수·검색/실패재시도 확인. 원본4경로12폭+운영모달3폭·Tab6단계. 모든 역할/원본 동등성은 후속.",
+    "progress_evidence": [
+      "docs/qa/R04-T03/members-flow/README.md",
+      "docs/qa/R04-T03/members-flow/browser-after-restart.json",
+      "docs/qa/R04-T03/members-flow/expert-reassigned-revoked.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R04-T04",
+    "title": "구성원·초대·권한·전문가 — DB·브라우저·재시작 수용검증",
+    "scope": "A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 실패; owner2명이 동시탈퇴/이전해도 최소1명 보장; 초대 중복·만료·전문가 기간 만료/재배정409.",
+    "dependencies": [
+      "R04-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R04-T04"
+    ],
+    "legacy_tasks": [
+      "P02-T03",
+      "P03-T02",
+      "P03-T05"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R04-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R04-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "새합성회사·멤버3/초대3/전문가배정1·감사45건·로컬메일4건/구버전job취소1건을 독립DB 대조. 권한HTTP11개·최종HTTP11개 및 재시작 지문 일치. 타입/린트/빌드 통과. 다중페이지/외부메일·별도브라우저 등 후속.",
+    "progress_evidence": [
+      "docs/qa/R04-T04/members-flow/README.md",
+      "docs/qa/R04-T04/members-flow/verified-after-restart.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R05-T01",
+    "title": "MY·프로필·활동 검토·탈퇴 — 모델·규칙 대조 및 보완",
+    "scope": "자기 사용자 범위와 회사별 활동 검토 scope를 분리한다. 탈퇴요청 사유 암호화·보존, 마지막 owner 제약, 검토 메시지/답변의 수정 정책과 감사 근거를 정리한다.",
+    "dependencies": [
+      "R04-T04"
+    ],
+    "acceptance": [
+      "C 활동 검토요청·탈퇴요청; R 프로필/내 활동/검토; U 이름·연락처·검토 응답; D 세션·연결 계정 해제, 탈퇴는 상태 전이.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/account-closure.ts",
+      "src/server/account-actor.ts",
+      "src/server/activity-reviews.ts",
+      "src/server/activity-review-mail.ts",
+      "src/server/auth-mutations.ts",
+      "src/server/sso-accounts.ts"
+    ],
+    "legacy_tasks": [
+      "P03-T03",
+      "P06-T02"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R05-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R04-T04": "local_acceptance_pass"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "dev/test6모델70컬럼28제약22인덱스10트리거 대조. 본인/회사 복합FK·진행 중 검토 unique·메시지 불변성·파기 승인·계정폐쇄/마지막 owner/admin 제약 확인. 신규 migration 없음.",
+    "progress_evidence": [
+      "docs/qa/R05-T01/model-audit/README.md",
+      "docs/qa/R05-T01/model-audit/catchsecu_dev.json",
+      "docs/qa/R05-T01/model-audit/catchsecu_test.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R05-T02",
+    "title": "MY·프로필·활동 검토·탈퇴 — 서버 API·업무 처리",
+    "scope": "프로필 PATCH·세션 DELETE·연결 계정 해제·closure 및 활동검토 actions/notifications/destruction의 상태 전이를 검사한다. 권한회수/탈퇴 경합 중 다른 회사 자료 조회를 막는다.",
+    "dependencies": [
+      "R05-T01"
+    ],
+    "acceptance": [
+      "자기 프로필 수정 재로그인 확인; B 사용자 프로필 노출없음; 최종 로그인 수단 해제 차단; 탈퇴 후 세션 폐기와 보존대상 분리; 검토 만료·중복처리·알림실패 재시도.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/account-closure.ts",
+      "src/server/account-actor.ts",
+      "src/server/activity-reviews.ts",
+      "src/server/activity-review-mail.ts",
+      "src/server/auth-mutations.ts",
+      "src/server/sso-accounts.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P03-T03",
+      "P06-T02"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R05-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R05-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "프로필/계정폐쇄/현재권한/활동검토/SSO 복구104개와 SSO121개, 7파일225개 PostgreSQL 시험 통과. 독립 HTTP13개 본인/회사/역할/버전/중복/소유자 폐쇄 거부와 DB 무변경 확인. 서버 계약 유지.",
+    "progress_evidence": [
+      "docs/qa/R05-T02/profile/README.md",
+      "docs/qa/R05-T02/profile/baseline.json",
+      "docs/qa/R05-T02/profile/sso-integration.json",
+      "docs/qa/R05-T04/profile-flow/boundaries.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R05-T03",
+    "title": "MY·프로필·활동 검토·탈퇴 — 전체 화면·모달 연결",
+    "scope": "/my-page 별칭→프로필, 편집/탈퇴 확인, 내 활동로그, 개인정보 활동검토 목록·상세·사유응답·처리결과·재시도를 구현 또는 보완한다.",
+    "dependencies": [
+      "R05-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/management/live.tsx",
+      "src/components/management/AccountClosure.tsx",
+      "src/components/management/ActivityReviews.tsx",
+      "src/components/auth/SsoAccounts.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P03-T03",
+      "P06-T02"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R05-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R05-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "프로필/기기 조회 재시도·프로필/검토/탈퇴 입력보호·409복구·파기 오류 노출·탈퇴 완료 안내 보완. 실제 프로필/세션/SSO 해제/검토 요청·답변·완료·취소·파기·보존/탈퇴 확인. 원본6경로18폭·탈퇴모달3폭/Tab4단계. 원본 전체 동등성은 남음.",
+    "progress_evidence": [
+      "docs/qa/R05-T03/profile-flow/README.md",
+      "docs/qa/R05-T03/profile-flow/closure-conflict.json",
+      "docs/qa/R05-T03/profile-flow/destruction-conflict.json",
+      "docs/qa/R05-T03/profile-flow/route-widths.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R05-T04",
+    "title": "MY·프로필·활동 검토·탈퇴 — DB·브라우저·재시작 수용검증",
+    "scope": "자기 프로필 수정 재로그인 확인; B 사용자 프로필 노출없음; 최종 로그인 수단 해제 차단; 탈퇴 후 세션 폐기와 보존대상 분리; 검토 만료·중복처리·알림실패 재시도.",
+    "dependencies": [
+      "R05-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R05-T04"
+    ],
+    "legacy_tasks": [
+      "P03-T03",
+      "P06-T02"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R05-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R05-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "합성계정 폐쇄v6·세션/자격증명/권한0·검토3건/메시지5건·감사75건·로컬알림1건 독립 DB 대조. HTTP13+8개 및 새서버8개·지문 일치. 모델/서버225개·타입/6파일린트/빌드 통과. fixture 시계/SSO 설정·외부 미검증 구분.",
+    "progress_evidence": [
+      "docs/qa/R05-T04/profile-flow/README.md",
+      "docs/qa/R05-T04/profile-flow/verified-after-restart.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R06-T01",
+    "title": "회사 보안정책·IP·MFA — 모델·규칙 대조 및 보완",
+    "scope": "회사 단일 정책, IP/CIDR 정규화·중복, IPv4/IPv6, MFA 예외 만료와 version을 점검한다. 보안 수치의 원본 미확인 기본값을 확정 사실로 기록하지 않는다.",
+    "dependencies": [
+      "R04-T04"
+    ],
+    "acceptance": [
+      "C IP 규칙/MFA 예외; R 정책·보안현황; U 정책·예외기간·활성; D 규칙·예외 삭제/정책 초기화.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/security-policy.ts",
+      "src/server/ip-access.ts",
+      "src/server/ip-enforcement.ts",
+      "src/server/client-ip.ts",
+      "src/server/mfa-policy.ts",
+      "src/server/mfa-enforcement.ts",
+      "src/server/password-policy.ts"
+    ],
+    "legacy_tasks": [
+      "P11-T01",
+      "P11-T02",
+      "P11-T05"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R06-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R04-T04": "local_acceptance_pass"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "dev/test4개 보안모델42컬럼21제약7인덱스4트리거 대조. CIDR 정규화/회사 unique, MFA 복합FK/암호화/24시간/자기예외/버전 제약 확인. 인증3모델은 R02 근거 참조; 신규 migration 없음. 후속: BillingPlanVersion capabilities 불변배열·CHECK 및105번째마이그레이션 dev/test검증. 예상밖 스키마차이0.",
+    "progress_evidence": [
+      "docs/qa/R06-T01/model-audit/README.md",
+      "docs/qa/R06-T01/model-audit/catchsecu_dev.json",
+      "docs/qa/R06-T01/model-audit/catchsecu_test.json",
+      "docs/qa/R06-T01/security-entitlements/README.md"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R06-T02",
+    "title": "회사 보안정책·IP·MFA — 서버 API·업무 처리",
+    "scope": "저장된 정책이 로그인·매 API·파일/내보내기·worker에 실제 집행되게 한다. 프록시 IP 신뢰 경계, 잘못된 정책으로 관리자 전원 잠금 방지와 예외 갱신 경합을 시험한다.",
+    "dependencies": [
+      "R06-T01"
+    ],
+    "acceptance": [
+      "IP 차단 후 기존 로그인에서도 API403; 잘못된 CIDR422(INVALID_CIDR); 신뢰하지 않는 X-Forwarded-For 우회실패; MFA 예외만료 즉시 재인증; 정책초기화 이후 DB와 화면 일치.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/security-policy.ts",
+      "src/server/ip-access.ts",
+      "src/server/ip-enforcement.ts",
+      "src/server/client-ip.ts",
+      "src/server/mfa-policy.ts",
+      "src/server/mfa-enforcement.ts",
+      "src/server/password-policy.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P11-T01",
+      "P11-T02",
+      "P11-T05"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R06-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R06-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "정책 조회의 오래된 권한8실패 재현→현재 actor/기한 트랜잭션 재검사로 수정. 관련104개+파일/worker77개(시점 구분) 통과. 실제 IPv4/IPv6/위조IP20개·MFA 자연만료8개 확인. Enterprise 기능gate는 후속 필수. 후속: 기능별구독 gate 전변경/재시도/우회 연결. 실제 만료worker 교착 재현→회사/구독 잠금순서 수정. 관련 고유225시험 통과.",
+    "progress_evidence": [
+      "docs/qa/R06-T02/security/README.md",
+      "docs/qa/R06-T02/security/current-authority-before.json",
+      "docs/qa/R06-T02/security/authority-regression.json",
+      "docs/qa/R06-T02/security/files-workers.json",
+      "docs/qa/R06-T02/security-entitlements/README.md",
+      "docs/qa/R06-T02/security-entitlements/worker-and-features-final.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R06-T03",
+    "title": "회사 보안정책·IP·MFA — 전체 화면·모달 연결",
+    "scope": "회사 정책 조회/설정, 보안 대시보드, IP 목록·편집·삭제, 2FA 강제·예외 사용자/기간을 API로 연결한다. Enterprise 미가입과 권한 부족을 구분한다.",
+    "dependencies": [
+      "R06-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/management/policy.tsx",
+      "src/components/management/SecurityOverview.tsx",
+      "src/components/management/IpAccess.tsx",
+      "src/components/management/MfaPolicy.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P11-T01",
+      "P11-T02",
+      "P11-T05"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R06-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R06-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "IP 검색 포커스/모바일 표·오류노출/입력보호·정책/예외409복구·기한 편집 보완. 실제 CRUD·정책6탭/초기화·21건 페이지/검색/정렬·8경로24폭/모달3폭 확인. 요금제별 제한 UI/API는 미완료. 후속: 포함/미포함/만료/시작전/미가입/MFA전용 상태별18화면, 만료8경로24폭, 상품/구독6폭, 실제IP/MFA저장·만료전편집창차단 확인.",
+    "progress_evidence": [
+      "docs/qa/R06-T03/security-flow/README.md",
+      "docs/qa/R06-T03/security-flow/routes-responsive.json",
+      "docs/qa/R06-T03/security-flow/ip-search-focus-after.json",
+      "docs/qa/R06-T03/security-flow/browser-after-restart.json",
+      "docs/qa/R06-T04/security-entitlements/README.md"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R06-T04",
+    "title": "회사 보안정책·IP·MFA — DB·브라우저·재시작 수용검증",
+    "scope": "IP 차단 후 기존 로그인에서도 API403; 잘못된 CIDR422(INVALID_CIDR); 신뢰하지 않는 X-Forwarded-For 우회실패; MFA 예외만료 즉시 재인증; 정책초기화 이후 DB와 화면 일치.",
+    "dependencies": [
+      "R06-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R06-T04"
+    ],
+    "legacy_tasks": [
+      "P11-T01",
+      "P11-T02",
+      "P11-T05"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R06-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R06-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "정책v5/기본값·IP제한v1/규칙v3·예외0·관리자MFA/감사126건·유휴세션 폐기 DB대조. HTTP최종8개·새서버 상태해시 일치. 실제TOTP/자연만료와 fixture 시계를 구분. 원본/외부 전체수용은 남음. 후속: 기능권한 HTTP23+만료6, 실제IPv6/IP·MFA보호유지, 회사6/구독5/감사31, 재시작해시 일치. 원본상품매핑·외부PG 수용은 남음.",
+    "progress_evidence": [
+      "docs/qa/R06-T04/security-flow/README.md",
+      "docs/qa/R06-T04/security-flow/verified-after-restart.json",
+      "docs/qa/R06-T04/security-flow/ip-boundaries.json",
+      "docs/qa/R06-T04/security-flow/mfa-expiry.json",
+      "docs/qa/R06-T04/security-entitlements/verified-after-restart.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R07-T01",
+    "title": "SSO·OAuth·기관 인증 — 모델·규칙 대조 및 보완",
+    "scope": "기관별 issuer·client·인증서와 암호화 secret, state/nonce·만료·소비 제약을 대조한다. VirtualOrgMember는 가상시험용임을 유지하며 실제 기관 신원 모델과 혼동하지 않는다.",
+    "dependencies": [
+      "R06-T04"
+    ],
+    "acceptance": [
+      "C SSO 공급자/인증 state/계정연결; R 설정·preflight; U 설정·활성; D 공급자 비활성/계정연결 해제. callback은 검증 후 1회 처리.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/sso.ts",
+      "src/server/sso-provider-lifecycle.ts",
+      "src/server/sso-route.ts",
+      "src/server/saml-validation.ts",
+      "src/server/sso-accounts.ts",
+      "src/server/org-auth.ts",
+      "src/server/sso-mfa.ts",
+      "src/server/sso-session-proof.ts",
+      "src/server/sso-identity.ts",
+      "src/contracts/sso-login-policy.ts",
+      "src/server/sso-login-policy.ts",
+      "src/server/sso-policy-mail.ts",
+      "src/server/org-email-mail.ts",
+      "src/components/auth/OrgLogin.tsx",
+      "src/app/api/v1/auth/org/email-register/challenge/route.ts"
+    ],
+    "legacy_tasks": [
+      "P11-T03",
+      "P11-T04",
+      "P02-T04"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R07-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R06-T04": "local_acceptance_pass"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여.",
+    "progress_evidence": [
+      "docs/qa/R07-T01/model-audit/catchsecu_dev.json",
+      "docs/qa/R07-T01/model-audit/catchsecu_test.json",
+      "docs/planning/09-rea-fullstack/sso-source-evidence.md",
+      "docs/qa/R07-T04/session-evidence/README.md",
+      "docs/qa/R07-T02/session-evidence/regression.json",
+      "docs/qa/R07-T02/session-evidence/auth-regression.json",
+      "docs/qa/R07-T04/session-evidence/verified-after-restart.json",
+      "docs/qa/R07-T04/policy-writer/README.md",
+      "docs/qa/R07-T04/org-email/README.md",
+      "docs/qa/R07-T02/org-email/regression.json",
+      "docs/qa/R07-T01/org-email/catchsecu_dev-contract.json",
+      "docs/qa/R07-T04/browser-followup/README.md",
+      "docs/qa/R07-T04/browser-binding/README.md",
+      "docs/qa/R07-T02/outbound/README.md",
+      "docs/qa/R07-T04/provider-context/README.md",
+      "docs/qa/R07-T04/https-flow/README.md",
+      "docs/qa/R07-T04/provider-layout/README.md",
+      "docs/qa/R07-T04/history-guard/README.md",
+      "docs/qa/R07-T04/route-states/README.md"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R07-T02",
+    "title": "SSO·OAuth·기관 인증 — 서버 API·업무 처리",
+    "scope": "OIDC/SAML 검증·계정연결 및 신규 /login/gpki/callback·/login/saeol/callback 경로를 정식 어댑터 계약에 연결한다. GPKI/새올/그룹웨어 규격은 제공사 확인 후 확정하며 callback URL만으로 성공시키지 않는다.",
+    "dependencies": [
+      "R07-T01"
+    ],
+    "acceptance": [
+      "잘못된 issuer/audience/state·만료/재사용 assertion 거부; 별도 시험 IdP로 로그인·연결·해제; 기관2곳 tenant 분리; 가상기관 테스트와 실제기관 수신 증거를 분리.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/sso.ts",
+      "src/server/sso-provider-lifecycle.ts",
+      "src/server/sso-route.ts",
+      "src/server/saml-validation.ts",
+      "src/server/sso-accounts.ts",
+      "src/server/org-auth.ts",
+      "src/server/sso-mfa.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json",
+      "src/server/org-email-mail.ts",
+      "src/components/auth/OrgLogin.tsx",
+      "src/app/api/v1/auth/org/email-register/challenge/route.ts",
+      "src/server/sso-transport.ts",
+      "src/server/public-network.ts"
+    ],
+    "legacy_tasks": [
+      "P11-T03",
+      "P11-T04",
+      "P02-T04"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R07-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R07-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여.",
+    "progress_evidence": [
+      "docs/qa/R07-T02/core/regression.json",
+      "docs/qa/R07-T02/core/crud-final.json",
+      "docs/qa/R07-T04/management-flow/http.json",
+      "docs/qa/R07-T02/core/regression-final.json",
+      "docs/qa/R07-T04/management-flow/ticket-http.json",
+      "docs/qa/R07-T04/session-evidence/README.md",
+      "docs/qa/R07-T02/session-evidence/regression.json",
+      "docs/qa/R07-T02/session-evidence/auth-regression.json",
+      "docs/qa/R07-T04/session-evidence/verified-after-restart.json",
+      "docs/qa/R07-T04/policy-enforcement/README.md",
+      "docs/qa/R07-T04/policy-writer/README.md",
+      "docs/qa/R07-T04/org-email/README.md",
+      "docs/qa/R07-T02/org-email/regression.json",
+      "docs/qa/R07-T01/org-email/catchsecu_dev-contract.json",
+      "docs/qa/R07-T04/browser-followup/README.md",
+      "docs/qa/R07-T04/browser-binding/README.md",
+      "docs/qa/R07-T02/outbound/README.md",
+      "docs/qa/R07-T04/provider-context/README.md",
+      "docs/qa/R07-T04/https-flow/README.md",
+      "docs/qa/R07-T04/provider-layout/README.md",
+      "docs/qa/R07-T04/history-guard/README.md",
+      "docs/qa/R07-T04/route-states/README.md"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R07-T03",
+    "title": "SSO·OAuth·기관 인증 — 전체 화면·모달 연결",
+    "scope": "SSO 목록·등록·수정·삭제·연결시험, OAuth/SAML 시작/성공/실패/초대가입, GPKI 이메일등록/기관 실패/새올 callback 화면을 서버 결과와 연결한다.",
+    "dependencies": [
+      "R07-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/management/SsoProviders.tsx",
+      "src/components/auth/AuthPages.tsx",
+      "src/components/auth/SsoRecovery.tsx",
+      "src/components/auth/SsoAccounts.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json",
+      "src/components/management/SsoLoginPolicy.tsx",
+      "src/server/org-email-mail.ts",
+      "src/components/auth/OrgLogin.tsx",
+      "src/app/api/v1/auth/org/email-register/challenge/route.ts"
+    ],
+    "legacy_tasks": [
+      "P11-T03",
+      "P11-T04",
+      "P02-T04"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R07-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R07-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여.",
+    "progress_evidence": [
+      "docs/qa/R07-T04/management-flow/browser.json",
+      "docs/qa/R07-T04/management-flow/responsive.json",
+      "docs/qa/R07-T04/policy-enforcement/README.md",
+      "docs/qa/R07-T04/policy-writer/README.md",
+      "docs/qa/R07-T04/org-email/README.md",
+      "docs/qa/R07-T02/org-email/regression.json",
+      "docs/qa/R07-T01/org-email/catchsecu_dev-contract.json",
+      "docs/qa/R07-T04/browser-followup/README.md",
+      "docs/qa/R07-T04/browser-binding/README.md",
+      "docs/qa/R07-T02/outbound/README.md",
+      "docs/qa/R07-T04/provider-context/README.md",
+      "docs/qa/R07-T04/https-flow/README.md",
+      "docs/qa/R07-T04/provider-layout/README.md",
+      "docs/qa/R07-T04/history-guard/README.md",
+      "docs/qa/R07-T04/route-states/README.md"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R07-T04",
+    "title": "SSO·OAuth·기관 인증 — DB·브라우저·재시작 수용검증",
+    "scope": "잘못된 issuer/audience/state·만료/재사용 assertion 거부; 별도 시험 IdP로 로그인·연결·해제; 기관2곳 tenant 분리; 가상기관 테스트와 실제기관 수신 증거를 분리.",
+    "dependencies": [
+      "R07-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R07-T04",
+      "src/server/org-email-mail.ts",
+      "src/components/auth/OrgLogin.tsx",
+      "src/app/api/v1/auth/org/email-register/challenge/route.ts"
+    ],
+    "legacy_tasks": [
+      "P11-T03",
+      "P11-T04",
+      "P02-T04"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R07-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R07-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. E5 가상GPKI 연결·MFA등록/실패/대기차단·로그인·해제·초대불일치/수락/재진입·마지막수단409 확인. 타입/린트·Ego3폭·DB/메일단언·서버재시작 hash2824c95f… 일치. 기존5개 fixture 보존. 전체/외부 조합은 잔여.",
+    "progress_evidence": [
+      "docs/qa/R07-T04/management-flow/README.md",
+      "docs/qa/R07-T04/management-flow/verified-after-restart.json",
+      "docs/qa/R07-T02/core/regression-final.json",
+      "docs/qa/R07-T04/management-flow/ticket-http.json",
+      "docs/qa/R07-T04/session-evidence/README.md",
+      "docs/qa/R07-T02/session-evidence/regression.json",
+      "docs/qa/R07-T02/session-evidence/auth-regression.json",
+      "docs/qa/R07-T04/session-evidence/verified-after-restart.json",
+      "docs/qa/R07-T04/policy-enforcement/README.md",
+      "docs/qa/R07-T04/policy-writer/README.md",
+      "docs/qa/R07-T04/org-email/README.md",
+      "docs/qa/R07-T02/org-email/regression.json",
+      "docs/qa/R07-T01/org-email/catchsecu_dev-contract.json",
+      "docs/qa/R07-T04/browser-followup/README.md",
+      "docs/qa/R07-T04/browser-binding/README.md",
+      "docs/qa/R07-T02/outbound/README.md",
+      "docs/qa/R07-T04/provider-context/README.md",
+      "docs/qa/R07-T04/https-flow/README.md",
+      "docs/qa/R07-T04/provider-layout/README.md",
+      "docs/qa/R07-T04/history-guard/README.md",
+      "docs/qa/R07-T04/route-states/README.md",
+      "docs/qa/R07-T04/journey/README.md",
+      "docs/qa/R07-T04/journey/after-restart.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R08-T01",
+    "title": "캐치폼·질문·템플릿·단계 편집 — 모델·규칙 대조 및 보완",
+    "scope": "Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 순서·필수·조건·옵션 ID 안정성을 확인한다. 원본 번들 question·policy 세부항목과 현재 계약의 누락 필드 표를 만든다.",
+    "dependencies": [
+      "R04-T04",
+      "R06-T04"
+    ],
+    "acceptance": [
+      "C 폼/초안/질문/보기/템플릿/복제; R 목록·상세·초안; U 순서·문구·유형·단계 설정; D 미사용 초안·질문·템플릿 보관.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/forms.ts",
+      "src/server/templates.ts",
+      "src/server/form-access.ts",
+      "src/server/form-documents.ts",
+      "src/server/answer-validation.ts"
+    ],
+    "legacy_tasks": [
+      "P04-T01",
+      "P04-T02",
+      "P04-T04"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R08-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R04-T04": "local_acceptance_pass",
+      "R06-T04": "local_acceptance_pass"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "partial_observed",
+    "updatedOn": "2026-10-10",
+    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 국내 연락처·이메일2종·생년월일: 질문13유형·역할/채널 바인딩·migration114·원본 문자열 직렬화·고정 검증 구현. 고유7파일125개·HTTP11·Ego 제출/취소복원/정정·재시작 폼1/응답1/정정1/동의3/감사15건 및 기존10세트 보존 통과. 이미지 캡처 시간초과는 미검증으로 남기며 국제전화/주소/서명/메타데이터/다중페이지 및 전체수용은 계속 진행. F3 국내/해외 주소: 질문15유형·국내 문자열/해외7필드·181국가·migration115·검증/정정/CSV 구현. 고유7파일85개·준비/게시HTTP10·실제 Kakao 검색/SDK 실패복구·Ego 제출/취소복원/정정/CSV·재시작 폼1/응답1/정정1/감사12건 및 기존11세트 보존 통과. 지연 SDK 결과의 화면/전송값 불일치 경로 수정. 이미지 원본 일치·PDF/모든 지연 조합·나머지 특수유형/메타데이터/다중페이지와 전체수용은 잔여. F3 직접 그리기: 질문16유형·PNG 파일 수명주기·메타데이터 계약·권한 마스킹·migration116 구현. 고유11파일201시험·HTTP10·Ego 제출/재입력/취소/정정/이력 다운로드/CSV·터치와390/768/1440px 획 보존 통과. 실제 목록 질문 순서 결함 수정. 재시작 폼1/응답1/정정1/파일2/감사30건과 기존12세트 보존. 최초 resize 전 캡처의 바이트 불일치는 한계로 기록하고 정정 적용 Blob/저장/다운로드 해시 일치 확인. 전체 화면 시각 검증·국제전화/언어·서명/메타데이터/다중페이지 및 전체수용 잔여. F3/F5 국제 연락처·언어·PDF: 원본16언어·181국가/179코드·nullable 게시 언어/migration117 구현. 고유13파일192시험 후 PDF/번역 최종8파일126시험 통과(중복 합산 안 함). 원본 문구1952개 중 연결 범위 명시. Arabic 발행 실패를 v2 PDF로 수정하고 실제 Ego 발행/RTL/제출/암호화 저장 확인. 폼2/응답2/정정1/감사25·production 재시작 hash 일치, 기존13fixture 보존. PDF.js 복합 Arabic 추출·전체 시각/번역·인증 서명·메타데이터/여러 페이지·전체수용은 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여.",
+    "progress_evidence": [
+      "docs/qa/R08-T01/README.md",
+      "docs/qa/R08-T01/model-audit/catchsecu_dev.json",
+      "docs/qa/R08-T01/model-audit/catchsecu_test.json",
+      "docs/qa/R08-T01/source-audit/excerpts.json",
+      "docs/planning/09-rea-fullstack/forms-execution.md",
+      "docs/qa/R08-T02/identities/README.md",
+      "docs/qa/R08-T02/identities/review-final.json",
+      "docs/qa/R08-T02/identities/flow/verify.json",
+      "docs/qa/R08-T02/exact-selection/README.md",
+      "docs/qa/R08-T02/exact-selection/final-after-space.json",
+      "docs/qa/R08-T02/exact-selection/flow/verify.json",
+      "docs/qa/R08-T02/text-limits/README.md",
+      "docs/qa/R08-T02/special-questions/README.md",
+      "docs/qa/R08-T02/address-questions/README.md",
+      "docs/qa/R08-T02/drawing-questions/README.md",
+      "docs/qa/R08-T02/international-contact/README.md",
+      "docs/qa/R08-T02/international-contact/pdf-integration.json",
+      "docs/qa/R08-T02/international-contact/flow/verify.json",
+      "docs/qa/R08-T02/international-contact/pdf-v2-visual-review.json",
+      "docs/qa/R08-T02/international-contact/frozen-fixtures/final/summary.json",
+      "docs/qa/R08-T02/question-metadata/explanation/README.md",
+      "docs/qa/R08-T02/question-metadata/explanation/tests-final-summary.json",
+      "docs/qa/R08-T02/question-metadata/explanation/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/reference-link/README.md",
+      "docs/qa/R08-T02/question-metadata/reference-link/regression.json",
+      "docs/qa/R08-T02/question-metadata/reference-link/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/personal-information/README.md",
+      "docs/qa/R08-T02/question-metadata/personal-information/quality-final.json",
+      "docs/qa/R08-T02/question-metadata/personal-information/flow/verify.json",
+      "docs/qa/R08-T02/custom-choice/README.md",
+      "docs/qa/R08-T02/custom-choice/quality-final.json",
+      "docs/qa/R08-T02/custom-choice/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/author-assets/README.md",
+      "docs/qa/R08-T02/question-metadata/author-assets/quality-final.json",
+      "docs/qa/R08-T02/question-metadata/author-assets/flow/verified-after-restart.json",
+      "docs/qa/R08-T02/collection-window/README.md",
+      "docs/qa/R08-T02/collection-window/upgrade-preservation.json",
+      "docs/qa/R08-T02/collection-window/verification-final.json"
+    ]
+  },
+  {
+    "id": "R08-T02",
+    "title": "캐치폼·질문·템플릿·단계 편집 — 서버 API·업무 처리",
+    "scope": "폼·템플릿 CRUD/use/copy/revise/draft/favorite 계약과 편집 저장 payload를 대조한다. 질문 유형별 필수/길이/선택/첨부 검증과 충돌409를 서버에서 집행한다.",
+    "dependencies": [
+      "R08-T01"
+    ],
+    "acceptance": [
+      "질문3종+제공자+동의서로 초안 작성→모든 단계 새로고침→다른 브라우저 재개; 2탭409; A 문서를 B 폼에 연결 차단; 게시본 수정 시 원래 응답의 질문·문구 불변.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/forms.ts",
+      "src/server/templates.ts",
+      "src/server/form-access.ts",
+      "src/server/form-documents.ts",
+      "src/server/answer-validation.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P04-T01",
+      "P04-T02",
+      "P04-T04"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R08-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R08-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 국내 연락처·이메일2종·생년월일: 질문13유형·역할/채널 바인딩·migration114·원본 문자열 직렬화·고정 검증 구현. 고유7파일125개·HTTP11·Ego 제출/취소복원/정정·재시작 폼1/응답1/정정1/동의3/감사15건 및 기존10세트 보존 통과. 이미지 캡처 시간초과는 미검증으로 남기며 국제전화/주소/서명/메타데이터/다중페이지 및 전체수용은 계속 진행. F3 국내/해외 주소: 질문15유형·국내 문자열/해외7필드·181국가·migration115·검증/정정/CSV 구현. 고유7파일85개·준비/게시HTTP10·실제 Kakao 검색/SDK 실패복구·Ego 제출/취소복원/정정/CSV·재시작 폼1/응답1/정정1/감사12건 및 기존11세트 보존 통과. 지연 SDK 결과의 화면/전송값 불일치 경로 수정. 이미지 원본 일치·PDF/모든 지연 조합·나머지 특수유형/메타데이터/다중페이지와 전체수용은 잔여. F3 직접 그리기: 질문16유형·PNG 파일 수명주기·메타데이터 계약·권한 마스킹·migration116 구현. 고유11파일201시험·HTTP10·Ego 제출/재입력/취소/정정/이력 다운로드/CSV·터치와390/768/1440px 획 보존 통과. 실제 목록 질문 순서 결함 수정. 재시작 폼1/응답1/정정1/파일2/감사30건과 기존12세트 보존. 최초 resize 전 캡처의 바이트 불일치는 한계로 기록하고 정정 적용 Blob/저장/다운로드 해시 일치 확인. 전체 화면 시각 검증·국제전화/언어·서명/메타데이터/다중페이지 및 전체수용 잔여. F3/F5 국제 연락처·언어·PDF: 원본16언어·181국가/179코드·nullable 게시 언어/migration117 구현. 고유13파일192시험 후 PDF/번역 최종8파일126시험 통과(중복 합산 안 함). 원본 문구1952개 중 연결 범위 명시. Arabic 발행 실패를 v2 PDF로 수정하고 실제 Ego 발행/RTL/제출/암호화 저장 확인. 폼2/응답2/정정1/감사25·production 재시작 hash 일치, 기존13fixture 보존. PDF.js 복합 Arabic 추출·전체 시각/번역·인증 서명·메타데이터/여러 페이지·전체수용은 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여. BI-05c 완료·마감 rich 편집, active/completion/closed/viewer 읽기 분리, 완료 증명과 viewer 명시적 폼 본문 공유를 구현했다. 관련9파일83시험·Ego 게시/제출/완료/일시중지/마감·PostgreSQL 자산/pin·production HTTP byte hash·82페이지 build를 통과했다. 다음은 BI-06 영수증/PDF 증거 v2와 BI-07 전체 수용이다. BI-07 본문 이미지 전체 수용: 실제 4슬롯 CRUD·게시·2페이지 제출·개정/과거 이력·복제/템플릿, 390/768/1440·RTL·키보드, 장애22·production82페이지·재시작 hash와 기존 frozen fixture20/20 통과. 본문 이미지 모듈은 완료했지만 R08-T02 전체 수용은 계속 진행한다. F5 수집 일정: 시작·종료의 버전/게시본 독립 컬럼·순서 제약, 시작 전 본문 비노출/425, 시작 후 제출, 종료 후410/마감 화면 구현. migration142·기존196버전/154게시본 보존, 전용5·회귀158시험·Ego Lite·production82페이지·재시작 지문 통과. F5 참여자 인증: EMAIL OTP·전체/허용 대상·대상 CRUD·폼 범위 중복 제한·게시본 세션/proof·파일 권한 구현. migration143~145, 새 설치145개·기존196버전 기본값, 관련16파일171시험, production 브라우저 제출·중복 차단·재시작 hash 통과. SOCIAL 실제 OAuth·SMTP 실수신과 R08 전수 수용은 잔여.",
+    "progress_evidence": [
+      "docs/qa/R08-T02/core/baseline.json",
+      "docs/qa/R08-T02/core/question-template-baseline.json",
+      "docs/qa/R08-T02/authority-flow/README.md",
+      "docs/qa/R08-T02/core/authority-regression.json",
+      "docs/qa/R08-T02/authority-flow/http.json",
+      "docs/qa/R08-T02/authority-flow/verify.json",
+      "docs/qa/R08-T02/identities/README.md",
+      "docs/qa/R08-T02/identities/review-final.json",
+      "docs/qa/R08-T02/identities/flow/verify.json",
+      "docs/qa/R08-T02/exact-selection/README.md",
+      "docs/qa/R08-T02/exact-selection/final-after-space.json",
+      "docs/qa/R08-T02/exact-selection/flow/verify.json",
+      "docs/qa/R08-T02/text-limits/README.md",
+      "docs/qa/R08-T02/special-questions/README.md",
+      "docs/qa/R08-T02/address-questions/README.md",
+      "docs/qa/R08-T02/drawing-questions/README.md",
+      "docs/qa/R08-T02/international-contact/README.md",
+      "docs/qa/R08-T02/international-contact/pdf-integration.json",
+      "docs/qa/R08-T02/international-contact/flow/verify.json",
+      "docs/qa/R08-T02/international-contact/pdf-v2-visual-review.json",
+      "docs/qa/R08-T02/international-contact/frozen-fixtures/final/summary.json",
+      "docs/qa/R08-T02/question-metadata/explanation/README.md",
+      "docs/qa/R08-T02/question-metadata/explanation/tests-final-summary.json",
+      "docs/qa/R08-T02/question-metadata/explanation/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/reference-link/README.md",
+      "docs/qa/R08-T02/question-metadata/reference-link/regression.json",
+      "docs/qa/R08-T02/question-metadata/reference-link/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/personal-information/README.md",
+      "docs/qa/R08-T02/question-metadata/personal-information/quality-final.json",
+      "docs/qa/R08-T02/question-metadata/personal-information/flow/verify.json",
+      "docs/qa/R08-T02/custom-choice/README.md",
+      "docs/qa/R08-T02/custom-choice/quality-final.json",
+      "docs/qa/R08-T02/custom-choice/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/author-assets/README.md",
+      "docs/qa/R08-T02/question-metadata/author-assets/quality-final.json",
+      "docs/qa/R08-T02/question-metadata/author-assets/flow/verified-after-restart.json",
+      "docs/qa/R08-T02/body-images/notice-access/README.md",
+      "docs/qa/R08-T02/body-images/notice-access/verification-final.json",
+      "docs/qa/R08-T02/body-images/full-acceptance/README.md",
+      "docs/qa/R08-T02/body-images/full-acceptance/verification-final.json",
+      "docs/qa/R08-T02/question-patterns/README.md",
+      "docs/qa/R08-T02/question-patterns/verification-final.json",
+      "docs/qa/R08-T02/question-patterns/browser-verification.json",
+      "docs/qa/R08-T02/question-metadata/consent-items/README.md",
+      "docs/qa/R08-T02/question-metadata/consent-items/verification-final.json",
+      "docs/qa/R08-T02/question-metadata/consent-items/browser-after-restart.json",
+      "docs/qa/R08-T02/collection-window/README.md",
+      "docs/qa/R08-T02/collection-window/ego-flow.json",
+      "docs/qa/R08-T02/collection-window/verification-final.json",
+      "docs/qa/R08-T02/participation-access/README.md",
+      "docs/qa/R08-T02/participation-access/verification-final.json",
+      "docs/qa/R08-T02/participation-access/browser-verify.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R08-T03",
+    "title": "캐치폼·질문·템플릿·단계 편집 — 전체 화면·모달 연결",
+    "scope": "템플릿→신규 폼, create/basic-frame/v3/recipient/agreement/set/setting 각 단계로 직접진입·저장·재개; 전체 단계 경로/query의 formId 유지. 목록 검색/필터/복제/삭제와 미저장 이동 경고.",
+    "dependencies": [
+      "R08-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/forms/FormEditor.tsx",
+      "src/components/forms/FormLists.tsx",
+      "src/components/forms/TemplateGallery.tsx",
+      "src/components/forms/Workflow.tsx",
+      "src/components/forms/QuestionInput.tsx",
+      "src/components/forms/QuestionSettings.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P04-T01",
+      "P04-T02",
+      "P04-T04"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R08-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R08-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여.",
+    "progress_evidence": [
+      "docs/qa/R08-T04/browser-flow/public-submission.json",
+      "docs/qa/R08-T02/identities/README.md",
+      "docs/qa/R08-T02/identities/review-final.json",
+      "docs/qa/R08-T02/identities/flow/verify.json",
+      "docs/qa/R08-T02/exact-selection/README.md",
+      "docs/qa/R08-T02/exact-selection/final-after-space.json",
+      "docs/qa/R08-T02/exact-selection/flow/verify.json",
+      "docs/qa/R08-T02/text-limits/README.md",
+      "docs/qa/R08-T02/question-metadata/explanation/README.md",
+      "docs/qa/R08-T02/question-metadata/explanation/tests-final-summary.json",
+      "docs/qa/R08-T02/question-metadata/explanation/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/reference-link/README.md",
+      "docs/qa/R08-T02/question-metadata/reference-link/regression.json",
+      "docs/qa/R08-T02/question-metadata/reference-link/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/personal-information/README.md",
+      "docs/qa/R08-T02/question-metadata/personal-information/quality-final.json",
+      "docs/qa/R08-T02/question-metadata/personal-information/flow/verify.json",
+      "docs/qa/R08-T02/custom-choice/README.md",
+      "docs/qa/R08-T02/custom-choice/quality-final.json",
+      "docs/qa/R08-T02/custom-choice/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/author-assets/README.md",
+      "docs/qa/R08-T02/question-metadata/author-assets/quality-final.json",
+      "docs/qa/R08-T02/question-metadata/author-assets/flow/verified-after-restart.json",
+      "docs/qa/R08-T03/template-catalog/README.md",
+      "docs/qa/R08-T03/template-catalog/verification-final.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R08-T04",
+    "title": "캐치폼·질문·템플릿·단계 편집 — DB·브라우저·재시작 수용검증",
+    "scope": "질문3종+제공자+동의서로 초안 작성→모든 단계 새로고침→다른 브라우저 재개; 2탭409; A 문서를 B 폼에 연결 차단; 게시본 수정 시 원래 응답의 질문·문구 불변.",
+    "dependencies": [
+      "R08-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R08-T04"
+    ],
+    "legacy_tasks": [
+      "P04-T01",
+      "P04-T02",
+      "P04-T04"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R08-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R08-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여.",
+    "progress_evidence": [
+      "docs/qa/R08-T04/browser-flow/db.json",
+      "docs/qa/R08-T02/identities/README.md",
+      "docs/qa/R08-T02/identities/review-final.json",
+      "docs/qa/R08-T02/identities/flow/verify.json",
+      "docs/qa/R08-T02/exact-selection/README.md",
+      "docs/qa/R08-T02/exact-selection/final-after-space.json",
+      "docs/qa/R08-T02/exact-selection/flow/verify.json",
+      "docs/qa/R08-T02/text-limits/README.md",
+      "docs/qa/R08-T02/question-metadata/explanation/README.md",
+      "docs/qa/R08-T02/question-metadata/explanation/tests-final-summary.json",
+      "docs/qa/R08-T02/question-metadata/explanation/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/reference-link/README.md",
+      "docs/qa/R08-T02/question-metadata/reference-link/regression.json",
+      "docs/qa/R08-T02/question-metadata/reference-link/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/personal-information/README.md",
+      "docs/qa/R08-T02/question-metadata/personal-information/quality-final.json",
+      "docs/qa/R08-T02/question-metadata/personal-information/flow/verify.json",
+      "docs/qa/R08-T02/custom-choice/README.md",
+      "docs/qa/R08-T02/custom-choice/quality-final.json",
+      "docs/qa/R08-T02/custom-choice/flow/verify.json",
+      "docs/qa/R08-T02/question-metadata/author-assets/README.md",
+      "docs/qa/R08-T02/question-metadata/author-assets/quality-final.json",
+      "docs/qa/R08-T02/question-metadata/author-assets/flow/verified-after-restart.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R09-T01",
+    "title": "폼 승인·게시·고정 URL — 모델·규칙 대조 및 보완",
+    "scope": "승인대상 버전 해시·게시 포인터·토큰 hash·고정slug unique와 만료를 확인한다. 승인 뒤 내용 변경 시 승인 유효성 및 참조 버전 고정을 명시한다.",
+    "dependencies": [
+      "R08-T04",
+      "R10-T04",
+      "R21-T04"
+    ],
+    "acceptance": [
+      "C 승인요청/게시/고정URL; R 승인상세·게시상태; U 승인결정·URL 대상·재개; D 승인취소·URL 폐기·게시중단.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/approvals.ts",
+      "src/server/public-publication.ts",
+      "src/server/fixed-urls.ts",
+      "src/server/forms.ts",
+      "src/server/form-cache.ts"
+    ],
+    "legacy_tasks": [
+      "P04-T03",
+      "P04-T05"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R09-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R08-T04": "local_acceptance_pass",
+      "R10-T04": "local_acceptance_pass",
+      "R21-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R09-T02",
+    "title": "폼 승인·게시·고정 URL — 서버 API·업무 처리",
+    "scope": "요청/승인/거절/취소와 publish/pause/resume/고정URL CRUD를 트랜잭션으로 연결한다. 자기승인 허용 여부를 계약으로 확정하고 만료 라이선스에서 write gate를 검증한다.",
+    "dependencies": [
+      "R09-T01"
+    ],
+    "acceptance": [
+      "초안→승인→게시→외부접속→중단410→재개; 승인본 바꿔치기 거부; 고정URL 대상 교체와 이전 링크 정책; 같은slug 경쟁409; 링크 복사만으로 게시되지 않음.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/approvals.ts",
+      "src/server/public-publication.ts",
+      "src/server/fixed-urls.ts",
+      "src/server/forms.ts",
+      "src/server/form-cache.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P04-T03",
+      "P04-T05"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R09-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R09-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R09-T03",
+    "title": "폼 승인·게시·고정 URL — 전체 화면·모달 연결",
+    "scope": "공유 단계에서 게시전 검증·승인상태·URL 복사·중단·재개, 고정URL 추가/이름변경/대상교체/삭제, 승인로그 상세/결정/사유 입력을 연결한다.",
+    "dependencies": [
+      "R09-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/forms/Approvals.tsx",
+      "src/components/forms/Workflow.tsx",
+      "src/components/forms/FixedUrls.tsx",
+      "src/components/forms/DraftStatus.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P04-T03",
+      "P04-T05"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R09-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R09-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "직접 생성한 폼의 단계 설정에서 실제 게시 후 공유 URL을 얻고 익명 응답까지 확인. 전체 승인/회수/고정URL 수용은 남음.",
+    "progress_evidence": [
+      "docs/qa/R08-T04/browser-flow/published.png"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R09-T04",
+    "title": "폼 승인·게시·고정 URL — DB·브라우저·재시작 수용검증",
+    "scope": "초안→승인→게시→외부접속→중단410→재개; 승인본 바꿔치기 거부; 고정URL 대상 교체와 이전 링크 정책; 같은slug 경쟁409; 링크 복사만으로 게시되지 않음.",
+    "dependencies": [
+      "R09-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R09-T04"
+    ],
+    "legacy_tasks": [
+      "P04-T03",
+      "P04-T05"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R09-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R09-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R10-T01",
+    "title": "처리 목적·동의서·처리방침·서비스 공개문서 — 모델·규칙 대조 및 보완",
+    "scope": "목적↔항목↔제공자와 DocumentVersion 스냅샷 관계를 대조한다. 국외이전·아동·CCTV·자동화 결정·권리담당자 등 역공학 상태에 있는 필드를 실제 schema/DTO 지원 여부별로 확정한다.",
+    "dependencies": [
+      "R03-T04",
+      "R06-T04"
+    ],
+    "acceptance": [
+      "C 목적/제공·수탁자/문서/문구; R 목록·버전·공개/PDF; U 초안·표시문구·재위탁; D 보관·복구·게시폐기. 증거 참조 버전은 불변.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/processing-catalog.ts",
+      "src/server/documents.ts",
+      "src/server/document-pdf.ts",
+      "src/server/public-service-documents.ts",
+      "src/server/subprocessors.ts",
+      "src/server/form-documents.ts"
+    ],
+    "legacy_tasks": [
+      "P05-T01",
+      "P05-T02",
+      "P05-T03",
+      "P05-T04",
+      "P03-T04"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R10-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R03-T04": "local_acceptance_pass",
+      "R06-T04": "local_acceptance_pass"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "게시 수탁자 출처 보존에 이어 DocumentPolicyDraft·복합FK·유형 guard·DTO 구현. dev103→104에서 기존7테이블 hash 보존. 원본102필드 중98개 정규화·수탁유형2개 부모 구분; 초기화 배열2개 서비스 전체 항목에 연결·재수탁자 항목/근거 추가·과거JSON 모양 보존. 원본 전체 동등성은 계속 검토.",
+    "progress_evidence": [
+      "docs/qa/R10-T01/public-recipient-snapshots/README.md",
+      "docs/qa/R10-T01/structured-policy/README.md",
+      "docs/qa/R10-T01/structured-policy/migration-after.json",
+      "docs/qa/R10-T01/source-field-audit/implementation-map.csv",
+      "docs/qa/R10-T01/source-field-audit/service-item-source.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R10-T02",
+    "title": "처리 목적·동의서·처리방침·서비스 공개문서 — 서버 API·업무 처리",
+    "scope": "목적/제공자/문구/문서 CRUD·restore/history/publish/unpublish/revoke/PDF와 서비스 동의표시·재위탁고지의 상태 전이를 연결한다. HTML 정제·PDF 폰트·공개 토큰 권한을 확인한다.",
+    "dependencies": [
+      "R10-T01"
+    ],
+    "acceptance": [
+      "목적+제공자 CRUD→문서생성/개정→공개토큰/PDF 내용일치; 소프트삭제/복구; 게시문서와 이전동의영수증 불변; 국내/국외/수신자/agree 변형 DB fixture로 각각검증.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/processing-catalog.ts",
+      "src/server/documents.ts",
+      "src/server/document-pdf.ts",
+      "src/server/public-service-documents.ts",
+      "src/server/subprocessors.ts",
+      "src/server/form-documents.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P05-T01",
+      "P05-T02",
+      "P05-T03",
+      "P05-T04",
+      "P03-T04"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R10-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R10-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "목적 수탁자 공개목록·초안변경 영향·100건 전처리 누락 수정. 구조화 초안 저장/제거/과거PATCH 보존·게시 검증·숨은 입력 공개 제외·실패 롤백 추가. 문서/PDF55개와 폼연결23개 회귀 통과. 후속 수탁 항목·재수탁자 저장/게시/PDF·권한58개, 네트워크 오류3개 통과. 전체 문서 API 수용 계속.",
+    "progress_evidence": [
+      "docs/qa/R10-T02/public-recipient-snapshots/README.md",
+      "docs/qa/R10-T01/structured-policy/server-first.json",
+      "docs/qa/R10-T01/structured-policy/form-binding-regression.json",
+      "docs/qa/R10-T02/trustee-items/README.md"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R10-T03",
+    "title": "처리 목적·동의서·처리방침·서비스 공개문서 — 전체 화면·모달 연결",
+    "scope": "이용목적 wizard, 동의서 생성/목록/편집/문구, 처리방침 목록·미리보기·버전·게시, 서비스 표시동의/수탁자 고지 화면. 모든 /services/... 공개 변형은 경로 파라미터에 맞는 문서 분기.",
+    "dependencies": [
+      "R10-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/forms/ProcessingCatalog.tsx",
+      "src/components/forms/Documents.tsx",
+      "src/components/forms/ConsentDocuments.tsx",
+      "src/components/forms/PublicServiceDocuments.tsx",
+      "src/components/management/ConsentDisplay.tsx",
+      "src/components/management/SubprocessorMail.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P05-T01",
+      "P05-T02",
+      "P05-T03",
+      "P05-T04",
+      "P03-T04"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R10-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R10-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "수집 근거·문서·문구·표시 설정 입력보호/409 복구. P/C/OC 공개경로 연결. UI CRUD·문구적용·게시·연결회수거부·PDF·390/768/1440폭 확인. 국외이전 게시/비공개/보관/복원과 공개7+4경로·390/768/1440폭 확인. 구조화88입력·재위탁 추가/삭제·409복구·미완성 게시거부·게시2본·모바일도 확인. 후속 서비스 항목 초기화·재수탁자 추가/삭제저장/재게시·실패재시도 입력보존·한국어 오류·390/768/1440폭도 확인. 전체 역할/원본 동등성은 남음.",
+    "progress_evidence": [
+      "docs/qa/R10-T03/catalog-flow/README.md",
+      "docs/qa/R10-T03/document-flow/README.md",
+      "docs/qa/R10-T03/clause-flow/README.md",
+      "docs/qa/R10-T04/overseas-flow/README.md",
+      "docs/qa/R10-T04/structured-policy/README.md",
+      "docs/qa/R10-T03/trustee-items/README.md"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R10-T04",
+    "title": "처리 목적·동의서·처리방침·서비스 공개문서 — DB·브라우저·재시작 수용검증",
+    "scope": "목적+제공자 CRUD→문서생성/개정→공개토큰/PDF 내용일치; 소프트삭제/복구; 게시문서와 이전동의영수증 불변; 국내/국외/수신자/agree 변형 DB fixture로 각각검증.",
+    "dependencies": [
+      "R10-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R10-T04"
+    ],
+    "legacy_tasks": [
+      "P05-T01",
+      "P05-T02",
+      "P05-T03",
+      "P05-T04",
+      "P03-T04"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R10-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R10-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "기존 수집 근거/문서 검증 유지. 문구·표시 설정 HTTP29개·DB감사18건·문구6/처리방침5/표시5·2 개정 및 재시작 지문 확인. 국외이전 HTTP30개·감사10건·PDF3개·출처6건·재시작 지문도 일치. 구조화 처리방침 HTTP14개·감사6건·PDF2개·재시작 지문도 일치. 후속 재수탁자 문서 v5/초안3/게시2본·감사5건·PDF2개·서버재시작 지문 일치, 과거 구조화 문서 그대로 보존. 전체유형/역할 수용 계속.",
+    "progress_evidence": [
+      "docs/qa/R10-T03/catalog-flow/db-after-restart.json",
+      "docs/qa/R10-T03/document-flow/db-after-restart.json",
+      "docs/qa/R10-T04/display-flow/verified-after-restart.json",
+      "docs/qa/R10-T04/overseas-flow/verified-after-restart.json",
+      "docs/qa/R10-T04/structured-policy/verified-after-restart.json",
+      "docs/qa/R10-T04/trustee-items/verified-after-restart.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R11-T01",
+    "title": "공개 폼·응답·첨부·정정 — 모델·규칙 대조 및 보완",
+    "scope": "Submission→FormVersion→Answer/ConsentReceipt와 파일 바인딩, 원본문항·동의문구·timestamp 보존을 검증한다. 정정 payload 암호화, 파일 검사 상태, export source 참조 및 purge 후 불가역 비노출을 설계한다.",
+    "dependencies": [
+      "R09-T04"
+    ],
+    "acceptance": [
+      "C 제출/동의영수증/첨부/메모; R 응답·파일·내보내기; U 정정/메모/보유기간; D 메모·미참조첨부, 개인정보 삭제는 파기요청.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/submissions.ts",
+      "src/server/submission-management.ts",
+      "src/server/submission-access.ts",
+      "src/server/consent-receipts.ts",
+      "src/server/files.ts",
+      "src/server/file-access.ts",
+      "src/server/file-download.ts",
+      "src/server/submission-export.ts"
+    ],
+    "legacy_tasks": [
+      "P06-T01",
+      "P06-T02",
+      "P06-T03",
+      "P06-T07"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R11-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R09-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R11-T02",
+    "title": "공개 폼·응답·첨부·정정 — 서버 API·업무 처리",
+    "scope": "외부 토큰 조회/제출과 응답 list/read/PATCH/withdraw/hold/retention/note/export API를 점검한다. 응답+영수증+outbox 원자성, 공개 제출 중복과 최대응답 경합, 파일 owner 검증을 수행한다.",
+    "dependencies": [
+      "R11-T01"
+    ],
+    "acceptance": [
+      "게시된폼 외부제출→관리자응답조회→정정→영수증/PDF→첨부hash비교→재시작; 2회제출 멱등; 필수동의누락400; 만료게시/타회사파일/공유범위밖파일 거부; 내보내기 재권한검사.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/submissions.ts",
+      "src/server/submission-management.ts",
+      "src/server/submission-access.ts",
+      "src/server/consent-receipts.ts",
+      "src/server/files.ts",
+      "src/server/file-access.ts",
+      "src/server/file-download.ts",
+      "src/server/submission-export.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P06-T01",
+      "P06-T02",
+      "P06-T03",
+      "P06-T07"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R11-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R11-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R11-T03",
+    "title": "공개 폼·응답·첨부·정정 — 전체 화면·모달 연결",
+    "scope": "project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이를 명세한다. 응답목록·상세·정정·철회·첨부 실제다운로드·로그; file-view 일반/공유 및 파일 지정/목록 네 변형을 각각 연결한다.",
+    "dependencies": [
+      "R11-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/forms/PublicForm.tsx",
+      "src/components/forms/SubmissionDetail.tsx",
+      "src/components/forms/FileView.tsx",
+      "src/components/forms/ExportJobs.tsx",
+      "src/components/forms/FormLists.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P06-T01",
+      "P06-T02",
+      "P06-T03",
+      "P06-T07"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R11-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R11-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "응답 상세의 미저장 입력 유실 재현 후 닫기/취소 보호·409 입력보존·최신 재조회 구현. 실제 UI 충돌/복구·메모 닫기 보호 통과.",
+    "progress_evidence": [
+      "docs/qa/R11-T04/browser-flow/conflict-recovered.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R11-T04",
+    "title": "공개 폼·응답·첨부·정정 — DB·브라우저·재시작 수용검증",
+    "scope": "게시된폼 외부제출→관리자응답조회→정정→영수증/PDF→첨부hash비교→재시작; 2회제출 멱등; 필수동의누락400; 만료게시/타회사파일/공유범위밖파일 거부; 내보내기 재권한검사.",
+    "dependencies": [
+      "R11-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R11-T04"
+    ],
+    "legacy_tasks": [
+      "P06-T01",
+      "P06-T02",
+      "P06-T03",
+      "P06-T07"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R11-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R11-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "정정/사유/메모CRUD·실제PDF다운로드/DB해시·409복구·새로고침·새서버 유지. 정정3건/메모0건과 감사CSV를 독립DB 대조. 첨부·전체수용은 남음.",
+    "progress_evidence": [
+      "docs/qa/R11-T04/browser-flow/README.md",
+      "docs/qa/R11-T04/browser-flow/db-after-conflict.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R12-T01",
+    "title": "외부 공유·열람자 인증 — 모델·규칙 대조 및 보완",
+    "scope": "공유권한은 회사·서비스·폼버전·허용필드·대상범위·만료를 가진다. 코드/인증 challenge hash·시도제한·세션 generation으로 권한 수정/회수 뒤 기존세션을 무효화한다.",
+    "dependencies": [
+      "R11-T04"
+    ],
+    "acceptance": [
+      "C 공유권한/열람 challenge; R 공유목록·허용 응답; U 허용필드·기간·대상; D 권한회수/열람세션 폐기.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/sharing.ts",
+      "src/server/viewer.ts",
+      "src/server/share-query.ts",
+      "src/server/share-cache.ts",
+      "src/server/sender-access.ts"
+    ],
+    "legacy_tasks": [
+      "P06-T04"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R12-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R11-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R12-T02",
+    "title": "외부 공유·열람자 인증 — 서버 API·업무 처리",
+    "scope": "공유 CRUD/resend/events와 challenge→verify→session→submissions/files/logout API에서 매번 허용필드/범위를 적용한다. 사용자가 전달한 filter로 범위를 넓힐 수 없게 한다.",
+    "dependencies": [
+      "R12-T01"
+    ],
+    "acceptance": [
+      "공유범위2필드/응답1개 지정→별도브라우저코드인증→그 범위만조회; 필드회수·만료·완전회수 즉시적용; 다른공유의 id 주입·재사용OTP·토큰로그노출 차단.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/sharing.ts",
+      "src/server/viewer.ts",
+      "src/server/share-query.ts",
+      "src/server/share-cache.ts",
+      "src/server/sender-access.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P06-T04"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R12-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R12-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R12-T03",
+    "title": "외부 공유·열람자 인증 — 전체 화면·모달 연결",
+    "scope": "공유생성/편집/회수/초대재전송, /shared-privacy/verify·email-verify·view 각 단계와 만료/권한없음. 이메일·공유코드 입력값과 필수동의 확인을 구분한다.",
+    "dependencies": [
+      "R12-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/forms/ShareGrants.tsx",
+      "src/components/forms/SharedPrivacy.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P06-T04"
+    ],
+    "status": "planned",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R12-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R12-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R12-T04",
+    "title": "외부 공유·열람자 인증 — DB·브라우저·재시작 수용검증",
+    "scope": "공유범위2필드/응답1개 지정→별도브라우저코드인증→그 범위만조회; 필드회수·만료·완전회수 즉시적용; 다른공유의 id 주입·재사용OTP·토큰로그노출 차단.",
+    "dependencies": [
+      "R12-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R12-T04"
+    ],
+    "legacy_tasks": [
+      "P06-T04"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R12-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R12-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R13-T01",
+    "title": "정보주체·동의이력·본인인증 — 모델·규칙 대조 및 보완",
+    "scope": "동명이인/동일이메일 다른서비스 분리 기준을 확정하고 SubjectAccessScope를 서버에서 좁힌다. 본인인증 결과와 폼버전/사용 목적을 불변 결합하고 secret은 암호화한다.",
+    "dependencies": [
+      "R11-T04"
+    ],
+    "acceptance": [
+      "C 본인조회 challenge/철회요청/인증설정; R 자기동의·처리이력; U 인증설정·철회확정/취소; D 인증설정 비활성·세션종료.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/subjects.ts",
+      "src/server/subject-identity.ts",
+      "src/server/subject-scope.ts",
+      "src/server/verification.ts",
+      "src/server/verification-flow.ts"
+    ],
+    "legacy_tasks": [
+      "P06-T05",
+      "P06-T06"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R13-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R11-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R13-T02",
+    "title": "정보주체·동의이력·본인인증 — 서버 API·업무 처리",
+    "scope": "access-requests→sessions→consents/events/withdrawals(confirm/cancel), 서비스별 verification CRUD와 검증된 provider callback을 연결한다. 검증 미설정이면 성공 영수증을 만들지 않는다.",
+    "dependencies": [
+      "R13-T01"
+    ],
+    "acceptance": [
+      "주체A 링크로 B동의 접근거부; 같은이메일 회사간격리; 철회확정→마케팅억제 반영; 취소·반복확정 멱등; 인증만료/중복callback/대상폼교체 거부; 실제기관시험 별도.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/subjects.ts",
+      "src/server/subject-identity.ts",
+      "src/server/subject-scope.ts",
+      "src/server/verification.ts",
+      "src/server/verification-flow.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P06-T05",
+      "P06-T06"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R13-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R13-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R13-T03",
+    "title": "정보주체·동의이력·본인인증 — 전체 화면·모달 연결",
+    "scope": "find/find-complete, 동의이력·행위이력 토큰, formComplete/form-interrupt 및 /identification/:result에 서버 확인결과를 표시한다. 토큰/URL 문구를 신원증명으로 신뢰하지 않는다.",
+    "dependencies": [
+      "R13-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/forms/SubjectPortal.tsx",
+      "src/components/forms/VerificationSettings.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P06-T05",
+      "P06-T06"
+    ],
+    "status": "planned",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R13-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R13-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R13-T04",
+    "title": "정보주체·동의이력·본인인증 — DB·브라우저·재시작 수용검증",
+    "scope": "주체A 링크로 B동의 접근거부; 같은이메일 회사간격리; 철회확정→마케팅억제 반영; 취소·반복확정 멱등; 인증만료/중복callback/대상폼교체 거부; 실제기관시험 별도.",
+    "dependencies": [
+      "R13-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R13-T04"
+    ],
+    "legacy_tasks": [
+      "P06-T05",
+      "P06-T06"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R13-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R13-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R14-T01",
+    "title": "개인정보 업로드·이관 — 모델·규칙 대조 및 보완",
+    "scope": "파일→헤더매핑→행검증→동의/출처증빙→Submission 변환 관계와 (tenant,job,rowNo)unique를 검사한다. 오류행·부분성공 정책과 원본파일 보존/삭제 시점을 명시한다.",
+    "dependencies": [
+      "R11-T04",
+      "R10-T04"
+    ],
+    "acceptance": [
+      "C 업로드job·행; R 검사결과·오류CSV·진행상태; U 매핑/동의증빙·재검증; D 미실행작업취소·파일정리. commit 이후 증빙은 보존.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/imports.ts",
+      "src/server/import-csv.ts",
+      "src/server/import-worker.ts",
+      "src/server/legacy-migration.ts"
+    ],
+    "legacy_tasks": [
+      "P07-T01",
+      "P14-T01"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R14-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R11-T04": "local_acceptance_pass",
+      "R10-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R14-T02",
+    "title": "개인정보 업로드·이관 — 서버 API·업무 처리",
+    "scope": "init/upload/inspect/validate/commit/retry/cancel/rows/errors.csv를 상태기계로 연결한다. 인코딩·크기·확장자·수식 주입·동의 근거 없는 데이터·중복행을 검사한다.",
+    "dependencies": [
+      "R14-T01"
+    ],
+    "acceptance": [
+      "정상CSV3행+오류1행→검증수정→확정; 같은commit2번/worker재시작에도 중복없음; B파일주입차단; UTF8/한글·대용량·잘못된동의 증빙·CSV수식 안전성.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/imports.ts",
+      "src/server/import-csv.ts",
+      "src/server/import-worker.ts",
+      "src/server/legacy-migration.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P07-T01",
+      "P14-T01"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R14-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R14-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R14-T03",
+    "title": "개인정보 업로드·이관 — 전체 화면·모달 연결",
+    "scope": "업로드 기본/동의/제공자 세 페이지에서 파일·매핑·검증오류·미리보기·확정·진행·재시도·취소를 연결한다. 기존 localStorage 이관은 사용자 선택 dry-run과 중복 보고 후 실행한다.",
+    "dependencies": [
+      "R14-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/forms/Imports.tsx",
+      "src/components/management/LegacyImport.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P07-T01",
+      "P14-T01"
+    ],
+    "status": "planned",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R14-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R14-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R14-T04",
+    "title": "개인정보 업로드·이관 — DB·브라우저·재시작 수용검증",
+    "scope": "정상CSV3행+오류1행→검증수정→확정; 같은commit2번/worker재시작에도 중복없음; B파일주입차단; UTF8/한글·대용량·잘못된동의 증빙·CSV수식 안전성.",
+    "dependencies": [
+      "R14-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R14-T04"
+    ],
+    "legacy_tasks": [
+      "P07-T01",
+      "P14-T01"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R14-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R14-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R15-T01",
+    "title": "광고 동의·수신거부 — 모델·규칙 대조 및 보완",
+    "scope": "주체·서비스·채널별 동의, 취득출처/일시/문구버전, 철회이벤트와 억제목록의 연결을 확인한다. 중복수신자 통합 기준과 목적별 동의범위를 명시한다.",
+    "dependencies": [
+      "R11-T04",
+      "R13-T04"
+    ],
+    "acceptance": [
+      "C 근거 있는 동의등록; R 동의목록·집계·내보내기; U 채널별 동의/철회; D 근거 삭제가 아닌 동의회수·보존정책 적용.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/marketing.ts",
+      "src/server/marketing-jobs.ts",
+      "src/server/suppression.ts",
+      "src/server/subject-query.ts"
+    ],
+    "legacy_tasks": [
+      "P07-T02"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R15-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R11-T04": "local_acceptance_pass",
+      "R13-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R15-T02",
+    "title": "광고 동의·수신거부 — 서버 API·업무 처리",
+    "scope": "preferences CRUD/withdrawals/export/sources/summary를 실제 ConsentReceipt와 연결한다. 철회는 예약발송이 claim되는 시점에도 재검사되며 재동의는 새로운 근거를 요구한다.",
+    "dependencies": [
+      "R15-T01"
+    ],
+    "acceptance": [
+      "동의→검색→철회→예약발송억제; 중복제거 on/off 집계 대조; 원본 응답정정 시 잘못된 주체 재동의 방지; 권한없는 복호화·타회사 export 실패.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/marketing.ts",
+      "src/server/marketing-jobs.ts",
+      "src/server/suppression.ts",
+      "src/server/subject-query.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P07-T02"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R15-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R15-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R15-T03",
+    "title": "광고 동의·수신거부 — 전체 화면·모달 연결",
+    "scope": "/form/ad-manage 검색조건(동의일·이메일/전화 존재·중복제거), 채널/서비스/폼 필터, 선택철회·수정·내보내기와 marketing-detail 집계를 연결한다.",
+    "dependencies": [
+      "R15-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/forms/Marketing.tsx",
+      "src/components/forms/MarketingSettings.tsx",
+      "src/components/forms/FormLists.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P07-T02"
+    ],
+    "status": "planned",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R15-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R15-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R15-T04",
+    "title": "광고 동의·수신거부 — DB·브라우저·재시작 수용검증",
+    "scope": "동의→검색→철회→예약발송억제; 중복제거 on/off 집계 대조; 원본 응답정정 시 잘못된 주체 재동의 방지; 권한없는 복호화·타회사 export 실패.",
+    "dependencies": [
+      "R15-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R15-T04"
+    ],
+    "legacy_tasks": [
+      "P07-T02"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R15-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R15-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R16-T01",
+    "title": "보유기간·파기 일정·증명서 — 모델·규칙 대조 및 보완",
+    "scope": "RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선순위, legalHold·승인·파기증명서를 대조한다. 파일/내보내기/캠페인 복제본까지 파기 범위를 추적한다.",
+    "dependencies": [
+      "R11-T04",
+      "R06-T04"
+    ],
+    "acceptance": [
+      "C 보유규칙/파기요청; R 기간·예정목록·증명서; U 보유기간·승인·보류·재예약; D 규칙보관·요청취소·승인된 실제파기. 증명서 수정/임의삭제 없음.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/retention-rules.ts",
+      "src/server/destruction.ts",
+      "src/server/destruction-worker.ts",
+      "src/server/collect-destruction.ts",
+      "src/server/destruction-access.ts"
+    ],
+    "legacy_tasks": [
+      "P07-T03",
+      "P07-T04"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R16-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R11-T04": "local_acceptance_pass",
+      "R06-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "RetentionRule 기존 스키마·관계·적용 우선순위 재사용 확인. 파기 전체 수용은 남음.",
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R16-T02",
+    "title": "보유기간·파기 일정·증명서 — 서버 API·업무 처리",
+    "scope": "기존 retention-rules CRUD와 /log/retention 신규 화면을 연결할 계약을 명시한다(원본 정상화면 미확인, 독립 제안). 파기 승인/거절/취소/재시도/재예약과 worker의 참조차단·재실행 안전성을 점검한다.",
+    "dependencies": [
+      "R16-T01"
+    ],
+    "acceptance": [
+      "짧은보유fixture→보류→만료worker실행(유지)→보류해제/승인→실제DB·파일삭제→증명서; 다운로드/발송/정정과 파기경합; worker중단후재개 중복증명서없음.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/retention-rules.ts",
+      "src/server/destruction.ts",
+      "src/server/destruction-worker.ts",
+      "src/server/collect-destruction.ts",
+      "src/server/destruction-access.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P07-T03",
+      "P07-T04"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R16-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R16-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "보유기간 HTTP·독립DB21개 통과. 파기 모듈 전체 수용은 남음.",
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R16-T03",
+    "title": "보유기간·파기 일정·증명서 — 전체 화면·모달 연결",
+    "scope": "/log/retention 기간규칙목록/추가/편집/보관, 수집파기현황, 파기예정·요청상세·승인/보류·재예약, 증명서조회/다운로드. 파기 이후 빈값이 아닌 파기 상태/근거를 표시한다.",
+    "dependencies": [
+      "R16-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/management/destruction.tsx",
+      "src/components/management/CollectDestruction.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P07-T03",
+      "P07-T04"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R16-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R16-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "규칙 CRUD UI·경로·메뉴 연결. 생성과 충돌 시 입력 보존을 Ego에서 확인.",
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R16-T04",
+    "title": "보유기간·파기 일정·증명서 — DB·브라우저·재시작 수용검증",
+    "scope": "짧은보유fixture→보류→만료worker실행(유지)→보류해제/승인→실제DB·파일삭제→증명서; 다운로드/발송/정정과 파기경합; worker중단후재개 중복증명서없음.",
+    "dependencies": [
+      "R16-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R16-T04"
+    ],
+    "legacy_tasks": [
+      "P07-T03",
+      "P07-T04"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R16-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R16-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "실제HTTP21개 통과. 브라우저 및 재시작 수용 검증 진행.",
+    "updatedOn": "2026-10-10",
+    "progress_evidence": [
+      "docs/qa/R16-T04/route-connection/README.md",
+      "docs/qa/R08-T04/browser-flow/db.json"
+    ]
+  },
+  {
+    "id": "R17-T01",
+    "title": "발신번호·문자 캠페인 — 모델·규칙 대조 및 보완",
+    "scope": "발신번호 검증·증빙파일 및 Campaign→Delivery→Receipt 고유키, 크레딧예약/정산을 확인한다. 전화번호 정규화·중복 제거·예약 timezone·발신자 변경 버전 고정을 명시한다.",
+    "dependencies": [
+      "R15-T04",
+      "R21-T04"
+    ],
+    "acceptance": [
+      "C 발신자·초안·수신자·템플릿; R 인증/발송내역; U 초안·예약·기본발신자; D 초안·발신자 비활성/예약취소. 발송완료는 receipt 이력 유지.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/senders.ts",
+      "src/server/sender-providers.ts",
+      "src/server/campaigns.ts",
+      "src/server/campaign-scheduling.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/sms-adapter.ts",
+      "src/server/campaign-ledger.ts"
+    ],
+    "legacy_tasks": [
+      "P08-T01",
+      "P08-T02",
+      "P08-T03",
+      "P08-T04"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R17-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R15-T04": "local_acceptance_pass",
+      "R21-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R17-T02",
+    "title": "발신번호·문자 캠페인 — 서버 API·업무 처리",
+    "scope": "발신자 CRUD/검증증빙/disable, 폼응답·직접수신자 구성, 캠페인 preview/schedule/reschedule/cancel/retry와 receipt 서명/순서/중복 검증. 발송직전 동의·권한·잔액 재검사.",
+    "dependencies": [
+      "R17-T01"
+    ],
+    "acceptance": [
+      "번호등록→시험검증→수신자2명→예약→취소/발송→receipt→잔액대조; 미승인번호거부; 철회직후발송차단; provider timeout 재시도 중복비용없음. 실제SMS도착증거 별도.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/senders.ts",
+      "src/server/sender-providers.ts",
+      "src/server/campaigns.ts",
+      "src/server/campaign-scheduling.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/sms-adapter.ts",
+      "src/server/campaign-ledger.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P08-T01",
+      "P08-T02",
+      "P08-T03",
+      "P08-T04"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R17-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R17-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R17-T03",
+    "title": "발신번호·문자 캠페인 — 전체 화면·모달 연결",
+    "scope": "sms 기본/폼선택/직접작성/번호관리/내역/번호없음 모두 실데이터. 번호등록 모달의 번호·설명·증빙4종·파일제한을 최신 캡처와 맞추고 작성내용·주소록·비용·예약확인을 구현한다.",
+    "dependencies": [
+      "R17-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/services/Senders.tsx",
+      "src/components/services/Campaigns.tsx",
+      "src/components/services/MessageTemplates.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P08-T01",
+      "P08-T02",
+      "P08-T03",
+      "P08-T04"
+    ],
+    "status": "planned",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R17-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R17-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R17-T04",
+    "title": "발신번호·문자 캠페인 — DB·브라우저·재시작 수용검증",
+    "scope": "번호등록→시험검증→수신자2명→예약→취소/발송→receipt→잔액대조; 미승인번호거부; 철회직후발송차단; provider timeout 재시도 중복비용없음. 실제SMS도착증거 별도.",
+    "dependencies": [
+      "R17-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R17-T04"
+    ],
+    "legacy_tasks": [
+      "P08-T01",
+      "P08-T02",
+      "P08-T03",
+      "P08-T04"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R17-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R17-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R18-T01",
+    "title": "발신메일·이메일 발송·수신거부 — 모델·규칙 대조 및 보완",
+    "scope": "템플릿 revision/발송당 HTML·첨부 snapshot, email suppression unique, 반송이벤트 idempotency를 대조한다. 발신 DNS/주소인증 상태는 서버 증거로만 변경한다.",
+    "dependencies": [
+      "R17-T04"
+    ],
+    "acceptance": [
+      "C 발신주소/메일초안/첨부/템플릿; R DNS·내역·반송; U 내용·예약·템플릿; D 초안·첨부·예약취소, 발신주소 비활성. 구독취소는 억제 이벤트.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/email-policy.ts",
+      "src/server/email-feedback.ts",
+      "src/server/message-content.ts",
+      "src/server/message-templates.ts",
+      "src/server/campaign-files.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/senders.ts"
+    ],
+    "legacy_tasks": [
+      "P09-T01",
+      "P09-T02",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R18-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R17-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R18-T02",
+    "title": "발신메일·이메일 발송·수신거부 — 서버 API·업무 처리",
+    "scope": "발신주소 request/confirm/DNS/check, HTML 정제·개인화 preview·첨부다운로드, 송신/반송/불만/구독취소 token 처리와 retry를 연결한다. 조작된 수신거부 토큰·다른회사 receipt를 거부한다.",
+    "dependencies": [
+      "R18-T01"
+    ],
+    "acceptance": [
+      "메일작성/첨부→로컬메일함 수신본문과hash대조→반송→억제→재발송차단; 실제SMTP·DNS·수신함·unsubscribe 및 재시작 검증을 분리 기록.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/email-policy.ts",
+      "src/server/email-feedback.ts",
+      "src/server/message-content.ts",
+      "src/server/message-templates.ts",
+      "src/server/campaign-files.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/senders.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P09-T01",
+      "P09-T02",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R18-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R18-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R18-T03",
+    "title": "발신메일·이메일 발송·수신거부 — 전체 화면·모달 연결",
+    "scope": "mail 폼/직접발송·발신주소/발송내역/주소없음 화면, 편집기·템플릿·미리보기·첨부·예약/취소·반송사유를 연결한다. 401/403을 빈목록으로 표시하지 않는다.",
+    "dependencies": [
+      "R18-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/services/Senders.tsx",
+      "src/components/services/Campaigns.tsx",
+      "src/components/services/MessageContent.tsx",
+      "src/components/services/EmailSuppressions.tsx",
+      "src/components/services/EmailUnsubscribe.tsx",
+      "src/components/services/CampaignFiles.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P09-T01",
+      "P09-T02",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R18-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R18-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R18-T04",
+    "title": "발신메일·이메일 발송·수신거부 — DB·브라우저·재시작 수용검증",
+    "scope": "메일작성/첨부→로컬메일함 수신본문과hash대조→반송→억제→재발송차단; 실제SMTP·DNS·수신함·unsubscribe 및 재시작 검증을 분리 기록.",
+    "dependencies": [
+      "R18-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R18-T04"
+    ],
+    "legacy_tasks": [
+      "P09-T01",
+      "P09-T02",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R18-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R18-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R19-T01",
+    "title": "알림톡 채널·템플릿·발송 — 모델·규칙 대조 및 보완",
+    "scope": "채널귀속·템플릿버전/심사상태/변수·버튼·이미지·fallback snapshot을 대조한다. KakaoMockReceipt는 실제카카오 receipt로 집계하지 않는다.",
+    "dependencies": [
+      "R17-T04"
+    ],
+    "acceptance": [
+      "C 채널·템플릿·발송초안; R 목록·상세·심사/발송내역; U 초안·반려수정·활성; D 미사용채널/템플릿보관. 승인본 수정은 재심사.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/kakao.ts",
+      "src/server/kakao-binding.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/campaigns.ts"
+    ],
+    "legacy_tasks": [
+      "P09-T03",
+      "P09-T04",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R19-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R17-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R19-T02",
+    "title": "알림톡 채널·템플릿·발송 — 서버 API·업무 처리",
+    "scope": "채널 CRUD/verify, 템플릿 CRUD/preview/submit/review/send 및 심사 callback, 수신결과·SMS 대체발송의 과금 멱등성을 점검한다.",
+    "dependencies": [
+      "R19-T01"
+    ],
+    "acceptance": [
+      "채널등록→검증→템플릿등록→반려/수정/승인→변수발송→receipt; 승인템플릿수정시 재심사; 비활성채널거부; fallback중복방지; 실제카카오 승인/수신은 제공사시험 증거필수.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/kakao.ts",
+      "src/server/kakao-binding.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/campaigns.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P09-T03",
+      "P09-T04",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R19-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R19-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R19-T03",
+    "title": "알림톡 채널·템플릿·발송 — 전체 화면·모달 연결",
+    "scope": "/alimtalk/channels 현재 dispatcher 누락을 연결하고 /alimtalk·templates/register·id·id/edit·send·history 전부 실제 상태에 맞춘다. Playground는 미리보기 도구로서 저장이 필요한 동작만 템플릿 계약에 연결한다.",
+    "dependencies": [
+      "R19-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/services/KakaoTemplates.tsx",
+      "src/components/services/KakaoTemplateDetail.tsx",
+      "src/components/services/Campaigns.tsx",
+      "src/components/services/kakao.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P09-T03",
+      "P09-T04",
+      "P09-T06"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R19-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R19-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "누락된 channels 경로를 기존 채널 CRUD 컴포넌트에 연결. 다른 경로 검증 예정.",
+    "updatedOn": "2026-10-10",
+    "progress_evidence": [
+      "docs/qa/R19-T03/route-connection/browser.json"
+    ]
+  },
+  {
+    "id": "R19-T04",
+    "title": "알림톡 채널·템플릿·발송 — DB·브라우저·재시작 수용검증",
+    "scope": "채널등록→검증→템플릿등록→반려/수정/승인→변수발송→receipt; 승인템플릿수정시 재심사; 비활성채널거부; fallback중복방지; 실제카카오 승인/수신은 제공사시험 증거필수.",
+    "dependencies": [
+      "R19-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R19-T04"
+    ],
+    "legacy_tasks": [
+      "P09-T03",
+      "P09-T04",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R19-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R19-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R20-T01",
+    "title": "알림 받기·웹훅·이메일 알림 — 모델·규칙 대조 및 보완",
+    "scope": "integration→subscription(service/form/event)과 delivery/attempt, 암호화endpoint 및 generation을 검사한다. 화면에서 본 9이벤트를 서버 발생지와 일대일 대응시킨다.",
+    "dependencies": [
+      "R11-T04"
+    ],
+    "acceptance": [
+      "C 알림설정/이벤트구독; R 설정·전송이력; U 대상·채널·활성; D 설정해제·일괄삭제. 전달결과는 append-only.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/notifications.ts",
+      "src/server/notification-worker.ts",
+      "src/server/notification-transport.ts"
+    ],
+    "legacy_tasks": [
+      "P09-T05",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R20-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R11-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R20-T02",
+    "title": "알림 받기·웹훅·이메일 알림 — 서버 API·업무 처리",
+    "scope": "CRUD/options/test/enabled/bulk-delete/deliveries/retry를 검증하고 실제 업무 트랜잭션에서 outbox를 만든다. HTTPS목적지·내부주소차단·secret마스킹·재시도 상한을 점검한다.",
+    "dependencies": [
+      "R20-T01"
+    ],
+    "acceptance": [
+      "폼응답이벤트→정확한 대상1회전송→실패/재시도→비활성/삭제 즉시중단; 다른서비스이벤트누출없음; endpoint변경경합·타임아웃·내부망URL거부. Slack/Teams실제수신 별도.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/notifications.ts",
+      "src/server/notification-worker.ts",
+      "src/server/notification-transport.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P09-T05",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R20-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R20-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R20-T03",
+    "title": "알림 받기·웹훅·이메일 알림 — 전체 화면·모달 연결",
+    "scope": "목록·추가/편집 모달의 이름, webhook/email, 전체/선택 서비스·폼, 9이벤트, 활성토글·테스트·삭제·전송결과/재시도까지 연결한다.",
+    "dependencies": [
+      "R20-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/services/Notifications.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P09-T05",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R20-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R20-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R20-T04",
+    "title": "알림 받기·웹훅·이메일 알림 — DB·브라우저·재시작 수용검증",
+    "scope": "폼응답이벤트→정확한 대상1회전송→실패/재시도→비활성/삭제 즉시중단; 다른서비스이벤트누출없음; endpoint변경경합·타임아웃·내부망URL거부. Slack/Teams실제수신 별도.",
+    "dependencies": [
+      "R20-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R20-T04"
+    ],
+    "legacy_tasks": [
+      "P09-T05",
+      "P09-T06"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R20-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R20-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R21-T01",
+    "title": "라이선스·결제수단·주문·원장·환불 — 모델·규칙 대조 및 보완",
+    "scope": "가격버전·회사구독·billing method·order/event/refund·복식원장 제약을 확인한다. 금액은 정수, 통화/가격snapshot, eventId unique, 잔액합계·환불누계 불변조건을 정의한다.",
+    "dependencies": [
+      "R04-T04"
+    ],
+    "acceptance": [
+      "C 구독/결제수단/주문/환불요청; R 상품·자산·원장·청구서; U 기본수단·예약해지/취소; D 수단삭제·구독해지. 승인결제/원장은 보정 이벤트만.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/admin-plans.ts",
+      "src/server/entitlements.ts",
+      "src/server/payment-methods.ts",
+      "src/server/payments.ts",
+      "src/server/subscriptions.ts",
+      "src/server/subscription-worker.ts",
+      "src/server/billing-settlement.ts",
+      "src/server/ledger.ts",
+      "src/server/billing-reads.ts",
+      "src/server/billing-history.ts"
+    ],
+    "legacy_tasks": [
+      "P10-T01",
+      "P10-T02",
+      "P10-T03",
+      "P10-T04",
+      "P10-T05"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R21-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R04-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R21-T02",
+    "title": "라이선스·결제수단·주문·원장·환불 — 서버 API·업무 처리",
+    "scope": "provider event 검증·order return·승인/실패/환불 상태기계와 멱등성을 재검증한다. 수정 중인 payment-events/payments/subscriptions를 보존하고 새계획의 검증만 추가한다. success URL은 조회 전용.",
+    "dependencies": [
+      "R21-T01"
+    ],
+    "acceptance": [
+      "시험주문→승인중복/역순event→1회잔액충전→부분/전액환불→원장합계0검증; 결제중해지409·과거취소구독충전차단 기존회귀 보존; 임의successURL로승인불가; 실제PG시험은 별도.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/admin-plans.ts",
+      "src/server/entitlements.ts",
+      "src/server/payment-methods.ts",
+      "src/server/payments.ts",
+      "src/server/subscriptions.ts",
+      "src/server/subscription-worker.ts",
+      "src/server/billing-settlement.ts",
+      "src/server/ledger.ts",
+      "src/server/billing-reads.ts",
+      "src/server/billing-history.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P10-T01",
+      "P10-T02",
+      "P10-T03",
+      "P10-T04",
+      "P10-T05"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R21-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R21-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R21-T03",
+    "title": "라이선스·결제수단·주문·원장·환불 — 전체 화면·모달 연결",
+    "scope": "license-service/membership/detail/method/billing-policy/history/usage/service-asset/bill/creditBill/refund와 성공/실패/type/errorCode 모든 변형을 연결한다. 대기/중복callback/권한없음·영수증·해지철회를 구분한다.",
+    "dependencies": [
+      "R21-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/services/payment.tsx",
+      "src/components/services/InvoiceDetail.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P10-T01",
+      "P10-T02",
+      "P10-T03",
+      "P10-T04",
+      "P10-T05"
+    ],
+    "status": "planned",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R21-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R21-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R21-T04",
+    "title": "라이선스·결제수단·주문·원장·환불 — DB·브라우저·재시작 수용검증",
+    "scope": "시험주문→승인중복/역순event→1회잔액충전→부분/전액환불→원장합계0검증; 결제중해지409·과거취소구독충전차단 기존회귀 보존; 임의successURL로승인불가; 실제PG시험은 별도.",
+    "dependencies": [
+      "R21-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R21-T04"
+    ],
+    "legacy_tasks": [
+      "P10-T01",
+      "P10-T02",
+      "P10-T03",
+      "P10-T04",
+      "P10-T05"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R21-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R21-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R22-T01",
+    "title": "개인정보·권한·활동 감사로그 — 모델·규칙 대조 및 보완",
+    "scope": "tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드를 대조한다. 현재 UI에서 IP·고객번호·사유가 - 처리되는 영역은 합법적 수집근거/보존과 함께 수집·마스킹 계약을 확정한다.",
+    "dependencies": [
+      "R04-T04"
+    ],
+    "acceptance": [
+      "C 실제업무 처리시 서버가 이벤트 추가; R 필터·상세·CSV; U/D 원장 직접 조작 없음. 검토요청·응답은 별도 resource 상태전이.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/audit.ts",
+      "src/server/audit-events.ts",
+      "src/server/form-audit-events.ts",
+      "src/server/activity-reviews.ts",
+      "src/server/exports.ts"
+    ],
+    "legacy_tasks": [
+      "P12-T01",
+      "P12-T04"
+    ],
+    "status": "in_progress",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R22-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R04-T04": "local_acceptance_pass"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "기존 폼/응답/파일/내보내기 관계로 조회필드를 정의. 현재회사/서비스/전체감사권한 경계를 명시하고 원문/IP/외부고객번호를 추정하지 않음.",
+    "progress_evidence": [
+      "docs/qa/R22-T02/audit-resources/README.md"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R22-T02",
+    "title": "개인정보·권한·활동 감사로그 — 서버 API·업무 처리",
+    "scope": "각 kind(info/marketing/service/member/authority/external/access/customer/mail)와 mine/form 범위 조회·export가 동일 필터를 사용하게 한다. 업무변경과 audit append 원자성, 개인정보원문 최소화·보존집행을 검증한다.",
+    "dependencies": [
+      "R22-T01"
+    ],
+    "acceptance": [
+      "각 도메인 실제변경1회→해당kind1건→화면/CSV같음; 읽기전용 권한·타회사·허용필드 마스킹; 로그PATCH/DELETE미노출; 경계날짜/KST·대량export·동일시각페이지 누락없음.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/audit.ts",
+      "src/server/audit-events.ts",
+      "src/server/form-audit-events.ts",
+      "src/server/activity-reviews.ts",
+      "src/server/exports.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P12-T01",
+      "P12-T04"
+    ],
+    "status": "in_progress",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R22-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R22-T01": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "실제 폼 이름·응답ID를 회사/폼 감사 API·CSV에 연결. 다른회사/서비스/없는참조/제한역할 차단·원문비노출. PostgreSQL/화면48개 통과.",
+    "progress_evidence": [
+      "docs/qa/R22-T02/audit-resources/tests-final.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R22-T03",
+    "title": "개인정보·권한·활동 감사로그 — 전체 화면·모달 연결",
+    "scope": "9종 로그와 내 활동·폼로그의 기간/서비스/처리자/검색/페이지크기/상세/내보내기, 개인정보활동 검토요청을 실제 컬럼에 연결한다. 403을 건수0으로 표시하지 않는다.",
+    "dependencies": [
+      "R22-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/management/AuditLogs.tsx",
+      "src/components/management/ActivityReviews.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P12-T01",
+      "P12-T04"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R22-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R22-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "일반 로그 상세와 실제 폼/응답 필드 연결. 403을0건으로 표시하지 않음. 실제 UI검색/상세/CSV·390/768/1440폭 검증.",
+    "progress_evidence": [
+      "docs/qa/R22-T02/audit-resources/browser.json",
+      "docs/qa/R22-T02/audit-resources/responsive.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R22-T04",
+    "title": "개인정보·권한·활동 감사로그 — DB·브라우저·재시작 수용검증",
+    "scope": "각 도메인 실제변경1회→해당kind1건→화면/CSV같음; 읽기전용 권한·타회사·허용필드 마스킹; 로그PATCH/DELETE미노출; 경계날짜/KST·대량export·동일시각페이지 누락없음.",
+    "dependencies": [
+      "R22-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R22-T04"
+    ],
+    "legacy_tasks": [
+      "P12-T01",
+      "P12-T04"
+    ],
+    "status": "in_progress",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R22-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R22-T03": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "실제 정정3건을 화면/CSV/독립DB에서 대조. viewer는 앱 role gate에서차단. 전체종류·검토·보존 수용은 남음.",
+    "progress_evidence": [
+      "docs/qa/R22-T02/audit-resources/viewer-denied.json",
+      "docs/qa/R11-T04/browser-flow/db-after-conflict.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R23-T01",
+    "title": "대시보드·통계·준수·월마감 — 모델·규칙 대조 및 보완",
+    "scope": "원천조회→서비스필터→기간버킷→snapshot과 근거hash를 대조한다. ComplianceClose와 BillingMonthClose를 다른 모델로 유지한다. 근거없는 점수/과태료를 실제 계산으로 제시하지 않는다.",
+    "dependencies": [
+      "R15-T04",
+      "R16-T04",
+      "R21-T04",
+      "R22-T04"
+    ],
+    "acceptance": [
+      "C 월마감 snapshot/출력job; R 대시보드·개인정보/광고통계·마감자료; U/D 수치 직접변경 없음, 출력취소/파일만 삭제 정책.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/analytics.ts",
+      "src/server/scoped-analytics.ts",
+      "src/server/compliance-evidence.ts",
+      "src/server/compliance-close.ts",
+      "src/server/compliance-exports.ts",
+      "src/server/analytics-period.ts"
+    ],
+    "legacy_tasks": [
+      "P12-T02",
+      "P12-T03",
+      "P12-T04"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R23-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R15-T04": "local_acceptance_pass",
+      "R16-T04": "local_acceptance_pass",
+      "R21-T04": "local_acceptance_pass",
+      "R22-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R23-T02",
+    "title": "대시보드·통계·준수·월마감 — 서버 API·업무 처리",
+    "scope": "dashboard/privacy/marketing/compliance/closes/exports의 분모·시점·동의철회·파기 반영 기준을 계약화한다. 마감 unique와 정정이력·실패재시도·읽기권한을 검증한다.",
+    "dependencies": [
+      "R23-T01"
+    ],
+    "acceptance": [
+      "수집3→철회1→파기1 fixture로 각통계DB대조; 서비스B제외; KST월말 경계; 마감중복1개; 파기후snapshot의 개인정보비노출; export재시작/취소·다운로드권한.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/analytics.ts",
+      "src/server/scoped-analytics.ts",
+      "src/server/compliance-evidence.ts",
+      "src/server/compliance-close.ts",
+      "src/server/compliance-exports.ts",
+      "src/server/analytics-period.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P12-T02",
+      "P12-T03",
+      "P12-T04"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R23-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R23-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R23-T03",
+    "title": "대시보드·통계·준수·월마감 — 전체 화면·모달 연결",
+    "scope": "대시보드7경로의 전체/서비스 선택과 기간/드릴다운, /log/month-monitoring의 고정Enterprise gate를 실제 월목록·상세·출력에 연결한다. 근거부족은 미평가로 표시한다.",
+    "dependencies": [
+      "R23-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/Dashboard.tsx",
+      "src/components/StatisticsPages.tsx",
+      "src/components/forms/Marketing.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P12-T02",
+      "P12-T03",
+      "P12-T04"
+    ],
+    "status": "in_progress",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R23-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R23-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "월마감 경로를 실제 집계마감 컴포넌트에 연결. 브라우저 검증 예정.",
+    "updatedOn": "2026-10-10",
+    "progress_evidence": [
+      "docs/qa/R23-T03/route-connection/browser.json"
+    ]
+  },
+  {
+    "id": "R23-T04",
+    "title": "대시보드·통계·준수·월마감 — DB·브라우저·재시작 수용검증",
+    "scope": "수집3→철회1→파기1 fixture로 각통계DB대조; 서비스B제외; KST월말 경계; 마감중복1개; 파기후snapshot의 개인정보비노출; export재시작/취소·다운로드권한.",
+    "dependencies": [
+      "R23-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R23-T04"
+    ],
+    "legacy_tasks": [
+      "P12-T02",
+      "P12-T03",
+      "P12-T04"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R23-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R23-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R24-T01",
+    "title": "공지·도움말·문의·공통 경로 — 모델·규칙 대조 및 보완",
+    "scope": "공지·첨부/가이드 게시상태·정렬·문의소유자/답변관계를 확인한다. 원본에 없는 관리자 authoring 경로는 독립운영 부가화면으로 별도 등록한다.",
+    "dependencies": [
+      "R02-T04"
+    ],
+    "acceptance": [
+      "C 관리자 공지/가이드·사용자문의; R 게시콘텐츠/상태; U 초안·답변·게시; D 초안/첨부보관. 로딩/오류/wildcard는 별도 CRUD 없음.",
+      "사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용."
+    ],
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/migrations",
+      "src/contracts",
+      "src/server/notices.ts",
+      "src/server/notice-attachments.ts",
+      "src/server/guides.ts",
+      "src/server/support-tickets.ts"
+    ],
+    "legacy_tasks": [
+      "P13-T01",
+      "P13-T02",
+      "P13-T03",
+      "P13-T04"
+    ],
+    "status": "planned",
+    "stage": "model",
+    "evidence_directory": "catchsecu-clone/docs/qa/R24-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R02-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R24-T02",
+    "title": "공지·도움말·문의·공통 경로 — 서버 API·업무 처리",
+    "scope": "콘텐츠 CRUD/게시·파일, 문의 생성/답변/종결/재개에 systemAdmin·자기문의 접근을 적용한다. 공개/로그인 경계와 안내 페이지의 실제 상태조회 계약을 명시한다.",
+    "dependencies": [
+      "R24-T01"
+    ],
+    "acceptance": [
+      "관리자공지생성/게시→일반조회→수정/보관·첨부검증; 일반계정관리CRUD거부; 문의A/B격리; 잘못된경로404·보안fallback·새로고침·뒤로가기·키보드·모바일까지 검증.",
+      "각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인."
+    ],
+    "files": [
+      "src/server/notices.ts",
+      "src/server/notice-attachments.ts",
+      "src/server/guides.ts",
+      "src/server/support-tickets.ts",
+      "src/app/api/v1",
+      "docs/planning/contracts/openapi.json"
+    ],
+    "legacy_tasks": [
+      "P13-T01",
+      "P13-T02",
+      "P13-T03",
+      "P13-T04"
+    ],
+    "status": "planned",
+    "stage": "backend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R24-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R24-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R24-T03",
+    "title": "공지·도움말·문의·공통 경로 — 전체 화면·모달 연결",
+    "scope": "notice/id/help-center·관리자작성/편집·내문의, /·/IE·loading·access-not-allow와 /*·/security/* fallback을 명시적으로 처리한다. wildcards를 임의모든경로 허용 정규식으로 합치지 않는다.",
+    "dependencies": [
+      "R24-T02"
+    ],
+    "acceptance": [
+      "route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태",
+      "입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증."
+    ],
+    "files": [
+      "src/components/NoticePages.tsx",
+      "src/components/GuidePages.tsx",
+      "src/components/SupportPages.tsx",
+      "src/components/LoadingTransition.tsx",
+      "src/components/AccessDeniedPage.tsx",
+      "src/components/AppShell.tsx",
+      "src/components/CloneApp.tsx",
+      "src/data/route-manifest.json",
+      "src/data/menu.json"
+    ],
+    "legacy_tasks": [
+      "P13-T01",
+      "P13-T02",
+      "P13-T03",
+      "P13-T04"
+    ],
+    "status": "planned",
+    "stage": "frontend",
+    "evidence_directory": "catchsecu-clone/docs/qa/R24-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R24-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R24-T04",
+    "title": "공지·도움말·문의·공통 경로 — DB·브라우저·재시작 수용검증",
+    "scope": "관리자공지생성/게시→일반조회→수정/보관·첨부검증; 일반계정관리CRUD거부; 문의A/B격리; 잘못된경로404·보안fallback·새로고침·뒤로가기·키보드·모바일까지 검증.",
+    "dependencies": [
+      "R24-T03"
+    ],
+    "acceptance": [
+      "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증",
+      "브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과",
+      "외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지."
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R24-T04"
+    ],
+    "legacy_tasks": [
+      "P13-T01",
+      "P13-T02",
+      "P13-T03",
+      "P13-T04"
+    ],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R24-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R24-T03": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R25-T01",
+    "title": "모든 경로·메뉴 행동·부가 운영화면 연결 검증",
+    "scope": "186 source entries + 별도 부가경로 register 전부를 fixture로 실제 열고 메뉴/모달/button을 API와 연결한다. 알려진정상화면과 제한안내를 혼동하지 않는다.",
+    "dependencies": [
+      "R02-T04",
+      "R03-T04",
+      "R04-T04",
+      "R05-T04",
+      "R06-T04",
+      "R07-T04",
+      "R08-T04",
+      "R09-T04",
+      "R10-T04",
+      "R11-T04",
+      "R12-T04",
+      "R13-T04",
+      "R14-T04",
+      "R15-T04",
+      "R16-T04",
+      "R17-T04",
+      "R18-T04",
+      "R19-T04",
+      "R20-T04",
+      "R21-T04",
+      "R22-T04",
+      "R23-T04",
+      "R24-T04"
+    ],
+    "acceptance": [
+      "RR행 186개에 action별 증거와 상태; wildcard2는404/보안fallback 검사",
+      "미연결메뉴/핸들러·고정제한안내·가짜저장·localStorage 업무원장·하드코딩통계 잔존0 또는 명시된순수미리보기예외"
+    ],
+    "files": [
+      "src/components",
+      "src/data",
+      "scripts/qa-full-page-gate.ts",
+      "docs/qa/R25-T01"
+    ],
+    "legacy_tasks": [
+      "P13-T04",
+      "P14-T01"
+    ],
+    "status": "planned",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R25-T01/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R02-T04": "local_acceptance_pass",
+      "R03-T04": "local_acceptance_pass",
+      "R04-T04": "local_acceptance_pass",
+      "R05-T04": "local_acceptance_pass",
+      "R06-T04": "local_acceptance_pass",
+      "R07-T04": "local_acceptance_pass",
+      "R08-T04": "local_acceptance_pass",
+      "R09-T04": "local_acceptance_pass",
+      "R10-T04": "local_acceptance_pass",
+      "R11-T04": "local_acceptance_pass",
+      "R12-T04": "local_acceptance_pass",
+      "R13-T04": "local_acceptance_pass",
+      "R14-T04": "local_acceptance_pass",
+      "R15-T04": "local_acceptance_pass",
+      "R16-T04": "local_acceptance_pass",
+      "R17-T04": "local_acceptance_pass",
+      "R18-T04": "local_acceptance_pass",
+      "R19-T04": "local_acceptance_pass",
+      "R20-T04": "local_acceptance_pass",
+      "R21-T04": "local_acceptance_pass",
+      "R22-T04": "local_acceptance_pass",
+      "R23-T04": "local_acceptance_pass",
+      "R24-T04": "local_acceptance_pass"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R25-T02",
+    "title": "전 도메인 교차 흐름·권한·경합 회귀",
+    "scope": "조직→문서→폼→승인게시→응답/업로드→공유/정보주체→동의→예약발송→과금→철회파기→로그/통계를 하나의 실제DB 흐름으로 검증한다.",
+    "dependencies": [
+      "R25-T01"
+    ],
+    "acceptance": [
+      "각 단계 원장·파일·집계·상태전이 일치; A/B회사와 역할변경경합",
+      "API제약 우회/오래된토큰/중복callback/파기와다운로드·발송경합을검증; 4단계 R/C/U/D가 있는 리소스는전부시험"
+    ],
+    "files": [
+      "tests",
+      "scripts",
+      "docs/qa/R25-T02"
+    ],
+    "legacy_tasks": [
+      "P14-T02"
+    ],
+    "status": "planned",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R25-T02/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R25-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R25-T03",
+    "title": "외부 제공사·기관·운영 스테이징 검증",
+    "scope": "SMS·SMTP·카카오·PG·IdP·GPKI/새올/그룹웨어·본인인증·Slack/Teams·S3/파일검사를 전용테스트계정/도메인으로 검증한다. 실제 원본서비스로 mutation을 보내지 않는다.",
+    "dependencies": [
+      "R25-T02"
+    ],
+    "acceptance": [
+      "실제발신/수신/providerID·receipt/실패·재시도·중복·취소환불 증거",
+      "자격증명/기관미확보 항목은 개별blocked 외부검증으로남김; 로컬mock통과로 전체완료표시금지"
+    ],
+    "files": [
+      "src/server/*adapter*",
+      "docs/qa/R25-T03"
+    ],
+    "legacy_tasks": [
+      "P14-T03"
+    ],
+    "status": "planned",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R25-T03/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R25-T02": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R25-T04",
+    "title": "이관·백업·복구·운영 런북",
+    "scope": "기존샘플이관dry-run/검증, DB·파일·암호키 복구전략과 migration·worker운영·장애복구 절차를 시험한다.",
+    "dependencies": [
+      "R25-T02"
+    ],
+    "acceptance": [
+      "백업→격리DB/저장소복원→로그인/파일/작업재개→레코드수·hash대조",
+      "기존migration수정없이upgrade검증; test/mockcredential 운영차단; 운영설정빠짐을배포성공으로감추지않음"
+    ],
+    "files": [
+      "docs/operations",
+      "scripts",
+      "prisma/migrations"
+    ],
+    "legacy_tasks": [
+      "P14-T04"
+    ],
+    "status": "in_progress",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R25-T04/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R25-T02": "task_complete"
+    },
+    "local_status": "partial_verified",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed",
+    "progress_note": "격리 DB에 실제pg_dump/pg_restore 및 암호화파일복사/복호화hash 대조. 131테이블 동일. 운영자료·키복구·worker재개·런북 최종수용은 남음.",
+    "progress_evidence": [
+      "docs/qa/R01-T01/db-rehearsal/result.json"
+    ],
+    "updatedOn": "2026-10-10"
+  },
+  {
+    "id": "R25-T05",
+    "title": "UI·접근성·성능·원본 대조 마무리",
+    "scope": "실제접근가능 원본 화면과 현재캡처를 비교하고 미관찰화면은 독립설계 상태를 유지한다. 대량목록/API/내보내기·작업대기 상태를 실제시험자료로 측정한다.",
+    "dependencies": [
+      "R25-T01"
+    ],
+    "acceptance": [
+      "데스크톱/모바일·키보드·focus·label·오류알림·한글줄바꿈 검증",
+      "임의성능수치 대신 데이터량·측정환경·목표를 fixture계약에서고정; 새이미지diff와차이목록; 원본미확인에100%일치주장금지"
+    ],
+    "files": [
+      "src/components",
+      "docs/qa/R25-T05"
+    ],
+    "legacy_tasks": [
+      "P13-T04"
+    ],
+    "status": "planned",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R25-T05/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R25-T01": "task_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  },
+  {
+    "id": "R25-T06",
+    "title": "최종 수용·추적표·릴리스 보고",
+    "scope": "모든 개별Task evidence를 재검토하고 rootTASKS/tasks.json/goals/route/UI/API/외부검증 지표를 동기화한다.",
+    "dependencies": [
+      "R25-T02",
+      "R25-T03",
+      "R25-T04",
+      "R25-T05"
+    ],
+    "acceptance": [
+      "미완료필수Task0·테스트실패0·차단미해결0일때만전체완료",
+      "코드/DB/API/UI/외부공급사/원본충실도 각각검증범위·제약을보고; 변경기록과재현명령·백업복구자료 완비"
+    ],
+    "files": [
+      "TASKS.md",
+      ".Codex/goals",
+      "docs/IMPLEMENTATION-STATUS.md",
+      "docs/qa/R25-T06"
+    ],
+    "legacy_tasks": [
+      "P14-T05"
+    ],
+    "status": "planned",
+    "stage": "cross-cutting",
+    "evidence_directory": "catchsecu-clone/docs/qa/R25-T06/",
+    "completion_evidence": [],
+    "dependency_gates": {
+      "R25-T02": "all_required_evidence_complete",
+      "R25-T03": "all_required_evidence_complete",
+      "R25-T04": "all_required_evidence_complete",
+      "R25-T05": "all_required_evidence_complete"
+    },
+    "local_status": "not_run",
+    "external_status": "not_assessed",
+    "source_fidelity_status": "not_assessed"
+  }
+]

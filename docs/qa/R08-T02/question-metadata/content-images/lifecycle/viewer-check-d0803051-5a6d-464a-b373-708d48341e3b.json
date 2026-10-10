@@ -1,0 +1,42 @@
+{
+  "mode": "viewer-check",
+  "runId": "d0803051-5a6d-464a-b373-708d48341e3b",
+  "recordedAt": "2026-10-10T09:23:40.216Z",
+  "result": "passed",
+  "checks": [
+    {
+      "action": "viewer selected question projection",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    },
+    {
+      "action": "viewer selected question manifest",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    },
+    {
+      "action": "viewer authorized original image bytes",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    },
+    {
+      "action": "viewer unselected question image is 404",
+      "status": 404,
+      "expected": 404,
+      "source": "live",
+      "code": "NOT_FOUND"
+    }
+  ],
+  "proof": {
+    "selectedImageHash": "bd7be30c3cbbe6d8c40dd355eeebd347ec1e47cd4471a5c8f28d3df88ae11ff8",
+    "selectedQuestionCount": 1,
+    "unselectedImageRejected": true,
+    "originalVersionReceiptPinsAndBytesUnchanged": true,
+    "hash": "120a7b18eb01ca91458c9fdd1bee11c00085d7981ee3e3166492b441b4655ac1"
+  },
+  "boundary": "Actual local API and DB observations when invoked; OTP uses local outbox. No original-site or external delivery/provider success claim.",
+  "failurePolicy": "No automatic rollback/cleanup on failure; inspect private lifecycle state before continuing."
+}

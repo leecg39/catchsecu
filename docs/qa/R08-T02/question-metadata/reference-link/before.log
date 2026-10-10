@@ -1,0 +1,409 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:13897) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/question-material-links.test.ts (18 tests | 16 failed) 7936ms
+   × LINK wire trims inputs but preserves the original URL spelling and supports exactly three ordered items 645ms
+   × URL and label limits count UTF-16 units including supplementary characters 354ms
+   × blank labels fall back to URL with a surrogate-safe 99-unit prefix plus ellipsis 348ms
+   ✓ unsafe URL forms, NUL and malformed Unicode are rejected without accepting FILE or relaxed JSON shapes 369ms
+   × creates normalized links, exposes exact public metadata and never fetches their targets 328ms
+   × legacy SQL null stays absent from DTO and preserves the pre-material approval fingerprint 436ms
+   × editing and reordering links preserves physical question/option IDs and supersedes the frozen approval 362ms
+   × omission preserves current links while explicit empty removes them without later resurrection 452ms
+   × implicit draft omission retains current links but a new logical question inherits none 372ms
+   × form copy and explicit revise retain links while preserving the correct logical identity boundaries 816ms
+   × template create/update/use preserves omitted lists, order and clearing with independent question IDs 833ms
+   ✓ legacy template JSON is neither enriched with defaults nor rewritten by repeated reads 470ms
+   × database enforces material shape, protocol, strict keys, sequence and exact UTF-16 lengths 384ms
+   × published material rows cannot be directly altered or removed 418ms
+   × stale version and revoked current authority reject material updates without changing data or audit 349ms
+   × form material changes roll back with their version when audit insertion fails 343ms
+   × template material changes roll back with their version when audit insertion fails 340ms
+   × old response correction retains its published links and leaves consent evidence and PDF bytes unchanged 312ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 16 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/question-material-links.test.ts > LINK wire trims inputs but preserves the original URL spelling and supports exactly three ordered items
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ tests/server/question-material-links.test.ts:74:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > URL and label limits count UTF-16 units including supplementary characters
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ tests/server/question-material-links.test.ts:84:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > blank labels fall back to URL with a surrogate-safe 99-unit prefix plus ellipsis
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ tests/server/question-material-links.test.ts:91:10
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > creates normalized links, exposes exact public metadata and never fetches their targets
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ fixture tests/server/question-material-links.test.ts:61:17
+ ❯ tests/server/question-material-links.test.ts:115:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > legacy SQL null stays absent from DTO and preserves the pre-material approval fingerprint
+PrismaClientKnownRequestError: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42703`. Message: `column "materialList" does not exist`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/question-material-links.test.ts:125:19
+    123| test("legacy SQL null stays absent from DTO and preserves the pre-mate…
+    124|   const f = await fixture(), row = await stored(f.id);
+    125|   const columns = await db.$queryRaw<{ materialList: unknown }[]>`SELE…
+       |                   ^
+    126|   expect(columns.every(q => q.materialList === null)).toBe(true);
+    127|   const dto = contentDto(row) as MaterialContent; expect(dto.questions…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > editing and reordering links preserves physical question/option IDs and supersedes the frozen approval
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ fixture tests/server/question-material-links.test.ts:61:17
+ ❯ tests/server/question-material-links.test.ts:132:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > omission preserves current links while explicit empty removes them without later resurrection
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ fixture tests/server/question-material-links.test.ts:61:17
+ ❯ tests/server/question-material-links.test.ts:147:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > implicit draft omission retains current links but a new logical question inherits none
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ fixture tests/server/question-material-links.test.ts:61:17
+ ❯ tests/server/question-material-links.test.ts:158:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > form copy and explicit revise retain links while preserving the correct logical identity boundaries
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ fixture tests/server/question-material-links.test.ts:61:17
+ ❯ tests/server/question-material-links.test.ts:169:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > template create/update/use preserves omitted lists, order and clearing with independent question IDs
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ tests/server/question-material-links.test.ts:177:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > database enforces material shape, protocol, strict keys, sequence and exact UTF-16 lengths
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRaw()` invocation:
+
+
+Raw query failed. Code: `42703`. Message: `column "materialList" of relation "Question" does not exist`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/question-material-links.test.ts:198:3
+    196|   const f = await fixture(), q = (await stored(f.id)).questions[0];
+    197|   const exactUrl = urlPrefix + "a".repeat(510 - urlPrefix.length) + "…
+    198|   await db.$executeRaw`UPDATE "Question" SET "materialList"=${JSON.str…
+       |   ^
+    199|   expect((await current(f.id)).questions[0].materialList).toEqual(vali…
+    200|   const invalid: unknown[] = [null, {}, "url", [link(0), link(1), link…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > published material rows cannot be directly altered or removed
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ fixture tests/server/question-material-links.test.ts:61:17
+ ❯ tests/server/question-material-links.test.ts:209:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > stale version and revoked current authority reject material updates without changing data or audit
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ fixture tests/server/question-material-links.test.ts:61:17
+ ❯ tests/server/question-material-links.test.ts:215:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > form material changes roll back with their version when audit insertion fails
+ FAIL  tests/server/question-material-links.test.ts > template material changes roll back with their version when audit insertion fails
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ fixture tests/server/question-material-links.test.ts:61:17
+ ❯ tests/server/question-material-links.test.ts:225:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/16]⎯
+
+ FAIL  tests/server/question-material-links.test.ts > old response correction retains its published links and leaves consent evidence and PDF bytes unchanged
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "materialList"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"materialList\""
+  }
+]
+ ❯ content tests/server/question-material-links.test.ts:54:28
+     52| });
+     53| function content(materialList?: unknown): MaterialContent {
+     54|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     55|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     56|       additionalExplanation: "그대로 유지하는 설명", ...(materialList === undef…
+ ❯ fixture tests/server/question-material-links.test.ts:61:17
+ ❯ tests/server/question-material-links.test.ts:241:93
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/16]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  16 failed | 2 passed (18)
+   Start at  15:35:13
+   Duration  10.24s (tests 78%, import 14%, transform 8%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/reference-link/before.json

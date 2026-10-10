@@ -1,17 +1,25 @@
-import type { Prisma } from "@/generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import type { DocumentSnapshot, DisplayKind } from "@/contracts/documents";
 import { emptyDisplay } from "@/contracts/documents";
 import type { ConsentDisplaySnapshot, DocumentSelection, FormConsentBundle, FormDocumentOption } from "@/contracts/form-documents";
-import { db, type Transaction } from "./db";
+import type { RichDocumentV1 } from "@/contracts/rich-content";
+import type { Transaction } from "./db";
+import { formTransaction } from "./form-access";
 import type { Context } from "./context";
 import { documentScope } from "./documents";
 import { companyRetentionDays } from "./security-policy";
 import { fail } from "./http";
+import { collectConsentItems, consentItemsSchema, hasConsentItemReview } from "@/contracts/consent-items";
 
-export const consentVersionInclude = { documentBindings: { orderBy: { order: "asc" as const }, include: { documentVersion: true } } };
+export const consentVersionInclude = {
+  documentBindings: { orderBy: { order: "asc" as const }, include: { documentVersion: true } },
+  sections: { orderBy: { order: "asc" as const } },
+};
 export type ConsentVersion = Prisma.FormVersionGetPayload<{ include: typeof consentVersionInclude }>;
 export function consentBundle(version: ConsentVersion): FormConsentBundle {
+  const collectedItems = version.consentItemSchemaVersion === 1 ? consentItemsSchema.parse(version.consentItems) : undefined;
   return { display: version.consentDisplay as ConsentDisplaySnapshot | null,
+    ...(collectedItems ? { collectedItems } : {}),
     documents: version.documentBindings.map(binding => {
       const snapshot = binding.documentVersion.snapshot as unknown as DocumentSnapshot;
       return { key: binding.id, required: binding.required, kind: binding.kind as DisplayKind, title: snapshot.title, type: snapshot.type,
@@ -33,7 +41,7 @@ async function assertDocumentAccess(tx: Transaction, ctx: Context, serviceId: st
     fail(403, "SERVICE_FORBIDDEN", "이 서비스의 문서를 선택할 권한이 없습니다.");
 }
 export async function formDocumentOptions(ctx: Context, serviceId: string, query: { page: number; pageSize: number; search: string }): Promise<{ items: FormDocumentOption[]; total: number; page: number; pageSize: number }> {
-  return db.$transaction(async tx => {
+  return formTransaction(ctx, "document.read", async tx => {
     await assertDocumentAccess(tx, ctx, serviceId);
     await tx.$queryRaw`SELECT id FROM "Service" WHERE id=${serviceId} FOR SHARE`;
     const where = { tenantId: ctx.tenantId, serviceId, snapshot: { path: ["title"], string_contains: query.search, mode: "insensitive" as const },
@@ -78,11 +86,20 @@ export async function validateDocumentSelections(tx: Transaction, ctx: Context, 
   }
   return selections.map(selection => rows.find(row => row.id === selection.documentVersionId)!);
 }
-export async function writeFormConsent(tx: Transaction, ctx: Context, serviceId: string, formVersionId: string, content: { documentConsents?: DocumentSelection[]; retentionDays: number | null }) {
+export async function writeFormConsent(tx: Transaction, ctx: Context, serviceId: string, formVersionId: string, content: {
+  documentConsents?: DocumentSelection[]; retentionDays: number | null;
+  questions: { catchFormPersonalInformationRequests?: Parameters<typeof collectConsentItems>[0][number]["catchFormPersonalInformationRequests"] }[];
+  bodyRich?: RichDocumentV1 | null; sections?: { bodyRich?: RichDocumentV1 | null }[] | null;
+}) {
   const selections = content.documentConsents ?? [], versions = await validateDocumentSelections(tx, ctx, serviceId, selections, content.retentionDays);
   const collection = await captureDisplay(tx, ctx.tenantId, serviceId, "collection");
   const thirdParty = selections.some(item => item.kind === "third_party") ? await captureDisplay(tx, ctx.tenantId, serviceId, "third_party") : null;
-  await tx.formVersion.update({ where: { id: formVersionId }, data: { receiptEvidenceVersion: 1, consentDisplay: collection as unknown as Prisma.InputJsonValue } });
+  const receiptEvidenceVersion = content.bodyRich || content.sections ? 2 : 1;
+  const reviewed = hasConsentItemReview(content.questions), collectedItems = collectConsentItems(content.questions);
+  await tx.formVersion.update({ where: { id: formVersionId }, data: { receiptEvidenceVersion,
+    consentDisplay: collection as unknown as Prisma.InputJsonValue,
+    consentItemSchemaVersion: reviewed ? 1 : 0,
+    consentItems: reviewed ? collectedItems as unknown as Prisma.InputJsonValue : Prisma.DbNull } });
   await tx.formDocumentBinding.deleteMany({ where: { formVersionId } });
   for (const [order, selection] of selections.entries()) await tx.formDocumentBinding.create({ data: {
     tenantId: ctx.tenantId, serviceId, formVersionId, documentId: versions[order].documentId, documentVersionId: versions[order].id,

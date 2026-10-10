@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-10-10T05:21:12.105799+00:00",
+  "initialByteComparison": "failed",
+  "artifacts": {
+    "submitted.png": {
+      "bytes": 3409,
+      "sha256": "739667cc63ffd035c7a0879d2ad1e09d286fb45bc3de4bb624d63e1b0ff5eaa4",
+      "width": 287,
+      "height": 120
+    },
+    "original-download.png": {
+      "bytes": 5808,
+      "sha256": "d95372bc7020d5b9a9a2c4c0eb6bf2fac572c910b28a0fcbf836c1ac63d20523",
+      "width": 672,
+      "height": 120
+    }
+  },
+  "cause": "Pre-apply capture occurred before ResizeObserver settled. Apply exported the redraw at the later 672px canvas width; the earlier 287px capture is not an applied-file byte baseline. Both images visually inspected and same black polyline shape observed.",
+  "correction": "Keep initial capture; verify initial download against private storage. For replacement capture the actual applied preview Blob before submitting and require exact SHA/byte equality."
+}

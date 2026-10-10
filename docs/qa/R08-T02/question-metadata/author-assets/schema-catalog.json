@@ -1,0 +1,62 @@
+{
+  "checkedAt": "2026-10-10T08:12:45.777Z",
+  "migrations": 123,
+  "constraints": [
+    {
+      "table_name": "AuthorAsset",
+      "name": "AuthorAsset_metadata_check",
+      "definition": "CHECK (((id ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text) AND (purpose = ANY (ARRAY['QUESTION_MATERIAL'::text, 'OPTION_IMAGE'::text])) AND ((size >= 1) AND (size <= 5242880)) AND (version > 0) AND ((purpose <> 'OPTION_IMAGE'::text) OR (size <= 1048576)) AND ((status = 'deleted'::text) OR ((\"nameCipher\" IS NOT NULL) AND (length(\"nameCipher\") > 0)))))"
+    },
+    {
+      "table_name": "AuthorAsset",
+      "name": "AuthorAsset_scope_check",
+      "definition": "CHECK ((((\"ownerKind\" = 'company'::text) AND (\"tenantId\" IS NOT NULL) AND (\"serviceId\" IS NOT NULL) AND (\"createdById\" IS NOT NULL)) OR ((\"ownerKind\" = 'system'::text) AND (\"tenantId\" IS NULL) AND (\"serviceId\" IS NULL) AND (\"createdById\" IS NULL))))"
+    },
+    {
+      "table_name": "AuthorAsset",
+      "name": "AuthorAsset_state_check",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'uploaded'::text, 'ready'::text, 'rejected'::text, 'deleting'::text, 'deleted'::text])))"
+    },
+    {
+      "table_name": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_identity_check",
+      "definition": "CHECK (((id ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text) AND (\"storageKey\" ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text) AND (sha256 ~ '^[a-f0-9]{64}$'::text) AND ((size >= 1) AND (size <= 5242880)) AND (\"validationVersion\" > 0) AND (version > 0)))"
+    },
+    {
+      "table_name": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_mime_check",
+      "definition": "CHECK ((mime = ANY (ARRAY['application/pdf'::text, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'::text, 'application/postscript'::text, 'image/jpeg'::text, 'image/png'::text])))"
+    },
+    {
+      "table_name": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_state_check",
+      "definition": "CHECK (((status = ANY (ARRAY['pending'::text, 'uploaded'::text, 'ready'::text, 'quarantined'::text, 'deleting'::text, 'deleted'::text])) AND (\"scanStatus\" = ANY (ARRAY['pending'::text, 'clean'::text, 'infected'::text, 'error'::text])) AND ((status <> 'ready'::text) OR ((\"scanStatus\" = 'clean'::text) AND (\"scanEngine\" IS NOT NULL) AND (\"scannedAt\" IS NOT NULL)))))"
+    },
+    {
+      "table_name": "AuthorAssetReference",
+      "name": "AuthorAssetReference_key_check",
+      "definition": "CHECK (((\"questionKey\" ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text) AND ((\"optionKey\" IS NULL) OR (\"optionKey\" ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text))))"
+    },
+    {
+      "table_name": "AuthorAssetReference",
+      "name": "AuthorAssetReference_parent_check",
+      "definition": "CHECK (((num_nonnulls(\"formVersionId\", \"templateId\", \"approvalId\") = 1) AND (((\"formVersionId\" IS NOT NULL) AND (\"questionId\" IS NOT NULL) AND (\"tenantId\" IS NOT NULL) AND (\"serviceId\" IS NOT NULL)) OR ((\"formVersionId\" IS NULL) AND (\"questionId\" IS NULL)))))"
+    },
+    {
+      "table_name": "AuthorAssetReference",
+      "name": "AuthorAssetReference_slot_check",
+      "definition": "CHECK ((((slot = 'material'::text) AND (\"orderNumber\" IS NOT NULL) AND ((\"orderNumber\" >= 0) AND (\"orderNumber\" <= 2)) AND (\"optionKey\" IS NULL)) OR ((slot = 'option'::text) AND (\"orderNumber\" IS NULL) AND (\"optionKey\" IS NOT NULL))))"
+    },
+    {
+      "table_name": "Question",
+      "name": "Question_material_list_check",
+      "definition": "CHECK (((\"materialList\" IS NULL) OR valid_question_material_links(\"materialList\")))"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "AuthorAssetReference_parent_slot_unique",
+      "definition": "CREATE UNIQUE INDEX \"AuthorAssetReference_parent_slot_unique\" ON public.\"AuthorAssetReference\" USING btree (COALESCE(\"formVersionId\", ''::text), COALESCE(\"templateId\", ''::text), COALESCE(\"approvalId\", ''::text), \"questionKey\", slot, COALESCE(\"orderNumber\", '-1'::integer), COALESCE(\"optionKey\", ''::text))"
+    }
+  ]
+}

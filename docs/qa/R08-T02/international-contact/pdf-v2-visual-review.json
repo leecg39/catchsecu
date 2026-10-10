@@ -1,0 +1,75 @@
+{
+  "checkedAt": "2026-10-10T05:53:51.263425+00:00",
+  "result": "sample_passed",
+  "reviewer": "root image inspection",
+  "renderer": "pdftoppm page1 1500px PNG",
+  "files": {
+    "visual-reviewed/pdf-v2-languages.pdf": "acce6eb2498baa47e2619960eb4fcb2f2f3e55794dbdea6c5bf998e666fa3225",
+    "visual-reviewed/pdf-v2-languages-page1.png": "e5ea0dca27c8f70dd26108c69f3361168200549c5e725c78fa8bfaf5dffb3096"
+  },
+  "observed": [
+    "Arabic sample right aligned with joined letter forms and expected two-word order",
+    "Thai and Turkish samples have visible glyphs",
+    "Header/body/hash/footer do not overlap or clip"
+  ],
+  "scope": "One short three-language page; not mixed-bidi, long text or full multilingual acceptance",
+  "multipage": {
+    "files": {
+      "visual-reviewed/pdf-v2-multipage.pdf": "e7941393c6614dac3f1b16c553f8d0da4a274e705d513607a6616731d91b0989",
+      "visual-reviewed/pdf-v2-multipage-page1.png": "52cd5cd79a7221a06f93b76a755aaac3c33ac226b22036bdf7a0c9655b07e764",
+      "visual-reviewed/pdf-v2-multipage-page4.png": "579de7c3c53ef512a3279d7002701de74b2b8155fa6ddd165d58abde5d420a31"
+    },
+    "pagesInspected": [
+      1,
+      4
+    ],
+    "observed": [
+      "Arabic/Latin/Thai mixed lines are visibly separated without clipping",
+      "Page 1 header and footer are visible",
+      "Last page contains source paragraphs 63 through 75 plus hash and 4/4 footer"
+    ],
+    "scope": "Pages 2 and 3 not visually inspected; all-page logical extraction remains automated test scope"
+  },
+  "thai": {
+    "files": {
+      "visual-reviewed/pdf-v2-thai.pdf": "004d646153643ae35d74f37c3dc90c054efa531f03dbf6c3ee59a97bf6477247",
+      "visual-reviewed/pdf-v2-thai-page1.png": "b3d64f28cdf9952c620dc1db044223f4dfdeb9481a6dd41fcf80fbd9fdd43156"
+    },
+    "observed": [
+      "Thai marks visible without clipping",
+      "Mixed Korean/Thai/English phone line shows all scripts and preserves +66 number direction",
+      "Body/hash/footer do not overlap"
+    ],
+    "scope": "Visual sample only; extraction is checked separately"
+  },
+  "arabicMixedBefore": {
+    "files": {
+      "visual-reviewed/pdf-v2-arabic-extraction-before.pdf": "5f45eb7f015651312d7bb3192794f0189e66d61e96ae72215537e78eb6c59535",
+      "visual-reviewed/pdf-v2-arabic-extraction-before-page1.png": "27a2162267ea1ae2174d2ec12634534bfae2687f672c8444607f28f3d6a5d08e"
+    },
+    "result": "visually inspected; extraction remains separately unresolved",
+    "observed": [
+      "Arabic glyphs and marks visible, no missing-glyph boxes or clipping",
+      "Unisolated date and telephone groups visually reordered in mixed-direction text"
+    ],
+    "notAsserted": [
+      "Exact mark positioning certified by native-language reviewer",
+      "PDF.js getTextContent round-trip",
+      "Independent browser-native bidi reference equivalence"
+    ]
+  },
+  "arabicIsolates": {
+    "files": {
+      "visual-reviewed/pdf-v2-arabic-isolates.pdf": "6f227575860f9efef3b00191c2e53a321f5fdc47556de1b35e9c20e336ade5d3",
+      "visual-reviewed/pdf-v2-arabic-isolates-page1.png": "fd879ed4d8b982493728459a52efd560d40039d552e66814831acb9cb28ca02f"
+    },
+    "result": "sample_passed",
+    "observed": [
+      "Explicitly isolated phone displays +82 1012345678 in the intended LTR order",
+      "Explicitly isolated date displays 2026-10-10",
+      "Unisolated comparison groups show bidi reordering",
+      "UUID visible intact; no missing-glyph boxes or clipping"
+    ],
+    "scope": "Visual sample and direction comparison; not PDF.js extraction acceptance"
+  }
+}

@@ -1,0 +1,945 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-10T05:29:58.783Z",
+  "author": "bundle_analysis",
+  "purpose": "F3/F5 국제 CONTACT의 원본 정적 계약 및 구현 경계",
+  "method": {
+    "artifactReadOnly": true,
+    "artifactExecuted": false,
+    "databaseAccessed": false,
+    "browserUsed": false,
+    "networkRequested": false,
+    "productFilesChanged": false,
+    "onlyWrittenArtifact": "docs/qa/R08-T02/international-contact/source-review.json",
+    "analysis": "기존 REA Evidence와 동일 보존 번들의 문자열/제어 흐름을 재사용. catalog/언어/문구는 Acorn AST literal 및 JSON 파싱만 사용하고 원본 JavaScript를 실행하지 않았다."
+  },
+  "provenance": {
+    "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+    "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "sourceBytes": 15337385,
+    "sourceUtf16Length": 15329557,
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "offsetConvention": "0-based Node.js UTF-16 code units; half-open [start,end). byte offset이 아니다.",
+    "reaSummary": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/static/rea-evidence-summary.json",
+    "reaRaw": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/static/rea-application-evidence.json.gz",
+    "reusedReports": [
+      "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/special-questions/source-observations.json",
+      "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/address-questions/source-address-review.json",
+      "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/address-questions/country-catalog.json"
+    ]
+  },
+  "summary": {
+    "separateQuestionTypeObserved": false,
+    "questionType": "CONTACT",
+    "questionLocalInternationalToggleObserved": false,
+    "modeSource": "formLanguage가 truthy이고 ko가 아니면 공개 국제 C0; ko/미설정은 국내 WZ/HZ. V3 작성기/미리보기는 formModelV3.formLanguage를 사용한다.",
+    "publicInputMinimumShape": {
+      "countryCode": "국가 ISO 예: US, CA, KR",
+      "extraNumber": "ASCII 숫자 문자열"
+    },
+    "publicSubmissionType": "string",
+    "publicSubmissionFormat": "전화코드 + 공백 1개 + extraNumber; 예 +82 1012345678",
+    "catalogEntries": 181,
+    "uniqueDialCodes": 179,
+    "serverBehavior": "미관측",
+    "liveExecution": "미관측",
+    "publicSubmissionField": "pages[].replies[].value"
+  },
+  "observations": [
+    {
+      "id": "INT-01",
+      "status": "관측",
+      "title": "별도 국제전화 질문 타입 대신 기존 CONTACT의 폼 언어 분기",
+      "conclusion": "공개 switch는 CONTACT 하나에서 formLanguage && formLanguage!==ko이면 C0, 아니면 WZ를 렌더한다. V3 질문 팔레트도 CONTACT 하나이며 작성기와 UMt 미리보기가 같은 전역 언어에 따라 jQ를 표시한다. 조사한 팔레트/질문 payload/공개 renderer에는 질문별 국제전화 toggle을 확인하지 못했다.",
+      "evidence": [
+        "E01",
+        "E06",
+        "E07",
+        "E08",
+        "E15",
+        "E17"
+      ]
+    },
+    {
+      "id": "INT-02",
+      "status": "관측",
+      "title": "폼 상단 언어 카드가 선택 진입점이며 기본 한국어",
+      "conclusion": "질문 페이지 목록 앞에 kOt 언어 카드를 렌더한다. NOt의 언어변경 버튼→COt의 16개 언어 select→확인 버튼이 setFormLanguageV3를 dispatch한다. Redux V3 초기값과 작성 payload fallback은 ko이다. reducer는 ADDRESS/FOREIGN_ADDRESS만 타입을 전환하고 CONTACT는 바꾸지 않는다. 응답자 국가 selector를 한국어 폼에 켜는 별도 옵션은 이 경로에서 관측되지 않는다.",
+      "evidence": [
+        "E09",
+        "E10",
+        "E11",
+        "E12",
+        "E13",
+        "E14",
+        "E16",
+        "E28",
+        "E29"
+      ]
+    },
+    {
+      "id": "INT-03",
+      "status": "관측",
+      "title": "국제 입력은 국가명(전화코드) select와 숫자 입력의 세로 배치",
+      "conclusion": "SQ는 $q 순서 그대로 국가명을 formLanguage→en→ko→ISO fallback으로 선택하여 국가명 (dialCode) label을 만든다. option value는 ISO이고 전화코드 자체나 직접입력 항목이 아니다. jQ는 select 위/숫자 input 아래, 8px gap, 각 45px 높이이다. 국제 분기에는 국내 010 고정 앞자리나 별도 customCountryCode 입력이 없다.",
+      "evidence": [
+        "E03",
+        "E04",
+        "E05",
+        "E26",
+        "E27"
+      ]
+    },
+    {
+      "id": "INT-04",
+      "status": "관측",
+      "title": "국가 기본 선택 없음·국가 변경 시 번호 유지·빈 국가 재선택 불가",
+      "conclusion": "공개 C0의 변경 callback 기본은 countryCode/extraNumber 빈 문자열이다. jQ/SQ도 미설정 또는 Hq가 못 찾는 국가를 빈 select로 표시한다. UMt 국제 미리보기 초기값에는 빈 countryCode,customCountryCode,extraNumber가 있다. 국제 callback은 기존 value를 펼쳐 특정 필드만 변경하므로 국가 변경 시 번호가 유지된다. 빈 option은 disabled+hidden이며 국가 선택 후 이를 다시 선택하는 버튼/clear control은 SQ/jQ 전체에 없다.",
+      "evidence": [
+        "E02",
+        "E03",
+        "E04",
+        "E17"
+      ]
+    },
+    {
+      "id": "INT-05",
+      "status": "관측",
+      "title": "DOM 입력 상한 30과 공개 유효성 6~15는 서로 다름",
+      "conclusion": "jQ input은 inputMode numeric,maxLength30이며 onChange에서 /\\D/g를 제거한다. C0는 선택 여부와 extraNumber.length가 6~15인지 검사한다. 국내 CONTACT용 patternRegex 또는 국가별 전화번호 패턴·전체 국제번호 길이는 C0에서 검사하지 않는다. 국가 ISO membership 역시 C0 validator가 아니라 select/Hq 표시 경로에만 있다. 따라서 이를 원본 서버의 엄격한 E.164 규칙으로 부를 수 없다.",
+      "evidence": [
+        "E02",
+        "E03",
+        "E04"
+      ]
+    },
+    {
+      "id": "INT-06",
+      "status": "관측",
+      "title": "선택 미응답은 두 필드가 모두 빈 경우만 유효",
+      "conclusion": "C0의 h는 questionElementType===MM이다. 국가/번호 모두 빈 MS는 valid=true, 모두 빈 MM은 false(message는 빈 문자열)이다. 국가 없이 번호가 있으면 국가 오류, 국가가 있고 번호가 0~5 또는 16자 이상이면 길이 오류이다. 국가만 고른 선택 질문도 번호를 채워야 한다. UI 빈 국가 option이 disabled이므로 번호만 비워서는 완전 미응답으로 돌아갈 수 없다.",
+      "evidence": [
+        "E02",
+        "E03",
+        "E31"
+      ]
+    },
+    {
+      "id": "INT-07",
+      "status": "관측",
+      "title": "readOnly·인증연결 입력 차단",
+      "conclusion": "C0는 disabled||readOnly||item.disabled||(IDV subtype 또는 matchQuestionMapping이면서 미인증)를 jQ.disabled로 합친다. jQ는 native select/input에 disabled를 전달한다. 미인증 안내는 noAuthPlaceholder이며 V3 작성기에는 한국어가 아닌 언어에서 IDV를 제한하는 별도 경로와 문구가 있다. 인증 외 일반 CONTACT 자체가 별도 라이선스를 요구한다는 근거는 이 범위에서 없다.",
+      "evidence": [
+        "E02",
+        "E03",
+        "E04",
+        "E32",
+        "E33"
+      ]
+    },
+    {
+      "id": "INT-08",
+      "status": "관측",
+      "title": "실제 공개 제출은 문자열이며 ISO와 국가명은 제출하지 않음",
+      "conclusion": "BRe의 h는 !!formLanguage && formLanguage!==ko. 국제 CONTACT는 Hq(value.countryCode).dialCode와 extraNumber가 모두 있을 때 `${dialCode} ${extraNumber}`, 아니면 빈 문자열을 pages[].replies[].value에 둔다. 항목 questionType/@type은 CONTACT로 유지한다. customCountryCode는 국제 직렬화에 사용하지 않는다. 정적 캐리어 안에 객체가 보이더라도 이 경로의 최종 응답은 객체가 아니다.",
+      "evidence": [
+        "E19",
+        "E20",
+        "E21",
+        "E26"
+      ]
+    },
+    {
+      "id": "INT-09",
+      "status": "관측 및 제한된 추론",
+      "title": "카탈로그는 주소의 기존 추출 데이터와 동일하며 공유 전화코드가 존재",
+      "conclusion": "$q [7961254,8159361)의 181개 ISO와 16개 언어 names/dialCode는 기존 src/data/form-countries.json에 정확히 투영돼 있다. 179개 distinct dialCode 중 +1은 US/CA, +7은 RU/KZ가 공유한다. 따라서 제출 문자열만으로 이 ISO를 유일하게 복원할 수 없다는 것은 직렬화와 카탈로그로부터 도출된다.",
+      "evidence": [
+        "E20",
+        "E26",
+        "E27"
+      ]
+    },
+    {
+      "id": "INT-10",
+      "status": "관측",
+      "title": "작성기 미리보기는 같은 UI를 쓰지만 공개 검증과 동등하지 않음",
+      "conclusion": "UMt의 국제 branch는 jQ onChange에서 state/상위 value만 바꾼다. 공개 C0의 6~15 검사나 pattern 검사를 호출하지 않는다. RMt의 CONTACT 검사는 extraNumber가 빈 문자열이 아닌지만 본다. 미리보기의 입력 가능/다음 동작을 원본 공개 제출의 허용 규칙으로 일반화하면 안 된다.",
+      "evidence": [
+        "E17",
+        "E18",
+        "E35"
+      ]
+    },
+    {
+      "id": "INT-11",
+      "status": "관측",
+      "title": "현재 입력 객체 요약 및 저장 응답 읽기 표시",
+      "conclusion": "현재 value 요약 경로는 countryCode를 Hq로 찾으면 dialCode+공백+extraNumber를 표시한다. 저장 replyContents 경로 하나는 첫 공백 앞뒤를 전화코드/번호로 나누어 표시하고, 두 기존 응답 모달은 국제 CONTACT 전체 문자열을 disabled input으로 표시한다. 이들은 ISO 국가 selector를 재구성하는 정정 입력의 증거가 아니다.",
+      "evidence": [
+        "E22",
+        "E23",
+        "E24",
+        "E25",
+        "E36"
+      ]
+    },
+    {
+      "id": "INT-12",
+      "status": "미관측을 포함한 범위 제한",
+      "title": "저장 문자열의 정정 역직렬화는 확인하지 못함",
+      "conclusion": "이번 번들의 Hq 호출 5개, catalog 이후 .dialCode 소비 3개, countryCode 생성/변경, CONTACT 공개·미리보기·replyContents 표시 경로를 조사했다. 저장 문자열을 ISO countryCode로 역매핑하는 함수는 이 범위에서 찾지 못했다. 서버가 구조값을 별도로 반환하는지, 정정 API가 ISO를 유지하는지는 미관측이다. 전화코드를 임의의 첫 ISO로 매핑하는 구현은 원본 사실로 정당화할 수 없다.",
+      "evidence": [
+        "E02",
+        "E03",
+        "E17",
+        "E20",
+        "E22",
+        "E23",
+        "E24",
+        "E25",
+        "E26",
+        "E27"
+      ]
+    }
+  ],
+  "validationTruthTable": {
+    "basis": "C0 조건문에서 도출한 기대값. 코드 실행/서버 시험 결과가 아니다.",
+    "rows": [
+      {
+        "required": false,
+        "countryCode": "",
+        "extraNumber": "",
+        "valid": true,
+        "message": ""
+      },
+      {
+        "required": true,
+        "countryCode": "",
+        "extraNumber": "",
+        "valid": false,
+        "message": ""
+      },
+      {
+        "required": false,
+        "countryCode": "US",
+        "extraNumber": "",
+        "valid": false,
+        "messageKey": "internationalContact.errLength"
+      },
+      {
+        "required": false,
+        "countryCode": "",
+        "extraNumber": "123456",
+        "valid": false,
+        "messageKey": "internationalContact.errCountryCode"
+      },
+      {
+        "required": true,
+        "countryCode": "US",
+        "extraNumber": "12345",
+        "valid": false,
+        "messageKey": "internationalContact.errLength"
+      },
+      {
+        "required": true,
+        "countryCode": "US",
+        "extraNumber": "123456",
+        "valid": true,
+        "message": ""
+      },
+      {
+        "required": true,
+        "countryCode": "US",
+        "extraNumber": "123456789012345",
+        "valid": true,
+        "message": ""
+      },
+      {
+        "required": true,
+        "countryCode": "US",
+        "extraNumber": "1234567890123456",
+        "valid": false,
+        "messageKey": "internationalContact.errLength"
+      }
+    ]
+  },
+  "catalog": {
+    "sourceIdentifier": "$q",
+    "evidence": "E27",
+    "entries": 181,
+    "languages": [
+      "ko",
+      "en",
+      "zh-CN",
+      "zh-TW",
+      "ja",
+      "de",
+      "fr",
+      "ru",
+      "es",
+      "pt",
+      "id",
+      "th",
+      "vi",
+      "tr",
+      "it",
+      "ar"
+    ],
+    "distinctDialCodes": 179,
+    "sharedDialCodes": [
+      {
+        "dialCode": "+1",
+        "iso": [
+          "US",
+          "CA"
+        ]
+      },
+      {
+        "dialCode": "+7",
+        "iso": [
+          "RU",
+          "KZ"
+        ]
+      }
+    ],
+    "sourceRawSha256": "a274fd6491b6d54f9fb929ec20df64c42bc4f1592596f209191f98b495ddffb7",
+    "retainedFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/data/form-countries.json",
+    "retainedSha256": "c683cb1b85530af1e90f6224e000f7dddaf5dcbcd53ba41ad38a27945880cee4",
+    "existingProvenanceFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/address-questions/country-catalog.json",
+    "existingProvenanceSha256": "09773ead42b7f3bb25b2b418aae16814006b71a68201ee360a7a501730c62189",
+    "retainedProjectionMatchesOriginalAst": true,
+    "exampleCountries": [
+      {
+        "iso": "US",
+        "dialCode": "+1",
+        "ko": "미국",
+        "en": "United States"
+      },
+      {
+        "iso": "CA",
+        "dialCode": "+1",
+        "ko": "캐나다",
+        "en": "Canada"
+      },
+      {
+        "iso": "RU",
+        "dialCode": "+7",
+        "ko": "러시아",
+        "en": "Russia"
+      },
+      {
+        "iso": "KZ",
+        "dialCode": "+7",
+        "ko": "카자흐스탄",
+        "en": "Kazakhstan"
+      },
+      {
+        "iso": "KR",
+        "dialCode": "+82",
+        "ko": "대한민국",
+        "en": "Republic of Korea"
+      }
+    ],
+    "reuse": "기존 data JSON에 dialCode가 포함되어 있으므로 별도 목록 복제 없이 재사용 가능. 최신 전화번호 규칙/전체 세계 국가 목록이라고 주장하지 않음."
+  },
+  "copy": {
+    "languageHeader": {
+      "cardTitle": "캐치폼 서비스 언어",
+      "cardBody": "선택한 언어로 캐치폼을 작성해 주세요.",
+      "changeButton": "언어변경"
+    },
+    "languageSelection": {
+      "title": "캐치폼 서비스 언어 설정",
+      "bodyTitle": "본 캐치폼을 서비스 할 언어 를 선택해 주세요.",
+      "bodyDesc1": "응답자에게 표시되는 캐치폼 화면의 시스템 언어가 설정됩니다.",
+      "bodyDesc2": "단, '문항' 과 '답변 선택항목' 등의 내용은 선택하신 언어로 직접 입력해 주셔야 합니다.",
+      "cancel": "취소하기",
+      "confirm": "{{language}} 선택하기"
+    },
+    "languageWarning": {
+      "title": "{{language}}로 캐치폼이 설정되었습니다.",
+      "bodyDesc1": "지금부터 제목, 본문, 각 문항의 질문과 답변을 <0>[{{language}}]</0>로 직접 입력해 주세요.",
+      "bodyDesc2": "응답자에게 보여지는 '이전으로' '다음으로' '제출하기' 등의 버튼과 시스템 언어 등은 자동으로 번역되어 노출됩니다.",
+      "warningTitle": "※주의사항",
+      "warningDesc1": "캐치폼 생성 시 문항별 AI 개인정보 자동 분류 기능은 한국어 질문에 최적화 되어 있습니다.",
+      "warningDesc2": "외국어로 설정된 캐치폼에서는 문항별 AI 개인정보 자동 분류 기능이 지원되지 않을 수 있습니다.",
+      "warningDesc3": "개인정보를 수집하는 문항은 직접 개인정보 설정 영역에서 유형을 선택하고 수집되는 개인정보 항목명을 입력해주세요.",
+      "confirm": "확인했어요"
+    },
+    "idvRestriction": {
+      "title": "기능 사용 제한 안내",
+      "body": "'본인인증 및 전자서명' 기능은 한국어로 설정된 캐치폼에서만 이용 가능합니다.",
+      "confirm": "확인했어요!"
+    },
+    "editor": {
+      "countryCodePlaceholder": "국가 번호를 선택하세요",
+      "numberPlaceholder": "숫자만 입력하세요"
+    },
+    "respondent": {
+      "countryCodePlaceholder": "국가 번호를 선택하세요",
+      "numberPlaceholder": "숫자만 입력하세요",
+      "errCountryCode": "국가 번호를 선택해 주세요.",
+      "errLength": "최소 6자리, 최대 15자리의 숫자만 입력해주세요."
+    },
+    "evidence": [
+      "E30",
+      "E31",
+      "E32"
+    ]
+  },
+  "languages": {
+    "sourceIdentifier": "CV",
+    "defaultCode": "ko",
+    "entries": [
+      {
+        "code": "ko",
+        "label": "한국어(기본)",
+        "nativeName": "한국어",
+        "koreanName": "한국어",
+        "isDefault": true
+      },
+      {
+        "code": "en",
+        "label": "English 영어",
+        "nativeName": "English",
+        "koreanName": "영어"
+      },
+      {
+        "code": "ja",
+        "label": "日本語 일본어",
+        "nativeName": "日本語",
+        "koreanName": "일본어"
+      },
+      {
+        "code": "zh-CN",
+        "label": "中文(简体) 중국어(간체)",
+        "nativeName": "中文(简体)",
+        "koreanName": "중국어(간체)"
+      },
+      {
+        "code": "zh-TW",
+        "label": "中文(繁體) 중국어(번체)",
+        "nativeName": "中文(繁體)",
+        "koreanName": "중국어(번체)"
+      },
+      {
+        "code": "de",
+        "label": "Deutsch 독일어",
+        "nativeName": "Deutsch",
+        "koreanName": "독일어"
+      },
+      {
+        "code": "fr",
+        "label": "Français 프랑스어",
+        "nativeName": "Français",
+        "koreanName": "프랑스어"
+      },
+      {
+        "code": "ru",
+        "label": "Русский 러시아어",
+        "nativeName": "Русский",
+        "koreanName": "러시아어"
+      },
+      {
+        "code": "es",
+        "label": "Español 스페인어",
+        "nativeName": "Español",
+        "koreanName": "스페인어"
+      },
+      {
+        "code": "pt",
+        "label": "Português 포루투칼어",
+        "nativeName": "Português",
+        "koreanName": "포루투칼어"
+      },
+      {
+        "code": "id",
+        "label": "Bahasa Indonesia 인도네시아어",
+        "nativeName": "Bahasa Indonesia",
+        "koreanName": "인도네시아어"
+      },
+      {
+        "code": "th",
+        "label": "ภาษาไทย 태국어",
+        "nativeName": "ภาษาไทย",
+        "koreanName": "태국어"
+      },
+      {
+        "code": "vi",
+        "label": "Tiếng Việt 베트남어",
+        "nativeName": "Tiếng Việt",
+        "koreanName": "베트남어"
+      },
+      {
+        "code": "tr",
+        "label": "Türkçe 튀르키에어",
+        "nativeName": "Türkçe",
+        "koreanName": "튀르키에어"
+      },
+      {
+        "code": "it",
+        "label": "Italiano 이탈리아어",
+        "nativeName": "Italiano",
+        "koreanName": "이탈리아어"
+      },
+      {
+        "code": "ar",
+        "label": "العربية 아랍어",
+        "nativeName": "العربية",
+        "koreanName": "아랍어",
+        "rtl": true
+      }
+    ],
+    "evidence": [
+      "E28",
+      "E29"
+    ]
+  },
+  "boundedNegativeSearch": {
+    "exactTermsAbsent": [
+      "INT_CONTACT",
+      "INTERNATIONAL_CONTACT",
+      "CONTACT_INTERNATIONAL",
+      "FOREIGN_CONTACT",
+      "internationalYn",
+      "useInternationalContact"
+    ],
+    "scope": "동일 main.183e9d2c.js 전체의 정확 문자열. 문자열 부재만으로 기능이 없다고 증명하지 않고 팔레트/렌더러/편집 payload 제어 흐름과 함께 판단.",
+    "observedHqCalls": [
+      8159434,
+      8202649,
+      8207044,
+      8502503,
+      10056097
+    ],
+    "observedDialCodePropertyConsumers": [
+      8202621,
+      8502653,
+      10056174
+    ],
+    "jQConsumers": [
+      8307989,
+      12745988,
+      12854185
+    ]
+  },
+  "implementationDecisionsToKeepExplicit": [
+    "한국어 폼에서도 국제번호를 허용하는 질문별 toggle을 추가한다면 원본 대응 기능이 아니라 독립 확장으로 명시할 것. 원본에 맞추려면 폼 언어 계약/F5와 연결한다.",
+    "국제값은 편집 중 ISO+digits 객체와 저장 문자열을 구분한다. 정정 복원을 위해 ISO를 별도로 보존하거나 기존 전체 문자열을 손실 없이 유지하는 독립 정책이 필요하며 +1/+7에서 첫 국가를 추측하면 안 된다.",
+    "원본 UI는 30자리까지 입력되지만 유효성은 6~15자리이다. 로컬에서 DOM부터15로 제한하거나 전체 E.164 길이/국가별 번호를 검증할 경우 원본보다 강한 독립 계약으로 명시한다.",
+    "원본 선택 질문의 국가 선택 후 비우기 어려운 동작을 유지할지, 명시적 전체 비우기/빈 국가 선택을 추가할지 결정한다. 추가는 원본 확인 사실과 구분한다.",
+    "언어 변경 reducer는 CONTACT의 기존 값/ISO를 변환하지 않는다. 게시본/기존 응답/미리보기 draft 전환의 데이터 보존은 독립 계약을 정해야 한다.",
+    "공개 입력 검증을 기준으로 구현하며 느슨한 작성기 미리보기를 서버/공개 규칙으로 복제하지 않는다."
+  ],
+  "unknowns": [
+    "원본 서버 요청 스키마, 국가 catalog membership 강제, 정규식/길이/숫자 검증 및 E.164 준수는 미관측.",
+    "저장 CONTACT 문자열에서 정정용 ISO를 복원하는 서버/클라이언트의 완전한 왕복 계약은 미관측.",
+    "실제 국제 폼 생성/전환/제출/정정/국가 select/언어 번역 lazy-load는 실행하지 않았다.",
+    "기존 비-V3 CONTACT legacy 렌더러에는 middleNumber/lastNumber 국내 경로도 있으며, 이번 결론은 국제 C0/jQ가 연결된 V3 및 명시된 읽기 경로 범위이다.",
+    "국제 CONTACT의 별도 요금제/역할 gate는 조사 범위에서 관측되지 않았다. 전체 제품의 gate 부재를 증명하지 않는다."
+  ],
+  "evidence": [
+    {
+      "id": "E01",
+      "label": "공개 CONTACT의 formLanguage 분기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8331226,
+      "end": 8331693,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "f28498e86c857380150bc3b9d09b147737c1f1763d1e72c13d9dba0d3cf1d778",
+      "raw": "case\"CONTACT\":return null!==f&&void 0!==f&&f.formLanguage&&\"ko\"!==f.formLanguage?(0,nI.jsx)(C0,{item:P,onUpdate:i,authCompleted:d||(null===P||void 0===P?void 0:P.authCompleted),disabled:P.disabled||u,readOnly:h,matchQuestionMapping:c,formLanguage:null===f||void 0===f?void 0:f.formLanguage}):(0,nI.jsx)(WZ,{item:P,onUpdate:i,elementGuideGroup:D,authCompleted:d||(null===P||void 0===P?void 0:P.authCompleted),disabled:P.disabled||u,readOnly:h,matchQuestionMapping:c});"
+    },
+    {
+      "id": "E02",
+      "label": "공개 국제 CONTACT C0 전체: 값·검증·잠금",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8306845,
+      "end": 8308324,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "ec1d59f755ad009b46fd41ee7fb046aedd3a9b7a64118b429aef2a16ca363429",
+      "raw": "C0=(0,yt.memo)((e=>{var t,r;let{item:n,onUpdate:a,disabled:o,readOnly:i,authCompleted:s,matchQuestionMapping:l,formLanguage:c}=e;const{t:d}=fa(\"translate\",{keyPrefix:\"infoOwnerForm\"}),u=c||SV,h=\"MM\"===(null===n||void 0===n?void 0:n.questionElementType),p=(0,yt.useCallback)((e=>{const t=(null===e||void 0===e?void 0:e.countryCode)||\"\",r=(null===e||void 0===e?void 0:e.extraNumber)||\"\",n=!t&&!r;return!h&&n?{valid:!0,message:\"\"}:h&&n?{valid:!1,message:\"\"}:t?r.length<6||r.length>15?{valid:!1,message:d(\"internationalContact.errLength\")}:{valid:!0,message:\"\"}:{valid:!1,message:d(\"internationalContact.errCountryCode\")}}),[h,d]),{valid:m,message:f}=(0,yt.useMemo)((()=>p(n.value||{})),[p,n.value]),g=!!f&&(!(null===(t=n.value)||void 0===t||!t.countryCode)||!(null===(r=n.value)||void 0===r||!r.extraNumber)),v=(0,yt.useCallback)(((e,t)=>{const r={countryCode:\"\",extraNumber:\"\",...n.value,[e]:t},{valid:o}=p(r);a(n.htmlFormInputName,r,o)}),[n.value,n.htmlFormInputName,p,a]);(0,yt.useEffect)((()=>{a(n.htmlFormInputName,n.value,m)}),[]);const b=\"IDV\"===n.questionSubType&&!s||l&&!s,x=o||i||n.disabled||b;return(0,nI.jsxs)(S0,{children:[(0,nI.jsx)(jQ,{copy:{countryCodePlaceholder:d(\"internationalContact.countryCodePlaceholder\"),numberPlaceholder:d(\"internationalContact.numberPlaceholder\")},value:n.value,lang:u,disabled:x,onChange:v}),g?(0,nI.jsx)(iI,{className:\"label-2\",color:Uj,children:f}):b&&(0,nI.jsx)(iI,{className:\"label-2\",color:Zk,children:d(\"noAuthPlaceholder\")})]})}))"
+    },
+    {
+      "id": "E03",
+      "label": "국가번호 select SQ 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8202419,
+      "end": 8203039,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "2e2350877e7b246c0a8dbd46c45c98768ea06948755ac3949dc9e6cf5a85b416",
+      "raw": "function SQ(e){let{value:t,lang:r,disabled:n=!1,placeholder:a=\"\",onChange:o}=e;const i=(0,yt.useMemo)((()=>$q.map((e=>{const t=e.names[r]||e.names.en||e.names.ko||e.iso;return{iso:e.iso,label:`${t} (${e.dialCode})`}}))),[r]),s=t&&Hq(t)?t.toUpperCase():\"\";return(0,nI.jsxs)(TQ,{$disabled:n,children:[(0,nI.jsxs)(EQ,{value:s,disabled:n,onChange:e=>o(e.target.value),\"aria-label\":a||\"country code\",children:[(0,nI.jsx)(\"option\",{value:\"\",disabled:!0,hidden:!0,children:a}),i.map((e=>(0,nI.jsx)(\"option\",{value:e.iso,children:e.label},e.iso)))]}),(0,nI.jsx)(NQ,{src:\"/media/google-icons/keyboard-arrow-down.svg\",alt:\"\"})]})}"
+    },
+    {
+      "id": "E04",
+      "label": "국제 연락처 공통 입력 jQ 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8205022,
+      "end": 8205586,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "5fcafc6dc1c59065b4bc4cc2942cb123da36eddb329112c07887d475e3787ca3",
+      "raw": "function jQ(e){let{copy:t,value:r={},disabled:n=!1,lang:a=SV,onChange:o}=e;return(0,nI.jsxs)(PQ,{children:[(0,nI.jsx)(SQ,{value:null===r||void 0===r?void 0:r.countryCode,lang:a,disabled:n,placeholder:t.countryCodePlaceholder,onChange:e=>null===o||void 0===o?void 0:o(\"countryCode\",e)}),(0,nI.jsx)(OQ,{$disabled:n,children:(0,nI.jsx)(MQ,{value:(null===r||void 0===r?void 0:r.extraNumber)||\"\",placeholder:t.numberPlaceholder,disabled:n,inputMode:\"numeric\",maxLength:30,onChange:e=>null===o||void 0===o?void 0:o(\"extraNumber\",e.target.value.replace(/\\D/g,\"\"))})})]})}"
+    },
+    {
+      "id": "E05",
+      "label": "국제 공통 입력의 세로 배치·높이·numeric 입력 CSS",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8205955,
+      "end": 8206700,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "f0edc9077979e99edfa2d256a1c7489a65124bbcea2c64535e14377a6c0f48c0",
+      "raw": ",PQ=as.div`\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n  width: 100%;\n`,OQ=as.div`\n  position: relative;\n  display: flex;\n  align-items: center;\n  width: 100%;\n  height: 45px;\n  border: 1px solid ${hj};\n  border-radius: 6px;\n  background: ${e=>{let{$disabled:t}=e;return t?Vk:\"transparent\"}};\n`,MQ=as.input`\n  width: 100%;\n  height: 100%;\n  padding-block: 0;\n  padding-inline: ${e=>{let{$hasArrow:t}=e;return t?\"16px 40px\":\"16px\"}};\n  border: 0;\n  outline: 0;\n  background: transparent;\n  color: ${ej};\n  font-size: 14px;\n  line-height: 18px;\n\n  &::placeholder {\n    color: ${Jk};\n    opacity: 1;\n  }\n\n  /* CATAPP-2140: InputFormText 비활성(text GREY700 / placeholder GREY500)과 동일 톤 */\n  &:disabled {\n    color: ${ej};\n    -webkit-text-"
+    },
+    {
+      "id": "E06",
+      "label": "V3 질문 팔레트: CONTACT 단일 항목 및 언어 판정",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12718939,
+      "end": 12719827,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "0c0678856a872bbe1e34b654e629d975b00a7632ff75239f89883b7de89dca7c",
+      "raw": "W=(0,yt.useMemo)((()=>({TEXTAREA:{img:jEt,text:u(\"longAnswer\")},TEXTBOX:{img:PEt,text:u(\"shortAnswer\")},CHECKBOX:{img:EEt,text:u(\"multipleChoice\")},RADIO:{img:REt,text:u(\"singleChoice\")},SELECTBOX:{img:kEt,text:u(\"dropdown\")},FILE:{img:OEt,text:u(\"fileUpload\")},ADDRESS:{img:SEt,text:u(\"address\")},FOREIGN_ADDRESS:{img:SEt,text:u(\"address\")},CONTACT:{img:_Et,text:u(\"contact\")},EMAIL:{img:IEt,text:u(\"email\")},EMAIL_DIRECT:{img:IEt,text:u(\"customEmail\")},BIRTH:{img:TEt,text:u(\"birth\")},DRAW:{img:NEt,text:u(\"draw\")},MATRIX_CHECKBOX:{img:xIt,text:u(\"matrixMultiple\")},MATRIX_RADIO:{img:AIt,text:u(\"matrixSingle\")},IDV:{img:rRt,text:u(C?\"idv\":\"ncpIdv\")}})),[u]),q=(0,yt.useMemo)((()=>TV(m)),[m]),G=q.code!==SV,Y=EV(m),Q=G?`${u(\"alert.phrase13\")} (${q.koreanName}\\ub85c \\uc785\\ub825)`:u(\"alert.phrase13\"),K=G?`${u(\"alert.phrase14\")} (${q.koreanName}\\ub85c \\uc785\\ub825)`:u(\"alert.phrase14\")"
+    },
+    {
+      "id": "E07",
+      "label": "V3 질문 편집기의 폼 언어 조회",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12718062,
+      "end": 12718177,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "44fcb1ffe264098c791b5a77f1d74ae962a5037ce26022c5f7c3dfb5ee589522",
+      "raw": "odelV3.pageList[c].questionList[o]),uk),m=Ut((e=>e.form.formModelV3.formLanguage||SV),uk),[f,g]=(0,yt.useState)({sh"
+    },
+    {
+      "id": "E08",
+      "label": "V3 CONTACT 편집기 스켈레톤의 국내/국제 분기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12745841,
+      "end": 12746645,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "678980b49843681c51681905b2e61dbeac1fbf0fb3a41d6b120deb97fe21d821",
+      "raw": "\"CONTACT\"===(null===x||void 0===x?void 0:x.elementType)&&(0,nI.jsx)(nI.Fragment,{children:G?(0,nI.jsx)(\"div\",{className:\"mt-2\",children:(0,nI.jsx)(jQ,{copy:J,lang:m,disabled:!0})}):(0,nI.jsxs)(\"div\",{className:\"flex items-center mt-2\",children:[(0,nI.jsx)(lB,{className:`flex-1 ${k} ${j}`,variant:\"standard\",value:\"\",disabled:!0,displayEmpty:!0,children:(0,nI.jsx)(bB,{value:\"\",children:u(\"select\")})}),(0,nI.jsx)(\"label\",{className:\"my-0 mx-1 custom-font-20\",children:\"-\"}),(0,nI.jsx)(bU,{sx:{width:\"20%\"},className:`${N} ${k}`,disabled:!0,id:\"standard-disabled\",defaultValue:\"\",variant:\"standard\"}),(0,nI.jsx)(\"label\",{className:\"my-0 mx-1 custom-font-20\",children:\"-\"}),(0,nI.jsx)(bU,{sx:{width:\"20%\"},className:`${N} ${k}`,disabled:!0,id:\"standard-disabled\",defaultValue:\"\",variant:\"standard\"})]})}),"
+    },
+    {
+      "id": "E09",
+      "label": "캐치폼 서비스 언어 카드와 언어변경 버튼",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12786708,
+      "end": 12787472,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "fa41f2a30e5b26fedb5bd879e6dd823623fc380e50eac17058e42c08d0e0b352",
+      "raw": "function NOt(e){let{language:t,onClick:r}=e;const{t:n}=fa(\"translate\",{keyPrefix:\"formI18n.languageHeader\"});return(0,nI.jsxs)(SOt,{children:[(0,nI.jsxs)(TOt,{children:[(0,nI.jsx)(cP,{width:\"32\",src:\"/img/google-icons-v2/general/language.svg\",alt:\"\"}),(0,nI.jsxs)(\"div\",{children:[(0,nI.jsx)(iI,{className:\"body-1-strong\",color:tj,children:n(\"cardTitle\")}),(0,nI.jsx)(iI,{className:\"body-2\",color:ej,children:n(\"cardBody\")})]})]}),(0,nI.jsxs)(EOt,{type:\"button\",onClick:r,children:[(0,nI.jsx)(iI,{className:\"label-2\",color:ej,style:{flex:\"1 0 0\",minWidth:0},children:t.label}),(0,nI.jsx)(iI,{className:\"label-2\",color:Aj,style:{flexShrink:0},children:n(\"changeButton\")}),(0,nI.jsx)(cP,{width:\"16\",src:\"/img/google-icons-v2/system/edit.svg\",color:Aj,alt:\"\"})]})]})}"
+    },
+    {
+      "id": "E10",
+      "label": "전역 서비스 언어 선택 modal와 reducer dispatch",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12784970,
+      "end": 12785984,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "e310dac38e5fde6728a4a062629ce52a7cd751822f29710126a856447ee67ffa",
+      "raw": "function COt(e){let{open:t,currentLanguageCode:r,onClose:n,onConfirmed:a}=e;const o=Wu(),{t:i}=fa(\"translate\",{keyPrefix:\"formI18n.modalA\"}),[s,l]=(0,yt.useState)(r);(0,yt.useEffect)((()=>{t&&l(r)}),[r,t]);const c=(0,yt.useMemo)((()=>CV.map((e=>({value:e.code,text:wOt(e)})))),[]),d=TV(s);return(0,nI.jsx)(vP,{open:t,onClose:n,title:i(\"title\"),width:500,headerHeight:80,padding:24,children:(0,nI.jsxs)(xOt,{children:[(0,nI.jsxs)(AOt,{children:[(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:i(\"bodyTitle\")}),(0,nI.jsx)(iI,{className:\"body-1\",color:ej,children:`${i(\"bodyDesc1\")} ${i(\"bodyDesc2\")}`})]}),(0,nI.jsx)(yB,{labelList:c,value:s,width:\"100%\",size:\"lg\",onChange:e=>l(e.target.value)}),(0,nI.jsxs)(yOt,{children:[(0,nI.jsx)(M_,{size:\"md\",type:\"secondary\",text:i(\"cancel\"),disabled:!1,onClick:n}),(0,nI.jsx)(M_,{size:\"md\",type:\"primary\",text:i(\"confirm\",{language:(u=d,u.koreanName)}),disabled:!1,onClick:()=>{var e;o((e=s,t=>t(YG.setFormLanguageV3({formLanguage:e})))),n(),a(d)}})]})]})});var u}"
+    },
+    {
+      "id": "E11",
+      "label": "언어 카드/modal 조합",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12787472,
+      "end": 12787866,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "c3e0cb6ff54038387a5a80d919f930ed81c5e4c2f7b14ec156cf3a70c43ea260",
+      "raw": "function kOt(){const e=Ut((e=>e.form.formModelV3.formLanguage||SV)),[t,r]=(0,yt.useState)(!1),[n,a]=(0,yt.useState)(null),o=TV(e);return(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsx)(NOt,{language:o,onClick:()=>r(!0)}),(0,nI.jsx)(COt,{open:t,currentLanguageCode:o.code,onClose:()=>r(!1),onConfirmed:e=>{e.code!==SV&&a(e)}}),n&&(0,nI.jsx)(bOt,{open:Boolean(n),language:n,onClose:()=>a(null)})]})}"
+    },
+    {
+      "id": "E12",
+      "label": "질문 페이지 목록 앞에 렌더되는 언어 카드",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12810527,
+      "end": 12810765,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "868528cf8bd543f7e4b84349802f1a6113218919d4af7f88952c367d125cac8c",
+      "raw": "er(\"scroll\",e)}}),[]),(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(\"div\",{style:{maxWidth:\"800px\",minWidth:\"800px\",height:\"fit-content\"},children:[(0,nI.jsx)(kOt,{}),i.pageList.map(((e,t)=>(0,nI.jsx)(mOt,{index:t},t))),(0,nI.jsx)(\"div\","
+    },
+    {
+      "id": "E13",
+      "label": "언어 변경 reducer: 주소 타입 전환, CONTACT 타입 유지",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 6925225,
+      "end": 6925654,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "7aea06b5b326ab0915a492578be7ababaa16bd5d32486e75ff7b4288680bed7f",
+      "raw": "setFormLanguageV3:(e,t)=>{var r;const{formLanguage:n}=t.payload;e.formModelV3.formLanguage=n;const a=\"ko\"===n?\"ADDRESS\":\"FOREIGN_ADDRESS\";null===(r=e.formModelV3.pageList)||void 0===r||r.forEach((e=>{var t;null===e||void 0===e||null===(t=e.questionList)||void 0===t||t.forEach((e=>{\"ADDRESS\"!==(null===e||void 0===e?void 0:e.elementType)&&\"FOREIGN_ADDRESS\"!==(null===e||void 0===e?void 0:e.elementType)||(e.elementType=a)}))}))},"
+    },
+    {
+      "id": "E14",
+      "label": "새 V3 폼의 기본 언어 ko",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 6914760,
+      "end": 6914880,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "070632e82f557a28e7c5ea34cc34518df67bdeb30e045893cb0bdaa5be07dfbe",
+      "raw": "List:[]}},formModelV3:{formLanguage:\"ko\",title:\"\",content:\"\",catchformId:0,catchFormProgress:\"\",useSecureKeyStroke:!1,pa"
+    },
+    {
+      "id": "E15",
+      "label": "질문 작성 payload C_t 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12625323,
+      "end": 12626122,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "bb08505761bbdf7ff33863c0e74262b328b16794c5b6aeb03c740684876123c8",
+      "raw": "C_t=e=>{const t=[];return e.pageList.forEach(((e,r)=>{t.push({page:e.page,pageTitle:0===r?\"\":e.pageTitle,pageContent:0===r?\"\":e.pageContent,pageOffset:e.pageOffset,questionList:e.questionList.map((e=>{return{nlpFeedbackId:e.nlpFeedbackId,title:e.title,additionalExplanation:e.description,catchFormQuestionType:e.elementType,questionOptionList:(t=kG(e.elementType,e.questionOptionList),Array.isArray(t)?t.map((e=>{const{optionImageUrl:t,imageUrl:r,optionImageFileSize:n,optionImageUploadToken:a,...o}=null!==e&&void 0!==e?e:{};return{...o,optionImageKey:SG(e)}})):[]),matrixOptionData:e.matrixOptionData,usePageOffset:e.usePageOffset,required:e.isRequired,useSecureKeyStroke:!1,...hG(e),...qY(e),materialList:lQ(e),...h_t(e),catchFormPersonalInformationRequests:w_t(e.detectedItems)};var t}))})})),t}"
+    },
+    {
+      "id": "E16",
+      "label": "폼 작성 payload S_t: formLanguage 기본 ko",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12626123,
+      "end": 12626800,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "f6b4e23677ce7e94f3cba0ec02fc24f27ba8da3657be57bcf2f5c03e9d80c2bb",
+      "raw": "S_t=(e,t)=>{var r;const n=$u.getState().form.constraint;let a={};return a={constraint:{chooseCollectLimitAmount:n.chooseCollectLimitAmount,collectLimitAmount:n.collectLimitAmount,chooseCollectOpenTime:n.chooseCollectOpenTime,collectOpenTime:n.collectOpenTime,collectOpenHour:\"none\"==n.collectOpenHour?null:n.collectOpenHour,chooseCollectEndTime:n.chooseCollectEndTime,collectEndTime:n.collectEndTime,collectEndHour:\"none\"==n.collectEndHour?null:n.collectEndHour,allowPageBack:n.allowPageBack},accessControl:Gvt(n),catchformId:e.catchformId,serviceId:t,title:e.title,mainText:e.description||\"<p></p>\",formLanguage:null!==(r=e.formLanguage)&&void 0!==r?r:\"ko\",pageList:C_t(e)},a}"
+    },
+    {
+      "id": "E17",
+      "label": "작성기 응답 미리보기 UMt 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12853110,
+      "end": 12856093,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "dbdd5d9063727f47e397a52f8220096efe7337ffb1d05bbc90c46265aedcd91c",
+      "raw": "function UMt(e){var t,r;let{item:n,handleChange:a,placeholder:o,disabled:i=!1}=e;const{t:s}=fa(\"translate\",{keyPrefix:\"infoOwnerForm\"}),l=J_t(),c=(0,nP.useMediaQuery)({maxWidth:480}),d=Ut((e=>e.form.formModelV3.formLanguage||SV)),u=d!==SV,h=(0,yt.useMemo)((()=>[{value:s(\"direct\"),name:s(\"direct\")},...BMt.map((e=>({value:e,name:e})))]),[s]),[p,m]=(0,yt.useState)(n.value||(u?{countryCode:\"\",customCountryCode:\"\",extraNumber:\"\"}:{countryCode:\"010\",customCountryCode:\"\",extraNumber:\"\"})),f=(0,yt.useCallback)(((e,t)=>{const r={countryCode:\"010\",customCountryCode:\"\",extraNumber:\"\",...p};return\"countryCode\"===e?{...r,countryCode:t,customCountryCode:\"\",extraNumber:t?r.extraNumber:\"\"}:{...r,[e]:t}}),[p]),g=(0,yt.useCallback)(((e,t)=>{const r=f(e,t),{countryCode:o,customCountryCode:i,extraNumber:l}=r||{};let c=!0;if(o||i||l){var d;const e=o===s(\"direct\")?i:o;(!e||o===s(\"direct\")&&(null!==(d=null===e||void 0===e?void 0:e.length)&&void 0!==d?d:0)<2||!l||l.length<7)&&(c=!1)}else c=\"MM\"!==n.questionElementType;a(r),m(r)}),[f,n.questionElementType,a,m,s]);return u?(0,nI.jsx)(jQ,{copy:{countryCodePlaceholder:s(\"internationalContact.countryCodePlaceholder\"),numberPlaceholder:s(\"internationalContact.numberPlaceholder\")},value:p,lang:d,disabled:i||n.disabled,onChange:(e,t)=>{const r={countryCode:\"\",customCountryCode:\"\",extraNumber:\"\",...p,[e]:t};m(r),a(r)}}):(0,nI.jsx)(nI.Fragment,{children:(0,nI.jsxs)(\"div\",{children:[(0,nI.jsxs)(\"div\",{className:\"flex gap-3 mb-3\",children:[(0,nI.jsx)(Kq,{isKeypad:!0===n.useSecureKeyStroke,keypadType:\"num\",id:`${n.htmlFormInputName},${n.questionType},customCountryCode`,placeholder:s(\"phrase.phrase68\"),className:\"\"+(c?\"mix-w-[96px] \":\"max-w-[215px] \"),width:\"32%\",disabled:i||n.disabled||(null===p||void 0===p?void 0:p.countryCode)!==s(\"direct\"),value:(null===p||void 0===p?void 0:p.countryCode)!==s(\"direct\")?null!==(t=null===p||void 0===p?void 0:p.countryCode)&&void 0!==t?t:\"010\":(null===p||void 0===p?void 0:p.customCountryCode)||\"\",onChange:e=>{const t=e.target.value.replace(/[^0-9]/g,\"\");g(\"customCountryCode\",t)},maxLength:4,type:\"text\",inputmode:\"numeric\"}),(0,nI.jsx)(Kq,{isKeypad:!0===n.useSecureKeyStroke,keypadType:\"num\",id:`${n.htmlFormInputName},${n.questionType},extraNumber`,placeholder:o||s(\"phrase.phrase69\"),value:(v=null===p||void 0===p?void 0:p.extraNumber,v?v.length>4?`${v.slice(0,4)}-${v.slice(4)}`:v:\"\"),onChange:e=>{const t=e.target.value.replace(/\\D/g,\"\").slice(0,8);g(\"extraNumber\",t)},disabled:i||n.disabled||\"\"===(null===p||void 0===p?void 0:p.countryCode),maxLength:9,type:\"text\",inputmode:\"numeric\"})]}),(0,nI.jsx)(EY,{selectClassName:`${l.selectRoot}`,inputClassName:l.input,displayEmpty:!0,items:h,value:null!==(r=null===p||void 0===p?void 0:p.countryCode)&&void 0!==r?r:\"010\",onChange:e=>g(\"countryCode\",e),disabled:i||n.disabled,placeholder:s(\"phrase.phrase70\"),children:h.map(((e,t)=>(0,nI.jsx)(bB,{value:null===e||void 0===e?void 0:e.value,children:null===e||void 0===e?void 0:e.name},t)))})]})});var v}"
+    },
+    {
+      "id": "E18",
+      "label": "작성기 미리보기 필수 판정 RMt: CONTACT extraNumber만 확인",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12847802,
+      "end": 12848542,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "5a11989a20a42f469794b3a14f2f564dbbcd6e63c1bccadb2f699f8048d5b8df",
+      "raw": "RMt=e=>{var t;const{elementType:r,value:n}=null!==e&&void 0!==e?e:{};switch(r){case\"IDV\":return!0;case\"ADDRESS\":return _Mt(null===n||void 0===n?void 0:n.address)||_Mt(null===n||void 0===n?void 0:n.streetAddress);case\"FOREIGN_ADDRESS\":return _Mt(null===n||void 0===n?void 0:n.streetAddress);case\"CONTACT\":return _Mt(null===n||void 0===n?void 0:n.extraNumber);case\"EMAIL\":return _Mt(null===n||void 0===n?void 0:n.email);case\"MATRIX_RADIO\":case\"MATRIX_CHECKBOX\":return((e,t)=>Array.isArray(e)?new Set(e.map((e=>String(e).split(\",\")[0]))).size>=t:t<=0)(n,Number(null===e||void 0===e||null===(t=e.matrixOptionData)||void 0===t?void 0:t.rows)||0);default:return\"string\"===typeof n?_Mt(n):Array.isArray(n)?n.length>0:void 0!==n&&null!==n&&\"\"!==n}}"
+    },
+    {
+      "id": "E19",
+      "label": "공개 제출 BRe: 언어에서 국제 여부 결정",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 10054475,
+      "end": 10054676,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "2c78381ffb8c244d0baa7420e1d7e94dc4410f4007cdbaf6c4d27ab4848c5b32",
+      "raw": "function BRe(e){const{formInfo:t,pageList:r,pageMoveList:n,pageIndex:a,questionElements:o,agreementTokens:i,nonAgreementTokens:s,apiParams:l,mTxId:c,t:d,formLanguage:u}=e,h=!!u&&\"ko\"!==u,p=i.filter((e="
+    },
+    {
+      "id": "E20",
+      "label": "BRe CONTACT 문자열 직렬화",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 10056048,
+      "end": 10056901,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "ef3644ec80dae40f51a30171dbb248290adc2d46bdc620ee32d7198787e2a2c7",
+      "raw": "case\"CONTACT\":if(h){var w,C,S;const t=(null===(w=Hq(null===(C=e.value)||void 0===C?void 0:C.countryCode))||void 0===w?void 0:w.dialCode)||\"\";y=t&&null!==(S=e.value)&&void 0!==S&&S.extraNumber?`${t} ${e.value.extraNumber}`:\"\"}else if(null!==(f=e.value)&&void 0!==f&&f.countryCode&&null!==(g=e.value)&&void 0!==g&&g.extraNumber){var T,E,N,k,j;let t=\"\";var I,_,R;if((null===(T=e.value)||void 0===T||null===(E=T.extraNumber)||void 0===E?void 0:E.length)>4)t=(null===(I=e.value)||void 0===I?void 0:I.extraNumber.slice(0,-4))+\"-\"+(null===(_=e.value)||void 0===_?void 0:_.extraNumber.slice(-4));else t=null===(R=e.value)||void 0===R?void 0:R.extraNumber;y=`${(null===(N=e.value)||void 0===N?void 0:N.countryCode)===d(\"direct\")?null===(k=e.value)||void 0===k?void 0:k.customCountryCode:null===(j=e.value)||void 0===j?void 0:j.countryCode}-${t}`}else y=\"\";break;"
+    },
+    {
+      "id": "E21",
+      "label": "BRe 응답 항목 결과 스키마",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 10058452,
+      "end": 10058839,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "c580ed31cde69478c977e25a88cd13bd8738f2bce767b4f30b8c3f35e6324f29",
+      "raw": "ng\"===typeof e.value?e.value.trim():(null!==e.value&&e.value,\"\")}return{questionId:e.questionId,questionType:e.questionType,\"@type\":e.questionType,subType:e.questionSubType,questionIndex:e.orderNumber,required:e.questionElementType,value:y}}));return{pageId:e.pageId,pageIndex:t,replies:r}}));return{formId:t.formId,passedPath:m,requestUser:l,userMTxId:c||null,pages:g,agreeTokenList:p}}"
+    },
+    {
+      "id": "E22",
+      "label": "현재 입력 객체 요약 표시: Hq(ISO) 우선",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8502357,
+      "end": 8503147,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "5757d326eb64cce7de4a9ae5e4807a7eb1d488c8759744d428228a1ad79e9556",
+      "raw": "case\"CONTACT\":{var f,g;const e=null===t||void 0===t?void 0:t.value;if(!e)return(0,nI.jsx)(iI,{className:\"label-1\",color:tj,children:\"-\"});const r=Hq(null===e||void 0===e?void 0:e.countryCode);if(r)return(0,nI.jsx)(iI,{className:\"label-1\",color:tj,children:null!==e&&void 0!==e&&e.extraNumber?`${r.dialCode} ${e.extraNumber}`:\"-\"});const n=!/^\\d+$/.test(String(null!==(f=null===e||void 0===e?void 0:e.countryCode)&&void 0!==f?f:\"\"))?null===e||void 0===e?void 0:e.customCountryCode:null===e||void 0===e?void 0:e.countryCode,a=String(null!==(g=null===e||void 0===e?void 0:e.extraNumber)&&void 0!==g?g:\"\");return n&&a?(0,nI.jsx)(iI,{className:\"label-1\",color:tj,children:a.length>4?`${n}-${a.slice(0,-4)}-${a.slice(-4)}`:`${n}-${a}`}):(0,nI.jsx)(iI,{className:\"label-1\",color:tj,children:\"-\"})}"
+    },
+    {
+      "id": "E23",
+      "label": "저장 replyContents 국제 표시: 첫 공백으로 분리",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8488123,
+      "end": 8488564,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "0f8a4f0e968322490752e7469a9728847214bdec28b57cda043e77584b0aa9a0",
+      "raw": "case\"CONTACT\":{var h;if(!(!O||\"ko\"===O)){const t=e.replyContents||\"\",r=t.indexOf(\" \"),n=r>=0?t.slice(0,r):\"\",a=r>=0?t.slice(r+1):t;return(0,nI.jsxs)(\"div\",{className:\"flex flex-col gap-2\",children:[(0,nI.jsxs)(P5,{children:[(0,nI.jsx)(Y5,{value:n,placeholder:B(\"internationalContact.countryCodePlaceholder\")}),(0,nI.jsx)(Q5,{})]}),(0,nI.jsx)(R5,{children:(0,nI.jsx)(Y5,{value:a,placeholder:B(\"internationalContact.numberPlaceholder\")})})]})}"
+    },
+    {
+      "id": "E24",
+      "label": "기존 응답/preview 국제 CONTACT read-only 단일문자열 표시 A",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8464847,
+      "end": 8465240,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "61057bd6e48c71873b4ba07c5e4ebbec383f3e6436a042c7f74ef72038aff9ee",
+      "raw": ",\"CONTACT\"===x.questionType&&(null!==p&&void 0!==p&&p.formLanguage&&\"ko\"!==p.formLanguage?(0,nI.jsx)(\"div\",{className:\"mt-3\",children:(0,nI.jsx)(Kq,{disabled:!0,value:\"PREVIEW\"===b?\"\":x.replyContents||\"\",type:\"text\",placeholder:_(\"enterExtraNumber\")})}):(0,nI.jsxs)(\"div\",{className:\"mt-3\",children:[(0,nI.jsxs)(\"div\",{className:\"flex gap-3 mb-3\",children:[(0,nI.jsx)(Kq,{disabled:\"PREVIEW\"!=="
+    },
+    {
+      "id": "E25",
+      "label": "기존 응답/preview 국제 CONTACT read-only 단일문자열 표시 B",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8558948,
+      "end": 8559341,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "759faa104a624aed88fba1553771c37218234ff8f45e9c88cde0f7136b82b692",
+      "raw": ",\"CONTACT\"===e.questionType&&(null!==i&&void 0!==i&&i.formLanguage&&\"ko\"!==i.formLanguage?(0,nI.jsx)(\"div\",{className:\"mt-3\",children:(0,nI.jsx)(Kq,{disabled:!0,value:\"PREVIEW\"===u?\"\":e.replyContents||\"\",type:\"text\",placeholder:T(\"enterExtraNumber\")})}):(0,nI.jsxs)(\"div\",{className:\"mt-3\",children:[(0,nI.jsxs)(\"div\",{className:\"flex gap-3 mb-3\",children:[(0,nI.jsx)(Kq,{disabled:\"PREVIEW\"!=="
+    },
+    {
+      "id": "E26",
+      "label": "국가 ISO 조회 Hq 및 이름 fallback Wq",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8159362,
+      "end": 8159490,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "e794181d0bb4e0f3eb21e14aa7b6b0c7728e1de5eb5d79e6ea8fa1da00df3c74",
+      "raw": "Hq=e=>e?$q.find((t=>t.iso===e.toUpperCase())):void 0,Wq=(e,t)=>{const r=Hq(e);return r&&(r.names[t]||r.names.en||r.names.ko)||e}"
+    },
+    {
+      "id": "E27",
+      "label": "국가 및 전화코드 원본 전체 배열: 기존 추출 파일 재사용",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 7961254,
+      "end": 8159361,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "a274fd6491b6d54f9fb929ec20df64c42bc4f1592596f209191f98b495ddffb7",
+      "rawOmittedReason": "198107 UTF-16 코드유닛의 반복 카탈로그. 보존 번들과 아래 기존 JSON을 직접 참조하며 중복 생성하지 않는다.",
+      "retainedProjection": {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/data/form-countries.json",
+        "sha256": "c683cb1b85530af1e90f6224e000f7dddaf5dcbcd53ba41ad38a27945880cee4",
+        "mapping": "{iso,names,dialCode}; 원본 flagEmoji/dropdownLabel 생략",
+        "astLiteralProjectionEqual": true
+      }
+    },
+    {
+      "id": "E28",
+      "label": "지원 언어 CV 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 7903809,
+      "end": 7906041,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "ef1986a48a0eae3b37771d282778d08644e3495bb270763fb56dbefaa95c4b57",
+      "raw": "[{code:\"ko\",label:\"\\ud55c\\uad6d\\uc5b4(\\uae30\\ubcf8)\",nativeName:\"\\ud55c\\uad6d\\uc5b4\",koreanName:\"\\ud55c\\uad6d\\uc5b4\",isDefault:!0},{code:\"en\",label:\"English \\uc601\\uc5b4\",nativeName:\"English\",koreanName:\"\\uc601\\uc5b4\"},{code:\"ja\",label:\"\\u65e5\\u672c\\u8a9e \\uc77c\\ubcf8\\uc5b4\",nativeName:\"\\u65e5\\u672c\\u8a9e\",koreanName:\"\\uc77c\\ubcf8\\uc5b4\"},{code:\"zh-CN\",label:\"\\u4e2d\\u6587(\\u7b80\\u4f53) \\uc911\\uad6d\\uc5b4(\\uac04\\uccb4)\",nativeName:\"\\u4e2d\\u6587(\\u7b80\\u4f53)\",koreanName:\"\\uc911\\uad6d\\uc5b4(\\uac04\\uccb4)\"},{code:\"zh-TW\",label:\"\\u4e2d\\u6587(\\u7e41\\u9ad4) \\uc911\\uad6d\\uc5b4(\\ubc88\\uccb4)\",nativeName:\"\\u4e2d\\u6587(\\u7e41\\u9ad4)\",koreanName:\"\\uc911\\uad6d\\uc5b4(\\ubc88\\uccb4)\"},{code:\"de\",label:\"Deutsch \\ub3c5\\uc77c\\uc5b4\",nativeName:\"Deutsch\",koreanName:\"\\ub3c5\\uc77c\\uc5b4\"},{code:\"fr\",label:\"Fran\\xe7ais \\ud504\\ub791\\uc2a4\\uc5b4\",nativeName:\"Fran\\xe7ais\",koreanName:\"\\ud504\\ub791\\uc2a4\\uc5b4\"},{code:\"ru\",label:\"\\u0420\\u0443\\u0441\\u0441\\u043a\\u0438\\u0439 \\ub7ec\\uc2dc\\uc544\\uc5b4\",nativeName:\"\\u0420\\u0443\\u0441\\u0441\\u043a\\u0438\\u0439\",koreanName:\"\\ub7ec\\uc2dc\\uc544\\uc5b4\"},{code:\"es\",label:\"Espa\\xf1ol \\uc2a4\\ud398\\uc778\\uc5b4\",nativeName:\"Espa\\xf1ol\",koreanName:\"\\uc2a4\\ud398\\uc778\\uc5b4\"},{code:\"pt\",label:\"Portugu\\xeas \\ud3ec\\ub8e8\\ud22c\\uce7c\\uc5b4\",nativeName:\"Portugu\\xeas\",koreanName:\"\\ud3ec\\ub8e8\\ud22c\\uce7c\\uc5b4\"},{code:\"id\",label:\"Bahasa Indonesia \\uc778\\ub3c4\\ub124\\uc2dc\\uc544\\uc5b4\",nativeName:\"Bahasa Indonesia\",koreanName:\"\\uc778\\ub3c4\\ub124\\uc2dc\\uc544\\uc5b4\"},{code:\"th\",label:\"\\u0e20\\u0e32\\u0e29\\u0e32\\u0e44\\u0e17\\u0e22 \\ud0dc\\uad6d\\uc5b4\",nativeName:\"\\u0e20\\u0e32\\u0e29\\u0e32\\u0e44\\u0e17\\u0e22\",koreanName:\"\\ud0dc\\uad6d\\uc5b4\"},{code:\"vi\",label:\"Ti\\u1ebfng Vi\\u1ec7t \\ubca0\\ud2b8\\ub0a8\\uc5b4\",nativeName:\"Ti\\u1ebfng Vi\\u1ec7t\",koreanName:\"\\ubca0\\ud2b8\\ub0a8\\uc5b4\"},{code:\"tr\",label:\"T\\xfcrk\\xe7e \\ud280\\ub974\\ud0a4\\uc5d0\\uc5b4\",nativeName:\"T\\xfcrk\\xe7e\",koreanName:\"\\ud280\\ub974\\ud0a4\\uc5d0\\uc5b4\"},{code:\"it\",label:\"Italiano \\uc774\\ud0c8\\ub9ac\\uc544\\uc5b4\",nativeName:\"Italiano\",koreanName:\"\\uc774\\ud0c8\\ub9ac\\uc544\\uc5b4\"},{code:\"ar\",label:\"\\u0627\\u0644\\u0639\\u0631\\u0628\\u064a\\u0629 \\uc544\\ub78d\\uc5b4\",nativeName:\"\\u0627\\u0644\\u0639\\u0631\\u0628\\u064a\\u0629\",koreanName:\"\\uc544\\ub78d\\uc5b4\",rtl:!0}]"
+    },
+    {
+      "id": "E29",
+      "label": "기본 언어 SV 및 유효하지 않은 언어 fallback TV",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 7906042,
+      "end": 7906160,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "123512fc6c0a63b49c3a236ace66f1176aba277627b629a52a2e6ac5cf899c27",
+      "raw": "SV=\"ko\",TV=e=>CV.find((t=>t.code===e))||CV[0],EV=e=>(e=>!0===TV(e).rtl)(e)?\"rtl\":void 0,NV=as.div`\n  border-radius: 8p"
+    },
+    {
+      "id": "E30",
+      "label": "한국어 작성기 국가/번호 placeholder",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 264627,
+      "end": 264813,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "c8262b0441221ca79aca95a60bf74cd04d64e975f2b564181c0f54d1f747b911",
+      "raw": "\"internationalContact\":{\"countryCodePlaceholder\":\"\\uad6d\\uac00 \\ubc88\\ud638\\ub97c \\uc120\\ud0dd\\ud558\\uc138\\uc694\",\"numberPlaceholder\":\"\\uc22b\\uc790\\ub9cc \\uc785\\ub825\\ud558\\uc138\\uc694\"}"
+    },
+    {
+      "id": "E31",
+      "label": "한국어 공개 연락처 placeholder/오류 문구",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 770749,
+      "end": 771158,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "a104af62aa154b354b374f32aa0f24d1c34f3678a0da14dca90bb7cdb970afe6",
+      "raw": "\"internationalContact\":{\"countryCodePlaceholder\":\"\\uad6d\\uac00 \\ubc88\\ud638\\ub97c \\uc120\\ud0dd\\ud558\\uc138\\uc694\",\"numberPlaceholder\":\"\\uc22b\\uc790\\ub9cc \\uc785\\ub825\\ud558\\uc138\\uc694\",\"errCountryCode\":\"\\uad6d\\uac00 \\ubc88\\ud638\\ub97c \\uc120\\ud0dd\\ud574 \\uc8fc\\uc138\\uc694.\",\"errLength\":\"\\ucd5c\\uc18c 6\\uc790\\ub9ac, \\ucd5c\\ub300 15\\uc790\\ub9ac\\uc758 \\uc22b\\uc790\\ub9cc \\uc785\\ub825\\ud574\\uc8fc\\uc138\\uc694.\"}"
+    },
+    {
+      "id": "E32",
+      "label": "한국어 폼 언어 변경 안내와 IDV 사용 제한 문구",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 227386,
+      "end": 230243,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "d665929a90988f0b32c76054a577062df84151afde0b13177a759af60d2f9e9a",
+      "raw": "\"formI18n\":{\"languageHeader\":{\"cardTitle\":\"\\uce90\\uce58\\ud3fc \\uc11c\\ube44\\uc2a4 \\uc5b8\\uc5b4\",\"cardBody\":\"\\uc120\\ud0dd\\ud55c \\uc5b8\\uc5b4\\ub85c \\uce90\\uce58\\ud3fc\\uc744 \\uc791\\uc131\\ud574 \\uc8fc\\uc138\\uc694.\",\"changeButton\":\"\\uc5b8\\uc5b4\\ubcc0\\uacbd\"},\"modalA\":{\"title\":\"\\uce90\\uce58\\ud3fc \\uc11c\\ube44\\uc2a4 \\uc5b8\\uc5b4 \\uc124\\uc815\",\"bodyTitle\":\"\\ubcf8 \\uce90\\uce58\\ud3fc\\uc744 \\uc11c\\ube44\\uc2a4 \\ud560 \\uc5b8\\uc5b4 \\ub97c \\uc120\\ud0dd\\ud574 \\uc8fc\\uc138\\uc694.\",\"bodyDesc1\":\"\\uc751\\ub2f5\\uc790\\uc5d0\\uac8c \\ud45c\\uc2dc\\ub418\\ub294 \\uce90\\uce58\\ud3fc \\ud654\\uba74\\uc758 \\uc2dc\\uc2a4\\ud15c \\uc5b8\\uc5b4\\uac00 \\uc124\\uc815\\ub429\\ub2c8\\ub2e4.\",\"bodyDesc2\":\"\\ub2e8, \\'\\ubb38\\ud56d\\' \\uacfc \\'\\ub2f5\\ubcc0 \\uc120\\ud0dd\\ud56d\\ubaa9\\' \\ub4f1\\uc758 \\ub0b4\\uc6a9\\uc740 \\uc120\\ud0dd\\ud558\\uc2e0 \\uc5b8\\uc5b4\\ub85c \\uc9c1\\uc811 \\uc785\\ub825\\ud574 \\uc8fc\\uc154\\uc57c \\ud569\\ub2c8\\ub2e4.\",\"cancel\":\"\\ucde8\\uc18c\\ud558\\uae30\",\"confirm\":\"{{language}} \\uc120\\ud0dd\\ud558\\uae30\"},\"modalB\":{\"title\":\"{{language}}\\ub85c \\uce90\\uce58\\ud3fc\\uc774 \\uc124\\uc815\\ub418\\uc5c8\\uc2b5\\ub2c8\\ub2e4.\",\"bodyDesc1\":\"\\uc9c0\\uae08\\ubd80\\ud130 \\uc81c\\ubaa9, \\ubcf8\\ubb38, \\uac01 \\ubb38\\ud56d\\uc758 \\uc9c8\\ubb38\\uacfc \\ub2f5\\ubcc0\\uc744 <0>[{{language}}]</0>\\ub85c \\uc9c1\\uc811 \\uc785\\ub825\\ud574 \\uc8fc\\uc138\\uc694.\",\"bodyDesc2\":\"\\uc751\\ub2f5\\uc790\\uc5d0\\uac8c \\ubcf4\\uc5ec\\uc9c0\\ub294 \\'\\uc774\\uc804\\uc73c\\ub85c\\' \\'\\ub2e4\\uc74c\\uc73c\\ub85c\\' \\'\\uc81c\\ucd9c\\ud558\\uae30\\' \\ub4f1\\uc758 \\ubc84\\ud2bc\\uacfc \\uc2dc\\uc2a4\\ud15c \\uc5b8\\uc5b4 \\ub4f1\\uc740 \\uc790\\ub3d9\\uc73c\\ub85c \\ubc88\\uc5ed\\ub418\\uc5b4 \\ub178\\ucd9c\\ub429\\ub2c8\\ub2e4.\",\"warningTitle\":\"\\u203b\\uc8fc\\uc758\\uc0ac\\ud56d\",\"warningDesc1\":\"\\uce90\\uce58\\ud3fc \\uc0dd\\uc131 \\uc2dc \\ubb38\\ud56d\\ubcc4 AI \\uac1c\\uc778\\uc815\\ubcf4 \\uc790\\ub3d9 \\ubd84\\ub958 \\uae30\\ub2a5\\uc740 \\ud55c\\uad6d\\uc5b4 \\uc9c8\\ubb38\\uc5d0 \\ucd5c\\uc801\\ud654 \\ub418\\uc5b4 \\uc788\\uc2b5\\ub2c8\\ub2e4.\",\"warningDesc2\":\"\\uc678\\uad6d\\uc5b4\\ub85c \\uc124\\uc815\\ub41c \\uce90\\uce58\\ud3fc\\uc5d0\\uc11c\\ub294 \\ubb38\\ud56d\\ubcc4 AI \\uac1c\\uc778\\uc815\\ubcf4 \\uc790\\ub3d9 \\ubd84\\ub958 \\uae30\\ub2a5\\uc774 \\uc9c0\\uc6d0\\ub418\\uc9c0 \\uc54a\\uc744 \\uc218 \\uc788\\uc2b5\\ub2c8\\ub2e4.\",\"warningDesc3\":\"\\uac1c\\uc778\\uc815\\ubcf4\\ub97c \\uc218\\uc9d1\\ud558\\ub294 \\ubb38\\ud56d\\uc740 \\uc9c1\\uc811 \\uac1c\\uc778\\uc815\\ubcf4 \\uc124\\uc815 \\uc601\\uc5ed\\uc5d0\\uc11c \\uc720\\ud615\\uc744 \\uc120\\ud0dd\\ud558\\uace0 \\uc218\\uc9d1\\ub418\\ub294 \\uac1c\\uc778\\uc815\\ubcf4 \\ud56d\\ubaa9\\uba85\\uc744 \\uc785\\ub825\\ud574\\uc8fc\\uc138\\uc694.\",\"confirm\":\"\\ud655\\uc778\\ud588\\uc5b4\\uc694\"},\"modalC\":{\"title\":\"\\uae30\\ub2a5 \\uc0ac\\uc6a9 \\uc81c\\ud55c \\uc548\\ub0b4\",\"body\":\"\\'\\ubcf8\\uc778\\uc778\\uc99d \\ubc0f \\uc804\\uc790\\uc11c\\uba85\\' \\uae30\\ub2a5\\uc740 \\ud55c\\uad6d\\uc5b4\\ub85c \\uc124\\uc815\\ub41c \\uce90\\uce58\\ud3fc\\uc5d0\\uc11c\\ub9cc \\uc774\\uc6a9 \\uac00\\ub2a5\\ud569\\ub2c8\\ub2e4.\",\"confirm\":\"\\ud655\\uc778\\ud588\\uc5b4\\uc694!\"}}"
+    },
+    {
+      "id": "E33",
+      "label": "국제 언어에서 IDV 유형 변경을 제한하는 작성기 분기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12727839,
+      "end": 12728022,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "7d69ee5e19ff3408e7c7a17197cd681f3069dc7fa9ba8d7b47a7a8d0c6f57207",
+      "raw": "const r=CQ(e,m);if(\"IDV\"===r&&G)return P(!1),void b(!0);const n=!nG(r)&&\"NONE\"!==dG(x).mode,a=zPt.filter((e=>!o_t(r,e)&&c_t(x,e)));if(n||a.length>0){const e=[...n?[u(\"selectLimit.titl"
+    },
+    {
+      "id": "E34",
+      "label": "공개 유효성 실패 시 CONTACT 안내 분기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 10069691,
+      "end": 10070502,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "6aee12e6ea2a73eed82736fd38cc154c70cd60068c7b5d9ad5e4a0d1d66ab725",
+      "raw": "urn!0;if(\"CONTACT\"===r.questionType){const{value:e,questionElementType:n}=r;let a=\"phrase.phrase14\";const o=\"MM\"===n&&!(null!==e&&void 0!==e&&e.countryCode)&&!(null!==e&&void 0!==e&&e.customCountryCode)&&!(null!==e&&void 0!==e&&e.extraNumber),i=\"MM\"===n&&!(null!==e&&void 0!==e&&e.extraNumber),s=\"MS\"===n&&!(null!==e&&void 0!==e&&e.extraNumber)&&(null===e||void 0===e?void 0:e.customCountryCode);return o?(ve(r.htmlFormInputName),!1):((null===e||void 0===e?void 0:e.countryCode)===t(\"direct\")&&(!e.customCountryCode||e.customCountryCode.length<2)?a=\"phrase.phrase21\":e&&(i||s)?a=\"phrase.phrase22\":null!==e&&void 0!==e&&e.extraNumber&&e.extraNumber.length<7&&(a=\"phrase.phrase23\"),U({...B,show:!0,message:t(a),onClick:()=>ve(r.htmlFormInputName)}),!1)}if(\"MATRIX_CHECKBOX\"===r.questionType||\"MATRIX_RADIO\"===r.qu"
+    },
+    {
+      "id": "E35",
+      "label": "미리보기 필수/유효성 실패 시 CONTACT 안내 분기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8546528,
+      "end": 8547855,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256OfUtf8Excerpt": "b99f1ee7305113b55abe5000b9348b5c9372a384dde6aecfcbc5c81b48b14f02",
+      "raw": "D,B,it,z,He]),lt=(0,yt.useCallback)((async()=>{var e;const t=$e.current;if(!se){if(!(()=>{const e=zq(j),t=yG(j),r=e?j.indexOf(e):-1;if(t&&(r<0||t.index<=r)){const{messageKey:e,params:r}=t.violation;return L({...M,show:!0,message:k(e,r),onClick:()=>ot(t.item.htmlFormInputName)}),!1}if(!e)return!0;if(\"CONTACT\"===e.questionType){const{value:t,questionElementType:r}=e;let n=\"phrase.phrase27\";const a=\"MM\"===r&&!(null!==t&&void 0!==t&&t.countryCode)&&!(null!==t&&void 0!==t&&t.customCountryCode)&&!(null!==t&&void 0!==t&&t.extraNumber),o=\"MM\"===r&&!(null!==t&&void 0!==t&&t.extraNumber),i=\"MS\"===r&&!(null!==t&&void 0!==t&&t.extraNumber)&&(null===t||void 0===t?void 0:t.customCountryCode);return a?(ot(e.htmlFormInputName),!1):((null===t||void 0===t?void 0:t.countryCode)===T(\"direct\")&&(!t.customCountryCode||t.customCountryCode.length<2)?n=\"phrase.phrase28\":t&&(o||i)?n=\"phrase.phrase29\":null!==t&&void 0!==t&&t.extraNumber&&t.extraNumber.length<7&&(n=\"phrase.phrase30\"),L({...M,show:!0,message:T(n),onClick:()=>ot(e.htmlFormInputName)}),!1)}if(\"MATRIX_CHECKBOX\"===e.questionType||\"MATRIX_RADIO\"===e.questionType){let t=!1;if(j.map((e=>{if((\"MATRIX_CHECKBOX\"===e.questionType||\"MATRIX_RADIO\"===e.questionType)&&\"MM\"===e.questionElementType&&!t){const r=e.value,n=e.matrixOptionData;if(!Array.isArray(r)||0===r.length)return voi"
+    },
+    {
+      "id": "E36",
+      "label": "저장 응답 모달의 언어 출처 languageCode/formLanguage",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8479805,
+      "end": 8480018,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "raw": "==(t=null===r||void 0===r?void 0:r.languageCode)&&void 0!==t?t:null===n||void 0===n?void 0:n.formLanguage,M=O&&\"string\"===typeof O?O:zN.language||\"ko\",[L,D]=(0,yt.useState)((()=>zN.hasResourceBundle(M,\"translate\")",
+      "sha256OfUtf8Excerpt": "aa9a077458e8b79415cacb226df7e1cc90901fd1e6dd3e464c7c25a21fda28a0"
+    }
+  ],
+  "languageBoundary": {
+    "enumSource": "CV [7903809,7906041)",
+    "allowedUiLanguageCodes": [
+      "ko",
+      "en",
+      "ja",
+      "zh-CN",
+      "zh-TW",
+      "de",
+      "fr",
+      "ru",
+      "es",
+      "pt",
+      "id",
+      "th",
+      "vi",
+      "tr",
+      "it",
+      "ar"
+    ],
+    "default": "ko",
+    "languageChangeEffects": [
+      "전역 formModelV3.formLanguage를 갱신한다.",
+      "ADDRESS/FOREIGN_ADDRESS는 선택 언어에 따라 타입을 전환한다.",
+      "CONTACT는 타입을 유지하고 언어에 따른 입력 UI 분기로 국제/국내를 선택한다.",
+      "해당 reducer에 기존 CONTACT value의 countryCode/extraNumber 변환이나 기존 서버 응답 migration은 없다."
+    ],
+    "translationScope": "안내 문구에 따르면 이전/다음/제출 등의 버튼과 시스템 문구는 자동 번역 대상이다. 제목·본문·문항·선택항목은 작성자가 선택 언어로 직접 입력한다. 실제 원격 번역 chunk 로드 및 번역 완전성은 실행하지 않았다.",
+    "evidence": [
+      "E13",
+      "E28",
+      "E29",
+      "E32"
+    ]
+  }
+}

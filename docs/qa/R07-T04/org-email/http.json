@@ -1,0 +1,86 @@
+{
+  "checkedAt": "2026-10-10T01:30:29.022Z",
+  "actualHttpChecks": 16,
+  "checks": [
+    {
+      "action": "소유자 계정 HTTP 생성",
+      "status": 200
+    },
+    {
+      "action": "소유자 HTTP 로그인",
+      "status": 200
+    },
+    {
+      "action": "가상 조직 공급자 생성",
+      "status": 201
+    },
+    {
+      "action": "공급자 활성화",
+      "status": 200
+    },
+    {
+      "action": "이메일 없는 디렉터리 생성",
+      "status": 201
+    },
+    {
+      "action": "공급자 링크에서 로그인 시작",
+      "status": 302
+    },
+    {
+      "action": "PIN 검증 후 이메일 단계 전환",
+      "status": 200
+    },
+    {
+      "action": "번호 없는 선점 거절",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "action": "이메일 인증번호 요청",
+      "status": 200
+    },
+    {
+      "action": "재발급 간격 제한",
+      "status": 429,
+      "code": "ORG_EMAIL_CHALLENGE_RATE_LIMITED"
+    },
+    {
+      "action": "다른 이메일에 번호 재사용 거절",
+      "status": 404,
+      "code": "ORG_EMAIL_CHALLENGE_NOT_FOUND"
+    },
+    {
+      "action": "잘못된 번호 거절",
+      "status": 422,
+      "code": "ORG_EMAIL_CODE_INVALID"
+    },
+    {
+      "action": "번호 확인·디렉터리·계정·세션 생성",
+      "status": 200
+    },
+    {
+      "action": "등록 티켓 재사용 거절",
+      "status": 401,
+      "code": "STATE_INVALID"
+    },
+    {
+      "action": "발급된 세션으로 본인 조회",
+      "status": 200
+    },
+    {
+      "action": "이메일 등록 전용 페이지",
+      "status": 200
+    }
+  ],
+  "stateHash": "2c89f4bbccf07f988ab4cc065c6aa85fdf0f49f11dd307a657787f7ab219d4f4",
+  "directoryVersion": 2,
+  "states": 0,
+  "challenges": 0,
+  "accounts": 1,
+  "proofs": 1,
+  "auditCount": 12,
+  "emailTransport": "actual scoped local outbox; SMTP not tested",
+  "fixtureSetup": "explicit DB owner verification/company bootstrap; member ownership acquired by delivered email OTP",
+  "externalGpkiVerified": false,
+  "browserVerified": false
+}

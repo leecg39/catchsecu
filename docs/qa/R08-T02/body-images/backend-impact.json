@@ -1,0 +1,1477 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-10T09:35:22.275Z",
+  "scope": "BI 영향 분석만; 현재 source 파일만 읽고 이 두 문서만 작성",
+  "restrictions": {
+    "productEdits": false,
+    "dbAccess": false,
+    "http": false,
+    "browser": false,
+    "tests": false,
+    "build": false,
+    "generators": false,
+    "fixtureReads": false,
+    "individualQaScriptExecution": false
+  },
+  "baseline": {
+    "sourceMigration": "124 present in source; live database not queried",
+    "frozenFixtureCount": 20,
+    "fixtureCountProvenance": "root instruction; fixtures not opened",
+    "reaEvidence": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "originalBundleSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "sourceReview": {
+      "path": "docs/qa/R08-T02/question-metadata/content-images/source-review.json",
+      "sha256": "dbc1a8dabe0b5d6343fd6c53ccd978f03e9a15f102328046166792ad56c3ddab"
+    },
+    "negativeSearch": {
+      "paths": [
+        "src/contracts/domains.ts",
+        "prisma/schema.prisma",
+        "src/components/forms/PublicForm.tsx",
+        "src/server/answer-validation.ts"
+      ],
+      "terms": [
+        "mainText",
+        "pageContent",
+        "FormPage",
+        "endPage",
+        "privatePage"
+      ],
+      "conclusion": "검토한 FormContent/FormVersion/PublicForm/answer-validation 경계에 페이지 모델·완료/마감 rich body가 없음; 앱 전체 모든 이름의 미존재를 주장하지 않음"
+    }
+  },
+  "findings": [
+    {
+      "id": "BI-I01",
+      "priority": "선행 결정",
+      "title": "단일 body만 존재; 다중 페이지/완료/마감은 별도 모델과 흐름 필요",
+      "evidence": [
+        "BI-E03",
+        "BI-E04",
+        "BI-E39",
+        "BI-E40",
+        "BI-E47"
+      ],
+      "consequence": "root 본문 하나를 추가해도 BI 전체 또는 F4 페이지 기능 완료가 아니다."
+    },
+    {
+      "id": "BI-I02",
+      "priority": "구현 차단",
+      "title": "질문 전용 parent/slot/FK 및 전체핀 동기화를 그대로 사용할 수 없음",
+      "evidence": [
+        "BI-E12",
+        "BI-E14",
+        "BI-E15",
+        "BI-E05"
+      ],
+      "consequence": "purpose 추가만으로 body ref를 저장할 수 없고, 부분 질문 sync는 body pin을 누락/삭제할 수 있다."
+    },
+    {
+      "id": "BI-I03",
+      "priority": "구현 차단",
+      "title": "14MiB는 계약/DB/transport/storage/scanner/데몬 전체 상한 변경이 필요",
+      "evidence": [
+        "BI-E11",
+        "BI-E12",
+        "BI-E14",
+        "BI-E17",
+        "BI-E18",
+        "BI-E19",
+        "BI-E20",
+        "BI-E21",
+        "BI-E22",
+        "BI-E23"
+      ],
+      "consequence": "한 계층만 올리면 나머지 계층에서 거절된다. 일반 파일10MiB/자료5MiB/질문·보기1MiB는 보존해야 한다."
+    },
+    {
+      "id": "BI-I04",
+      "priority": "설계 충돌",
+      "title": "기존 sanitizer는 이미지와 편집기 표시 속성을 제거",
+      "evidence": [
+        "BI-E08",
+        "BI-E09",
+        "BI-E10",
+        "BI-E02"
+      ],
+      "consequence": "sanitize-html 엔진은 재사용 가능하나 메시지/공지 정책 자체의 재사용은 이미지·공백·순수이미지본문을 손상시킨다."
+    },
+    {
+      "id": "BI-I05",
+      "priority": "권한 결정",
+      "title": "공개 전체핀과 viewer 선택질문 필터는 body/end/private 정책을 표현하지 않음",
+      "evidence": [
+        "BI-E26",
+        "BI-E27",
+        "BI-E28",
+        "BI-E30",
+        "BI-E31"
+      ],
+      "consequence": "질문 없는 핀은 viewer에서 제외되거나, 필터를 제거하면 미선택페이지가 노출된다. 마감 화면은 기존 410 gate와 별도 설계가 필요하다."
+    },
+    {
+      "id": "BI-I06",
+      "priority": "호환성 결정",
+      "title": "rich content는 approval fingerprint와 ConsentEvidence.formBody/PDF의 버전 경계",
+      "evidence": [
+        "BI-E05",
+        "BI-E07",
+        "BI-E32",
+        "BI-E33",
+        "BI-E34",
+        "BI-E35",
+        "BI-E36",
+        "BI-E37",
+        "BI-E45"
+      ],
+      "consequence": "기존 body를 HTML로 재해석·정규화하거나 renderer1/2를 바꾸면 기존 해시/표시계약을 깨뜨린다."
+    },
+    {
+      "id": "BI-I07",
+      "priority": "전파 누락 위험",
+      "title": "copy/remap/system template는 현재 질문 자산만 처리",
+      "evidence": [
+        "BI-E06",
+        "BI-E15",
+        "BI-E38",
+        "BI-E46",
+        "BI-E24"
+      ],
+      "consequence": "본문 키/페이지 및 node identity remap까지 원자적으로 확장해야 복사본의 소유권·quota·삭제 독립성을 보장한다."
+    },
+    {
+      "id": "BI-I08",
+      "priority": "자원 결정",
+      "title": "14MiB 한장 허용과 PDF16MiB/JSON1MB·누적이미지 예산은 서로 다른 경계",
+      "evidence": [
+        "BI-E25",
+        "BI-E23",
+        "BI-E35",
+        "BI-E36"
+      ],
+      "consequence": "dataURI로 JSON에 넣지 말고 bytes는 별도 업로드; 총픽셀/레이아웃/출력한도 정책과 preflight 필요."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D01",
+      "topic": "versioned rich-content canonical 저장",
+      "recommended": "기존 body는 그대로 두고 nullable rich-content schema version을 새로 추가; normalized typed document nodes+owned asset UUID를 canonical으로 사용하고 원본 HTML 입출력은 parser/serializer adapter로 연결",
+      "alternatives": [
+        "sanitized HTML + canonical image manifest: SQL과 HTML의 동일성 증명 또는 DB에서 검증 가능한 canonical 구조 필요",
+        "raw HTML 또는 regex img 추출만: pin 정합성과 안전한 round trip을 동시에 충족하지 못하므로 비추천"
+      ],
+      "open": "최종 필드명, HTML allowlist/style/alt/width 규칙, canonical unicode/빈문단 및 총길이 상한은 원본 조사와 root 계획에서 확정"
+    },
+    {
+      "id": "D02",
+      "topic": "page/block 모델",
+      "recommended": "FormVersion에 속한 FormSection(physical ID+logical stableKey+order)와 네 종류의 content block을 표현; flat questions는 유지하되 질문의 page 소속/ordered questionIds를 검증",
+      "alternatives": [
+        "정규화 FormContentBlock + parent FK + image occurrence FK",
+        "versioned JSON AST + nullable pageKey/nodeKey ref + deferred exact projection"
+      ],
+      "open": "F4 페이지 분기/재정렬/삭제 시 질문 처리 및 첫페이지 mainText 의미"
+    },
+    {
+      "id": "D03",
+      "topic": "asset purpose와 위치",
+      "recommended": "원본 네 purpose를 구분; ref의 questionKey/questionId는 질문 슬롯에만 요구하고 body는 block/page/node identity와 exact version/template/approval parent를 사용",
+      "alternatives": [
+        "기존 AuthorAssetReference 확장(권장): 공통 lifetime/GC fence 재사용",
+        "별도 body ref table: 모든 quota/GC/삭제/조회가 두 테이블을 보아야 함"
+      ],
+      "open": "FormSection/ContentBlock 물리 FK vs JSON 논리 key 검증 선택; NULL unique 함정 방지를 위한 slot별 unique index"
+    },
+    {
+      "id": "D04",
+      "topic": "14MiB 전달",
+      "recommended": "새 body purpose만 trusted server constant로14MiB, 기존기본10MiB helpers는 유지; 공통 암호화 포맷/AAD는 변경하지 않고 옵션/전용 wrapper로 저장·읽기·scan 상한 전달",
+      "alternatives": [
+        "global MAX_FILE_BYTES를14로만 변경: 기존 응답파일 계약 확대 위험으로 비추천"
+      ],
+      "open": "daemon streaming/file ceiling, aggregate decode memory/bandwidth budget, S3 bounded GET, 동시 업로드/검사 제한"
+    },
+    {
+      "id": "D05",
+      "topic": "public/end/private/viewer",
+      "recommended": "실제 저장 슬롯별 manifest projection을 먼저 정의; viewer는 선택 질문과 관련 page만 허용할지 또는 body 제외할지 명시. private는 마감화면 의미로 기록",
+      "alternatives": [
+        "end content를 비밀이 아닌 공개 표현으로 명시",
+        "완료 receipt-bound capability로 end만 제공: 별도 토큰/수명/회수 계약 필요"
+      ],
+      "open": "pause/expiry/quota/revoke/회사폐쇄별 마감본문과 이미지 허용, 오래된 링크/미선택페이지·end/private 노출 범위"
+    },
+    {
+      "id": "D06",
+      "topic": "receipt/PDF",
+      "recommended": "기존 evidence0/1 및 저장 pdfCipher/hash 보존. 신규 rich evidence2+별도 rich renderer 버전으로 snapshot과 image hash/size/layout/renderer provenance 저장; stored PDF 재생성 금지",
+      "alternatives": [
+        "텍스트 projection+image manifest만 기록: 이미지 포함 PDF 완료로 세지 않음",
+        "이미지를 PDF에 embed: snapshot고정bytes를 인가된 private storage에서만 로드하고 총출력한도 preflight"
+      ],
+      "open": "main/pages 중 실제 동의 맥락 범위, end/private 제외 원칙, 페이지 방문증명 여부, 다운샘플 정책·원본hash와 PDFderivedhash 분리"
+    }
+  ],
+  "sequence": [
+    {
+      "id": "S0",
+      "depends": [],
+      "deliverable": "원본 BI-01와 D01/D02/D05/D06 확정; 상한/serializer/페이지 개념을 계약 문서로 고정",
+      "completeScope": "계획만"
+    },
+    {
+      "id": "S1",
+      "depends": [
+        "S0"
+      ],
+      "deliverable": "현재 코드 API/DB를 이용한 RED, nullable versioned contract와 sanitizer/AST adapter 및 omission 정책",
+      "completeScope": "rich 계약"
+    },
+    {
+      "id": "S2",
+      "depends": [
+        "S1"
+      ],
+      "deliverable": "14MiB purpose별 상한+storage/scan/daemon+DB additive migration+신규 slot/FK/deferred projection/GC fence",
+      "completeScope": "저장 및 참조 기반"
+    },
+    {
+      "id": "S3",
+      "depends": [
+        "S2"
+      ],
+      "deliverable": "full FormContent atomic sync, root body editor+읽기·copy/template/approval 한 경로 수직검증",
+      "completeScope": "root 본문만 partial; BI 전체 완료 아님"
+    },
+    {
+      "id": "S4",
+      "depends": [
+        "S2",
+        "S3"
+      ],
+      "deliverable": "F4 page identity/order/question mapping/분기와 page/end/private 상태·권한·copy/delete·역사 경로 구현",
+      "completeScope": "네 위치의 실제 동작"
+    },
+    {
+      "id": "S5",
+      "depends": [
+        "S4"
+      ],
+      "deliverable": "evidence2/rich PDF preflight/submit 저장과 기존0/1/rawbytes 불변, retention 및 export 영향 검증",
+      "completeScope": "증거/출력"
+    },
+    {
+      "id": "S6",
+      "depends": [
+        "S3",
+        "S4",
+        "S5"
+      ],
+      "deliverable": "root 단독 DB/HTTP/Ego/재시작/새freeze; 20개 기존fixture는 승인된root보존 절차만 사용",
+      "completeScope": "통과한 BI 하위범위만 checkpoint"
+    }
+  ],
+  "tests": [
+    {
+      "id": "R01",
+      "layer": "contract",
+      "scenario": "기존 plain body에 literal <img>/공백/BOM·Unicode가 있어도 old DTO/JSON/fingerprint/PDF bytes 동일; nullable 신규키 생략",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R02",
+      "layer": "contract/server",
+      "scenario": "rich omission은 현재 동일 version/block 보존, explicit clear만삭제; 과거버전 부활·새page/node 잘못상속금지; legacy client body변경충돌 정책",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R03",
+      "layer": "sanitize",
+      "scenario": "script/onerror/svg/math/iframe/srcdoc/srcset/CSSurl/data/blob/remoteurl/userinfo/entity 인코딩 거절·제거; 허용정렬/폭/alt/링크·순수이미지문단 roundtrip·idempotence",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R04",
+      "layer": "contract/DB",
+      "scenario": "네 purpose/slot 일치, root/page/end/private physical parent FK·node uniqueness·page 소속; typedserver와 directSQL 양쪽 경계",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R05",
+      "layer": "DB concurrency",
+      "scenario": "JSON/AST→pins 정확일치, 추가/삭제 양쓰기순서, FormVersion directSQL root변경↔GC row-lock 경합 및 RR거절; query시간 추정으로 대체하지 않음",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R06",
+      "layer": "file pipeline",
+      "scenario": "원본에맞는 정상PNG/JPEG14MiB경계/초과/손상/hash/MIME/content-length/chunked; PUT→encrypt→read→ClamAV→complete→download hash; system import/S3도 같은 경계",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R07",
+      "layer": "negative compatibility",
+      "scenario": "일반FILE10MiB·material5MiB·QI/option1MiB 그대로; BI MIME를문서purpose·QI슬롯으로주입거절",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R08",
+      "layer": "resource",
+      "scenario": "8M픽셀/8192변/메타데이터·동시decode·전체form이미지예산·500k텍스트/250page/16MiB PDF 충돌; watchdog자식프로세스로유한실행검증",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R09",
+      "layer": "forms",
+      "scenario": "질문만수정/제목만수정이root/page/end/private pin을지우지않음; body만수정이질문핀을지우지않음; stale409/audit실패전체rollback",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R10",
+      "layer": "pages",
+      "scenario": "최소2페이지에중복이미지, 질문이동·재정렬·삭제/취소·분기·숨긴필수/이전응답정정; 첫페이지mainText와둘째pageContent구분",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R11",
+      "layer": "copy/template",
+      "scenario": "같은/다른서비스 및 system공용template use 새owner+같은blob+각소유quota; 명시copy page/node/HTMLkey remap; pure revise만기존owner유지",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R12",
+      "layer": "lifecycle",
+      "scenario": "template 수정/삭제, 페이지단독삭제, 임시업로드TTL, 마지막핀후grace, 다른owner생존, 격리된기존pin유지/신규attach거절, GC/copy 경쟁",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R13",
+      "layer": "approval",
+      "scenario": "네 위치각수정→승인무효, 이전snapshot 핀/bytes불변, 새로운승인후게시; 게시page/block directSQL 변경거절",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R14",
+      "layer": "public gates",
+      "scenario": "활성/정원종료/일시중지/만료/회수/회사폐쇄의root/page/end/private JSON·manifest·직접bytes 각각범위; 토큰재사용·역사URL 정책",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R15",
+      "layer": "viewer",
+      "scenario": "선택page/질문경계와root/end/private 정책검증; 미선택404·revoke401·응답기한410, 공유발급자권한회수 및 deadline끝재검사",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R16",
+      "layer": "receipt/PDF",
+      "scenario": "신규rich컨텍스트+16언어+14MiB image 누적preflight, 실제consent제출 pdfCipher복호화/hash/시각/재읽기 동일; 구0/1원문/renderer1·2 독립golden 동일",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R17",
+      "layer": "UI/API",
+      "scenario": "서버확정schema없이UI키생성금지; upload완료전 save barrier, 삭제/페이지변경/서비스변경/undo 후늦은결과 revive금지; 모바일·RTL·폭/alt·깨진이미지 fallback",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R18",
+      "layer": "migration/restart",
+      "scenario": "기존20fixture 원문불변은root전용절차; 새컬럼null+공통열hash·적용파일checksum·빈스키마·drift; freeze후HTTP/DB UI읽기금지",
+      "status": "planned-not-executed"
+    },
+    {
+      "id": "R19",
+      "layer": "export/import",
+      "scenario": "CSV답변열/body없음 유지 및기존다운로드hash; import폼에 rich/page를 임의생성하지않음; 원본답변PDF 기능은기존textPDF와구분",
+      "status": "planned-not-executed"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "BI-E01",
+      "path": "docs/qa/R08-T02/question-metadata/content-images/PLAN.md",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/PLAN.md",
+      "symbol": "BI-01..07",
+      "fileSha256": "9a1316bba6819b89e9bbaa1eb37ef5cf1f71442eeacad245be3901deaab44db9",
+      "lineCount": 69,
+      "ranges": [
+        {
+          "start": 50,
+          "end": 58,
+          "sha256": "073c319b7b78c9b643599c6f677b3c2e3b89bf651cc6b1a449ff8e9f008b0e30"
+        }
+      ],
+      "fact": "현재 승인 계획은 본문·페이지·완료·마감과 PDF를 별도 BI 단계로 남긴다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E02",
+      "path": "docs/qa/R08-T02/question-metadata/content-images/source-review.md",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.md",
+      "symbol": "원본 정적 관측",
+      "fileSha256": "aab39af92cc41508f793ac20047202afcf260ab8ccb90c17aff63e51b726ccd8",
+      "lineCount": 86,
+      "ranges": [
+        {
+          "start": 13,
+          "end": 27,
+          "sha256": "65604fd54d2df0c9a84b534f65c81eaea52f7bb424147f8d347c95f8a832bbed"
+        },
+        {
+          "start": 41,
+          "end": 70,
+          "sha256": "762c3c8efdd8e4e376258a12cff9a2f6df2d6c42818cc1562a8045a966b6ab0a"
+        },
+        {
+          "start": 77,
+          "end": 85,
+          "sha256": "366e98bbbe739f795f57499e575eb2c76ac0179802cd42ab16e2a4a98027b5a1"
+        }
+      ],
+      "fact": "mainText/pageContent HTML, 네 purpose, 14MiB, URL 집합, 페이지 복제/PDF 서버 미관측을 구분한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E03",
+      "path": "src/contracts/domains.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/domains.ts",
+      "symbol": "formContentSchema/validateFormForPublish",
+      "fileSha256": "c1a51de6cf042c32fbe7ed888ccac4584b2ef93fbeb1b7ab1c570bcbac389a9b",
+      "lineCount": 69,
+      "ranges": [
+        {
+          "start": 10,
+          "end": 29,
+          "sha256": "79af25bee9792c57e4f8e1078c5b4f5899ef907b0bc2c88ffc1105474254d050"
+        },
+        {
+          "start": 53,
+          "end": 69,
+          "sha256": "c65abff7f8a3b626054f8aa5af069085b8f3aaebdacc4f2e9ae3bba5fc142d4c"
+        }
+      ],
+      "fact": "body 문자열·flat questions 엄격 계약이며 페이지/end/private 필드가 없다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E04",
+      "path": "prisma/schema.prisma",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/schema.prisma",
+      "symbol": "FormVersion/Question/AuthorAssetReference",
+      "fileSha256": "681d92b1a4bcfa5a5dc59db0b9ce8111801a9041a2e90ac394d114e8be377006",
+      "lineCount": 2667,
+      "ranges": [
+        {
+          "start": 1278,
+          "end": 1345,
+          "sha256": "939e50b5a7e2ac188f95c0e9150ff8bf05bed8d2b912bbc366310d9fe487d886"
+        },
+        {
+          "start": 1363,
+          "end": 1432,
+          "sha256": "7e48d4342da20e2fb33a0870837fcc3fba855e92d2ba4c12360b402b0bd159fc"
+        },
+        {
+          "start": 1441,
+          "end": 1486,
+          "sha256": "3bc4957949a003b88c8e257754ac08b243c4719ad6dc9c2a648dc44d55ebdb9f"
+        },
+        {
+          "start": 1584,
+          "end": 1600,
+          "sha256": "5074ac769e2e19edfce89c108d1616cd0f2ce47afea175326cec31a80e573ae2"
+        }
+      ],
+      "fact": "버전 body 하나, 질문에 결합된 ref, template/approval JSON, receipt에 저장 PDF가 존재한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E05",
+      "path": "src/server/forms.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts",
+      "symbol": "contentDto/fingerprint/createVersion/writeQuestions/updateFormDraft/publish/copy/purge",
+      "fileSha256": "fa1f4d1988ad3f88a22b2c8a08dff9396dfd44ff2945482f874c24c371b5789c",
+      "lineCount": 508,
+      "ranges": [
+        {
+          "start": 46,
+          "end": 94,
+          "sha256": "c38d0f097c06f499bda5674a686f4c9fd54be1578648c9f6855374249f14aab8"
+        },
+        {
+          "start": 152,
+          "end": 163,
+          "sha256": "447b4be9c46e3bb570191e96c4935eaa665f99f8ad489eb916c36dc8e76d56b1"
+        },
+        {
+          "start": 243,
+          "end": 285,
+          "sha256": "a1ff6c6bb880cc6511e541e457345fc9109fba0b97c300510a82c578b62d43a7"
+        },
+        {
+          "start": 294,
+          "end": 314,
+          "sha256": "e9609684c4c3d044ff79d4c1bda926704da87c668c38e8096545ad6eed4cf3cf"
+        },
+        {
+          "start": 393,
+          "end": 449,
+          "sha256": "c68a4161f6d67fa5515f885eaa1f811da5c672f269b8a2d9078a8761a1d776ff"
+        }
+      ],
+      "fact": "현재 DTO/hash/쓰기/pin은 body+questions를 사용하며 writeQuestions 내부가 부모의 모든 refs를 동기화한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E06",
+      "path": "src/server/templates.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/templates.ts",
+      "symbol": "dto/createTemplate/updateTemplate/deleteTemplate/useTemplate",
+      "fileSha256": "d19e613ed66d87ce473d206afcdad90f4ed994453fa5dbb596f59cfbbb684946",
+      "lineCount": 145,
+      "ranges": [
+        {
+          "start": 24,
+          "end": 37,
+          "sha256": "7ef11a04bbeeed53b644196e453298ff708b52db3a59580a470a858563c1d062"
+        },
+        {
+          "start": 93,
+          "end": 145,
+          "sha256": "b1c03b045138271d75082da6b40b9defa48a23d770cedb2594728069afba26ae"
+        }
+      ],
+      "fact": "등록은 같은 서비스 키를 pin하고 use는 copyAuthorAssets 후 cloneFormContent를 사용한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E07",
+      "path": "src/server/approvals.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/approvals.ts",
+      "symbol": "requestApproval/decideApproval",
+      "fileSha256": "d550157b8b187054e9bd84f1b44c8dc66be487d32fbb0a2716fa1fbcb671681a",
+      "lineCount": 128,
+      "ranges": [
+        {
+          "start": 30,
+          "end": 56,
+          "sha256": "a0d9d5fceccc44bf649b60964933707a554075750ca808532426a0843c240915"
+        },
+        {
+          "start": 108,
+          "end": 126,
+          "sha256": "89bed0cf68ea7a1867d2d1d4558834ab5ff38be138c4185366e6ddfc5a3aed10"
+        }
+      ],
+      "fact": "contentDto snapshot·fingerprint·독립 pin을 승인 트랜잭션에 저장하고 현재 버전/정책을 대조한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E08",
+      "path": "src/server/message-content.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/message-content.ts",
+      "symbol": "sanitizeMessageHtml/normalizeMessageContent",
+      "fileSha256": "d9bc962cab3a45de379cf83c4f0ca4690a8e75cdaba09176ae97b56179d15f4c",
+      "lineCount": 44,
+      "ranges": [
+        {
+          "start": 5,
+          "end": 33,
+          "sha256": "af15ae1dfb9a41ad369003d22e2e5e86827c74718e8f821ba49f90f4b6ce6b5c"
+        }
+      ],
+      "fact": "sanitize-html 기반이나 img/style 제거·메시지 변수 제한·텍스트 없는 HTML 거부라는 메시지 전용 정책이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E09",
+      "path": "src/server/notices.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/notices.ts",
+      "symbol": "cleanBody",
+      "fileSha256": "bc146cd4945cbaff1e53c21594ac513e19009910e675d06b9f6a2649aa5f8683",
+      "lineCount": 96,
+      "ranges": [
+        {
+          "start": 12,
+          "end": 17,
+          "sha256": "333e37bd5ed3e48b391c4ae9bc71a89b43be309ae97a3ef0f5f747a356346e5f"
+        }
+      ],
+      "fact": "공지 sanitizer도 img 미허용이며 trim 처리한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E10",
+      "path": "package.json",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/package.json",
+      "symbol": "sanitize-html dependency",
+      "fileSha256": "72e6da47b4cdba56ba9713a5d60b8a5cab6c7b2a6c602bc7176ddb8012e0f2f9",
+      "lineCount": 86,
+      "ranges": [
+        {
+          "start": 45,
+          "end": 54,
+          "sha256": "26aeb66491352e31d0e757b8cd54a09a466cd9bd86ba217d09aee7a466a559af"
+        },
+        {
+          "start": 63,
+          "end": 70,
+          "sha256": "17214c2caa0028759754f777ba20f2da830589275deaa897101fa3e887130606"
+        }
+      ],
+      "fact": "sanitize-html 2.18.0을 직접 의존성으로 보유한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E11",
+      "path": "src/contracts/author-assets.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/author-assets.ts",
+      "symbol": "purposes/byteLimit/uploadInput/readScope",
+      "fileSha256": "960f4889d4f30e9622ff0eee0ac98d442ffc68fcf5ac147c6cf272ffdaef6c37",
+      "lineCount": 67,
+      "ranges": [
+        {
+          "start": 3,
+          "end": 45,
+          "sha256": "68c61ebf0dc8827189edfb960ec0c1d574b49249c5d654247764bac49886d31d"
+        },
+        {
+          "start": 54,
+          "end": 67,
+          "sha256": "442c0f2ef4d00903107588091086584037d4defb78a5ba3be320f691b2437e7b"
+        }
+      ],
+      "fact": "현재 purpose 3종, asset 입력 절대상한 5MiB, 이미지 1MiB; 멤버 scope는 form/template/approval/submission이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E12",
+      "path": "prisma/migrations/20261025012000_author_assets/migration.sql",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261025012000_author_assets/migration.sql",
+      "symbol": "blob bound/ref constraints/locks/graph",
+      "fileSha256": "059e740f4de7e93da25ab997610d041c6ce581e1860af456197fcf6aff5e005e",
+      "lineCount": 383,
+      "ranges": [
+        {
+          "start": 2,
+          "end": 62,
+          "sha256": "fdf3b0eb32e96c5c7bb0dbc7fdce5af7ad123169092740f6c4d97421ae22062d"
+        },
+        {
+          "start": 93,
+          "end": 98,
+          "sha256": "3733a782b8be55f4b6220478150c23bf36a0c3f616d9a347d445b5abc317096e"
+        },
+        {
+          "start": 138,
+          "end": 160,
+          "sha256": "1be978fa87fec68fb16e5cdf2ba2c5d447cf540f30bcfd7c64b3c1afd19fa94b"
+        },
+        {
+          "start": 200,
+          "end": 241,
+          "sha256": "b258bac69876d783c2c6bde3083b576912b5cdb1a83386e1cee0087d5f9598a5"
+        },
+        {
+          "start": 282,
+          "end": 292,
+          "sha256": "5a029b40f66c3b482573813668312c268a9434cddc82554a7f7a7a2bc91ea691"
+        },
+        {
+          "start": 339,
+          "end": 383,
+          "sha256": "75b5c63a3729ef3a1cefd8855a87c74ee3b6ebc34756e6328cb7ed254f15a757"
+        }
+      ],
+      "fact": "blob 5MiB, 질문 키 필수·version ref의 물리 질문 필수; RC·immutable·GC fence·deferred graph의 기반이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E13",
+      "path": "prisma/migrations/20261025013000_author_assets_expiry_precision/migration.sql",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261025013000_author_assets_expiry_precision/migration.sql",
+      "symbol": "expiry precision",
+      "fileSha256": "af90851ed0a690711627d2b4d05fd9479d6a13b85b3e59ece1fe3590b8ef4269",
+      "lineCount": 40,
+      "ranges": [
+        {
+          "start": 1,
+          "end": 12,
+          "sha256": "c8549134fadeb84a2d1e3fe35dd6b6b6f08eb253f7e2e14007702866cd946d7f"
+        }
+      ],
+      "fact": "적용된 예약 시각 정밀도 보완을 유지해야 한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E14",
+      "path": "prisma/migrations/20261025014000_question_images/migration.sql",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261025014000_question_images/migration.sql",
+      "symbol": "check_author_asset/author_asset_expected/version_content/parent/lock",
+      "fileSha256": "11e867719285a0124a40517d159ce23942aea249c41876ff6735f170507bce49",
+      "lineCount": 182,
+      "ranges": [
+        {
+          "start": 9,
+          "end": 20,
+          "sha256": "da30eaee7cfdba92de811771368d0e4f84f90dc9c2cdbb6170105209d1636658"
+        },
+        {
+          "start": 22,
+          "end": 58,
+          "sha256": "9c60588cc9b6ec8b2f8ce6e852822f38ec21c054b90bb2f2b8025252a7f4aa79"
+        },
+        {
+          "start": 60,
+          "end": 141,
+          "sha256": "8e80865543ec9b354f456063fdfff2c4ea6f8e711d8af7381d8568cb0b8b1ff0"
+        },
+        {
+          "start": 143,
+          "end": 181,
+          "sha256": "f2ed8ac1cbdbf111d71ea2f484628d5f35b0a5133036420e1764363dd90a032d"
+        }
+      ],
+      "fact": "현재 최종 purpose/slot/SQL projection은 세 질문 자산으로 한정된다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E15",
+      "path": "src/server/author-asset-references.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/author-asset-references.ts",
+      "symbol": "authorAssetSlots/withAuthorAssetReferences/assertAuthorAssetReferences/copyAuthorAssets",
+      "fileSha256": "db29e009b48e9323cb39bd73454df2fdf8b36d80161a7148916297f8e15e3286",
+      "lineCount": 152,
+      "ranges": [
+        {
+          "start": 10,
+          "end": 61,
+          "sha256": "bd5420eeec61ff2f2717712c78bbae7e20918afe0aa0c2c488cc51f668933fa7"
+        },
+        {
+          "start": 76,
+          "end": 151,
+          "sha256": "4d9142c21fa9e1ce780cb0df6359876f49d72d2512e3b365f8e6edbed9943f9e"
+        }
+      ],
+      "fact": "입력은 질문 배열, 물리 질문 FK 필요, asset→blob 정렬 잠금, 부모 전체핀 비교/교체, 복제는 질문 키만 remap한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E16",
+      "path": "src/server/author-asset-uploads.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/author-asset-uploads.ts",
+      "symbol": "init/PUT/complete/read/response/GC",
+      "fileSha256": "e5e2d4279fa2d7972c480c8dd19b1eb09c4d77ba1b75c32acff2f501005e8208",
+      "lineCount": 220,
+      "ranges": [
+        {
+          "start": 28,
+          "end": 50,
+          "sha256": "4947afd0c273d7c67acd6e5a36273efffe1092489f52cdc98e6e6d8730348954"
+        },
+        {
+          "start": 57,
+          "end": 75,
+          "sha256": "0084a264436746761b03d7af00ee0225f8cfadd7f16ab9e13e2935b547b36b5e"
+        },
+        {
+          "start": 90,
+          "end": 151,
+          "sha256": "0623a2e7c9db509a38565281c72a43a7dc881475c6e47d2f069d558e2a670b09"
+        },
+        {
+          "start": 160,
+          "end": 219,
+          "sha256": "16f114201a9f350c0ffe71883ec38e4f99710006dc657ecbd288f55dc8eef99d"
+        }
+      ],
+      "fact": "durable reservation, private bytes, scanner, purpose inline, pinned 삭제 차단 및 최종 blob owner GC를 재사용할 수 있다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E17",
+      "path": "src/server/file-validation.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-validation.ts",
+      "symbol": "readFileBody",
+      "fileSha256": "98738853c605eb95fc53acea63ac72ef8d13a790e0a9d00b0ab08a01fa402b9c",
+      "lineCount": 48,
+      "ranges": [
+        {
+          "start": 30,
+          "end": 48,
+          "sha256": "c718edaf201292110b377bd51f5e64b77edfc12c2f5d3c3c68c24ec5c3ce0f08"
+        }
+      ],
+      "fact": "스트리밍 읽기는 전역 MAX_FILE_BYTES와 예약 size에 모두 제한된다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E18",
+      "path": "src/contracts/files.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/files.ts",
+      "symbol": "MAX_FILE_BYTES",
+      "fileSha256": "fed0f280c4b41468f8e9eafa4a6792568d9da55b99e1965254201234c937c0cd",
+      "lineCount": 15,
+      "ranges": [
+        {
+          "start": 1,
+          "end": 10,
+          "sha256": "bdf4a3d9712404e848d324469a3698a450165737407342673fb150be21007dee"
+        }
+      ],
+      "fact": "일반 응답 파일 등 기존 공통 상한은 10MiB이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E19",
+      "path": "src/server/file-storage.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-storage.ts",
+      "symbol": "PrivateFileStorage/encryptStoredObject/decryptStoredObject/localFiles",
+      "fileSha256": "c170df25a5ef48b73cea4470895768185244ec6d690461f955baed5f102c3da7",
+      "lineCount": 89,
+      "ranges": [
+        {
+          "start": 11,
+          "end": 34,
+          "sha256": "5170ea2167932eb7f2c5ca7b85b5eed8db2c6d627a5a4cb25df466bb57a568b4"
+        },
+        {
+          "start": 53,
+          "end": 88,
+          "sha256": "dfbc9c929739ea7fc785a8ee7d8f611dc72bdcbec7b2bb60bf01ee147be5dc6a"
+        }
+      ],
+      "fact": "암호화 쓰기 10MiB·복호화 10MiB+32 및 버퍼 전체 읽기이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E20",
+      "path": "src/server/s3-storage.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/s3-storage.ts",
+      "symbol": "createS3FileStorage",
+      "fileSha256": "315cc789bb1ae00c272bf6e83909eef046662f8138698ab3243fc27c26374663",
+      "lineCount": 59,
+      "ranges": [
+        {
+          "start": 32,
+          "end": 58,
+          "sha256": "09915f067e54c480ab2b6610747ae2b36a021518be562473ac8f96ef1624c587"
+        }
+      ],
+      "fact": "S3 write에도 10MiB 제한, GET도 공통 decrypt를 통과한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E21",
+      "path": "src/server/file-scanner.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-scanner.ts",
+      "symbol": "scanFile",
+      "fileSha256": "2d09f1f2f7be3c3fce7dce442b0ddcc6791a6324978269a709dd390795b4431e",
+      "lineCount": 47,
+      "ranges": [
+        {
+          "start": 8,
+          "end": 25,
+          "sha256": "704e44fce5e5ed3e1b6ab1350762a745151570e693cf2db4733f0997bd37e100"
+        },
+        {
+          "start": 28,
+          "end": 46,
+          "sha256": "7986ee080f40c19a92e73ec5b353c7252fc218622e2d6bfdf121bfbd99ee47f0"
+        }
+      ],
+      "fact": "scanFile은 10MiB 제한이며 ClamAV INSTREAM에 한 버퍼를 복사한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E22",
+      "path": "scripts/clamav-local.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/clamav-local.ts",
+      "symbol": "configure",
+      "fileSha256": "b0ba2a8f76d499df306ae7c4478283f857c50f96658c074e8bc83fcf2c9e0250",
+      "lineCount": 38,
+      "ranges": [
+        {
+          "start": 11,
+          "end": 21,
+          "sha256": "f1d4f8ac40746fdc25d03ff7d7f672607f32df64a3c69fdb70eb498b2181cc7c"
+        }
+      ],
+      "fact": "생성하는 데몬 설정은 StreamMaxLength/MaxFileSize 11M, MaxScanSize 20M이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E23",
+      "path": "src/server/author-asset-validation.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/author-asset-validation.ts",
+      "symbol": "AUTHOR_ASSET_VALIDATION_LIMITS/validateImage/validateAuthorAssetBytes",
+      "fileSha256": "1d9c3e8a6bd8083e22fad512333cc5ff4267ed8255d0f087a7bee06eb1976965",
+      "lineCount": 347,
+      "ranges": [
+        {
+          "start": 11,
+          "end": 26,
+          "sha256": "81dd2796721f0b56be161d75369c7a21e0ed22aa8f4578f9fad9bc6c837276ca"
+        },
+        {
+          "start": 244,
+          "end": 247,
+          "sha256": "524cdbcdcd4057b462ed42ed93b3a054d8415c0009fb028c83687d45b762934b"
+        },
+        {
+          "start": 307,
+          "end": 342,
+          "sha256": "0d8f54487bf72693997cb2933c212b94ddc2a0509d0c6ed176ff06bfd010277c"
+        }
+      ],
+      "fact": "현재 독립 이미지 처리상한 8192변·8M픽셀·채널4·3초·동시2 및 실제 sharp 디코드이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E24",
+      "path": "src/server/file-quota.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-quota.ts",
+      "symbol": "lockFileQuota/fileQuotaUsage/reserveQuota",
+      "fileSha256": "48b8aba7fdf6db82e34b48d70621f4f7b22677a17140aca9268d9e53375bc423",
+      "lineCount": 22,
+      "ranges": [
+        {
+          "start": 6,
+          "end": 21,
+          "sha256": "de539164106af3d4bd04881c4d5be3036f951ba9f4faa09197344c925930f613"
+        }
+      ],
+      "fact": "Company UPDATE를 actor SHARE 이전에 잡고 logical AuthorAsset size도 quota에 합산한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E25",
+      "path": "src/server/http.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/http.ts",
+      "symbol": "body",
+      "fileSha256": "90a64265bf3c6651a7678435fa5b8cc1ea886094ab36cb216d8062270e3de1a6",
+      "lineCount": 91,
+      "ranges": [
+        {
+          "start": 14,
+          "end": 30,
+          "sha256": "5f871d8a6f1993598e8b32e4a040b836d9c7edaa0fd5086384630058b95ab137"
+        }
+      ],
+      "fact": "JSON body는 Content-Length 여부와 무관하게 최대 1,000,000 bytes를 스트림으로 검사한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E26",
+      "path": "src/server/author-asset-reads.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/author-asset-reads.ts",
+      "symbol": "readPinnedAuthorAssets/lockMemberParent/memberAuthorAssets/publicAuthorAssets",
+      "fileSha256": "eb8f37c0e7bf4d54ae932c4316d359485f358c4bf4dedd165e676e225d0dd03e",
+      "lineCount": 103,
+      "ranges": [
+        {
+          "start": 18,
+          "end": 102,
+          "sha256": "ab4d7b07d5ead6a0dad8b5f4316887920ef1628051f160468f6ad402aa45374e"
+        }
+      ],
+      "fact": "public은 활성 version 전체핀, viewer용 필터는 questionKeys, submission은 고정 version+기한을 사용한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E27",
+      "path": "src/server/public-publication.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/public-publication.ts",
+      "symbol": "lockPublicPublication",
+      "fileSha256": "599a4b65169b0af465c572bbf00a779768eb57ddbbcb6ef110139eaeac4f034c",
+      "lineCount": 22,
+      "ranges": [
+        {
+          "start": 4,
+          "end": 21,
+          "sha256": "bdeb10ad6a737312bed5a202950b714ffa0471c0abf3e52063e06e8f6dc000f8"
+        }
+      ],
+      "fact": "현재 활성 최신 published+service/company+expiry gate이며 paused/revoked/expired는 410이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E28",
+      "path": "src/server/submissions.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+      "symbol": "publicForm/submitForm",
+      "fileSha256": "e199495671ee028ee30e85bc1e81ed9f7534de6920d5cf329671681fa87ee02a",
+      "lineCount": 144,
+      "ranges": [
+        {
+          "start": 27,
+          "end": 45,
+          "sha256": "c4f98844a737302eda5b2c0991a75ef5d5b0c0584cea042553c35d72f9ef9f38"
+        },
+        {
+          "start": 72,
+          "end": 119,
+          "sha256": "13d52b50fd8da62de6bc63b900b98759c99e9eab26b7eee47e7212a13d3cfcdb"
+        }
+      ],
+      "fact": "공개 DTO는 관리자 분류만 제거하고 contentDto를 반환; 모든 flat question 답변 검증 후 같은 트랜잭션에서 receipt를 생성한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E29",
+      "path": "src/server/submission-management.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+      "symbol": "getSubmission/correctSubmission",
+      "fileSha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+      "lineCount": 155,
+      "ranges": [
+        {
+          "start": 39,
+          "end": 80,
+          "sha256": "321be0fdcbf352a4423c72026513f506096bfc65050c51341d2e333f239c858e"
+        }
+      ],
+      "fact": "과거 질문은 고정 formVersion에서 반환하나 전체 body/page DTO는 반환하지 않는다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E30",
+      "path": "src/contracts/sharing.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/sharing.ts",
+      "symbol": "ViewerInfo/SharedQuestion",
+      "fileSha256": "0471a52d5b628bfc274af445e25ccf61aca383299c32bf9c28191091658b0d0e",
+      "lineCount": 37,
+      "ranges": [
+        {
+          "start": 23,
+          "end": 36,
+          "sha256": "c13d8e12b0d57b38ce56c7df95606e18473b9f7a6eb4262d81f65f649494d0b1"
+        }
+      ],
+      "fact": "공유 DTO는 선택 질문+제목 중심이며 body/page가 없다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E31",
+      "path": "src/server/viewer.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/viewer.ts",
+      "symbol": "viewerInfo/sharedAuthorAssets",
+      "fileSha256": "ee6e63a7d97a7c952df1af20036e125113f8d17d323cfdaa813c451d5a98b59e",
+      "lineCount": 220,
+      "ranges": [
+        {
+          "start": 94,
+          "end": 124,
+          "sha256": "3c86687c05e987740f33a1a9c5c7c2c9e796010fba86359819dc91478544bc7d"
+        },
+        {
+          "start": 212,
+          "end": 219,
+          "sha256": "7d4356c5b281fea2cd2502ff31218512647eade8a4995a0fb8da03dc2550d9ce"
+        }
+      ],
+      "fact": "공유 인증·기한 재검사 후 선택 질문 키로 pins를 한정한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E32",
+      "path": "src/contracts/form-documents.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-documents.ts",
+      "symbol": "ConsentEvidence",
+      "fileSha256": "0e9e5ce72c7a8539ccf358096f1a2274fc3f2b0b4fb057150686b25893161af6",
+      "lineCount": 17,
+      "ranges": [
+        {
+          "start": 6,
+          "end": 17,
+          "sha256": "c6f48a9592df68fde15efa45423f886b41d0a325da571789a2fa12172f0472cc"
+        }
+      ],
+      "fact": "schemaVersion1 formBody 문자열과 동의 문서 bundle만 정의한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E33",
+      "path": "src/server/consent-receipts.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/consent-receipts.ts",
+      "symbol": "evidenceFor/renderConsentEvidence/evidencePdf/preflight/create/read",
+      "fileSha256": "8fd52962540ba0c9d10b4fc5e5d373512a14dfc2dc8cf82486f2bc5616741a00",
+      "lineCount": 93,
+      "ranges": [
+        {
+          "start": 20,
+          "end": 91,
+          "sha256": "dfe4ce0e41739e255c9f2eac7ab51596f783f21d350aaafbdcd499e06732189a"
+        }
+      ],
+      "fact": "body를 증거에 넣고 text PDF를 생성·암호화 저장하며 이후 저장 bytes를 검증하여 반환한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E34",
+      "path": "src/server/form-documents.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/form-documents.ts",
+      "symbol": "consentVersionInclude/writeFormConsent",
+      "fileSha256": "796e7008423cc20d44bf29c027c998e20b3067f74875836687c5d5a3145caf88",
+      "lineCount": 95,
+      "ranges": [
+        {
+          "start": 12,
+          "end": 20,
+          "sha256": "908276dc73929aabfd96d250657dd58a75a5814a0bd2389f4566dccbaae248a5"
+        },
+        {
+          "start": 82,
+          "end": 95,
+          "sha256": "47481e8b70b547e9fab9caea1c823230c75a1fa6c260ab5ad68ce263c55059ab"
+        }
+      ],
+      "fact": "writeFormConsent는 receiptEvidenceVersion=1을 설정하므로 rich receipt 버전 도입 시 writer도 함께 분기해야 한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E35",
+      "path": "src/server/pdf-renderer.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/pdf-renderer.ts",
+      "symbol": "PdfSource/renderPdf",
+      "fileSha256": "64769537b279db6a46e6709699a57ca2bceb0029226fac8c3a8e574254dc21e5",
+      "lineCount": 76,
+      "ranges": [
+        {
+          "start": 8,
+          "end": 30,
+          "sha256": "62ef2db2554024420bdef4515c10c9a2a0e26d8a85395e894c8c10ef0e142e32"
+        },
+        {
+          "start": 47,
+          "end": 65,
+          "sha256": "df26d99c9cdfa470db313e95d695ba95df5a613837140ef8dbcd0f27b4c601f3"
+        }
+      ],
+      "fact": "v1 text 렌더와 글자 기반 v2 dispatch; 500k문자·250페이지·16MiB 제한이며 이미지 입력이 없다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E36",
+      "path": "src/server/pdf-renderer-v2.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/pdf-renderer-v2.ts",
+      "symbol": "renderPdfV2",
+      "fileSha256": "23d96f6477c31c70cfbfd53621194c3b6a19f4c42679960493f2d7bba1642045",
+      "lineCount": 122,
+      "ranges": [
+        {
+          "start": 56,
+          "end": 76,
+          "sha256": "6888c2d488bd146b0446a5ab384ec2626ffe37018ac5cb6e0f6468c170b8f2c9"
+        },
+        {
+          "start": 93,
+          "end": 120,
+          "sha256": "f8ff5f91f47e2384afe3eca4204bd6290f04fe6943717b0e73b178018cb82e4a"
+        }
+      ],
+      "fact": "다국어 v2도 text layout 전용이며 rich HTML/image renderer가 아니다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E37",
+      "path": "src/server/document-pdf.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/document-pdf.ts",
+      "symbol": "storedPdf",
+      "fileSha256": "85cb22811131d253662fb30923ecd0110c4d4d0ed3bc4b923a2aff9a95ce77d6",
+      "lineCount": 45,
+      "ranges": [
+        {
+          "start": 10,
+          "end": 24,
+          "sha256": "e7427bcabb62cf0c7b7f583a8ff2f866c2ad417817b20b75890f01135ba8dab2"
+        }
+      ],
+      "fact": "DocumentPdf는 existing bytes 우선 및 renderer 반환 metadata 저장; ConsentReceipt와 다른 저장 모델이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E38",
+      "path": "src/contracts/form-copy.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-copy.ts",
+      "symbol": "cloneFormContent",
+      "fileSha256": "f7116f6021716937822e1eb5074d8ec1b21323e7d24fe558829ea99c7074f260",
+      "lineCount": 23,
+      "ranges": [
+        {
+          "start": 4,
+          "end": 22,
+          "sha256": "6ef327e064ca3cbc7eac00245159be2e32f001cda756d75558d285b039871604"
+        }
+      ],
+      "fact": "질문·보기·행·조건·마케팅 ID만 remap하며 page/block/node ID는 없다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E39",
+      "path": "src/components/forms/PublicForm.tsx",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+      "symbol": "public/receipt/closed branches",
+      "fileSha256": "e8e297ab3e9d06010546ec1d15400d29ce3920bba60df849d0e4496dca02d642",
+      "lineCount": 164,
+      "ranges": [
+        {
+          "start": 129,
+          "end": 163,
+          "sha256": "3ba776772e50c31a67b1a6f486fb81f61790b2d4352a21c5496b2d55cb6ef4d3"
+        }
+      ],
+      "fact": "한 form의 flat questions; 완료/마감은 고정 문자열, body는 React 평문으로 표시한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E40",
+      "path": "src/components/forms/FormEditor.tsx",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+      "symbol": "emptyContent/body editor",
+      "fileSha256": "1806e7d68652a33ff1b02e262e549be1e68a60646a1154f5a7dcca0afc12669d",
+      "lineCount": 263,
+      "ranges": [
+        {
+          "start": 32,
+          "end": 35,
+          "sha256": "c828b044e0a40ef04e16ef97df9b2d4da0e5a6552f51037c9d529ed08f3cdd66"
+        },
+        {
+          "start": 189,
+          "end": 198,
+          "sha256": "961cb7aff8db5a48621bd6d6f3951f626fb23f4ad5eab966f77a245491047c9e"
+        },
+        {
+          "start": 251,
+          "end": 256,
+          "sha256": "8bbca5bca5bd69dd09554d4d534dd8591d484c782af620dae10dd61d9aa62f0d"
+        }
+      ],
+      "fact": "textarea 단일본문 및 showSubmitNotice만 존재한다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E41",
+      "path": "src/components/forms/Approvals.tsx",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/Approvals.tsx",
+      "symbol": "approval snapshot",
+      "fileSha256": "820dda90a1d9373a55146dac3d5fd8bf96f7bc0f64f9b6434bc3c6aab784d3aa",
+      "lineCount": 91,
+      "ranges": [
+        {
+          "start": 69,
+          "end": 76,
+          "sha256": "f60ab2750d5977c25dc4e0d19b5481b378338e7bbce4cf094425da742cdd4436"
+        }
+      ],
+      "fact": "snapshot.content.body 평문 및 hasAuthorAssets(questions)로 provider를 켠다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E42",
+      "path": "src/lib/author-assets.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/author-assets.ts",
+      "symbol": "uploadAuthorAsset/hasAuthorAssets",
+      "fileSha256": "264ef93a1ca9c8352bd73ea180db75c3510a5fea1afc9de6f8f65c88bb21ecd4",
+      "lineCount": 62,
+      "ranges": [
+        {
+          "start": 19,
+          "end": 58,
+          "sha256": "6aa14432f3de3bebe86d196e9b0e8c4a140ea05b2c24cc45805ab0216ccd9a90"
+        }
+      ],
+      "fact": "purpose가 결정된 업로드 파이프와 질문 배열만 보는 자산 탐색 helper이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E43",
+      "path": "src/lib/use-form-draft.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/use-form-draft.ts",
+      "symbol": "validate/persist",
+      "fileSha256": "430b6028ac7839417419cb69a6728d94b8f20c5f184b0d14a5ff6ec9164f2238",
+      "lineCount": 52,
+      "ranges": [
+        {
+          "start": 10,
+          "end": 23,
+          "sha256": "af007fd57696ca57b7ee9ca6282b1f969a7d5f3d408cdb91d2876386c710145c"
+        },
+        {
+          "start": 44,
+          "end": 50,
+          "sha256": "6afdaa4efc8b69d35295d514bed6762b607991ec3d5ab6e36c2ef2a310ec796d"
+        }
+      ],
+      "fact": "전체 FormContent 저장·버전·idempotency 경계 재사용 지점이다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E44",
+      "path": "src/server/export-renderer.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/export-renderer.ts",
+      "symbol": "exportLayout/renderExportRow/exportSourceHash",
+      "fileSha256": "d17362c1baa2315a065b103d4164c4ad4413eff2b362ff9bcfb5de72d6091eef",
+      "lineCount": 66,
+      "ranges": [
+        {
+          "start": 15,
+          "end": 65,
+          "sha256": "e6f060db9950fce77c5d5f4126d433197d0de5341da790856913ed98aca313b9"
+        }
+      ],
+      "fact": "CSV는 질문·답변·응답파일만 사용하며 form body 이미지 열을 현재 출력하지 않는다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E45",
+      "path": "prisma/migrations/20261002094000_forms/migration.sql",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261002094000_forms/migration.sql",
+      "symbol": "protect_published_version/question",
+      "fileSha256": "df2545e63def70b8c0ee8c3fd334368253ce5c3c77fea6c976a722ec76ca9025",
+      "lineCount": 373,
+      "ranges": [
+        {
+          "start": 328,
+          "end": 351,
+          "sha256": "2f54d5060bbb80c8f39897e3261f693ddc51c3439f374b43197e1aa4c113fc55"
+        }
+      ],
+      "fact": "게시 부모/질문 불변을 유지해야 하며 신규 page/block 자식에는 별도 보호가 필요하다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E46",
+      "path": "src/server/author-asset-system-import.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/author-asset-system-import.ts",
+      "symbol": "importSystemAuthorAsset",
+      "fileSha256": "0bd09bc9162c614bc1f510b6d9a84e465de413e72604e60b3844c0fa4755f1c4",
+      "lineCount": 49,
+      "ranges": [
+        {
+          "start": 11,
+          "end": 48,
+          "sha256": "430ba01d81b729f9da3ee9f6128d708000f248ed84eafb163cadaba1f333df94"
+        }
+      ],
+      "fact": "시스템 템플릿 importer도 검증/저장/검사 상한을 통과하며 HTTP scope를 받지 않는다.",
+      "evidenceType": "local-source-read-only"
+    },
+    {
+      "id": "BI-E47",
+      "path": "src/server/answer-validation.ts",
+      "absolutePath": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+      "symbol": "validateAnswers",
+      "fileSha256": "e33a8041ea09af970705937c8f467aa1f8796470eefd853cf5a187a11258b462",
+      "lineCount": 119,
+      "ranges": [
+        {
+          "start": 18,
+          "end": 30,
+          "sha256": "3f3c7197989b9d14c877bbc61e3797d92fa00713f73ec85b200079633f6ab9cf"
+        }
+      ],
+      "fact": "flat questions 기반 visibleQuestionIds 사용. 페이지 분기 의미는 별도 전파해야 한다.",
+      "evidenceType": "local-source-read-only"
+    }
+  ],
+  "unknowns": [
+    "원본 서버의 sanitizer/소유권/다운로드정책/total image count/HTML length/PDF embedded images는 정적 번들로 확정 불가",
+    "실제 로컬 daemon·S3 운영설정과 14MiB 성능은 이번에 조회·실행하지 않음",
+    "root PLAN에서 canonical rich wire 방향, FormSection 및 consent 포함 범위는 정해졌음. 구체 node enum/HTML adapter/DB FK 설계와 구현 가능 자원 예산은 후속 계약·실측 단계에서 확정."
+  ],
+  "status": "analysis-complete-no-implementation",
+  "hashConvention": {
+    "file": "SHA-256 of exact file bytes; no normalization",
+    "ranges": "UTF-8 decode; split on LF; remove exactly one final empty split item if source ends in LF; select inclusive 1-based start/end lines; join with LF; UTF-8 encode; no trailing LF added. Source line ending bytes inside selected lines are otherwise preserved.",
+    "lineCount": "Count after dropping the synthetic terminal empty split item; blank physical lines remain.",
+    "previousArtifactSha256": "8d6bd8b8813d3c5096efec76c8b3cc3430ef389cabdac96996fc7663c8162e80",
+    "correction": "Initial collector included the terminal empty split item in EOF ranges. Source file SHA-256 values have not changed. EOF ranges now end at the last physical line.",
+    "correctedRanges": [
+      {
+        "id": "BI-E11",
+        "previous": {
+          "start": 54,
+          "end": 69,
+          "sha256": "6ceeec23d4db99ef787d1837b390674999c62c87b44f767c93bbeea31f54f231"
+        },
+        "current": {
+          "start": 54,
+          "end": 67,
+          "sha256": "442c0f2ef4d00903107588091086584037d4defb78a5ba3be320f691b2437e7b"
+        }
+      },
+      {
+        "id": "BI-E34",
+        "previous": {
+          "start": 82,
+          "end": 96,
+          "sha256": "abcbc4f1cd5fd569251e92cfec9e89613700bacb03d0d32d10d010b1dbc4bcbf"
+        },
+        "current": {
+          "start": 82,
+          "end": 95,
+          "sha256": "47481e8b70b547e9fab9caea1c823230c75a1fa6c260ab5ad68ce263c55059ab"
+        }
+      }
+    ]
+  },
+  "planComparison": {
+    "reviewedAt": "2026-10-10T09:38:13.825Z",
+    "path": "docs/qa/R08-T02/body-images/PLAN.md",
+    "sha256": "7bb51baa9eae66001e2c8c9bdc1e7c8cb23cb2153d10b7dfcfba2b36c4a2a5ed",
+    "result": "BI-02a의 순수 계약 작업을 막는 구조적 충돌은 없음. 계획은 페이지 선행 모델, 전체 pin 그래프, 완료/마감 별도 인가, 버전별 증거와 구형 보존을 반영했다. 아래 두 항목은 실제 통합 전 보완 필요.",
+    "decisionsResolved": [
+      "D01: bodyRich의 nullable 문서 + 평문 body 투영, 생략/clear/모호한 구형 요청 422",
+      "D02: 기존 FormPage 목록 타입과 구별한 FormSection 도입, F4 선행",
+      "D05: 완료 성공 증명 및 마감 안내 전용 읽기, viewer 기본 비공개/명시 공유",
+      "D06: rich evidence v2에 root/실제 방문 페이지 포함, 완료/마감 제외, 저장 PDF 재생성 금지"
+    ],
+    "findings": [
+      {
+        "id": "BI-P01",
+        "priority": "계약/HTTP 통합 전",
+        "planLines": [
+          60,
+          77
+        ],
+        "evidence": [
+          "BI-E25"
+        ],
+        "issue": "계획의 폼 전체 rich JSON 1 MiB(1,048,576 bytes)는 기존 body()의 전체 요청 1,000,000 bytes보다 크다. rich 필드 외 version/title/questions/동의 및 JSON envelope도 포함되므로 계약 상한의 유효 문서가 HTTP 413으로 거절될 수 있다.",
+        "recommendation": "BI-02a/02c에서 UTF-8 JSON 바이트와 전체 요청 예산을 함께 고정한다. 일반 요청 1,000,000 기본은 보존하면서 폼/템플릿 경로만 명시적 bounded override를 설계하거나, 전체 envelope를 고려한 rich 상한을 선택한다. 순수 schema 통과 + 실제 HTTP 경계 시험을 별도로 둔다."
+      },
+      {
+        "id": "BI-P02",
+        "priority": "작업 의존성 보완",
+        "planLines": [
+          78,
+          79,
+          81,
+          83,
+          86
+        ],
+        "evidence": [
+          "BI-E11",
+          "BI-E14",
+          "BI-E16",
+          "BI-E17",
+          "BI-E19",
+          "BI-E21",
+          "BI-E23"
+        ],
+        "issue": "Task 표의 BI-05a 이미지 업로드/교체 수용에는 BI-03a/03b 의존성이 없고, BI-04b 핀 통합에도 신규 purpose/DB 상한 도입 완료 의존성이 명시되지 않았다. 현재 계약과 DB는 새 body purpose를 허용하지 않고 저장/scan은 10 MiB다.",
+        "recommendation": "순수 UI/graph 코드는 병행 가능하되 실제 업로드/핀/이미지 PDF 수용 전에 BI-03a/03b를 선행으로 명시한다. BI-02a 시작에는 영향 없다."
+      }
+    ],
+    "implementationCautions": [
+      "계획의 24M pixels/16,384px는 신규 body purpose에만 적용하고 기존 QI/option의 8M pixels/8192px 제한을 보존한다. 현재 공통 validator 상수를 전역 변경하지 않는다.",
+      "기존 R08 resource 시험 항목의 8M/8192는 현재 호환 경계이며 새 body 한도는 root PLAN의 독립 안전 계약과 실측으로 별도 검증한다."
+    ],
+    "runtimeExecuted": false
+  }
+}

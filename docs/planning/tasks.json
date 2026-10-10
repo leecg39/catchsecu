@@ -923,12 +923,13 @@
     ],
     "acceptance": "success URL 위조로 paid 불가; 카드원문 저장0; callback 중복/순서역전; sandbox 승인",
     "status": "in_progress",
-    "updatedAt": "2026-10-06T01:23:21.281086+00:00",
+    "updatedAt": "2026-10-07T02:08:25.170049+00:00",
     "evidence": "docs/qa/P10-T02/",
     "statusReview": "docs/qa/status-revalidation/task-evidence-inventory.json",
     "partialEvidence": [
       "docs/qa/P10-T02/",
-      "docs/qa/P10-T02/current-authority/README.md"
+      "docs/qa/P10-T02/current-authority/README.md",
+      "docs/qa/P10-T02/event-integrity/README.md"
     ]
   },
   {
@@ -961,13 +962,14 @@
     ],
     "acceptance": "환불누계 초과 거부; PG와 DB 대사; refund retry 중복0; 마감후 정정 이벤트",
     "status": "in_progress",
-    "updatedAt": "2026-10-06T01:13:29.112070+00:00",
+    "updatedAt": "2026-10-07T02:08:25.170246+00:00",
     "evidence": "docs/qa/P10-T04/",
     "statusReview": "docs/qa/status-revalidation/task-evidence-inventory.json",
     "partialEvidence": [
       "docs/qa/P10-T04/",
       "docs/qa/P10-T04/expiration/README.md",
-      "docs/qa/P10-T04/subscription-authority/README.md"
+      "docs/qa/P10-T04/subscription-authority/README.md",
+      "docs/qa/P10-T02/event-integrity/README.md"
     ]
   },
   {
@@ -1039,7 +1041,7 @@
     ],
     "acceptance": "state/nonce/PKCE/audience/issuer/서명·재전송·연결탈취 검사; 테스트 IdP 실제 SSO",
     "status": "in_progress",
-    "updatedAt": "2026-10-06T00:49:34.417046+00:00",
+    "updatedAt": "2026-10-10",
     "evidence": "docs/qa/P11-T03/",
     "partialEvidence": [
       "docs/qa/P11-T03/revalidation/",
@@ -1053,6 +1055,11 @@
       "docs/qa/P11-T03/provider-reference/",
       "docs/qa/P11-T03/expert-reinvitation/",
       "docs/qa/P11-T03/provider-lifecycle/"
+    ],
+    "progress_note": "2026-10-10 조직 이메일 소유 확인·state 로그인/초대 등록 전환·전용 복구 화면 구현. migration108/Prisma134, 고유7파일274시험·실제HTTP16/재시작HTTP1·로컬 메일·디렉터리v2/티켓0/감사12 해시 일치. 독립검토의 만료티켓 발급한도 소모 수정. 시작 브라우저 결합(login CSRF)·SSO outbound DNS/사설IP 차단·HTTPS IdP·Ego 화면 및 외부 인증 수용은 필수 후속. 전체51진행/56계획/0완료, goal active.",
+    "updatedOn": "2026-10-10",
+    "progress_evidence": [
+      "docs/qa/R07-T04/policy-writer/README.md"
     ]
   },
   {
@@ -1066,8 +1073,9 @@
     ],
     "acceptance": "공식 sandbox/테스트환경의 성공·실패 증거; SDK/접근권 없으면 블로커 유지; 임의 성공 처리 금지",
     "status": "planned",
-    "updatedAt": "2026-10-04T05:20:28.198357+00:00",
-    "evidence": "docs/qa/P11-T04/"
+    "updatedAt": "2026-10-10",
+    "evidence": "docs/qa/P11-T04/",
+    "progress_note": "2026-10-10 조직 이메일 소유 확인·state 로그인/초대 등록 전환·전용 복구 화면 구현. migration108/Prisma134, 고유7파일274시험·실제HTTP16/재시작HTTP1·로컬 메일·디렉터리v2/티켓0/감사12 해시 일치. 독립검토의 만료티켓 발급한도 소모 수정. 시작 브라우저 결합(login CSRF)·SSO outbound DNS/사설IP 차단·HTTPS IdP·Ego 화면 및 외부 인증 수용은 필수 후속. 전체51진행/56계획/0완료, goal active."
   },
   {
     "id": "P11-T05",

@@ -1,0 +1,52 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-10T11:09:38.467Z",
+  "migrations": 137,
+  "fresh": {
+    "schema": "qa_page_branches_fresh_5103fb0c989b4d4eadf6885f99ffc163",
+    "columns": [
+      {
+        "table_name": "QuestionOption",
+        "column_name": "branchDestinationKind",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "QuestionOption",
+        "column_name": "branchDestinationSectionId",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "Submission",
+        "column_name": "pagePathVersion",
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "table_name": "Submission",
+        "column_name": "terminationKind",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "Submission",
+        "column_name": "visitedPageKeys",
+        "is_nullable": "YES",
+        "column_default": null
+      }
+    ],
+    "branchTriggers": 4,
+    "partialBranchIndex": true
+  },
+  "upgrade": {
+    "schema": "qa_page_branches_upgrade_5103fb0c989b4d4eadf6885f99ffc163",
+    "beforeMigrations": 129,
+    "afterMigrations": 137,
+    "legacyOptionUnchanged": true,
+    "legacySubmissionPath": {
+      "pagePathVersion": 0
+    }
+  },
+  "scope": "Ephemeral schemas in catchsecu_test; fresh install and 129→137 upgrade; schemas removed after verification."
+}

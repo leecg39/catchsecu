@@ -1,0 +1,641 @@
+{
+  "sourceAudit": "field-map.json",
+  "initialStateFields": 102,
+  "implementedNormalized": 98,
+  "derivedFromSection": 2,
+  "clientInitializationReview": 0,
+  "clientInitializationImplemented": 2,
+  "allSourceParityAccepted": false,
+  "fields": [
+    {
+      "sourcePath": "under14Info.privacyCollectPurpose",
+      "target": "children.purpose",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "under14Info.mandatoryItems[]",
+      "target": "children.requiredItems[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "under14Info.optionalItems[]",
+      "target": "children.optionalItems[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "under14Info.period[].prefix",
+      "target": "children.periods[].prefix",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "under14Info.period[].dateNumber",
+      "target": "children.periods[].amount",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "under14Info.period[].dateType",
+      "target": "children.periods[].unit",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "under14Info.period[].coupler",
+      "target": "children.periods[].condition",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "under14Info.legalRepresentativeItems[]",
+      "target": "children.guardianItems[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "itServiceType",
+      "target": "hosting.mode",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "itServiceTrustees[].companyName",
+      "target": "hosting.trustees[].name",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "itServiceTrustees[].country",
+      "target": "hosting.trustees[].country",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "itServiceTrustees[].contact",
+      "target": "hosting.trustees[].contact",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "itServiceTrustees[].serviceTrusteeType",
+      "target": "hosting.trustees[].(parent section)",
+      "status": "derived_from_section",
+      "note": "원본 IT_SERVICE/OUT_SOURCING을 hosting/development 부모 구역으로 구분한다."
+    },
+    {
+      "sourcePath": "itServiceTrustees[].consignmentWork",
+      "target": "hosting.trustees[].work",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "itServiceTrustees[].mandatoryEntrustItems[]",
+      "target": "hosting.trustees[].requiredItems[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "itServiceTrustees[].optionalEntrustItems[]",
+      "target": "hosting.trustees[].optionalItems[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "itServiceTrustees[].reconsignment[]",
+      "target": "hosting.trustees[].subprocessors[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "devOutSourcingYn",
+      "target": "development.enabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "devOutSourcingTrustees[].companyName",
+      "target": "development.trustees[].name",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "devOutSourcingTrustees[].country",
+      "target": "development.trustees[].country",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "devOutSourcingTrustees[].contact",
+      "target": "development.trustees[].contact",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "devOutSourcingTrustees[].serviceTrusteeType",
+      "target": "development.trustees[].(parent section)",
+      "status": "derived_from_section",
+      "note": "원본 IT_SERVICE/OUT_SOURCING을 hosting/development 부모 구역으로 구분한다."
+    },
+    {
+      "sourcePath": "devOutSourcingTrustees[].consignmentWork",
+      "target": "development.trustees[].work",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "devOutSourcingTrustees[].mandatoryEntrustItems[]",
+      "target": "development.trustees[].requiredItems[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "devOutSourcingTrustees[].optionalEntrustItems[]",
+      "target": "development.trustees[].optionalItems[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "devOutSourcingTrustees[].reconsignment[]",
+      "target": "development.trustees[].subprocessors[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "notUsageInfo.notUsageProcessType",
+      "target": "inactiveUsers.action",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "notUsageInfo.notUsagePIProcessDetail.notUsageStorePeriod",
+      "target": "inactiveUsers.amount",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "notUsageInfo.notUsagePIProcessDetail.notUsageStorePeriodType",
+      "target": "inactiveUsers.unit",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "notUsageInfo.notUsagePIProcessDetail.notUsageStoreUserCustom",
+      "target": "inactiveUsers.customText",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "withDrawInfo.withDrawProcessType",
+      "target": "withdrawals.action",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "withDrawInfo.withDrawProcessDetail.withDrawStorePeriod",
+      "target": "withdrawals.amount",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "withDrawInfo.withDrawProcessDetail.withDrawStorePeriodType",
+      "target": "withdrawals.unit",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "withDrawInfo.withDrawProcessDetail.withDrawStoreInfo",
+      "target": "withdrawals.items[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInfo.cctvIsExists",
+      "target": "cctv.enabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInfo.cctvInstallPurposes[]",
+      "target": "cctv.purposes[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInfo.cctvInstallCustomPurpose",
+      "target": "cctv.customPurpose",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].installLocation",
+      "target": "cctv.installations[].location",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].totalAmount",
+      "target": "cctv.installations[].count",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].uptime",
+      "target": "cctv.installations[].operatingHours",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].cctvStorage.storagePeriod",
+      "target": "cctv.installations[].storagePeriod",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].cctvStorage.cctvStoragePeriodType",
+      "target": "cctv.installations[].storageUnit",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].cctvStorage.storageLocation",
+      "target": "cctv.installations[].storageLocation",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].cctvConsignment",
+      "target": "cctv.installations[].outsourced",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].cctvManageTrustee.trusteeName",
+      "target": "cctv.installations[].trustee.name",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].cctvManageTrustee.country",
+      "target": "cctv.installations[].trustee.country",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvInstallInfoList[].cctvManageTrustee.contact",
+      "target": "cctv.installations[].trustee.contact",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvManagerInfo[].department",
+      "target": "cctv.managers[].department",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvManagerInfo[].managerInfo",
+      "target": "cctv.managers[].nameAndPosition",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvManagerInfo[].cctvManagerType",
+      "target": "cctv.managers[].role",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvSubManagerInfo[].department",
+      "target": "cctv.managers[].department",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvSubManagerInfo[].managerInfo",
+      "target": "cctv.managers[].nameAndPosition",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "cctvSubManagerInfo[].cctvManagerType",
+      "target": "cctv.managers[].role",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionYn",
+      "target": "automatedDecisions.enabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.decisionOverview",
+      "target": "automatedDecisions.overview",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.piTypeContent",
+      "target": "automatedDecisions.processedInformation",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.piTypeRelation",
+      "target": "automatedDecisions.decisionRelation",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.processProcedure",
+      "target": "automatedDecisions.procedure",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.specialPiYn",
+      "target": "automatedDecisions.specialInformation",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.sensitivePrivacyProcess.selected",
+      "target": "automatedDecisions.sensitive.selected",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.sensitivePrivacyProcess.purpose",
+      "target": "automatedDecisions.sensitive.purpose",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.sensitivePrivacyProcess.items[]",
+      "target": "automatedDecisions.sensitive.items[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.underFourteenPrivacyProcess.selected",
+      "target": "automatedDecisions.children.selected",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.underFourteenPrivacyProcess.purpose",
+      "target": "automatedDecisions.children.purpose",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.underFourteenPrivacyProcess.items[]",
+      "target": "automatedDecisions.children.items[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.requestContacts[].departmentName",
+      "target": "automatedDecisions.contacts[].department",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "autoDecisionInfo.autoDecisionDetail.requestContacts[].contact",
+      "target": "automatedDecisions.contacts[].contact",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "directorInfo.directorName",
+      "target": "officers.name",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "directorInfo.directorPos",
+      "target": "officers.position",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "directorInfo.directorEmail",
+      "target": "officers.email",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "ecommerceRetentionItem[]",
+      "target": "preservation.commerceItems[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "accessHistoryRetentionItem[]",
+      "target": "preservation.accessItems[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "userInfo.hpUpdatePath",
+      "target": "officers.updatePath",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "userInfo.hpDeletePath",
+      "target": "officers.deletePath",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "departmentInfo.privacyDepartmentYN",
+      "target": "officers.departmentEnabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "departmentInfo.department.directorDepartment",
+      "target": "officers.department.name",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "departmentInfo.department.directorDepartmentContact",
+      "target": "officers.department.contact",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "departmentInfo.department.departmentDirectorName",
+      "target": "officers.department.officerName",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "domesticInfo.domainAgentYn",
+      "target": "officers.domesticAgentEnabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "domesticInfo.domesticAgents[].corporationName",
+      "target": "officers.domesticAgents[].name",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "domesticInfo.domesticAgents[].representativeName",
+      "target": "officers.domesticAgents[].representative",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "domesticInfo.domesticAgents[].emailAddress",
+      "target": "officers.domesticAgents[].email",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "domesticInfo.domesticAgents[].contact",
+      "target": "officers.domesticAgents[].contact",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "domesticInfo.domesticAgents[].address",
+      "target": "officers.domesticAgents[].address",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "dpoInfo.existsDpo",
+      "target": "officers.dpoEnabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "dpoInfo.dpoDetail.dpoName",
+      "target": "officers.dpo.name",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "dpoInfo.dpoDetail.dpoAddress",
+      "target": "officers.dpo.address",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "dpoInfo.dpoDetail.dpoContact",
+      "target": "officers.dpo.contact",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "execDate",
+      "target": "Document.effectiveDate",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "sensitiveInfo.possibilitySensitivePrivacyYN",
+      "target": "sensitiveDisclosure.enabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "sensitiveInfo.sensitiveInfo.sensitiveOpenLocation",
+      "target": "sensitiveDisclosure.locations",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "sensitiveInfo.sensitiveInfo.sensitiveCloseMethod",
+      "target": "sensitiveDisclosure.optOut",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "overseaTransferInfo.overseaTransferPrivacyYN",
+      "target": "overseasTransfer.enabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "overseaTransferInfo.overseaTransfer.overseaTransferRefuse",
+      "target": "overseasTransfer.refusal",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "overseaTransferInfo.overseaTransfer.overseaTransferRefuseEffect",
+      "target": "overseasTransfer.effect",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "privacyCollectYn",
+      "target": "children.enabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "deviceInternalInfo.deviceInternalYn",
+      "target": "deviceProcessing.enabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "deviceInternalInfo.deviceInternalDetail.deviceInternalFunction",
+      "target": "deviceProcessing.functions",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "deviceInternalInfo.deviceInternalDetail.deviceInternalItems[]",
+      "target": "deviceProcessing.items[]",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "behavioralAdYn",
+      "target": "behavioralAdvertising.enabled",
+      "status": "implemented_normalized",
+      "note": "독립 DTO·DB·게시 스냅샷·개별 입력 구현. 원본 API wire 형식과 동일하다는 의미가 아님."
+    },
+    {
+      "sourcePath": "initMandatoryItems[]",
+      "target": "ProcessingPurpose.items -> DocumentOptions.policyItems",
+      "status": "client_initialization_implemented",
+      "note": "서비스 전체 활성 목적의 필수/선택 항목을 조회해 신규 수탁자/재수탁자 초기값과 선택 목록으로 사용한다. 중복 제거·100개 초과 수동 선택은 독립 자원 제한이다."
+    },
+    {
+      "sourcePath": "initOptionalItems[]",
+      "target": "ProcessingPurpose.items -> DocumentOptions.policyItems",
+      "status": "client_initialization_implemented",
+      "note": "서비스 전체 활성 목적의 필수/선택 항목을 조회해 신규 수탁자/재수탁자 초기값과 선택 목록으로 사용한다. 중복 제거·100개 초과 수동 선택은 독립 자원 제한이다."
+    }
+  ],
+  "additionalObservedFields": [
+    "under14Info.period[].directPrefix",
+    "outsourcingInputType",
+    "linkText",
+    "linkUrl",
+    "piReasonType",
+    "reconsignment[].(direct/link fields)",
+    "reconsignment[].mandatoryEntrustItems[]",
+    "reconsignment[].optionalEntrustItems[]",
+    "reconsignment[].piReasonType"
+  ],
+  "evidence": [
+    "../structured-policy/server-first.json",
+    "../../R10-T04/structured-policy/created.json",
+    "service-item-source.json",
+    "initialization-controls.json",
+    "../../R10-T02/trustee-items/tests-final.json"
+  ]
+}

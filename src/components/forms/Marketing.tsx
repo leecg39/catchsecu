@@ -2,13 +2,14 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { api, errorText, useResource } from "@/lib/api";
-import { marketingEventLabel, marketingStatus, type MarketingPage, type MarketingRecord, type MarketingSource, type MarketingSummary } from "@/contracts/marketing";
+import { marketingEventLabel, marketingQuestionTypeAllowed, marketingStatus, type MarketingChannel, type MarketingPage, type MarketingRecord, type MarketingSource, type MarketingSummary } from "@/contracts/marketing";
 import type { Paged } from "@/contracts/forms";
 import { useApplication } from "../ApplicationContext";
 import { ActionButton, Modal, PageHeading, Panel, DataTable } from "../shared";
 import { RemoteTable } from "../RemoteTable";
 import "./marketing.css";
 const time = (v: string | null) => v ? new Date(v).toLocaleString("ko-KR") : "—";
+const channelLabels: Record<MarketingChannel, string> = { email: "이메일", sms: "문자", kakao: "알림톡" };
 const dateBoundary = (value: string, end: boolean) => {
   const day = new Date(value + "T00:00:00");
   if (end) day.setDate(day.getDate() + 1);
@@ -58,16 +59,16 @@ function MarketingList({ serviceId }: { serviceId: string }) {
     <Panel><div className="marketing-toolbar"><h2>수신동의 목록</h2><div className="cs-row"><Link href="/marketing-detail" className="cs-link">서비스별 현황</Link><ActionButton secondary disabled={busy || !!list.error || list.loading || !list.data?.permissions.canExport} onClick={download}>CSV 내보내기</ActionButton>{list.data?.permissions.canCreate && <ActionButton onClick={() => setCreate(true)}>동의 근거 등록</ActionButton>}</div></div>
       <form className="marketing-filters" onSubmit={e => { e.preventDefault(); setSearch(query); changed(); }}>
         <input className="cs-input" aria-label="이름 또는 연락처 검색" placeholder="이름·이메일·전화번호 완전일치" value={query} onChange={e => setQuery(e.target.value)} maxLength={254} />
-        <select className="cs-input" aria-label="마케팅 채널" value={channel} onChange={e => { setChannel(e.target.value); changed(); }}><option value="">전체 채널</option><option value="email">이메일</option><option value="sms">문자</option></select>
+        <select className="cs-input" aria-label="마케팅 채널" value={channel} onChange={e => { setChannel(e.target.value); changed(); }}><option value="">전체 채널</option>{Object.entries(channelLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
         <select className="cs-input" aria-label="동의 상태" value={status} onChange={e => { setStatus(e.target.value); changed(); }}><option value="">전체 상태</option>{Object.entries(marketingStatus).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
         <select className="cs-input" aria-label="발송 제외 필터" value={excluded} onChange={e => { setExcluded(e.target.value); changed(); }}><option value="">발송 제외 전체</option><option value="true">발송 제외</option><option value="false">제외하지 않음</option></select><ActionButton secondary>검색</ActionButton>
         <select className="cs-input" aria-label="동의 정렬 기준" value={sort} onChange={e => { setSort(e.target.value); changed(); }}><option value="createdAt">등록 시각</option><option value="grantedAt">동의 시각</option></select>
         <select className="cs-input" aria-label="동의 정렬 방향" value={direction} onChange={e => { setDirection(e.target.value); changed(); }}><option value="desc">최근순</option><option value="asc">오래된순</option></select>
       </form>
-      <div className="marketing-toolbar"><p>이메일과 문자의 동의는 각각 한 건으로 표시됩니다.</p><div className="cs-row"><ActionButton secondary onClick={reload}>새로고침</ActionButton><ActionButton secondary disabled={!selected.length || busy || list.loading} onClick={() => { setError(""); setConfirm({ rows: selected, erase: false }); }}>선택동의철회 ({selected.length})</ActionButton></div></div>
+      <div className="marketing-toolbar"><p>이메일·문자·알림톡의 동의는 각각 한 건으로 표시됩니다.</p><div className="cs-row"><ActionButton secondary onClick={reload}>새로고침</ActionButton><ActionButton secondary disabled={!selected.length || busy || list.loading} onClick={() => { setError(""); setConfirm({ rows: selected, erase: false }); }}>선택동의철회 ({selected.length})</ActionButton></div></div>
       <RemoteTable columns={["선택", "이름", "채널", "연락처", "수집 출처", "동의일", "발송 제외", "상태 · 철회일", "관리"]}
         rows={(list.data?.items ?? []).map(row => ({ id: row.id, cells: [<input key="select" type="checkbox" aria-label={`${row.name ?? "삭제된 항목"} ${row.channel} 선택`} disabled={busy || !row.permissions.canWithdraw} checked={selected.some(s => s.id === row.id)} onChange={e => setSelectedIds(v => e.target.checked ? [...v, row.id] : v.filter(id => id !== row.id))} />,
-          row.name ?? "원문 없음", row.channel === "email" ? "이메일" : "문자", row.contact ?? "—", row.sourceTitle, time(row.grantedAt), row.excluded ? "제외" : "—",
+          row.name ?? "원문 없음", channelLabels[row.channel], row.contact ?? "—", row.sourceTitle, time(row.grantedAt), row.excluded ? "제외" : "—",
           <span key="state">{marketingStatus[row.status]}<small className="marketing-subtext">{time(row.withdrawnAt)}</small>{row.denial && <small className="marketing-subtext">{row.denial}</small>}</span>,
           <button key="detail" className="cs-link" onClick={() => setDetail(row.id)}>상세</button>] }))} total={list.data?.total ?? 0} page={list.data?.page ?? page} pageSize={pageSize} onPage={p => { setPage(p); setSelectedIds([]); setConfirm(undefined); }} onPageSize={n => { setPageSize(n); changed(); }} loading={list.loading} error={list.error?.message} />
       {error && !confirm && <p role="alert">{error}</p>}<p role="status">{message}</p>
@@ -94,10 +95,12 @@ function MarketingDetail({ id, onClose, onChanged, onAction }: { id: string; onC
 }
 function MarketingCreate({ serviceId, onClose, onCreated }: { serviceId: string; onClose: () => void; onCreated: (id: string) => void }) {
   const [page, setPage] = useState(1), [query, setQuery] = useState(""), [search, setSearch] = useState(""), [sourceId, setSourceId] = useState<string>();
-  const [channel, setChannel] = useState("email"), [nameId, setNameId] = useState(""), [contactId, setContactId] = useState("");
+  const [channel, setChannel] = useState<MarketingChannel>("email"), [nameId, setNameId] = useState(""), [contactId, setContactId] = useState("");
   const [busy, setBusy] = useState(false), [error, setError] = useState(""); const pending = useRef<{ body: string; key: string } | null>(null);
   const sources = useResource<Paged<MarketingSource>>("/marketing/sources?" + new URLSearchParams({ serviceId, page: String(page), search }));
   const source = sources.data?.items.find(row => row.id === sourceId && new Date(row.retentionUntil) > new Date());
+  const nameQuestions = source?.questions.filter(q => marketingQuestionTypeAllowed("name", q.type)) ?? [];
+  const contactQuestions = source?.questions.filter(q => q.id !== nameId && marketingQuestionTypeAllowed(channel, q.type)) ?? [];
   const currentPage = sources.data?.page ?? page;
   return <Modal title="기존 응답의 마케팅 동의 근거 등록" onClose={() => { if (!busy) onClose(); }}><div className="cs-stack">
     <p>별도로 받은 채널별 수신동의의 근거를 등록하세요. 원본 응답에 있는 이름과 연락처를 직접 선택합니다.</p>
@@ -111,8 +114,9 @@ function MarketingCreate({ serviceId, onClose, onCreated }: { serviceId: string;
         const r = await api<{ id: string }>("/marketing/preferences", { method: "POST", body, headers: { "Idempotency-Key": pending.current.key } }); onCreated(r.id);
       } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
     }}><fieldset disabled={busy} className="cs-stack marketing-fieldset">
-      <label className="cs-label">동의 채널<select className="cs-input" aria-label="등록할 동의 채널" value={channel} onChange={e => setChannel(e.target.value)}><option value="email">이메일</option><option value="sms">문자</option></select></label>
-      {[{ id: "이름 질문", value: nameId, change: setNameId }, { id: "연락처 질문", value: contactId, change: setContactId }].map(field => <label className="cs-label" key={field.id}>{field.id}<select className="cs-input" aria-label={field.id} value={field.value} required onChange={e => field.change(e.target.value)}><option value="">선택하세요</option>{source.questions.map(q => <option key={q.id} value={q.id}>{q.label} · {q.value.slice(0, 70)}</option>)}</select></label>)}
+      <label className="cs-label">동의 채널<select className="cs-input" aria-label="등록할 동의 채널" value={channel} onChange={e => { setChannel(e.target.value as MarketingChannel); setContactId(""); }}>{Object.entries(channelLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+      {[{ id: "이름 질문", value: nameId, questions: nameQuestions, change: (value: string) => { setNameId(value); if (value === contactId) setContactId(""); } },
+        { id: "연락처 질문", value: contactId, questions: contactQuestions, change: setContactId }].map(field => <label className="cs-label" key={field.id}>{field.id}<select className="cs-input" aria-label={field.id} value={field.questions.some(q => q.id === field.value) ? field.value : ""} required onChange={e => field.change(e.target.value)}><option value="">선택하세요</option>{field.questions.map(q => <option key={q.id} value={q.id}>{q.label} · {q.value.slice(0, 70)}</option>)}</select></label>)}
       <label className="cs-label">동의한 시각<input className="cs-input" aria-label="동의한 시각" name="grantedAt" type="datetime-local" required /></label>
       <label className="cs-label">마케팅 목적<textarea className="cs-input" aria-label="등록 마케팅 목적" name="purpose" required maxLength={3000} /></label>
       <label className="cs-label">증빙 참조<textarea className="cs-input" aria-label="동의 증빙 참조" name="reference" placeholder="수신동의 문서명·기록 번호·수집 경로" required minLength={5} maxLength={1000} /></label>

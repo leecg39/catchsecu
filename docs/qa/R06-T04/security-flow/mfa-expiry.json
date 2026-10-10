@@ -1,0 +1,53 @@
+{
+  "checkedAt": "2026-10-09T20:47:41.025Z",
+  "expiryUsedRealClock": true,
+  "noExpiryDatabaseMutation": true,
+  "row": {
+    "id": "0b7b3f94-ecf5-49e1-ae35-959ea1b58a49",
+    "tenantId": "775d221d-6051-4948-bfae-18a4211a8926",
+    "memberId": "b9e42c48-af7c-4ecd-a0c4-cf3a15757984",
+    "reason": "REA 실제 시계 만료 검증",
+    "expiresAt": "2026-10-09T20:47:40.639Z",
+    "createdAt": "2026-10-09T20:47:32.770Z",
+    "version": 1,
+    "active": true
+  },
+  "cases": [
+    {
+      "label": "unregistered existing member session denied",
+      "status": 403,
+      "code": "MFA_REQUIRED"
+    },
+    {
+      "label": "short real exception created",
+      "status": 201
+    },
+    {
+      "label": "same request returns same exception",
+      "status": 201
+    },
+    {
+      "label": "foreign exception hidden",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "label": "live exception opens same session",
+      "status": 200
+    },
+    {
+      "label": "natural deadline denies same session without cleanup",
+      "status": 403,
+      "code": "MFA_REQUIRED"
+    },
+    {
+      "label": "expired creation replay is gone",
+      "status": 410,
+      "code": "MFA_EXCEPTION_EXPIRED"
+    },
+    {
+      "label": "required owner cannot disable MFA",
+      "status": 403
+    }
+  ]
+}

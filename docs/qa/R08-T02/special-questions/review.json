@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-10-10",
+  "reviewer": "independent read-only agent bundle_analysis",
+  "findings": [
+    {
+      "severity": "P2",
+      "file": "src/components/forms/SpecialQuestionInput.tsx",
+      "issue": "Direct domain selection retained the previous domain, unlike original c0 case domain",
+      "resolution": "Clear domain when changing to direct; subsequent browser-input.json asserts blank and invalid form, then blocks Enter submission before entering a new domain"
+    }
+  ],
+  "nonFindings": [
+    "Contact optional blank rest serializes empty",
+    "EMAIL 100+100, EMAIL_DIRECT 100, BIRTH 8 UI/server limits aligned",
+    "Current correction unmount/remount avoids a demonstrated stale initialization bug"
+  ],
+  "scope": "Source review only; browser evidence recorded separately. Calendar validity and fixed validators are independent implementation contracts, not observed original server regex."
+}

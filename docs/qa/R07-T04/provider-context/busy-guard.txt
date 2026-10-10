@@ -1,0 +1,183 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 전체 구현 검증"(2): 2 managed, 0 untracked — p1* "캐치시큐 데모", p2 "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=460]
+        container
+          text "서비스명"
+          text "SSO 문맥 시험 A"
+        container
+          text "외부 ⓘ"
+          text "-"
+          image
+      container
+        anchor [ref=461, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        button [ref=462]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=463]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=464]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=465]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=466]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=467]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=468]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=469]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=470, loc=href:/shared-privacy/view, url=http://localhost:3100/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=471, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=472, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          anchor [ref=473, loc=href:https://catchsecu.com/, url=https://catchsecu.com/]
+            text "홈페이지"
+          anchor [ref=474, loc=href:/legal/privacy, url=http://localhost:3100/legal/privacy]
+            text "개인정보"
+            text "처리방침"
+          anchor [ref=475, loc=href:/legal/terms, url=http://localhost:3100/legal/terms]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          button "회사 선택" [ref=476, loc=css:button[aria-label="회사 선택"]]
+            text "SSO 문맥 시험 A"
+            text "⌄"
+        container
+          button [ref=477]
+            svg_root
+            text "검색"
+            text "Ctrl K"
+          button "키보드 단축키 안내" [ref=478, loc=css:button[aria-label="키보드 단축키 안내"]]
+            svg_root
+          button [ref=479]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=480, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+            image
+          button "문의" [ref=481, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=482, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+            image
+          button [ref=483]
+            image
+            text "MY"
+      container [ref=484]
+        container
+          heading
+            text "SSO 연결 관리"
+          container
+            anchor [ref=485, loc=href:/security/sso, url=http://localhost:3100/security/sso]
+              text "로그인 정책"
+            button [ref=512]
+              text "SSO 연결 등록"
+        paragraph
+          text "OIDC 또는 SAML 공급자로 회사 구성원의 로그인을 연결합니다. 등록 후 사전검사를 통과해야 활성화할 수 있습니다. 사용 중지·인증 정보 교체는 새 로그..."
+        container
+          container
+            container
+              text "SSO 연결 검색"
+              textbox [ref=513, loc=css:input[placeholder="이름·프로토콜·Issuer"]]
+                text "문맥 시험 기관 01"
+            container
+              text "SSO 연결 정렬"
+              combobox [ref=514]
+                text "등록일순"
+          region "SSO 연결 목록" [ref=515, loc=role:region[name="SSO 연결 목록"]]
+            table
+              table_row
+                table_cell
+                  text "이름"
+                table_cell
+                  text "프로토콜"
+                table_cell
+                  text "Issuer"
+                table_cell
+                  text "로그인 주소"
+                table_cell
+                  text "사전검사"
+                table_cell
+                  text "사용 상태"
+                table_cell
+                  text "등록일"
+                table_cell
+                  text "관리"
+              table_row
+                table_cell
+                  text "문맥 시험 기관 01"
+                table_cell
+                  text "가상 GPKI"
+                table_cell
+                  text "urn:virtual:gpki"
+                table_cell
+                  text "/login/gpki"
+                table_cell
+                  text "통과"
+                table_cell
+                  text "사용 안 함"
+                table_cell
+                  text "2026. 10. 10."
+                table_cell
+                  button [ref=516]
+                    text "디렉터리"
+                  button [ref=517]
+                    text "사전검사"
+                  button [ref=518]
+                    text "사용"
+                  button [ref=519]
+                    text "수정"
+                  button [ref=520]
+                    text "삭제"
+          container
+            container
+              text "총"
+              text "1"
+              text "개 ·"
+              text "1"
+              text "/"
+              text "1"
+              text "쪽"
+            container
+              button [ref=521]
+                text "이전"
+              button [ref=522]
+                text "다음"
+  alertdialog "저장하지 않은 변경 사항" [ref=523, loc=role:alertdialog[name="저장하지 않은 변경 사항"]]
+    heading
+      text "저장하지 않은 변경 사항"
+    container
+      text "SSO 변경 요청을 처리 중입니다. 아직 처리 결과가 확정되지 않았습니다. 이 화면을 나가면 목록에서 결과를 다시 확인해야 합니다."
+      container
+        button [ref=524]
+          text "계속 편집"
+        button [ref=525]
+          text "나가기"

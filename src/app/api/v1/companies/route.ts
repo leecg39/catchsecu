@@ -4,6 +4,8 @@ import { requireActor } from "@/server/context";
 import { body, json, listQuery, rateLimit, route } from "@/server/http";
 import { companyInput } from "@/server/schemas";
 import { companyDto, listCompanies } from "@/server/company-management";
+import { lockAccountActor } from "@/server/account-actor";
+import { assertFileDeadlines } from "@/server/file-access";
 export const GET = route(async request => {
   const actor = await requireActor(request.headers);
   const query = listQuery.pick({ page: true, pageSize: true, search: true }).parse(Object.fromEntries(new URL(request.url).searchParams));
@@ -14,6 +16,11 @@ export const POST = route(async (request, requestId) => {
   await rateLimit("company:create:" + actor.user.id, 5, 3600);
   const input = await body(request, companyInput);
   const company = await db.$transaction(async tx => {
+    // Registration changes this session's company. Take its write lock up front,
+    // after the account lock, so simultaneous registrations cannot upgrade shared locks.
+    await tx.$queryRaw`SELECT id FROM "User" WHERE id=${actor.user.id} FOR SHARE`;
+    await tx.$queryRaw`SELECT id FROM "Session" WHERE id=${actor.session.id} AND "userId"=${actor.user.id} FOR UPDATE`;
+    const current = await lockAccountActor(tx, actor);
     const created = await tx.company.create({ data: {
       ...input, policy: { create: {} },
       memberships: { create: { userId: actor.user.id, role: "owner" } },
@@ -28,6 +35,7 @@ export const POST = route(async (request, requestId) => {
     await tx.session.update({ where: { id: actor.session.id }, data: { activeCompanyId: created.id, activeServiceId: null } });
     await tx.auditEvent.create({ data: { tenantId: created.id, actorId: actor.user.id, action: "company.created",
       resource: "company", resourceId: created.id, requestId, detail: {} } });
+    assertFileDeadlines(current.deadlines);
     return created;
   });
   return json(companyDto(company, true), 201);

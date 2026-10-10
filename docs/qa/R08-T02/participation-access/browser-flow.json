@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-10-10T14:12:45.096Z",
+  "result": "passed",
+  "server": "local production on port 3119 with PostgreSQL test database",
+  "browser": {
+    "preferred": "Ego Lite",
+    "used": "controlled Chrome fallback",
+    "limitation": "Ego Lite control was interrupted when another Ego workspace changed the active app. The same production server and database were verified in Chrome."
+  },
+  "steps": [
+    {
+      "step": 1,
+      "assertion": "Admin settings showed participation access enabled, EMAIL method, ALL targets and duplicate restriction enabled.",
+      "passed": true
+    },
+    {
+      "step": 2,
+      "assertion": "The public route exposed only the email-authentication prompt before proof and did not expose the form question.",
+      "passed": true
+    },
+    {
+      "step": 3,
+      "assertion": "A locally delivered email OTP was verified and the form question became visible.",
+      "passed": true
+    },
+    {
+      "step": 4,
+      "assertion": "A real response was submitted and the completion receipt was rendered.",
+      "passed": true
+    },
+    {
+      "step": 5,
+      "assertion": "Reloading the same session showed the duplicate-participation rejection message.",
+      "passed": true,
+      "visibleMessage": "이미 참여를 완료하셨습니다. 본 설문은 중복 참여가 제한됩니다."
+    },
+    {
+      "step": 6,
+      "assertion": "After the production server restarted, the same duplicate rejection remained visible and database state hash was unchanged.",
+      "passed": true
+    }
+  ],
+  "sensitiveFixture": "Credentials, email address, OTP and public token are stored only in an ignored local fixture and are not included in this evidence."
+}

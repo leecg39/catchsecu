@@ -1,0 +1,15 @@
+{
+  "purpose": "Preserve pre-117 frozen snapshot comparisons after additive nullable formLanguage column.",
+  "helpers": [
+    "drawing-flow",
+    "address-flow",
+    "special-flow",
+    "text-flow",
+    "exact-flow",
+    "option-flow",
+    "form-authority"
+  ],
+  "assertion": "Every encountered formLanguage value must equal null, then that new key is omitted from the old-column hash. Existing fields, rows and recorded hashes remain unchanged. Non-null would fail.",
+  "ssoHelpersUnchanged": "Six SSO snapshot helpers do not select FormVersion, so no compatibility adjustment required.",
+  "runtimeVerification": "pending"
+}

@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-10-10T13:28:39.685Z",
+  "result": "passed",
+  "mode": "verify",
+  "formVersions": 196,
+  "publications": 154,
+  "formVersionsSha256": "a159349aa1308a10fa32f2c49792c3e428edc2783cdbb8236df2b87efe6504e4",
+  "publicationsSha256": "f07447395f75400d4fd4322c818786525d42d2c4c32493eb7a7500e3866bd697",
+  "columns": [
+    {
+      "table_name": "FormVersion",
+      "column_name": "collectionCloseAt"
+    },
+    {
+      "table_name": "FormVersion",
+      "column_name": "collectionOpenAt"
+    },
+    {
+      "table_name": "FormVersion",
+      "column_name": "collectionWindowSchemaVersion"
+    },
+    {
+      "table_name": "Publication",
+      "column_name": "opensAt"
+    }
+  ],
+  "constraints": [
+    {
+      "conname": "FormVersion_collection_window_check",
+      "definition": "CHECK ((((\"collectionWindowSchemaVersion\" = 0) AND (\"collectionOpenAt\" IS NULL) AND (\"collectionCloseAt\" IS NULL)) OR ((\"collectionWindowSchemaVersion\" = 1) AND ((\"collectionOpenAt\" IS NULL) OR (\"collectionCloseAt\" IS NULL) OR (\"collectionOpenAt\" < \"collectionCloseAt\")))))"
+    },
+    {
+      "conname": "Publication_collection_window_check",
+      "definition": "CHECK (((\"opensAt\" IS NULL) OR (\"expiresAt\" IS NULL) OR (\"opensAt\" < \"expiresAt\")))"
+    }
+  ],
+  "legacyFormVersions": {
+    "total": 196,
+    "preserved": 196
+  },
+  "legacyPublications": {
+    "total": 154,
+    "preserved": 154
+  },
+  "scope": "Development PostgreSQL after migration; hashes exclude only the four additive columns. Every existing version remains schema 0/null and every existing publication has a null open time."
+}

@@ -1,0 +1,61 @@
+{
+  "actualHttp": true,
+  "syntheticCompanyId": "6b158356-e3ef-4827-a34f-711a08769cf7",
+  "emailVerifiedByFixture": true,
+  "count": 12,
+  "checks": [
+    {
+      "name": "synthetic sign-up",
+      "status": 200
+    },
+    {
+      "name": "actual sign-in",
+      "status": 200
+    },
+    {
+      "name": "virtual provider create",
+      "status": 201
+    },
+    {
+      "name": "virtual provider enable",
+      "status": 200
+    },
+    {
+      "name": "member create without email",
+      "status": 201
+    },
+    {
+      "name": "initial ticket issued",
+      "status": 200
+    },
+    {
+      "name": "directory update revokes ticket",
+      "status": 200
+    },
+    {
+      "name": "old ticket rejected after update",
+      "status": 401,
+      "code": "STATE_INVALID"
+    },
+    {
+      "name": "new credentials snapshot issues fresh ticket",
+      "status": 200
+    },
+    {
+      "name": "directory delete revokes ticket",
+      "status": 200
+    },
+    {
+      "name": "old ticket rejected after delete",
+      "status": 401,
+      "code": "STATE_INVALID"
+    },
+    {
+      "name": "provider cleanup",
+      "status": 200
+    }
+  ],
+  "pendingStates": 0,
+  "externalInstitutionVerified": false,
+  "concurrencyEvidence": "docs/qa/R07-T02/core/regression-final.json; this HTTP probe verifies sequential ticket lifecycle on the rebuilt server"
+}

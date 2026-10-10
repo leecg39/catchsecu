@@ -1,0 +1,1035 @@
+{
+  "title": "F3 FILE 참고자료·보기 이미지 백엔드 영향 분석",
+  "status": "읽기 전용 조사 완료 / 구현·동적 검증 미실행",
+  "plan": "PLAN-draft.md",
+  "scope": {
+    "writtenFiles": [
+      "backend-impact.json",
+      "PLAN-draft.md"
+    ],
+    "performed": [
+      "기존 소스와 시험 패턴 읽기",
+      "정적 근거·변경 영향·실행 가능한 구현 및 수용 계획 작성",
+      "소스 SHA-256와 줄 범위 보존"
+    ],
+    "notPerformed": [
+      "제품·시험 코드 변경",
+      "DB 조회·변경",
+      "시험·빌드·마이그레이션·generate",
+      "브라우저·원본 API·서버·worker 실행"
+    ],
+    "runtimeNote": "root의 runtime-baseline 보고는 전달받았으나 이 조사자가 재실행하거나 독립 검증하지 않았다."
+  },
+  "originalEvidence": {
+    "path": "source-review.json",
+    "sha256": "fd0dfaa04585db24ab8f51b39010bf5e3dabbf5dfb9212927874de3ca84ca0be",
+    "owner": "/root/bundle_analysis",
+    "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "reaEvidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "kind": "정적 원본 번들 발췌; 실제 원본 서버의 저장·권한·수명·백신 정책은 미관측",
+    "contracts": [
+      "materialList FILE/LINK 혼합 합계3, orderNumber 0기반 연속, FILE fileKey 및 linkLabel/linkUrl null",
+      "QUESTION_MATERIAL: PDF/DOCX/AI 5MiB; 클라이언트 magic DOCX ZIP, AI PDF/PS",
+      "OPTION_IMAGE: optionImageKey string|null, RADIO/CHECKBOX 일반 보기만, 문항당20장·1MiB JPEG/JPG/PNG",
+      "기타true, dropdown, matrix 이미지 불허·제거; questionImageKey는 별도 기능",
+      "opaque key는 원본 UUID 제약 미관측; 로컬 UUID scoped asset은 독립 설계",
+      "파일명 allowLongName:true, URL/이름/size/uploadToken은 저장 serializer에서 제거",
+      "temp/discard는 best-effort; replacedS3Key가 과거 영구 객체를 삭제한다는 보장은 미관측"
+    ],
+    "sha256VerifiedAt": "2026-10-10T07:45:23.635Z"
+  },
+  "recommendation": {
+    "model": "불변 AuthorAssetBlob + tenant/service 또는 system 소유 AuthorAsset + FormVersion/Template/Approval typed refs",
+    "why": "기존 caller transaction 내부에서 대상 소유권·quota·참조를 원자적으로 복제하고 cross-company 사본의 bytes를 원본 삭제와 분리할 수 있다.",
+    "reuse": [
+      "암호화 privateFiles 저장소",
+      "scanFile ClamAV fail-closed",
+      "현재 actor/publication/viewer 가드",
+      "제한된 body reader 및 안전 다운로드 헤더"
+    ],
+    "doNotReuseDirectly": [
+      "응답 FileObject의 단일 질문·응답 소유 및 파기 수명",
+      "가이드 교체 시 old bytes 즉시 삭제",
+      "생성형 document PDF를 DOCX/AI 업로드로 취급"
+    ],
+    "alternative": "범위별 물리 복제는 가능하나 매번 bytes 검증·쓰기와 durable staging/outbox·quota·rollback orphan 처리가 필요하다. 기존 useTemplate의 caller transaction/15초 제한 때문에 초기 최소안으로는 더 복잡하다.",
+    "pinIntegrity": "서비스가 부모 JSON과 typed refs를 같은 트랜잭션에서 sync하고 DEFERRABLE INITIALLY DEFERRED constraint triggers로 최종 집합 동등성·scope·purpose·ready/scan 상태를 검사하는 안을 권장. SQL 자동 생성 트리거와 혼합하지 않는다. 신규 SQL 직접우회 시험이 필수이다."
+  },
+  "risks": [
+    {
+      "id": "R01",
+      "priority": "P0",
+      "risk": "임의 key로 타 회사/서비스/부모 자산 또는 private blob 직접 연결",
+      "action": "opaque asset ID를 exact parent binding과 현재 권한으로 검증. 승인된 template copy만 새 소유권 생성",
+      "evidence": [
+        "B01",
+        "B02",
+        "B15"
+      ]
+    },
+    {
+      "id": "R02",
+      "priority": "P0",
+      "risk": "마지막 refs 삭제 대 clone/attach 경합으로 다른 회사 사본 bytes 유실",
+      "action": "typed FK와 Asset→Blob 순서, deleting fence 및 마지막 asset/예약 확인, retryable GC",
+      "evidence": [
+        "B07",
+        "B15",
+        "B27"
+      ]
+    },
+    {
+      "id": "R03",
+      "priority": "P0",
+      "risk": "Company SHARE→UPDATE quota upgrade 교착 또는 세 파일 종류 합계 누락",
+      "action": "outer preflight부터 공통 직렬화 잠금·최강 잠금 선점. FileObject/사업자/author 모두 같은 quota helper. 실제 양순서 경합/409 rollback 검증",
+      "evidence": [
+        "B01",
+        "B18",
+        "B19",
+        "B28"
+      ]
+    },
+    {
+      "id": "R04",
+      "priority": "P1",
+      "risk": "mutable draft의 ref 제거가 과거 승인 snapshot 파일까지 삭제",
+      "action": "ApprovalRequest 생성시 독립 pin, cancelled/superseded 이력 보존",
+      "evidence": [
+        "B14",
+        "B17"
+      ]
+    },
+    {
+      "id": "R05",
+      "priority": "P1",
+      "risk": "JSON material/template/approval과 pin 불일치, SQL scope/type/status 우회",
+      "action": "service sync+deferred final-state constraints, optionImageKey FK, 직접SQL 교차tenant/type/unsafe/foreign parent 거절 및 고정snapshot 검증",
+      "evidence": [
+        "B10",
+        "B11",
+        "B14",
+        "B15",
+        "B38",
+        "B39"
+      ]
+    },
+    {
+      "id": "R06",
+      "priority": "P1",
+      "risk": "확장자·얕은 magic만으로 DOCX/AI/inline image 승인",
+      "action": "bounded ZIP/XML/decode 및 실제 ClamAV. 외부 관계 링크 자체는 허용하되 fetch/entity 해석 금지. 원본 이미지 bytes/EXIF 보존",
+      "evidence": [
+        "B05",
+        "B06",
+        "B09"
+      ]
+    },
+    {
+      "id": "R07",
+      "priority": "P1",
+      "risk": "장기 URL/캐시가 권한 회수·token 종료·공유 선택질문을 우회",
+      "action": "각 다운로드 exact version/parent/current gate와 I/O후 기한 재검사; no-store",
+      "evidence": [
+        "B02",
+        "B04",
+        "B21",
+        "B25",
+        "B26"
+      ]
+    },
+    {
+      "id": "R08",
+      "priority": "P1",
+      "risk": "현재 refs만 join하면 제거 후 과거 자산 감사 기록이 폼 로그에서 사라짐",
+      "action": "이벤트 발생시 불변 parent 감사 association, 현재 tenant/service scope 유지",
+      "evidence": [
+        "B31",
+        "B32"
+      ]
+    },
+    {
+      "id": "R09",
+      "priority": "P1",
+      "risk": "tenant asset이 임의 public template JSON으로 공개 승격",
+      "action": "system owner와 trusted seed/platform publisher 경로, source template 실제 ref 검증",
+      "evidence": [
+        "B15",
+        "B36"
+      ]
+    },
+    {
+      "id": "R10",
+      "priority": "P2",
+      "risk": "폐쇄 요청을 실제 최종삭제로 오해하거나 source 회사 삭제로 타회사 clone 삭제",
+      "action": "요청/취소와 closed/최종 erasure 분리. 복구 refs 유지, 각 target의 소유권 생존",
+      "evidence": [
+        "B28"
+      ]
+    }
+  ],
+  "changeAreas": [
+    {
+      "area": "스키마",
+      "paths": [
+        "prisma/schema.prisma",
+        "prisma/migrations/<new>_question_author_assets/migration.sql"
+      ],
+      "changes": "Blob/Asset/reservation/typed refs 및 nullable optionImageKey; FILE union과 scope/FK/불변/deferred graph 제약; 기존 행·migration 수정 없음"
+    },
+    {
+      "area": "계약/저장/복제",
+      "paths": [
+        "src/contracts/question-materials.ts",
+        "src/contracts/questions.ts",
+        "src/contracts/option-identities.ts",
+        "src/contracts/form-copy.ts",
+        "src/server/question-options.ts",
+        "src/server/forms.ts",
+        "src/server/templates.ts",
+        "src/server/approvals.ts"
+      ],
+      "changes": "엄격 union·max·current omission/null; copy scope mapping; JSON/ref 원자성; 승인pin; 기존 fingerprint 보존"
+    },
+    {
+      "area": "I/O 신규제안",
+      "paths": [
+        "src/server/author-assets.ts",
+        "src/server/author-asset-access.ts",
+        "src/server/author-asset-validation.ts",
+        "src/server/author-asset-gc.ts",
+        "src/app/api/v1/author-assets/**"
+      ],
+      "changes": "durable init/PUT/complete/bind, scoped preview/download; raw blob key 비공개; 기존 FILE allowlist 미확장"
+    },
+    {
+      "area": "quota/audit/cache/worker",
+      "paths": [
+        "src/server/files.ts",
+        "src/server/company-management.ts",
+        "src/server/service-management.ts",
+        "src/server/idempotency.ts",
+        "src/server/form-audit-events.ts",
+        "src/server/audit-resources.ts",
+        "scripts/worker.ts"
+      ],
+      "changes": "공통 quota 직렬화/합산, author_asset cache, 불변 parent 감사 mapping, draft/template refs release/GC"
+    },
+    {
+      "area": "공개/정정/공유",
+      "paths": [
+        "src/server/submissions.ts",
+        "src/server/submission-management.ts",
+        "src/server/sharing.ts",
+        "src/server/viewer.ts"
+      ],
+      "changes": "원래 version 및 선택 질문만 material/option asset 접근. 새 자산을 답변 CSV/동의 receipt 법률 evidence에 삽입하지 않음"
+    }
+  ],
+  "testPlan": [
+    "기존 공개 계약·server를 통해 FILE/optionImageKey 미지원 RED; helper import collection failure 금지",
+    "strict FILE/LINK 합계3·순서·nullable·UUID와 extra field, old DTO/hash 불변",
+    "이미지 RADIO/CHECKBOX ordinary20·1MiB, dropdown/matrix/custom 거절, 타입전환 명시null, current omit/history 재유입 방지",
+    "실제 clean PDF/DOCX/AI PDF·PS/JPEG/PNG scan·암호화저장·download bytes/hash",
+    "1/5MiB 경계·size/hash/MIME/extension·ZIP/이미지 자원상한·ENTITY/암호화·EICAR·scanner실패/서명오래됨",
+    "255UTF16 제안 파일명 bound·긴 한글/보조평면·CRLF/NUL/path/잘못된Unicode 거절·안전 header·EXIF 방향",
+    "타tenant/service/parent/question/purpose 주입, pending wrongowner, raw blob 정보 미노출",
+    "ready전 bind·반복complete·취소/늦은업로드·TTL·감사 rollback·추적 가능한 orphan",
+    "same-scope copy/revise/template 및 cross-service use 새asset+quota; public template→회사 A/B, A삭제 뒤 B bytes 유지",
+    "권한회수·SSO/MFA/IP/password/session/company·I/O후 만료·idempotent replay·409 원자성",
+    "published/approval pin·현재 교체/삭제/이름변경 후 old bytes/name·directSQL 불변/scope/type/status/graph 거절",
+    "구응답 정정·선택질문 공유·token/grant 회수·응답상한과 content read 구분",
+    "FileObject/business/author quota 경합, attach/clone 대 GC 양순서 READ COMMITTED·고정snapshot 정책·실패409 rollback",
+    "응답파기가 author asset을 지우지 않음, draft/template release, 마지막blobGC crash/retry, closed/recovery와 타회사clone 생존",
+    "기존 FILE/DRAW/LINK/custom/문서/CSV/PDF/영수증 frozen bytes/hash 및 old null DTO 보존",
+    "실제 Ego 업로드/교체/취소/순서/유형변경/게시/개정/모든허용템플릿scope/다운로드/권한회수/quota/재시작"
+  ],
+  "openDecisions": [
+    "root 최종 스키마/API 명칭과 migration 번호",
+    "공용 template의 trusted seed 또는 플랫폼 publisher 관리 범위",
+    "세 quota writer를 포함하는 outer transaction 잠금의 정확한 구현",
+    "DOCX/AI 검사 라이브러리·지원형식 fixture, bounded image 크기 및 파일명 로컬 상한",
+    "시스템 자산 quota와 최종 회사 erasure/복구 API의 별도 제품 범위"
+  ],
+  "evidence": [
+    {
+      "id": "B01",
+      "path": "src/server/files.ts",
+      "sha256": "89d02d977c1ac2c9f8e4c12fe0cea7bd4a558879d2686768f36a65076fd88562",
+      "lineCount": 184,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 18,
+          "endLine": 32,
+          "sha256": "c7af3b02b436f509d30e6dbceaec52394bae5583cbaee736435ea1e0739af38f"
+        },
+        {
+          "startLine": 34,
+          "endLine": 85,
+          "sha256": "c0e288cfbbed1549034762480eb34e77e672165f4bf99d1b90d68c77e9a0ee3e"
+        },
+        {
+          "startLine": 90,
+          "endLine": 132,
+          "sha256": "711304f8fa8f8acf3e8a64b368055d89f5f1ceee5eb3b549dd7354469aa030b2"
+        },
+        {
+          "startLine": 134,
+          "endLine": 183,
+          "sha256": "226d8a1185be0e6583fb673084e6b2f935a3ca7e5871ac37a0d26545f75e4772"
+        }
+      ]
+    },
+    {
+      "id": "B02",
+      "path": "src/server/file-access.ts",
+      "sha256": "5d69c3b1ec143b709fb32a829cd5e97d6c5d36e6701536660d798286bc992feb",
+      "lineCount": 149,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 18,
+          "endLine": 40,
+          "sha256": "f2a6cccd9703dbdda0d904c93562b9cf690d839615770bf2b074278145635194"
+        },
+        {
+          "startLine": 49,
+          "endLine": 115,
+          "sha256": "aa98956ad68e9fcc8d870d9dc59639bf72768997446fe1fce0ad0fbca14856d5"
+        },
+        {
+          "startLine": 117,
+          "endLine": 148,
+          "sha256": "c8a82a51cdb9eff962410b0770916a477470deac3809253a1d22327598f853c1"
+        }
+      ]
+    },
+    {
+      "id": "B03",
+      "path": "src/server/file-bindings.ts",
+      "sha256": "17d9484a8999e5aae54d016029da275e50a71788907cbf261599c8536900ff19",
+      "lineCount": 57,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 57,
+          "sha256": "17d9484a8999e5aae54d016029da275e50a71788907cbf261599c8536900ff19"
+        }
+      ]
+    },
+    {
+      "id": "B04",
+      "path": "src/server/file-download.ts",
+      "sha256": "10e0d63516de97899cda7b6752407715fc53109546d251023e0fec1cb9000945",
+      "lineCount": 73,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 14,
+          "endLine": 72,
+          "sha256": "67925961103c3073b6732939439e0f89e59fd9bdda76864738e146c1b330b273"
+        }
+      ]
+    },
+    {
+      "id": "B05",
+      "path": "src/server/file-validation.ts",
+      "sha256": "98738853c605eb95fc53acea63ac72ef8d13a790e0a9d00b0ab08a01fa402b9c",
+      "lineCount": 48,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 6,
+          "endLine": 47,
+          "sha256": "ac207ab0ad8c1903a6424cfb0c64871ee0d92f6196a6388f037a35e821c6a06c"
+        }
+      ]
+    },
+    {
+      "id": "B06",
+      "path": "src/server/file-scanner.ts",
+      "sha256": "2d09f1f2f7be3c3fce7dce442b0ddcc6791a6324978269a709dd390795b4431e",
+      "lineCount": 47,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 7,
+          "endLine": 46,
+          "sha256": "a5e6b76e1575d12857d7efd740c075dd510ada3a441cee7c166ea9001a557d74"
+        }
+      ]
+    },
+    {
+      "id": "B07",
+      "path": "src/server/file-storage.ts",
+      "sha256": "c170df25a5ef48b73cea4470895768185244ec6d690461f955baed5f102c3da7",
+      "lineCount": 89,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 8,
+          "endLine": 89,
+          "sha256": "4024888ff57ba84ef8dde24935cfa2bb4c8530b29b12dc58a04edadae2d3bf9f"
+        }
+      ]
+    },
+    {
+      "id": "B08",
+      "path": "src/server/s3-storage.ts",
+      "sha256": "315cc789bb1ae00c272bf6e83909eef046662f8138698ab3243fc27c26374663",
+      "lineCount": 59,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 29,
+          "endLine": 58,
+          "sha256": "b52f44c5afd92e5d60551f2c56f6a1d1439cec4fa69774957995727a978d05fa"
+        }
+      ]
+    },
+    {
+      "id": "B09",
+      "path": "src/contracts/files.ts",
+      "sha256": "fed0f280c4b41468f8e9eafa4a6792568d9da55b99e1965254201234c937c0cd",
+      "lineCount": 15,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 15,
+          "sha256": "fed0f280c4b41468f8e9eafa4a6792568d9da55b99e1965254201234c937c0cd"
+        }
+      ]
+    },
+    {
+      "id": "B10",
+      "path": "src/contracts/question-materials.ts",
+      "sha256": "9d2f6b837f8800f4c875ac053bed7d60b969049d286aa45cd1a50deb882b906c",
+      "lineCount": 68,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 68,
+          "sha256": "9d2f6b837f8800f4c875ac053bed7d60b969049d286aa45cd1a50deb882b906c"
+        }
+      ]
+    },
+    {
+      "id": "B11",
+      "path": "src/contracts/option-identities.ts",
+      "sha256": "ef535cf5c2fd7e970669f07323d2dec3287a6810184426a4511f79394181e276",
+      "lineCount": 42,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 5,
+          "endLine": 41,
+          "sha256": "6160bc620dcec798204be6108e0310e5f24d5fa170f730e7a4da66ecbf0027ae"
+        }
+      ]
+    },
+    {
+      "id": "B12",
+      "path": "src/contracts/form-copy.ts",
+      "sha256": "f7116f6021716937822e1eb5074d8ec1b21323e7d24fe558829ea99c7074f260",
+      "lineCount": 23,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 4,
+          "endLine": 22,
+          "sha256": "4ccea1aebffd07ebc79d109dc4472ed1e8a71d9994c0f79f2b92a6b00b4abbec"
+        }
+      ]
+    },
+    {
+      "id": "B13",
+      "path": "src/server/question-options.ts",
+      "sha256": "c8219d035494815e5cc31d0f654019809eecb3e2b51911c95eabfeda2074f985",
+      "lineCount": 12,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 12,
+          "sha256": "c8219d035494815e5cc31d0f654019809eecb3e2b51911c95eabfeda2074f985"
+        }
+      ]
+    },
+    {
+      "id": "B14",
+      "path": "src/server/forms.ts",
+      "sha256": "9356e0215638ea8b5b7d715a10c23d9b9f73dc30ed48c26f72d5a7bd197dcb26",
+      "lineCount": 495,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 43,
+          "endLine": 89,
+          "sha256": "0cb8aaea5b94fc270df4de4cadb5e685fc0a176c9c820c87125b20ea1859cab0"
+        },
+        {
+          "startLine": 108,
+          "endLine": 133,
+          "sha256": "b48d5f7cea8f4fb7ac66efba75cd61c21599b66a6ed43c3e473b44fa88d0ac43"
+        },
+        {
+          "startLine": 145,
+          "endLine": 207,
+          "sha256": "17dbfacf90685a9728016379c0f773b88c8c034be532214b7ef10bc3fc52a3e6"
+        },
+        {
+          "startLine": 235,
+          "endLine": 327,
+          "sha256": "392b51cdce7ebec45dd2c2c2a3b6ef2c75045403d65ae1fa850425907a99a530"
+        },
+        {
+          "startLine": 353,
+          "endLine": 437,
+          "sha256": "e54af002e9d91fd95e860724b38b73c13fd3aef84d50ac5c2e0c74e155a49ac6"
+        }
+      ]
+    },
+    {
+      "id": "B15",
+      "path": "src/server/templates.ts",
+      "sha256": "f1bfe44e6d3ab53c597a3b8eb046f7448220b5aca42cf5bc49e05f926e175818",
+      "lineCount": 136,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 25,
+          "endLine": 69,
+          "sha256": "aa3fec8241da42c9f5706648b756ff541902a1422e3d9b9db24d9ca8f385c17b"
+        },
+        {
+          "startLine": 90,
+          "endLine": 135,
+          "sha256": "543d47c87c719a50f8fd29f61d8209e6c2f95b76d5d5673008f412b383451f51"
+        }
+      ]
+    },
+    {
+      "id": "B16",
+      "path": "src/app/api/v1/templates/[...segments]/route.ts",
+      "sha256": "d7a3b49247226ad4bea878f61c537e6efc37720627de6b831b62ed317f282a0e",
+      "lineCount": 38,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 20,
+          "endLine": 38,
+          "sha256": "5779be949c3e8d9b8e1f39133d64b826b8624a89ac1476158b75955b49881351"
+        }
+      ]
+    },
+    {
+      "id": "B17",
+      "path": "src/server/approvals.ts",
+      "sha256": "f47207517872000209542c274f96cb80acd2e2ffb1a73c7c85a2587dc868c81b",
+      "lineCount": 125,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 29,
+          "endLine": 51,
+          "sha256": "58d583c69893cba33ded0d998056bc2b63c8a77c9244674afe34eb95f4784c54"
+        },
+        {
+          "startLine": 79,
+          "endLine": 85,
+          "sha256": "33d4b9e2f491c2c585fa200239ed8678d333f4c59ec04420b235ff8ff24bc064"
+        }
+      ]
+    },
+    {
+      "id": "B18",
+      "path": "src/server/form-access.ts",
+      "sha256": "2a088f47f97e0342e0717bfab47d3e25c9c292d1bc12e926f721998142babf11",
+      "lineCount": 41,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 8,
+          "endLine": 40,
+          "sha256": "343bb57f440916d8a902e92503c3d406447474ea59375c122513a4c9ad5cf686"
+        }
+      ]
+    },
+    {
+      "id": "B19",
+      "path": "src/server/service-actor.ts",
+      "sha256": "90de94af2280241df81b535e480f44bf2b925d918bfcd2cc2649fceec4fa4545",
+      "lineCount": 63,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 20,
+          "endLine": 63,
+          "sha256": "b53837301c772ed31a8208894508a91336864f8fa45b547386c636e2d3422780"
+        }
+      ]
+    },
+    {
+      "id": "B20",
+      "path": "src/server/permissions.ts",
+      "sha256": "b76a7b3ecb720b29662d431c0737deb1d47d788b61f135d59ed41192d384b20d",
+      "lineCount": 24,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 12,
+          "endLine": 22,
+          "sha256": "6e51c8fabb86e4413951df7b4764c5132a3ad040f625d70dd535d00445e277d8"
+        }
+      ]
+    },
+    {
+      "id": "B21",
+      "path": "src/server/public-publication.ts",
+      "sha256": "599a4b65169b0af465c572bbf00a779768eb57ddbbcb6ef110139eaeac4f034c",
+      "lineCount": 22,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 4,
+          "endLine": 22,
+          "sha256": "c8d567ef5e0e21bb4db62ed03fcc4af87937268e8946fb6e7c360d1e1a836254"
+        }
+      ]
+    },
+    {
+      "id": "B22",
+      "path": "src/server/submissions.ts",
+      "sha256": "e199495671ee028ee30e85bc1e81ed9f7534de6920d5cf329671681fa87ee02a",
+      "lineCount": 144,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 36,
+          "endLine": 73,
+          "sha256": "e94830981802d4272a00cfb30d6337280833a320ff7ff8eb65d039c763961191"
+        },
+        {
+          "startLine": 130,
+          "endLine": 144,
+          "sha256": "1fecf2d23eb37c5e7a4b222f7b374a5405e90bd34a586043efc5e94b3b1773c4"
+        }
+      ]
+    },
+    {
+      "id": "B23",
+      "path": "src/server/submission-management.ts",
+      "sha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+      "lineCount": 155,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 34,
+          "endLine": 81,
+          "sha256": "287a1e3512279f986308bb20f3454a408d8aa9eb81b508d3ccd97748dc6585ea"
+        }
+      ]
+    },
+    {
+      "id": "B24",
+      "path": "src/server/sharing.ts",
+      "sha256": "805a534fd54426c26fdad6dd9ae033ee560b3d7301c372bb3e5ecfb42be49383",
+      "lineCount": 193,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 17,
+          "endLine": 40,
+          "sha256": "2002e1223d099ec6dd58ba49e13da171bdb6a412d014a83f535f5be6485e1ae6"
+        }
+      ]
+    },
+    {
+      "id": "B25",
+      "path": "src/server/viewer.ts",
+      "sha256": "6d023a948d4bfabc6caebfa3a9add9e53d8324a0ba06a53ff963cc05533aa69d",
+      "lineCount": 209,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 95,
+          "endLine": 119,
+          "sha256": "0dfaef657035139424db2cfc168a457c13d191e119c5b6f947d3b7eaa798f7a2"
+        },
+        {
+          "startLine": 136,
+          "endLine": 159,
+          "sha256": "2745aeb33a925343168dde292de150deb9b15d748abb72751334af3655393605"
+        },
+        {
+          "startLine": 189,
+          "endLine": 208,
+          "sha256": "5a952b1df97f4b9ee7d9db9dc7cd52a3abef217ff477d8d351416a11cfae38f5"
+        }
+      ]
+    },
+    {
+      "id": "B26",
+      "path": "src/server/idempotency.ts",
+      "sha256": "2df941f7f72dc7b3961d4a19bbd174a154032781a8ae377f87816575495aa7c6",
+      "lineCount": 89,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 16,
+          "sha256": "f4d2ddc396089498aa36c4e9154d7ca5bfae2612fe9a76126bb4e8c6a2fb3001"
+        },
+        {
+          "startLine": 35,
+          "endLine": 85,
+          "sha256": "59e475e35bb997502a23f77dc10e3ac332d7ec7266a2a28b38814dbd3ede588d"
+        }
+      ]
+    },
+    {
+      "id": "B27",
+      "path": "src/server/destruction-worker.ts",
+      "sha256": "d54767c5e2a876a771ae0cb6849c1b4d1a6c872036deb6ceb89114d511cd751c",
+      "lineCount": 166,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 82,
+          "endLine": 140,
+          "sha256": "b86f6a4a660db6f29ae6377445c4f4927da7ed2073ab8332c2332257a4e80337"
+        }
+      ]
+    },
+    {
+      "id": "B28",
+      "path": "src/server/company-management.ts",
+      "sha256": "f66073438de7837e42d1bfeee443c8a1d3bb30a8b90ebe03294a39fae2368be7",
+      "lineCount": 180,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 70,
+          "endLine": 97,
+          "sha256": "beb0d03b584f220d4e402dd6c1bb3f364f00ecd6eb1dee2a2a7f6bc74c0ee346"
+        },
+        {
+          "startLine": 99,
+          "endLine": 150,
+          "sha256": "3992904a6a52229babdc874750712fef3f8b671355f27bcbc3f43aec5cd02107"
+        }
+      ]
+    },
+    {
+      "id": "B29",
+      "path": "src/server/service-management.ts",
+      "sha256": "16c94f65e5e63f5bc3dfae89e5048c112af7ed3374a4ee37ebfb90b1a3283b39",
+      "lineCount": 24,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 12,
+          "endLine": 24,
+          "sha256": "387b6c79fc0d4ec427073440e991fe0bdd5f58df428460e02a9b5b9fdff4e672"
+        }
+      ]
+    },
+    {
+      "id": "B30",
+      "path": "scripts/worker.ts",
+      "sha256": "6a0685a5178dcbf5226e3e93ce1b73ef815fffca53ed9b053583505aea7fd66e",
+      "lineCount": 64,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 52,
+          "sha256": "fd5298e4e03d3b60b76c125e9cdf0a9d0862534f829898d38f289d3cc04b7d3a"
+        }
+      ]
+    },
+    {
+      "id": "B31",
+      "path": "src/server/form-audit-events.ts",
+      "sha256": "863698c100293568398ff83829910079c5e5f1788494d1afde8f143e2b825cd0",
+      "lineCount": 65,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 11,
+          "endLine": 42,
+          "sha256": "25c9870bad30f535abe005316689e0541d80e44d533daf21b4994fb96551aaa3"
+        }
+      ]
+    },
+    {
+      "id": "B32",
+      "path": "src/server/audit-resources.ts",
+      "sha256": "d08aee4c29b2a4311952b0c074b2429793486b6d228c69f4946f3eef95ca0dea",
+      "lineCount": 43,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 8,
+          "endLine": 43,
+          "sha256": "f3280142c11cca1606fbd7a03ddcfd466e011ee796fca761a75674083bbfc3fa"
+        }
+      ]
+    },
+    {
+      "id": "B33",
+      "path": "src/server/form-documents.ts",
+      "sha256": "796e7008423cc20d44bf29c027c998e20b3067f74875836687c5d5a3145caf88",
+      "lineCount": 95,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 12,
+          "endLine": 21,
+          "sha256": "4448dea83894fc1da9828adbcee538e810a1f9aec95f6e841d6a42a2c2567d0b"
+        },
+        {
+          "startLine": 31,
+          "endLine": 48,
+          "sha256": "f58592e73bd1ce80671b4b88672bd07b03020d7d98a85dd5b20153b19fe70927"
+        },
+        {
+          "startLine": 67,
+          "endLine": 95,
+          "sha256": "0545b5e51fe5ee4ae7b777912a8a16ebd0454da3d6df3f1ee53229a7684a347f"
+        }
+      ]
+    },
+    {
+      "id": "B34",
+      "path": "src/server/document-pdf.ts",
+      "sha256": "85cb22811131d253662fb30923ecd0110c4d4d0ed3bc4b923a2aff9a95ce77d6",
+      "lineCount": 45,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 10,
+          "endLine": 44,
+          "sha256": "d02512b776d0c75212fccfc958fb392e50e05581ae3a7564b8cea677137e9665"
+        }
+      ]
+    },
+    {
+      "id": "B35",
+      "path": "src/server/campaign-files.ts",
+      "sha256": "856460be236d59b020eff611373a0eb563bb7f3b3b087a555ca88c9c24772bbd",
+      "lineCount": 75,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 19,
+          "endLine": 75,
+          "sha256": "1d221d8392d7b556c7371dca0d062beb7b16a026955f3a47385fa62b7a22c3c6"
+        }
+      ]
+    },
+    {
+      "id": "B36",
+      "path": "src/server/notice-attachments.ts",
+      "sha256": "5c0028bc676376735f2673adb6c1b1da67f78a583ce8237b24d3f0aa91b6bcdc",
+      "lineCount": 127,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 27,
+          "endLine": 112,
+          "sha256": "5b3f9456580f59f6776a7fa9e15789c08f7d2ad075e848368fbd7d9bf762bdfb"
+        }
+      ]
+    },
+    {
+      "id": "B37",
+      "path": "src/server/guides.ts",
+      "sha256": "e7247c27b3f046ce13dcde1e6f1522f42ed4d4548765f2f946cd53ddd3de8ca5",
+      "lineCount": 148,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 70,
+          "endLine": 145,
+          "sha256": "15d0bc008e5118b69605d5007bc535e6cfce75fa7a5d94b01ce135428e254528"
+        }
+      ]
+    },
+    {
+      "id": "B38",
+      "path": "prisma/schema.prisma",
+      "sha256": "53dbe7d7b7e57264dfb6e3059ef1828bb178ee5fba460d0090be443e42ee896d",
+      "lineCount": 2584,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1068,
+          "endLine": 1112,
+          "sha256": "95c1cf91061905ae38b2dad8af0705c1f3a2ca9c6cfd0e27647b0a42415dedaf"
+        },
+        {
+          "startLine": 1276,
+          "endLine": 1355,
+          "sha256": "cac90128b1bd2b352998d1f80cc895ff404eefb68e167ccad90c2178c443ce07"
+        },
+        {
+          "startLine": 1388,
+          "endLine": 1410,
+          "sha256": "c7427fb250872071df41f6ad229da842a0684d7deb3ff77d1349461e28396367"
+        },
+        {
+          "startLine": 1704,
+          "endLine": 1820,
+          "sha256": "6c05f233a4e797546fe88c0e715b093f13488726edf0a249c305931154cc34ed"
+        },
+        {
+          "startLine": 1857,
+          "endLine": 1873,
+          "sha256": "9773550ad5f804bad9d0e5172c696833cbc47c5a098f0e506c9d68c3c2d49311"
+        }
+      ]
+    },
+    {
+      "id": "B39",
+      "path": "prisma/migrations/20261025009000_question_material_links/migration.sql",
+      "sha256": "1f528795c8de48f1d51931dc596da34f4c1ef7d54bdbf6fda86da48731762126",
+      "lineCount": 52,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 52,
+          "sha256": "1f528795c8de48f1d51931dc596da34f4c1ef7d54bdbf6fda86da48731762126"
+        }
+      ]
+    },
+    {
+      "id": "B40",
+      "path": "prisma/migrations/20261025006000_drawing_questions/migration.sql",
+      "sha256": "a33a727cc50a7fa778d05b7e01113548b67232b07b56d894cf3fd59f9bdc2446",
+      "lineCount": 58,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 58,
+          "sha256": "a33a727cc50a7fa778d05b7e01113548b67232b07b56d894cf3fd59f9bdc2446"
+        }
+      ]
+    },
+    {
+      "id": "B41",
+      "path": "tests/server/files.test.ts",
+      "sha256": "1688e805101eb36d4052b624e30fa02285997d8f9efd21929413e3dadad0da1b",
+      "lineCount": 337,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 91,
+          "endLine": 105,
+          "sha256": "8d884243625ab9ccf8d999abbd009b55f7348cf186e053411c1f0509ffbe78b9"
+        },
+        {
+          "startLine": 149,
+          "endLine": 170,
+          "sha256": "be13175e04943bc53834fc2fbc31e40364b93839718c7fe7f33729bb79fec0a2"
+        },
+        {
+          "startLine": 259,
+          "endLine": 284,
+          "sha256": "fe33b499c1789af42b4095adcaba444b7fb166b4b6dcb9f44251465204b0f2bd"
+        },
+        {
+          "startLine": 306,
+          "endLine": 330,
+          "sha256": "bf178cce5cf75bc3d979307a3ed0f5e6b8b816fa1f6479da83dd94ecac9fe7d1"
+        }
+      ]
+    },
+    {
+      "id": "B42",
+      "path": "tests/server/file-access-gate.test.ts",
+      "sha256": "db1888cdb08e1e6af90c02141bc3f36b7fbe88c963608ccc5abdd469ac25006e",
+      "lineCount": 230,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 90,
+          "endLine": 140,
+          "sha256": "16378be53acc1f7dd8361a44622bbb506d99c07b16dc16595ba2be5cdd9553b8"
+        },
+        {
+          "startLine": 150,
+          "endLine": 224,
+          "sha256": "e0abed12042018269f8a4974c9684ef4a2bf924cb14c3b3e7f7bab17a3960b6f"
+        }
+      ]
+    },
+    {
+      "id": "B43",
+      "path": "tests/server/question-drawing-types.test.ts",
+      "sha256": "914d3937d7ac5444eef69e83cc0ca257ca254596f8cab879a4223c87635f2fad",
+      "lineCount": 354,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 117,
+          "endLine": 144,
+          "sha256": "fdf32aeb3614e6b1a37a1eac243943c54dcff758dd33debb191fdaf62da097cb"
+        },
+        {
+          "startLine": 168,
+          "endLine": 229,
+          "sha256": "62cfcb8680132bd26e8ed7e1d6fe89e98ea95b428db64d941a2f3b19798524db"
+        },
+        {
+          "startLine": 254,
+          "endLine": 348,
+          "sha256": "4550fbffb4c774f9531f98f6efb9eee804210445059588803104c4e7574a8ae1"
+        }
+      ]
+    },
+    {
+      "id": "B44",
+      "path": "tests/server/question-material-links.test.ts",
+      "sha256": "32d7e582497e0ac1039139c3c4573062202eee02376182a257c7683c42e32a51",
+      "lineCount": 258,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 100,
+          "sha256": "3edd8ccabc47794dc457a5acf78cfeb8a08a05fd13e9aaf1449f06980574d6e1"
+        }
+      ]
+    },
+    {
+      "id": "B45",
+      "path": "src/server/consent-receipts.ts",
+      "sha256": "8fd52962540ba0c9d10b4fc5e5d373512a14dfc2dc8cf82486f2bc5616741a00",
+      "lineCount": 93,
+      "evidenceKind": "local-source-static",
+      "ranges": [
+        {
+          "startLine": 1,
+          "endLine": 65,
+          "sha256": "07471f3b7c7f2ec1793cb94c0740b9f0f766cc302579e89e455631f51e1c8f2d"
+        }
+      ]
+    }
+  ],
+  "repository": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone",
+  "capturedAt": "2026-10-10T07:45:23.622Z",
+  "planSha256": "076324309b67073659a91d23c9866d8f2ec91096ce5a710528e018bbd3206d39",
+  "rootDecisions": {
+    "explicitCopy": "copyForm/useTemplate => new scoped Asset IDs + logical quota even within same service; share immutable blob",
+    "revise": "same Asset + new pins",
+    "registerTemplate": "attach uploader reservation or verified same-service asset",
+    "pinIntegrity": "service sync + deferred final-state constraint"
+  }
+}

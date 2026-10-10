@@ -1,0 +1,48 @@
+{
+  "verifiedAt": "2026-10-10T18:53:56+09:00",
+  "checkpoint": "BI-02a",
+  "status": "passed",
+  "scope": {
+    "included": [
+      "RichDocumentV1 strict contract",
+      "resource and structural limits",
+      "plain-text projection and round trip",
+      "image discovery and immutable asset/node remap",
+      "legacy body omission/null compatibility helper contract"
+    ],
+    "excluded": [
+      "FormContent and database persistence",
+      "HTTP and OpenAPI integration",
+      "HTML parser and React renderer",
+      "browser and external-provider acceptance"
+    ]
+  },
+  "checks": [
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/rich-content-contract.test.ts tests/server/form-rich-content-contract.test.ts",
+      "exitCode": 0,
+      "result": "2 files, 46 tests passed"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/eslint/bin/eslint.js src/contracts/rich-content.ts src/contracts/form-rich-content.ts tests/server/rich-content-contract.test.ts tests/server/form-rich-content-contract.test.ts",
+      "exitCode": 0,
+      "result": "0 errors"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit --pretty false",
+      "exitCode": 0,
+      "result": "0 errors"
+    },
+    {
+      "command": "git diff --check -- src/contracts/rich-content.ts src/contracts/form-rich-content.ts tests/server/rich-content-contract.test.ts tests/server/form-rich-content-contract.test.ts",
+      "exitCode": 0,
+      "result": "clean"
+    }
+  ],
+  "files": {
+    "src/contracts/rich-content.ts": "6dd920bfe379bed97fef91637c7051f0605aabb194e7806268d2aefcf31455af",
+    "src/contracts/form-rich-content.ts": "1e782522b4f88e4c5fa58f8267dc348110dce8c60ed7ae35b6a4bcd8bbda1ced",
+    "tests/server/rich-content-contract.test.ts": "6d83bfc7f7948925da39f59ebef2b268b08bd6ca652620c9164a79336e3052d0",
+    "tests/server/form-rich-content-contract.test.ts": "c4fab79812863502bd626847d55f5a8dcb31ed832d5452744bb05fd5220a9c48"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-10-10T01:18:32.161241+00:00",
+  "agent": "prior_evidence",
+  "readOnly": true,
+  "browserRun": false,
+  "findings": [
+    {
+      "issue": "Mail type export 누락",
+      "resolution": "jobs.ts export 추가; 최종 typecheck/build 통과"
+    },
+    {
+      "issue": "여러 탭에서 stale 회사 화면의 변경이 새 회사에 적용될 수 있음",
+      "resolution": "조회/요청 tenantId 결합·Company 잠금 아래 불일치 거절; 동일 사용자의 A/B 회사 라우트 회귀 통과"
+    },
+    {
+      "issue": "최신 정책만 재조회하면 회사 헤더와 편집 대상이 달라질 수 있음",
+      "resolution": "정책 응답과 화면 companyId 불일치 시 편집 폼 미표시·전체 새로고침 안내; 소스 재검토 해소"
+    }
+  ],
+  "result": "identified findings resolved; browser acceptance pending"
+}

@@ -1,0 +1,162 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-10T10:50:54.422Z",
+  "database": "catchsecu_test",
+  "migration": "20261025019000_author_asset_rich_documents",
+  "red": {
+    "command": "vitest author-asset-references -t whole form content",
+    "result": "failed as expected",
+    "code": "RICH_BODY_IMAGES_UNAVAILABLE",
+    "beforeImplementation": true
+  },
+  "implementation": {
+    "graph": "One FormContent graph covers question materials/images plus root, page, completion and closed rich documents.",
+    "identity": "Question-free references use slot + documentKey/pageKey + nodeKey; questionKey remains null.",
+    "purposes": [
+      "FORM_CONTENT_IMAGE",
+      "PAGE_CONTENT_IMAGE",
+      "END_PAGE_CONTENT_IMAGE",
+      "PRIVATE_PAGE_CONTENT_IMAGE"
+    ],
+    "copy": "Form copy and template use create one new logical owner per unique source asset and remap every rich document.",
+    "lifetime": "Draft, published version, approval and template pins independently retain assets; final detach restores one-hour expiry.",
+    "wholeFormLimits": {
+      "richJsonBytes": 524288,
+      "richImageNodes": 100
+    }
+  },
+  "databaseGuards": {
+    "columns": [
+      {
+        "column_name": "documentKey",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "nodeKey",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "questionKey",
+        "is_nullable": "YES"
+      }
+    ],
+    "checks": [
+      {
+        "conname": "AuthorAssetReference_key_check",
+        "convalidated": true
+      },
+      {
+        "conname": "AuthorAssetReference_parent_check",
+        "convalidated": true
+      },
+      {
+        "conname": "AuthorAssetReference_slot_check",
+        "convalidated": true
+      }
+    ],
+    "triggers": [
+      {
+        "tgname": "FormSection_author_asset_consistency",
+        "relname": "FormSection",
+        "proname": "check_author_asset_graph",
+        "tgdeferrable": true,
+        "tginitdeferred": true
+      },
+      {
+        "tgname": "FormSection_author_asset_lock",
+        "relname": "FormSection",
+        "proname": "lock_author_asset_content",
+        "tgdeferrable": false,
+        "tginitdeferred": false
+      },
+      {
+        "tgname": "FormVersion_author_asset_lock",
+        "relname": "FormVersion",
+        "proname": "lock_author_asset_content",
+        "tgdeferrable": false,
+        "tginitdeferred": false
+      }
+    ],
+    "canonicalProjectionFunctions": [
+      "author_asset_document_images",
+      "author_asset_expected",
+      "author_asset_version_content",
+      "validate_author_asset_parent"
+    ]
+  },
+  "validation": {
+    "focused": {
+      "files": 4,
+      "tests": 51,
+      "result": "passed"
+    },
+    "related": {
+      "files": 14,
+      "tests": 153,
+      "result": "passed",
+      "serial": true
+    },
+    "migration": {
+      "freshInstall": 129,
+      "upgrade": "128→129",
+      "legacyReferenceUnchanged": true
+    },
+    "schemaContract": {
+      "checks": 10,
+      "indexes": 1,
+      "functions": 15,
+      "triggers": 18,
+      "unexpectedDifferences": 0
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": {
+      "result": "passed",
+      "staticPages": 82
+    },
+    "plan": {
+      "tasks": 107,
+      "sourcePaths": 186,
+      "additionalPatterns": 21,
+      "result": "passed"
+    },
+    "apiContracts": {
+      "paths": 323,
+      "operations": 458,
+      "policies": 45,
+      "unmapped": 0,
+      "result": "passed"
+    }
+  },
+  "cases": [
+    "four-slot plus question graph",
+    "duplicate nodes and logical quota",
+    "publish/revision history",
+    "approval snapshot",
+    "template pin and use remap",
+    "wrong purpose/service/expiry",
+    "audit rollback",
+    "direct SQL projection bypass",
+    "invalid document identity",
+    "GC fence",
+    "attach/GC concurrency"
+  ],
+  "externalDependencies": "No external credential or provider call is required for BI-04b backend ownership verification.",
+  "untouched": [
+    "production database",
+    "question-image frozen 20 fixture",
+    "localhost:3108 frozen runtime"
+  ],
+  "hashes": {
+    "prisma/migrations/20261025019000_author_asset_rich_documents/migration.sql": "a6d6581c991f045f318fe4d31db9cb6e34d1b973d0ec82733acbca491eed65d9",
+    "prisma/schema.prisma": "7904d683a1d43b58a3fc8471b5c073f14bd8a3e24610c461717eb93d933193d4",
+    "src/server/author-asset-references.ts": "e43f3812a07be3542c451c4a5400409db7c2ded51cc56f54f82de70f0895849e",
+    "src/server/forms.ts": "f7ca2454a114feedbeab1420f23233a15e72eb6e0452a959b0dbc11823e9be72",
+    "src/server/templates.ts": "61696063aa4cb9f408f3b1ac434416e7f0014c240f369faa11864e47d0a41895",
+    "src/server/approvals.ts": "6ebc62775db7b9927031a703a65e0e6b21b952d04e90596d8ac2a4ee9634bf26",
+    "src/contracts/form-rich-content.ts": "9a7c34a149069c95cf2b631a7c6e046b55fac88c3d55d0b81e12cc37ff676bb5",
+    "src/contracts/domains.ts": "545a80c9197c67116b19f4625a5d52c433f3cb45a5563cb5135d8255990caa92",
+    "tests/server/author-asset-references.test.ts": "c8ebe7fc5d306e8249ae938d842f6db54c840cff7796aaa9f080159e81aa1761",
+    "tests/server/form-sections-contract.test.ts": "3d55f19fb1614d92f1d4995b7936fdd11abf493ebb6427be557d6eda8853927f"
+  }
+}

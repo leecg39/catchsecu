@@ -1,0 +1,341 @@
+{
+  "checkedAt": "2026-10-09T16:26:03.684Z",
+  "database": "catchsecu_dev",
+  "readOnly": true,
+  "contractResult": "passed",
+  "runtimeResult": "not_run",
+  "allCrudVerified": false,
+  "sourceRoutes": 186,
+  "concreteRoutes": 184,
+  "fallbackRoutes": 2,
+  "additionalRoutes": 20,
+  "scenarioContracts": 618,
+  "pathsWithRealBindings": 192,
+  "missingActors": [],
+  "preparationRequired": [
+    {
+      "routeId": "RR010",
+      "template": "/alimtalk/templates/:templateId",
+      "prerequisites": [
+        "실제 DB/API에서 kakaoTemplate fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR011",
+      "template": "/alimtalk/templates/:templateId/edit",
+      "prerequisites": [
+        "실제 DB/API에서 kakaoTemplate fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR013",
+      "template": "/auth-code",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR021",
+      "template": "/bill/:id",
+      "prerequisites": [
+        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR022",
+      "template": "/bill/:id/refund",
+      "prerequisites": [
+        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR025",
+      "template": "/creditBill/:id",
+      "prerequisites": [
+        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR035",
+      "template": "/file-view/:customerId/:questionId/:fileId",
+      "prerequisites": [
+        "실제 DB/API에서 file fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR036",
+      "template": "/file-view/:customerId/:questionId/:fileId/shared",
+      "prerequisites": [
+        "실제 DB/API에서 file fixture 생성·유효 상태 확인",
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR037",
+      "template": "/file-view/:customerId/shared",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR049",
+      "template": "/form/info-upload/agreement",
+      "prerequisites": [
+        "실제 DB/API에서 importJob fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR050",
+      "template": "/form/info-upload/recipient",
+      "prerequisites": [
+        "실제 DB/API에서 importJob fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR056",
+      "template": "/gpki/email-register",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지",
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR057",
+      "template": "/gpki/fail",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR058",
+      "template": "/gwloginUser/login",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR060",
+      "template": "/identification/:result",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR061",
+      "template": "/infoOwner/action-history/:infoOwnerToken",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR062",
+      "template": "/infoOwner/agree-history/:infoOwnerToken",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR070",
+      "template": "/link/oauth2",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR071",
+      "template": "/link/oauth2/verified",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지",
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR091",
+      "template": "/login-otp",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR092",
+      "template": "/login/gpki",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR093",
+      "template": "/login/gpki/callback",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지",
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR094",
+      "template": "/login/oauth2",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR095",
+      "template": "/login/oauth2/verified",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지",
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR096",
+      "template": "/login/saeol",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR097",
+      "template": "/login/saeol/callback",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지",
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR098",
+      "template": "/login/saml",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR099",
+      "template": "/login/saml/fail",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR100",
+      "template": "/login/saml/start",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR101",
+      "template": "/login/saml/verified",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지",
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR120",
+      "template": "/oauth2/fail",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR121",
+      "template": "/oauth2/invite/signup",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR122",
+      "template": "/oauth2/signup",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR126",
+      "template": "/passwordChange",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR129",
+      "template": "/pay/credit/success/:purchaseId",
+      "prerequisites": [
+        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR135",
+      "template": "/pay/plus/success/:purchaseId",
+      "prerequisites": [
+        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR136",
+      "template": "/pay/plus/success/:purchasedId/:type",
+      "prerequisites": [
+        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR138",
+      "template": "/pay/result/success/:purchaseId",
+      "prerequisites": [
+        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
+      ]
+    },
+    {
+      "routeId": "RR145",
+      "template": "/saeol/fail/:org",
+      "prerequisites": [
+        "시험 IdP/기관 계정과 서명된 실제 callback 준비. 임의 result/state로 대체 금지"
+      ]
+    },
+    {
+      "routeId": "RR173",
+      "template": "/shared-privacy/email-verify",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR174",
+      "template": "/shared-privacy/verify",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR175",
+      "template": "/shared-privacy/view",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR184",
+      "template": "/two-step",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "RR185",
+      "template": "/two-step-setting",
+      "prerequisites": [
+        "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
+      ]
+    },
+    {
+      "routeId": "AR020",
+      "template": "/email/unsubscribe/:token",
+      "prerequisites": [
+        "실제 DB/API에서 unsubscribeToken fixture 생성·유효 상태 확인"
+      ]
+    }
+  ],
+  "strictReadiness": "blocked",
+  "limitation": "DB 참조 및 시나리오 계약 검사. HTTP/브라우저 CRUD 실행과 외부 공급사 수용은 별도 수행."
+}

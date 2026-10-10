@@ -1,0 +1,689 @@
+{
+  "result": "passed",
+  "database": "catchsecu_test",
+  "checkedAt": "2026-10-09T18:57:46.900Z",
+  "scope": "six management models; metadata and explicit tenant/state/uniqueness assertions, not all business acceptance",
+  "tables": [
+    "Company",
+    "Service",
+    "Membership",
+    "ServiceGrant",
+    "AccessRequest",
+    "CompanyBusinessFile"
+  ],
+  "columns": [
+    {
+      "table": "AccessRequest",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "requesterId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "reason",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "reviewerId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "decisionNote",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "resolvedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccessRequest",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "name",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "publicName",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "address",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "phone",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "website",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "businessNo",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "billingEmail",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "billingContactName",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "billingContactPhone",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Company",
+      "column": "closureRequestedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "Company",
+      "column": "closureReasonCipher",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Company",
+      "column": "closureRequestedById",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "nameCipher",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "mime",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "size",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "sha256",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "storageKey",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "scanEngine",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "scannedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "role",
+      "type": "USER-DEFINED",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "accessKind",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "expertAssignmentId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Service",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Service",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Service",
+      "column": "name",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Service",
+      "column": "externalName",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Service",
+      "column": "description",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Service",
+      "column": "type",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Service",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Service",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "Service",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Service",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "memberId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "capabilities",
+      "type": "ARRAY",
+      "nullable": "YES"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    }
+  ],
+  "constraints": [
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_requester_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"requesterId\") REFERENCES \"Membership\"(\"tenantId\", id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_reviewer_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"reviewerId\") REFERENCES \"Membership\"(\"tenantId\", id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_service_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_state_check",
+      "definition": "CHECK (((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'cancelled'::text])) AND (version > 0) AND (((status = 'pending'::text) AND (\"reviewerId\" IS NULL) AND (\"resolvedAt\" IS NULL) AND (\"decisionNote\" = ''::text)) OR ((status = 'cancelled'::text) AND (\"reviewerId\" IS NULL) AND (\"resolvedAt\" IS NOT NULL) AND (\"decisionNote\" = ''::text)) OR ((status = ANY (ARRAY['approved'::text, 'rejected'::text])) AND (\"reviewerId\" IS NOT NULL) AND (\"resolvedAt\" IS NOT NULL)))))"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "Company",
+      "name": "Company_closure_request_check",
+      "definition": "CHECK ((((\"closureRequestedAt\" IS NULL) AND (\"closureReasonCipher\" IS NULL) AND (\"closureRequestedById\" IS NULL)) OR ((\"closureRequestedAt\" IS NOT NULL) AND (\"closureReasonCipher\" IS NOT NULL) AND (\"closureRequestedById\" IS NOT NULL))))"
+    },
+    {
+      "table": "Company",
+      "name": "Company_closure_requested_by_fkey",
+      "definition": "FOREIGN KEY (id, \"closureRequestedById\") REFERENCES \"Membership\"(\"tenantId\", \"userId\") ON DELETE RESTRICT"
+    },
+    {
+      "table": "Company",
+      "name": "Company_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Company",
+      "name": "Company_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'suspended'::text, 'closing'::text, 'closed'::text])))"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_check",
+      "definition": "CHECK ((((status = 'deleted'::text) AND (\"nameCipher\" IS NULL) AND (mime IS NULL) AND (size = 0) AND (sha256 IS NULL) AND (\"storageKey\" IS NULL)) OR ((status <> 'deleted'::text) AND (\"nameCipher\" IS NOT NULL) AND (mime = ANY (ARRAY['application/pdf'::text, 'image/png'::text, 'image/jpeg'::text])) AND (size > 0) AND (sha256 IS NOT NULL) AND (\"storageKey\" IS NOT NULL))))"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_size_check",
+      "definition": "CHECK (((size >= 0) AND (size <= 10485760)))"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'deleting'::text, 'deleted'::text])))"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_storageKey_key",
+      "definition": "UNIQUE (\"storageKey\")"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_tenantId_id_key",
+      "definition": "UNIQUE (\"tenantId\", id)"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_accessKind_check",
+      "definition": "CHECK ((((\"accessKind\" = 'direct'::text) AND (\"expertAssignmentId\" IS NULL)) OR ((\"accessKind\" = 'expert'::text) AND (\"expertAssignmentId\" IS NOT NULL) AND (role = 'viewer'::\"Role\"))))"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_expertAssignment_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"expertAssignmentId\", \"userId\") REFERENCES \"ExpertAssignment\"(\"tenantId\", id, \"expertUserId\") ON DELETE RESTRICT"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'suspended'::text, 'revoked'::text])))"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "Service",
+      "name": "Service_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Service",
+      "name": "Service_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'archived'::text])))"
+    },
+    {
+      "table": "Service",
+      "name": "Service_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_tenantId_memberId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"memberId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_tenantId_serviceId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE CASCADE"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_one_pending_key",
+      "definition": "CREATE UNIQUE INDEX \"AccessRequest_one_pending_key\" ON public.\"AccessRequest\" USING btree (\"tenantId\", \"requesterId\", \"serviceId\") WHERE (status = 'pending'::text)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_pkey",
+      "definition": "CREATE UNIQUE INDEX \"AccessRequest_pkey\" ON public.\"AccessRequest\" USING btree (id)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_requester_created_idx",
+      "definition": "CREATE INDEX \"AccessRequest_requester_created_idx\" ON public.\"AccessRequest\" USING btree (\"tenantId\", \"requesterId\", \"createdAt\", id)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_status_created_idx",
+      "definition": "CREATE INDEX \"AccessRequest_status_created_idx\" ON public.\"AccessRequest\" USING btree (\"tenantId\", status, \"createdAt\", id)"
+    },
+    {
+      "table": "AccessRequest",
+      "name": "AccessRequest_tenant_id_key",
+      "definition": "CREATE UNIQUE INDEX \"AccessRequest_tenant_id_key\" ON public.\"AccessRequest\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "Company",
+      "name": "Company_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Company_pkey\" ON public.\"Company\" USING btree (id)"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_active_tenant_key",
+      "definition": "CREATE UNIQUE INDEX \"CompanyBusinessFile_active_tenant_key\" ON public.\"CompanyBusinessFile\" USING btree (\"tenantId\") WHERE (status = 'active'::text)"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_pkey",
+      "definition": "CREATE UNIQUE INDEX \"CompanyBusinessFile_pkey\" ON public.\"CompanyBusinessFile\" USING btree (id)"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_status_createdAt_idx",
+      "definition": "CREATE INDEX \"CompanyBusinessFile_status_createdAt_idx\" ON public.\"CompanyBusinessFile\" USING btree (status, \"createdAt\")"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_storageKey_key",
+      "definition": "CREATE UNIQUE INDEX \"CompanyBusinessFile_storageKey_key\" ON public.\"CompanyBusinessFile\" USING btree (\"storageKey\")"
+    },
+    {
+      "table": "CompanyBusinessFile",
+      "name": "CompanyBusinessFile_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"CompanyBusinessFile_tenantId_id_key\" ON public.\"CompanyBusinessFile\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_expertAssignmentId_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_expertAssignmentId_key\" ON public.\"Membership\" USING btree (\"expertAssignmentId\")"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Membership_pkey\" ON public.\"Membership\" USING btree (id)"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_tenantId_id_key\" ON public.\"Membership\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenantId_id_userId_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_tenantId_id_userId_key\" ON public.\"Membership\" USING btree (\"tenantId\", id, \"userId\")"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenantId_userId_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_tenantId_userId_key\" ON public.\"Membership\" USING btree (\"tenantId\", \"userId\")"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenant_assignment_user_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_tenant_assignment_user_key\" ON public.\"Membership\" USING btree (\"tenantId\", \"expertAssignmentId\", \"userId\")"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_userId_status_idx",
+      "definition": "CREATE INDEX \"Membership_userId_status_idx\" ON public.\"Membership\" USING btree (\"userId\", status)"
+    },
+    {
+      "table": "Service",
+      "name": "Service_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Service_pkey\" ON public.\"Service\" USING btree (id)"
+    },
+    {
+      "table": "Service",
+      "name": "Service_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Service_tenantId_id_key\" ON public.\"Service\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "Service",
+      "name": "Service_tenantId_name_key",
+      "definition": "CREATE UNIQUE INDEX \"Service_tenantId_name_key\" ON public.\"Service\" USING btree (\"tenantId\", name)"
+    },
+    {
+      "table": "Service",
+      "name": "Service_tenantId_status_createdAt_id_idx",
+      "definition": "CREATE INDEX \"Service_tenantId_status_createdAt_id_idx\" ON public.\"Service\" USING btree (\"tenantId\", status, \"createdAt\", id)"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_pkey",
+      "definition": "CREATE UNIQUE INDEX \"ServiceGrant_pkey\" ON public.\"ServiceGrant\" USING btree (id)"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_tenantId_memberId_serviceId_key",
+      "definition": "CREATE UNIQUE INDEX \"ServiceGrant_tenantId_memberId_serviceId_key\" ON public.\"ServiceGrant\" USING btree (\"tenantId\", \"memberId\", \"serviceId\")"
+    }
+  ],
+  "sourceFingerprints": {
+    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/migrations/20261003140000_service_access_requests/migration.sql": "fb97b6980807154a6862ce53d037c71d931e1f048ce13c05cf5cdd3adeefcd05",
+    "src/server/company-management.ts": "9df1b5042cfa2b52ebbfa922a16ca0de193acb82f366a1eb47f4be753057f286",
+    "src/server/service-management.ts": "16c94f65e5e63f5bc3dfae89e5048c112af7ed3374a4ee37ebfb90b1a3283b39",
+    "src/server/access-requests.ts": "bf1be491ffae5ea0f85c8ef050206f2799d1322806d31c2b241f1fd57389c3aa",
+    "src/contracts/access-requests.ts": "8defe9040457a2cd0721537db0054ad2cdddb15cb9de236a3d174cc9bc7fdba9"
+  }
+}

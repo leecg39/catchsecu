@@ -1,4 +1,5 @@
 import { randomBytes, randomUUID } from "node:crypto";
+import { assertSsoProviderPolicy } from "./sso-policy-enforcement";
 import { makeSignature } from "better-auth/crypto";
 import { z } from "zod";
 import type { Transaction } from "./db";
@@ -15,10 +16,10 @@ import { trustedClientIp } from "./client-ip";
 const bindingSchema = z.object({
   userId: z.string(), tenantId: z.string(), providerId: z.string(), providerVersion: z.number().int(),
   accountId: z.string(), memberId: z.string(), memberVersion: z.number().int(), passwordChangedAt: z.string().nullable(),
-  originalSessionId: z.string().nullable(),
+  originalSessionId: z.string().nullable(), authenticatedAt: z.iso.datetime(),
 });
 type Binding = z.infer<typeof bindingSchema>;
-export type SsoMfaAuthorization = { bindingId: string; userId: string; tenantId: string; deadline: Date };
+export type SsoMfaAuthorization = { bindingId: string; userId: string; tenantId: string; providerId: string; accountId: string; authenticatedAt: Date; deadline: Date };
 type AuthContext = { internalAdapter: {
   findVerificationValue(identifier: string): Promise<{ id: string; value: string; expiresAt: Date } | null>;
 } };
@@ -65,6 +66,7 @@ export async function bindSsoMfa(identifier: string, context: AuthContext, heade
     || !provider.enabled || !provider.preflightOk || provider.version !== binding.providerVersion)
     fail(409, "SSO_CONFIGURATION_CHANGED", "SSO 설정이 변경되었습니다. 다시 로그인해주세요.");
   await assertCompanyIp(binding.tenantId, trustedClientIp(headers), tx);
+  await assertSsoProviderPolicy(tx, provider);
   const member = await tx.membership.findFirst({ where: { id: binding.memberId, tenantId: binding.tenantId,
     userId: binding.userId, status: "active", accessKind: "direct", version: binding.memberVersion } });
   const account = await tx.account.findFirst({ where: { id: binding.accountId, userId: binding.userId, providerId: "sso:" + binding.providerId } });
@@ -82,5 +84,6 @@ export async function bindSsoMfa(identifier: string, context: AuthContext, heade
   if (deadline <= new Date()) fail(401, "SSO_MFA_EXPIRED", "SSO 인증이 만료되었습니다.");
   scope.actorId = binding.userId; scope.tenantId = binding.tenantId;
   scope.proofDeadline = !scope.proofDeadline || deadline < scope.proofDeadline ? deadline : scope.proofDeadline;
-  scope.ssoMfa = { bindingId: proof.id, userId: binding.userId, tenantId: binding.tenantId, deadline };
+  scope.ssoMfa = { bindingId: proof.id, userId: binding.userId, tenantId: binding.tenantId, providerId: binding.providerId,
+    accountId: binding.accountId, authenticatedAt: new Date(binding.authenticatedAt), deadline };
 }

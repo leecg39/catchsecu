@@ -3,25 +3,39 @@ import { useState } from "react";
 import type { ConsentDisplaySnapshot, FormConsentBundle, FormDocumentOption, DocumentSelection } from "@/contracts/form-documents";
 import type { Paged } from "@/contracts/forms";
 import { useResource } from "@/lib/api";
+import type { FormLanguage } from "@/contracts/form-language";
+import { formPrivacyPolicyLabel, formRequiredLabel } from "@/contracts/form-system-copy";
+import type { ConsentItem } from "@/contracts/consent-items";
+import { personalInformationLabels } from "./QuestionPersonalInformation";
 
-export function ConsentDisplay({ display }: { display: ConsentDisplaySnapshot | null | undefined }) {
+export function ConsentItems({ items, emptyMessage }: { items?: readonly ConsentItem[]; emptyMessage?: string }) {
+  if (!items) return null;
+  return <section className="consent-collected-items"><h3>문항에서 수집하는 개인정보</h3>
+    {items.length ? <ul aria-label="동의서 자동 집계 항목">{items.map((item, index) => <li key={`${item.type}-${item.name}-${index}`}>
+      <strong>{personalInformationLabels[item.type]}</strong> · <span dir="auto">{item.name}</span>
+    </li>)}</ul> : <p>{emptyMessage ?? "개인정보로 분류해 확인한 수집 항목이 없습니다."}</p>}
+    <p className="cs-muted">문항별 개인정보 분류에서 자동 집계한 항목입니다.</p>
+  </section>;
+}
+
+export function ConsentDisplay({ display, language }: { display: ConsentDisplaySnapshot | null | undefined; language?: FormLanguage }) {
   if (!display) return null;
   return <div className="consent-display"><p><strong>{display.name}</strong></p><p>{display.startText}</p>
     {display.processorText && <p>{display.processorText}</p>}{display.policyText && <p>{display.policyText}</p>}
-    {display.policy?.kind === "external" && <a className="cs-link" href={display.policy.url} target="_blank" rel="noopener noreferrer">개인정보 처리방침</a>}
-    {display.policy?.kind === "document" && <details><summary>개인정보 처리방침 v{display.policy.number} · {display.policy.title}</summary>
+    {display.policy?.kind === "external" && <a className="cs-link" href={display.policy.url} target="_blank" rel="noopener noreferrer">{formPrivacyPolicyLabel(language)}</a>}
+    {display.policy?.kind === "document" && <details><summary>{formPrivacyPolicyLabel(language)} v{display.policy.number} · {display.policy.title}</summary>
       <pre>{display.policy.renderedText}</pre><p className="consent-hash">본문 해시: {display.policy.contentHash}</p></details>}
   </div>;
 }
-export function ConsentDocuments({ bundle, selectable = false }: { bundle: FormConsentBundle | null | undefined; selectable?: boolean }) {
+export function ConsentDocuments({ bundle, selectable = false, language }: { bundle: FormConsentBundle | null | undefined; selectable?: boolean; language?: FormLanguage }) {
   if (!bundle?.documents.length) return null;
   return <div className="consent-documents">{bundle.documents.map(document => <section className="public-consent" key={document.key}>
-    <h3>{document.title} · v{document.number}</h3><ConsentDisplay display={document.display} />
+    <h3>{document.title} · v{document.number}</h3><ConsentDisplay display={document.display} language={language} />
     <details><summary>동의 문서 전체 보기 · {document.kind === "collection" ? "수집·이용" : "제3자 제공"}</summary>
       <pre>{document.renderedText}</pre><p className="consent-hash">본문 해시: {document.contentHash}</p></details>
     <p>{document.required ? document.display.requiredText : document.display.optionalText}</p>
     {selectable ? <label className="cs-row"><input type="checkbox" name="documentConsents" value={document.key} required={document.required} />
-      [{document.required ? "필수" : "선택"}] {document.title} v{document.number}에 동의합니다.</label> : <p>{document.required ? "필수" : "선택"} 동의 항목</p>}
+      [{formRequiredLabel(language, document.required)}] {document.title} v{document.number}에 동의합니다.</label> : <p>{formRequiredLabel(language, document.required)} 동의 항목</p>}
   </section>)}</div>;
 }
 export function FormDocumentsEditor({ serviceId, selections, stored, onChange, kind }: { serviceId: string; selections: DocumentSelection[]; kind?: DocumentSelection["kind"];

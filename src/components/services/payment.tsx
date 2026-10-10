@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { api, ApiError, errorText, useResource } from "@/lib/api";
 import type { AssetOverview, BillingOverview, PlanRecord, SubscriptionRecord } from "@/contracts/subscriptions";
+import { securityCapabilities, securityCapabilityLabels } from "@/contracts/feature-entitlements";
 import type { BillingHistoryList } from "@/contracts/billing-history";
 import type { LedgerOverview } from "@/contracts/ledger";
 import type { PaymentMethodRecord } from "@/contracts/payment-methods";
@@ -47,7 +48,7 @@ export function MembershipPage() {
       </header><ul><li><span>✓</span>서비스 {version?.serviceLimit ?? "무제한"}개</li>
         <li><span>✓</span>구성원 {version?.memberLimit ?? "무제한"}명</li>
         <li><span>✓</span>개인정보 주체 {version?.subjectLimit ?? "무제한"}명</li>
-        <li><span>✓</span>캐치폼 {version?.formLimit ?? "무제한"}개</li></ul></article>;
+        <li><span>✓</span>캐치폼 {version?.formLimit ?? "무제한"}개</li>{securityCapabilities.map(capability=><li key={capability}><span>{version?.capabilities.includes(capability)?"✓":"–"}</span>{securityCapabilityLabels[capability]} {version?.capabilities.includes(capability)?"포함":"미포함"}</li>)}</ul></article>;
     })}</div>
     <p className="svc-muted">연간 최종 금액은 아직 확인되지 않았습니다. 구독 요청은 결제를 진행하거나 유료 기능을 활성화하지 않습니다.</p>
   </Panel></div></>;
@@ -107,6 +108,7 @@ export function LicenseManagement() {
             <ActionButton type="submit" secondary disabled={busy !== null}>종료 예약</ActionButton>
           </form>)}
       </div>)}</Panel>
+      <Panel title="보안 설정 이용 권한">{entitlement && securityCapabilities.map(capability=><p key={capability}>{securityCapabilityLabels[capability]}: {entitlement.security[capability].available?"이용 가능":entitlement.security[capability].state==="not_included"?"현재 구독에 미포함":"이용 가능한 구독 없음"}</p>)}</Panel>
       <PaymentOrdersPanel onChanged={() => state.reload()}/>
       <PaymentMethodsPanel methods={methods}/>
       <Panel title="이용 한도"><p className="svc-muted">{entitlement?.active ? `이용 종료 시각: ${dateTime(entitlement.periodEnd)}` : "현재 이용 가능한 구독이 없습니다."}</p>

@@ -1,0 +1,206 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 전체 구현 검증"(2): 2 managed, 0 untracked — p1* "캐치시큐 데모", p2 "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=460]
+        container
+          text "서비스명"
+          text "SSO 문맥 시험 A"
+        container
+          text "외부 ⓘ"
+          text "-"
+          image
+      container
+        anchor [ref=461, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        button [ref=462]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=463]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=464]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=465]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=466]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=467]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=468]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=469]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=470, loc=href:/shared-privacy/view, url=http://localhost:3100/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=471, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=472, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          anchor [ref=473, loc=href:https://catchsecu.com/, url=https://catchsecu.com/]
+            text "홈페이지"
+          anchor [ref=474, loc=href:/legal/privacy, url=http://localhost:3100/legal/privacy]
+            text "개인정보"
+            text "처리방침"
+          anchor [ref=475, loc=href:/legal/terms, url=http://localhost:3100/legal/terms]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          button "회사 선택" [ref=476, loc=css:button[aria-label="회사 선택"]]
+            text "SSO 문맥 시험 A"
+            text "⌄"
+        container
+          button [ref=477]
+            svg_root
+            text "검색"
+            text "Ctrl K"
+          button "키보드 단축키 안내" [ref=478, loc=css:button[aria-label="키보드 단축키 안내"]]
+            svg_root
+          button [ref=479]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=480, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+            image
+          button "문의" [ref=481, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=482, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+            image
+          button [ref=483]
+            image
+            text "MY"
+      container [ref=484]
+        container
+          heading
+            text "SSO 연결 관리"
+          container
+            anchor [ref=485, loc=href:/security/sso, url=http://localhost:3100/security/sso]
+              text "로그인 정책"
+            button [ref=486]
+              text "SSO 연결 등록"
+        paragraph
+          text "OIDC 또는 SAML 공급자로 회사 구성원의 로그인을 연결합니다. 등록 후 사전검사를 통과해야 활성화할 수 있습니다. 사용 중지·인증 정보 교체는 새 로그..."
+        container
+          container
+            container
+              text "SSO 연결 검색"
+              textbox [ref=487, loc=css:input[placeholder="이름·프로토콜·Issuer"]]
+                text "문맥 시험 OIDC"
+            container
+              text "SSO 연결 정렬"
+              combobox [ref=488]
+                text "등록일순"
+          region "SSO 연결 목록" [ref=489, loc=role:region[name="SSO 연결 목록"]]
+            table
+              table_row
+                table_cell
+                  text "프로토콜"
+                table_cell
+                  text "Issuer"
+                table_cell
+                  text "로그인 주소"
+                table_cell
+                  text "사전검사"
+                table_cell
+                  text "사용 상태"
+                table_cell
+                  text "등록일"
+                table_cell
+                  text "관리"
+              table_row
+                table_cell
+                  text "OIDC"
+                table_cell
+                  text "https://127.0.0.1:3444"
+                table_cell
+                  text "/api/v1/auth/sso/da189306-0f53-48af-9a72-80ac8506ea5f?mode=login"
+                table_cell
+                  text "미통과 —"
+                  text "JWKS 조회 실패: 인증 제공자가 공개 인터넷 주소를 사용하지 않습니다."
+                table_cell
+                  text "사용 안 함"
+                table_cell
+                  text "2026. 10. 10."
+                table_cell
+                  button [ref=490]
+                    text "사전검사"
+                  button [ref=491]
+                    text "사용"
+                  button [ref=492]
+                    text "수정"
+                  button [ref=493]
+                    text "삭제"
+          container
+            container
+              text "총"
+              text "1"
+              text "개 ·"
+              text "1"
+              text "/"
+              text "1"
+              text "쪽"
+            container
+              button [ref=494]
+                text "이전"
+              button [ref=495]
+                text "다음"
+        dialog "SSO 연결 수정" [ref=496, loc=role:dialog[name="SSO 연결 수정"]]
+          container
+            heading
+              text "SSO 연결 수정"
+            button "닫기" [ref=497, loc=css:button[aria-label="닫기"]]
+              text "×"
+          form
+            paragraph
+              text "인증서·시크릿·스코프를 변경하면 새 로그인과 진행 중 인증이 중지됩니다. 기존 로그인은 유지됩니다. 활성 구성원의 다른 로그인 수단을 먼저 준비..."
+            alert
+              paragraph
+                text "다른 곳에서 수정됐습니다. 현재 입력을 복사한 뒤 최신 내용으로 다시 편집해주세요."
+              button [ref=503]
+                text "최신 내용 불러오기"
+            group [ref=498]
+              container
+                text "표시 이름"
+                textbox [ref=499, loc=css:input[name="name"]]
+                  text "내가 입력한 충돌 이름"
+              container
+                text "스코프"
+                textbox [ref=500, loc=css:input[name="scopes"]]
+                  text "openid email"
+              container
+                text "클라이언트 시크릿 교체 (비우면 유지)"
+                textbox [ref=501, loc=css:input[name="clientSecret"]]
+            button [ref=502]
+              text "저장"
+  alertdialog "최신 SSO 설정 불러오기" [ref=504, loc=role:alertdialog[name="최신 SSO 설정 불러오기"]]
+    heading
+      text "최신 SSO 설정 불러오기"
+    container
+      text "현재 입력한 이름·시크릿·인증서를 버리고 최신 설정을 불러올까요?"
+      container
+        button [ref=505]
+          text "계속 편집"
+        button [ref=506]
+          text "입력 버리고 불러오기"

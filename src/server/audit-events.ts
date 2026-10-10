@@ -11,6 +11,7 @@ import { safeCsvCell } from "./import-csv";
 import { lockServiceActor } from "./service-actor";
 import { roleCapabilities } from "./permissions";
 import { auditAccess } from "./audit";
+import { auditResources, hiddenAuditResource } from "./audit-resources";
 
 export const auditEventQuery = z.object({
   scope: z.enum(["company", "mine"]).default("company"),
@@ -27,7 +28,7 @@ export type AuditEventQuery = z.infer<typeof auditEventQuery>;
 
 export const actionPrefixes: Record<AuditEventQuery["kind"], readonly string[]> = {
   all: [], service: ["service.", "company."],
-  info: ["submission.", "file.", "consent_receipt.", "destruction.", "import."],
+  info: ["submission.", "file.", "author_asset.", "consent_receipt.", "destruction.", "import."],
   marketing: ["marketing."], customer: ["subject.", "submission."],
   member: ["member.", "invitation.", "expert.", "access_request.", "company.ownership_"],
   authority: ["member.", "invitation.", "expert.", "access_request.", "policy.", "mfa_policy.", "mfa_exception.", "ip_access.", "ip_rule."],
@@ -63,7 +64,7 @@ export async function listOwnAuditEvents(actor: AccountActor, input: AuditEventQ
       orderBy: [{ createdAt: "desc" }, { id: "desc" }], skip: (page - 1) * input.pageSize, take: input.pageSize });
     await auditAccess(tx, { tenantId: null, user: current.user }, requestId, "audit.viewed", accessDetail(input, rows.length));
     assertFileDeadlines(current.deadlines);
-    return { items: rows.map(row => ({ ...row, resourceId: null, serviceId: null, serviceName: null, actorName: current.user.name })),
+    return { items: rows.map(row => ({ ...row, resourceId: null, serviceId: null, serviceName: null, actorName: current.user.name, ...hiddenAuditResource })),
       total, page, pageSize: input.pageSize };
   }, auditTransaction);
 }
@@ -132,11 +133,13 @@ export async function safeRows(tx: Transaction, ctx: Context, rows: AuditRow[], 
   const services = rows.length ? await tx.service.findMany({ where: { tenantId: ctx.tenantId,
     id: { in: rows.flatMap(row => row.serviceId ? [row.serviceId] : []) } }, select: { id: true, name: true } }) : [];
   const names = new Map(services.map(item => [item.id, item.name]));
+  const resources = await auditResources(tx, ctx.tenantId, rows, companyWide);
   const showActor = companyWide || scope === "mine";
   return rows.map(row => ({ id: row.id, createdAt: row.createdAt, action: row.action,
     resource: row.resource, resourceId: companyWide && row.resourceId && safeResourceId.test(row.resourceId) ? row.resourceId : null,
     serviceId: row.serviceId, serviceName: row.serviceId ? names.get(row.serviceId) ?? "조회할 수 없는 서비스" : null,
-    actorName: showActor ? row.actor?.name ?? "처리자 정보 없음" : null }));
+    actorName: showActor ? row.actor?.name ?? "처리자 정보 없음" : null,
+    ...(resources.get(row.id) ?? hiddenAuditResource) }));
 }
 
 export async function listAuditEvents(ctx: Context, input: AuditEventQuery, requestId: string = randomUUID()) {
@@ -163,9 +166,9 @@ export async function exportAuditEvents(ctx: Context, input: AuditEventQuery, re
     if (rows.length > maxAuditExportRows)
       fail(413, "AUDIT_EXPORT_LIMIT", "내보낼 기록이 5,000건을 넘습니다. 기간이나 서비스를 좁혀주세요.");
     const safe = await safeRows(tx, current, rows, companyWide, input.scope);
-    const csvRows = [["이벤트 ID", "처리일시", "서비스명", "처리자명", "처리내용", "처리대상", "대상 ID"],
+    const csvRows = [["이벤트 ID", "처리일시", "서비스명", "처리자명", "처리내용", "처리대상", "대상 ID", "캐치폼·개인정보 업로드명", "응답 ID"],
       ...safe.map(item => [item.id, item.createdAt.toISOString(), item.serviceName ?? "회사 공통",
-        item.actorName ?? "비공개", item.action, item.resource, item.resourceId ?? ""])];
+        item.actorName ?? "비공개", item.action, item.resource, item.resourceId ?? "", item.formName ?? "", item.submissionId ?? ""])];
     const csv = "\uFEFF" + csvRows.map(row => row.map(safeCsvCell).join(",")).join("\r\n") + "\r\n";
     await auditAccess(tx, current, requestId, "audit.exported", accessDetail(input, safe.length), input.serviceId);
     assertFileDeadlines(deadlines);

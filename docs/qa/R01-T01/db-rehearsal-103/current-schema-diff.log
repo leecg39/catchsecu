@@ -1,0 +1,275 @@
+Loaded Prisma config from prisma.config.ts.
+
+
+[*] Changed the `AccessRequest` table
+  [-] Removed foreign key on columns (tenantId, requesterId)
+  [-] Removed foreign key on columns (tenantId, reviewerId)
+  [-] Removed foreign key on columns (tenantId, serviceId)
+  [-] Removed foreign key on columns (tenantId)
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+  [+] Added foreign key on columns (tenantId)
+  [+] Added foreign key on columns (tenantId, requesterId)
+  [+] Added foreign key on columns (tenantId, serviceId)
+  [+] Added foreign key on columns (tenantId, reviewerId)
+  [*] Renamed index `AccessRequest_requester_created_idx` to `AccessRequest_tenantId_requesterId_createdAt_id_idx`
+  [*] Renamed index `AccessRequest_status_created_idx` to `AccessRequest_tenantId_status_createdAt_id_idx`
+  [*] Renamed index `AccessRequest_tenant_id_key` to `AccessRequest_tenantId_id_key`
+
+[*] Changed the `Account` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)
+
+[*] Changed the `AccountClosure` table
+  [-] Removed foreign key on columns (userId)
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)
+  [+] Added foreign key on columns (userId)
+
+[*] Changed the `ActivityReview` table
+  [*] Renamed the foreign key "ActivityReview_auditEvent_fkey" to "ActivityReview_tenantId_serviceId_auditEventId_recipientUs_fkey"
+  [*] Renamed the foreign key "ActivityReview_destroyApprover_fkey" to "ActivityReview_tenantId_destroyApproverId_fkey"
+  [*] Renamed the foreign key "ActivityReview_recipient_fkey" to "ActivityReview_tenantId_recipientId_recipientUserId_fkey"
+  [*] Renamed the foreign key "ActivityReview_requester_fkey" to "ActivityReview_tenantId_requesterId_fkey"
+  [*] Renamed the foreign key "ActivityReview_service_fkey" to "ActivityReview_tenantId_serviceId_fkey"
+
+[*] Changed the `ActivityReviewMessage` table
+  [*] Renamed the foreign key "ActivityReviewMessage_author_fkey" to "ActivityReviewMessage_tenantId_authorId_fkey"
+  [*] Renamed the foreign key "ActivityReviewMessage_review_fkey" to "ActivityReviewMessage_tenantId_reviewId_fkey"
+
+[*] Changed the `BillingMonthClose` table
+  [-] Removed foreign key on columns (tenantId)
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `None`)
+  [+] Added foreign key on columns (tenantId)
+  [*] Renamed index `BillingMonthClose_key` to `BillingMonthClose_tenantId_month_currency_key`
+
+[*] Changed the `BillingPlanVersion` table
+  [-] Removed foreign key on columns (planId)
+  [+] Added foreign key on columns (planId)
+
+[*] Changed the `BillingSubscription` table
+  [-] Removed foreign key on columns (planId)
+  [-] Removed foreign key on columns (planVersionId, planId)
+  [-] Removed foreign key on columns (tenantId)
+  [+] Added foreign key on columns (tenantId)
+  [+] Added foreign key on columns (planId)
+  [+] Added foreign key on columns (planVersionId, planId)
+
+[*] Changed the `BillingSubscriptionEvent` table
+  [-] Removed foreign key on columns (subscriptionId)
+  [+] Added foreign key on columns (subscriptionId)
+
+[*] Changed the `Company` table
+  [-] Removed foreign key on columns (id, closureRequestedById)
+
+[*] Changed the `CompanyBusinessFile` table
+  [-] Removed foreign key on columns (tenantId)
+  [+] Added foreign key on columns (tenantId)
+
+[*] Changed the `ComplianceClose` table
+  [*] Renamed the foreign key "ComplianceClose_tenant_fkey" to "ComplianceClose_tenantId_fkey"
+
+[*] Changed the `ComplianceExportJob` table
+  [*] Renamed the foreign key "ComplianceExportJob_close_fkey" to "ComplianceExportJob_tenantId_closeId_fkey"
+  [*] Renamed the foreign key "ComplianceExportJob_requester_fkey" to "ComplianceExportJob_tenantId_memberId_requesterId_fkey"
+
+[*] Changed the `CreditAccount` table
+  [-] Removed foreign key on columns (tenantId)
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+  [+] Added foreign key on columns (tenantId)
+
+[*] Changed the `EmailFeedback` table
+  [-] Removed foreign key on columns (tenantId, deliveryId)
+  [-] Removed foreign key on columns (jobId)
+  [-] Removed foreign key on columns (tenantId, serviceId)
+  [+] Added foreign key on columns (tenantId, serviceId)
+  [+] Added foreign key on columns (jobId)
+  [+] Added foreign key on columns (tenantId, deliveryId)
+  [*] Renamed index `EmailFeedback_contact_kind_time` to `EmailFeedback_tenantId_serviceId_contactHash_kind_occurredA_idx`
+  [*] Renamed index `EmailFeedback_delivery_time` to `EmailFeedback_deliveryId_createdAt_id_idx`
+  [*] Renamed index `EmailFeedback_job_kind` to `EmailFeedback_jobId_kind_idx`
+  [*] Renamed index `EmailFeedback_scope_key` to `EmailFeedback_tenantId_serviceId_contactHash_id_key`
+
+[*] Changed the `EmailSuppression` table
+  [-] Removed foreign key on columns (tenantId, serviceId, contactHash, sourceEventId)
+  [+] Added foreign key on columns (tenantId, serviceId, contactHash, sourceEventId)
+  [*] Renamed index `EmailSuppression_identity_key` to `EmailSuppression_tenantId_serviceId_contactHash_reason_key`
+  [*] Renamed index `EmailSuppression_service_time` to `EmailSuppression_tenantId_serviceId_createdAt_id_idx`
+
+[*] Changed the `ExpertAssignment` table
+  [-] Removed foreign key on columns (assignedById)
+  [-] Removed foreign key on columns (expertUserId)
+  [-] Removed foreign key on columns (tenantId)
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+  [+] Added foreign key on columns (tenantId)
+  [+] Added foreign key on columns (expertUserId)
+  [+] Added foreign key on columns (assignedById)
+  [*] Renamed index `ExpertAssignment_tenant_id_key` to `ExpertAssignment_tenantId_id_key`
+  [*] Renamed index `ExpertAssignment_tenant_id_user_key` to `ExpertAssignment_tenantId_id_expertUserId_key`
+  [*] Renamed index `ExpertAssignment_tenant_user_key` to `ExpertAssignment_tenantId_expertUserId_key`
+  [*] Renamed index `ExpertAssignment_user_status_expiry_idx` to `ExpertAssignment_expertUserId_status_expiresAt_idx`
+
+[*] Changed the `ExpertAssignmentService` table
+  [-] Removed foreign key on columns (tenantId, assignmentId)
+  [-] Removed foreign key on columns (tenantId, serviceId)
+  [+] Added foreign key on columns (tenantId, assignmentId)
+  [+] Added foreign key on columns (tenantId, serviceId)
+  [*] Renamed index `ExpertAssignmentService_scope_key` to `ExpertAssignmentService_tenantId_assignmentId_serviceId_key`
+  [*] Renamed index `ExpertAssignmentService_service_idx` to `ExpertAssignmentService_tenantId_serviceId_idx`
+
+[*] Changed the `FileObject` table
+  [-] Removed foreign key on columns (tenantId, serviceId, campaignId)
+  [-] Removed index on columns (campaignId, status)
+  [-] Removed index on columns (senderId, status)
+  [+] Added foreign key on columns (tenantId, serviceId, campaignId)
+
+[*] Changed the `Guide` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+
+[*] Changed the `Job` table
+  [-] Removed index on columns (campaignDeliveryId)
+  [-] Removed index on columns (marketingPreferenceId)
+  [-] Removed index on columns (marketingSubmissionId)
+  [-] Removed index on columns (senderId, status)
+
+[*] Changed the `KakaoChannel` table
+  [*] Renamed the foreign key "KakaoChannel_service_fkey" to "KakaoChannel_tenantId_serviceId_fkey"
+
+[*] Changed the `KakaoTemplate` table
+  [*] Renamed the foreign key "KakaoTemplate_channel_fkey" to "KakaoTemplate_tenantId_channelId_fkey"
+
+[*] Changed the `LedgerEntry` table
+  [-] Removed foreign key on columns (transactionId)
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `None`)
+  [+] Added foreign key on columns (transactionId)
+
+[*] Changed the `LedgerTransaction` table
+  [-] Removed foreign key on columns (reservationId)
+  [-] Removed foreign key on columns (tenantId)
+  [-] Removed foreign key on columns (tenantId, serviceId)
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `None`)
+  [+] Added foreign key on columns (tenantId)
+  [+] Added foreign key on columns (tenantId, serviceId)
+  [+] Added foreign key on columns (reservationId)
+  [*] Renamed index `LedgerTransaction_reservation_idx` to `LedgerTransaction_reservationId_idx`
+  [*] Renamed index `LedgerTransaction_tenant_currency_created_idx` to `LedgerTransaction_tenantId_currency_createdAt_id_idx`
+  [*] Renamed index `LedgerTransaction_tenant_service_created_idx` to `LedgerTransaction_tenantId_serviceId_createdAt_id_idx`
+
+[*] Changed the `Membership` table
+  [-] Removed foreign key on columns (tenantId, expertAssignmentId, userId)
+  [+] Added foreign key on columns (tenantId, expertAssignmentId, userId)
+  [*] Renamed index `Membership_tenant_assignment_user_key` to `Membership_tenantId_expertAssignmentId_userId_key`
+
+[*] Changed the `MessageTemplateRevision` table
+  [-] Removed foreign key on columns (tenantId, actorId)
+
+[*] Changed the `MfaException` table
+  [-] Removed foreign key on columns (tenantId, createdById)
+  [-] Removed foreign key on columns (tenantId, memberId)
+  [+] Added foreign key on columns (tenantId, memberId)
+  [+] Added foreign key on columns (tenantId, createdById)
+
+[*] Changed the `Notice` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+
+[*] Changed the `NoticeAttachment` table
+  [-] Removed foreign key on columns (noticeId)
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+  [+] Added foreign key on columns (noticeId)
+  [*] Renamed index `NoticeAttachment_notice_status_created_idx` to `NoticeAttachment_noticeId_status_createdAt_id_idx`
+  [*] Renamed index `NoticeAttachment_status_created_idx` to `NoticeAttachment_status_createdAt_id_idx`
+
+[*] Changed the `NotificationAttempt` table
+  [-] Removed foreign key on columns (deliveryId)
+  [+] Added foreign key on columns (deliveryId)
+
+[*] Changed the `NotificationDelivery` table
+  [-] Removed foreign key on columns (tenantId, serviceId, eventId)
+  [-] Removed foreign key on columns (tenantId, serviceId, integrationId)
+  [+] Added foreign key on columns (tenantId, serviceId, integrationId)
+  [+] Added foreign key on columns (tenantId, serviceId, eventId)
+
+[*] Changed the `NotificationEvent` table
+  [-] Removed foreign key on columns (tenantId, serviceId)
+  [+] Added foreign key on columns (tenantId, serviceId)
+
+[*] Changed the `NotificationIntegration` table
+  [-] Removed foreign key on columns (tenantId, creatorId)
+  [-] Removed foreign key on columns (tenantId, serviceId)
+  [+] Added foreign key on columns (tenantId, serviceId)
+  [+] Added foreign key on columns (tenantId, creatorId)
+
+[*] Changed the `NotificationSubscription` table
+  [-] Removed foreign key on columns (tenantId, serviceId, integrationId)
+  [+] Added foreign key on columns (tenantId, serviceId, integrationId)
+
+[*] Changed the `PaymentEvent` table
+  [*] Renamed the foreign key "PaymentEvent_order_fkey" to "PaymentEvent_orderId_fkey"
+
+[*] Changed the `PaymentMethod` table
+  [*] Renamed the foreign key "PaymentMethod_tenant_fkey" to "PaymentMethod_tenantId_fkey"
+
+[*] Changed the `PaymentOrder` table
+  [*] Renamed the foreign key "PaymentOrder_method_fkey" to "PaymentOrder_tenantId_methodId_fkey"
+  [*] Renamed the foreign key "PaymentOrder_subscription_fkey" to "PaymentOrder_subscriptionId_fkey"
+
+[*] Changed the `PaymentRefund` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `None`)
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+  [*] Renamed the foreign key "PaymentRefund_order_fkey" to "PaymentRefund_tenantId_orderId_fkey"
+  [*] Renamed index `PaymentRefund_order` to `PaymentRefund_tenantId_orderId_status_idx`
+  [*] Renamed index `PaymentRefund_tenant_id` to `PaymentRefund_tenantId_id_key`
+
+[*] Changed the `PurposeRevision` table
+  [-] Removed foreign key on columns (tenantId, actorId)
+  [+] Added foreign key on columns (tenantId, actorId)
+
+[*] Changed the `RateLimit` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)
+
+[*] Changed the `RecipientRevision` table
+  [-] Removed foreign key on columns (tenantId, actorId)
+  [+] Added foreign key on columns (tenantId, actorId)
+
+[*] Changed the `RetentionRule` table
+  [*] Renamed the foreign key "RetentionRule_service_fkey" to "RetentionRule_tenantId_serviceId_fkey"
+  [*] Renamed the foreign key "RetentionRule_tenant_fkey" to "RetentionRule_tenantId_fkey"
+
+[*] Changed the `Session` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)
+
+[*] Changed the `SsoProvider` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `None`)
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+
+[*] Changed the `SsoState` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `None`)
+
+[*] Changed the `Subprocessor` table
+  [*] Renamed the foreign key "Subprocessor_service_fkey" to "Subprocessor_tenantId_serviceId_fkey"
+
+[*] Changed the `SubprocessorNotice` table
+  [*] Renamed the foreign key "SubprocessorNotice_actor_fkey" to "SubprocessorNotice_tenantId_actorId_fkey"
+  [*] Renamed the foreign key "SubprocessorNotice_subprocessor_fkey" to "SubprocessorNotice_tenantId_subprocessorId_fkey"
+
+[*] Changed the `SupportTicket` table
+  [-] Removed foreign key on columns (answeredById)
+  [-] Removed foreign key on columns (authorId)
+  [-] Removed foreign key on columns (tenantId)
+  [-] Removed foreign key on columns (tenantId, serviceId)
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+  [+] Added foreign key on columns (tenantId)
+  [+] Added foreign key on columns (tenantId, serviceId)
+  [+] Added foreign key on columns (authorId)
+  [+] Added foreign key on columns (answeredById)
+  [*] Renamed index `SupportTicket_status_created_idx` to `SupportTicket_status_createdAt_id_idx`
+  [*] Renamed index `SupportTicket_tenant_author_status_created_idx` to `SupportTicket_tenantId_authorId_status_createdAt_id_idx`
+
+[*] Changed the `TwoFactor` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)
+
+[*] Changed the `User` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)
+
+[*] Changed the `Verification` table
+  [*] Altered column `id` (default changed from `Some(DbGenerated(Some("(gen_random_uuid())::text")))` to `Some(DbGenerated(Some("gen_random_uuid()::text")))`)

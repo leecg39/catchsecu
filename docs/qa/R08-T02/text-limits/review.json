@@ -1,0 +1,8 @@
+{
+  "mode": "independent read-only review; no test execution by reviewer",
+  "finding": "Legacy subjectRole null limits incorrectly compared role cap against raw padded value, invalidating unrelated corrections.",
+  "fix": "Server questionTextMaxLength uses explicit/general1000/20000; subject validators retain trim-based identity caps. Browser answerTextMaxLength retains role input caps.",
+  "regression": "question-text-limits: legacy subject values keep trim-based identity checks during unrelated corrections",
+  "otherFindings": 0,
+  "recheck": "Independent read-only reviewer confirmed fix, no additional findings; regression included in38 passed tests"
+}

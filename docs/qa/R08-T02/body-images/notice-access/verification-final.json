@@ -1,0 +1,81 @@
+{
+  "result": "passed",
+  "checkpoint": "BI-05c",
+  "recordedAt": "2026-10-10T21:01:01+09:00",
+  "scope": "완료·마감 rich 편집, 활성/완료/마감/viewer 분리 읽기 권한, 완료 증명, 명시적 viewer 폼 본문 공유",
+  "automatedValidation": {
+    "files": 9,
+    "tests": 83,
+    "breakdown": {
+      "question-image-backend": 16,
+      "author-asset-reads": 8,
+      "sharing": 22,
+      "form-sections-persistence": 7,
+      "public-submission-state": 6,
+      "public-submission-gate": 10,
+      "author-asset-api-and-rich-openapi": 14
+    },
+    "typecheck": "passed",
+    "eslint": "passed",
+    "productionBuild": {
+      "status": "passed",
+      "staticPages": 82,
+      "testOnlyProviderFlags": [
+        "ALLOW_LOCAL_MAIL=1",
+        "ALLOW_LOCAL_KAKAO=1",
+        "ALLOW_LOCAL_PAYMENT=1"
+      ]
+    },
+    "openapiPaths": 323,
+    "plan": {
+      "tasks": 107,
+      "sourcePaths": 186,
+      "concretePaths": 184,
+      "fallbackPaths": 2,
+      "additionalPaths": 21,
+      "cycles": 0
+    },
+    "diffCheck": "passed"
+  },
+  "stateMatrix": {
+    "active": "폼 본문, 페이지, 질문, 동의 surface만 허용",
+    "completion": "성공한 제출의 암호화 증명과 정확한 게시본에 결합된 완료 surface만 허용",
+    "closed": "일시중지, 기간 종료, 응답 한도에서 마감 surface만 허용",
+    "private": "토큰 회수, 보관/삭제, 회사/서비스 비활성은 모든 public surface 거절",
+    "viewer": "선택 질문과 소속 페이지, 명시적 shareFormBody grant의 폼 본문만 허용"
+  },
+  "browser": {
+    "browser": "Ego Lite",
+    "server": "production build on localhost:3113",
+    "database": "catchsecu_test",
+    "steps": [
+      "custom completion and closed rich text saved",
+      "two PNG assets uploaded and ClamAV-clean",
+      "active form published without notice leakage",
+      "one public submission displayed exact completion notice and image",
+      "paused form displayed only closed notice and image",
+      "database and production HTTP byte hashes matched"
+    ],
+    "evidence": [
+      "browser/prepare.json",
+      "browser/browser-db.json",
+      "browser/closed-http.json"
+    ]
+  },
+  "schema": {
+    "database": "catchsecu_test",
+    "unexpectedDiffs": 0,
+    "intentionalSqlOnlyDiffs": 1,
+    "evidence": [
+      "schema/catchsecu_test-contract.json",
+      "schema/catchsecu_test-checked-diff.sql"
+    ]
+  },
+  "externalDependencies": [],
+  "remaining": [
+    "BI-06 rich 완료/영수증/PDF 증거 v2와 과거 증거 호환",
+    "BI-07 전체 상태, 복제, 템플릿, 승인, 게시 이력, 접근성, 성능 수용",
+    "R08-T02와 전체 계획의 남은 수용 조건"
+  ],
+  "overallGoalComplete": false
+}

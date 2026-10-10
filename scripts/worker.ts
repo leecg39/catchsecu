@@ -5,6 +5,7 @@ import { cleanupCampaigns } from "../src/server/campaign-worker";
 import { randomUUID } from "node:crypto";
 import { db } from "../src/server/db";
 import { runOneJob } from "../src/server/jobs";
+import { cleanupAuthorAssets } from "../src/server/author-asset-uploads";
 import { cleanupExpiredFiles } from "../src/server/files";
 import { cleanupNoticeAttachments } from "../src/server/notice-attachments";
 import { cleanupBusinessFiles } from "../src/server/company-management";
@@ -35,6 +36,8 @@ async function main() {
       await cleanupSubjectAccess();
       await cleanupExpiredImports();
       await cleanupExpiredExports();
+      const authorCleanup = await cleanupAuthorAssets();
+      if (authorCleanup.deleted || authorCleanup.retry) console.info("문항 첨부 자료 정리", authorCleanup);
       const cleanup = await cleanupExpiredFiles();
       if (cleanup.deleted || cleanup.retry) console.info("임시 파일 정리", cleanup);
       const noticeCleanup = await cleanupNoticeAttachments();

@@ -1,0 +1,805 @@
+{
+  "schemaVersion": 1,
+  "status": "읽기 전용 분석 및 renderer v2 구현 전략 확정안; 구현 승인·실행 전",
+  "observedAt": "2026-10-10T05:42:47.261Z",
+  "scope": {
+    "repository": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone",
+    "authorizedOutput": "docs/qa/R08-T02/international-contact/pdf-language-gap.json",
+    "methods": [
+      "제품·의존성 소스 읽기",
+      "기존 폰트 fontkit cmap·glyph 메타데이터 조회",
+      "181개 국가명 및 16언어 시스템 문구 코드포인트 비교",
+      "공식 PDFKit/fontkit/Unicode/Noto 웹 자료 조회",
+      "공식 npm registry의 dependency/version/integrity 메타데이터 조회(설치 없음)"
+    ],
+    "notPerformed": [
+      "제품 코드 수정",
+      "DB 조회·변경",
+      "테스트 실행",
+      "브라우저 실행",
+      "PDF 생성",
+      "새 폰트 다운로드·설치",
+      "시스템 폰트 복사"
+    ],
+    "originBoundary": "아랍어 폼 실제 HTTP 게시 422 PDF_UNSUPPORTED_CHARACTER는 부모 에이전트가 관찰한 결과이며 이 조사자가 재실행하지 않았다. 원본 Catchsecu PDF 지원에 대한 관찰은 아니다."
+  },
+  "conclusion": [
+    "현재 한글 단일 폰트의 cmap 사전검사가 아랍어·태국어·일부 터키어를 거절한다. 16언어의 실제 문구를 지원하려면 Arabic/Thai 외에 Latin 확장 글리프도 필요하다.",
+    "글리프 보유와 아랍어 문단의 bidi·shaping 정확성은 별도 조건이다. PDFKit 0.20.2의 현재 호출 경로에 폰트만 추가해서 올바른 혼합 방향 문단이 보장된다고 판단할 근거가 없다.",
+    "기존 rendererVersion=1, PDF_FONT_HASH, 원래 폰트 바이트와 렌더 알고리즘을 유지하고, 확장 경로만 rendererVersion=2 및 별도 폰트 manifest hash로 구분하는 것이 최소 호환 설계다.",
+    "저장된 DocumentPdf와 ConsentReceipt는 재생성하지 않고 기존 bytes/pdfHash/contentHash/evidence를 그대로 보존해야 한다."
+  ],
+  "sourceSnapshotSha256": {
+    "src/data/form-countries.json": "c683cb1b85530af1e90f6224e000f7dddaf5dcbcd53ba41ad38a27945880cee4",
+    "src/data/form-system-copy.json": "6c9f6f1bba196cfdd4962fe1214d62594e5e05ce8c8ca568f1ff516227ce5906",
+    "src/server/pdf-renderer.ts": "4dde7b7d4006399cd56a29529da2dff93aa869bb40c9d8516d28993f9a6177ba",
+    "src/server/consent-receipts.ts": "8fd52962540ba0c9d10b4fc5e5d373512a14dfc2dc8cf82486f2bc5616741a00",
+    "src/server/document-pdf.ts": "85cb22811131d253662fb30923ecd0110c4d4d0ed3bc4b923a2aff9a95ce77d6"
+  },
+  "localEvidence": [
+    {
+      "file": "src/server/pdf-renderer.ts",
+      "lines": "8-20, 24-34, 44-59",
+      "facts": [
+        "rendererVersion=1 및 고정 단일 폰트 SHA-256이다.",
+        "text/title/author의 비공백 코드포인트가 단일 폰트에 없으면 PDF_UNSUPPORTED_CHARACTER를 낸다.",
+        "label과 생성된 header/footer는 현재 사전 문자 검사에 포함되지 않는다.",
+        "한 폰트와 기본 text()를 사용하며 script/language/direction/features를 전달하지 않는다.",
+        "기존 본문 500000 UTF-16 단위, 250페이지, 16MiB 제한이 있다."
+      ]
+    },
+    {
+      "file": "src/server/consent-receipts.ts",
+      "lines": "20-24, 35-56, 58-76, 79-91",
+      "facts": [
+        "schemaVersion=1 동의 증거의 canonicalDocument 해시가 documentHash다.",
+        "PDF 소스는 폼 제목·본문·목적·동의 표시·동의 문서·한글 고정 문구다. 질문 라벨과 질문 답변, formLanguage는 포함하지 않는다.",
+        "폼 게시 preflight는 선택 동의 문서까지 PDF 검증한다.",
+        "영수증은 실제 PDF 바이트를 암호화 저장하고 읽을 때 복호화·해시검사한다. 다시 렌더하지 않는다.",
+        "영수증 저장에는 rendererVersion/fontHash가 없다. PDF 레이아웃 버전과 evidence schemaVersion을 같은 개념으로 바꾸면 안 된다."
+      ]
+    },
+    {
+      "file": "src/server/forms.ts",
+      "lines": "273",
+      "facts": [
+        "게시 경로에서 preflightConsentReceipt를 호출한다. 이 지점의 PDF 실패가 실제 게시를 막을 수 있다."
+      ]
+    },
+    {
+      "file": "src/server/document-pdf.ts",
+      "lines": "10-24",
+      "facts": [
+        "DocumentVersion을 잠그고 이미 저장된 PDF를 재사용한다.",
+        "저장된 PDF가 없을 때에만 renderPdf 후 생성한다.",
+        "게시 시점이 오래된 DocumentVersion이라도 아직 PDF가 없다면 최초 다운로드 때 현 렌더러가 실행된다. 신규 렌더러 선택 정책을 명시해야 한다."
+      ]
+    },
+    {
+      "file": "prisma/schema.prisma",
+      "lines": "1496-1517, 1783-1797",
+      "facts": [
+        "DocumentPdf에는 rendererVersion/fontHash가 있지만 ConsentReceipt에는 없다."
+      ]
+    },
+    {
+      "file": "prisma/migrations/20261002201000_document_pdf/migration.sql",
+      "lines": "15-20, 25-32",
+      "facts": [
+        "rendererVersion > 0과 SHA-256 형식/실제 PDF hash를 검사하므로 DocumentPdf의 version 2 값 저장 자체에 스키마 변경은 필요하지 않다.",
+        "기존 DocumentPdf UPDATE/DELETE는 불변 트리거가 차단한다. 이를 해제하거나 기존 행을 갱신하는 마이그레이션이 필요하지 않다."
+      ]
+    },
+    {
+      "file": "node_modules/pdfkit/js/pdfkit.js",
+      "lines": "3417-3418, 3440-3466, 3469-3484",
+      "facts": [
+        "font.layout(text, features)만 전달한다.",
+        "features가 없으면 공백·탭 경계로 나눈 run을 입력 순서로 연결한다.",
+        "fontkit glyph codePoints를 PDF subset의 ToUnicode 입력에 사용한다.",
+        "이 파일의 다른 bidi/stringprep 검색 결과는 암호화/SASL 처리일 수 있으므로 텍스트 bidi 지원 근거로 사용하지 않았다."
+      ]
+    },
+    {
+      "file": "node_modules/fontkit/src/layout/LayoutEngine.js",
+      "lines": "25-80",
+      "facts": [
+        "단일 script/language/direction의 GlyphRun을 만들고 GSUB/GPOS로 대체·배치한다."
+      ]
+    },
+    {
+      "file": "node_modules/fontkit/src/layout/Script.js",
+      "lines": "156-179",
+      "facts": [
+        "자동 script는 첫 Common/Inherited/Unknown 이외 문자를 기반으로 고른다. 문단 전체를 방향·스크립트 run으로 분해하는 알고리즘은 아니다."
+      ]
+    },
+    {
+      "file": "node_modules/fontkit/src/layout/GlyphRun.js",
+      "lines": "33-40",
+      "facts": [
+        "direction 미지정 시 script 기본 방향을 적용한다."
+      ]
+    },
+    {
+      "file": "node_modules/fontkit/src/opentype/OTLayoutEngine.js",
+      "lines": "61-80",
+      "facts": [
+        "GPOS 처리 후 RTL run glyph/position 순서를 뒤집는다. 단일 run 처리를 혼합 문단 Unicode bidi 완성으로 간주하면 안 된다."
+      ]
+    }
+  ],
+  "glyphAudit": {
+    "fontSha256": "6bcb2a0703aa137e874fc2dffa85f6c21ba9a67fa329e81b8c801663af7e992a",
+    "postscriptName": "NotoSansCJKkr-Regular",
+    "characterSetCount": 44810,
+    "cmapSetSha256": "0600474ec33a82598363720512afe3662e817b63240bec83eefd903c4060c3a2",
+    "mappedToNotdef": [],
+    "copyTopKeys": [
+      "ko",
+      "en",
+      "ja",
+      "zh-CN",
+      "zh-TW",
+      "de",
+      "fr",
+      "ru",
+      "es",
+      "pt",
+      "id",
+      "th",
+      "vi",
+      "tr",
+      "it",
+      "ar"
+    ],
+    "byLanguage": {
+      "ko": {
+        "checkedUniqueCodepoints": 390,
+        "missingCount": 0,
+        "missing": []
+      },
+      "en": {
+        "checkedUniqueCodepoints": 76,
+        "missingCount": 0,
+        "missing": []
+      },
+      "zh-CN": {
+        "checkedUniqueCodepoints": 529,
+        "missingCount": 0,
+        "missing": []
+      },
+      "zh-TW": {
+        "checkedUniqueCodepoints": 539,
+        "missingCount": 0,
+        "missing": []
+      },
+      "ja": {
+        "checkedUniqueCodepoints": 394,
+        "missingCount": 0,
+        "missing": []
+      },
+      "de": {
+        "checkedUniqueCodepoints": 78,
+        "missingCount": 0,
+        "missing": []
+      },
+      "fr": {
+        "checkedUniqueCodepoints": 85,
+        "missingCount": 0,
+        "missing": []
+      },
+      "ru": {
+        "checkedUniqueCodepoints": 120,
+        "missingCount": 0,
+        "missing": []
+      },
+      "es": {
+        "checkedUniqueCodepoints": 80,
+        "missingCount": 0,
+        "missing": []
+      },
+      "pt": {
+        "checkedUniqueCodepoints": 86,
+        "missingCount": 0,
+        "missing": []
+      },
+      "id": {
+        "checkedUniqueCodepoints": 73,
+        "missingCount": 0,
+        "missing": []
+      },
+      "th": {
+        "checkedUniqueCodepoints": 115,
+        "missingCount": 58,
+        "missing": [
+          "U+E2A",
+          "U+E2B",
+          "U+E23",
+          "U+E31",
+          "U+E10",
+          "U+E2D",
+          "U+E40",
+          "U+E21",
+          "U+E34",
+          "U+E01",
+          "U+E32",
+          "U+E41",
+          "U+E04",
+          "U+E19",
+          "U+E14",
+          "U+E0B",
+          "U+E35",
+          "U+E22",
+          "U+E16",
+          "U+E1B",
+          "U+E15",
+          "U+E4C",
+          "U+E1F",
+          "U+E43",
+          "U+E49",
+          "U+E18",
+          "U+E25",
+          "U+E1A",
+          "U+E1D",
+          "U+E48",
+          "U+E07",
+          "U+E28",
+          "U+E2E",
+          "U+E42",
+          "U+E27",
+          "U+E0A",
+          "U+E13",
+          "U+E08",
+          "U+E39",
+          "U+E47",
+          "U+E38",
+          "U+E44",
+          "U+E17",
+          "U+E0D",
+          "U+E30",
+          "U+E37",
+          "U+E4A",
+          "U+E1E",
+          "U+E20",
+          "U+E0F",
+          "U+E09",
+          "U+E02",
+          "U+E36",
+          "U+E33",
+          "U+E1C",
+          "U+E46",
+          "U+E29",
+          "U+E0E"
+        ]
+      },
+      "vi": {
+        "checkedUniqueCodepoints": 138,
+        "missingCount": 0,
+        "missing": []
+      },
+      "tr": {
+        "checkedUniqueCodepoints": 83,
+        "missingCount": 5,
+        "missing": [
+          "U+15F",
+          "U+131",
+          "U+130",
+          "U+15E",
+          "U+11F"
+        ]
+      },
+      "it": {
+        "checkedUniqueCodepoints": 79,
+        "missingCount": 0,
+        "missing": []
+      },
+      "ar": {
+        "checkedUniqueCodepoints": 102,
+        "missingCount": 46,
+        "missing": [
+          "U+627",
+          "U+644",
+          "U+648",
+          "U+64A",
+          "U+62A",
+          "U+645",
+          "U+62D",
+          "U+62F",
+          "U+629",
+          "U+643",
+          "U+646",
+          "U+631",
+          "U+633",
+          "U+632",
+          "U+62E",
+          "U+635",
+          "U+62C",
+          "U+628",
+          "U+623",
+          "U+641",
+          "U+642",
+          "U+647",
+          "U+625",
+          "U+637",
+          "U+634",
+          "U+63A",
+          "U+626",
+          "U+649",
+          "U+636",
+          "U+62B",
+          "U+E32",
+          "U+E31",
+          "U+E2A",
+          "U+639",
+          "U+630",
+          "U+64F",
+          "U+64B",
+          "U+60C",
+          "U+64E",
+          "U+621",
+          "U+640",
+          "U+624",
+          "U+622",
+          "U+651",
+          "U+64D",
+          "U+638"
+        ]
+      }
+    },
+    "corpus": [
+      "src/data/form-countries.json: 181개 국가의 names 16언어",
+      "src/data/form-system-copy.json: 각 언어의 모든 문자열"
+    ],
+    "assumptions": [
+      "중복 코드포인트는 언어별로 한 번 검사하며 whitespace는 렌더러와 동일하게 제외했다.",
+      "기존 폰트 전체 cmap 44810 코드포인트를 glyphForCodePoint로 조회하여 glyph 0 매핑이 없는지 확인했다.",
+      "이 수치는 현 코퍼스 범위이고 각 언어의 가능한 전체 Unicode 입력 지원을 의미하지 않는다.",
+      "cmap 검사는 shaping·줄바꿈·시각적 자형·PDF text extraction을 검증하지 않는다."
+    ],
+    "thaiInArabicCorpus": [
+      {
+        "path": "countries.BW.names.ar",
+        "value": "بوتسوانา"
+      },
+      {
+        "path": "countries.HN.names.ar",
+        "value": "هندورัส"
+      }
+    ],
+    "thaiInArabicBoundary": "국가명 원본 추출 데이터 BW/HN의 ar 이름에 태국어 코드포인트가 섞여 있다. 이번 분석에서 고치지 않았다. 언어 코드 하나만으로 폰트를 고르면 혼합 문자열을 놓치므로 실제 문자/스크립트 단위 fallback이 필요하다.",
+    "newFontsAudit": "신규 폰트 바이너리는 받지 않았으므로 새 묶음의 지원 글리프 수·SHA·합집합 완전성은 아직 미검증이다."
+  },
+  "findings": [
+    {
+      "priority": "P1",
+      "kind": "확정 호환 공백",
+      "summary": "16언어 선택과 실제 PDF 게시 가능 범위가 다르다.",
+      "reproduction": "ar/th/tr 문자를 폼 title/body/consentPurpose/동의 표시 또는 연결 동의 문서에 넣고 게시한다. 기존 폰트에 없는 문자면 preflight가 422를 낸다.",
+      "evidence": [
+        "src/server/pdf-renderer.ts:26",
+        "src/server/consent-receipts.ts:52",
+        "src/server/forms.ts:273"
+      ]
+    },
+    {
+      "priority": "P1",
+      "kind": "확정 설계 위험; 신규 폰트 출력은 미실험",
+      "summary": "Arabic 폰트 추가만으로 bidi 문단이 해결된다는 보장이 없다.",
+      "reproduction": "두 단어 이상 아랍어와 한글 라벨, 이메일, +82 번호, 괄호·날짜·해시를 같은 문단에 둔다. 실제 시각 순서와 추출 순서를 독립 확인해야 한다.",
+      "evidence": [
+        "node_modules/pdfkit/js/pdfkit.js:3440",
+        "node_modules/fontkit/src/layout/Script.js:156",
+        "node_modules/fontkit/src/opentype/OTLayoutEngine.js:74"
+      ]
+    },
+    {
+      "priority": "P2",
+      "kind": "확정 검사 누락",
+      "summary": "PdfSource.label은 출력되지만 현재 cmap 사전검사에서 빠진다.",
+      "reproduction": "renderPdf의 label에 기존 폰트 미지원 문자를 전달한다. 현재 호출자는 한글 고정 label이므로 지금 외부 경로에서 재현됐다는 의미는 아니다.",
+      "evidence": [
+        "src/server/pdf-renderer.ts:26",
+        "src/server/pdf-renderer.ts:44"
+      ]
+    },
+    {
+      "priority": "P2",
+      "kind": "보존 설계 요구",
+      "summary": "ConsentReceipt에는 렌더러·폰트 메타데이터가 저장되지 않는다.",
+      "reproduction": "다중 렌더러 도입 후 receipt의 PDF 생성 경로를 DB 필드만으로 식별할 수 없다. 단 PDF bytes/hash 보존과 무결성 검사에는 문제가 없다.",
+      "evidence": [
+        "src/server/consent-receipts.ts:63",
+        "prisma/schema.prisma:1496"
+      ]
+    }
+  ],
+  "recommendedDesign": {
+    "invariants": [
+      "PDF_RENDERER_VERSION=1/PDF_FONT_HASH 기존 상수의 의미를 바꾸지 않는다. 원래 CJK 폰트 파일 및 SHA를 유지한다.",
+      "기존 renderer1의 고정 입력 결과 bytes/hash/pageCount를 보존하고 기존 DocumentPdf 및 ConsentReceipt 저장 행을 갱신·백필하지 않는다.",
+      "canonicalDocument, form contentDto, approval fingerprint, receipt evidence schemaVersion=1의 원문은 렌더러 편의를 위해 정규화·번역·변경하지 않는다.",
+      "글리프가 없는 문자열을 대체 문자·음역·누락으로 성공시키지 않고 기존처럼 명시적 실패와 원자성을 유지한다."
+    ],
+    "dispatch": {
+      "recommended": "기존 경로로 모든 출력 문자를 지원하는 기존 호환 입력은 renderer1을 그대로 사용한다. 추가 스크립트/글리프가 필요한 새 렌더 요청만 renderer2를 사용한다. formLanguage만 기준으로 고르지 않는다.",
+      "details": [
+        "버전 선택 전 title/author/text/label와 실제 생성 header/footer 문자열까지 묶어 검사한다.",
+        "신규 경로는 실제 텍스트 스크립트 및 결합 클러스터 기반으로 CJK+Latin+Arabic+Thai를 선택한다.",
+        "이미 저장된 PDF는 무조건 원래 바이트를 제공한다. PDF 미생성 구게시 문서는 호환 텍스트이면 renderer1 유지, 새 경로가 필요한 텍스트이면 최초 생성 renderer2라는 정책을 문서화한다.",
+        "모든 신규 요청을 무조건 renderer2로 전환하려면 기존 고정 입력 재생성 기대값과 별도 version-dispatch 계약을 먼저 합의해야 한다."
+      ]
+    },
+    "fontBundle": {
+      "candidates": [
+        {
+          "role": "기존 한글·한자·가나 및 기존 glyph 보존",
+          "family": "NotoSansCJKkr-Regular",
+          "source": "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/OTF/Korean/NotoSansCJKkr-Regular.otf",
+          "sha256": "6bcb2a0703aa137e874fc2dffa85f6c21ba9a67fa329e81b8c801663af7e992a"
+        },
+        {
+          "role": "터키어 및 Latin 확장",
+          "family": "Noto Sans Regular",
+          "source": "https://github.com/notofonts/latin-greek-cyrillic",
+          "status": "배포 버전·정적 Regular 파일·commit SHA·파일 SHA 확정 필요"
+        },
+        {
+          "role": "Arabic shaping",
+          "family": "Noto Sans Arabic Regular",
+          "source": "https://github.com/notofonts/arabic",
+          "status": "배포 버전·정적 Regular 파일·commit SHA·파일 SHA 확정 필요"
+        },
+        {
+          "role": "Thai mark positioning",
+          "family": "Noto Sans Thai Regular",
+          "source": "https://github.com/notofonts/thai",
+          "status": "배포 버전·정적 Regular 파일·commit SHA·파일 SHA 확정 필요"
+        }
+      ],
+      "manifest": "신규 fontHash는 순서 고정된 {family,file,sha256} manifest의 SHA-256으로 정의하고 rendererVersion=2와 함께 저장한다. 알고리즘·PDFKit/fontkit 버전은 manifest 또는 별도 renderer manifest에 고정한다. 여러 폰트를 사용하면서 기존 단일 PDF_FONT_HASH를 재사용하지 않는다.",
+      "license": "공식 OFL 1.1 배포 파일과 해당 copyright/OFL.txt를 함께 저장한다. 시스템 설치 글꼴을 복사하지 않는다. 원본 파일을 변형하면 Reserved Font Name 등 해당 배포 라이선스 조건을 재검토한다.",
+      "regionNote": "기존 KR 폰트로 zh-CN/zh-TW/ja의 코드포인트는 현재 코퍼스에서 채워지나 언어별 지역 자형 동일성까지 증명되지는 않았다. 원본 화면 자형 일치가 목표이면 CJK 지역별 폰트/locl 선택은 별도 범위다."
+    },
+    "layout": {
+      "required": [
+        "문단의 base direction 결정과 UAX #9의 방향 run 분해·약한 문자/중립문자/괄호 처리",
+        "줄바꿈 뒤 line 단위 시각 순서 처리",
+        "script/font run 분해 시 결합 문자·Thai tone marks·Arabic joining·ZWJ/ZWNJ의 문맥 보존",
+        "한 glyph씩 폰트 전환하지 않고 shaping 가능한 연속 run/클러스터 유지",
+        "숫자·이메일·UUID·SHA-256·전화번호의 LTR 순서와 검색 가능한 원문 Unicode 보존",
+        "ToUnicode 및 추출 논리 순서와 화면 시각 순서를 별도 검증"
+      ],
+      "notSufficient": [
+        "align:'right'만 적용",
+        "JavaScript 문자열 또는 단어 전체를 임의 reverse",
+        "glyph 존재 여부만 확인",
+        "features:[]로 word-cache를 우회하는 것만으로 완료 판정"
+      ],
+      "nextStep": "rendererV2ImplementationProposal의 PDFKit+fontkit+bidi-js 별도 모듈을 확정 제안한다. parsed-font adapter의 실제 run shaping·추출 회귀를 먼저 검증하고 통과한 뒤 업무 경로에 연결한다. 이번 단계는 읽기 분석과 전략 문서화까지이며 제품 구현은 하지 않았다."
+    },
+    "receiptMetadata": {
+      "minimum": "증거 schemaVersion=1과 documentHash는 그대로 두고 PDF Creator/manifest 식별을 새 렌더러에 기록한다. 기존 bytes/hash 검증 및 저장 형태는 유지할 수 있다.",
+      "auditOption": "DB에서 새 receipt의 rendererVersion/fontHash를 직접 조회해야 한다면 nullable 필드를 additive migration으로 추가하고 새 생성 시에만 기록한다. 기존 null은 그대로 유지한다. evidenceCipher에 무조건 새키를 넣어 기존 evidence hash를 바꾸는 방식은 피한다.",
+      "boundary": "새 PDF 레이아웃은 동의 내용·수집 목적·동의 시각이 바뀐 것이 아니므로 그것만으로 receiptEvidenceVersion을 변경할 필요는 없다."
+    }
+  },
+  "requiredChangesAfterScopeAgreement": [
+    {
+      "files": [
+        "src/server/pdf-renderer.ts",
+        "신규 PDF 폰트 registry/renderer2 모듈"
+      ],
+      "change": "legacy renderer 분리 보존, 완전한 출력 문자열 검사, 버전 dispatcher, pinned font manifest, mixed script layout, 동일 오류/크기 제한"
+    },
+    {
+      "files": [
+        "assets/fonts/*",
+        "assets/fonts/README.md"
+      ],
+      "change": "공식 OFL Noto Latin/Arabic/Thai 원본 파일과 각각 출처·고정 버전·SHA·라이선스 기록"
+    },
+    {
+      "files": [
+        "src/server/consent-receipts.ts"
+      ],
+      "change": "최소안에서는 renderPdf 결과가 새 버전일 수 있음을 허용하되 evidence 생성/해시/읽기 불변. renderer metadata 저장 채택 시에만 새 필드 전달"
+    },
+    {
+      "files": [
+        "src/server/document-pdf.ts"
+      ],
+      "change": "기존 PDF 재사용과 lock 유지. 최초 생성의 renderer 선택 정책 확인"
+    },
+    {
+      "files": [
+        "tests/server/document-pdf.test.ts",
+        "tests/server/form-documents.test.ts",
+        "신규 PDF 다국어 테스트"
+      ],
+      "change": "기존 renderer1 assertions를 새 기대값으로 덮어쓰지 않고 renderer2 케이스 추가"
+    },
+    {
+      "files": [
+        "scripts/qa-document-pdf.ts",
+        "scripts/qa-form-documents.ts",
+        "국제 연락처 QA helper"
+      ],
+      "change": "기존 폰트 포함 확인 보존, 신규 PDF embedded font·시각 확인·해시 보존 증거 추가"
+    }
+  ],
+  "acceptanceCases": [
+    {
+      "id": "PDF-LANG-01",
+      "priority": "P0",
+      "case": "legacy 폰트 SHA·정렬 cmap SHA·44810개 glyph 0 부재를 고정한다. renderer1 고정 timestamp/source의 이전 golden PDF bytes/hash/pageCount가 일치해야 한다. 다른 라이브러리 버전으로 renderer1을 바꾸지 않는다."
+    },
+    {
+      "id": "PDF-LANG-02",
+      "priority": "P0",
+      "case": "기존 13개 frozen fixture 및 기존 DocumentPdf/ConsentReceipt의 bytes/pdfCipher/pdfHash/documentHash/evidenceCipher를 변경 전후 보존한다. 조회가 재렌더를 호출하지 않는지 검사한다."
+    },
+    {
+      "id": "PDF-LANG-03",
+      "priority": "P0",
+      "case": "현재 181국가×16언어와 모든 시스템 문구 코드포인트를 새 폰트 합집합으로 재검사한다. 기존 44810 문자의 font assignment/지원이 줄지 않아야 한다. 실제 PDF에 필요 없는 corpus와 실제 렌더 source 범위를 구분해 보고한다."
+    },
+    {
+      "id": "PDF-LANG-04",
+      "priority": "P0",
+      "case": "ar/th/tr 각각 폼 title/body/purpose/display/필수·선택 동의 문서에 문자를 넣어 HTTP 게시→제출→영수증 PDF 읽기를 검증한다. 단순 질문 라벨만 아랍어로 바꾼 성공은 이 공백의 검증이 아니다."
+    },
+    {
+      "id": "PDF-LANG-05",
+      "priority": "P0",
+      "case": "여러 아랍어 단어, 라임-알레프와 모음부호, Arabic-Indic/Latin 숫자, 괄호·콜론·한글·이메일·+82 번호·날짜·UUID·해시가 섞인 문단을 줄바꿈/페이지 넘김까지 검증한다. 원문 논리 순서와 glyph 시각 순서를 각각 확인한다."
+    },
+    {
+      "id": "PDF-LANG-06",
+      "priority": "P0",
+      "case": "Thai 자음·상하 모음·tone marks·긴 공백 없는 문장, Turkish ş ı İ Ş ğ, Vietnamese NFC/NFD 및 결합 부호를 확인한다. 결합 클러스터가 서로 다른 폰트로 갈라지거나 행 높이에서 잘리면 실패다."
+    },
+    {
+      "id": "PDF-LANG-07",
+      "priority": "P0",
+      "case": "pdfjs text extraction, embedded-font 목록, raster 시각 비교를 함께 확인한다. 텍스트 추출 성공만으로 bidi가 맞다고 판단하지 않는다. 고정 버전 독립 Unicode bidi/shaping oracle 또는 동등한 검증 자료를 사용한다."
+    },
+    {
+      "id": "PDF-LANG-08",
+      "priority": "P1",
+      "case": "title/author/body/label/generated header/footer의 모든 글리프를 확인한다. 현재 unsupported emoji 시험(💩, 😀)은 지원 범위 확대 합의 없이는 계속 명시적 422여야 한다."
+    },
+    {
+      "id": "PDF-LANG-09",
+      "priority": "P0",
+      "case": "폰트 누락·checksum mismatch·미지원 문자·페이지/바이트 상한·감사 실패에서 FormVersion 게시/Publication/Submission/ConsentReceipt/DocumentPdf의 부분 저장이 없어야 한다. 기존 파일은 그대로 읽혀야 한다."
+    },
+    {
+      "id": "PDF-LANG-10",
+      "priority": "P1",
+      "case": "renderer2 동일 입력/고정 일시를 여러 fresh process에서 렌더하여 결정성을 확인한다. fonts metadata timestamp와 font 순서가 PDF bytes를 흔들지 않아야 한다. 출력은 250페이지·16MiB 등 현재 상한을 유지한다."
+    },
+    {
+      "id": "PDF-LANG-11",
+      "priority": "P1",
+      "case": "동시 최초 문서 PDF 요청이 한 개 immutable artifact를 생성하고 이후 public/private 읽기가 동일한 bytes/hash를 반환한다. 권한·만료·다른 tenant 검사도 기존 경로를 유지한다."
+    },
+    {
+      "id": "PDF-LANG-12",
+      "priority": "P1",
+      "case": "기존 게시 문서 중 PDF 미생성 행의 최초 다운로드 선택 정책과 언어 없는 구 FormVersion/null언어의 receipt 동작을 명시적으로 회귀 검사한다."
+    }
+  ],
+  "existingTestEvidence": [
+    {
+      "file": "tests/server/document-pdf.test.ts",
+      "lines": "69-86",
+      "meaning": "현재 renderer1/fontHash/byte 동일성 계약"
+    },
+    {
+      "file": "tests/server/document-pdf.test.ts",
+      "lines": "88-96, 119-136",
+      "meaning": "구버전 보존·동시 최초 생성·DB 불변 계약"
+    },
+    {
+      "file": "tests/server/document-pdf.test.ts",
+      "lines": "148-172",
+      "meaning": "미지원 glyph 실패·한국어 다중페이지 결정성·상한 계약"
+    },
+    {
+      "file": "tests/server/form-documents.test.ts",
+      "lines": "216-230",
+      "meaning": "과거 evidenceVersion0에는 PDF를 새로 만들지 않는 계약 및 preflight 실패 원자성"
+    },
+    {
+      "file": "scripts/qa-document-pdf.ts",
+      "lines": "28",
+      "meaning": "현재 embedded NotoSansCJKkr assertion"
+    },
+    {
+      "file": "scripts/qa-form-documents.ts",
+      "lines": "42",
+      "meaning": "현재 동의 PDF embedded NotoSansCJKkr assertion"
+    }
+  ],
+  "officialSources": [
+    {
+      "id": "PDFKIT-TEXT",
+      "url": "https://pdfkit.org/docs/text.html",
+      "summary": "TTF/OTF embedding, font 변경, continued rich text와 OpenType features를 문서화한다. right 정렬을 UAX9 문단 처리의 보증으로 제시하지 않는다."
+    },
+    {
+      "id": "PDFKIT-0202",
+      "url": "https://github.com/foliojs/pdfkit/blob/v0.20.2/lib/font/embedded.js",
+      "summary": "프로젝트 설치 버전의 font.layout 호출·word cache·ToUnicode 입력 동작을 확인하는 고정 tag 소스."
+    },
+    {
+      "id": "FONTKIT-LAYOUT",
+      "url": "https://github.com/foliojs/fontkit/blob/v2.0.4/src/layout/LayoutEngine.js",
+      "summary": "script/language/direction을 받는 run 레이아웃 및 GSUB/GPOS를 확인하는 설치 버전 소스."
+    },
+    {
+      "id": "FONTKIT-SCRIPT",
+      "url": "https://github.com/foliojs/fontkit/blob/v2.0.4/src/layout/Script.js",
+      "summary": "문자열의 첫 주요 script 자동 선택 로직. 완전한 혼합 방향 문단 분해와 구분된다."
+    },
+    {
+      "id": "UAX9",
+      "url": "https://www.unicode.org/reports/tr9/tr9-52.html",
+      "summary": "Unicode 양방향 알고리즘의 문단 방향, 약한·중립 문자, 괄호 및 줄 단위 재배열을 별도 layout 책임으로 확인한다."
+    },
+    {
+      "id": "NOTO-LATIN",
+      "url": "https://github.com/notofonts/latin-greek-cyrillic",
+      "summary": "Noto Sans Latin/Greek/Cyrillic 공식 source와 배포·proof 안내."
+    },
+    {
+      "id": "NOTO-ARABIC",
+      "url": "https://github.com/notofonts/arabic",
+      "summary": "Noto Arabic 공식 source. 실제 채택 파일은 버전·hash를 별도 고정해야 한다."
+    },
+    {
+      "id": "NOTO-THAI",
+      "url": "https://github.com/notofonts/thai",
+      "summary": "Noto Thai 공식 source. 실제 채택 파일은 버전·hash를 별도 고정해야 한다."
+    },
+    {
+      "id": "OFL-LATIN",
+      "url": "https://raw.githubusercontent.com/notofonts/latin-greek-cyrillic/main/OFL.txt",
+      "summary": "OFL 1.1 및 해당 copyright를 원본 글꼴과 함께 보존한다."
+    },
+    {
+      "id": "OFL-ARABIC",
+      "url": "https://raw.githubusercontent.com/notofonts/arabic/main/OFL.txt",
+      "summary": "공식 Arabic 폰트의 OFL 1.1 원문. 앱과 번들·PDF embed 가능 조건과 Reserved Font Name 조건을 구분한다."
+    },
+    {
+      "id": "OFL-THAI",
+      "url": "https://raw.githubusercontent.com/notofonts/thai/main/OFL.txt",
+      "summary": "공식 Thai 폰트의 OFL 1.1 원문. 출력 문서를 폰트와 같은 라이선스로 배포해야 한다는 의미는 아니다."
+    },
+    {
+      "id": "BIDI-JS-PINNED",
+      "url": "https://github.com/lojjic/bidi-js/blob/f7826ac23bf365552bf2ac3dd51296e5f3e72970/README.md",
+      "summary": "1.1.0의 embedding levels·줄별 reorder·mirrored characters API. 문서상 Unicode 13 구현이며 최신 표준 전체 지원으로 확대 해석하지 않는다."
+    },
+    {
+      "id": "BIDI-JS-PACKAGE",
+      "url": "https://github.com/lojjic/bidi-js/blob/f7826ac23bf365552bf2ac3dd51296e5f3e72970/package.json",
+      "summary": "MIT, version 1.1.0, require-from-string 의존성 및 TypeScript 선언 확인."
+    },
+    {
+      "id": "PDFKIT-FONT-FACTORY",
+      "url": "https://github.com/foliojs/pdfkit/blob/v0.20.2/lib/font_factory.js",
+      "summary": "layout 메서드가 있는 parsed fontkit 인스턴스를 등록할 수 있어 신규 adapter의 통합 지점이다."
+    },
+    {
+      "id": "LINEBREAK",
+      "url": "https://github.com/foliojs/linebreak",
+      "summary": "PDFKit이 사용하는 UAX14 break opportunity 제공 라이브러리. 실제 줄 선택·폭·Thai dictionary 품질은 상위 레이아웃에서 검증해야 한다."
+    }
+  ],
+  "remainingUnknowns": [
+    "새 폰트 실제 cmap 합집합·폰트 SHA·버전은 미확정",
+    "새 PDF의 시각적 Arabic/Thai 품질 및 줄바꿈/ToUnicode/결정성은 미실행",
+    "기존 glyph 44810 전체의 래스터 품질은 미검증; 이번 검사는 cmap→glyph 0 여부까지",
+    "시스템 문구 번역 파일은 부모가 계속 편집 중이므로 hash가 바뀌면 코퍼스 검사를 재실행해야 한다",
+    "원본 Catchsecu 서버의 PDF renderer·폰트·지원 범위는 관측하지 않았다"
+  ],
+  "rendererV2ImplementationProposal": {
+    "decision": "legacy v1을 그대로 두고 새 텍스트 레이아웃 모듈을 사용하는 PDFKit renderer v2를 추가한다. v2는 문단 bidi → 줄바꿈 → 방향/script/font run shaping → 좌표 배치를 직접 통제한다.",
+    "boundaries": [
+      "제품의 브라우저 또는 외부 PDF 서비스에 의존하지 않는다.",
+      "기존 PDFKit 0.20.2/fontkit 2.0.4를 올리지 않는다.",
+      "고정 폰트 3개 추가 외에 기존 NotoSansCJKkr 파일을 교체하지 않는다.",
+      "첫 구현에는 ConsentReceipt 스키마/기존 evidenceCipher를 변경하지 않는다. 새 PDF의 Creator와 font manifest로 버전을 기록하고 DocumentPdf는 기존 rendererVersion/fontHash 필드에 기록한다."
+    ],
+    "dependencies": {
+      "keep": {
+        "pdfkit": "0.20.2",
+        "fontkit": "2.0.4"
+      },
+      "add": {
+        "bidi-js": "1.1.0"
+      },
+      "promoteTransitiveToDirect": {
+        "linebreak": "1.1.0"
+      },
+      "bidiRegistry": {
+        "registry": "https://registry.npmjs.org/bidi-js/latest",
+        "status": 200,
+        "name": "bidi-js",
+        "version": "1.1.0",
+        "license": "MIT",
+        "dependencies": {
+          "require-from-string": "^2.0.2"
+        },
+        "gitHead": "f7826ac23bf365552bf2ac3dd51296e5f3e72970",
+        "dist": {
+          "integrity": "sha512-fX1Onk0tdVPC7obPWB5EbJ1z7NVhLq4m2xZLq2YXBkxzMXIGRpNMU88n0EPgWseKl12J7zXs7qrDxPK4sRs2fg==",
+          "tarball": "https://registry.npmjs.org/bidi-js/-/bidi-js-1.1.0.tgz"
+        }
+      },
+      "bidiLimit": "공식 pinned README의 지원 표준은 Unicode bidi 13.0.0이다. 최신 UAX9-52 전체 준수를 주장하지 않는다. 이 과제의 16언어 실제 코퍼스와 Arabic 혼합 방향·isolate·bracket 회귀를 직접 통과시킨다. 새 Unicode 문자도 지원한다고 일반화하지 않는다.",
+      "dependencyDetail": "README에는 no external dependencies라고 쓰였지만 실제 1.1.0 package.json/registry에는 require-from-string ^2.0.2가 있다. 실제 lockfile과 배포 모듈을 기준으로 검토하고 integrity를 고정한다.",
+      "segmentation": "Intl.Segmenter의 grapheme/Thai word 경계를 사용하면 Node/ICU 버전도 renderer manifest에 포함해야 한다. 이번 관찰 런타임은 Node 25.4.0, ICU 78.2, Unicode 17.0이다. 배포 런타임이 다르면 golden 검증 없이 동일 hash를 주장하지 않는다.",
+      "notInstalled": true
+    },
+    "assetsToAdd": [
+      {
+        "path": "assets/fonts/NotoSans-Regular.ttf",
+        "role": "Latin 확장 및 Turkish",
+        "source": "https://github.com/notofonts/latin-greek-cyrillic"
+      },
+      {
+        "path": "assets/fonts/NotoSansArabic-Regular.ttf",
+        "role": "Arabic GSUB/GPOS",
+        "source": "https://github.com/notofonts/arabic"
+      },
+      {
+        "path": "assets/fonts/NotoSansThai-Regular.ttf",
+        "role": "Thai marks/GPOS",
+        "source": "https://github.com/notofonts/thai"
+      },
+      {
+        "path": "assets/fonts/각 폰트 출처에 대응하는 OFL/copyright 파일과 manifest",
+        "role": "정적 Regular 원본, commit/release와 SHA-256을 받은 직후 고정"
+      }
+    ],
+    "modules": [
+      {
+        "path": "src/server/pdf-renderer.ts",
+        "responsibility": "기존 renderer v1 본문을 보존한 wrapper/dispatcher. PDF_RENDERER_VERSION=1/PDF_FONT_HASH 의미 유지; renderer2 결과는 2/별도 manifest hash."
+      },
+      {
+        "path": "신규 src/server/pdf-fonts.ts",
+        "responsibility": "폰트 bytes/checksum/cmap/manifest cache 및 모든 출력 문자열의 glyph 검사. 원래 cmap coverage를 줄이지 않음."
+      },
+      {
+        "path": "신규 src/server/pdf-layout.ts",
+        "responsibility": "문단 수준 embedding levels, 클러스터/word/line 경계, script/font/direction run, advance 기반 줄바꿈과 시각 좌표 계산. 원문 index map 유지."
+      },
+      {
+        "path": "신규 src/server/pdf-renderer-v2.ts",
+        "responsibility": "A4/기존 여백·크기 제한·metadata·stream 처리 유지. 레이아웃 run을 PDFKit에서 정확한 x/y로 출력하며 순수 우측정렬에 기대지 않음."
+      },
+      {
+        "path": "package.json/package-lock.json",
+        "responsibility": "새 bidi-js와 linebreak 직접 의존성을 고정. 설치는 승인된 구현 단계에서만 실행."
+      }
+    ],
+    "shapingIntegration": [
+      "PDFKit 0.20.2 font_factory는 layout 함수가 있는 parsed fontkit Font 인스턴스를 받는다. 이를 신규 렌더러 안의 명시적 adapter 경계로 사용한다. node_modules 파일을 고치거나 v1의 전역 prototype을 바꾸지 않는다.",
+      "단일 font/script/direction run을 shape할 때 fontkit.layout에 명시적 script/direction을 전달하고 PDFKit의 기본 공백 분할 캐시가 이를 다시 분해하지 않도록 해당 run에서 features와 adapter 동작을 검증한다.",
+      "문자열을 미리 전부 시각 순서로 뒤집고 fontkit RTL reversal을 다시 적용하는 이중반전을 피한다. bidi levels/index map은 배치 순서에 사용하고 shaping에는 논리 순서 run을 준다.",
+      "줄바꿈은 실제 shaped advance로 결정하고 줄 경계에서 다시 shape한다. Arabic joining이 끊기는 위치와 Thai mark cluster를 임의 code-unit으로 자르지 않는다.",
+      "원문 추출이 달라질 경우 PDFKit marked content의 actual/ActualText 사용을 검토하되 PDF.js·다른 PDF 읽기 도구에서 실제 추출을 검증한다. 현재 소스 node_modules/pdfkit/js/pdfkit.js:5661은 options.actual을 지원한다."
+    ],
+    "implementationGate": [
+      "글꼴 SHA/cmap/지원 코퍼스 검사 및 기존 v1 golden을 먼저 고정한다.",
+      "Arabic 혼합 문단·Thai marks·Turkish 문자열의 독립 레이아웃/추출 테스트를 실제 새 모듈에 작성한다.",
+      "첫 run adapter가 PDFKit font cache·ToUnicode·ligature 회귀를 통과하지 못하면 실패 원인을 먼저 보고한다. 우측정렬 또는 역순 문자열로 수용 기준을 낮추지 않는다.",
+      "그다음 실제 폼 게시/제출/영수증·문서 다운로드를 연결하고 existing 13 fixture 및 v1 bytes 불변을 부모의 직렬 DB 테스트로 확인한다."
+    ]
+  }
+}

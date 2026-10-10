@@ -1,0 +1,256 @@
+{
+  "format": 1,
+  "mode": "run",
+  "runId": "e945ba32-31fd-499d-a8eb-fa914a423a32",
+  "recordedAt": "2026-10-10T08:39:29.741Z",
+  "result": "passed",
+  "executedCases": [
+    {
+      "name": "anonymous member request is 401",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:28.814Z",
+      "finishedAt": "2026-10-10T08:39:28.820Z"
+    },
+    {
+      "name": "stale form scope is 409",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:28.821Z",
+      "finishedAt": "2026-10-10T08:39:28.864Z"
+    },
+    {
+      "name": "mixed scope query is 422",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:28.864Z",
+      "finishedAt": "2026-10-10T08:39:28.869Z"
+    },
+    {
+      "name": "duplicate query is 422",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:28.870Z",
+      "finishedAt": "2026-10-10T08:39:28.874Z"
+    },
+    {
+      "name": "pinned ready asset cannot be discarded",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:28.874Z",
+      "finishedAt": "2026-10-10T08:39:28.954Z"
+    },
+    {
+      "name": "wrong purpose and MIME are rejected before reservation",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:28.954Z",
+      "finishedAt": "2026-10-10T08:39:28.977Z"
+    },
+    {
+      "name": "oversize reservation is rejected before storage",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:28.978Z",
+      "finishedAt": "2026-10-10T08:39:28.994Z"
+    },
+    {
+      "name": "same key replays one reservation",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:29.065Z",
+      "finishedAt": "2026-10-10T08:39:29.124Z"
+    },
+    {
+      "name": "raw content MIME mismatch is 415",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:29.125Z",
+      "finishedAt": "2026-10-10T08:39:29.155Z"
+    },
+    {
+      "name": "same length corrupted bytes fail SHA256",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:29.155Z",
+      "finishedAt": "2026-10-10T08:39:29.185Z"
+    },
+    {
+      "name": "clean but unbound asset is absent from public scope",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:29.185Z",
+      "finishedAt": "2026-10-10T08:39:29.294Z"
+    },
+    {
+      "name": "actual ClamAV rejects in-memory EICAR DOCX",
+      "result": "passed",
+      "startedAt": "2026-10-10T08:39:29.294Z",
+      "finishedAt": "2026-10-10T08:39:29.533Z"
+    }
+  ],
+  "checks": [
+    {
+      "action": "positive control: authenticated current form manifest",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "positive control: active public manifest",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "anonymous manifest",
+      "status": 401,
+      "code": "UNAUTHENTICATED",
+      "expectedStatus": 401,
+      "expectedCode": "UNAUTHENTICATED"
+    },
+    {
+      "action": "stale manifest version",
+      "status": 409,
+      "code": "VERSION_CONFLICT",
+      "expectedStatus": 409,
+      "expectedCode": "VERSION_CONFLICT"
+    },
+    {
+      "action": "form query with extra parent",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "expectedStatus": 422,
+      "expectedCode": "VALIDATION_ERROR"
+    },
+    {
+      "action": "duplicate kind query",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "expectedStatus": 422,
+      "expectedCode": "VALIDATION_ERROR"
+    },
+    {
+      "action": "pinned asset current version",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "discard pinned ready asset",
+      "status": 409,
+      "code": "AUTHOR_ASSET_IN_USE",
+      "expectedStatus": 409,
+      "expectedCode": "AUTHOR_ASSET_IN_USE"
+    },
+    {
+      "action": "invalid purpose MIME",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "expectedStatus": 422,
+      "expectedCode": "VALIDATION_ERROR"
+    },
+    {
+      "action": "oversize material",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "expectedStatus": 422,
+      "expectedCode": "VALIDATION_ERROR"
+    },
+    {
+      "action": "clean PDF: reserve upload",
+      "status": 201,
+      "expectedStatus": 201
+    },
+    {
+      "action": "idempotent reservation",
+      "status": 201,
+      "expectedStatus": 201
+    },
+    {
+      "action": "wrong content MIME",
+      "status": 415,
+      "code": "FILE_CONTENT_TYPE",
+      "expectedStatus": 415,
+      "expectedCode": "FILE_CONTENT_TYPE"
+    },
+    {
+      "action": "corrupt content hash",
+      "status": 422,
+      "code": "AUTHOR_ASSET_INTEGRITY",
+      "expectedStatus": 422,
+      "expectedCode": "AUTHOR_ASSET_INTEGRITY"
+    },
+    {
+      "action": "upload valid PDF",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "scan actual PDF",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "public unbound PDF",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "expectedStatus": 404,
+      "expectedCode": "NOT_FOUND"
+    },
+    {
+      "action": "antivirus DOCX: reserve upload",
+      "status": 201,
+      "expectedStatus": 201
+    },
+    {
+      "action": "upload structurally valid DOCX",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "scan antivirus test DOCX",
+      "status": 422,
+      "code": "AUTHOR_ASSET_UNSAFE",
+      "expectedStatus": 422,
+      "expectedCode": "AUTHOR_ASSET_UNSAFE"
+    },
+    {
+      "action": "infected DOCX preview unavailable",
+      "status": 409,
+      "code": "AUTHOR_ASSET_NOT_READY",
+      "expectedStatus": 409,
+      "expectedCode": "AUTHOR_ASSET_NOT_READY"
+    },
+    {
+      "action": "clean PDF: read current cleanup version",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "clean PDF: delete unreferenced reservation",
+      "status": 204,
+      "expectedStatus": 204
+    },
+    {
+      "action": "clean PDF: deleted reservation is unavailable",
+      "status": 410,
+      "code": "AUTHOR_ASSET_EXPIRED",
+      "expectedStatus": 410,
+      "expectedCode": "AUTHOR_ASSET_EXPIRED"
+    },
+    {
+      "action": "antivirus DOCX: read current cleanup version",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "antivirus DOCX: delete unreferenced reservation",
+      "status": 204,
+      "expectedStatus": 204
+    },
+    {
+      "action": "antivirus DOCX: deleted reservation is unavailable",
+      "status": 410,
+      "code": "AUTHOR_ASSET_EXPIRED",
+      "expectedStatus": 410,
+      "expectedCode": "AUTHOR_ASSET_EXPIRED"
+    }
+  ],
+  "failures": [],
+  "protectedDatabaseUnchanged": true,
+  "probeCleanupComplete": true,
+  "databaseFingerprint": {
+    "before": "1d139f93a03da2c79beb8bc598ff805491c9b18d4f0a85d8f9e8b9f0fd02ee99",
+    "after": "1d139f93a03da2c79beb8bc598ff805491c9b18d4f0a85d8f9e8b9f0fd02ee99",
+    "protectedAssets": 9
+  },
+  "originalProbeRunResult": "passed",
+  "scope": "Local production HTTP; database observations only; no mocked scan or ready/clean writes"
+}

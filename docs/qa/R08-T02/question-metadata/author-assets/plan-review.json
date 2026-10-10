@@ -1,0 +1,1035 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-10T07:47:01.746Z",
+  "author": "/root/bundle_analysis",
+  "status": "review_complete_no_blockers",
+  "scope": "원본 FILE/option image 정적 계약, 최종 root PLAN.md, 최종 PLAN-draft.md/backend-impact.json 및 현재 관련 소스의 읽기 전용 대조. 제품/테스트/DB/브라우저/서버 실행·변경 없음.",
+  "source": {
+    "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/source-review.json",
+    "sha256": "fd0dfaa04585db24ab8f51b39010bf5e3dabbf5dfb9212927874de3ca84ca0be",
+    "originalBundleSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152"
+  },
+  "planReadiness": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+      "sha256": "e84a0edba86313f46f3874d1478626d44c85592bf3492cfe99e7c9e5a49d165a",
+      "bytes": 13647,
+      "lineCount": 88,
+      "exists": true,
+      "reviewed": true
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+      "sha256": "076324309b67073659a91d23c9866d8f2ec91096ce5a710528e018bbd3206d39",
+      "bytes": 22486,
+      "lineCount": 128,
+      "exists": true,
+      "reviewed": true
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/backend-impact.json",
+      "sha256": "670d351f968586c40bea3a7df46caec18ea74b6ce93636fabfed33349b9c5e41",
+      "bytes": 35586,
+      "lineCount": 1036,
+      "exists": true,
+      "reviewed": true
+    }
+  ],
+  "blockers": [],
+  "requiredAcceptanceCases": [
+    {
+      "id": "A01",
+      "topic": "FILE와 LINK의 shared list",
+      "acceptance": "FILE/LINK 혼합 합계3; 0-based 재정렬; LINK 구 wire·생략 보존·[] 제거 유지.",
+      "sourceFact": "material-shared-list",
+      "sourceExcerptRefs": [
+        "material-readers",
+        "material-wire",
+        "material-editor-core",
+        "material-editor-upload"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            11,
+            14
+          ],
+          [
+            41,
+            42
+          ],
+          [
+            77,
+            77
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            9,
+            13
+          ],
+          [
+            114,
+            114
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A02",
+      "topic": "FILE 타입·경계",
+      "acceptance": "PDF/DOCX/AI, 빈 파일 거절, 5 MiB 동일값 허용/초과 거절. MIME·내용·스캔 강화는 독립계약으로 구분.",
+      "sourceFact": "material-file-validation",
+      "sourceExcerptRefs": [
+        "quota-size-type",
+        "file-validation-signature",
+        "material-editor-upload"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            13,
+            13
+          ],
+          [
+            21,
+            21
+          ],
+          [
+            67,
+            73
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            10,
+            14
+          ],
+          [
+            46,
+            50
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A03",
+      "topic": "보기 이미지 nullable wire",
+      "acceptance": "optionImageKey string|null; 기존 option stable ID/value/label/custom state 보존; field 생략과 명시null 삭제의 업데이트 의미 확정.",
+      "sourceFact": "option-image-wire",
+      "sourceExcerptRefs": [
+        "option-image-normalize",
+        "question-wire",
+        "question-load"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            14,
+            15
+          ],
+          [
+            41,
+            46
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            91,
+            91
+          ],
+          [
+            114,
+            116
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A04",
+      "topic": "보기 이미지 대상",
+      "acceptance": "객관식 답변/체크박스의 일반 보기만; 기타·드롭다운·행렬 금지. 비지원 유형 전환/기타 전환 시 삭제 확인과 서버 최종 상태 검증.",
+      "sourceFact": "option-image-eligibility",
+      "sourceExcerptRefs": [
+        "option-image-normalize",
+        "option-editor-eligibility",
+        "feature-map",
+        "question-wire",
+        "type-change-delete-confirm"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            15,
+            15
+          ],
+          [
+            54,
+            56
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            11,
+            11
+          ],
+          [
+            91,
+            91
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A05",
+      "topic": "보기 이미지 수·용량",
+      "acceptance": "문항당20개/보기당1개/각1 MiB; 20개 상태에서 교체 허용; JPG/JPEG/PNG·빈파일·위조서명 거절.",
+      "sourceFact": "option-image-validation",
+      "sourceExcerptRefs": [
+        "quota-size-type",
+        "file-validation-signature",
+        "option-upload-input",
+        "option-upload"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            15,
+            16
+          ],
+          [
+            54,
+            54
+          ],
+          [
+            69,
+            72
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            11,
+            11
+          ],
+          [
+            115,
+            116
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A06",
+      "topic": "교체·삭제·late result",
+      "acceptance": "교체 실패시 기존 자산 유지, 취소·질문/보기 삭제·타입 전환·정렬 이후 late upload가 다른 질문/보기에 붙지 않음.",
+      "sourceFact": "pending-upload",
+      "sourceExcerptRefs": [
+        "upload-token-and-normalize",
+        "material-settle",
+        "material-editor-upload",
+        "option-editor-eligibility",
+        "option-upload"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            17,
+            17
+          ],
+          [
+            29,
+            30
+          ],
+          [
+            54,
+            55
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            38,
+            42
+          ],
+          [
+            118,
+            118
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A07",
+      "topic": "공개 자료 표시",
+      "acceptance": "응답자가 파일 이름/크기/다운로드를 사용; locale16 다운로드 라벨 유지; 재정렬/링크와 혼합시 동일 순서.",
+      "sourceFact": "public-file-ui",
+      "sourceExcerptRefs": [
+        "material-public-css",
+        "material-public",
+        "v3-public-gate"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            19,
+            19
+          ],
+          [
+            31,
+            32
+          ],
+          [
+            53,
+            56
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            83,
+            89
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A08",
+      "topic": "보기 이미지 표시",
+      "acceptance": "입력·미리보기·읽기전용 응답에 이미지와 확대/닫기; 선택과 확대 이벤트 분리; 깨진 이미지·모바일/키보드 접근성 경계 명시.",
+      "sourceFact": "public-image-ui",
+      "sourceExcerptRefs": [
+        "option-public-thumbnail",
+        "checkbox-public-image",
+        "option-lightbox",
+        "option-checkbox-zoom",
+        "option-radio-zoom",
+        "option-editor-css"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            19,
+            19
+          ],
+          [
+            56,
+            60
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            49,
+            49
+          ],
+          [
+            125,
+            125
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A09",
+      "topic": "자산 소유권 분리",
+      "acceptance": "응답자 업로드/DRAW·작성자 자료·보기 이미지 용도 상호 재사용 금지; 서버가 tenant/service 및 asset type/ready/clean을 재검증.",
+      "sourceFact": "file-key-semantics",
+      "sourceExcerptRefs": [
+        "asset-types-api",
+        "asset-copy-collect",
+        "asset-copy-map-strip",
+        "asset-temp-discard",
+        "material-wire",
+        "question-wire"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            25,
+            27
+          ],
+          [
+            31,
+            32
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            26,
+            32
+          ],
+          [
+            83,
+            91
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A10",
+      "topic": "인증된 자산 조회",
+      "acceptance": "관리자 service/form 권한 및 publication·receipt·share의 허용된 version/question 참조 범위에 묶어 조회. asset id만으로 다운로드되지 않음.",
+      "sourceFact": "public-file-ui",
+      "sourceExcerptRefs": [
+        "material-public-css",
+        "material-public",
+        "v3-public-gate"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            31,
+            32
+          ],
+          [
+            51,
+            56
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            83,
+            89
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A11",
+      "topic": "불변 참조 수명",
+      "acceptance": "draft 삭제/새버전 교체가 게시·승인·기존응답·템플릿 참조 bytes를 지우지 않음. 참조 및 물리삭제 경합의 lock 순서 확정.",
+      "sourceFact": "remove-lifecycle",
+      "sourceExcerptRefs": [
+        "asset-temp-discard",
+        "material-editor-core",
+        "option-replace-delete",
+        "toggle-cleanup-delete-question",
+        "toggle-off-confirm",
+        "feature-map",
+        "type-change-delete-confirm"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            27,
+            29
+          ],
+          [
+            48,
+            50
+          ],
+          [
+            59,
+            59
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            28,
+            32
+          ],
+          [
+            95,
+            99
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A12",
+      "topic": "만료·스캔·정리",
+      "acceptance": "ready/clean 전에 연결 금지; 만료된 임시 업로드와 실패한 bytes 정리; 참조된 assets는 TTL cleanup에서 제외. scanner 불가/오류는 실패로 처리.",
+      "sourceFact": "remove-lifecycle",
+      "sourceExcerptRefs": [
+        "asset-temp-discard",
+        "material-editor-core",
+        "option-replace-delete",
+        "toggle-cleanup-delete-question",
+        "toggle-off-confirm",
+        "feature-map",
+        "type-change-delete-confirm"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            25,
+            30
+          ],
+          [
+            44,
+            45
+          ],
+          [
+            50,
+            50
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            38,
+            44
+          ],
+          [
+            95,
+            99
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A13",
+      "topic": "저장/복제 원자성",
+      "acceptance": "권한/버전/검증 실패의 참조 변경·quota·새 bytes 롤백/보상; 동시 업로드/연결/삭제 경합으로 orphan 또는 20/3초과가 생기지 않음.",
+      "sourceFact": "quota",
+      "sourceExcerptRefs": [
+        "quota-size-type",
+        "quota-load",
+        "upload-queue",
+        "material-editor-upload",
+        "option-upload"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            27,
+            30
+          ],
+          [
+            33,
+            33
+          ],
+          [
+            44,
+            50
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            32,
+            42
+          ],
+          [
+            73,
+            79
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A14",
+      "topic": "폼·템플릿 복제",
+      "acceptance": "same-service 참조 reuse 또는 bytes copy 정책을 확정; cross-service·공개템플릿 사용에서 목적 서비스 소유권/새key 및 원본삭제 후 목적물 유지.",
+      "sourceFact": "copy-template-boundary",
+      "sourceExcerptRefs": [
+        "asset-types-api",
+        "asset-copy-collect",
+        "asset-copy-map-strip",
+        "question-copy",
+        "page-copy",
+        "template-create"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            18,
+            18
+          ],
+          [
+            28,
+            28
+          ],
+          [
+            47,
+            49
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            54,
+            69
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A15",
+      "topic": "quota 정책",
+      "acceptance": "원본 동적 assetUsage와 독립 로컬 상한 구분; 교체 credit·복제·중복키참조의 청구 정의 및 서버 원자검사.",
+      "sourceFact": "quota",
+      "sourceExcerptRefs": [
+        "quota-size-type",
+        "quota-load",
+        "upload-queue",
+        "material-editor-upload",
+        "option-upload"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            29,
+            30
+          ],
+          [
+            33,
+            33
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            73,
+            79
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A16",
+      "topic": "구버전 데이터·문서",
+      "acceptance": "자산 없는 DTO/PDF/hash를 무조건 새필드 null로 재작성하지 않음; LINK-only 기존 응답/템플릿/공유/CSV 회귀 유지.",
+      "sourceFact": "material-read-shape",
+      "sourceExcerptRefs": [
+        "material-readers",
+        "question-load"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            43,
+            43
+          ],
+          [
+            77,
+            79
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            106,
+            110
+          ],
+          [
+            124,
+            124
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A17",
+      "topic": "UI 편집 안정성",
+      "acceptance": "업로드 중 저장/발행/회사 전환/선택제거에 안전한 정책; stale async 응답 적용 거절; 새 폼/템플릿 에디터 업로드 소유자 할당 시점을 구체화.",
+      "sourceFact": "pending-upload",
+      "sourceExcerptRefs": [
+        "upload-token-and-normalize",
+        "material-settle",
+        "material-editor-upload",
+        "option-editor-eligibility",
+        "option-upload"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            53,
+            55
+          ],
+          [
+            60,
+            60
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            38,
+            42
+          ],
+          [
+            118,
+            120
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    },
+    {
+      "id": "A18",
+      "topic": "미관측 경계",
+      "acceptance": "filename 상한·원본 총quota·서버 검증·URLTTL·수명·UUID는 원본 사실로 주장하지 않음. 링크5개 오류문구를 실행 합계3 규칙으로 오해하지 않음.",
+      "sourceFact": "source-inconsistency",
+      "sourceExcerptRefs": [
+        "material-editor-core",
+        "material-editor-upload",
+        "server-error-client-map"
+      ],
+      "status": "covered_in_plan",
+      "planReferences": {
+        "rootFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN.md",
+        "lineRanges": [
+          [
+            7,
+            21
+          ],
+          [
+            75,
+            81
+          ]
+        ],
+        "draftFile": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/author-assets/PLAN-draft.md",
+        "draftLineRanges": [
+          [
+            3,
+            16
+          ],
+          [
+            99,
+            99
+          ]
+        ]
+      },
+      "coverageMeaning": "계획에 수용 조건 또는 구현 단계가 명시됨. 구현/동적 검증 합격 의미가 아님."
+    }
+  ],
+  "verification": {
+    "sourceReadOnly": true,
+    "sourceReviewShaMatched": true,
+    "originalBundleShaMatched": true,
+    "plansPresentAndParsed": true,
+    "backendEvidenceSourceFiles": 45,
+    "backendEvidenceRanges": 73,
+    "backendSourceAndRangeHashesMatched": true,
+    "backendRangeHashConvention": "1-based inclusive lines joined with LF and one final LF",
+    "additionalOriginalExcerpts": 3,
+    "testsRun": false,
+    "dbAccess": false,
+    "browserAccess": false,
+    "networkAccess": false,
+    "productFilesChanged": false,
+    "onlyOwnedReportWritten": true
+  },
+  "verdict": {
+    "result": "구현 착수를 막는 확정 blocker 없음",
+    "blockerCount": 0,
+    "interpretation": "A02 계획 검토 결론. DB/API 구현·실제 권한/수명/검사/브라우저 시험은 아직 통과 판정하지 않았다.",
+    "authority": "root PLAN.md가 최종 결정이며 draft/impact는 현재 그 결정을 보강한다."
+  },
+  "resolvedPlanDifferences": [
+    {
+      "id": "D01",
+      "topic": "same-service 명시 복사/use",
+      "initialDraft": "같은 서비스에서 동일 logical asset 재사용 가능",
+      "finalRoot": "명시 copyForm/useTemplate는 같은 서비스라도 source asset당 새 logical asset와 quota를 배정하고 blob만 공유. 순수 revise는 재사용.",
+      "finalDraftLines": [
+        58,
+        62
+      ],
+      "rootLines": [
+        18,
+        28,
+        49
+      ],
+      "assessment": "최종 draft가 root 결정으로 갱신되어 충돌 없음. 원본 copy newKey와도 모순되지 않음."
+    },
+    {
+      "id": "D02",
+      "topic": "신규 부모 업로드 문맥",
+      "initialDraft": "form/template write 권한을 확인한다는 개괄만 존재",
+      "finalDraft": "parent ID 없는 신규 에디터는 service+발급자 미연결 reservation을 먼저 만들고 create에서 같은 사용자의 ready asset을 같은 service에 bind. TTL 정리.",
+      "finalDraftLines": [
+        38,
+        42
+      ],
+      "rootLines": [
+        29,
+        31,
+        44
+      ],
+      "assessment": "기존 FormEditor의 미저장 시작 경로를 막지 않는 구체안 추가. 구현 시 proof/tenant/service 재확인 시험 필요하나 계획 blocker는 해소."
+    },
+    {
+      "id": "D03",
+      "topic": "pin 동기화",
+      "initialRoot": "자동 동기화 또는 동등 검증",
+      "finalDraft": "service sync + DEFERRABLE INITIALLY DEFERRED 최종집합/소유범위/목적/상태 검증. 자동 pin 생성 trigger와 혼합하지 않음.",
+      "finalDraftLines": [
+        28,
+        32
+      ],
+      "rootLines": [
+        27,
+        27
+      ],
+      "assessment": "root가 채택한 동등 무결성 방식과 일치. deferred constraint 자체를 동시성 직렬화 증명으로 취급하지 않음."
+    }
+  ],
+  "sourceFidelityInterpretations": [
+    {
+      "id": "F01",
+      "topic": "유형 전환",
+      "statement": "이미지 제거는 이미지 비지원 유형/기타 전환에 적용한다. 일반 RADIO↔CHECKBOX는 UPt가 options를 유지하고 kG도 허용하므로 이미지 유지가 원본 동작이다. root PLAN의 타입 전환 문구를 모든 타입 이동에서 이미지 삭제라는 의미로 확대하지 않는다.",
+      "rootLine": 15,
+      "draftLine": 91,
+      "extraEvidence": [
+        "choice-option-preservation",
+        "type-change-options",
+        "type-and-custom-image-normalizer"
+      ],
+      "implementationAcceptance": "이미지가 있는 객관식↔체크박스 전환은 이미지/option stable ID를 보존. 드롭다운/행렬/기타로 전환하면 확인과 명시 null/서버 거절 정책 적용."
+    },
+    {
+      "id": "F02",
+      "topic": "quota·보안·수명",
+      "statement": "원본 이미지 교체의 클라이언트 old-size credit 대신 역사 논리 자산을 정리 전까지 청구하는 정책, strict UUID/255 UTF16·실제 parser/ClamAV·핀/권한 모델은 독립 보완이다. PLAN이 원본 서버 동등 동작으로 주장하지 않으므로 원본 불일치 blocker가 아니다."
+    },
+    {
+      "id": "F03",
+      "topic": "질문/페이지 복제의 파일 제외 옵션",
+      "statement": "원본의 용량 부족 시 파일 제외 복제는 현재 전체양식 복사와 별도다. root PLAN:79가 다중페이지/질문복제 후속과 누락 범위를 명시하고 서버의 조용한 자산 삭제를 금지하여 이번 승인 범위를 과장하지 않는다."
+    }
+  ],
+  "implementationGatesAlreadyPlanned": [
+    {
+      "topic": "권한·수명",
+      "required": "raw key가 아니라 exact parent/version/question과 현재 actor/publication/viewer를 매번 검증, I/O 후 기한 재검사; published/approval/template pin 및 clone 대상 독립 생존.",
+      "refs": [
+        "PLAN.md:27-32",
+        "PLAN-draft.md:83-99"
+      ]
+    },
+    {
+      "topic": "quota·GC 동시성",
+      "required": "모든 quota writer의 공통 잠금 순서/합계, 마지막 ref 제거 대 attach/clone, READ COMMITTED 양방향 row-lock 시험. 고정 snapshot은 별도 입증 전 성공 주장 금지.",
+      "refs": [
+        "PLAN.md:30-33",
+        "PLAN-draft.md:73-79"
+      ]
+    },
+    {
+      "topic": "검증기/리소스 상한",
+      "required": "선택 parser direct dependency 버전 및 실제 ZIP/이미지 숫자 상한은 A07 코드/시험 전에 확정. 현재 문서는 해당 구현 합격 증거 아님.",
+      "refs": [
+        "PLAN.md:67-73",
+        "PLAN-draft.md:46-50"
+      ]
+    },
+    {
+      "topic": "실제 공용 템플릿 fixture",
+      "required": "trusted system asset seed/publisher 경로 및 회사 A/B 복사 후 원본 정리와 별개 생존을 검증.",
+      "refs": [
+        "PLAN.md:26-28",
+        "PLAN-draft.md:61-69"
+      ]
+    }
+  ],
+  "additionalOriginalExcerpts": [
+    {
+      "id": "choice-option-preservation",
+      "symbol": "DPt/UPt",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "start": 12715789,
+      "endExclusive": 12716365,
+      "coordinate": "0-based JS UTF-16 code units; end exclusive",
+      "text": "DPt=[\"RADIO\",\"CHECKBOX\",\"SELECTBOX\"],FPt=function(){return{value:arguments.length>0&&void 0!==arguments[0]?arguments[0]:1,optionQuestionName:\"\\ud30c\\uc77c \\uc5c5\\ub85c\\ub4dc \\uc218\",isCustomValue:!1}},BPt=e=>({value:0,optionQuestionName:\"\",isCustomValue:!1,...e?{pageOffset:-2}:{}}),UPt=e=>{let{prevElementType:t,nextElementType:r,prevOptionList:n,withPageOffset:a=!1}=e;if(i=r,DPt.includes(i)){var o;return\"FILE\"!==t&&(null!==(o=null===n||void 0===n?void 0:n.length)&&void 0!==o?o:0)>0?[...n]:[BPt(a)]}var i;return\"FILE\"===r?[FPt()]:[]},zPt=[\"questionImage\",\"questionMaterial",
+      "excerptUtf8Sha256": "3f21c3e59babb89660b801182c81d8ebeb582511efca35c64a84ee428071e6c8"
+    },
+    {
+      "id": "type-change-options",
+      "symbol": "ce→UPt",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "start": 12725626,
+      "endExclusive": 12725783,
+      "coordinate": "0-based JS UTF-16 code units; end exclusive",
+      "text": "n.questionOptionList=UPt({prevElementType:null===r||void 0===r?void 0:r.elementType,nextElementType:e,prevOptionList:n.questionOptionList,withPageOffset:!0})",
+      "excerptUtf8Sha256": "0f2a4f3da093996f5949303040ef88b7f06382ca8d60560303fdda827fafe55c"
+    },
+    {
+      "id": "type-and-custom-image-normalizer",
+      "symbol": "kG",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "start": 8168497,
+      "endExclusive": 8168900,
+      "coordinate": "0-based JS UTF-16 code units; end exclusive",
+      "text": "e((e=>null!==CG(e)))}function NG(e){return null!==CG(e)||null!==SG(e)}function kG(e,t){if(!Array.isArray(t))return[];const r=(e=>\"RADIO\"===e||\"CHECKBOX\"===e)(e),n=e=>NG(e)&&(!r||(e=>!0===(null===e||void 0===e?void 0:e.isCustomValue)||\"Y\"===(null===e||void 0===e?void 0:e.customValueYn))(e));return t.some(n)?t.map((e=>n(e)?{...e,optionImageKey:null,optionImageUrl:null,imageUrl:null,optionImageFileSize:",
+      "excerptUtf8Sha256": "b98c8b1890becb8719bc1e482a9fa51f6cd109d2af5ae65a49c7a1383991fe61"
+    }
+  ],
+  "localReadEvidence": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+      "lines": [
+        [
+          32,
+          58
+        ],
+        [
+          81,
+          89
+        ]
+      ],
+      "reason": "신규 form/template의 parent ID 미존재 상태 확인",
+      "sha256": "49e84857c272522adbbf4eeee40186c1b673dc8f0ceaf5c9d6eb6dc1a1be1d32"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/templates.ts",
+      "lines": [
+        [
+          51,
+          68
+        ],
+        [
+          90,
+          135
+        ]
+      ],
+      "reason": "현재 public/tenant template 읽기와 target service 사용/caller transaction 확인",
+      "sha256": "f1bfe44e6d3ab53c597a3b8eb046f7448220b5aca42cf5bc49e05f926e175818"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts",
+      "lines": [
+        [
+          217,
+          239
+        ],
+        [
+          415,
+          437
+        ]
+      ],
+      "reason": "생성/갱신/개정/복제 연결점 확인",
+      "sha256": "9356e0215638ea8b5b7d715a10c23d9b9f73dc30ed48c26f72d5a7bd197dcb26"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/form-access.ts",
+      "lines": [
+        [
+          12,
+          40
+        ]
+      ],
+      "reason": "현재 actor 기한/권한과 15초 transaction 경계 확인",
+      "sha256": "2a088f47f97e0342e0717bfab47d3e25c9c292d1bc12e926f721998142babf11"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-access.ts",
+      "lines": [
+        [
+          31,
+          36
+        ],
+        [
+          49,
+          129
+        ]
+      ],
+      "reason": "응답용 FileObject 권한·수명은 작성자 자산과 분리해야 함",
+      "sha256": "5d69c3b1ec143b709fb32a829cd5e97d6c5d36e6701536660d798286bc992feb"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/files.ts",
+      "lines": [
+        [
+          18,
+          32
+        ],
+        [
+          90,
+          173
+        ]
+      ],
+      "reason": "기존 quota·I/O·TTL/물리삭제 의미 확인",
+      "sha256": "89d02d977c1ac2c9f8e4c12fe0cea7bd4a558879d2686768f36a65076fd88562"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/approvals.ts",
+      "lines": [
+        [
+          29,
+          51
+        ]
+      ],
+      "reason": "Approval snapshot 별도 pin 요구의 코드 근거",
+      "sha256": "f47207517872000209542c274f96cb80acd2e2ffb1a73c7c85a2587dc868c81b"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/idempotency.ts",
+      "lines": [
+        [
+          1,
+          110
+        ]
+      ],
+      "reason": "caller transaction과 cache replay/resource lifetime 연결점",
+      "sha256": "2df941f7f72dc7b3961d4a19bbd174a154032781a8ae377f87816575495aa7c6"
+    }
+  ]
+}

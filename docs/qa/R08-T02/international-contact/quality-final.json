@@ -1,0 +1,69 @@
+{
+  "checkedAt": "2026-10-10T06:12:49.978811+00:00",
+  "result": "passed_with_documented_limits",
+  "scope": "International contact/version language, selected source translations, multilingual PDF; not whole R08 or all-language acceptance",
+  "build": {
+    "directory": ".next-rea-international-pdf",
+    "id": "_idXxmRfmr7z3sbDhFEG2",
+    "log": "build-pdf.log",
+    "result": "passed"
+  },
+  "typecheck": {
+    "result": "passed",
+    "config": "tsconfig.rea-international-pdf.json",
+    "log": "typecheck-pdf.log"
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 2,
+    "logs": [
+      "lint-final.log",
+      "lint-final-additional.log"
+    ],
+    "scope": "lint-scope.json"
+  },
+  "openApi": {
+    "paths": 311,
+    "result": "passed",
+    "log": "openapi-final.log"
+  },
+  "tests": {
+    "earlierInternationalRegression": {
+      "files": 13,
+      "passed": 192,
+      "report": "test-summary.json"
+    },
+    "finalIntegratedRegression": {
+      "files": 8,
+      "passed": 126,
+      "failed": 0,
+      "pending": 0,
+      "report": "pdf-integration.json"
+    },
+    "additiveTotals": false
+  },
+  "database": {
+    "migrations": 117,
+    "existingEightTableCommonColumnHashesPreserved": true,
+    "unexpectedSchemaDifferences": 0,
+    "previousFrozenFixtures": 13,
+    "report": "frozen-fixtures/final/summary.json"
+  },
+  "restart": {
+    "checkedAt": "2026-10-10T06:10:23.654Z",
+    "result": "passed",
+    "hash": "779fa58463567b42c3c33caa398c52823942eec7a2dafbf31b97ff09a2fd8946",
+    "forms": 2,
+    "submissions": 2,
+    "corrections": 1,
+    "audits": 25,
+    "beforePid": 84141,
+    "afterPid": 85598,
+    "browser": "flow/browser-after-restart.json"
+  },
+  "limits": [
+    "Whole-page visual screenshots unavailable; only DOM geometry for UI",
+    "PDF.js complex Arabic copy/search does not equal original logical string; ActualText preserved",
+    "Remaining system translations, signature/identity, metadata and multipage workflows pending"
+  ]
+}

@@ -13,6 +13,7 @@ import { lockServiceActor } from "./service-actor";
 import { assertFileDeadlines } from "./file-access";
 import { idempotent } from "./idempotency";
 import { lockAccountActor } from "./account-actor";
+import { ssoSessionState } from "./sso-policy-enforcement";
 
 export const assignableRole = z.enum(["admin", "editor", "viewer", "privacy", "sender", "billing", "security", "auditor"]);
 const servicesInput = z.array(z.uuid()).max(100).refine(value => new Set(value).size === value.length, "서비스가 중복되었습니다.");
@@ -248,6 +249,9 @@ export async function acceptInvitation(actor: Actor, token: string, requestId: s
   const row = await checkedInvitation(actor, token, tx);
   const current = await lockAccountActor(tx, actor);
   if (current.user.email.toLowerCase() !== row.email) fail(404, "INVITATION_NOT_FOUND", "이 계정으로 수락할 수 있는 초대가 없습니다.");
+  // Verified invitation acceptance establishes membership, enabling SSO linking.
+  // It does not grant business access before the target company's authentication.
+  const ssoLogin = await ssoSessionState(row.tenantId, current.user.id, current.session.id, tx);
   const inviter = await tx.membership.findFirst({ where: { id: row.invitedBy, tenantId: row.tenantId, status: "active" } });
   if (!inviter || !roleCan(inviter.role, "member.manage")) fail(409, "INVITER_UNAVAILABLE", "초대한 담당자의 권한이 변경되었습니다. 다시 초대를 요청해주세요.");
   mayAssign(inviter.role, row.role);
@@ -262,11 +266,11 @@ export async function acceptInvitation(actor: Actor, token: string, requestId: s
   await revokeInvitedExpert(tx, existing, requestId);
   await replaceGrants(tx, row.tenantId, member.id, row.serviceIds, row.role);
   await tx.invitation.update({ where: { id: row.id }, data: { status: "accepted", acceptedBy: actor.user.id, version: { increment: 1 } } });
-  await tx.session.update({ where: { id: actor.session.id }, data: { activeCompanyId: row.tenantId, activeServiceId: row.serviceIds[0] } });
+  await tx.session.update({ where: { id: actor.session.id }, data: { activeCompanyId: row.tenantId, activeServiceId: ssoLogin.required ? null : row.serviceIds[0] } });
   await audit(tx, { tenantId: row.tenantId, user: actor.user }, requestId, "invitation.accepted", "invitation", row.id, ["status", "membership"]);
   assertFileDeadlines(current.deadlines);
   assertInvitationDeadline(row.expiresAt);
-  return { companyId: row.tenantId, companyName: row.tenant.name, memberId: member.id };
+  return { companyId: row.tenantId, companyName: row.tenant.name, memberId: member.id, ssoLogin };
 }
 
 function assertInvitationDeadline(expiresAt: Date) {
@@ -284,6 +288,7 @@ export async function acceptInvitationRequest(actor: Actor, token: string, key: 
     await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${cached.companyId} FOR SHARE`;
     const current = await lockAccountActor(tx, actor);
     deadlines = current.deadlines;
+    const ssoLogin = await ssoSessionState(cached.companyId, current.user.id, current.session.id, tx);
     await tx.$queryRaw`SELECT id FROM "Membership" WHERE id=${cached.memberId} AND "tenantId"=${cached.companyId} FOR SHARE`;
     const invitation = await tx.invitation.findUnique({ where: { tokenHash: tokenHash(token) }, include: { tenant: true } });
     const member = await tx.membership.findFirst({ where: { id: cached.memberId, tenantId: cached.companyId,
@@ -292,7 +297,7 @@ export async function acceptInvitationRequest(actor: Actor, token: string, key: 
       invitation.acceptedBy !== current.user.id || invitation.email !== current.user.email.toLowerCase() ||
       invitation.tenant.status !== "active" || !member)
       fail(410, "INVITATION_UNAVAILABLE", "초대 수락 상태가 변경되었습니다. 현재 회사와 구성원 상태를 확인해주세요.");
-    return { companyId: invitation.tenantId, companyName: invitation.tenant.name, memberId: member.id };
+    return { companyId: invitation.tenantId, companyName: invitation.tenant.name, memberId: member.id, ssoLogin };
   }, async () => {
     if (deadlines) assertFileDeadlines(deadlines);
     if (invitationDeadline) assertInvitationDeadline(invitationDeadline);

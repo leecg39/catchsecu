@@ -1,5 +1,22 @@
 import { z } from "zod";
 
+export type RetentionRuleRecord = {
+  id: string;
+  serviceId: string;
+  retentionDays: number;
+  reason: string;
+  status: string;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+};
+export type RetentionRulePage = {
+  items: RetentionRuleRecord[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
 const days = z.number().int().min(1).max(36500);
 export const retentionRuleCreate = z.object({
   serviceId: z.uuid(),

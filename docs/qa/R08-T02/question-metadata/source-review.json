@@ -1,0 +1,917 @@
+{
+  "checkedAt": "2026-10-10T06:17:45.901Z",
+  "scope": "F3 질문 메타데이터 원본/로컬 읽기 대조. 제품 코드·테스트·DB·브라우저·네트워크를 변경하거나 실행하지 않았다.",
+  "source": {
+    "path": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+    "sha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "reaEvidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "offsetUnit": "zero-based JavaScript UTF-16 code units; endExclusive",
+    "reusedAudit": "docs/qa/R08-T01/source-audit/excerpts.json",
+    "execution": "원본 JS 실행 없이 정적 문자열 발췌",
+    "bytes": 15337385,
+    "utf16Length": 15329557
+  },
+  "categories": {
+    "observed": "원본 프런트 코드 또는 현재 로컬 소스에서 확인",
+    "inference": "구현 동등성/영향 분석",
+    "unknown": "원본 서버 스키마·실응답·권한·강제 규칙·실행은 미관측"
+  },
+  "recommendation": "설명부터 구현: 선택 평문 3000자이며 답변 형식·파일·NLP 의존성이 없다. 개인정보 분류는 별도 배열·확인·언어·동의 집계가 있어 설명과 분리한다.",
+  "features": [
+    {
+      "id": "description",
+      "status": "confirmed-local-gap",
+      "observed": {
+        "editorField": "description",
+        "wireField": "additionalExplanation",
+        "format": "선택 문자열; default empty; V3 textarea maxLength=3000",
+        "public": "질문 제목 → 별도 질문 이미지 → 참고자료 → <pre>{additionalExplanation}</pre> → 답변. React 텍스트로 개행 보존.",
+        "richHtml": false,
+        "load": "additionalExplanation || '' → description",
+        "limitScope": "프런트 UTF-16 maxLength만 관측; 서버 상한 미관측",
+        "evidence": [
+          "metadata-serializer",
+          "metadata-load",
+          "description-editor",
+          "description-limit",
+          "description-public"
+        ]
+      },
+      "local": [
+        [
+          "src/contracts/questions.ts",
+          16,
+          "strict schema에 설명 없음"
+        ],
+        [
+          "prisma/schema.prisma",
+          1314,
+          "Question에 설명 없음"
+        ],
+        [
+          "src/server/forms.ts",
+          40,
+          "contentDto 명시 투영"
+        ],
+        [
+          "src/server/forms.ts",
+          150,
+          "writeQuestions 명시 저장/변경 비교"
+        ],
+        [
+          "src/components/forms/FormEditor.tsx",
+          136,
+          "질문 제목만 편집"
+        ],
+        [
+          "src/components/forms/PublicForm.tsx",
+          131,
+          "legend 다음 QuestionInput"
+        ],
+        [
+          "src/components/forms/TemplateGallery.tsx",
+          20,
+          "미리보기 설명 없음"
+        ],
+        [
+          "src/server/submission-management.ts",
+          59,
+          "정정은 contentDto 질문 재사용"
+        ]
+      ],
+      "inference": [
+        "description?: string max3000과 plain React text+white-space:pre-wrap가 관측 동작에 맞음. 임의 trim은 개행/공백 의미를 바꾸므로 피함.",
+        "별도 이미지/링크 필드를 설명 rich HTML로 합치지 않음.",
+        "없음/빈값을 과거 DTO에 일괄 주입하지 않는 호환 정책으로 기존 승인 hash를 보존해야 함."
+      ],
+      "unknown": [
+        "원본 서버 최대길이/공백 정규화",
+        "구형 편집기 300자 경로도 있으나 이번 기준은 V3 3000자"
+      ]
+    },
+    {
+      "id": "pattern",
+      "status": "typed-partial-equivalence-general-editor-unconfirmed",
+      "observed": {
+        "fields": [
+          "infoPatternId",
+          "patternRegex"
+        ],
+        "validation": "a1: trimmed nonempty value에 !patternRegex || new RegExp(patternRegex).test(value); 빈값은 questionElementType MM에서 거절.",
+        "guideIds": {
+          "1": "common",
+          "2": "additionalInquiries",
+          "3": "residentRegistration",
+          "4": "email",
+          "7": "address",
+          "8": "birth"
+        },
+        "guideNamespace": "infoOwnerForm: 3→phrase1/2, 4→phrase3/4, 7→phrase5(helpText), 8→phrase6/7",
+        "input": "a1 maxLength100; ID8 숫자만, ID3 6+7 숫자 하이픈 포맷",
+        "serializer": "C_t에서 infoPatternId/patternRegex 직접 속성은 확인되지 않음",
+        "evidence": [
+          "pattern-render",
+          "pattern-guides",
+          "metadata-serializer"
+        ]
+      },
+      "local": [
+        [
+          "src/contracts/questions.ts",
+          16,
+          "범용 pattern metadata 없음"
+        ],
+        [
+          "src/components/forms/QuestionSettings.tsx",
+          9,
+          "글자수/조건/행렬/선택수"
+        ],
+        [
+          "src/components/forms/QuestionInput.tsx",
+          58,
+          "특수 EMAIL/BIRTH 검증 있음"
+        ],
+        [
+          "src/server/answer-validation.ts",
+          85,
+          "특수 유형 검증"
+        ],
+        [
+          "src/server/answer-validation.ts",
+          92,
+          "validationKind email/phone/number는 질문 스키마 pattern이 아님"
+        ],
+        [
+          "src/server/submission-management.ts",
+          80,
+          "정정 fieldTypes에서 validationKind 파생"
+        ]
+      ],
+      "inference": [
+        "범용 pattern 편집 버튼 누락을 단정할 근거는 부족함.",
+        "숫자 ID로 실제 regex를 추정하지 않음. 현재 typed validation은 부분 대응이며 서버 강제 규칙 복원이 아님.",
+        "명명된 로컬 검증 규칙을 도입하려면 독립 계약으로 표시."
+      ],
+      "unknown": [
+        "실제 patternRegex 값/플래그",
+        "범용 패턴 편집·저장 설정 API",
+        "원본 서버 검증·사용자 regex 안전 실행 정책"
+      ]
+    },
+    {
+      "id": "option-images",
+      "status": "confirmed-local-gap",
+      "observed": {
+        "fields": [
+          "optionImageKey",
+          "optionImageUrl (imageUrl fallback)",
+          "optionImageFileSize",
+          "optionImageUploadToken (임시)"
+        ],
+        "types": [
+          "RADIO",
+          "CHECKBOX"
+        ],
+        "exclusion": "custom isCustomValue===true 또는 customValueYn=Y에는 이미지 제거. SELECTBOX/다른 유형도 kG 정규화에서 제거.",
+        "limits": {
+          "mime": [
+            "image/jpeg",
+            "image/jpg",
+            "image/png"
+          ],
+          "bytes": 1048576,
+          "imagesPerQuestion": 20,
+          "replacement": "현재 보기 제외하고 다른 이미지 수 계산",
+          "totalQuota": "assetUsage/응답 limitBytes 동적; 고정 수치 미관측"
+        },
+        "wire": "C_t는 URL·size·임시 토큰을 제거하고 optionImageKey 보존.",
+        "upload": {
+          "method": "POST",
+          "urlTemplate": "${PE}/company-operated-service/catch-form/asset/upload",
+          "formData": [
+            "catchformId",
+            "assetType=OPTION_IMAGE",
+            "file",
+            "replacedS3Key?"
+          ],
+          "responseFieldsRead": [
+            "fileKey",
+            "fileUrl",
+            "fileSize",
+            "usedBytes",
+            "limitBytes"
+          ]
+        },
+        "lifecycle": "업로드 토큰으로 현재 위치/기능 여부를 재검사. 삭제/유형변경/기능해제 후 늦은 성공은 temp/discard. asset/copy와 originS3Key payload 존재.",
+        "evidence": [
+          "option-image-normalize",
+          "option-image-upload",
+          "asset-api",
+          "asset-discard",
+          "asset-copy-key",
+          "metadata-serializer",
+          "custom-public",
+          "metadata-v3-gate",
+          "metadata-feature-map"
+        ]
+      },
+      "local": [
+        [
+          "src/contracts/questions.ts",
+          9,
+          "보기 strict id/label/value만"
+        ],
+        [
+          "prisma/schema.prisma",
+          1336,
+          "QuestionOption 이미지 없음"
+        ],
+        [
+          "src/components/forms/QuestionOptions.tsx",
+          14,
+          "label 편집만"
+        ],
+        [
+          "src/components/forms/QuestionInput.tsx",
+          40,
+          "보기 label만 렌더"
+        ],
+        [
+          "src/server/forms.ts",
+          173,
+          "stableKey/label/value/order 저장"
+        ]
+      ],
+      "inference": [
+        "응답자 첨부파일과 작성자 자산은 소유권·공개 범위가 다름. 새 author-asset 계약 선행.",
+        "임시파일 교체/삭제/복사·게시된 버전 참조 불변성과 늦은 응답 정리가 필요."
+      ],
+      "unknown": [
+        "원본 서버 MIME/검사/권한/수명주기 강제",
+        "실제 전체 quota"
+      ]
+    },
+    {
+      "id": "reference-materials",
+      "status": "confirmed-local-gap",
+      "observed": {
+        "state": "materials[] {id,type:file|link,name,url,fileKey?,size?,sequence}",
+        "wire": "materialList[]: FILE {materialType,orderNumber,fileKey,linkLabel:null,linkUrl:null}; LINK {materialType,orderNumber,fileKey:null,linkLabel,linkUrl}",
+        "readCompatibility": "materialList 우선, serviceFormQuestionAssets 및 materials fallback",
+        "limits": {
+          "combinedCount": 3,
+          "fileBytes": 5242880,
+          "fileExtensions": [
+            "pdf",
+            "docx",
+            "ai"
+          ],
+          "urlLength": 512,
+          "labelLength": 100,
+          "schemes": [
+            "http:",
+            "https:"
+          ],
+          "labelDefault": "trim(label) 또는 URL; 100자 넘으면 앞99자+…"
+        },
+        "public": "제목/별도이미지 다음 xQ, 설명보다 앞. 파일명·크기·다운로드 또는 링크 새탭. target=_blank rel=noopener noreferrer.",
+        "assetType": "QUESTION_MATERIAL",
+        "evidence": [
+          "reference-url-rule",
+          "reference-adapter",
+          "reference-serialize",
+          "reference-public",
+          "reference-editor",
+          "reference-link-editor",
+          "reference-file-rule",
+          "asset-api",
+          "metadata-v3-gate",
+          "metadata-feature-map"
+        ]
+      },
+      "local": [
+        [
+          "src/contracts/questions.ts",
+          16,
+          "자료 배열 없음"
+        ],
+        [
+          "src/components/forms/FormEditor.tsx",
+          136,
+          "자료 UI 없음"
+        ],
+        [
+          "src/components/forms/PublicForm.tsx",
+          131,
+          "자료 공개 목록 없음"
+        ],
+        [
+          "src/contracts/domains.ts",
+          38,
+          "기존 파일 10MiB PDF/PNG/JPEG/CSV/plain"
+        ],
+        [
+          "src/contracts/files.ts",
+          6,
+          "public upload는 questionId 응답파일"
+        ]
+      ],
+      "inference": [
+        "링크만 먼저 구현 가능: 3개/순서/http(s)/512/label100, 자산 서버와 분리.",
+        "참고 FILE은 작성자 자산 기반 이후. 응답 파일 한도/허용 목록을 재사용하지 않음.",
+        "원본 프런트에서 서버 URL fetch 필요성은 관측되지 않음; 새 탭 링크 동작."
+      ],
+      "unknown": [
+        "원본 서버 스캔·실제 MIME·권한·만료",
+        "AI 파일 검사의 실제 방식"
+      ]
+    },
+    {
+      "id": "custom-choice",
+      "status": "confirmed-local-gap-answer-contract-change",
+      "observed": {
+        "editor": "RADIO/CHECKBOX/SELECTBOX; URt가 최대 한 개 isCustomValue:true를 뒤에 추가. 일반 보기 추가는 기타 앞, 원본 value는 숫자 재인덱스.",
+        "public": "customValueYn=Y 선택 시 text maxLength100; readOnly는 텍스트 표시.",
+        "validation": "기타 선택 시 optional이어도 공백 text 거절. 미선택 optional은 빈값 가능. 기타는 복수선택 개수 1개.",
+        "aiV3State": {
+          "single": "{optionValue:number,isCustomValue:boolean,text:string}|null",
+          "multiple": "{optionValue:number[],isCustomValue:boolean,text:string}"
+        },
+        "submit": {
+          "single": "{optionValue,customValue,text:string|null}|null",
+          "multiple": "[{optionValue,customValue:false,text:null},...,{optionValue,customValue:true,text:string|null}]"
+        },
+        "legacy": "NEW/AI/AI_V2의 일부 single codec은 value|text 문자열. V3 객체와 구분.",
+        "evidence": [
+          "custom-editor",
+          "custom-public",
+          "custom-codecs",
+          "custom-submit",
+          "option-image-normalize",
+          "custom-count"
+        ]
+      },
+      "local": [
+        [
+          "src/contracts/questions.ts",
+          9,
+          "custom flag 없음"
+        ],
+        [
+          "src/contracts/questions.ts",
+          24,
+          "custom 답변 union 없음"
+        ],
+        [
+          "src/contracts/questions.ts",
+          70,
+          "scalar equals / array includes 조건"
+        ],
+        [
+          "src/contracts/questions.ts",
+          94,
+          "객체는 행렬처럼 format"
+        ],
+        [
+          "src/components/forms/QuestionOptions.tsx",
+          24,
+          "일반 보기만 추가"
+        ],
+        [
+          "src/components/forms/QuestionInput.tsx",
+          40,
+          "custom 입력 없음"
+        ],
+        [
+          "src/server/answer-validation.ts",
+          66,
+          "비행렬 객체 answer 거절"
+        ],
+        [
+          "src/server/forms.ts",
+          176,
+          "기존 stable value 변경 금지"
+        ],
+        [
+          "src/contracts/form-copy.ts",
+          7,
+          "UUID 복사 매핑"
+        ]
+      ],
+      "inference": [
+        "원본 숫자 재인덱스를 이식하지 않고 기존 UUID stable id/value 유지.",
+        "custom 보기 1개 + 구조적 답변 + 기존 string/array 호환을 함께 설계. text를 value에 |로 붙이지 않음.",
+        "조건·개수·숨김 정리·정정·표시/CSV·copy에 공통 선택값 추출/formatter가 필요."
+      ],
+      "unknown": [
+        "원본 서버 길이 강제·구버전 마이그레이션",
+        "custom 선택 페이지 분기의 서버 동작"
+      ]
+    },
+    {
+      "id": "privacy-classification",
+      "status": "confirmed-local-gap-not-subjectRole",
+      "observed": {
+        "state": "detectedItems[] {type,name,nlpFeedbackId,personalInformationSource,detectedType,detectedName,isConfirm,...error flags}",
+        "wire": "catchFormPersonalInformationRequests[] {nlpFeedbackId,personalInformationType,detectedPersonalInformation,personalInformationSource}",
+        "enum": {
+          "PERSONAL_INFORMATION": "개인정보",
+          "SENSITIVE": "민감정보",
+          "IDENTIFICATION": "고유식별정보",
+          "RESIDENT": "주민등록번호",
+          "NON_PERSONAL_INFORMATION": "개인정보 없음"
+        },
+        "sources": [
+          "USER",
+          "NLP"
+        ],
+        "confirm": "type 필수. 없음 외 name.trim 필수; 없음은 name/detectedName 비움. 행렬은 없음 외 분류 확인 차단. RESIDENT는 required/disabled 적용.",
+        "language": "한국어 NLP/USER 다중항목 추가·삭제·확인. 비한국어 수동 수집 YES/NO·이름/분류 확인 경로.",
+        "nameMaxLength": "확인한 입력/확인 경로에서 명시적인 maxLength 미확정",
+        "api": {
+          "method": "POST",
+          "urlTemplate": "${PE}/company-operated-service/nlp/user_input_personal_information",
+          "observedRequestFields": [
+            "id",
+            "originalText",
+            "analysisType=NER",
+            "isChange",
+            "catchformId",
+            "companyId",
+            "userId",
+            "userInputContent",
+            "formLanguage (일부)",
+            "questionType (일부)"
+          ]
+        },
+        "downstream": "g_t는 분기별 개인정보 분류 존재를 검사. T_t는 없음 제외 type/name을 집계. 단일 태그와 다름.",
+        "evidence": [
+          "privacy-enum",
+          "privacy-default",
+          "privacy-confirm",
+          "privacy-editor",
+          "privacy-api",
+          "privacy-branch",
+          "privacy-aggregate",
+          "metadata-serializer",
+          "metadata-load"
+        ]
+      },
+      "local": [
+        [
+          "src/contracts/questions.ts",
+          18,
+          "subjectRole name/email은 분류와 다름"
+        ],
+        [
+          "src/components/forms/FormEditor.tsx",
+          141,
+          "정보주체 조회용 역할 UI"
+        ],
+        [
+          "prisma/schema.prisma",
+          1320,
+          "subjectRole뿐, 분류 배열 없음"
+        ],
+        [
+          "src/server/forms.ts",
+          160,
+          "분류 저장/확인/NLP 투영 없음"
+        ]
+      ],
+      "inference": [
+        "수동 분류 snapshot→동의 연결→실제 NLP 제공자를 분리.",
+        "태그 저장만으로 NLP 분석·동의 문서 자동 반영 완료라고 주장하지 않음.",
+        "이름 길이/항목 수 로컬 상한은 독립 계약으로 명시."
+      ],
+      "unknown": [
+        "NLP 실응답·원본 서버 권한/검증",
+        "분류별 서버 강제 동의 문서·name/item 상한"
+      ]
+    }
+  ],
+  "crossCutting": {
+    "api": "POST/PATCH formContentSchema strict 계약이므로 UI만 추가하면 거절. schema→Prisma→writeQuestions/contentDto 동시 연결.",
+    "hashes": "fingerprint는 contentDto의 JSON. 빈 default 메타데이터를 과거 DTO에 일괄 삽입하면 승인 hash가 달라진다. 기존 저장 PDF를 재생성하거나 renderer version을 바꿀 필요 없음.",
+    "versioning": "reviseForm contentDto→createVersion; copyForm/template use cloneFormContent. 문자열/링크는 보존, 자산은 참조·권한·복제 계약 필요.",
+    "ui": "FormEditor/PublicForm/TemplateGallery/SubmissionDetail edit의 표시 일관성. 응답 목록 별도 투영과 답변값 자체를 혼동하지 않음.",
+    "concurrency": "저장중 잠금/409 입력보존/다른 탭 tenant/service 변경, 자산 업로드 중 질문 reorder/delete/유형변경 후 ID binding.",
+    "language": "작성자 본문을 자동번역하지 않고 formLanguage/RTL 유지. system copy는 관측된 키만 사용.",
+    "originalFeatureScope": {
+      "createType": "AI_V3",
+      "normalizer": "wQ removes option images/materialList/serviceFormQuestionAssets outside AI_V3",
+      "featureKeys": [
+        "useQuestionImage",
+        "useQuestionMaterial",
+        "useOptionImage"
+      ],
+      "typeEligibility": "IDV none; RADIO image/material/optionImage/pageOffset; CHECKBOX image/material/optionImage; SELECTBOX image/material/pageOffset; other types image/material",
+      "interpretation": "Client version/feature checks observed; not evidence of server entitlement enforcement."
+    }
+  },
+  "implementationOrder": [
+    {
+      "step": "M1",
+      "name": "설명",
+      "ready": true,
+      "reason": "3000자 평문 계약 명확; 자산/NLP/답변 의존성 없음"
+    },
+    {
+      "step": "M2",
+      "name": "참고 LINK만",
+      "ready": true,
+      "reason": "원본 제한 확인; 자산 서버 불필요"
+    },
+    {
+      "step": "M3",
+      "name": "수동 개인정보 분류 스냅샷",
+      "ready": "이름/개수 로컬 상한·동의 연결 범위 결정 후",
+      "reason": "NLP/자동 동의 연동과 분리"
+    },
+    {
+      "step": "M4",
+      "name": "기타 직접입력",
+      "ready": "답변 호환 설계 후",
+      "reason": "조건/개수/정정/CSV까지 하나의 단계"
+    },
+    {
+      "step": "M5a",
+      "name": "작성자 자산 기반 + 보기 이미지",
+      "ready": "자산 권한/검사/수명주기 계약 후"
+    },
+    {
+      "step": "M5b",
+      "name": "참고 FILE",
+      "ready": "M2/M5a 이후; pdf/docx/ai 5MiB"
+    },
+    {
+      "step": "M6",
+      "name": "범용 pattern",
+      "ready": false,
+      "reason": "실제 regex/편집 API 미관측; 근거 확보 또는 독립 로컬 규칙 필요"
+    }
+  ],
+  "validation": "계획만 작성. 이 조사에서 제품 테스트 실행 없음.",
+  "excerpts": [
+    {
+      "id": "metadata-serializer",
+      "symbol": "w_t/C_t",
+      "start": 12625116,
+      "endExclusive": 12626226,
+      "text": "w_t=e=>{const t=[];return e.forEach((e=>{t.push({nlpFeedbackId:e.nlpFeedbackId,personalInformationType:e.type,detectedPersonalInformation:e.name,personalInformationSource:e.personalInformationSource})})),t},C_t=e=>{const t=[];return e.pageList.forEach(((e,r)=>{t.push({page:e.page,pageTitle:0===r?\"\":e.pageTitle,pageContent:0===r?\"\":e.pageContent,pageOffset:e.pageOffset,questionList:e.questionList.map((e=>{return{nlpFeedbackId:e.nlpFeedbackId,title:e.title,additionalExplanation:e.description,catchFormQuestionType:e.elementType,questionOptionList:(t=kG(e.elementType,e.questionOptionList),Array.isArray(t)?t.map((e=>{const{optionImageUrl:t,imageUrl:r,optionImageFileSize:n,optionImageUploadToken:a,...o}=null!==e&&void 0!==e?e:{};return{...o,optionImageKey:SG(e)}})):[]),matrixOptionData:e.matrixOptionData,usePageOffset:e.usePageOffset,required:e.isRequired,useSecureKeyStroke:!1,...hG(e),...qY(e),materialList:lQ(e),...h_t(e),catchFormPersonalInformationRequests:w_t(e.detectedItems)};var t}))})})),t},S_t=(e,t)=>{var r;const n=$u.getState().form.constraint;let a={};return a={constraint:{chooseCollectLim",
+      "excerptUtf8Sha256": "2e6db8080cf981495a3e46b3dc2567d7929c8d56f45e549c4e0790c8e7273c28"
+    },
+    {
+      "id": "metadata-load",
+      "symbol": "V3 loader",
+      "start": 12887600,
+      "endExclusive": 12888950,
+      "text": " t=[];return e.map((e=>{var r,n,a;const o=(e=>{const t=[];return e.map((e=>t.push({nlpFeedbackId:e.nlpFeedbackId,type:e.personalInformationType,name:e.detectedPersonalInformation,detectedType:e.personalInformationType,detectedName:e.detectedPersonalInformation,personalInformationSource:e.personalInformationSource,detectedTypeErrorStyle:!1,detectedNameErrorStyle:!1,confirmErrorStyle:!1,isConfirm:!0}))),t})(e.catchFormPersonalInformationRequests);t.push({usePageOffset:e.usePageOffset,nlpFeedbackId:e.nlpFeedbackId,disabled:!!o.find((e=>\"RESIDENT\"===e.detectedType)),isRequired:e.required,currentTitle:e.title,title:e.title,description:e.additionalExplanation||\"\",elementType:e.catchFormQuestionType,questionOptionList:(null!==(r=e.questionOptionList)&&void 0!==r?r:[]).map((e=>({...e,optionImageFileSize:_G(e)}))),useSecureKeyStroke:!1,matrixOptionData:e.matrixOptionData,selectLimitMode:null!==(n=e.selectLimitMode)&&void 0!==n?n:null,selectLimitCount:null!==(a=e.selectLimitCount)&&void 0!==a?a:null,questionImageKey:WY(e),questionImageUrl:HY(e),questionImageFileSize:GY(e),materials:sQ(e),...p_t(e),detectedItems:o})})),t};return(0,yt.useEffect)((()=>{let e,s=[];\"STEP0\"!==r?v$(t).then((async t=>{var r,n,o,l,d,u,h,p;e=t.data;const m=t.data.pages.map((e=>(s=[...s,...T_t([{questionList:e.questionList}])],{...e,questionList:c(e.questionList)}))",
+      "excerptUtf8Sha256": "aff692c09d644b2159527df57c3b13c545c077059a522f2fa0a802e6b9de1334"
+    },
+    {
+      "id": "description-editor",
+      "symbol": "KPt",
+      "start": 12741200,
+      "endExclusive": 12741580,
+      "text": "rial\"))}}),(0,nI.jsx)(\"div\",{dir:Y,children:(0,nI.jsx)(DEt,{className:\"w-full\",error:!1,type:\"textarea\",variant:\"standard\",disabled:S===o||i,value:null===x||void 0===x?void 0:x.description,inputSize:\"lg\",onChange:e=>(e=>{const t=(0,tK.cloneDeep)(x);t.description=e,ie(t)})(e.target.value),placeholder:K,required:!1,maxLength:s,width:\"\"})})]}),(\"RADIO\"===(null===x||void 0===x?void",
+      "excerptUtf8Sha256": "f2c4e27a073591537d2dab6cb033d815fc0efd6849388e0e9b120dbca774d0dc"
+    },
+    {
+      "id": "description-limit",
+      "symbol": "KPt caller",
+      "start": 12760924,
+      "endExclusive": 12761264,
+      "text": "{pageIndex:r,questionListLength:i.length,questionIndex:n,isDefaultQuestionDetectLoading:t,questionExplainMaxLength:3e3,handleChangeQuestionRequired:p,handleCopyQuestion:g,handleChangeQuestionTitle:m,handleRemoveDetectedItem:v},e.id||`question-${r}-${n}`),\"IDV\"===e.elementType&&(0,nI.jsx)(tOt,{questionNumber:o.pageList[r].questionList[n].q",
+      "excerptUtf8Sha256": "848ac06594d1d3a033bd8097a18a010296d58717cf0d0ba61c645ebe33337646"
+    },
+    {
+      "id": "description-public",
+      "symbol": "renderer",
+      "start": 8329800,
+      "endExclusive": 8330310,
+      "text": "P?void 0:P.questionType)?I(C>1?\"idv\":\"signature\"):P.questionName]}),O&&(0,nI.jsx)(d1,{children:(0,nI.jsx)(u1,{src:O,alt:\"\",draggable:!1})}),(0,nI.jsx)(xQ,{item:P}),P.additionalExplanation&&(0,nI.jsx)(iI,{className:\"body-1 mt-2\",color:sj,children:(0,nI.jsx)(\"pre\",{style:{margin:\"5 0 5 0\"},children:P.additionalExplanation})}),(0,nI.jsx)(\"div\",{className:\"mt-3\",style:T?{pointerEvents:\"none\"}:void 0,children:(()=>{switch(P.questionType){case\"TEXTBOX\":case\"EMAIL_DIRECT\":return(0,nI.jsx)(a1,{item:P,onUpdate:i,e",
+      "excerptUtf8Sha256": "ee9813242f449d781e5fd2bae8dd963744933021b27bf9b7159254e74e0a16b0"
+    },
+    {
+      "id": "pattern-render",
+      "symbol": "a1",
+      "start": 8324600,
+      "endExclusive": 8326900,
+      "text": "i,matchQuestionMapping:s}=e;const{t:l}=fa(\"translate\",{keyPrefix:\"infoOwnerForm\"}),c=(0,yt.useMemo)((()=>{const e=(t.value||\"\").trim();return e?!t.patternRegex||new RegExp(t.patternRegex).test(e):\"MM\"!==t.questionElementType}),[t.value,t.questionElementType,t.patternRegex]),d=(0,yt.useMemo)((()=>{var e;return(null===n||void 0===n||null===(e=n.find((e=>e.infoPatternId===t.infoPatternId)))||void 0===e?void 0:e.placeholder)||l(\"phrase.phrase65\")}),[n,t.infoPatternId,l]),u=(0,yt.useMemo)((()=>{var e;return t.value&&!c?(null===n||void 0===n||null===(e=n.find((e=>e.infoPatternId===t.infoPatternId)))||void 0===e?void 0:e.helperText)||\"\":null}),[t.value,c,n,t.infoPatternId]),h=(0,yt.useMemo)((()=>{var e;return(null===(e=n.find((e=>e.infoPatternId===t.infoPatternId)))||void 0===e?void 0:e.patternName)===l(\"residentRegistration\")}),[n,t.infoPatternId,l]),p=(0,yt.useCallback)((e=>{const t=e.replace(/\\D/g,\"\"),r=t.slice(0,6),n=t.slice(6,13);return n?`${r}-${n}`:r}),[]),m=(0,yt.useCallback)((e=>{let n=e.target.value;8===t.infoPatternId?n=n.replace(/[^0-9]/g,\"\"):3===t.infoPatternId&&(n=p(n));const a=(()=>{const e=n.trim();return e?!t.patternRegex||new RegExp(t.patternRegex).test(e):\"MM\"!==t.questionElementType})();r(t.htmlFormInputName,n,a)}),[t.infoPatternId,t.questionElementType,t.patternRegex,t.htmlFormInputName,p,r]);return(0,yt.useEffect)((()=>{r(t.htmlFormInputName,t.value,c)}),[]),(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsx)(Kq,{disabled:\"IDV\"===t.questionSubType||t.disabled||o||s,readOnly:i,isKeypad:!0===(null===t||void 0===t?void 0:t.useSecureKeyStroke),keypadType:\"alpha\",id:`${t.htmlFormInputName},${t.questionType}`,placeholder:!a&&\"IDV\"===t.questionSubType||s?l(\"noAuthPlaceholder\"):d,value:t.value||\"\",maxLength:100,error:!!t.value&&!c,hintText:u,hintTextColor:Uj,onChange:m,type:\"text\",inputmode:3===(null===t||void 0===t?void 0:t.infoPatternId)?\"numeric\":\"text\",infoPatternId:null===t||void 0===t?void 0:t.infoPatternId,autoComplete:\"one-time-code\"}),h&&(0,nI.jsxs)(o1,{className:\"mt-2\",children:[(0,nI.jsxs)(\"div\",{className:\"row-line-center mt-2\",children:[(0,nI.jsx)(BU,{width:10,className:\"me-1 warn\",color:\"#FF5050\",src:\"/media/catchsecu/warning.svg\",alt:\"\"}),l(\"phrase.phrase35\")]}),(0,nI.jsx)(\"div\",{children:l(\"phrase.phrase36\")}),(0,nI.jsxs)(\"div\",{children:[\"(\",",
+      "excerptUtf8Sha256": "dcd6d98fac327fcde60f8da765c7b145fe03cc59d73e85ab863041bcb8771909"
+    },
+    {
+      "id": "pattern-guides",
+      "symbol": "D",
+      "start": 8327480,
+      "endExclusive": 8328700,
+      "text": "ranslate\",{keyPrefix:\"infoOwnerForm\"}),_=((0,nP.useMediaQuery)({maxWidth:840}),(0,nP.useMediaQuery)({maxWidth:480}),(0,nP.useMediaQuery)({maxWidth:639})),R=null!==a&&void 0!==a?a:\"AI_V3\",P=(0,yt.useMemo)((()=>wQ(o,a)),[o,a]),O=HY(P),M=x?AG(P):null,L=zY(UY(j,\"INFO_OWNER\"===w&&!_)),D=(0,yt.useMemo)((()=>[{infoPatternId:1,patternName:I(\"common\")},{infoPatternId:2,patternName:I(\"additionalInquiries\")},{infoPatternId:3,patternName:I(\"residentRegistration\"),placeholder:I(\"phrase.phrase1\"),helperText:I(\"phrase.phrase2\")},{infoPatternId:4,patternName:I(\"email\"),placeholder:I(\"phrase.phrase3\"),helperText:I(\"phrase.phrase4\")},{infoPatternId:7,patternName:I(\"address\"),placeholder:\"\",helpText:I(\"phrase.phrase5\")},{infoPatternId:8,patternName:I(\"birth\"),placeholder:I(\"phrase.phrase6\"),helperText:I(\"phrase.phrase7\")}]),[]);return(0,nI.jsxs)(\"div\",{children:[A&&\"SIGNATURE\"!==(null===P||void 0===P?void 0:P.questionType)&&(0,nI.jsx)(l1,{id:`${P.htmlFormInputName}-CARD`,padding:L,isValid:!P.isValid&&x,className:\"mb-[10px]\",style:T?{pointerEvents:\"none\"}:void 0,children:(0,nI.jsx)(y0,{item:P,onUpdateObject:s,onUpdateList:l,elementGuideGroup:D,authCompleted:d||(null===P||void 0===P?void 0:P.authCompleted),disabled:P.disa",
+      "excerptUtf8Sha256": "dc695f6577ec561e1c265311de743b8af2b16b37e327051fc1f4dbad7e22ff11"
+    },
+    {
+      "id": "option-image-normalize",
+      "symbol": "wG/CG/SG/kG",
+      "start": 8168003,
+      "endExclusive": 8169160,
+      "text": "wG=[\"image/jpeg\",\"image/jpg\",\"image/png\"];function CG(e){var t;const r=null!==(t=null===e||void 0===e?void 0:e.optionImageUrl)&&void 0!==t?t:null===e||void 0===e?void 0:e.imageUrl;return\"string\"===typeof r&&\"\"!==r.trim()?r:null}function SG(e){const t=null===e||void 0===e?void 0:e.optionImageKey;return\"string\"===typeof t&&\"\"!==t.trim()?t:null}function TG(e,t){return Array.isArray(e)?e.filter(((e,r)=>r!==t&&(null!==CG(e)||null!==SG(e)))).length:0}function EG(e){return Array.isArray(e)&&e.some((e=>null!==CG(e)))}function NG(e){return null!==CG(e)||null!==SG(e)}function kG(e,t){if(!Array.isArray(t))return[];const r=(e=>\"RADIO\"===e||\"CHECKBOX\"===e)(e),n=e=>NG(e)&&(!r||(e=>!0===(null===e||void 0===e?void 0:e.isCustomValue)||\"Y\"===(null===e||void 0===e?void 0:e.customValueYn))(e));return t.some(n)?t.map((e=>n(e)?{...e,optionImageKey:null,optionImageUrl:null,imageUrl:null,optionImageFileSize:null}:e)):t}const jG=\"optionImageUploadToken\";function IG(e){const{[jG]:t,...r}=null!==e&&void 0!==e?e:{};return r}function _G(e){const t=null===e||void 0===e?void 0:e.optionImageFileSize;return\"number\"===typeof t&&Number.isFinite(t)?t:null}const RG=e=>{let{va",
+      "excerptUtf8Sha256": "96f5bce3395658b8afbecca248d3fb3da61f0a1dcd4d56ca4713776c67639e15"
+    },
+    {
+      "id": "option-image-upload",
+      "symbol": "zRt",
+      "start": 12685000,
+      "endExclusive": 12687100,
+      "text": "p)return;const m=$u.getState().form.formModelV3,f=m.catchformId,g=null!==(i=null===(s=m.pageList[o].questionList[n])||void 0===s?void 0:s.questionOptionList)&&void 0!==i?i:[],{valid:v,reason:b}=function(e,t){return e&&wG.includes(e.type)?e.size>1048576?{valid:!1,reason:\"size\"}:t&&t.currentImageCount>=20?{valid:!1,reason:\"count\"}:{valid:!0}:{valid:!1,reason:\"mime\"}}(p,{currentImageCount:TG(g,r)});if(!v&&\"count\"===b)return z(\"count\"),void lE(\"count\");const x=SG(j.current),A=null!==x&&null!==(l=_G(j.current))&&void 0!==l?l:0,y=od(p,\"optionImage\");if(!y.allowed){var w;const e=\"type\"===y.reason?\"mime\":null!==(w=y.reason)&&void 0!==w?w:\"mime\";return z(e),void lE(e)}const C=`oiu-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;O({...j.current,[jG]:C}),M.flush();const S=()=>{const e=W(C);e&&q(e,IG(e.option))},{valid:T}=await vz(p,td,{allowLongName:!0});if(!T)return z(\"mime\"),lE(\"mime\"),void S();B(!0);try{var E,N,k,I;const e=await yNt((()=>{const e=sd($u.getState().form.assetUsage,-A),{allowed:t,remainBytes:r}=ad(p.size,e);return t?null:r}),(()=>function(e,t,r){return F$(e,L$,t,r)}(f,p,x)));if(!e.ok)return z(\"total\",c(\"quotaExceeded\",{remain:id(e.reason)})),lE(\"total\"),void S();const{fileKey:a,fileUrl:i,fileSize:s,usedBytes:l,limitBytes:d}=null!==(E=null===(N=e.result)||void 0===N?void 0:N.data)&&void 0!==E?E:{};if(!a)throw new Error(\"fileKey is missing in upload response\");h(KG(l,p.size-A,d));const u=\"number\"===typeof s?s:p.size,m=()=>{u>0&&h(XG(-u)),P_t(f,[a])},v=W(C);if(!v)return void m();if(!i_t(null===(k=$u.getState().form.formModelV3.pageList[o])||void 0===k||null===(I=k.questionList)||void 0===I?void 0:I[n],\"optionImage\"))return m(),void q(v,IG(v.option));q(v,{...IG(v.option),optionImageKey:a,optionImageUrl:null!==i&&void 0!==i?i:null,optionImageFileSize:u});const b=TG(g,r);P=\"RADIO\"===t?\"radio\":\"checkbox\",L=g.length,D=b+1,Tt().dataLayer({dataLayer:{event:\"insert_option_image\",question_type:P,option_count:L,image_option_count:D}})}catch(F){var _,R;const e=fNt(F);z(gNt(F)?\"mime\":\"upload\",e?null!==(_=e.serverMessage)&&void 0!==_?_:d(String(e.messag",
+      "excerptUtf8Sha256": "66e309aeb5a7a33acfa4459b595caddf4fbffc393dde6ccf959aa03a0d8d83bd"
+    },
+    {
+      "id": "asset-api",
+      "symbol": "F$/U$",
+      "start": 7918290,
+      "endExclusive": 7919110,
+      "text": "UESTION_IMAGE\",L$=\"OPTION_IMAGE\",D$=\"QUESTION_MATERIAL\";function F$(e,t,r,n){if(null===r||void 0===r||!r.name)return Promise.reject(new Error(\"uploadCatchFormAsset: file name is required \\u2014 append the Blob with a file name (FormData.append(field, blob, name))\"));const a=new FormData;return a.append(\"catchformId\",String(e)),a.append(\"assetType\",t),a.append(\"file\",r),n&&a.append(\"replacedS3Key\",n),At.post(`${PE}/company-operated-service/catch-form/asset/upload`,a,{headers:{\"Check-Multipart\":!0}})}function B$(e,t){const r=new FormData;return r.append(\"file\",t),At.post(`${PE}/company-operated-service/access-control/whitelist/catchforms/${e}`,r,{headers:{\"Check-Multipart\":!0}})}function U$(e){return At.post(`${PE}/company-operated-service/catch-form/asset/copy`,e)}const z$={regDtm:\"REG_DTM\",subject:\"SUBJECT\",a",
+      "excerptUtf8Sha256": "ca6670284f9678bd29e2abdd958c71a7e142d508f68b237d71a72995198c1492"
+    },
+    {
+      "id": "asset-discard",
+      "symbol": "P_t",
+      "start": 12628650,
+      "endExclusive": 12629300,
+      "text": " 0===e.optionNames.length?t(\"branchReason.noAnswerOnly\",{page:r}):e.includesNoAnswer?t(\"branchReason.withOptionsAndNoAnswer\",{options:n,page:r}):t(\"branchReason.withOptions\",{options:n,page:r})},__t=e=>null!==e&&void 0!==e&&\"\"!==e&&0!==e,R_t=new Map;function P_t(e,t){if(!__t(e))return;const r=Array.from(new Set(t.filter((e=>\"string\"===typeof e&&\"\"!==e.trim()))));var n;if(0!==r.length)try{Promise.resolve((n={catchformId:e,s3Keys:r},At.post(`${PE}/company-operated-service/catch-form/asset/temp/discard`,n))).catch((()=>{}))}catch{}}function O_t(e,t){let{removed:r,present:n,origin:a=[],sendDelete:o=!0}=t;if(!__t(e))return;const i=e=>Array.from(ne",
+      "excerptUtf8Sha256": "643af0334386a74551277fa58102db9e295f38d152af2a2589edca9feb97b83c"
+    },
+    {
+      "id": "asset-copy-key",
+      "symbol": "jNt/INt",
+      "start": 12344600,
+      "endExclusive": 12345700,
+      "text": "d format\")?QN(\"uploadAdapter.alert.phrase3\"):QN(\"size too big\"===n?\"uploadAdapter.alert.phrase4\":\"can not read file\"===n?\"uploadAdapter.alert.phrase5\":\"uploadAdapter.alert.uploadFailed\");r(a)}}finally{n()}}))}}}const TNt=e=>\"string\"===typeof e&&\"\"!==e.trim()?e:null,ENt=e=>\"number\"===typeof e&&Number.isFinite(e)?e:0,NNt=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.[a-z0-9]+$/i;function kNt(e){if(\"string\"!==typeof e||\"\"===e.trim())return!1;if(/^data:/i.test(e.trim()))return!1;const t=e.split(/[?#]/)[0];return NNt.test(t.slice(t.lastIndexOf(\"/\")+1))}const jNt=(e,t)=>({assetType:e,originS3Key:t,targetAssetType:e});function INt(e){const t={},r=TNt(null===e||void 0===e?void 0:e.questionImageKey);r&&(t[r]=ENt(null===e||void 0===e?void 0:e.questionImageFileSize));for(const a of null!==(n=null===e||void 0===e?void 0:e.questionOptionList)&&void 0!==n?n:[]){var n;const e=TNt(null===a||void 0===a?void 0:a.optionImageKey);e&&(t[e]=ENt(null===a||void 0===a?void 0:a.optionImageFileSize))}for(const a of sQ(e)){const e=TNt(null===a||void 0===a?void 0:a.fileKey);\"file\"===(null===a||",
+      "excerptUtf8Sha256": "b1d3ff82bc0f05c90fe81fc18f4a84c2a2dc03cb6e5515662095f45c365d5647"
+    },
+    {
+      "id": "reference-url-rule",
+      "symbol": "tQ",
+      "start": 8196731,
+      "endExclusive": 8197145,
+      "text": "function tQ(e,t){const r=eQ(e);if(!r)return{valid:!1,reason:\"url_scheme\"};if(r.length>512)return{valid:!1,reason:\"url_length\"};try{const{protocol:e}=new URL(r);if(\"http:\"!==e&&\"https:\"!==e)return{valid:!1,reason:\"url_scheme\"}}catch{return{valid:!1,reason:\"url_scheme\"}}return t&&t.currentMaterialCount>=3?{valid:!1,reason:\"count\"}:{valid:!0}}const rQ=[\"QUESTION_MATERIAL\",\"QUESTION_LINK\"],nQ=e=>\"string\"===typeof e",
+      "excerptUtf8Sha256": "5c9cf7d902d0069b434a17e1a5b12dc955bfca59752b1fcd81121e12008fb350"
+    },
+    {
+      "id": "reference-adapter",
+      "symbol": "aQ",
+      "start": 8197320,
+      "endExclusive": 8197950,
+      "text": ".orderNumber:t,a=nQ(null===e||void 0===e?void 0:e.downloadUrl)||nQ(r?null===e||void 0===e?void 0:e.fileUrl:null===e||void 0===e?void 0:e.linkUrl);return{id:`qm-s${n}-${r?\"f\":\"l\"}`,type:r?\"file\":\"link\",name:nQ(null===e||void 0===e?void 0:e.displayName)||nQ(r?null===e||void 0===e?void 0:e.fileName:null===e||void 0===e?void 0:e.linkLabel)||a,url:a,...r?{fileKey:\"string\"===typeof(null===e||void 0===e?void 0:e.fileKey)?e.fileKey:null,size:\"number\"===typeof(null===e||void 0===e?void 0:e.fileSize)?e.fileSize:void 0}:{},sequence:n}},oQ=(e,t)=>{const r=\"QUESTION_MATERIAL\"===(null===e||void 0===e?void 0:e.assetType),n=\"number\"===typ",
+      "excerptUtf8Sha256": "a13db09ae4740cb8e1a182c1bd85d8457559ebaeede635122731ddd94c437a9f"
+    },
+    {
+      "id": "reference-serialize",
+      "symbol": "lQ",
+      "start": 8199026,
+      "endExclusive": 8199705,
+      "text": "function lQ(e){return sQ(e).filter((e=>\"file\"===(null===e||void 0===e?void 0:e.type)?\"string\"===typeof e.fileKey&&\"\"!==e.fileKey.trim():\"string\"===typeof(null===e||void 0===e?void 0:e.url)&&\"\"!==e.url.trim())).sort(((e,t)=>{var r,n;return(null!==(r=null===e||void 0===e?void 0:e.sequence)&&void 0!==r?r:0)-(null!==(n=null===t||void 0===t?void 0:t.sequence)&&void 0!==n?n:0)})).map(((e,t)=>{var r;return\"file\"===e.type?{materialType:\"FILE\",orderNumber:t,fileKey:null!==(r=e.fileKey)&&void 0!==r?r:null,linkLabel:null,linkUrl:null}:{materialType:\"LINK\",orderNumber:t,fileKey:null,linkLabel:e.name||null,linkUrl:e.url}}))}function cQ(e){if(\"number\"!==typeof e||!Number.isFinite(e)||",
+      "excerptUtf8Sha256": "381fd276185f591fde543a5dc1d09ef68e06fb1555ec669908a0606607f803b9"
+    },
+    {
+      "id": "reference-public",
+      "symbol": "xQ",
+      "start": 8200700,
+      "endExclusive": 8201830,
+      "text": "ction xQ(e){let{item:t,t:r}=e;const{t:n}=fa(\"translate\",{keyPrefix:\"infoOwnerForm\"}),a=null!==r&&void 0!==r?r:n,o=JY(),i=sQ(t).filter((e=>\"link\"!==e.type||tQ(e.url).valid));return 0===i.length?null:(0,nI.jsx)(mQ,{children:i.map((e=>(0,nI.jsxs)(fQ,{children:[(0,nI.jsx)(BU,{src:\"file\"===e.type?\"/img/google-icons-v2/document/discription.svg\":\"/img/google-icons-v2/system/link.svg\",width:16,color:sj,className:\"shrink-0\"}),(0,nI.jsx)(gQ,{className:\"body-2\",color:tj,title:e.name,children:e.name}),\"file\"===e.type?(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsx)(vQ,{className:\"label-1\",color:pQ,children:cQ(e.size)}),(0,nI.jsx)(bQ,{href:e.url,download:e.name,target:\"_blank\",rel:\"noopener noreferrer\",\"aria-label\":a(\"questionMaterial.download\"),title:a(\"questionMaterial.download\"),onClick:()=>o.downloadMaterial(\"file\"),children:(0,nI.jsx)(BU,{src:\"/img/google-icons-v2/arrows/download.svg\",width:16,color:sj})})]}):(0,nI.jsx)(bQ,{href:e.url,target:\"_blank\",rel:\"noopener noreferrer\",\"aria-label\":a(\"questionMaterial.openInNewTab\"),title:e.url,onClick:()=>o.downloadMaterial(\"link\"),children:(0,nI.jsx)(BU,{src:\"/img/google-icons-v2/s",
+      "excerptUtf8Sha256": "18a0c994b4ed3cc68433f999b4be0ab75dcfa54b16f4f7250283e2c313a18b62"
+    },
+    {
+      "id": "reference-editor",
+      "symbol": "xPt",
+      "start": 12704200,
+      "endExclusive": 12705900,
+      "text": "dth: 100%;\n`,bPt=as(iI)`\n  width: 100%;\n`;function xPt(e){let{materials:t,catchformId:r,questionType:n,disabled:a=!1,onChange:o,onRequestDelete:i,onUploadBegin:s,onUploadSettle:l,onUploadAbort:c}=e;const{t:d}=fa(\"translate\",{keyPrefix:\"aiQuestions\"}),{t:u}=fa(\"translate\",{keyPrefix:\"aiQuestions.assetError\"}),h=(0,yt.useRef)(null),[p,m]=(0,yt.useState)(!1),[f,g]=(0,yt.useState)(!1),[v,b]=(0,yt.useState)(\"\"),[x,A]=(0,yt.useState)(\"\"),[y,w]=(0,yt.useState)(null),C=(0,yt.useRef)(t);C.current=t;const S=t.length>=3,T=a||p||S,E=a||p||f||S,N=e=>{switch(e){case\"size\":return d(\"questionMaterial.fileSizeExceeded\");case\"type\":return d(\"questionMaterial.fileTypeNotAllowed\");case\"signature\":return d(\"questionMaterial.fileSignatureMismatch\");case\"count\":return d(\"questionMaterial.materialCountExceeded\");case\"total\":return d(\"questionMaterial.formTotalExceeded\");case\"url_scheme\":return d(\"questionMaterial.linkSchemeInvalid\");case\"url_length\":return d(\"questionMaterial.linkUrlTooLong\");case\"empty\":return d(\"questionMaterial.fileEmpty\");default:return d(\"questionMaterial.uploadFailed\")}},k=(e,t)=>{$u.dispatch(ic({show:!0,type:\"fail\",text:t||N(e)}))},j=()=>{g(!1),b(\"\"),A(\"\"),w(null)},I=(0,yt.useCallback)((e=>{const t=C.current.find((t=>t.id===e));\"file\"===(null===t||void 0===t?void 0:t.type)&&(\"number\"===typeof t.size&&$u.dispatch(XG(-t.size)),P_t(r,[t.fileKey])),o(uQ(C.current.filter((t=>t.id!==e))))}),[o,r]);return(0,nI.jsxs)(rPt,{className:\"non-drag mt-3\",children:[(0,nI.jsx)(iI,{className:\"label-1\",color:tPt,children:d(\"questionMaterial.blockTitle\")}),t.length>0&&(0,nI.jsx)(nPt,{children:(0,nI.jsx)(CEt.Container,{lockAxis:\"y\",dragHandleSelector:\".material-drag-handle\",onDrop:e=>{let{rem",
+      "excerptUtf8Sha256": "bcd908b3480dab214a687469c730b70d873f83275731f43333c610b831a761ea"
+    },
+    {
+      "id": "reference-link-editor",
+      "symbol": "xPt",
+      "start": 12707000,
+      "endExclusive": 12708700,
+      "text": "ading\")})]}),f&&(0,nI.jsxs)(dPt,{children:[(0,nI.jsxs)(uPt,{children:[(0,nI.jsx)(BU,{src:ZRt,width:16,color:sj}),(0,nI.jsx)(iI,{className:\"label-1\",color:ej,children:d(\"questionMaterial.addLink\")})]}),(0,nI.jsxs)(hPt,{children:[(0,nI.jsx)(pPt,{className:\"label-1\",color:Zk,children:d(\"questionMaterial.linkLabel\")}),(0,nI.jsx)(fD,{inputSize:\"sm\",wrapClassName:\"flex-1 min-w-0\",value:v,maxLength:100,placeholder:d(\"questionMaterial.linkLabelPlaceholder\"),onChange:e=>b(e.target.value)})]}),(0,nI.jsxs)(hPt,{children:[(0,nI.jsx)(pPt,{className:\"label-1\",color:Zk,children:d(\"questionMaterial.linkUrl\")}),(0,nI.jsx)(fD,{inputSize:\"sm\",wrapClassName:\"flex-1 min-w-0\",value:x,error:!!y,maxLength:512,placeholder:d(\"questionMaterial.linkUrlPlaceholder\"),onChange:e=>{A(e.target.value),y&&w(null)}})]}),y&&(0,nI.jsx)(bPt,{className:\"body-2\",color:Uj,children:d(\"url_length\"===y?\"questionMaterial.linkUrlTooLong\":\"questionMaterial.linkSchemeInvalid\")}),(0,nI.jsxs)(mPt,{children:[(0,nI.jsx)(M_,{size:\"sm\",type:\"secondary\",disabled:!1,text:d(\"questionMaterial.cancel\"),onClick:j}),(0,nI.jsx)(M_,{size:\"sm\",type:\"primary\",disabled:\"\"===eQ(x),text:d(\"questionMaterial.confirm\"),onClick:()=>{const e=eQ(x),{valid:r,reason:a}=tQ(e,{currentMaterialCount:t.length});if(!r)return\"count\"===a?(k(\"count\"),j()):w(\"url_length\"===a?\"url_length\":\"url_scheme\"),void sE(null!==a&&void 0!==a?a:\"url_scheme\");const i=function(e,t){const r=(\"string\"===typeof e?e.trim():\"\")||t;return r.length<=100?r:`${r.slice(0,99)}\\u2026`}(v,e);o(uQ([...t,{id:dQ(),type:\"link\",name:i,url:e,sequence:t.length}])),iE(null!==n&&void 0!==n?n:\"\",\"link\"),j()}})]})]}),(0,nI.jsxs)(fPt,{children:[(0,nI.jsxs)(gPt,{type:\"button\",disabled:T,onClick:()",
+      "excerptUtf8Sha256": "aa0483504f3eb473b5297348503aafc23ff2084d86505e1f4eb613953444a69b"
+    },
+    {
+      "id": "reference-file-rule",
+      "symbol": "xPt",
+      "start": 12709300,
+      "endExclusive": 12711150,
+      "text": "t:ZY.map((e=>`.${e}`)).join(\",\"),className:\"hidden\",onChange:async e=>{var a;const o=e.target,i=null===(a=o.files)||void 0===a?void 0:a[0];if(o.value=\"\",!i)return;const{valid:h,reason:p}=function(e,t){var r;if(!e)return{valid:!1,reason:\"type\"};const n=function(e){const t=e.lastIndexOf(\".\");return t<0||t===e.length-1?\"\":e.slice(t+1).toLowerCase()}(null!==(r=e.name)&&void 0!==r?r:\"\");return ZY.includes(n)?e.size>5242880?{valid:!1,reason:\"size\"}:t.currentMaterialCount>=3?{valid:!1,reason:\"count\"}:{valid:!0}:{valid:!1,reason:\"type\"}}(i,{currentMaterialCount:t.length});if(!h){const e=null!==p&&void 0!==p?p:\"type\";return k(e),void sE(e)}const{valid:f,reason:g}=await vz(i,[...ZY],{allowLongName:!0});if(!f){const e=\"empty\"===g?\"empty\":\"ext\"===g?\"type\":\"signature\";return k(e),void sE(\"type\"===e?\"type\":\"signature\")}const v=s();m(!0);try{var b,x,A;const e=await yNt((()=>{const{allowed:e,remainBytes:t}=ad(i.size,$u.getState().form.assetUsage);return e?null:t}),(()=>function(e,t){return F$(e,D$,t)}(r,i)));if(!e.ok)return k(\"total\",d(\"material.quotaExceeded\",{remain:id(e.reason)})),sE(\"total\"),void c(v);const{fileKey:t,fileUrl:a,fileName:o,fileSize:s,usedBytes:u,limitBytes:h}=null!==(b=null===(x=e.result)||void 0===x?void 0:x.data)&&void 0!==b?b:{};if(!t)throw new Error(\"fileKey is missing in upload response\");$u.dispatch(KG(u,i.size,h));const p=\"number\"===typeof s?s:i.size;if(!l(v,{id:dQ(),type:\"file\",name:o||i.name,url:null!==a&&void 0!==a?a:\"\",size:p,fileKey:t,sequence:0}))return p>0&&$u.dispatch(XG(-p)),void P_t(r,[t]);iE(null!==n&&void 0!==n?n:\"\",\"file\",null===(A=i.name.split(\".\").pop())||void 0===A?void 0:A.toLowerCase())}catch(C){var y,w;const e=fNt(C);k(gNt(C)?\"type\":\"upload\",e?null!==(y=e.serverMessage)&&void 0!==y?y:u(String(e.messageKey)):null),sE(null!==(w=null===e||void 0===e?void 0:e.category)&&void 0!==w?w:gNt(C)?\"typ",
+      "excerptUtf8Sha256": "491fd5dca4ffd693c3f5990d247d2c9e4be52f5da2e74fe9611537d3cb243b06"
+    },
+    {
+      "id": "custom-editor",
+      "symbol": "URt",
+      "start": 12676900,
+      "endExclusive": 12678780,
+      "text": "e\",padding:\"8px 16px\",color:\"#757575\"}});function URt(e){let{elementType:t,questionIndex:r,pageIndex:n,onRequestDeleteOptionImage:a,useOptionImageFeature:o}=e;const{t:i}=fa(\"translate\",{keyPrefix:\"aiQuestions\"}),s=Wu(),l=(0,yt.useRef)([]),c=Ut((e=>{var t;return null===(t=e.form.formModelV3.pageList[n].questionList[r])||void 0===t?void 0:t.questionOptionList}),uk),[d,u]=(0,yt.useState)(!0),h=null===c||void 0===c?void 0:c.some((e=>null===e||void 0===e?void 0:e.isCustomValue));return(0,yt.useEffect)((()=>{u(!1)}),[]),(0,nI.jsxs)(nI.Fragment,{children:[!d&&(null===c||void 0===c?void 0:c.map(((e,i)=>(0,nI.jsx)(nI.Fragment,{children:(0,nI.jsx)(zRt,{elementType:t,optionItemIndex:i,questionIndex:r,inputRefs:l,pageIndex:n,onRequestDeleteOptionImage:a,useOptionImageFeature:o})})))),(0,nI.jsxs)(\"div\",{className:\"mt-4 flex\",children:[(0,nI.jsx)(iI,{className:\"label-2 cursor-pointer\",color:aj,onClick:()=>(()=>{const e=(0,tK.cloneDeep)(c),t=null===c||void 0===c?void 0:c.findIndex((e=>null===e||void 0===e?void 0:e.isCustomValue));t>-1?null===e||void 0===e||e.splice(t,0,{value:null===e||void 0===e?void 0:e.length,optionQuestionName:\"\",isCustomValue:!1,pageOffset:-2}):null===e||void 0===e||e.push({value:null===e||void 0===e?void 0:e.length,optionQuestionName:\"\",isCustomValue:!1,pageOffset:-2});const a=null===e||void 0===e?void 0:e.map(((e,t)=>({...e,value:t})));s(tY(r,a,n))})(),children:i(\"addItem\")}),!h&&(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(iI,{className:\"label-2-weak mx-1 cursor-default\",children:[\" \",i(\"or\"),\" \"]}),(0,nI.jsx)(iI,{className:\"label-2 cursor-pointer\",color:aj,onClick:()=>(()=>{const e=(0,tK.cloneDeep)(c);null===e||void 0===e||e.push({value:null===e||void 0===e?void 0:e.length,optionQuestionName:\"\",isCustomValue:!0,pageOffset:-2}),s(tY(r,e,n))})(),children:i(\"addEtcItem\")})]})]})]})}const zRt=(0,yt.memo)((function(e){let{elementType:t,opti",
+      "excerptUtf8Sha256": "8c8478012db1867fb2e47877524df608a4cb027ff092cd6883e56c679414ed05"
+    },
+    {
+      "id": "custom-public",
+      "symbol": "radio",
+      "start": 8180108,
+      "endExclusive": 8181008,
+      "text": "customValueYn&&(r=\"\")),a(t,r),u(t),m(r)})(e),disabled:o,isCustomValue:\"Y\"===e.customValueYn,readOnly:l,imageUrl:CG(e),reserveImageSlot:h,onImageClick:c,children:\"Y\"===e.customValueYn&&d===e.value&&(0,nI.jsx)(\"div\",{className:\"px-4 w-full\",children:l?(0,nI.jsx)(lY,{value:p,placeholder:i}):(0,nI.jsx)(Kq,{id:`${s}-input`,className:\"inline-block \"+(o?\" \":\"!bg-white \"),placeholder:i,maxLength:100,value:p||\"\",onChange:f,disabled:o,readOnly:l,type:\"text\"})})},t)))})},bY=e=>{let{items:t,usePageOffset:r,selectedValue:n,stringValue:a,onChange:o,disabled:i,pageIndex:s,placeholder:l,id:c,readOnly:d=!1,onImageZoom:u}=e;const[h,p]=(0,yt.useState)(n),[m,f]=(0,yt.useState)(a||\"\"),g=Wu(),v=EG(t);return(0,yt.useEffect)((()=>{o(h,m||\"\")}),[h,m]),(0,nI.jsx)(\"div\",{className:\"flex flex-col gap-2 \"+(d?\"cursor-not-allowed\":\"cursor-auto\"),children:t.map(((e,t)=>(0,nI.jsx)(gY,{label:e.optionQuestionName||\"\",valu",
+      "excerptUtf8Sha256": "5bb48aa3e1a80b0113d066d0ea0005a685c1a36cfb5fab625b81db5d18d72ad4"
+    },
+    {
+      "id": "custom-codecs",
+      "symbol": "pK",
+      "start": 8220410,
+      "endExclusive": 8223900,
+      "text": "rray.isArray(e)?e.map((e=>{const t=e.split(\",\");return{row:parseInt(t[0],10),col:parseInt(t[1],10)}})):[],validate:(e,t)=>lK(e,t,(e=>null===e||void 0===e?void 0:e.row))},uK={parse:e=>{if(!e||\"string\"!==typeof e)return{selected:null,text:\"\"};const[t=null,r=\"\"]=e.split(\"|\");return{selected:t,text:r}},format:(e,t)=>{const{selected:r,text:n}=e;if(!r)return\"\";const a=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));return a&&a.value===r?`${r}|${n||\"\"}`:r},validate:(e,t)=>{if(\"MM\"===t.questionElementType&&(!e||\"\"===e.trim()))return!1;const r=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));if(!r||!e)return!0;const{selected:n,text:a}=uK.parse(e);return!(n===r.value&&(!a||\"\"===a.trim()))}},hK={parse:e=>{if(!e||\"string\"!==typeof e)return{selected:null,text:\"\"};const[t=null,r=\"\"]=e.split(\"|\");return{selected:t,text:r}},format:(e,t)=>{const{selected:r,text:n}=e;if(!r)return\"\";const a=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));return a&&a.value===r?`${r}|${n||\"\"}`:r},validate:(e,t)=>{if(\"MM\"===t.questionElementType&&(!e||\"\"===e.trim()))return!1;const r=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));if(!r||!e)return!0;const{selected:n,text:a}=hK.parse(e);return!(n===r.value&&(!a||\"\"===a.trim()))}},pK={CHECKBOX:{NEW:nK,AI:nK,AI_V2:nK,AI_V3:{getInitialValue:e=>e||null,parse:(e,t)=>{if(!e||\"object\"!==typeof e||Array.isArray(e))return{checkboxValues:[],stringValue:\"\"};const r=(e.optionValue||[]).map(String),n=e.text||\"\";if(e.isCustomValue){var a;const e=null===t||void 0===t||null===(a=t.formQuestionOptionDataList)||void 0===a?void 0:a.find((e=>\"Y\"===e.customValueYn));e&&e.value&&!r.includes(e.value)&&r.push(e.value)}return{checkboxValues:r,stringValue:n}},format:(e,t,r)=>{const n=[];let a=!1,o=null;if(null!==r&&void 0!==r&&r.formQuestionOptionDataList){const e=r.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn));e&&(o=e.value)}for(const i of e)i===o?a=!0:n.push(parseInt(i,10));return n.sort(((e,t)=>e-t)),{optionValue:n,isCustomValue:a,text:t}},validate:(e,t)=>{if(\"MM\"===t.questionElementType){if(!e)return!1;if(0===e.optionValue.length&&!e.isCustomValue)return!1}if(!e)return!0;return!(e.isCustomValue&&(!e.text||\"\"===e.text.trim()))}}},RADIO:{NEW:uK,AI:uK,AI_V2:uK,AI_V3:{parse:e=>{if(!e||\"object\"!==typeof e||Array.isArray(e)){const t=\"number\"===typeof e||\"string\"===typeof e?parseInt(String(e),10):null;return{selected:null!==t?String(t):null,text:\"\"}}return{selected:null!==e.optionValue&&void 0!==e.optionValue?String(e.optionValue):null,text:e.text||\"\"}},format:(e,t)=>{const{selected:r,text:n}=e;if(!r)return null;const a=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn)),o=a&&a.value===r;return{optionValue:parseInt(r,10),isCustomValue:o,text:n||\"\"}},validate:(e,t)=>!(\"MM\"===t.questionElementType&&!e)&&(!e||!(e.isCustomValue&&(!e.text||\"\"===e.text.trim())))}},SELECTBOX:{NEW:hK,AI:hK,AI_V2:hK,AI_V3:{parse:e=>{if(!e||\"object\"!==typeof e||Array.isArray(e))return{selected:null,text:\"\"};return{selected:null!==e.optionValue&&void 0!==e.optionValue?String(e.optionValue):null,text:e.text||\"\"}},format:(e,t)=>{const{selected:r,text:n}=e;if(!r)return null;const a=t.formQuestionOptionDataList.find((e=>\"Y\"===e.customValueYn)),o=a&&a.value===r;return{optionValue:parseInt(r,10),isCustomValue:o,text:n||\"\"}},validate:(e,t)=>!(\"MM\"===t.questionElementType&&!e)&&(!e||!(e.isCustomValue&&(!e.text||\"\"===e.text.trim())))}},FILE:{NEW:sK,AI:sK,AI_V2:sK,AI_V3:{filesProp:\"value\",getFileName:e=>(",
+      "excerptUtf8Sha256": "47ac56a930d88af64af301d74f158e124e6d3c27000e97c810df877b12f3bb21"
+    },
+    {
+      "id": "custom-submit",
+      "symbol": "BRe",
+      "start": 10056900,
+      "endExclusive": 10058700,
+      "text": ";case\"EMAIL\":if(null!==(v=e.value)&&void 0!==v&&v.email){const t=e.value.domain===d(\"direct\")?e.value.customDomain:e.value.domain;y=t?`${e.value.email}@${t}`:\"\"}else y=\"\";break;case\"CHECKBOX\":y=function(e){var t;const r=null===e||void 0===e?void 0:e.value;if(!r||\"object\"!==typeof r||!Array.isArray(r.optionValue))return[];const n=[],a=null===e||void 0===e||null===(t=e.formQuestionOptionDataList)||void 0===t?void 0:t.find((e=>\"Y\"===e.customValueYn)),o=a?parseInt(a.value,10):null;return(r.optionValue||[]).forEach((t=>{const r=\"string\"===typeof t?parseInt(t,10):t;var a;isNaN(r)||r===o||(null===e||void 0===e||null===(a=e.formQuestionOptionDataList)||void 0===a?void 0:a.find((e=>parseInt(e.value,10)===r&&\"N\"===e.customValueYn)))&&n.push({optionValue:r,customValue:!1,text:null})})),r.isCustomValue&&a&&null!==o&&n.push({optionValue:o,customValue:!0,text:r.text||null}),n}(e);break;case\"RADIO\":case\"SELECTBOX\":y={optionValue:null===(b=e.value)||void 0===b?void 0:b.optionValue,customValue:null===(x=e.value)||void 0===x?void 0:x.isCustomValue,text:(null===(A=e.value)||void 0===A?void 0:A.text)||null},null!==y.optionValue&&void 0!==y.optionValue||(y=null);break;case\"FILE\":const P=e.value;y=Array.isArray(P)?P.filter((e=>e&&\"object\"===typeof e&&e.s3Key)).map((e=>({s3Key:e.s3Key,fileName:e.fileName,fileSize:e.fileSize}))):[];break;case\"SIGNATURE\":case\"DRAW\":const O=e.value;y=O&&\"object\"===typeof O&&O.s3Key?{s3Key:O.s3Key,fileName:O.fileName,fileSize:O.fileSize}:null;break;case\"MATRIX_RADIO\":case\"MATRIX_CHECKBOX\":y=e.value;break;default:y=\"string\"===typeof e.value?e.value.trim():(null!==e.value&&e.value,\"\")}return{questionId:e.questionId,questionType:e.questionType,\"@type\":e.questionType,subType:e.questionSubType,questionIndex:e.orderNumber,required:e.questionElementType,value:y}}));retu",
+      "excerptUtf8Sha256": "efdcde175c3ed1f8ed4c45790098bcfde285b06f6a95255416c7298de6014f55"
+    },
+    {
+      "id": "privacy-enum",
+      "symbol": "BB",
+      "start": 7824331,
+      "endExclusive": 7824760,
+      "text": "BB=[{text:\"\\uac1c\\uc778\\uc815\\ubcf4 \\ubd84\\ub958 \\uc120\\ud0dd\",value:\"\"},{text:\"\\uac1c\\uc778\\uc815\\ubcf4\",value:\"PERSONAL_INFORMATION\"},{text:\"\\ubbfc\\uac10\\uc815\\ubcf4\",value:\"SENSITIVE\"},{text:\"\\uace0\\uc720\\uc2dd\\ubcc4\\uc815\\ubcf4\",value:\"IDENTIFICATION\"},{text:\"\\uc8fc\\ubbfc\\ub4f1\\ub85d\\ubc88\\ud638\",value:\"RESIDENT\"},{text:\"\\uac1c\\uc778\\uc815\\ubcf4 \\uc5c6\\uc74c\",value:\"NON_PERSONAL_INFORMATION\"}],UB=99999,zB=as.div`\n  positi",
+      "excerptUtf8Sha256": "0a744dc314c8f8ba54a6830a4f6e40109623d7ba348712ed7fb105535d07f89a"
+    },
+    {
+      "id": "privacy-default",
+      "symbol": "kRt",
+      "start": 12657811,
+      "endExclusive": 12658233,
+      "text": "kRt=function(){let e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:\"\";return{detectedTypeErrorStyle:!1,detectedNameErrorStyle:!1,confirmErrorStyle:!1,detectedType:\"\",detectedName:e,isConfirm:arguments.length>2&&void 0!==arguments[2]&&arguments[2],name:e,nlpFeedbackId:null,type:arguments.length>0&&void 0!==arguments[0]?arguments[0]:\"\",personalInformationSource:\"USER\"}};function jRt(e){var t;let{detectQuestionLo",
+      "excerptUtf8Sha256": "9f8343419ad5573d8715066091751ff44388995b2a626d5aadcdc5e8cd544212"
+    },
+    {
+      "id": "privacy-confirm",
+      "symbol": "jRt",
+      "start": 12658900,
+      "endExclusive": 12661800,
+      "text": "}),300),[]),v=function(e,t,r){let n=arguments.length>3&&void 0!==arguments[3]&&arguments[3];if(d!==SV){const a={...u},s=(0,tK.cloneDeep)(p);return s[t].type=r.personalInformationType,s[t].isConfirm=n,s[t].confirmErrorStyle=!n,\"NON_PERSONAL_INFORMATION\"===r.personalInformationType&&(s[t].name=\"\",s[t].detectedName=\"\"),s[t].detectedType!==r.personalInformationType?s[t].detectedTypeErrorStyle=!1:s[t].detectedName!==r.userInputContent&&(s[t].detectedNameErrorStyle=!1),i(ZG(e,{...a,disabled:\"RESIDENT\"===r.personalInformationType,isRequired:\"RESIDENT\"===r.personalInformationType||a.isRequired,detectedItems:s},o)),void m(s)}a$({id:u.nlpFeedbackId,originalText:u.title,analysisType:\"NER\",isChange:!0,catchformId:c,companyId:l.companyIdx,userId:l.userIdx,userInputContent:r}).then((a=>{if(a.data.success){const s=a.data.response,l={...u},c=(0,tK.cloneDeep)(p);c[t].nlpFeedbackId=s.id,c[t].type=r.personalInformationType,c[t].isConfirm=n,c[t].confirmErrorStyle=!n,\"NON_PERSONAL_INFORMATION\"===r.personalInformationType&&(c[t].name=\"\",c[t].detectedName=\"\"),c[t].detectedType!==r.personalInformationType?c[t].detectedTypeErrorStyle=!1:c[t].detectedName!==r.userInputContent&&(c[t].detectedNameErrorStyle=!1),i(ZG(e,{...l,nlpFeedbackId:s.id,disabled:\"RESIDENT\"===r.personalInformationType,isRequired:\"RESIDENT\"===r.personalInformationType||l.isRequired,detectedItems:c},o)),m(c)}}))},b=(e,t)=>{const r=(0,tK.cloneDeep)(p);r[t].isConfirm=!p[t].isConfirm,f(r)},x=(e,t)=>{if(!p[t].type)return alert(s(\"alert.phrase6\")),!1;if(\"NON_PERSONAL_INFORMATION\"!==p[t].type&&!p[t].name.trim())return alert(s(\"alert.phrase7\")),!1;if((\"MATRIX_CHECKBOX\"===u.elementType||\"MATRIX_RADIO\"===u.elementType)&&\"NON_PERSONAL_INFORMATION\"!==p[t].type)return alert(s(\"alert.phrase46\")),!1;const r=\"\"!==u.title,n=p[t].name.trim()!==p[t].detectedName.trim();if(r&&n)v(e,t,{personalInformationType:p[t].type,userInputContent:p[t].name},!0);else{const e=(0,tK.cloneDeep)(p);e[t].isConfirm=!0,e[t].confirmErrorStyle=!1,f(e)}};(0,yt.useEffect)((()=>{m(h)}),[u]);const A=d!==SV,y=0===p.length?\"\":\"NON_PERSONAL_INFORMATION\"===(null===(t=p[0])||void 0===t?void 0:t.type)?\"NO\":\"YES\",w=\"YES\"===y&&p[0]||kRt(),C=(e,t)=>({id:u.nlpFeedbackId,originalText:u.title,analysisType:\"NER\",isChange:!0,catchformId:c,companyId:l.companyIdx,userId:l.userIdx,userInputContent:{personalInformationType:e,userInputContent:t},formLanguage:d,questionType:u.elementType}),S=function(){let e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:u.nlpFeedbackId;const t=[{...kRt(\"NON_PERSONAL_INFORMATION\",\"\",!0),nlpFeedbackId:e,personalInformationSource:\"USER\"}];i(ZG(n,{...u,nlpFeedbackId:e,detectedItems:t},o)),m(t)},T=async e=>{if(\"YES\"!==e){g.cancel(),S();try{var t;const e=await a$(C(\"NON_PERSONAL_INFORMATION\",\"\"));null!==e&&void 0!==e&&null!==(t=e.data)&&void 0!==t&&t.success&&S(e.data.response.id)}catch(r){}}else{const e=p.filter((e=>\"NON_PERSONAL_IN",
+      "excerptUtf8Sha256": "6022ff50707ff70b0832b5180dbb6ed5ee25fcd42f9dbd2386ff84669de3f763"
+    },
+    {
+      "id": "privacy-editor",
+      "symbol": "jRt",
+      "start": 12664600,
+      "endExclusive": 12667700,
+      "text": "aceholder:s(\"manualPrivacy.namePlaceholder\"),onChange:e=>(e=>{const t={...w,name:e,detectedName:e,detectedNameErrorStyle:!1,isConfirm:!1,personalInformationSource:\"USER\"};f([t])})(e.target.value),disabled:w.isConfirm,inputSize:\"lg\"})})]}),(0,nI.jsx)(ERt,{children:w.isConfirm?(0,nI.jsx)(M_,{size:\"md\",type:\"secondary\",text:s(\"edit\"),disabled:!1,onClick:k}):(0,nI.jsx)(M_,{size:\"md\",type:\"primary\",text:s(\"check\"),disabled:!1,onClick:N})})]}),\"NO\"===y&&(0,nI.jsx)(TRt,{children:(0,nI.jsx)(iI,{className:\"label-1-weak\",color:ej,children:s(\"manualPrivacy.nonCollectMessage\")})})]}):(0,nI.jsx)(\"div\",{className:\"mt-8 non-drag\",children:r===n||a?(0,nI.jsx)(\"div\",{className:\"flex justify-center\",children:p.personalInformationSource}):(0,nI.jsx)(nI.Fragment,{children:p.map(((e,t)=>(0,nI.jsxs)(Q_t,{personalInformationSource:e.personalInformationSource,detectedItem:e,children:[(0,nI.jsxs)(\"div\",{className:\"\"+(\"NON_PERSONAL_INFORMATION\"===e.type&&e.personalInformationSource,\"flex justify-between items-center flex-wrap\"),children:[(0,nI.jsxs)(\"div\",{className:\"flex gap-1 items-center\",children:[(0,nI.jsxs)(iI,{className:\"label-1-strong mb-4 flex items-center\",color:\"NON_PERSONAL_INFORMATION\"!==e.type&&\"NLP\"===e.personalInformationSource?aj:ej,children:[\"NON_PERSONAL_INFORMATION\"!==e.type&&\"NLP\"===e.personalInformationSource&&s(\"alert.phrase25\"),\" \",\"NON_PERSONAL_INFORMATION\"===e.type&&\"NLP\"===e.personalInformationSource&&s(\"alert.phrase26\"),\" \",(void 0===e.personalInformationSource||null===e.personalInformationSource)&&s(\"alert.phrase26\"),\" \",\"USER\"===e.personalInformationSource&&s(\"alert.phrase27\"),\" \"]}),\"NON_PERSONAL_INFORMATION\"!==e.type&&\"NLP\"===e.personalInformationSource&&(0,nI.jsxs)(\"div\",{className:\"mb-[18px]\",children:[(0,nI.jsx)(LEt,{title:s(\"alert.phrase28\"),content:s(\"alert.phrase29\"),placement:\"top\",theme:\"light\"}),\" \"]}),\"USER\"===e.personalInformationSource&&s(\"alert.phrase27\")&&(0,nI.jsxs)(\"div\",{className:\"mb-[18px]\",children:[(0,nI.jsx)(E4,{title:\"\",content:s(\"alert.phrase30\"),placement:\"top\",theme:\"light\"}),\" \"]})]}),(0,nI.jsxs)(\"div\",{className:\"mb-4 flex items-center\",children:[(0,nI.jsx)(BU,{src:\"/img/google-icons-v2/marks/plus.svg\",onClick:()=>(()=>{const e=(0,tK.cloneDeep)(p);e.push({detectedTypeErrorStyle:!1,detectedNameErrorStyle:!1,confirmErrorStyle:!1,detectedType:\"\",detectedName:\"\",isConfirm:!1,name:\"\",nlpFeedbackId:u.nlpFeedbackId,type:\"\",personalInformationSource:\"USER\"}),f(e)})(),color:sj}),(!e.detectedName&&!e.detectedType||\"USER\"===e.personalInformationSource)&&(0,nI.jsx)(\"div\",{className:\"\",children:(0,nI.jsx)(\"div\",{className:\"btn btn-xs btn-icon btn-light btn-hover-primary mb-0\",onClick:()=>((e,t)=>{const r=(0,tK.cloneDeep)(p);r.splice(t,1),f(r)})(0,t),children:(0,nI.jsx)(BU,{src:\"/img/google-icons-v2/system/delete.svg\",color:sj})})})]})]}),(0,nI.jsxs)(\"div\",{className:\"\",children:[(0,nI.jsxs)(\"div\",{className:\"row-line-center  \"+(\"NON_PERSONAL_INFORMATION\"!==e.type?\"\":\"align-middle\"),children:[(0,nI.jsx)(yB,{width:\"145px\",labelList:BB,disabled:e.isConfirm,value:e.type,error:e.detectedTypeErrorStyle,onChange:e=>((e,t,r)=>{if(e",
+      "excerptUtf8Sha256": "9c4d450eb1339e37ac936053256d7ee63c1db9e6b30c9e349b62a7b6fcdfaee4"
+    },
+    {
+      "id": "privacy-api",
+      "symbol": "a$",
+      "start": 7914352,
+      "endExclusive": 7914469,
+      "text": "function a$(e){return At.post(`${PE}/company-operated-service/nlp/user_input_personal_information`,e)}function o$(e){",
+      "excerptUtf8Sha256": "2eba744971d0bacc1cf9084bb294e7dad9f9699690ceb43436a023a4761d1ca4"
+    },
+    {
+      "id": "privacy-branch",
+      "symbol": "g_t",
+      "start": 12621400,
+      "endExclusive": 12622300,
+      "text": "null===(d=t.questionOptionList)||void 0===d||d.forEach((e=>{const t=m_t(e.pageOffset);t!==UB&&s.add(t)})),t.isRequired||s.add(1);break}}l||s.add(m_t(i.pageOffset));const u=Array.from(s).sort(((e,t)=>e-t));for(const e of u)n(a+e,o);o.pop()}(0,[]);for(let n=0;n<r.length;n++)r[n];return t};function g_t(e,t){const r=[\"PERSONAL_INFORMATION\",\"SENSITIVE\",\"IDENTIFICATION\",\"RESIDENT\"],n=[];return t.forEach(((t,a)=>{let o=!1;for(const n of t){const t=e.pageList[n];if(t){for(const e of t.questionList)if(e.detectedItems){for(const t of e.detectedItems)if(r.includes(t.type)){o=!0;break}if(o)break}if(o)break}}o||n.push(a)})),n}function v_t(e,t){const r=[];return t.forEach(((t,n)=>{let a=0;for(const r of t){const t=e.pageList[r];if(t)for(const e of t.questionList)\"identification\"===e.questionType&&a++}a>1&&r.push(n)})),r}function b_t(e,t){const r=[];return t.forEach(((t,n)=>{const a=[];for(const r of t",
+      "excerptUtf8Sha256": "e4a9046980e48ebcd2496511258f65dda1801142ed0fc0f011100943b0842b99"
+    },
+    {
+      "id": "privacy-aggregate",
+      "symbol": "T_t",
+      "start": 12626800,
+      "endExclusive": 12627100,
+      "text": ",T_t=e=>e.flatMap((e=>e.questionList.flatMap((e=>e.catchFormPersonalInformationRequests.filter((e=>\"NON_PERSONAL_INFORMATION\"!==e.personalInformationType)).map((e=>({type:e.personalInformationType,name:e.detectedPersonalInformation}))))))),E_t=e=>e.sort(((e,t)=>{const r=e.path.indexArray,n=t.path.in",
+      "excerptUtf8Sha256": "437c650adc4213be05ad8724e4cf263c5ca26fec1268f5c735124e17fba5d8ab"
+    },
+    {
+      "id": "custom-count",
+      "symbol": "gG",
+      "start": 8165447,
+      "endExclusive": 8165954,
+      "text": "gG=(e,t)=>{if(!e)return 0;if(\"string\"===typeof e){const[t=\"\"]=e.split(\"|\");return t.split(\",\").filter((e=>\"\"!==e.trim())).length}if(Array.isArray(e))return e.length;const r=Array.isArray(e.optionValue)?e.optionValue:[];if(!e.isCustomValue)return r.length;const n=(e=>{const t=sG(e).find((e=>\"Y\"===(null===e||void 0===e?void 0:e.customValueYn)));if(!t)return null;const r=parseInt(t.value,10);return Number.isFinite(r)?r:null})(t),a=null!==n&&r.some((e=>parseInt(String(e),10)===n));return r.length+(a?0:1)},",
+      "excerptUtf8Sha256": "22d5dc7471fbf8afcb707ff5e4af9325ed790c81b7a072fdf5ec9e0b1dfee443"
+    },
+    {
+      "id": "metadata-v3-gate",
+      "symbol": "wQ",
+      "start": 8201830,
+      "endExclusive": 8202420,
+      "text": "ystem/open-in-new.svg\",width:16,color:sj})})]},e.id)))})}const AQ=[\"questionOptionList\",\"formQuestionOptionDataList\"],yQ=e=>e&&\"object\"===typeof e?{...e,optionImageUrl:null,imageUrl:null,optionImageKey:null}:e;function wQ(e,t){return(e=>\"AI_V3\"===e)(t)?e:function(e){if(!e||\"object\"!==typeof e)return e;const t={...e,selectLimitMode:null,selectLimitCount:null,questionImageUrl:null,imageUrl:null,materialList:null,serviceFormQuestionAssets:null};for(const r of AQ){const n=e[r];Array.isArray(n)&&(t[r]=n.map(yQ))}return t}(e)}const CQ=(e,t)=>\"ADDRESS\"===e&&t&&\"ko\"!==t?\"FOREIGN_ADDRESS\":e;f",
+      "excerptUtf8Sha256": "8434d6e26f46d428ffd1a10c3285d362f3e95914e7af273600e151c898a0066a"
+    },
+    {
+      "id": "metadata-feature-map",
+      "symbol": "e_t/n_t/i_t",
+      "start": 12618200,
+      "endExclusive": 12619600,
+      "text": "/ai/recipient\",{state:{catchformId:f,version:\"v3\",isEdit:null===(n=y.state)||void 0===n?void 0:n.isEdit}});break;case\"V3_RECIPIENT_SAVE\":case\"V3_SETTING_TEMP\":o(\"/form/ai/setting\",{state:{catchformId:f,version:\"v3\",isEdit:null===(a=y.state)||void 0===a?void 0:a.isEdit}})}return}const s={serviceId:i};i$(f).then((e=>{r$(s).then((e=>{r(nY()),C(e.data.response.catchFormProgress,e.data.response.catchformId),h(!1)})).finally((()=>{b(!0)}))})).catch((e=>{}))}})]})}const e_t={questionImage:\"useQuestionImage\",questionMaterial:\"useQuestionMaterial\",optionImage:\"useOptionImage\",pageOffset:\"usePageOffset\"},t_t=[\"questionImage\",\"questionMaterial\",\"optionImage\"],r_t=e=>{var t,r;return null!==(t=null!==(r=null===e||void 0===e?void 0:e.elementType)&&void 0!==r?r:null===e||void 0===e?void 0:e.catchFormQuestionType)&&void 0!==t?t:null===e||void 0===e?void 0:e.questionType};function n_t(e){return\"string\"!==typeof e||\"\"===e||\"IDV\"===e?[]:\"RADIO\"===e?[\"questionImage\",\"questionMaterial\",\"optionImage\",\"pageOffset\"]:\"CHECKBOX\"===e?[\"questionImage\",\"questionMaterial\",\"optionImage\"]:\"SELECTBOX\"===e?[\"questionImage\",\"questionMaterial\",\"pageOffset\"]:[\"questionImage\",\"questionMaterial\"]}const a_t=e=>n_t(e).length>0,o_t=(e,t)=>n_t(e).includes(t);function i_t(e,t){const r=null===e||void 0===e?void 0:e[e_t[t]];return\"boolean\"===typeof r?r:\"pageOffset\"!==t&&c_t(e,t)}function s_t(e,t){if(\"questionImage\"===t)ret",
+      "excerptUtf8Sha256": "20d5cc01aea953cc1277b81a85f2b073b6dc5123b2018594683de8b7ee9c718d"
+    }
+  ],
+  "staticSearch": {
+    "patternRegexColonOccurrences": 0,
+    "patternRegexAssignmentOccurrences": 0
+  },
+  "localSnapshots": [
+    {
+      "path": "src/contracts/questions.ts",
+      "sha256": "c563b932a3ea3503439024d00298e244d585925d6eace0f993f49ce30030a21b",
+      "lines": 117
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "sha256": "0c85c41dc64ec3fc68e71b9182e212012438be53acc157694c41b4186c387ccc",
+      "lines": 2580
+    },
+    {
+      "path": "src/server/forms.ts",
+      "sha256": "8de6462997db830856217ae4a44380db2a57b4350865e7339a2b1b9466b2bbd8",
+      "lines": 466
+    },
+    {
+      "path": "src/components/forms/FormEditor.tsx",
+      "sha256": "7b4d2323ed189b18e3c30d3b13578eb1903c8a7fa073ebb0f8f96591fd5803fa",
+      "lines": 159
+    },
+    {
+      "path": "src/components/forms/PublicForm.tsx",
+      "sha256": "e06a842b120718792677e2541c40c87d03af49c333cefb71e256aa778acfe136",
+      "lines": 158
+    },
+    {
+      "path": "src/components/forms/TemplateGallery.tsx",
+      "sha256": "5fb9a4a031efafe5cb087e1a777505fbb03701c3a900e20711295d198b9d19e8",
+      "lines": 77
+    },
+    {
+      "path": "src/server/submission-management.ts",
+      "sha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+      "lines": 155
+    },
+    {
+      "path": "src/components/forms/QuestionSettings.tsx",
+      "sha256": "fac1495fbe132f96106ca93cd0c78fb4e32a2b67fa208a3a0e74b5e462f19b81",
+      "lines": 41
+    },
+    {
+      "path": "src/components/forms/QuestionInput.tsx",
+      "sha256": "44a09aaac8c0b9b348715ca0e0735b0335ef661f2bd1a53e11c6ecf2fc8da8d1",
+      "lines": 71
+    },
+    {
+      "path": "src/server/answer-validation.ts",
+      "sha256": "97e9d3fc9499dcad45f803762833ea637e82dccf5f41400b0fca4ba5f2404892",
+      "lines": 99
+    },
+    {
+      "path": "src/components/forms/QuestionOptions.tsx",
+      "sha256": "792f0a21170d2051ec0d5c8659671b37ee296e7384d7c14d1967f86bacab351a",
+      "lines": 28
+    },
+    {
+      "path": "src/contracts/domains.ts",
+      "sha256": "c1a51de6cf042c32fbe7ed888ccac4584b2ef93fbeb1b7ab1c570bcbac389a9b",
+      "lines": 69
+    },
+    {
+      "path": "src/contracts/files.ts",
+      "sha256": "fed0f280c4b41468f8e9eafa4a6792568d9da55b99e1965254201234c937c0cd",
+      "lines": 15
+    },
+    {
+      "path": "src/contracts/form-copy.ts",
+      "sha256": "f7116f6021716937822e1eb5074d8ec1b21323e7d24fe558829ea99c7074f260",
+      "lines": 23
+    },
+    {
+      "path": "src/server/templates.ts",
+      "sha256": "2e75165dd4dc0bfd34cb3cfc0ae5d5dcd31271dfabc2bf2806e254158eb4bfb6",
+      "lines": 132
+    },
+    {
+      "path": "src/contracts/forms.ts",
+      "sha256": "a32cef312bab5acf57d17530213a112d4aa3a1ad9b57d9c854c286bc3e63db6c",
+      "lines": 44
+    },
+    {
+      "path": "src/app/api/v1/forms/route.ts",
+      "sha256": "a5bbed6c1ba221eec0c89839d920f82a6afe65dcfb83195f0952eb0267f84522",
+      "lines": 18
+    },
+    {
+      "path": "src/app/api/v1/forms/[...segments]/route.ts",
+      "sha256": "6df00c12f39e04ef783792511ae1df6f8a8e7d12372d88d9dc9d24512e53f25a",
+      "lines": 127
+    }
+  ]
+}

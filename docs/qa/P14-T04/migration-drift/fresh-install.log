@@ -1,6 +1,6 @@
-Datasource "db": PostgreSQL database "catchsecu_test", schema "qa_drift_52b690e6de2855fe" at "localhost:5432"
+Datasource "db": PostgreSQL database "catchsecu_test", schema "qa_drift_e232e04c47852afc" at "localhost:5432"
 
-101 migrations found in prisma/migrations
+147 migrations found in prisma/migrations
 
 Applying migration `20261002090000_foundation`
 Applying migration `20261002091000_auth_generated_ids`
@@ -103,6 +103,52 @@ Applying migration `20261016000000_virtual_org_auth`
 Applying migration `20261016100000_virtual_org_protocols`
 Applying migration `20261016110000_billing_unused_version_removal`
 Applying migration `20261017130000_kakao_mock_receipts`
+Applying migration `20261017140000_sms_receipt_attempts`
+Applying migration `20261018000000_document_version_recipients`
+Applying migration `20261019000000_document_policy_draft`
+Applying migration `20261020000000_security_entitlements`
+Applying migration `20261021000000_sso_login_evidence`
+Applying migration `20261022000000_sso_policy_challenge`
+Applying migration `20261023000000_org_email_challenge`
+Applying migration `20261024000000_sso_browser_binding`
+Applying migration `20261025000000_question_option_identities`
+Applying migration `20261025001000_question_option_conditions`
+Applying migration `20261025002000_question_exact_selection`
+Applying migration `20261025003000_question_text_limits`
+Applying migration `20261025004000_contact_email_birth_questions`
+Applying migration `20261025005000_address_questions`
+Applying migration `20261025006000_drawing_questions`
+Applying migration `20261025007000_form_language`
+Applying migration `20261025008000_question_explanations`
+Applying migration `20261025009000_question_material_links`
+Applying migration `20261025010000_question_personal_information`
+Applying migration `20261025011000_question_custom_choice`
+Applying migration `20261025012000_author_assets`
+Applying migration `20261025013000_author_assets_expiry_precision`
+Applying migration `20261025014000_question_images`
+Applying migration `20261025015000_form_rich_body`
+Applying migration `20261025016000_rich_body_asset_purposes`
+Applying migration `20261025017000_form_sections`
+Applying migration `20261025018000_form_section_trigger_fix`
+Applying migration `20261025019000_author_asset_rich_documents`
+Applying migration `20261025020000_form_page_branches`
+Applying migration `20261025020100_form_page_branch_trigger_scope`
+Applying migration `20261025020200_form_page_branch_lookup`
+Applying migration `20261025020300_author_asset_trigger_scope`
+Applying migration `20261025020400_submission_page_path_validator_fix`
+Applying migration `20261025020500_submission_page_path_edges`
+Applying migration `20261025020600_option_trigger_metadata_scope`
+Applying migration `20261025020700_submission_ineligible_guard`
+Applying migration `20261025020800_share_grant_form_body`
+Applying migration `20261025020900_rich_consent_evidence_v2`
+Applying migration `20261025021000_question_patterns`
+Applying migration `20261025022000_form_consent_items`
+Applying migration `20261025023000_form_collection_window`
+Applying migration `20261025024000_form_participation_access`
+Applying migration `20261025025000_form_participant_identity`
+Applying migration `20261025026000_form_participation_constraint_names`
+Applying migration `20261025027000_form_template_catalog_metadata`
+Applying migration `20261025028000_form_template_thumbnail_constraints`
 
 The following migration(s) have been applied:
 
@@ -308,6 +354,98 @@ migrations/
   └─ 20261016110000_billing_unused_version_removal/
     └─ migration.sql
   └─ 20261017130000_kakao_mock_receipts/
+    └─ migration.sql
+  └─ 20261017140000_sms_receipt_attempts/
+    └─ migration.sql
+  └─ 20261018000000_document_version_recipients/
+    └─ migration.sql
+  └─ 20261019000000_document_policy_draft/
+    └─ migration.sql
+  └─ 20261020000000_security_entitlements/
+    └─ migration.sql
+  └─ 20261021000000_sso_login_evidence/
+    └─ migration.sql
+  └─ 20261022000000_sso_policy_challenge/
+    └─ migration.sql
+  └─ 20261023000000_org_email_challenge/
+    └─ migration.sql
+  └─ 20261024000000_sso_browser_binding/
+    └─ migration.sql
+  └─ 20261025000000_question_option_identities/
+    └─ migration.sql
+  └─ 20261025001000_question_option_conditions/
+    └─ migration.sql
+  └─ 20261025002000_question_exact_selection/
+    └─ migration.sql
+  └─ 20261025003000_question_text_limits/
+    └─ migration.sql
+  └─ 20261025004000_contact_email_birth_questions/
+    └─ migration.sql
+  └─ 20261025005000_address_questions/
+    └─ migration.sql
+  └─ 20261025006000_drawing_questions/
+    └─ migration.sql
+  └─ 20261025007000_form_language/
+    └─ migration.sql
+  └─ 20261025008000_question_explanations/
+    └─ migration.sql
+  └─ 20261025009000_question_material_links/
+    └─ migration.sql
+  └─ 20261025010000_question_personal_information/
+    └─ migration.sql
+  └─ 20261025011000_question_custom_choice/
+    └─ migration.sql
+  └─ 20261025012000_author_assets/
+    └─ migration.sql
+  └─ 20261025013000_author_assets_expiry_precision/
+    └─ migration.sql
+  └─ 20261025014000_question_images/
+    └─ migration.sql
+  └─ 20261025015000_form_rich_body/
+    └─ migration.sql
+  └─ 20261025016000_rich_body_asset_purposes/
+    └─ migration.sql
+  └─ 20261025017000_form_sections/
+    └─ migration.sql
+  └─ 20261025018000_form_section_trigger_fix/
+    └─ migration.sql
+  └─ 20261025019000_author_asset_rich_documents/
+    └─ migration.sql
+  └─ 20261025020000_form_page_branches/
+    └─ migration.sql
+  └─ 20261025020100_form_page_branch_trigger_scope/
+    └─ migration.sql
+  └─ 20261025020200_form_page_branch_lookup/
+    └─ migration.sql
+  └─ 20261025020300_author_asset_trigger_scope/
+    └─ migration.sql
+  └─ 20261025020400_submission_page_path_validator_fix/
+    └─ migration.sql
+  └─ 20261025020500_submission_page_path_edges/
+    └─ migration.sql
+  └─ 20261025020600_option_trigger_metadata_scope/
+    └─ migration.sql
+  └─ 20261025020700_submission_ineligible_guard/
+    └─ migration.sql
+  └─ 20261025020800_share_grant_form_body/
+    └─ migration.sql
+  └─ 20261025020900_rich_consent_evidence_v2/
+    └─ migration.sql
+  └─ 20261025021000_question_patterns/
+    └─ migration.sql
+  └─ 20261025022000_form_consent_items/
+    └─ migration.sql
+  └─ 20261025023000_form_collection_window/
+    └─ migration.sql
+  └─ 20261025024000_form_participation_access/
+    └─ migration.sql
+  └─ 20261025025000_form_participant_identity/
+    └─ migration.sql
+  └─ 20261025026000_form_participation_constraint_names/
+    └─ migration.sql
+  └─ 20261025027000_form_template_catalog_metadata/
+    └─ migration.sql
+  └─ 20261025028000_form_template_thumbnail_constraints/
     └─ migration.sql
 
 All migrations have been successfully applied.

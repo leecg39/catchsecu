@@ -1,3 +1,4 @@
+import { SsoTestBrowser } from "../helpers/sso-browser";
 import { ssoProviderCheckedRecord } from "@/contracts/sso";
 import { createOTP } from "@better-auth/utils/otp";
 import { base32 } from "@better-auth/utils/base32";
@@ -23,6 +24,7 @@ vi.mock("@/server/audit", async original => {
 
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
+const browser = new SsoTestBrowser();
 const password = "Sso-owner!12345";
 
 // 실제 RSA 키와 HTTP 서버를 사용하는 로컬 OIDC IdP. 서명·JWKS·PKCE·claim을 모두 실제로 검증한다.
@@ -76,8 +78,11 @@ const server: Server = createServer((req, res) => {
   }
   res.writeHead(404); res.end();
 });
+// Capture the company selected by each fixture; never infer it from a later shared-session change.
+const fixtureCompanies = new Map<string, string>();
 function req(path: string, cookie = "", method = "GET", input?: unknown, key?: string) {
-  return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie,
+  if (path === "/security/sso" && method === "POST" && input && typeof input === "object") input = { tenantId: fixtureCompanies.get(cookie), ...input };
+  return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie: browser.cookie(cookie),
     ...(input === undefined ? {} : { "content-type": "application/json" }), ...(key ? { "idempotency-key": key } : {}) },
     ...(input === undefined ? {} : { body: JSON.stringify(input) }) });
 }
@@ -88,9 +93,12 @@ async function ownerCookie() {
   const company = await db.company.create({ data: { name: "SSO 회사", publicName: "SSO", policy: { create: {} },
     memberships: { create: { userId: user.id, role: "owner" } } } });
   const login = await auth.handler(req("/auth/sign-in/email", "", "POST", { email, password }));
-  return { cookie: login.headers.getSetCookie().map(value => value.split(";")[0]).join("; "), company, user, email };
+  const cookie = login.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
+  fixtureCompanies.set(cookie, company.id);
+  return { cookie, company, user, email };
 }
 beforeEach(async () => {
+  browser.reset(); fixtureCompanies.clear();
   ssoFault.providerUpdateAudit = false; ssoFault.providerAudit = false; ssoFault.providerAuditSeen = false; ssoFault.unlinkAuditSeen = false; ssoFault.unlinkAudit = false; ssoFault.audit = false; jwksGate = undefined; idp.codes.clear(); idp.lastAuth = null; idp.failToken = null; idp.wrongKey = false;
   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "Job", "SsoProvider" CASCADE');
 });
@@ -102,8 +110,22 @@ async function ssoFlow() {
   const { GET: callbackRoute } = await import("@/app/api/v1/auth/sso/callback/route");
   const { POST: createProvider, GET: listProviders } = await import("@/app/api/v1/security/sso/route");
   const { PATCH: patchProvider } = await import("@/app/api/v1/security/sso/[id]/route");
-  return { startRoute, callbackRoute, createProvider, listProviders, patchProvider };
+  return { startRoute: browser.wrap(startRoute), callbackRoute: browser.wrap(callbackRoute), createProvider, listProviders, patchProvider };
 }
+
+test("E2 사설 HTTPS JWKS는 네트워크에 전달하기 전에 사전검사에서 거절한다", async () => {
+  const { cookie } = await ownerCookie(), { createProvider } = await ssoFlow();
+  const outbound = vi.fn(async () => Response.json({ keys: [jwk] }));
+  vi.stubGlobal("fetch", outbound);
+  try {
+    const response = await createProvider(req("/security/sso", cookie, "POST", { name: "사설망 거절", protocol: "oidc",
+      issuer: "https://idp.example.test", clientId: "test", authorizationUrl: "https://idp.example.test/authorize",
+      tokenUrl: "https://idp.example.test/token", jwksUrl: "https://169.254.169.254/jwks", scopes: "openid email" }, randomUUID()));
+    expect(response.status).toBe(201);
+    expect((await response.json()).preflightOk).toBe(false);
+    expect(outbound).not.toHaveBeenCalled();
+  } finally { vi.unstubAllGlobals(); }
+});
 
 test("SSO 제공자 CRUD·사전검사·활성화 게이트", async () => {
   await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
@@ -178,6 +200,7 @@ test("실제 OIDC 로그인: state→PKCE→서명검증→세션발급→재전
   expect(member.role).toBe("viewer");
   const account = await db.account.findFirstOrThrow({ where: { providerId: "sso:" + provider.id } });
   expect(account.accountId).toBe(`${idp.issuer}|idp-sub-1`);
+  expect(await db.ssoSessionProof.findFirst({ where: { userId: user.id } })).toMatchObject({ tenantId: company.id, providerId: provider.id, accountId: account.id, identityProvider: "OTHER" });
   // state 재전송 → 일회성 소비로 차단
   const replay = await callbackRoute(req(`/auth/sso/callback?${callback.searchParams}`));
   expect(replay.status).toBe(401);
@@ -239,7 +262,7 @@ async function providerSettingsFixture() {
   } } });
   const { requireContext } = await import("@/server/context");
   const ctx = await requireContext(req("/security/sso", owner.cookie).headers);
-  const input = { protocol: "oidc" as const, name: "관리 시험 IdP", issuer: idp.issuer, clientId: "catchsecu",
+  const input = { tenantId: owner.company.id, protocol: "oidc" as const, name: "관리 시험 IdP", issuer: idp.issuer, clientId: "catchsecu",
     authorizationUrl: idp.issuer + "/authorize", tokenUrl: idp.issuer + "/token",
     jwksUrl: idp.issuer + "/jwks.json", scopes: "openid profile email" };
   const provider = await db.ssoProvider.create({ data: { ...input, tenantId: owner.company.id, preflightOk: true } });
@@ -389,7 +412,7 @@ test("P11 콜백: 다른 사용자에게 연결된 외부 계정으로 현재 �
   expect((await response.json()).error.code).toBe("SSO_ACCOUNT_ALREADY_LINKED");
   expect(await db.session.count({ where: { userId: other.id } })).toBe(0);
 });
-test("P11 콜백: 유효한 시작 세션은 callback 쿠키 없이도 같은 사용자에게만 연결한다", async () => {
+test("P11 콜백: 시작 브라우저와 유효한 세션은 인증 세션 쿠키 없이도 같은 사용자에게만 연결한다", async () => {
   const f = await pendingOidc("link");
   const response = await f.callbackRoute(req("/auth/sso/callback?" + f.callback.searchParams));
   expect(response.status).toBe(302);
@@ -441,7 +464,7 @@ test("P11 콜백: 이미 연결된 계정도 취소된 초대를 우회할 수 �
   const { POST: inviteStart } = await import("@/app/api/v1/invitations/sso/start/route");
   const invitation = await db.invitation.create({ data: { tenantId: f.company.id, invitedBy: f.ctx.member.id,
     email: "sso-user@catchsecu.test", role: "viewer", serviceIds: [], tokenHash: tokenHash(token), expiresAt: new Date(Date.now() + 60000) } });
-  const started = await inviteStart(req("/invitations/sso/start", "", "POST", { token, providerId: f.provider.id }));
+  const started = await browser.wrap(inviteStart)(req("/invitations/sso/start", "", "POST", { token, providerId: f.provider.id }));
   expect(started.status).toBe(200);
   const authorize = await fetch((await started.json()).redirect, { redirect: "manual" });
   const callback = new URL(authorize.headers.get("location")!);
@@ -477,7 +500,7 @@ test("P11 콜백: 기존 연결 계정의 재초대도 초대 역할과 서비�
   const { POST: inviteStart } = await import("@/app/api/v1/invitations/sso/start/route");
   const invitation = await db.invitation.create({ data: { tenantId: f.company.id, invitedBy: f.ctx.member.id,
     email: user.email, role: "editor", serviceIds: [service.id], tokenHash: tokenHash(token), expiresAt: new Date(Date.now() + 60000) } });
-  const started = await inviteStart(req("/invitations/sso/start", "", "POST", { token, providerId: f.provider.id }));
+  const started = await browser.wrap(inviteStart)(req("/invitations/sso/start", "", "POST", { token, providerId: f.provider.id }));
   expect(started.status).toBe(200);
   const authorize = await fetch((await started.json()).redirect, { redirect: "manual" });
   const callback = new URL(authorize.headers.get("location")!);
@@ -541,6 +564,7 @@ test("SSO MFA: 코드 검증 전 세션0, 검증 후 대상 회사 세션1과 �
   expect(verified.status).toBe(200);
   const session = await db.session.findFirstOrThrow({ where: { userId: f.user.id } });
   expect(session.activeCompanyId).toBe(f.company.id);
+  expect(await db.ssoSessionProof.findUnique({ where: { sessionId: session.id } })).toMatchObject({ userId: f.user.id, providerId: f.provider.id, tenantId: f.company.id, identityProvider: "OTHER" });
   expect(await db.auditEvent.count({ where: { action: "session.created", resourceId: session.id } })).toBe(1);
   expect(await db.auditEvent.count({ where: { action: "sso.login", actorId: f.user.id } })).toBe(1);
   expect((await auth.handler(req("/auth/two-factor/verify-totp", cookie, "POST", { code: await f.code() }))).status).toBe(401);
@@ -553,9 +577,10 @@ async function pendingSsoMfa() {
   expect(callback.headers.get("location")).toContain("/login-otp");
   return { ...f, mfaCookie: responseCookies(callback) };
 }
-test.each(["provider", "membership", "account", "closed", "password", "binding", "expiry", "ip"])("SSO MFA: %s 변경 후 새 세션을 만들지 않는다", async kind => {
+test.each(["provider", "membership", "account", "closed", "password", "binding", "expiry", "ip", "ssoPolicy"])("SSO MFA: %s 변경 후 새 세션을 만들지 않는다", async kind => {
   const f = await pendingSsoMfa();
   if (kind === "provider") await db.ssoProvider.update({ where: { id: f.provider.id }, data: { version: { increment: 1 } } });
+  if (kind === "ssoPolicy") await db.ssoLoginPolicy.create({ data: { tenantId: f.company.id, mode: "GOOGLE" } });
   if (kind === "membership") await db.membership.update({ where: { id: f.ctx.member.id }, data: { status: "revoked", version: { increment: 1 } } });
   if (kind === "account") await db.account.deleteMany({ where: { userId: f.user.id, providerId: "sso:" + f.provider.id } });
   if (kind === "closed") {
@@ -649,8 +674,10 @@ test("SSO MFA: 감사 저장 실패는 세션·복구코드·SSO 바인딩 소�
   expect(failed.status).toBe(500);
   expect(failed.headers.getSetCookie()).toHaveLength(0);
   expect(await db.session.count({ where: { userId: f.user.id } })).toBe(0);
+  expect(await db.ssoSessionProof.count({ where: { userId: f.user.id } })).toBe(0);
   const retry = await auth.handler(req("/auth/two-factor/verify-backup-code", f.mfaCookie, "POST", { code: f.backup }));
   expect(retry.status).toBe(200);
+  expect(await db.ssoSessionProof.count({ where: { userId: f.user.id } })).toBe(1);
   expect(await db.auditEvent.count({ where: { action: "sso.login", actorId: f.user.id } })).toBe(1);
 });
 
@@ -960,7 +987,7 @@ async function invitationSsoFixture() {
   const { POST: start } = await import("@/app/api/v1/invitations/sso/start/route");
   const { callbackRoute } = await ssoFlow();
   async function begin() {
-    const response = await start(req("/invitations/sso/start", "", "POST", { token, providerId: f.provider.id }));
+    const response = await browser.wrap(start)(req("/invitations/sso/start", "", "POST", { token, providerId: f.provider.id }));
     expect(response.status).toBe(200);
     const { redirect } = await response.json();
     expect(redirect).not.toContain(token);
@@ -1070,7 +1097,7 @@ test("P11 초대 SSO: 기존 연결 계정의 2FA 확인 전에는 로그인 세
   const invitation = await db.invitation.create({ data: { tenantId: f.company.id, invitedBy: inviter.id,
     email: f.email, role: "viewer", serviceIds: [], tokenHash: tokenHash(token), expiresAt: new Date(Date.now() + 600000) } });
   const { POST: start } = await import("@/app/api/v1/invitations/sso/start/route");
-  const started = await start(req("/invitations/sso/start", "", "POST", { token, providerId: f.provider.id }));
+  const started = await browser.wrap(start)(req("/invitations/sso/start", "", "POST", { token, providerId: f.provider.id }));
   expect(started.status).toBe(200);
   const authorize = await fetch((await started.json()).redirect, { redirect: "manual" });
   const callback = new URL(authorize.headers.get("location")!);
@@ -1254,4 +1281,67 @@ test("P11 공급자 중지: 감사 실패 시 활성 상태·version·계정·�
   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: f.provider.id } })).toMatchObject({ enabled: true, version: 1 });
   expect(await db.account.findUnique({ where: { id: f.account.id } })).not.toBeNull();
   expect(await db.session.findUnique({ where: { id: f.ctx.session.id } })).not.toBeNull();
+});
+
+test.each(["login", "link"])("E1 %s 콜백은 시작 브라우저 쿠키가 없으면 취소 응답도 소비하지 않는다", async mode => {
+  const f = await pendingOidc(mode);
+  const { GET: rawCallback } = await import("@/app/api/v1/auth/sso/callback/route");
+  const state = f.callback.searchParams.get("state")!;
+  const response = await rawCallback(new Request(origin + "/api/v1/auth/sso/callback?" + new URLSearchParams({ state, error: "access_denied" })));
+  expect(response.status).toBe(401);
+  expect((await response.json()).error.code).toBe("SSO_BROWSER_MISMATCH");
+  expect(await db.ssoState.count()).toBe(1);
+  expect(await db.account.count({ where: { providerId: "sso:" + f.provider.id } })).toBe(0);
+});
+
+test.each(["other", "duplicate", "malformed", "legacy"])("E1 OIDC %s 브라우저 결합 거절은 state와 인증 코드를 소비하지 않는다", async variant => {
+  const f = await pendingOidc();
+  const { GET: rawCallback } = await import("@/app/api/v1/auth/sso/callback/route");
+  const state = await db.ssoState.findFirstOrThrow();
+  const bindingName = browser.cookie().split("=", 1)[0];
+  const cookie = variant === "other" ? bindingName + "=" + "x".repeat(43)
+    : variant === "duplicate" ? browser.cookie() + "; " + browser.cookie()
+    : variant === "malformed" ? bindingName + "=invalid" : browser.cookie();
+  if (variant === "legacy") await db.ssoState.update({ where: { id: state.id }, data: { browserHash: null } });
+  const response = await rawCallback(new Request(f.callback, { headers: { cookie } }));
+  expect(response.status).toBe(401); expect((await response.json()).error.code).toBe("SSO_BROWSER_MISMATCH");
+  expect(await db.ssoState.count({ where: { id: state.id } })).toBe(1);
+  expect(idp.codes.has(f.callback.searchParams.get("code")!)).toBe(true);
+  expect(await db.account.count({ where: { providerId: "sso:" + f.provider.id } })).toBe(0);
+  if (variant !== "legacy") expect((await f.callbackRoute(new Request(f.callback))).status).toBe(302);
+});
+test("E1 같은 브라우저의 두 OIDC 시작과 콜백은 서로의 쿠키를 지우지 않는다", async () => {
+  const first = await pendingOidc(), firstCookie = browser.cookie();
+  const firstState = await db.ssoState.findFirstOrThrow();
+  const secondStart = await first.startRoute(req("/auth/sso/" + first.provider.id));
+  expect(browser.cookie()).toBe(firstCookie);
+  const secondAuth = await fetch(secondStart.headers.get("location")!, { redirect: "manual" });
+  const secondCallback = new URL(secondAuth.headers.get("location")!);
+  const states = await db.ssoState.findMany();
+  expect(states).toHaveLength(2); expect(new Set(states.map(s => s.browserHash)).size).toBe(1);
+  expect(new Set(states.map(s => s.nonceHash)).size).toBe(2);
+  expect(firstState.browserHash).not.toBeNull();
+  const firstDone = await first.callbackRoute(new Request(first.callback));
+  const secondDone = await first.callbackRoute(new Request(secondCallback));
+  expect(firstDone.status).toBe(302); expect(secondDone.status).toBe(302);
+  for (const response of [firstDone, secondDone]) expect(response.headers.getSetCookie().some(c => c.startsWith("catchsecu-sso-browser-local-"))).toBe(false);
+  expect(await db.ssoState.count()).toBe(0);
+});
+
+test("E1 쿠키 없는 두 OIDC 동시 시작은 양쪽 실제 PKCE 콜백이 성공한다", async () => {
+  const f = await providerSettingsFixture();
+  await db.ssoProvider.update({ where: { id: f.provider.id }, data: { enabled: true } });
+  const { GET: start } = await import("@/app/api/v1/auth/sso/[providerId]/route");
+  const { GET: callback } = await import("@/app/api/v1/auth/sso/callback/route");
+  const responses = await Promise.all([1, 2].map(() => start(new Request(origin + "/api/v1/auth/sso/" + f.provider.id))));
+  for (const response of responses) { expect(response.status).toBe(302); browser.capture(response); }
+  const states = await db.ssoState.findMany();
+  expect(new Set(states.map(s => s.browserHash)).size).toBe(2);
+  expect(new Set(states.map(s => s.nonceHash)).size).toBe(2);
+  for (const response of responses) {
+    const authorize = await fetch(response.headers.get("location")!, { redirect: "manual" });
+    expect((await callback(new Request(authorize.headers.get("location")!, { headers: { cookie: browser.cookie() } }))).status).toBe(302);
+  }
+  expect(await db.ssoState.count()).toBe(0);
+  expect(await db.account.count({ where: { providerId: "sso:" + f.provider.id } })).toBe(1);
 });

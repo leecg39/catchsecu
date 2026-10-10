@@ -1,0 +1,73 @@
+{
+  "checkedAt": "2026-10-09T15:13:55.518Z",
+  "barriers": [
+    {
+      "table": "Company",
+      "actualWaitObserved": true,
+      "waiters": 1,
+      "afterWaitStatus": 401
+    },
+    {
+      "table": "DestructionRequest",
+      "actualWaitObserved": true,
+      "waiters": 1,
+      "afterWaitStatus": 401
+    },
+    {
+      "table": "AuditEvent",
+      "action": "hold",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "table": "AuditEvent",
+      "action": "destruction-request",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "table": "AuditEvent",
+      "action": "approve",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "table": "AuditEvent",
+      "action": "retention",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "table": "AuditEvent",
+      "action": "certificate",
+      "actualDelaySeconds": 2,
+      "status": 401,
+      "mutationAndAuditRolledBack": true
+    },
+    {
+      "kind": "expertViewerRole",
+      "forgedGrantCannotElevateRole": true,
+      "requestAndCertificateDenied": true,
+      "holdUnchanged": true
+    },
+    {
+      "kind": "retentionBoundary",
+      "actualAuditDelaySeconds": 2,
+      "elapsedRetentionUpdateRolledBack": true
+    },
+    {
+      "kind": "syntheticVerificationErasure",
+      "receipts": 2,
+      "events": 4,
+      "encryptedAttempts": 2,
+      "remainingLinkedOriginals": 0,
+      "lateBindingRejected": true,
+      "providerProtocolVerified": false
+    }
+  ],
+  "providerProtocolVerified": false
+}

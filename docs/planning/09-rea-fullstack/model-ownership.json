@@ -1,0 +1,1638 @@
+[
+  {
+    "model": "User",
+    "owner_tasks": [
+      "R02-T01",
+      "R05-T01"
+    ],
+    "field_count": 27,
+    "constraints": [],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "AccountClosure",
+    "owner_tasks": [
+      "R05-T01"
+    ],
+    "field_count": 6,
+    "constraints": [],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Notice",
+    "owner_tasks": [
+      "R24-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@index([status, sortOrder, publishedAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "NoticeAttachment",
+    "owner_tasks": [
+      "R24-T01"
+    ],
+    "field_count": 11,
+    "constraints": [
+      "@@index([noticeId, status, createdAt, id])",
+      "@@index([status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Guide",
+    "owner_tasks": [
+      "R24-T01"
+    ],
+    "field_count": 15,
+    "constraints": [
+      "@@index([status, categoryOrder, sortOrder, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SupportTicket",
+    "owner_tasks": [
+      "R24-T01"
+    ],
+    "field_count": 19,
+    "constraints": [
+      "@@index([tenantId, authorId, status, createdAt, id])",
+      "@@index([status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Session",
+    "owner_tasks": [
+      "R02-T01",
+      "R05-T01",
+      "R07-T01"
+    ],
+    "field_count": 13,
+    "constraints": [
+      "@@unique([userId, id])",
+      "@@index([userId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Account",
+    "owner_tasks": [
+      "R02-T01",
+      "R05-T01",
+      "R07-T01"
+    ],
+    "field_count": 16,
+    "constraints": [
+      "@@index([userId])",
+      "@@unique([providerId, accountId])",
+      "@@index([ssoProviderId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Verification",
+    "owner_tasks": [
+      "R02-T01",
+      "R07-T01"
+    ],
+    "field_count": 6,
+    "constraints": [
+      "@@index([identifier])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "TwoFactor",
+    "owner_tasks": [
+      "R02-T01",
+      "R06-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@index([userId])",
+      "@@index([secret])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "RateLimit",
+    "owner_tasks": [
+      "R02-T01"
+    ],
+    "field_count": 4,
+    "constraints": [],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Company",
+    "owner_tasks": [
+      "R03-T01"
+    ],
+    "field_count": 42,
+    "constraints": [],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "CompanyBusinessFile",
+    "owner_tasks": [
+      "R03-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([status, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "BillingPlan",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 6,
+    "constraints": [],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "BillingPlanVersion",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 17,
+    "constraints": [
+      "@@unique([planId, number, cycle])",
+      "@@unique([id, planId])",
+      "@@index([planId, cycle, orderable])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "BillingSubscription",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 19,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, status, periodEnd])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "PaymentMethod",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 14,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, status])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "PaymentOrder",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 14,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, status, createdAt])",
+      "@@index([tenantId, methodId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "PaymentEvent",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 6,
+    "constraints": [
+      "@@index([orderId, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "PaymentRefund",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, orderId, status])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "BillingMonthClose",
+    "owner_tasks": [
+      "R21-T01",
+      "R23-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@unique([tenantId, month, currency])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "BillingSubscriptionEvent",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 7,
+    "constraints": [
+      "@@unique([subscriptionId, version])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "CreditAccount",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 7,
+    "constraints": [
+      "@@id([tenantId, currency])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "LedgerTransaction",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 15,
+    "constraints": [
+      "@@unique([tenantId, kind, sourceKind, sourceId])",
+      "@@index([tenantId, currency, createdAt, id])",
+      "@@index([tenantId, serviceId, createdAt, id])",
+      "@@index([reservationId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "LedgerEntry",
+    "owner_tasks": [
+      "R21-T01"
+    ],
+    "field_count": 7,
+    "constraints": [
+      "@@unique([transactionId, account])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Membership",
+    "owner_tasks": [
+      "R03-T01",
+      "R04-T01"
+    ],
+    "field_count": 44,
+    "constraints": [
+      "@@unique([tenantId, expertAssignmentId, userId])",
+      "@@unique([tenantId, id, userId])",
+      "@@unique([tenantId, userId])",
+      "@@unique([tenantId, id])",
+      "@@index([userId, status])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Service",
+    "owner_tasks": [
+      "R03-T01"
+    ],
+    "field_count": 42,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, name])",
+      "@@index([tenantId, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ProcessingPurpose",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 21,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Recipient",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 25,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Subprocessor",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 13,
+    "constraints": [
+      "@@unique([tenantId, serviceId, emailHash])",
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, serviceId, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SubprocessorNotice",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 13,
+    "constraints": [
+      "@@unique([tenantId, subprocessorId, contentHash])",
+      "@@index([tenantId, serviceId, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "PurposeRecipient",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 6,
+    "constraints": [
+      "@@id([tenantId, purposeId, recipientId])",
+      "@@index([tenantId, recipientId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "PurposeRevision",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 9,
+    "constraints": [
+      "@@unique([tenantId, purposeId, version])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "RecipientRevision",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 9,
+    "constraints": [
+      "@@unique([tenantId, recipientId, version])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ServiceGrant",
+    "owner_tasks": [
+      "R03-T01",
+      "R04-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@unique([tenantId, memberId, serviceId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "AccessRequest",
+    "owner_tasks": [
+      "R03-T01",
+      "R04-T01",
+      "R24-T01"
+    ],
+    "field_count": 16,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, requesterId, createdAt, id])",
+      "@@index([tenantId, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ExpertAssignment",
+    "owner_tasks": [
+      "R04-T01"
+    ],
+    "field_count": 15,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, id, expertUserId])",
+      "@@unique([tenantId, expertUserId])",
+      "@@index([expertUserId, status, expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ExpertAssignmentService",
+    "owner_tasks": [
+      "R04-T01"
+    ],
+    "field_count": 6,
+    "constraints": [
+      "@@unique([tenantId, assignmentId, serviceId])",
+      "@@index([tenantId, serviceId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ComplianceExportJob",
+    "owner_tasks": [
+      "R23-T01"
+    ],
+    "field_count": 24,
+    "constraints": [
+      "@@unique([tenantId, memberId, requestKeyHash])",
+      "@@index([tenantId, memberId, closeId, createdAt, id])",
+      "@@index([status, leaseUntil, createdAt])",
+      "@@index([expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ComplianceClose",
+    "owner_tasks": [
+      "R23-T01"
+    ],
+    "field_count": 9,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceKey, month])",
+      "@@index([tenantId, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SecurityPolicy",
+    "owner_tasks": [
+      "R06-T01"
+    ],
+    "field_count": 21,
+    "constraints": [],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "RetentionRule",
+    "owner_tasks": [
+      "R16-T01"
+    ],
+    "field_count": 11,
+    "constraints": [
+      "@@unique([tenantId, serviceId])",
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, status, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SsoProvider",
+    "owner_tasks": [
+      "R07-T01"
+    ],
+    "field_count": 22,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, enabled])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SsoState",
+    "owner_tasks": [
+      "R07-T01"
+    ],
+    "field_count": 18,
+    "constraints": [
+      "@@index([expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "VirtualOrgMember",
+    "owner_tasks": [
+      "R07-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@unique([providerId, orgCode, employeeNo])",
+      "@@unique([orgCode, employeeNo])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "PasswordHistory",
+    "owner_tasks": [
+      "R02-T01",
+      "R06-T01"
+    ],
+    "field_count": 5,
+    "constraints": [
+      "@@index([userId, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "PasswordDeferral",
+    "owner_tasks": [
+      "R02-T01",
+      "R06-T01"
+    ],
+    "field_count": 13,
+    "constraints": [
+      "@@unique([tenantId, memberId])",
+      "@@index([userId])",
+      "@@index([expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "MfaException",
+    "owner_tasks": [
+      "R06-T01"
+    ],
+    "field_count": 11,
+    "constraints": [
+      "@@unique([tenantId, memberId])",
+      "@@index([tenantId, expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "IpAccessPolicy",
+    "owner_tasks": [
+      "R06-T01"
+    ],
+    "field_count": 6,
+    "constraints": [],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "IpRule",
+    "owner_tasks": [
+      "R06-T01"
+    ],
+    "field_count": 9,
+    "constraints": [
+      "@@unique([tenantId, cidr])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Invitation",
+    "owner_tasks": [
+      "R04-T01"
+    ],
+    "field_count": 14,
+    "constraints": [
+      "@@index([tenantId, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "AuditEvent",
+    "owner_tasks": [
+      "R22-T01",
+      "R23-T01"
+    ],
+    "field_count": 13,
+    "constraints": [
+      "@@unique([tenantId, serviceId, id, actorId])",
+      "@@index([tenantId, createdAt, id])",
+      "@@index([actorId, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "FileObject",
+    "owner_tasks": [
+      "R11-T01",
+      "R14-T01",
+      "R16-T01",
+      "R18-T01"
+    ],
+    "field_count": 35,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, ownerId])",
+      "@@index([tenantId, serviceId, status])",
+      "@@index([tenantId, submissionId, questionId])",
+      "@@index([status, expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Sender",
+    "owner_tasks": [
+      "R17-T01",
+      "R18-T01"
+    ],
+    "field_count": 27,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, channel, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SenderVerification",
+    "owner_tasks": [
+      "R17-T01",
+      "R18-T01"
+    ],
+    "field_count": 18,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([senderId, generation, method, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SenderEvent",
+    "owner_tasks": [
+      "R17-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@unique([senderId, version])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Job",
+    "owner_tasks": [
+      "R16-T01"
+    ],
+    "field_count": 28,
+    "constraints": [
+      "@@index([status, dueAt])",
+      "@@index([payloadErasedAt, localCopyErasedAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "JobAttempt",
+    "owner_tasks": [
+      "R01-T01"
+    ],
+    "field_count": 9,
+    "constraints": [
+      "@@index([jobId, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "IdempotencyRecord",
+    "owner_tasks": [
+      "R01-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@unique([scope, key])",
+      "@@index([expiresAt])",
+      "@@index([tenantId, resourceType, resourceId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ApiRateLimit",
+    "owner_tasks": [
+      "R01-T01"
+    ],
+    "field_count": 3,
+    "constraints": [],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Form",
+    "owner_tasks": [
+      "R08-T01",
+      "R09-T01"
+    ],
+    "field_count": 22,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "FormVersion",
+    "owner_tasks": [
+      "R08-T01",
+      "R09-T01"
+    ],
+    "field_count": 31,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, formId, id])",
+      "@@unique([formId, number])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Question",
+    "owner_tasks": [
+      "R08-T01"
+    ],
+    "field_count": 17,
+    "constraints": [
+      "@@unique([tenantId, formVersionId, id])",
+      "@@unique([tenantId, formVersionId, stableKey])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "QuestionOption",
+    "owner_tasks": [
+      "R08-T01"
+    ],
+    "field_count": 5,
+    "constraints": [
+      "@@unique([questionId, value])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "FormFavorite",
+    "owner_tasks": [
+      "R08-T01"
+    ],
+    "field_count": 5,
+    "constraints": [
+      "@@id([tenantId, memberId, formId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ApprovalRequest",
+    "owner_tasks": [
+      "R09-T01"
+    ],
+    "field_count": 22,
+    "constraints": [
+      "@@unique([tenantId, formId, formVersionId, id])",
+      "@@index([tenantId, status, createdAt, id])",
+      "@@index([formId, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "FormTemplate",
+    "owner_tasks": [
+      "R08-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@index([tenantId, status])",
+      "@@unique([tenantId, serviceId, title])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Publication",
+    "owner_tasks": [
+      "R09-T01"
+    ],
+    "field_count": 21,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, id, formVersionId])",
+      "@@unique([tenantId, formId, formVersionId, approvalId])",
+      "@@unique([tenantId, formId, id, formVersionId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "FixedUrl",
+    "owner_tasks": [
+      "R09-T01"
+    ],
+    "field_count": 10,
+    "constraints": [
+      "@@index([tenantId, status])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Submission",
+    "owner_tasks": [
+      "R11-T01",
+      "R14-T01",
+      "R16-T01",
+      "R23-T01"
+    ],
+    "field_count": 35,
+    "constraints": [
+      "@@unique([tenantId, importJobId, importRowNo])",
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, id, formVersionId])",
+      "@@index([tenantId, formVersionId, submittedAt, id])",
+      "@@index([tenantId, submittedAt])",
+      "@@index([status, retentionUntil])",
+      "@@index([tenantId, subjectId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Answer",
+    "owner_tasks": [
+      "R11-T01",
+      "R14-T01"
+    ],
+    "field_count": 9,
+    "constraints": [
+      "@@unique([submissionId, questionId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ConsentReceipt",
+    "owner_tasks": [
+      "R11-T01"
+    ],
+    "field_count": 13,
+    "constraints": [
+      "@@unique([tenantId, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ConsentEvent",
+    "owner_tasks": [
+      "R11-T01"
+    ],
+    "field_count": 7,
+    "constraints": [],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Correction",
+    "owner_tasks": [
+      "R11-T01"
+    ],
+    "field_count": 10,
+    "constraints": [
+      "@@unique([tenantId, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "CorrectionPayload",
+    "owner_tasks": [
+      "R11-T01"
+    ],
+    "field_count": 6,
+    "constraints": [
+      "@@unique([tenantId, correctionId])",
+      "@@index([tenantId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SubmissionNote",
+    "owner_tasks": [
+      "R11-T01"
+    ],
+    "field_count": 10,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, submissionId, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "DestructionRequest",
+    "owner_tasks": [
+      "R16-T01"
+    ],
+    "field_count": 31,
+    "constraints": [
+      "@@unique([tenantId, id, submissionId, serviceId])",
+      "@@index([tenantId, serviceId, createdAt, id])",
+      "@@index([status, dueAt, nextAttemptAt])",
+      "@@index([tenantId, submissionId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "DestructionCertificate",
+    "owner_tasks": [
+      "R16-T01"
+    ],
+    "field_count": 15,
+    "constraints": [
+      "@@unique([tenantId, submissionId])",
+      "@@unique([tenantId, requestId, submissionId, serviceId])",
+      "@@index([tenantId, serviceId, completedAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ImportJob",
+    "owner_tasks": [
+      "R14-T01"
+    ],
+    "field_count": 43,
+    "constraints": [
+      "@@unique([tenantId, serviceId, fileId])",
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, id, formVersionId])",
+      "@@index([tenantId, serviceId, status, createdAt, id])",
+      "@@index([status, leaseUntil, nextAttemptAt])",
+      "@@index([expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ImportRow",
+    "owner_tasks": [
+      "R14-T01"
+    ],
+    "field_count": 16,
+    "constraints": [
+      "@@unique([tenantId, jobId, rowNo])",
+      "@@index([tenantId, jobId, status, rowNo])",
+      "@@index([submissionId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ImportEvidence",
+    "owner_tasks": [
+      "R14-T01"
+    ],
+    "field_count": 7,
+    "constraints": [
+      "@@unique([tenantId, submissionId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Document",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 21,
+    "constraints": [
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "DocumentPurpose",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 6,
+    "constraints": [
+      "@@id([tenantId, documentId, purposeId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "DocumentRecipient",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 6,
+    "constraints": [
+      "@@id([tenantId, documentId, recipientId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "DocumentVersion",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 14,
+    "constraints": [
+      "@@unique([tenantId, serviceId, documentId, id])",
+      "@@unique([documentId, number])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "DocumentPdf",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@unique([tenantId, serviceId, documentId, documentVersionId])",
+      "@@index([tenantId, serviceId, documentId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "DocumentPublication",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 14,
+    "constraints": [
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, documentId, status])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ClauseTemplate",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 11,
+    "constraints": [
+      "@@index([tenantId, serviceId, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ServiceConsentDisplay",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 18,
+    "constraints": [
+      "@@unique([tenantId, serviceId, kind])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "FormDocumentBinding",
+    "owner_tasks": [
+      "R08-T01",
+      "R10-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@unique([formVersionId, documentId])",
+      "@@unique([formVersionId, order])",
+      "@@index([tenantId, serviceId, documentVersionId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ShareGrant",
+    "owner_tasks": [
+      "R12-T01"
+    ],
+    "field_count": 20,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, id, formVersionId])",
+      "@@index([tenantId, formId, createdAt, id])",
+      "@@index([expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ShareField",
+    "owner_tasks": [
+      "R12-T01"
+    ],
+    "field_count": 6,
+    "constraints": [
+      "@@id([grantId, questionId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ViewerChallenge",
+    "owner_tasks": [
+      "R12-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@unique([tenantId, grantId, id])",
+      "@@index([grantId, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ViewerSession",
+    "owner_tasks": [
+      "R12-T01"
+    ],
+    "field_count": 11,
+    "constraints": [
+      "@@index([grantId, expiresAt])",
+      "@@unique([tenantId, grantId, challengeId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "DataSubject",
+    "owner_tasks": [
+      "R13-T01"
+    ],
+    "field_count": 11,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceId, identityHash])",
+      "@@index([nameHash, emailHash])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SubjectAccessRequest",
+    "owner_tasks": [
+      "R13-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@index([expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SubjectAccessScope",
+    "owner_tasks": [
+      "R13-T01"
+    ],
+    "field_count": 5,
+    "constraints": [
+      "@@id([requestId, subjectId])",
+      "@@index([tenantId, subjectId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SubjectSession",
+    "owner_tasks": [
+      "R13-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@index([expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SubjectWithdrawal",
+    "owner_tasks": [
+      "R13-T01",
+      "R15-T01"
+    ],
+    "field_count": 10,
+    "constraints": [
+      "@@index([sessionId, submissionId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Suppression",
+    "owner_tasks": [
+      "R13-T01",
+      "R15-T01"
+    ],
+    "field_count": 10,
+    "constraints": [
+      "@@unique([tenantId, serviceId, emailHash, channel])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "MarketingPreference",
+    "owner_tasks": [
+      "R15-T01",
+      "R23-T01"
+    ],
+    "field_count": 25,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceId, channel, contactHash])",
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, status, createdAt, id])",
+      "@@index([sourceSubmissionId])",
+      "@@index([tenantId, serviceId, nameHash])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "MarketingEvent",
+    "owner_tasks": [
+      "R15-T01"
+    ],
+    "field_count": 9,
+    "constraints": [
+      "@@unique([preferenceId, version])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "KakaoChannel",
+    "owner_tasks": [
+      "R19-T01"
+    ],
+    "field_count": 11,
+    "constraints": [
+      "@@unique([tenantId, serviceId, searchId])",
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, serviceId, status, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "KakaoTemplate",
+    "owner_tasks": [
+      "R19-T01"
+    ],
+    "field_count": 15,
+    "constraints": [
+      "@@unique([tenantId, serviceId, name])",
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, channelId, status])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "KakaoMockReceipt",
+    "owner_tasks": [
+      "R19-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@index([tenantId, templateId, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SmsReceipt",
+    "owner_tasks": [
+      "R17-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@unique([deliveryId, attempt])",
+      "@@index([tenantId, createdAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "Campaign",
+    "owner_tasks": [
+      "R17-T01",
+      "R18-T01",
+      "R19-T01"
+    ],
+    "field_count": 38,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, channel, status, createdAt, id])",
+      "@@index([expiresAt, status])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "CampaignDelivery",
+    "owner_tasks": [
+      "R17-T01",
+      "R18-T01",
+      "R19-T01"
+    ],
+    "field_count": 23,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([campaignId, contactHash])",
+      "@@index([campaignId, status, position, id])",
+      "@@index([sourceSubmissionId])",
+      "@@index([preferenceId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "CampaignEvent",
+    "owner_tasks": [
+      "R17-T01",
+      "R18-T01",
+      "R19-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@unique([campaignId, version])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "MessageTemplate",
+    "owner_tasks": [
+      "R17-T01",
+      "R18-T01"
+    ],
+    "field_count": 15,
+    "constraints": [
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, channel, status, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "MessageTemplateRevision",
+    "owner_tasks": [
+      "R17-T01",
+      "R18-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@id([templateId, version])",
+      "@@unique([tenantId, serviceId, templateId, version])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "EmailFeedback",
+    "owner_tasks": [
+      "R18-T01"
+    ],
+    "field_count": 16,
+    "constraints": [
+      "@@unique([tenantId, serviceId, contactHash, id])",
+      "@@index([tenantId, serviceId, contactHash, kind, occurredAt])",
+      "@@index([jobId, kind])",
+      "@@index([deliveryId, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "NotificationIntegration",
+    "owner_tasks": [
+      "R20-T01"
+    ],
+    "field_count": 19,
+    "constraints": [
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "NotificationSubscription",
+    "owner_tasks": [
+      "R20-T01"
+    ],
+    "field_count": 7,
+    "constraints": [
+      "@@unique([integrationId, kind])",
+      "@@index([tenantId, serviceId, kind])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "NotificationEvent",
+    "owner_tasks": [
+      "R20-T01"
+    ],
+    "field_count": 13,
+    "constraints": [
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, occurredAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "NotificationDelivery",
+    "owner_tasks": [
+      "R20-T01"
+    ],
+    "field_count": 23,
+    "constraints": [
+      "@@unique([integrationId, eventId])",
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([status, nextAttemptAt, leaseUntil])",
+      "@@index([integrationId, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "NotificationAttempt",
+    "owner_tasks": [
+      "R20-T01"
+    ],
+    "field_count": 9,
+    "constraints": [
+      "@@unique([deliveryId, number])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "EmailSuppression",
+    "owner_tasks": [
+      "R18-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@unique([tenantId, serviceId, contactHash, reason])",
+      "@@index([tenantId, serviceId, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ExportJob",
+    "owner_tasks": [
+      "R11-T01",
+      "R22-T01"
+    ],
+    "field_count": 28,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, requesterId, requestKeyHash])",
+      "@@index([tenantId, requesterId, formId, createdAt, id])",
+      "@@index([status, leaseUntil, createdAt])",
+      "@@index([expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ExportChunk",
+    "owner_tasks": [
+      "R11-T01"
+    ],
+    "field_count": 7,
+    "constraints": [
+      "@@unique([jobId, number])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ExportSource",
+    "owner_tasks": [
+      "R11-T01",
+      "R16-T01"
+    ],
+    "field_count": 8,
+    "constraints": [
+      "@@unique([jobId, rowNo])",
+      "@@unique([jobId, submissionId])",
+      "@@index([tenantId, submissionId, jobId])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "VerificationIntegration",
+    "owner_tasks": [
+      "R13-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@unique([tenantId, serviceId])",
+      "@@unique([tenantId, serviceId, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "VerificationIntegrationRevision",
+    "owner_tasks": [
+      "R13-T01"
+    ],
+    "field_count": 12,
+    "constraints": [
+      "@@unique([tenantId, serviceId, integrationId, version])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "VerificationAttempt",
+    "owner_tasks": [
+      "R13-T01"
+    ],
+    "field_count": 28,
+    "constraints": [
+      "@@unique([tenantId, serviceId, id])",
+      "@@index([tenantId, serviceId, status, expiresAt])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "VerificationEvent",
+    "owner_tasks": [
+      "R13-T01"
+    ],
+    "field_count": 11,
+    "constraints": [
+      "@@unique([tenantId, serviceId, attemptId, id])",
+      "@@unique([attemptId, providerEventHash])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "VerificationReceipt",
+    "owner_tasks": [
+      "R13-T01"
+    ],
+    "field_count": 19,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@unique([tenantId, serviceId, attemptId])",
+      "@@unique([tenantId, submissionId, kind])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ActivityReview",
+    "owner_tasks": [
+      "R05-T01",
+      "R22-T01"
+    ],
+    "field_count": 24,
+    "constraints": [
+      "@@unique([tenantId, id])",
+      "@@index([tenantId, recipientId, status, createdAt, id])",
+      "@@index([tenantId, requesterId, status, createdAt, id])",
+      "@@index([tenantId, serviceId, status, createdAt, id])",
+      "@@index([destructionStatus, retentionUntil])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "ActivityReviewMessage",
+    "owner_tasks": [
+      "R05-T01",
+      "R22-T01"
+    ],
+    "field_count": 9,
+    "constraints": [
+      "@@index([tenantId, reviewId, createdAt, id])"
+    ],
+    "current_status": "schema_present_runtime_unverified"
+  },
+  {
+    "model": "SsoLoginPolicy",
+    "owner_tasks": [
+      "R07-T01"
+    ],
+    "field_count": 4,
+    "constraints": [
+      "tenant PK/FK",
+      "mode NONE/AZURE/GOOGLE",
+      "version > 0"
+    ],
+    "current_status": "schema_verified_policy_api_and_enforcement_pending"
+  },
+  {
+    "model": "SsoSessionProof",
+    "owner_tasks": [
+      "R07-T01"
+    ],
+    "field_count": 7,
+    "constraints": [
+      "session PK",
+      "session/user composite FK",
+      "provider/tenant composite FK",
+      "account/provider/user composite FK",
+      "UPDATE forbidden"
+    ],
+    "current_status": "local_protocol_mfa_http_and_restart_verified"
+  },
+  {
+    "model": "DocumentPolicyDraft",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 6,
+    "constraints": [
+      "@@unique([tenantId, serviceId, documentId])"
+    ],
+    "current_status": "existing_implementation_precedes_this_checkpoint",
+    "note": "Existing schema discovered missing from the ownership index; implementation not newly added in R07."
+  },
+  {
+    "model": "DocumentVersionRecipient",
+    "owner_tasks": [
+      "R10-T01"
+    ],
+    "field_count": 7,
+    "constraints": [
+      "@@id([tenantId, documentVersionId, recipientId], map: \"DocumentVersionRecipient_pkey\")",
+      "@@index([tenantId, serviceId, recipientId], map: \"DocumentVersionRecipient_recipient_idx\")"
+    ],
+    "current_status": "existing_implementation_precedes_this_checkpoint",
+    "note": "Existing schema discovered missing from the ownership index; implementation not newly added in R07."
+  }
+]

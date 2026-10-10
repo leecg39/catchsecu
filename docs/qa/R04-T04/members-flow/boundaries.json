@@ -1,0 +1,62 @@
+{
+  "result": "passed",
+  "cases": [
+    {
+      "label": "restored member can read granted service",
+      "status": 200
+    },
+    {
+      "label": "other service is denied",
+      "status": 403,
+      "code": "SERVICE_FORBIDDEN"
+    },
+    {
+      "label": "viewer cannot list members",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "label": "viewer cannot create form",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "label": "foreign tenant cannot read member",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "label": "foreign tenant cannot change member",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "label": "owner cannot remove self",
+      "status": 409,
+      "code": "SELF_PERMISSION_CHANGE"
+    },
+    {
+      "label": "owner cannot change self role",
+      "status": 409,
+      "code": "SELF_PERMISSION_CHANGE"
+    },
+    {
+      "label": "ownership requires current password",
+      "status": 401,
+      "code": "PASSWORD_REQUIRED"
+    },
+    {
+      "label": "company owner is not platform admin",
+      "status": 403,
+      "code": "PLATFORM_ADMIN_REQUIRED"
+    },
+    {
+      "label": "company owner cannot list expert options",
+      "status": 403,
+      "code": "PLATFORM_ADMIN_REQUIRED"
+    }
+  ],
+  "memberVersionUnchanged": 7,
+  "activeOwners": 1,
+  "independentHttpSession": true
+}

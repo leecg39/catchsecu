@@ -5,5 +5,8 @@ import { ssoRoute } from "@/server/sso-route";
 
 export const POST = ssoRoute(async request => {
   const input = await body(request, ssoInvitationStart);
-  return json(await startSso(input.providerId, "invite", request.headers, input.token));
+  const { redirect, browserCookie } = await startSso(input.providerId, "invite", request.headers, input.token);
+  const response = json({ redirect });
+  response.headers.append("set-cookie", browserCookie);
+  return response;
 });

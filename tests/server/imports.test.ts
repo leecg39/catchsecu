@@ -53,6 +53,9 @@ async function signup(name: string, role: Role, company = tenant) {
   expect(response.status).toBe(200); cookies[name] = response.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
 }
 beforeAll(async () => {
+  // A killed test process cannot run finally; remove only this suite's delay hook.
+  await db.$executeRawUnsafe('DROP TRIGGER IF EXISTS qa_import_cache_delay ON "IdempotencyRecord"');
+  await db.$executeRawUnsafe('DROP FUNCTION IF EXISTS qa_import_cache_delay()');
   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit" CASCADE');
   for (const id of [tenant, foreign]) await db.company.create({ data: { id, name: id, publicName: id, policy: { create: {} } } });
   for (const [id, tenantId] of [[service, tenant], [second, tenant], [foreignService, foreign]])
@@ -62,6 +65,8 @@ beforeAll(async () => {
 beforeEach(async () => { await db.apiRateLimit.deleteMany(); await db.rateLimit.deleteMany(); });
 const barriers: object[] = [];
 afterAll(async () => {
+  await db.$executeRawUnsafe('DROP TRIGGER IF EXISTS qa_import_cache_delay ON "IdempotencyRecord"');
+  await db.$executeRawUnsafe('DROP FUNCTION IF EXISTS qa_import_cache_delay()');
   const folder = resolve("docs/qa/P07-T01"); await mkdir(folder, { recursive: true });
   await writeFile(resolve(folder, "lock-barriers.json"), JSON.stringify({ isolatedDatabase: true, providerVerified: false, barriers }, null, 2) + "\n");
   await db.$disconnect();

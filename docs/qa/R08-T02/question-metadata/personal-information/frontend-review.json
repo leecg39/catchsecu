@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 1,
+  "author": "bundle_analysis",
+  "reviewType": "read-only UI source review",
+  "scope": {
+    "ownedOutput": "docs/qa/R08-T02/question-metadata/personal-information/frontend-review.json",
+    "productWrites": false,
+    "dbAccess": false,
+    "browserAccess": false,
+    "serverExecution": false,
+    "testsExecuted": false,
+    "description": "지정된 UI 6개 파일·스타일·렌더 시험과 새 계약 helper, 확정 PLAN/원본 보존 근거를 대조. 공통 Modal/Confirm/dirty guard는 기존 동작 의존성을 읽음. backend 연결·마이그레이션 정확성은 본 검토 범위 밖."
+  },
+  "outcome": {
+    "confirmedDefects": 0,
+    "blockingFindings": [],
+    "statement": "검토한 소스에서 재현 조건이 확정되는 UI 결함을 찾지 못함. 실행 검증 통과를 의미하지 않음."
+  },
+  "checks": [
+    {
+      "id": "PI-UI-01",
+      "topic": "요약 및 추가·중복 metadata",
+      "status": "source-consistent",
+      "locations": [
+        {
+          "file": "src/components/forms/QuestionPersonalInformation.tsx",
+          "start": 9,
+          "end": 16
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 33,
+          "end": 37
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 53,
+          "end": 65
+        }
+      ],
+      "conclusion": "없음/[]는 요약을 렌더하지 않는다. 배열을 정렬·중복제거하지 않고 map하여 같은 분류/이름 및 NONE 혼합 순서가 유지된다. 편집은 value shallow copy와 독립 UUID key를 사용하여 같은 값 항목도 개별 수정/삭제한다."
+    },
+    {
+      "id": "PI-UI-02",
+      "topic": "NONE·이름·문자 상한",
+      "status": "source-consistent",
+      "locations": [
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 83,
+          "end": 90
+        },
+        {
+          "file": "src/contracts/question-personal-information.ts",
+          "start": 3,
+          "end": 23
+        }
+      ],
+      "conclusion": "NONE 선택시 name을 정확한 빈 문자열로 바꾸고 이름 입력을 숨긴다. 그 외는 50 UTF-16 native maxLength와 schema 검사, trim-empty/NUL/잘못된 Unicode 거절. raw name을 trim하여 저장하지 않는다. None에서 다른 분류로 바꾸면 이름이 빈 상태여서 적용 전 입력이 필요하다."
+    },
+    {
+      "id": "PI-UI-03",
+      "topic": "RESIDENT·required",
+      "status": "source-consistent",
+      "locations": [
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 44,
+          "end": 51
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 61,
+          "end": 66
+        },
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "start": 136,
+          "end": 149
+        }
+      ],
+      "conclusion": "적용은 hasResident(values)||question.required를 같은 callback으로 보낸다. 기존 분류 제거·일반 분류 변경·전체 제거에서도 required=true를 자동 해제하지 않는다. 필수 input은 RESIDENT 때 disabled이고 handler도 false 전환을 거절한다. 변경 사유 안내를 함께 표시한다."
+    },
+    {
+      "id": "PI-UI-04",
+      "topic": "행렬 전환",
+      "status": "source-consistent",
+      "locations": [
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "start": 123,
+          "end": 135
+        },
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "start": 149,
+          "end": 149
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 19,
+          "end": 21
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 61,
+          "end": 64
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 83,
+          "end": 87
+        }
+      ],
+      "conclusion": "NONE 이외 항목이 한 개라도 있으면 행렬 option을 비활성화하고 handler도 거절한다. 데이터 자동 삭제 없음. 행렬에서 새 분류는 NONE이며 다른 enum 선택을 UI와 apply 둘 다 막는다. NONE+PERSONAL 혼합도 동일 차단한다."
+    },
+    {
+      "id": "PI-UI-05",
+      "topic": "질문 ID·snapshot·async 전체 제거",
+      "status": "source-consistent-with-runtime-limit",
+      "locations": [
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 15,
+          "end": 17
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 29,
+          "end": 30
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 44,
+          "end": 51
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 57,
+          "end": 66
+        },
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "start": 122,
+          "end": 122
+        },
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "start": 147,
+          "end": 147
+        }
+      ],
+      "conclusion": "Panel key와 callback 대상은 question.id이다. snapshot은 id/type/required/label/list를 포함한다. apply 전 현재 snapshot 비교, 전체 제거는 confirm 전에 받은 snapshot과 await 후 latest.current를 다시 비교한다. 거절시 부모 state를 쓰지 않고 오류를 알린다. React commit·effect·확인 Promise의 실제 타이밍과 unmount 도중 상위 hook 동작은 미실행이라 별도 실행 확인이 필요하다."
+    },
+    {
+      "id": "PI-UI-06",
+      "topic": "dirty·취소·busy",
+      "status": "source-consistent-with-runtime-limit",
+      "locations": [
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 31,
+          "end": 42
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 53,
+          "end": 58
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 77,
+          "end": 105
+        },
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "start": 147,
+          "end": 147
+        }
+      ],
+      "conclusion": "임시 목록을 original JSON과 비교해 navigation guard를 등록한다. dirty 취소/Escape/닫기는 confirm 후 닫고 busy일 때 거절한다. 적용 전까지 부모에 반영하지 않는다. 필드·추가·삭제·적용은 disabled와 handler guard가 있다. 모달 내 전부 삭제 후 적용은 제거 안내문과 적용 동작을 거치며, 외부 전체 제거 버튼은 별도 확인 dialog를 거친다."
+    },
+    {
+      "id": "PI-UI-07",
+      "topic": "관리 요약·응답 정정",
+      "status": "source-consistent",
+      "locations": [
+        {
+          "file": "src/components/forms/QuestionSummary.tsx",
+          "start": 7,
+          "end": 11
+        },
+        {
+          "file": "src/components/forms/SubmissionDetail.tsx",
+          "start": 128,
+          "end": 130
+        },
+        {
+          "file": "src/components/forms/SubmissionDetail.tsx",
+          "start": 153,
+          "end": 155
+        }
+      ],
+      "conclusion": "같은 평문 컴포넌트를 관리 요약과 응답 상세/정정 필드에 사용한다. 정정에는 별도 분류 편집기를 넣지 않는다. 읽기 상태와 정정 상태는 서로 다른 분기이므로 같은 질문의 분류 요약을 중복 렌더하지 않는다. 원래 게시 버전 metadata를 서버가 전달하는 계약은 기존 plan-review 근거이며 이번에는 backend 완료를 새로 판정하지 않는다."
+    },
+    {
+      "id": "PI-UI-08",
+      "topic": "언어·원본 차이",
+      "status": "intentional-local-contract",
+      "locations": [
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 19,
+          "end": 21
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 24,
+          "end": 37
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 81,
+          "end": 99
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformation.tsx",
+          "start": 12,
+          "end": 15
+        }
+      ],
+      "conclusion": "관리 UI는 formLanguage를 기준으로 배열을 축소하지 않으며 모든 항목을 편집한다. 원본 비한국어의 단일 항목 중심 UI와 다른 것으로 PLAN에 명시되어 있다. 새 일반 문항은 PERSONAL_INFORMATION, 행렬은 NONE을 초기 선택하며 원본 kRt의 미선택 초기값과 차이가 있다. 이 값은 모달 임시 상태이며 이름 없이 일반 분류 적용은 거절된다. 전 언어 공개 시스템 문구 번역 완료를 뜻하지 않는다."
+    },
+    {
+      "id": "PI-UI-09",
+      "topic": "공개 표면",
+      "status": "ui-scope-only",
+      "locations": [
+        {
+          "file": "src/components/forms/QuestionSummary.tsx",
+          "start": 7,
+          "end": 11
+        },
+        {
+          "file": "src/components/forms/SubmissionDetail.tsx",
+          "start": 128,
+          "end": 155
+        }
+      ],
+      "conclusion": "새 summary가 연결된 지정 변경은 관리 요약/응답 상세다. 공개 input/render 컴포넌트에 분류 UI를 추가하는 코드 변경은 이 범위에 없다. 공개 JSON projection 제거는 backend 작업 중이며 이번 검토에서 비노출 통과를 주장하지 않는다. 일반 토큰·고정URL의 키 부재 시험은 root/backend 수용 항목이다."
+    },
+    {
+      "id": "PI-UI-10",
+      "topic": "평문·공백·a11y·모바일",
+      "status": "static-evidence-only",
+      "locations": [
+        {
+          "file": "src/components/forms/QuestionPersonalInformation.tsx",
+          "start": 12,
+          "end": 16
+        },
+        {
+          "file": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+          "start": 74,
+          "end": 104
+        },
+        {
+          "file": "src/components/forms/forms.css",
+          "start": 18,
+          "end": 18
+        }
+      ],
+      "conclusion": "이름과 enum 라벨은 React text이며 HTML 삽입 없음. 이름은 dir=auto, white-space:pre-wrap 및 overflow-wrap:anywhere로 표시한다. label/select/input/fieldset/legend, list aria-label, role=alert를 제공한다. 공통 Modal은 dialog role/label 및 useDialogFocus를 사용한다. 390/768/1440 화면 실제 레이아웃, 실제 스크린리더·중첩 confirm focus 복귀는 미검증이다."
+    }
+  ],
+  "testsRead": [
+    {
+      "file": "tests/server/question-personal-information-render.test.ts",
+      "tests": 2,
+      "coverage": [
+        "분류 unset/[] 요약 없음",
+        "XSS escaping·원문 공백·NONE 이름 span 없음·자동 분석 표현 없음"
+      ],
+      "notCovered": [
+        "모달 클릭/Enter/Escape/포커스",
+        "dirty/async confirm 완료 전 질문 변경·busy·unmount",
+        "행렬·RESIDENT UI 상태 전환",
+        "언어 변경·공개 API·버전·DB"
+      ],
+      "executedByThisAgent": false
+    }
+  ],
+  "sourceFidelity": {
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "bundleSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "report": "docs/qa/R08-T02/question-metadata/remaining-source-review/source-review.json",
+    "excerptIds": [
+      "pi_enum",
+      "pi_confirm",
+      "pi_manual",
+      "pi_ko_input",
+      "pi_ko_list",
+      "pi_title_detection",
+      "resident_required"
+    ],
+    "differencesAlreadyScoped": [
+      "NLP/feedback 엔진 없음, 수동 USER/null만 사용",
+      "문항당20은 독립 상한",
+      "언어 공통 복수 편집",
+      "배치 모달 적용이며 원본 항목별 확인/편집과 다름",
+      "제목·전체 폼 복제·템플릿은 수동 metadata 보존",
+      "행렬 전환의 명시 차단, RESIDENT 자동 질문 타입 변환 없음",
+      "공개 API 비노출은 독립 로컬 정책"
+    ],
+    "additionalObservedUiDifference": "새 일반 항목의 분류 기본값이 PERSONAL_INFORMATION(원본 빈 선택값); 행렬 새 항목은 NONE. PLAN과 충돌하는 필수 규칙은 확인되지 않음."
+  },
+  "limitations": [
+    "읽기 전용이므로 UI 이벤트나 브라우저 렌더를 실행하지 않았다.",
+    "새 helper와 UI 소스의 정합만 점검했다. backend/DB 연결·공개 JSON 필드 제거·이관·실제 오류코드 완료 여부는 별도 담당자 영역이다.",
+    "비동기 작업 종료·라우트 이동·컴포넌트 unmount 경합은 상위 draft/confirm 생명주기와 함께 실제 수용이 필요하며 소스만으로 확정 결함을 판정하지 않았다.",
+    "원본 서버·라이브 분류 화면의 실행/권한·라이선스는 미관측이다."
+  ],
+  "verification": {
+    "productsModified": false,
+    "testsRun": false,
+    "onlyArtifactJsonWritten": true,
+    "allLocalPathsExist": true,
+    "allLineReferencesInRange": true,
+    "snapshotCount": 13
+  },
+  "recordedAtUtc": "2026-10-10T06:57:46.071Z",
+  "fileSnapshots": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionPersonalInformation.tsx",
+      "relative": "src/components/forms/QuestionPersonalInformation.tsx",
+      "sha256": "7ed2eb9513238935ec5143ed9b9268674c92ca0efe48d3282ce51ab501453eb8",
+      "bytes": 1122,
+      "lines": 19
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionPersonalInformationEditor.tsx",
+      "relative": "src/components/forms/QuestionPersonalInformationEditor.tsx",
+      "sha256": "8e1ff405fffc1d8079238bc0efcf2f5aee898cc1869c8947e5f04e89a9e9d744",
+      "bytes": 8612,
+      "lines": 108
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/question-personal-information.ts",
+      "relative": "src/contracts/question-personal-information.ts",
+      "sha256": "d71850f7e086caa59c98739a4eda299de2bb73bb3f0cdba3bd4781718ad1c98b",
+      "bytes": 4331,
+      "lines": 47
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+      "relative": "src/components/forms/FormEditor.tsx",
+      "sha256": "104ba195815bfcbf4200a3d0675f398acf400bcdf9cdca51e12b07d7604bcbab",
+      "bytes": 20888,
+      "lines": 180
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionSummary.tsx",
+      "relative": "src/components/forms/QuestionSummary.tsx",
+      "sha256": "e1acf72c619becdffbc6e88104f72c15a97d7c61f7b9863df2f6d90e6de15003",
+      "bytes": 1561,
+      "lines": 19
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+      "relative": "src/components/forms/SubmissionDetail.tsx",
+      "sha256": "5919a9069a311dfcb9229ec4272fa9c8dc3c91e2b48c1500d4e146d8a527fefb",
+      "bytes": 20936,
+      "lines": 199
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/forms.css",
+      "relative": "src/components/forms/forms.css",
+      "sha256": "b0958ee93bc93baab727bc0981946b18f3cc97854e2f31d47e5f3e37c9ea48ba",
+      "bytes": 9013,
+      "lines": 19
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-personal-information-render.test.ts",
+      "relative": "tests/server/question-personal-information-render.test.ts",
+      "sha256": "9adeb947a2bcd3b05f60f313863eee5f448bd910ae3084cc8095998ef301f704",
+      "bytes": 1769,
+      "lines": 21
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/shared.tsx",
+      "relative": "src/components/shared.tsx",
+      "sha256": "9d10bb9079ae059e3b93a4b01bcf98a536680296def8f3825bd86fa3152d4ace",
+      "bytes": 4518,
+      "lines": 15
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/ux/confirm.tsx",
+      "relative": "src/components/ux/confirm.tsx",
+      "sha256": "7dd40629e2d0bde6a718cfcbb60d17977d7558ae6fecbd8b125491014463c07d",
+      "bytes": 2463,
+      "lines": 44
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/ux/navigation-guard.tsx",
+      "relative": "src/components/ux/navigation-guard.tsx",
+      "sha256": "f26d77a57f7bd3bcbe95c606e01c7337a1faf97552ec6e838af0aa8dc5ec4778",
+      "bytes": 3493,
+      "lines": 65
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/personal-information/PLAN.md",
+      "relative": "docs/qa/R08-T02/question-metadata/personal-information/PLAN.md",
+      "sha256": "773212eeddafac5160d5d21e21da91f3c8f0a4290f2d7eed50e0e35362caf968",
+      "bytes": 5984,
+      "lines": 24
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/remaining-source-review/source-review.json",
+      "relative": "docs/qa/R08-T02/question-metadata/remaining-source-review/source-review.json",
+      "sha256": "e9d3163c55ef9f6efaa439f9731d5ec9b24c30c2fc9f1994747731b03768cc30",
+      "bytes": 99370,
+      "lines": 1008
+    }
+  ]
+}

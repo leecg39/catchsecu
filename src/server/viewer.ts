@@ -1,15 +1,18 @@
+import { readPinnedAuthorAssets } from "./author-asset-reads";
 import { randomInt, timingSafeEqual } from "node:crypto";
 import { db, type Transaction } from "./db";
 import { decrypt, opaqueToken, tokenHash } from "./crypto";
 import { fail, HttpError } from "./http";
 import { enqueueMail } from "./jobs";
 import { lockFileIssuer, fileInfo } from "./file-access";
-import { findShare, grantQuestions, type Grant } from "./sharing";
+import { findShare, grantPresentation, grantQuestions, type Grant } from "./sharing";
 import { privateFiles } from "./file-storage";
 import { validateFileBytes } from "./file-validation";
 import type { SharedSubmission, ViewerInfo } from "@/contracts/sharing";
 import type { z } from "zod";
 import type { challengeInput } from "@/contracts/sharing";
+import { fileAnswerId, isFileQuestion } from "@/contracts/drawing-questions";
+import { emptyAnswer } from "@/contracts/questions";
 
 export const VIEWER_COOKIE = "cs_viewer", CHALLENGE_COOKIE = "cs_viewer_challenge";
 const secretPattern = /^[A-Za-z0-9_-]{43}$/;
@@ -28,7 +31,7 @@ async function activeGrant(tx: Transaction, id: string, write = false) {
   const initial = await findShare(tx, id);
   if (!initial) fail(401, "VIEWER_SESSION_EXPIRED", "다시 이메일 인증을 완료해주세요.");
   const issuer = await lockFileIssuer(tx, { tenantId: initial.tenantId, member: { id: initial.createdBy }, user: { id: initial.creator.userId } },
-    initial.serviceId, ["share.manage", "submission.read", ...(initial.fields.some(f => f.question.type === "파일 업로드") ? ["file.read" as const] : [])]);
+    initial.serviceId, ["share.manage", "submission.read", ...(initial.fields.some(f => isFileQuestion(f.question.type)) ? ["file.read" as const] : [])]);
   await tx.$queryRaw`SELECT id FROM "Form" WHERE id=${initial.formId} FOR SHARE`;
   if (write) await tx.$queryRaw`SELECT id FROM "ShareGrant" WHERE id=${id} FOR UPDATE`;
   else await tx.$queryRaw`SELECT id FROM "ShareGrant" WHERE id=${id} FOR SHARE`;
@@ -36,7 +39,7 @@ async function activeGrant(tx: Transaction, id: string, write = false) {
   if (row.revokedAt || row.expiresAt <= new Date() || (form.status === "archived" && form.sourceType !== "import") || !row.fields.length)
     fail(401, "VIEWER_SESSION_EXPIRED", "공유 권한이 만료되었거나 회수되었습니다. 담당자에게 문의해주세요.");
   // Fields may have changed while waiting for the grant lock. Re-evaluate file capability.
-  if (row.fields.some(f => f.question.type === "파일 업로드")) await lockFileIssuer(tx,
+  if (row.fields.some(f => isFileQuestion(f.question.type))) await lockFileIssuer(tx,
     { tenantId: row.tenantId, member: { id: row.createdBy }, user: { id: row.creator.userId } }, row.serviceId, ["file.read"]);
   if (issuer.member.accessKind === "expert" && issuer.member.expertAssignment!.expiresAt <= new Date()) fail(401, "VIEWER_SESSION_EXPIRED", "공유 발급자의 배정 기한이 종료되었습니다.");
   if (row.expiresAt <= new Date()) fail(401, "VIEWER_SESSION_EXPIRED", "공유 권한이 만료되었습니다.");
@@ -117,7 +120,7 @@ export async function withViewer<T>(token: string | null, operation: (tx: Transa
   }, { timeout: 15000 });
 }
 export function viewerInfo(grant: Grant, session: { expiresAt: Date }): ViewerInfo {
-  return { formTitle: grant.formVersion.title, formNumber: grant.formVersion.number, questions: grantQuestions(grant),
+  return { formTitle: grant.formVersion.title, formNumber: grant.formVersion.number, questions: grantQuestions(grant), ...grantPresentation(grant),
     expiresAt: session.expiresAt.toISOString(), grantExpiresAt: grant.expiresAt.toISOString() };
 }
 export async function logoutViewer(token: string | null, requestId: string) {
@@ -144,15 +147,16 @@ async function sharedSubmission(tx: Transaction, grant: Grant, id: string, setRe
     const answer = row.answers.find(a => a.questionId === field.questionId);
     if (answer) {
       values[field.question.stableKey] = decrypt<SharedSubmission["values"][string]>(answer.valueCipher);
-      if (field.question.type === "파일 업로드" && typeof values[field.question.stableKey] === "string" && values[field.question.stableKey]) fileIds.push(values[field.question.stableKey] as string);
+      const id = fileAnswerId(values[field.question.stableKey]);
+      if (isFileQuestion(field.question.type) && id) fileIds.push(id);
     }
   }
   const files = await tx.fileObject.findMany({ where: { id: { in: fileIds }, tenantId: grant.tenantId, submissionId: id,
     formVersionId: grant.formVersionId, questionId: { in: grant.fields.map(f => f.questionId) }, status: "attached", scanStatus: "clean",
     OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] }, include: { question: { select: { stableKey: true } } } });
-  const attachments = files.filter(file => file.question && values[file.question.stableKey] === file.id).map(fileInfo);
-  for (const field of grant.fields.filter(f => f.question.type === "파일 업로드"))
-    if (!attachments.some(file => file.questionId === field.question.stableKey)) values[field.question.stableKey] = "";
+  const attachments = files.filter(file => file.question && fileAnswerId(values[file.question.stableKey]) === file.id).map(fileInfo);
+  for (const field of grant.fields.filter(f => isFileQuestion(f.question.type)))
+    if (!attachments.some(file => file.questionId === field.question.stableKey)) values[field.question.stableKey] = emptyAnswer(field.question.type);
   return { id: row.id, submittedAt: row.submittedAt.toISOString(), values, attachments };
 }
 export async function listSharedSubmissions(token: string | null, page: number, pageSize: number, requestId: string) {
@@ -202,5 +206,18 @@ export async function sharedFile(token: string | null, submissionId: string, que
       "Content-Disposition": "attachment; filename=\"attachment\"; filename*=UTF-8''" + encoded,
       "X-Content-Type-Options": "nosniff", "Content-Security-Policy": "sandbox; default-src 'none'",
       "Cache-Control": "private, no-store", "Referrer-Policy": "no-referrer" } });
+  });
+}
+
+export async function sharedAuthorAssets(token: string | null, submissionId: string, requestId: string, assetId?: string) {
+  return withViewer(token, async (tx, grant, session) => {
+    await sharedSubmission(tx, grant, submissionId, session.setResponseDeadline);
+    const pageKeys = [...new Set(grant.fields.flatMap(field => field.question.section ? [field.question.section.pageKey] : []))];
+    const selectors = [{ slots: ["material", "option", "question"], questionKeys: grant.fields.map(field => field.question.stableKey) },
+      ...(pageKeys.length ? [{ slots: ["page_content"], documentKeys: pageKeys }] : []),
+      ...(grant.shareFormBody ? [{ slots: ["form_content"], documentKeys: ["form"] }] : [])];
+    const result = await readPinnedAuthorAssets(tx, { formVersionId: grant.formVersionId, selectors }, assetId);
+    if (assetId) await viewerAudit(tx, grant, requestId, "share.author_asset_downloaded", { sessionId: session.id, submissionId, fileId: assetId });
+    return result;
   });
 }

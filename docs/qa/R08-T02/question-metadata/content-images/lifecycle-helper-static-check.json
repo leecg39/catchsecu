@@ -1,0 +1,45 @@
+{
+  "recordedAt": "2026-10-10T09:21:29.784Z",
+  "node": "v24.19.0",
+  "typescript": "5.9.3",
+  "before": {
+    "helper": "d029fd4f9495ac1e94db937a12c1030026b09d32fef92a4fa4f4b7eb3cf360ee",
+    "config": "484270f607408735cc1ab4e3068c9d767b29c061d04718e246e8bf439d8b84f0"
+  },
+  "after": {
+    "helper": "d029fd4f9495ac1e94db937a12c1030026b09d32fef92a4fa4f4b7eb3cf360ee",
+    "config": "484270f607408735cc1ab4e3068c9d767b29c061d04718e246e8bf439d8b84f0"
+  },
+  "unchangedInputs": true,
+  "results": [
+    {
+      "name": "lint",
+      "command": [
+        "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "node_modules/eslint/bin/eslint.js",
+        "scripts/qa-rea-question-images-lifecycle.ts"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/lifecycle-helper-lint.log",
+      "logSha256": "be1ba272ecc73ab53dca91b4081625cdf2503bba7f4fc982b952296bd73fce9e"
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.rea-question-images.json",
+        "--noEmit",
+        "--pretty",
+        "false"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/lifecycle-helper-typecheck.log",
+      "logSha256": "825ee445ff3b4c88e20f9b4e8e8f156f69e0fb2f89efd5dd305768485ece4c59"
+    }
+  ],
+  "scope": "Static ESLint of lifecycle helper and TypeScript noEmit of root-owned QI configuration only. No helper execution, fixture reads, DB, HTTP, browser, build, migrations or generators."
+}

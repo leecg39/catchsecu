@@ -3,6 +3,7 @@ import { isAbsolute } from "node:path";
 import { env } from "./env";
 import { fail } from "./http";
 import { MAX_FILE_BYTES } from "@/contracts/files";
+import { MAX_PRIVATE_OBJECT_BYTES } from "@/contracts/storage-limits";
 
 function unavailable(): never { fail(503, "FILE_SCANNER_UNAVAILABLE", "파일 검사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요."); }
 async function command(bytes: Buffer, timeout = 20000) {
@@ -36,8 +37,9 @@ export async function requireFileScanner() {
     fail(503, "FILE_SCANNER_OUTDATED", "파일 검사 데이터가 최신 상태가 아닙니다. 관리자에게 문의해주세요.");
   return { engine: version!.slice(0, 200), signatureUpdatedAt: new Date(updatedAt) };
 }
-export async function scanFile(bytes: Buffer) {
-  if (!bytes.length || bytes.length > MAX_FILE_BYTES) fail(413, "FILE_TOO_LARGE", "파일 크기 제한을 초과했습니다.");
+export async function scanFile(bytes: Buffer, maxBytes = MAX_FILE_BYTES) {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > MAX_PRIVATE_OBJECT_BYTES) throw new Error("Invalid trusted scan byte limit");
+  if (!bytes.length || bytes.length > maxBytes) fail(413, "FILE_TOO_LARGE", "파일 크기 제한을 초과했습니다.");
   const scanner = await requireFileScanner(), length = Buffer.alloc(4); length.writeUInt32BE(bytes.length);
   let reply: string;
   try { reply = await command(Buffer.concat([Buffer.from("zINSTREAM\0"), length, bytes, Buffer.alloc(4)])); } catch { unavailable(); }

@@ -1,0 +1,34 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 전체 구현 검증"(2): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    anchor "캐치시큐 로그인" [ref=1022, loc=css:a[aria-label="캐치시큐 로그인"], url=http://localhost:3100/login]
+      image
+    container
+      heading
+        text "회원가입"
+      form
+        textbox "이름" [ref=1023, loc=css:input[name="name"]]
+          text "이름"
+        textbox "이메일" [ref=1024, loc=css:input[name="email"]]
+          text "이메일을 입력해주세요"
+        container
+          textbox "비밀번호" [ref=1025, loc=css:input[name="password"]]
+            text "비밀번호"
+          button "비밀번호 표시 전환" [ref=1026, loc=css:button[aria-label="비밀번호 표시 전환"]]
+            text "◉"
+        paragraph
+          text "비밀번호는 12~128자로 입력해주세요."
+        container
+          checkbox [ref=1027]
+          container
+            anchor [ref=1028, loc=href:/legal/terms, url=http://localhost:3100/legal/terms]
+              text "서비스 이용약관"
+            text "및"
+            anchor [ref=1029, loc=href:/legal/privacy, url=http://localhost:3100/legal/privacy]
+              text "개인정보 처리방침"
+            text "에 동의합니다."
+        button [ref=1030]
+          text "회원가입"
+      anchor [ref=1031, loc=href:/login?returnTo=%2Fdashboard, url=http://localhost:3100/login?returnTo=%2Fdashboard]
+        text "로그인으로 돌아가기"
+  alert

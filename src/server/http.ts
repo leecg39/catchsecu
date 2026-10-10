@@ -62,10 +62,17 @@ export function route(handler: Handler, externalAuthentication?: "signed-webhook
         status = 422; code = "VALIDATION_ERROR"; message = "입력 내용을 확인해주세요.";
         fieldErrors = error.flatten().fieldErrors;
       } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        const driver = error.meta?.driverAdapterError as { cause?: { originalCode?: unknown; code?: unknown } } | undefined;
+        const sqlState = String(error.meta?.code ?? driver?.cause?.originalCode ?? driver?.cause?.code ?? "");
         if (error.code === "P2002") { status = 409; code = "ALREADY_EXISTS"; message = "이미 등록된 값입니다."; }
         if (["P2003", "P2014"].includes(error.code)) { status = 409; code = "RESOURCE_IN_USE"; message = "연결된 데이터가 있어 처리할 수 없습니다."; }
         if (error.code === "P2025") { status = 404; code = "NOT_FOUND"; message = "항목을 찾을 수 없습니다."; }
         if (error.code === "P2034") { status = 409; code = "CONCURRENT_CHANGE"; message = "동시 변경이 발생했습니다. 다시 시도해주세요."; }
+        if (["P2010", "P2004"].includes(error.code)) {
+          if (["40001", "40P01", "55P03"].includes(sqlState)) { status = 409; code = "CONCURRENT_CHANGE"; message = "동시 변경이 발생했습니다. 다시 시도해주세요."; }
+          if (sqlState === "23514") { status = 409; code = "DATA_CONFLICT"; message = "현재 데이터 상태에서는 처리할 수 없습니다. 최신 내용을 불러와주세요."; }
+          if (sqlState === "0A000") { status = 409; code = "TRANSACTION_UNSUPPORTED"; message = "현재 처리 방식으로 변경을 저장할 수 없습니다. 다시 시도해주세요."; }
+        }
       }
       if (status === 500) console.error(JSON.stringify({ requestId, code, kind: error instanceof Error ? error.name : "UnknownError",
         stack: error instanceof Error ? error.stack?.split("\n").slice(1, 8).join(" | ") : undefined }));

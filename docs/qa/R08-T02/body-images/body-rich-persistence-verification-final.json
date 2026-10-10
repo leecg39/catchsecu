@@ -1,0 +1,99 @@
+{
+  "verifiedAt": "2026-10-10T19:09:36+09:00",
+  "checkpoint": "BI-02c",
+  "status": "passed",
+  "scope": {
+    "included": [
+      "nullable and optional FormContent.bodyRich with exact body projection",
+      "FormVersion JSONB persistence and legacy SQL null DTO omission",
+      "locked-current omission preservation, ambiguous edit rejection and explicit removal",
+      "template parity, published history preservation and approval fingerprint compatibility",
+      "real form POST, GET and PATCH handlers",
+      "reusable recursive OpenAPI RichDocument components"
+    ],
+    "excluded": [
+      "rich editor toolbar and browser acceptance",
+      "body image upload, ownership pins, authorized bytes and garbage collection",
+      "page, completion and closed-screen rich slots",
+      "rich consent evidence and PDF generation"
+    ],
+    "stagedSafety": "Rich image nodes return RICH_BODY_IMAGES_UNAVAILABLE until BI-04b can atomically own and pin every asset reference."
+  },
+  "database": {
+    "target": "postgresql://localhost:5432/catchsecu_test",
+    "migration": "20261025015000_form_rich_body",
+    "migrationCount": 125,
+    "status": "up to date",
+    "productionDatabaseTouched": false
+  },
+  "initialFailuresResolved": [
+    "Zod recursive definitions generated local #/$defs references that were invalid after embedding in OpenAPI components",
+    "the contract verifier did not classify the existing author-asset complete endpoint as a bodyless POST"
+  ],
+  "checks": [
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --env-file=.env.test.local node_modules/prisma/build/index.js migrate deploy",
+      "exitCode": 0,
+      "result": "migration125 applied to isolated catchsecu_test"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/form-rich-body-persistence.test.ts",
+      "exitCode": 0,
+      "result": "1 file, 6 tests passed; PostgreSQL plus real form HTTP handlers, approval fingerprint and form/template copies"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/form-rich-body-persistence.test.ts tests/server/form-crud-gate.test.ts tests/server/form-current-authority.test.ts tests/server/form-draft-save.test.ts tests/server/form-draft-state.test.ts tests/server/form-module-flow.test.ts tests/server/form-publication-state.test.ts tests/server/policy-approvals.test.ts tests/server/template-access-gate.test.ts tests/server/form-system-copy.test.ts tests/server/question-image-backend.test.ts",
+      "exitCode": 0,
+      "result": "11 files, 114 tests passed"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/rich-content-contract.test.ts tests/server/form-rich-content-contract.test.ts tests/server/rich-content-html.test.ts tests/server/rich-content-render.test.ts tests/server/form-rich-body-openapi.test.ts",
+      "exitCode": 0,
+      "result": "5 files, 56 tests passed"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --env-file=.env.local --import tsx scripts/generate-openapi.ts && python3 scripts/verify-contracts.py",
+      "exitCode": 0,
+      "result": "323 paths, 458 operations, 45 policies; no invalid local recursive references"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --env-file=.env.local node_modules/prisma/build/index.js validate && /Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --env-file=.env.test.local node_modules/prisma/build/index.js migrate status",
+      "exitCode": 0,
+      "result": "schema valid; isolated database up to date at 125 migrations"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/eslint/bin/eslint.js <BI-02a..02c related sources and tests>",
+      "exitCode": 0,
+      "result": "0 errors and 0 warnings"
+    },
+    {
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit --pretty false",
+      "exitCode": 0,
+      "result": "0 errors"
+    },
+    {
+      "command": "git diff --check -- <BI-02a..02c sources, tests, migration and generated contracts>",
+      "exitCode": 0,
+      "result": "clean"
+    }
+  ],
+  "files": {
+    "prisma/schema.prisma": "6c43ce80b998c9a424d651d69fa1095aa8de10b291787706d8cbc1480d1989d9",
+    "prisma/migrations/20261025015000_form_rich_body/migration.sql": "522b48d7c17882470acc7fc1eceb7265deac5da0a8ddb1ac638cb67e06605e7e",
+    "src/generated/prisma/models/FormVersion.ts": "53ab3a8248c8b21ef5bd01ecfd4561e70584498ffca0038278ba10fcdc12b631",
+    "src/contracts/domains.ts": "b58e68538defcd71066464e845a7be31a6c975719692c17743f5e1cfa2cffe4f",
+    "src/server/form-rich-body.ts": "55d292b6a8cc77e18cae4f2ed205ef32be9dc9ef2974c30c45e4d2c733b22680",
+    "src/server/forms.ts": "350822151c24fe176bf50a2a00ba9b2ddcf1f4768965698864bae6ece613b925",
+    "src/server/templates.ts": "a48a30f800cbb03d9319edeb9f7955f3853a32eef791de799390d5f0767603b5",
+    "scripts/generate-openapi.ts": "7e5c1a325c6b1768932db1082106aed781a11baf2db50f79e6bb047b340da53f",
+    "tests/server/form-rich-body-persistence.test.ts": "827e466efc4bffc64512f3a903313248dda6250617f00c29a4a4fae9a3b8dfde",
+    "tests/server/form-rich-body-openapi.test.ts": "a534c02384f6b265431e1e8a829f41d0396f934a8f6867c7643e824826125a4a",
+    "docs/planning/contracts/openapi.json": "ec864e90538e494ac4c8240a2b0069f4dd016855c2774d1aea055907d9be13ec"
+  },
+  "fixturePolicy": {
+    "existingFrozenFixtureRead": false,
+    "existingProductionRuntimeTouched": false,
+    "browserRun": false,
+    "reason": "BI-02c has no editor UI; browser and frozen acceptance remain in BI-05 and BI-07."
+  }
+}

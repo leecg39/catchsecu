@@ -14,7 +14,7 @@ export async function assertProviderCanStop(tx: Transaction, ctx: Context, provi
     await tx.$queryRaw`SELECT id FROM "User" WHERE id=${userId} FOR UPDATE`;
     const active = await tx.membership.findFirst({ where: { ...activeMembershipWhere(userId, ctx.tenantId), accessKind: "direct",
       user: { status: "active", emailVerified: true } } });
-    if (active && !await hasSsoFallback(tx, userId, accounts.filter(a => a.userId === userId).map(a => a.id)))
+    if (active && !await hasSsoFallback(tx, userId, accounts.filter(a => a.userId === userId).map(a => a.id), ctx.tenantId))
       fail(409, "SSO_PROVIDER_LAST_LOGIN", "이 SSO만으로 로그인하는 활성 구성원이 있습니다. 다른 로그인 수단을 준비한 뒤 SSO 사용을 중지하거나 인증 정보를 변경해주세요.");
   }
   return { accounts, userIds };

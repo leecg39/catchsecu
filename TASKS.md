@@ -1,3 +1,24 @@
+# 2026-10-10 활성 구현 계획
+
+F5 참여자 인증: 이메일 OTP·전체/허용 대상·대상 배치 CRUD·폼 범위 중복 참여 제한·게시본 범위 세션/proof·공개 업로드/작성자 자산 권한을 구현했다. migration143~145, 새 설치145개, 기존버전196개 기본값 보존, 관련16파일171시험, 실제 production 브라우저 제출·중복 차단과 재시작 hash를 확인했다. [검증](docs/qa/R08-T02/participation-access/README.md). 카카오·네이버 실제 OAuth와 SMTP 실수신, R08 전수 수용은 남아 있어 공식 완료0/진행53/계획54를 유지한다.
+
+F5 응답 수집 일정: 버전별 시작·종료 시각, PostgreSQL 순서 제약, 게시본 `opensAt/expiresAt`, 시작 전 질문 비노출·제출425, 시작 후 제출, 종료 후410/마감 화면을 구현했다. migration142·기존196버전/154게시본 해시 보존, 전용5·회귀158시험, Ego Lite 실제 일정/제출/마감과 production 재시작 지문을 확인했다. [검증](docs/qa/R08-T02/collection-window/README.md). R08 전수 수용은 남아 있어 공식 완료0/진행53/계획54를 유지한다.
+
+F3 동의 항목 자동 집계: 수동 문항 분류에서 `NON_PERSONAL_INFORMATION`을 제외하고 순서·중복을 보존한 동의 항목을 폼 버전에 고정했다. migration141의 엄격 JSON 제약·지연 트리거2개, 기존196버전 보존, 집중/통합/확장 시험, Ego 편집·공개·제출·PDF·production 재시작을 통과했다. NLP/AI 분류와 법정 동의 문안 전체 생성, R08 전수 수용은 남아 있다. [검증](docs/qa/R08-T02/question-metadata/consent-items/README.md). 공식 완료0/진행53/계획54를 유지한다.
+
+F3 입력 패턴: 확인된 ID 1·2·3·4·7·8만 저장하는 nullable 모델과 DB 제약, 폼 CRUD·복제·템플릿·게시·공개 제출/정정, 편집/공개 화면을 구현했다. 호출자 정규식은 거부하며 주민등록번호는 고정 문자 검사와 13자리 자동 형식을 사용한다. 집중6·관련27·frozen fixture20/20, migration140 빈 설치·기존 질문415개 보존, Ego 잘못된 값 거부/정상 제출·production 재시작 hash와 82페이지 build를 확인했다. [검증](docs/qa/R08-T02/question-patterns/README.md). R08-T02와 공식 완료0/진행53/계획54는 유지한다.
+
+F3 문항 이미지: 단일 questionImageKey·JPEG/PNG 1 MiB·migration124·현재/과거 버전 참조·복제/템플릿/승인/열람 구현. 관련23파일323시험·실제 HTTP 경계12·수명주기71요청·Ego 편집/공개/제출/교체/정정/3폭/선택 공유 확인. 폼3·자산11·참조14·실제blob3과 이전19세트의 재시작 해시 보존. 본문 rich HTML 이미지·NLP/자동동의·다중페이지·전수 수용은 잔여. [검증](docs/qa/R08-T02/question-metadata/content-images/README.md). 공식 완료0/진행53/계획54 유지.
+본문 rich 체크포인트: BI-02a~07 typed 문서·14 MiB 자산·페이지/분기·4개 rich 표시 영역·읽기 권한·동의 증거/PDF 영수증 v2를 migration125~139로 구현했다. BI-07에서 실제 4슬롯 CRUD·게시·2페이지 제출·개정/과거 이력·복제/템플릿, 390/768/1440·RTL·키보드, 장애 회귀22·production82페이지·재시작 hash와 기존 fixture20/20을 확인했다. [검증](docs/qa/R08-T02/body-images/full-acceptance/README.md). 본문 이미지 모듈은 완료했지만 공식 전체 상태 완료0/진행53/계획54는 유지한다.
+
+F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. [검증](docs/qa/R08-T02/question-metadata/personal-information/README.md). 공식 상태 완료0/진행53/계획54 유지.
+
+F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. [검증](docs/qa/R08-T02/question-metadata/reference-link/README.md). 공식 상태 완료0/진행53/계획54 유지.
+
+[최신 전체 TASKS](docs/planning/09-rea-fullstack/TASKS.md): 186개 원본 경로·21개 부가 경로·107개 작업. 사용자 승인에 따라 구현·검증을 재개했다. 실행 상태의 기준은 `docs/planning/active-plan.json`이다. 아래72개 작업은 기존 이력으로 보존하며 신규 작업과 이중 합산하지 않는다.
+
+F3 질문 추가 설명: DB/API·편집·공개·정정·템플릿 연결, 고유102시험, Ego 실동작/PDF바이트/production 재시작·기존14fixture 보존 확인. 나머지 메타데이터·전수 수용은 진행 중. [검증](docs/qa/R08-T02/question-metadata/explanation/README.md).
+
 # TASKS — 캐치시큐 전 페이지 풀스택 CRUD
 
 > 2026-10-02: 사용자의 계획 실행 요청에 따라 구현을 시작했다. 검증 증거가 있는 항목만 완료로 표시한다.
@@ -558,6 +579,8 @@
 
 ### P10-T02 — 결제수단·PG 주문·인증
 
+- 2026-10-07 결제 이벤트 후속: 승인/실패와 환불 입력 계약을 분리하고, 잘못된 JSON400·환불 식별자 검증·결제 중 구독 취소409·과거 취소 구독의 원장 단독 충전 방지를 구현했다. 유효 fixture에서7개 실패를 재현했고 최종 PostgreSQL74개·HTTP23개(재시작5)·타입/린트/production 빌드·계약308경로440작업을 통과했다. 실제 PG/브라우저/원본 대조는 미완료다. [증거](docs/qa/P10-T02/event-integrity/README.md).
+
 - 2026-10-06 결제수단·주문 내부 보완: 현재 권한·세션·정책/최종 기한 검사, 대표 교체 version 갱신, 주문 재요청 최신 상태, 다른 수단 주문 충돌 및 동시 생성/해지 직렬화를 구현했다. 이름 수정 UI와 실패 입력 보존·409 최신 목록 조회를 추가했다. PostgreSQL 86개·HTTP 25개(재시작4 포함)·전체 타입·변경 린트·production 빌드·계약 300경로/431작업 검증 통과. 실제 PG/브라우저는 미완료, 공식 완료17·진행42·계획13 유지. [증거](docs/qa/P10-T02/current-authority/README.md).
 
 - [ ] P10-T02 구현·검증 완료
@@ -786,3 +809,9 @@
 - 선행: P14-T03, P14-T04
 - 검증/완료: 전 Task 체크·외부검증 완료·critical/high미해결0·무근거 완성 주장0; 미충족 있으면 전체 완료금지
 - 증거: [docs/qa/P14-T05/](docs/qa/P14-T05/README.md) — 72 Task 전수 증거 매핑 보고서 작성. 전체 수용 게이트 미충족으로 미완료.
+
+
+- 2026-10-10 조직 이메일 소유 확인·state 로그인/초대 등록 전환·전용 복구 화면 구현. migration108/Prisma134, 고유7파일274시험·실제HTTP16/재시작HTTP1·로컬 메일·디렉터리v2/티켓0/감사12 해시 일치. 독립검토의 만료티켓 발급한도 소모 수정. 시작 브라우저 결합(login CSRF)·SSO outbound DNS/사설IP 차단·HTTPS IdP·Ego 화면 및 외부 인증 수용은 필수 후속. 전체51진행/56계획/0완료, goal active. 증거: `docs/qa/R07-T04/org-email/README.md`.
+
+
+F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여.

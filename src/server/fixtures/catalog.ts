@@ -1,4 +1,4 @@
-/** Stable local fixtures for the 181-route catalog. These values are test data, not production secrets. */
+/** Stable local fixtures shared by the active route catalog. These values are test data, not production secrets. */
 export const companies = {
   a: "10000000-0000-4000-8000-000000000001",
   b: "10000000-0000-4000-8000-000000000002",
@@ -80,71 +80,13 @@ export const tokens = {
   documentPolicy: token("FixDocPolicyA"),
   documentOverseas: token("FixDocOverseasA"),
 } as const;
-/** Routes whose business object has no table yet. Page shells may open; the ID is not a database row. */
-export const unmodeledRoutes = new Set(["R014", "R069", "R070", "R108", "R109", "R110", "R111", "R113", "R114", "R115", "R116", "R156"]);
-/**
- * R162–R164 keep the source path letters. Those letters are not aliases of consent, policy, or overseas documents.
- * The three tokens below only prove that a 43-character public document token can open the route.
- */
-export const unresolvedDocumentRoutes = {
-  R162: tokens.documentConsent,
-  R163: tokens.documentPolicy,
-  R164: tokens.documentOverseas,
-} as const;
-const params: Record<string, string> = {
-  customerId: records.submission,
-  questionId: records.questionFile,
-  fileId: records.file,
-  outerToken: tokens.publicForm,
-  serviceId: services.a,
-  formId: records.form,
-  templateId: records.kakaoTemplate,
-  admNotiId: noticeId,
-  purchaseId: records.purchase,
-  purchasedId: records.purchase,
-  type: "license",
-  errorCode: "PG_DENIED",
-  id: records.invoice,
-  category: "items",
-  agree: "required",
-  isDomestic: "domestic",
-  result: "pending",
-  org: "fixture-org",
-  infoOwnerToken: tokens.subjectAccess,
-  token: tokens.documentConsent,
-};
-export function concretePath(routeId: string, template: string) {
-  const value = template.replace(/:([A-Za-z]+)/g, (_, name: string) => {
-    if (routeId === "R009" && name === "outerToken") return fixedSlug;
-    if (name === "token" && routeId in unresolvedDocumentRoutes) return unresolvedDocumentRoutes[routeId as keyof typeof unresolvedDocumentRoutes];
-    const resolved = params[name];
-    if (!resolved) throw new Error(routeId + " 경로 매개변수 " + name + " 에 대한 fixture가 없습니다.");
-    return resolved;
-  });
-  if (value.includes(":")) throw new Error(routeId + " 경로에 치환되지 않은 매개변수가 있습니다.");
-  return value;
-}
-export type VerificationGrade = "internal" | "adapter" | "staging";
-export function routeGrade(routeId: string): VerificationGrade {
-  return unmodeledRoutes.has(routeId) ? "staging" : "internal";
-}
-/** Tasks that own no page row. A task missing from both the route matrix and this map is an orphan. */
-export const nonRouteTasks: Record<string, "foundation" | "enforcement" | "embedded" | "gate" | "release"> = {
-  "P00-T01": "foundation", "P00-T02": "foundation", "P00-T03": "foundation", "P00-T04": "foundation",
-  "P01-T01": "foundation", "P01-T02": "foundation", "P01-T03": "foundation", "P01-T04": "foundation", "P01-T05": "foundation",
-  "P02-T03": "enforcement", "P02-T05": "gate", "P03-T05": "gate", "P04-T05": "gate",
-  "P05-T04": "embedded", "P06-T07": "gate", "P07-T03": "embedded", "P07-T04": "gate",
-  "P08-T03": "embedded", "P09-T02": "embedded", "P09-T06": "gate", "P10-T05": "gate",
-  "P11-T05": "gate", "P12-T03": "embedded", "P12-T04": "gate", "P13-T03": "gate", "P13-T04": "gate",
-  "P14-T01": "release", "P14-T02": "release", "P14-T03": "release", "P14-T04": "release", "P14-T05": "release",
-};
 export const externalScenarios = [
   { id: "EXT-01", grade: "adapter" as const, name: "로컬 메일함 전달", evidence: "MAIL_TRANSPORT=local 일 때 .local 메일 파일", releasePass: false },
   { id: "EXT-02", grade: "adapter" as const, name: "ClamAV 파일 검사", evidence: "CLAMAV_SOCKET이 연결될 때만 adapter. 없으면 blocked", releasePass: false },
   { id: "EXT-03", grade: "adapter" as const, name: "로컬 Slack/Teams 알림 파일", evidence: "NOTIFICATION_TRANSPORT=local", releasePass: false },
   { id: "EXT-04", grade: "staging" as const, name: "외부 SMTP 수신·반송", evidence: "공급자 receipt 없음", releasePass: false },
-  { id: "EXT-05", grade: "staging" as const, name: "문자·카카오 발송", evidence: "모델 또는 공급자 계정 없음", releasePass: false },
-  { id: "EXT-06", grade: "staging" as const, name: "PG 승인·환불", evidence: "구매·청구 모델과 sandbox 없음", releasePass: false },
+  { id: "EXT-05", grade: "staging" as const, name: "문자·카카오 발송", evidence: "공급자 시험 계정·실제 발송 receipt 미확보", releasePass: false },
+  { id: "EXT-06", grade: "staging" as const, name: "PG 승인·환불", evidence: "PaymentOrder/Refund 구현; 실제 PG sandbox 수용 미확인", releasePass: false },
   { id: "EXT-07", grade: "staging" as const, name: "본인인증 callback", evidence: "검증 영수증 없음. URL의 result 값으로 성공 처리 금지", releasePass: false },
   { id: "EXT-08", grade: "staging" as const, name: "SSO·새올", evidence: "테스트 IdP와 기관 계약 없음", releasePass: false },
 ] as const;

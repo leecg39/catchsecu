@@ -2,6 +2,7 @@ import { activeMembershipWhere, type Context } from "./context";
 import type { Transaction } from "./db";
 import { fail } from "./http";
 import { roleCan, type Capability } from "./permissions";
+import { assertSsoSession } from "./sso-policy-enforcement";
 
 export async function currentServiceScope(tx: Transaction, ctx: Context, capability: Capability) {
   await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${ctx.tenantId} FOR SHARE`;
@@ -17,6 +18,7 @@ export async function currentServiceScope(tx: Transaction, ctx: Context, capabil
   const user = await tx.user.findFirst({ where: { id: ctx.user.id, status: "active", emailVerified: true } });
   const session = await tx.session.findFirst({ where: { id: ctx.session.id, userId: ctx.user.id, expiresAt: { gt: new Date() } } });
   if (!user || !session) fail(401, "SESSION_EXPIRED", "세션이 만료되었습니다. 다시 로그인해주세요.");
+  await assertSsoSession(tx, ctx.tenantId, ctx.user.id, session.id);
   const member = await tx.membership.findFirst({ where: { ...activeMembershipWhere(ctx.user.id, ctx.tenantId), id: ctx.member.id },
     include: { grants: true, expertAssignment: { include: { services: true } } } });
   if (!member) fail(403, "FORBIDDEN", "현재 회사의 권한을 확인해주세요.");

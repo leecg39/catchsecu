@@ -44,7 +44,7 @@ async function main() {
       const header = "[v1 · 질문 " + (index + 1) + "] " + question.label, value = item.values[question.id];
       if (question.rows) for (const [rowIndex, matrixRow] of question.rows.entries()) {
         const cell = row[columns.indexOf(header + " · 행 " + (rowIndex + 1) + ": " + matrixRow.label)];
-        const answer = typeof value === "object" && !Array.isArray(value) ? value[matrixRow.id] : undefined;
+        const answer = value && typeof value === "object" && !Array.isArray(value) && matrixRow.id in value ? (value as Record<string, string | string[]>)[matrixRow.id] : undefined;
         assert.equal(cell, Array.isArray(answer) ? JSON.stringify(answer) : answer ?? "");
       } else assert.equal(row[columns.indexOf(header)], Array.isArray(value) ? JSON.stringify(value) : value ?? "");
     }

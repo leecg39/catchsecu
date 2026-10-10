@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { SecurityEntitlements } from "./feature-entitlements";
 export const approvalRole = z.enum(["owner", "admin", "security"]);
 export const policySettings = z.object({
   minPassword: z.number().int().min(12).max(128),
@@ -26,7 +27,7 @@ export const policyDefaults: z.infer<typeof policySettings> = {
   automaticDestruction: false, allowRetentionAdjustment: false, allowRetentionDesignation: false, retentionDays: 365,
   activityReviewRetentionDays: null,
 };
-export type PolicyRecord = z.infer<typeof policySettings> & { tenantId: string; version: number; passwordRevision: number; approvalRevision: number; updatedAt: string; canManage: boolean };
+export type PolicyRecord = z.infer<typeof policySettings> & { tenantId: string; version: number; passwordRevision: number; approvalRevision: number; updatedAt: string; canManage: boolean; entitlements: SecurityEntitlements };
 export const approvalRequestInput = z.object({
   version: z.number().int().positive(),
   message: z.string().trim().min(1).max(4000),

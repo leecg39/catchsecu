@@ -1,0 +1,31 @@
+{
+  "result": "failed",
+  "checks": [
+    {
+      "name": "anonymous-read-denied",
+      "status": 401,
+      "code": "UNAUTHENTICATED"
+    },
+    {
+      "name": "viewer-read-denied",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "viewer-create-denied",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "invalid-days-rejected",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "cross-company-create-denied",
+      "status": 400,
+      "code": "IDEMPOTENCY_REQUIRED"
+    }
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: cross-company-create-denied: {\"error\":{\"code\":\"IDEMPOTENCY_REQUIRED\",\"message\":\"유효한 Idempotency-Key가 필요합니다.\",\"requestId\":\"829693be-2642-4e58-82ef-0a9f4e4082d7\"}}\n\n400 !== 404\n"
+}

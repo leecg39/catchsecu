@@ -1,0 +1,786 @@
+{
+  "checkedAt": "2026-10-10T03:22:14.795Z",
+  "result": "passed",
+  "database": "catchsecu_test",
+  "tables": [
+    "Form",
+    "FormVersion",
+    "Question",
+    "QuestionOption",
+    "FormTemplate",
+    "FormFavorite",
+    "FormDocumentBinding"
+  ],
+  "scope": "Read-only seven-model metadata and selected tenant/FK/uniqueness/published-child-trigger assertions. Does not establish source fidelity, stable option identity or complete CRUD acceptance.",
+  "metadataHash": "153f6d1fae281fdff11d2a7730362b15c6ae25bec0393dadd8a67b07857e291b",
+  "columns": [
+    {
+      "table": "Form",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "ownerId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "title",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "publishedVersionId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Form",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "sourceType",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "designatedRetentionDays",
+      "type": "integer",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "formVersionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "documentId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "documentVersionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "required",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "kind",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "order",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "displaySnapshot",
+      "type": "jsonb",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormFavorite",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormFavorite",
+      "column": "memberId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormFavorite",
+      "column": "formId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "title",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "category",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "content",
+      "type": "jsonb",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "formId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "number",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "title",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "body",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "verify",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "font",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "bold",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "consentRequired",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "consentPurpose",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "retentionDays",
+      "type": "integer",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "maxResponses",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "showSubmitNotice",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "publishedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "consentDisplay",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "receiptEvidenceVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "marketing",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "formVersionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "stableKey",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "type",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "label",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "required",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "order",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "subjectRole",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "condition",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "matrixRows",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "selectionLimits",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "questionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "value",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "order",
+      "type": "integer",
+      "nullable": "NO"
+    }
+  ],
+  "constraints": [
+    {
+      "table": "Form",
+      "name": "Form_designated_retention",
+      "definition": "CHECK (((\"designatedRetentionDays\" IS NULL) OR ((\"designatedRetentionDays\" >= 1) AND (\"designatedRetentionDays\" <= 36500))))"
+    },
+    {
+      "table": "Form",
+      "name": "Form_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Form",
+      "name": "Form_source_check",
+      "definition": "CHECK (((\"sourceType\" = ANY (ARRAY['form'::text, 'import'::text])) AND ((\"sourceType\" <> 'import'::text) OR ((status = 'archived'::text) AND (\"publishedVersionId\" IS NULL)))))"
+    },
+    {
+      "table": "Form",
+      "name": "Form_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['draft'::text, 'pendingApproval'::text, 'published'::text, 'paused'::text, 'archived'::text])))"
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_id_publishedVersionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", id, \"publishedVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", \"formId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_ownerId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"ownerId\") REFERENCES \"Membership\"(\"tenantId\", \"userId\") ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_serviceId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_tenantId_formVersionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_tenantId_serviceId_documentId_document_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"documentId\", \"documentVersionId\") REFERENCES \"DocumentVersion\"(\"tenantId\", \"serviceId\", \"documentId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_values",
+      "definition": "CHECK (((kind = ANY (ARRAY['collection'::text, 'third_party'::text])) AND ((\"order\" >= 0) AND (\"order\" <= 9)) AND (jsonb_typeof(\"displaySnapshot\") = 'object'::text)))"
+    },
+    {
+      "table": "FormFavorite",
+      "name": "FormFavorite_pkey",
+      "definition": "PRIMARY KEY (\"tenantId\", \"memberId\", \"formId\")"
+    },
+    {
+      "table": "FormFavorite",
+      "name": "FormFavorite_tenantId_formId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formId\") REFERENCES \"Form\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "FormFavorite",
+      "name": "FormFavorite_tenantId_memberId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"memberId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_scope_check",
+      "definition": "CHECK ((((\"tenantId\" IS NULL) AND (\"serviceId\" IS NULL)) OR ((\"tenantId\" IS NOT NULL) AND (\"serviceId\" IS NOT NULL))))"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_tenantId_serviceId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_consent_evidence",
+      "definition": "CHECK ((((\"receiptEvidenceVersion\" = 0) AND (\"consentDisplay\" IS NULL)) OR ((\"receiptEvidenceVersion\" = 1) AND (\"consentDisplay\" IS NOT NULL) AND (jsonb_typeof(\"consentDisplay\") = 'object'::text))))"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_ranges",
+      "definition": "CHECK (((number > 0) AND ((\"retentionDays\" IS NULL) OR ((\"retentionDays\" >= 1) AND (\"retentionDays\" <= 36500))) AND ((\"maxResponses\" >= 1) AND (\"maxResponses\" <= 1000000))))"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['draft'::text, 'published'::text])))"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_tenantId_formId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formId\") REFERENCES \"Form\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "Question",
+      "name": "Question_condition_operator_check",
+      "definition": "CHECK (((condition IS NULL) OR ((jsonb_typeof((condition -> 'operator'::text)) = 'string'::text) AND ((condition ->> 'operator'::text) = ANY (ARRAY['equals'::text, 'includes'::text])) AND ((char_length(btrim((condition ->> 'value'::text))) >= 1) AND (char_length(btrim((condition ->> 'value'::text))) <= 500)))))"
+    },
+    {
+      "table": "Question",
+      "name": "Question_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Question",
+      "name": "Question_settings_check",
+      "definition": "CHECK (valid_question_settings(type, \"subjectRole\", condition, \"matrixRows\", \"selectionLimits\"))"
+    },
+    {
+      "table": "Question",
+      "name": "Question_subject_role_check",
+      "definition": "CHECK (((\"subjectRole\" IS NULL) OR ((\"subjectRole\" = ANY (ARRAY['name'::text, 'email'::text])) AND (type = '단문형 답변'::text) AND required)))"
+    },
+    {
+      "table": "Question",
+      "name": "Question_tenantId_formVersionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "Question",
+      "name": "Question_type_check",
+      "definition": "CHECK ((type = ANY (ARRAY['단문형 답변'::text, '장문형 답변'::text, '객관식 답변'::text, '체크박스'::text, '드롭다운'::text, '날짜'::text, '파일 업로드'::text, '행렬형 단일 선택'::text, '행렬형 복수 선택'::text])))"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_questionId_fkey",
+      "definition": "FOREIGN KEY (\"questionId\") REFERENCES \"Question\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "Form",
+      "name": "Form_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Form_pkey\" ON public.\"Form\" USING btree (id)"
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Form_tenantId_id_key\" ON public.\"Form\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_serviceId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Form_tenantId_serviceId_id_key\" ON public.\"Form\" USING btree (\"tenantId\", \"serviceId\", id)"
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_serviceId_status_createdAt_id_idx",
+      "definition": "CREATE INDEX \"Form_tenantId_serviceId_status_createdAt_id_idx\" ON public.\"Form\" USING btree (\"tenantId\", \"serviceId\", status, \"createdAt\", id)"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_formVersionId_documentId_key",
+      "definition": "CREATE UNIQUE INDEX \"FormDocumentBinding_formVersionId_documentId_key\" ON public.\"FormDocumentBinding\" USING btree (\"formVersionId\", \"documentId\")"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_formVersionId_order_key",
+      "definition": "CREATE UNIQUE INDEX \"FormDocumentBinding_formVersionId_order_key\" ON public.\"FormDocumentBinding\" USING btree (\"formVersionId\", \"order\")"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormDocumentBinding_pkey\" ON public.\"FormDocumentBinding\" USING btree (id)"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_tenantId_serviceId_documentVersionId_idx",
+      "definition": "CREATE INDEX \"FormDocumentBinding_tenantId_serviceId_documentVersionId_idx\" ON public.\"FormDocumentBinding\" USING btree (\"tenantId\", \"serviceId\", \"documentVersionId\")"
+    },
+    {
+      "table": "FormFavorite",
+      "name": "FormFavorite_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormFavorite_pkey\" ON public.\"FormFavorite\" USING btree (\"tenantId\", \"memberId\", \"formId\")"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormTemplate_pkey\" ON public.\"FormTemplate\" USING btree (id)"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_tenantId_serviceId_title_key",
+      "definition": "CREATE UNIQUE INDEX \"FormTemplate_tenantId_serviceId_title_key\" ON public.\"FormTemplate\" USING btree (\"tenantId\", \"serviceId\", title)"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_tenantId_status_idx",
+      "definition": "CREATE INDEX \"FormTemplate_tenantId_status_idx\" ON public.\"FormTemplate\" USING btree (\"tenantId\", status)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_formId_number_key",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_formId_number_key\" ON public.\"FormVersion\" USING btree (\"formId\", number)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_one_draft",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_one_draft\" ON public.\"FormVersion\" USING btree (\"tenantId\", \"formId\") WHERE (status = 'draft'::text)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_pkey\" ON public.\"FormVersion\" USING btree (id)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_tenantId_formId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_tenantId_formId_id_key\" ON public.\"FormVersion\" USING btree (\"tenantId\", \"formId\", id)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_tenantId_id_key\" ON public.\"FormVersion\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "Question",
+      "name": "Question_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Question_pkey\" ON public.\"Question\" USING btree (id)"
+    },
+    {
+      "table": "Question",
+      "name": "Question_subject_role_unique",
+      "definition": "CREATE UNIQUE INDEX \"Question_subject_role_unique\" ON public.\"Question\" USING btree (\"formVersionId\", \"subjectRole\") WHERE (\"subjectRole\" IS NOT NULL)"
+    },
+    {
+      "table": "Question",
+      "name": "Question_tenantId_formVersionId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Question_tenantId_formVersionId_id_key\" ON public.\"Question\" USING btree (\"tenantId\", \"formVersionId\", id)"
+    },
+    {
+      "table": "Question",
+      "name": "Question_tenantId_formVersionId_stableKey_key",
+      "definition": "CREATE UNIQUE INDEX \"Question_tenantId_formVersionId_stableKey_key\" ON public.\"Question\" USING btree (\"tenantId\", \"formVersionId\", \"stableKey\")"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_pkey",
+      "definition": "CREATE UNIQUE INDEX \"QuestionOption_pkey\" ON public.\"QuestionOption\" USING btree (id)"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_questionId_value_key",
+      "definition": "CREATE UNIQUE INDEX \"QuestionOption_questionId_value_key\" ON public.\"QuestionOption\" USING btree (\"questionId\", value)"
+    }
+  ],
+  "triggers": [
+    {
+      "table": "Form",
+      "name": "import_form_immutable",
+      "definition": "CREATE TRIGGER import_form_immutable BEFORE UPDATE ON public.\"Form\" FOR EACH ROW EXECUTE FUNCTION protect_import_form()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_import_form()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$ BEGIN\n IF TG_TABLE_NAME='Publication' THEN\n   IF EXISTS (SELECT 1 FROM \"Form\" WHERE id=NEW.\"formId\" AND \"sourceType\"='import') THEN RAISE EXCEPTION 'import forms cannot publish' USING ERRCODE='23514'; END IF;\n ELSIF NEW.\"sourceType\" IS DISTINCT FROM OLD.\"sourceType\" THEN RAISE EXCEPTION 'immutable form origin' USING ERRCODE='23514'; END IF;\n RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "form_document_binding_guard",
+      "definition": "CREATE TRIGGER form_document_binding_guard BEFORE INSERT OR DELETE OR UPDATE ON public.\"FormDocumentBinding\" FOR EACH ROW EXECUTE FUNCTION guard_form_document_binding()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_form_document_binding()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id TEXT; parent_status TEXT; parent_tenant TEXT; parent_service TEXT; evidence_version INTEGER;\nBEGIN\n  IF TG_OP='UPDATE' THEN RAISE EXCEPTION 'replace draft bindings instead of mutating evidence' USING ERRCODE='23514'; END IF;\n  parent_id:=CASE WHEN TG_OP='DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  SELECT v.status, v.\"tenantId\", f.\"serviceId\", v.\"receiptEvidenceVersion\" INTO parent_status,parent_tenant,parent_service,evidence_version\n    FROM \"FormVersion\" v JOIN \"Form\" f ON f.id=v.\"formId\" WHERE v.id=parent_id FOR UPDATE OF v;\n  IF parent_status IS DISTINCT FROM 'draft' THEN RAISE EXCEPTION 'published form document bindings are immutable' USING ERRCODE='23514'; END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  IF NEW.\"tenantId\" IS DISTINCT FROM parent_tenant OR NEW.\"serviceId\" IS DISTINCT FROM parent_service OR evidence_version<>1\n    THEN RAISE EXCEPTION 'form document binding scope mismatch' USING ERRCODE='23514'; END IF;\n  IF (SELECT count(*) FROM \"FormDocumentBinding\" WHERE \"formVersionId\"=parent_id)>=10\n    THEN RAISE EXCEPTION 'at most ten documents per form' USING ERRCODE='23514'; END IF;\n  IF NOT EXISTS (SELECT 1 FROM \"Document\" d JOIN \"DocumentVersion\" v ON v.\"documentId\"=d.id\n      WHERE v.id=NEW.\"documentVersionId\" AND d.status='published' AND d.type IN ('consent','overseas_transfer'))\n    THEN RAISE EXCEPTION 'only published consent documents can be selected' USING ERRCODE='23514'; END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "form_document_publish_guard",
+      "definition": "CREATE TRIGGER form_document_publish_guard BEFORE UPDATE ON public.\"FormVersion\" FOR EACH ROW EXECUTE FUNCTION guard_form_document_publish()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_form_document_publish()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF OLD.status='draft' AND NEW.status='published' AND EXISTS (\n    SELECT 1 FROM \"FormDocumentBinding\" b JOIN \"Document\" d ON d.id=b.\"documentId\"\n      WHERE b.\"formVersionId\"=NEW.id AND (d.status<>'published' OR NOT EXISTS (\n        SELECT 1 FROM \"DocumentPublication\" p WHERE p.\"documentVersionId\"=b.\"documentVersionId\" AND p.status='active'\n          AND (p.\"expiresAt\" IS NULL OR p.\"expiresAt\">CURRENT_TIMESTAMP))))\n    THEN RAISE EXCEPTION 'selected consent document is no longer public' USING ERRCODE='23514'; END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "published_version_immutable",
+      "definition": "CREATE TRIGGER published_version_immutable BEFORE DELETE OR UPDATE ON public.\"FormVersion\" FOR EACH ROW EXECUTE FUNCTION protect_published_version()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_published_version()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF OLD.status = 'published' THEN\n    RAISE EXCEPTION 'Published form versions are immutable' USING ERRCODE = '23514';\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "question_rules_publish_guard",
+      "definition": "CREATE TRIGGER question_rules_publish_guard BEFORE UPDATE ON public.\"FormVersion\" FOR EACH ROW EXECUTE FUNCTION guard_question_rules_publish()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_question_rules_publish()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE q record; source record; option_count integer;\nBEGIN\n IF NEW.status<>'published' OR OLD.status='published' THEN RETURN NEW; END IF;\n FOR q IN SELECT * FROM \"Question\" WHERE \"formVersionId\"=NEW.id ORDER BY \"order\" LOOP\n  SELECT count(*) INTO option_count FROM \"QuestionOption\" WHERE \"questionId\"=q.id;\n  IF q.type IN ('객관식 답변','체크박스','드롭다운','행렬형 단일 선택','행렬형 복수 선택') AND option_count=0 THEN\n   RAISE EXCEPTION 'Choice questions need options' USING ERRCODE='23514';\n  END IF;\n  IF q.\"selectionLimits\" IS NOT NULL AND (coalesce((q.\"selectionLimits\"->>'min')::integer,0)>option_count OR coalesce((q.\"selectionLimits\"->>'max')::integer,0)>option_count) THEN\n   RAISE EXCEPTION 'Selection count exceeds available options' USING ERRCODE='23514';\n  END IF;\n  IF q.\"condition\" IS NOT NULL THEN\n   SELECT * INTO source FROM \"Question\" WHERE \"formVersionId\"=NEW.id AND \"stableKey\"=q.\"condition\"->>'questionId' AND \"order\"<q.\"order\";\n   IF NOT FOUND OR (q.\"condition\"->>'operator'='equals' AND source.type NOT IN ('객관식 답변','드롭다운'))\n    OR (q.\"condition\"->>'operator'='includes' AND source.type<>'체크박스')\n    OR NOT EXISTS (SELECT 1 FROM \"QuestionOption\" WHERE \"questionId\"=source.id AND value=q.\"condition\"->>'value')\n    OR NEW.marketing->>'nameQuestionId'=q.\"stableKey\" OR NEW.marketing->>'emailQuestionId'=q.\"stableKey\" OR NEW.marketing->>'smsQuestionId'=q.\"stableKey\" THEN\n    RAISE EXCEPTION 'Invalid branch reference' USING ERRCODE='23514';\n   END IF;\n  END IF;\n END LOOP;\n RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "subject_question_publish_guard",
+      "definition": "CREATE TRIGGER subject_question_publish_guard BEFORE UPDATE ON public.\"FormVersion\" FOR EACH ROW EXECUTE FUNCTION guard_subject_questions()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_subject_questions()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF NEW.status='published' AND (SELECT count(*) FROM \"Question\" WHERE \"formVersionId\"=NEW.id AND \"subjectRole\" IS NOT NULL)=1 THEN\n    RAISE EXCEPTION 'both subject name and email are required' USING ERRCODE='23514';\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "published_question_immutable",
+      "definition": "CREATE TRIGGER published_question_immutable BEFORE INSERT OR DELETE OR UPDATE ON public.\"Question\" FOR EACH ROW EXECUTE FUNCTION protect_published_question()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_published_question()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP <> 'INSERT' AND EXISTS (SELECT 1 FROM \"FormVersion\" WHERE id = OLD.\"formVersionId\" AND status = 'published') THEN\n    RAISE EXCEPTION 'Published questions are immutable' USING ERRCODE = '23514';\n  END IF;\n  IF TG_OP <> 'DELETE' AND EXISTS (SELECT 1 FROM \"FormVersion\" WHERE id = NEW.\"formVersionId\" AND status = 'published') THEN\n    RAISE EXCEPTION 'Published questions are immutable' USING ERRCODE = '23514';\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "published_option_immutable",
+      "definition": "CREATE TRIGGER published_option_immutable BEFORE INSERT OR DELETE OR UPDATE ON public.\"QuestionOption\" FOR EACH ROW EXECUTE FUNCTION protect_published_option()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_published_option()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE question_id TEXT;\nBEGIN\n  IF TG_OP <> 'INSERT' THEN\n    IF EXISTS (SELECT 1 FROM \"Question\" q JOIN \"FormVersion\" v ON v.id=q.\"formVersionId\" WHERE q.id=OLD.\"questionId\" AND v.status='published') THEN\n      RAISE EXCEPTION 'Published options are immutable' USING ERRCODE = '23514';\n    END IF;\n  END IF;\n  IF TG_OP <> 'DELETE' THEN\n    IF EXISTS (SELECT 1 FROM \"Question\" q JOIN \"FormVersion\" v ON v.id=q.\"formVersionId\" WHERE q.id=NEW.\"questionId\" AND v.status='published') THEN\n      RAISE EXCEPTION 'Published options are immutable' USING ERRCODE = '23514';\n    END IF;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    }
+  ],
+  "sourceFingerprints": {
+    "prisma/schema.prisma": "a8a8f1ea87ecb884e321ef69c39b20fe2214515356c1d38ebe6fb2708ba3a725",
+    "src/contracts/domains.ts": "0ab479d1fd2a1f4d6d31c1d17c0a0343b11337195093b81981cbb1abc76ee664",
+    "src/contracts/questions.ts": "500344848d1e3545c3d840cee48246890fae105425df83569d9d71f2a2f3d073",
+    "src/contracts/forms.ts": "e854450564eac7857cf70b431ea0cf563926f8325daf3758f7116a26b22cea1d",
+    "src/contracts/form-copy.ts": "f3be3a7998b20b9f11cf78ae3214f149a9fda60fc88f8269fa1c5cf3dd84afde",
+    "src/server/forms.ts": "c436e04423a5af9c0577d6a6addac22d7f360212144d5e7c96e25de058397c7e",
+    "src/server/templates.ts": "e747108ae1547be34eddb2f1dee53e01864c157fb00bed0ec464e38975572cff",
+    "src/server/form-documents.ts": "69f4cb98e54131eb9376b5f217db27b828937850d0bad277ae2fc20484a210f6",
+    "src/server/form-access.ts": "b3d1c29ab810eeab5a41dbd18492c516404300752a33d5122f446fd8be2b962b",
+    "src/server/answer-validation.ts": "f2269f95d66a2943af3a0d884f037d19e58aef27e631afc791f50ac0fcd54aa9"
+  }
+}

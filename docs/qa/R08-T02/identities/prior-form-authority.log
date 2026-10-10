@@ -1,0 +1,23 @@
+(node:27517) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Post-restart DB state changed
++ actual - expected
+
++ '95e2096f85d2074f23501ca276667ec2f7dd686f1bf8f64db637dad0aa06033a'
+- '6d197ff8a75cd71ce9e2cc97d773821d869983479782ee9880dca3d22ac74ae7'
+
+    at <anonymous> (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-rea-form-authority.ts:115:75)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '95e2096f85d2074f23501ca276667ec2f7dd686f1bf8f64db637dad0aa06033a',
+  expected: '6d197ff8a75cd71ce9e2cc97d773821d869983479782ee9880dca3d22ac74ae7',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

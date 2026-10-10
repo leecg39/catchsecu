@@ -12,6 +12,7 @@ export type Application = {
   expertAssignmentCount: number;
   requireMfa?: boolean;
   requirePasswordChange?: boolean;
+  ssoLogin?: { mode: "NONE" | "AZURE" | "GOOGLE"; version: number; required: boolean };
 };
 const Context = createContext<{ data?: Application; reload: () => void }>({ reload: () => {} });
 export function ApplicationProvider({ children }: { children: ReactNode }) {

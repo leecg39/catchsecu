@@ -1,0 +1,620 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-10T04:49:08Z",
+  "author": "/root/prior_evidence",
+  "purpose": "R08 주소 질문 추가 전 소스 기반 통합 영향 검토",
+  "repository": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone",
+  "method": {
+    "sourceReadOnly": true,
+    "codeChanged": false,
+    "databaseAccessed": false,
+    "browserUsed": false,
+    "testsExecuted": false,
+    "onlyWrittenArtifact": "docs/qa/R08-T02/address-questions/impact-review.json",
+    "note": "공유 작업 트리의 현재 소스만 읽음. 부모의 원본 관찰을 재현하지 않았으며 아래 P1/P2는 새 타입을 일부 경로에만 추가할 때의 누락 위험이다."
+  },
+  "sourceObservationBoundary": {
+    "provenance": "부모 /root가 이번 작업 지시에서 전달한 원본 제출 관찰. 이 에이전트가 직접 관찰한 REA evidence는 아님.",
+    "ADDRESS": "문자열",
+    "FOREIGN_ADDRESS": {
+      "shape": "7개 문자열 속성을 갖는 객체",
+      "keys": [
+        "country",
+        "countryName",
+        "streetAddress",
+        "addressDetail",
+        "city",
+        "state",
+        "postalCode"
+      ]
+    },
+    "unknown": [
+      "로컬 타입의 최종 표시명/영문 원본 enum 대응",
+      "국내주소의 우편번호·기본주소·상세주소 결합 규칙",
+      "원본 선택 질문의 미응답 payload 표현",
+      "국가 코드 체계 및 country/countryName 대응표",
+      "필수 하위 필드, 국가별 state/postalCode 예외, 필드별 최대 길이",
+      "주소 검색 공급자/API와 실패 시 수동입력 동작",
+      "원본 서버의 주소 검증 규칙"
+    ]
+  },
+  "priorities": [
+    {
+      "id": "ADDR-01",
+      "priority": "P1",
+      "area": "질문 타입 및 요청 답변 스키마",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 3
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 22
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 24
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/domains.ts",
+          "line": 26
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+          "line": 20
+        }
+      ],
+      "observed": "질문 enum에 두 주소 타입이 없다. AnswerValue의 Record 타입은 해외주소를 구조적으로 포함할 수 있지만 런타임 객체 분기는 UUID 키의 행렬 답변만 허용하므로 7개 이름 키 객체는 제출/정정 요청에서 거부된다.",
+      "changes": [
+        "새 질문 타입을 questionTypes에 추가한다.",
+        "7개 키·문자열 타입·필드별 상한·추가 키 금지를 명시한 strict 주소 schema와 명시적 ForeignAddress 타입/type guard를 추가한다.",
+        "answersSchema에 주소 객체 분기를 추가하되 기존 UUID 행렬 record 검사를 느슨하게 만들지 않는다.",
+        "타입에 따른 허용 답변 모양은 server validation에서 다시 검사한다. union에 주소 객체를 넣었다는 이유로 단문·파일·선택형에도 객체를 허용하면 안 된다."
+      ],
+      "verify": [
+        "국내주소 string과 해외주소 7키 객체의 API 제출/정정 성공",
+        "누락/추가 키, 숫자·null·array·중첩객체, 과도한 필드 길이 거부",
+        "주소 객체를 기존 단문/체크박스/행렬/파일 질문에 보내면 거부",
+        "기존 행렬 단일·복수 선택 및 EXACT 회귀 유지"
+      ]
+    },
+    {
+      "id": "ADDR-02",
+      "priority": "P1",
+      "area": "서버 답변 검증 및 정규화",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+          "line": 24
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+          "line": 42
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+          "line": 51
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/special-questions.ts",
+          "line": 1
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/http.ts",
+          "line": 14
+        }
+      ],
+      "observed": "비행렬 객체는 42행에서 INVALID_ANSWER_TYPE이며 이후 scalar 분기는 string을 전제한다. 현재 specialAnswerError도 문자열 전용 호출이다. HTTP 전체 본문은 1,000,000 bytes 제한이 있다.",
+      "changes": [
+        "주소 전용 분기를 비행렬 객체 거부 이전에 둔다. 국내주소는 string, 해외주소는 strict 객체만 허용한다.",
+        "질문 필수 여부와 주소 내부 완결성 검사를 분리한다. 원본 미관찰 규칙은 독립 구현 계약이라고 명시한다.",
+        "원문 trim/정규화 여부와 하위필드 필수성은 명시적으로 결정하고 잘못된 형식을 빈 값으로 묵살하지 않는다.",
+        "country/countryName을 기본값으로 넣을 경우 국가 정보만 존재하는 답변의 의미를 정의한다. 국가 코드만 보고 실제 주소 입력이 완료됐다고 판단하면 안 된다.",
+        "수동 DTO 조립/내부 직접 호출에서도 같은 함수가 실행되도록 유지한다."
+      ],
+      "verify": [
+        "전체 빈 값·공백만·국가만·주소 한 필드만·완성된 주소 각각의 required/optional 결과",
+        "국가별 우편번호·state 차이는 선택한 독립 계약대로 검증",
+        "한글/Unicode/줄바꿈·쉼표 보존, 필드 상한 N/N+1",
+        "잘못된 답변 시 Submission/Answer/동의·감사 행이 남지 않음"
+      ]
+    },
+    {
+      "id": "ADDR-03",
+      "priority": "P1",
+      "area": "빈 답변과 조건 숨김",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 68
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 77
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 78
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+          "line": 19
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "line": 83
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "line": 111
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 65
+        }
+      ],
+      "observed": "새 비행렬 타입의 emptyAnswer 기본값은 현재 빈 문자열이다. isEmptyAnswer는 모든 object 값을 돌며 trim한다. 공개 화면은 숨긴 질문을 state에서 삭제하고, 정정 화면/서버는 emptyAnswer로 교체한다.",
+      "changes": [
+        "해외주소의 빈 값 표현을 하나로 정한다. 예: 7개 빈 문자열을 가진 fresh 객체. optional/숨김/삭제/재표시에서 같은 표현을 쓴다.",
+        "기존 행렬의 {} 및 체크박스 [] 표현은 보존한다.",
+        "기본 국가 메타데이터만 있는 상태를 미응답으로 볼지, 불완전 답변으로 거절할지 결정하여 서버와 native UI validation을 일치시킨다.",
+        "상위 조건은 현재 선택형 값만 참조한다. 주소를 조건 source로 허용하는 변경은 필요하지 않으며 별도 요구 없이는 금지한다."
+      ],
+      "verify": [
+        "입력한 해외주소를 숨기면 7개 값이 모두 제거되고 재표시해도 복원되지 않음",
+        "숨은 질문에 비어 있지 않은 주소 객체를 직접 전송하면 HIDDEN_ANSWER",
+        "optional 전부 비움 성공, required 전부 비움 실패",
+        "국가만 기본 선택된 상태와 공백 필드가 숨김 검사를 우회하지 않음"
+      ]
+    },
+    {
+      "id": "ADDR-04",
+      "priority": "P1",
+      "area": "입력 UI·정정 복원·타입 전환",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+          "line": 13
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+          "line": 38
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "line": 124
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 119
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+          "line": 116
+        }
+      ],
+      "observed": "QuestionInput은 주소 객체를 현재 text=''로 바꾸어 일반 input으로 렌더링한다. 공개 제출과 정정이 이 컴포넌트를 공유한다. 편집기의 타입 전환은 textMaxLength/subjectRole/rows/limits/options를 초기화한다.",
+      "changes": [
+        "질문 타입으로 분기하는 주소 입력 컴포넌트를 추가해 해외주소 객체를 onChange로 전달한다.",
+        "이미 저장된 7개 필드 객체에서 controlled state를 복원하고, reset/수정 취소/새 응답 전환에도 동기화한다.",
+        "국내주소를 한 문자열로 저장한다면 기존 문자열을 임의 분해해 주소 일부를 잃지 않는다.",
+        "필수 native validation은 실제 활성 입력에 연결하고 숨긴/비활성 입력의 customValidity가 제출을 막지 않도록 한다.",
+        "새 주소 타입을 choiceTypes/matrixTypes/textQuestionTypes 또는 subject/marketing 허용 타입에 편의상 편입하지 않는다."
+      ],
+      "verify": [
+        "공개 입력·정정 화면의 7개 필드 왕복과 전부 지우기",
+        "취소/재열기와 다른 응답 전환 시 이전 주소가 남지 않음",
+        "단문/행렬/이메일→주소→기존 타입 전환 저장/게시",
+        "제출 결과 불확실 상태에서는 주소 sub-input도 변경 잠금 및 같은 요청 재시도"
+      ]
+    },
+    {
+      "id": "ADDR-05",
+      "priority": "P1",
+      "area": "CSV 동기·비동기 내보내기",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/export-renderer.ts",
+          "line": 12
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/export-renderer.ts",
+          "line": 24
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/export-renderer.ts",
+          "line": 40
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/export-renderer.ts",
+          "line": 45
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-export.ts",
+          "line": 17
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/exports.ts",
+          "line": 149
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/exports.ts",
+          "line": 177
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/import-csv.ts",
+          "line": 96
+        }
+      ],
+      "observed": "현재 CSV renderer는 행렬 row 이외의 객체를 마지막 분기에서 빈 문자열로 반환한다. 해외주소 저장만 허용하면 동기/비동기 CSV가 주소를 조용히 누락한다.",
+      "changes": [
+        "공통 export-renderer에서 해외주소를 명시적으로 직렬화한다.",
+        "최소 변경안은 고정 key 순서의 lossless JSON을 한 셀로 출력하는 것이다. 7개 열 분리안을 택한다면 ExportColumn에 주소 field key를 별도 정의하고 matrix rowId와 혼동하지 않는다.",
+        "필드 분리 시 1,000열 제한/복수 게시 버전/20MB 제한을 다시 계산한다.",
+        "모든 출력 셀은 safeCsvCell을 거쳐 수식 시작 문자·따옴표·줄바꿈 처리를 유지한다.",
+        "비동기 작업의 저장된 layoutCipher 및 exportSourceHash 호환성을 확인한다. 기존 row/column 형태를 전역 변경하지 않는다."
+      ],
+      "verify": [
+        "7개 값이 모두 비어 있지 않은 주소의 동기/비동기 CSV 내용 일치",
+        "쉼표/따옴표/줄바꿈/수식 시작 문자 처리와 한글 보존",
+        "구형 문자열 답변과 새 주소 답변이 여러 게시 버전에 함께 있어도 원래 질문 열과 연결",
+        "정정 후 다시 내보내기 및 만료/파기 후 값 차단"
+      ]
+    },
+    {
+      "id": "ADDR-06",
+      "priority": "P2",
+      "area": "응답 목록·상세·정정 이력·외부 공유 표시",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 91
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/Workflow.tsx",
+          "line": 90
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 78
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SharedPrivacy.tsx",
+          "line": 71
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+          "line": 125
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/sharing.ts",
+          "line": 19
+        }
+      ],
+      "observed": "formatAnswer는 모든 object를 행렬처럼 '키: 값 / ...'로 출력한다. 질문 타입은 목록·공유 DTO와 세 UI 호출부에 이미 전달된다.",
+      "changes": [
+        "formatAnswer 또는 주소 전용 formatter에서 questionType/type guard로 해외주소를 구분하고 정해진 필드 순서/사용자용 라벨을 사용한다.",
+        "country와 countryName을 임의로 옵션 label/value처럼 치환하지 않는다. 표현 정책을 명시해 저장 원문과 혼동하지 않도록 한다.",
+        "신규 주소 표시를 React text로 유지하며 원문을 HTML로 해석하지 않는다.",
+        "공유 질문 DTO는 현재 type을 포함하므로 필수 신규 질문 설정이 없다면 별도 metadata 확장은 불필요하다."
+      ],
+      "verify": [
+        "목록·상세·정정 before/after·외부 공유가 동일한 7개 값과 순서 표시",
+        "object가 [object Object] 또는 UUID 행 라벨로 표시되지 않음",
+        "빈 선택 답변은 '-' 등 기존 미응답 표현, 긴 주소와 HTML 특수문자도 안전하게 표시"
+      ]
+    },
+    {
+      "id": "ADDR-07",
+      "priority": "P2",
+      "area": "정정 비교·부분 요청·원자성",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+          "line": 20
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+          "line": 76
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+          "line": 78
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+          "line": 92
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/idempotency.ts",
+          "line": 4
+        }
+      ],
+      "observed": "정정은 질문 단위 얕은 merge 후 baseline 전체를 검증하고 JSON.stringify로 변경 여부를 판정한다. 해외주소 sub-field만 보내면 객체 전체가 교체된다. idempotency는 객체 key를 정렬하므로 순서만 바뀐 요청을 같은 payload로 볼 수 있지만 정정 비교는 그렇지 않다.",
+      "changes": [
+        "해외주소 정정은 7개 필드 전체 교체로 명시하고 strict schema로 부분 객체를 거부하는 안이 현재 API와 일치한다. deep PATCH가 필요하면 별도 계약으로 설계한다.",
+        "주소 객체를 저장 전에 고정 key 순서로 구성하여 key 순서만 바뀐 NO_CHANGES 정정이 감사 이벤트를 만들지 않게 한다.",
+        "기존 게시 버전의 question type을 계속 사용하고 새 draft의 타입이 과거 응답 해석을 바꾸지 않게 한다.",
+        "주소 오류로 다른 질문의 정정까지 막히지 않도록 optional 빈 값과 legacy 값 호환을 테스트한다."
+      ],
+      "verify": [
+        "다른 질문만 정정해도 주소 7개 값 유지",
+        "주소 일부 key만 보낸 요청은 계약대로 거절; 기존 객체 손실 없음",
+        "동일 값 역순 key 요청은 의미 없는 Correction/version 증가 없음",
+        "유효한 주소 수정은 before/after 원문과 감사 원자 보존, 409/감사 실패 rollback"
+      ]
+    },
+    {
+      "id": "ADDR-08",
+      "priority": "P2",
+      "area": "외부 공유 권한과 암호화 저장",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/crypto.ts",
+          "line": 12
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+          "line": 98
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/schema.prisma",
+          "line": 1483
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/viewer.ts",
+          "line": 134
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/viewer.ts",
+          "line": 142
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/sharing.ts",
+          "line": 34
+        }
+      ],
+      "observed": "encrypt/decrypt는 임의 JSON을 왕복하므로 Answer.valueCipher 구조 변경은 불필요하다. valueType은 String이다. 공유는 선택된 Question ID만 조회하고 그 답변 전체 객체를 복호화한다.",
+      "changes": [
+        "기존 암호화 컬럼과 tenant/formVersion/question FK를 유지한다.",
+        "공유는 주소 질문 전체 단위임을 유지한다. 하위 addressDetail 등의 부분 공유가 필요하다면 현 questionIds 권한 모델로 표현할 수 없으므로 별도 설계가 필요하다.",
+        "strict 답변 schema로 추가/숨겨진 key 저장을 차단하여 일반 viewer가 미정의 payload까지 노출하지 않게 한다.",
+        "원문 주소를 새 로그/감사 detail에 넣지 않는다. 현재 감사는 질문 ID/필드명만 기록한다."
+      ],
+      "verify": [
+        "저장 암호문에 주소 평문이 없고 복호 후 문자열/객체 정확히 동일",
+        "선택하지 않은 주소 질문은 외부공유 payload에 없음",
+        "선택한 주소의 7개 필드만 전달, 만료/철회/다른 tenant 경계 유지",
+        "첨부파일 분기는 주소 객체를 파일 ID로 오인하지 않음"
+      ]
+    },
+    {
+      "id": "ADDR-09",
+      "priority": "P2",
+      "area": "DB 제약·기존 게시본·승인·복사/템플릿",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261025004000_contact_email_birth_questions/migration.sql",
+          "line": 3
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261025004000_contact_email_birth_questions/migration.sql",
+          "line": 8
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261025002000_question_exact_selection/migration.sql",
+          "line": 13
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261025003000_question_text_limits/migration.sql",
+          "line": 3
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261002094000_forms/migration.sql",
+          "line": 339
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts",
+          "line": 38
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts",
+          "line": 74
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-copy.ts",
+          "line": 4
+        }
+      ],
+      "observed": "Question_type_check은 최신 연락처/이메일/생년월일까지 허용한다. rows/limits는 기존 행렬·체크박스에 한정되며 textMaxLength는 단문/장문만 허용한다. 기존 게시 질문은 모든 update/delete를 막는다. copy는 structuredClone을 사용한다.",
+      "changes": [
+        "기존 migration을 수정하지 않고 새 additive migration에서 Question_type_check만 최종 주소 타입명을 포함하도록 확장한다.",
+        "subjectRole와 marketing DB guard는 주소를 계속 거부해야 한다. 답변 plaintext shape는 암호문 DB CHECK가 아닌 서버 계약에서 검증한다.",
+        "주소에 새 질문 설정이 없다면 Question 모델/DTO/hash에 빈 default key를 넣지 않는다. 기존 승인 지문과 게시 row를 재작성하지 않는다.",
+        "rows/selectionLimits/textMaxLength/optionDefinitions는 주소에서 기존 비해당 규칙대로 거절한다.",
+        "복사/템플릿 사용의 질문 logical ID 재할당, revise에서 ID 보존과 기존 게시본 불변을 그대로 사용한다."
+      ],
+      "verify": [
+        "주소 타입 초안 생성·수정·게시·copy·template use 성공",
+        "주소에 subjectRole/marketing 연결 또는 행렬/텍스트 설정을 붙이면 계약과 DB가 거절",
+        "기존 게시본 원문·질문·승인 지문 변경 없음",
+        "타입 전환은 새 draft에만 반영되고 과거 응답 정정은 원래 타입 유지"
+      ]
+    },
+    {
+      "id": "ADDR-10",
+      "priority": "P2",
+      "area": "CSV import는 별도 문자열 계약",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/imports.ts",
+          "line": 15
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/imports.ts",
+          "line": 30
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/import-csv.ts",
+          "line": 65
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/import-worker.ts",
+          "line": 78
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/import-worker.ts",
+          "line": 96
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+          "line": 74
+        }
+      ],
+      "observed": "importMapping은 text/email/phone/number/date만, ImportPayload.values는 string[]만 지원한다. worker는 subjectRole 단문, date 날짜, 나머지 장문 질문을 만든다. 정정 시 import evidence.fieldTypes로 추가 검사한다.",
+      "changes": [
+        "이번 폼 주소 타입 추가만으로 기존 CSV 주소 문자열을 새 객체 타입으로 자동 변환하지 않는다.",
+        "해외주소 객체의 CSV roundtrip import가 요구된다면 mapping enum·7열/JSON셀 해석·ImportPayload/Preview DTO·import UI·worker type 매핑을 별도 확장해야 한다.",
+        "기존 주소 텍스트가 장문형/null textMaxLength로 남는 것을 보존하고 새 UI 기본 길이를 import에 주입하지 않는다."
+      ],
+      "verify": [
+        "기존 CSV 주소 문자열 import·조회·정정·export가 그대로 유지",
+        "미지원 주소 mapping type 요청은 거부되며 임의 JSON 해석이 발생하지 않음",
+        "추가 import 지원을 택한다면 7필드 완전성·개별 열 누락·행 오류·재시도·중복검사 별도 검증"
+      ]
+    },
+    {
+      "id": "ADDR-11",
+      "priority": "P3",
+      "area": "PDF 경계",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/consent-receipts.ts",
+          "line": 20
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/consent-receipts.ts",
+          "line": 35
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/consent-receipts.ts",
+          "line": 79
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 174
+        }
+      ],
+      "observed": "현재 응답 상세의 PDF는 제출 당시 동의 문서 영수증이다. evidence에는 폼 본문/목적/문서 동의가 있으며 질문별 답변은 포함하지 않는다. 저장된 PDF/hash를 다운로드한다.",
+      "changes": [
+        "주소 답변 추가만으로 기존 영수증 schemaVersion/PDF/hash를 변경하지 않는다.",
+        "주소를 포함하는 응답 PDF를 요구한다면 별도 신규 출력 계약이며 현재 동의 영수증과 구분한다."
+      ],
+      "verify": [
+        "주소 응답 제출/정정 후 기존 동의 영수증 PDF/hash가 불필요하게 바뀌지 않음",
+        "영수증에 주소 원문이 새로 노출되지 않음",
+        "문서 동의 검증 및 PDF 사전 렌더링 회귀 유지"
+      ]
+    },
+    {
+      "id": "ADDR-12",
+      "priority": "P2",
+      "area": "OpenAPI·문서와 필수 검증 묶음",
+      "evidence": [
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/generate-openapi.ts",
+          "line": 424
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/generate-openapi.ts",
+          "line": 432
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/generate-openapi.ts",
+          "line": 511
+        },
+        {
+          "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/public-submission.ts",
+          "line": 11
+        }
+      ],
+      "observed": "공개 제출과 정정 OpenAPI는 Zod 계약에서 생성한다. 제출 재시도 세션은 직렬화 payload와 idempotency key를 고정한다.",
+      "changes": [
+        "질문 enum/7키 object 분기/추가키 금지/최대길이를 생성된 OpenAPI에 반영한다. 이번 검토에서는 생성 명령을 실행하지 않았다.",
+        "기존 테스트 묶음에 새 주소 특화 통합 테스트를 추가하고 실제 브라우저에서 중첩 입력의 native validation·초기값·조건 숨김을 확인한다."
+      ],
+      "verify": [
+        "새 주소 API 계약이 OpenAPI로 생성되며 기존 matrix anyOf가 유지",
+        "동일 idempotency key 재시도는 접수 한 건, 주소 값 변경 시 payload 충돌",
+        "필수/선택/숨김/정정/동기·비동기 CSV/공유를 모두 포함한 신규 통합 테스트",
+        "새 UI 제출→새로고침/정정 복원→조건 숨김→다시 표시의 실제 브라우저 검증"
+      ]
+    }
+  ],
+  "recommendedImplementationOrder": [
+    "공식 원본 관찰과 독립 검증 계약의 경계 확정(빈 값·필수 하위필드·국가 코드·상한)",
+    "질문 enum + strict 주소 schema/type guard + canonical empty/normalization + additive DB migration",
+    "QuestionInput 주소 컴포넌트 + server validateAnswers + 타입 전환 및 조건 숨김",
+    "공통 formatAnswer + CSV renderer(동기/비동기)",
+    "정정/공유/복사·템플릿/기존 게시본/마케팅·정보주체 거부 회귀",
+    "OpenAPI 재생성 및 root의 직렬 DB 통합 테스트·브라우저 검증"
+  ],
+  "reuseTests": [
+    "tests/server/question-special-types.test.ts",
+    "tests/server/question-special-bindings.test.ts",
+    "tests/server/question-rules.test.ts",
+    "tests/server/question-exact-selection.test.ts",
+    "tests/server/question-identities.test.ts",
+    "tests/server/question-text-limits.test.ts",
+    "tests/server/submission-export.test.ts",
+    "tests/server/async-export.test.ts",
+    "tests/server/sharing.test.ts",
+    "tests/server/share-creation-state.test.ts",
+    "tests/server/imports.test.ts",
+    "tests/server/form-documents.test.ts",
+    "tests/server/public-submission-state.test.ts",
+    "tests/server/form-draft-save.test.ts"
+  ],
+  "implementationFollowUp": {
+    "scope": "영향 분석 완료 후 부모가 별도 위임한 주소 계약·서버·CSV·마이그레이션·통합 테스트 구현",
+    "note": "위 method, unknown, evidence 줄 번호와 아래 SHA256은 구현 전 분석 시점의 기록이다. 이 항목만 후속 구현 상태를 기록한다.",
+    "files": [
+      "src/contracts/address-questions.ts",
+      "src/contracts/questions.ts",
+      "src/server/answer-validation.ts",
+      "src/server/export-renderer.ts",
+      "prisma/migrations/20261025005000_address_questions/migration.sql",
+      "tests/server/question-address-types.test.ts"
+    ],
+    "resolvedContract": {
+      "types": ["주소", "해외 주소"],
+      "domestic": "(5자리 우편번호) 주소 내용, trim 후 1000자 이내. 형식과 상한은 원본 서버 검증 미관측 상태의 독립 구현 계약.",
+      "foreign": "strict 7문자열 키. 생략만 빈 7필드 객체. 고정 키 순서·trim·181개 ISO 목록 기반 한국어 국가명으로 정규화. 명시 string/array/{}는 표시된 질문에서 거부.",
+      "foreignRequired": "country/streetAddress/city 모두 필수",
+      "foreignOptional": "핵심 3필드 전부 빈값 또는 전부 입력. 상세/주/우편번호만 입력한 경우는 허용.",
+      "limits": { "streetAddress": 255, "addressDetail": 255, "city": 100, "state": 100, "postalCode": 20, "countryName": 100 },
+      "csv": "비어 있지 않은 해외주소는 고정 7키 JSON 문자열, 빈 객체는 빈 셀. 동기·비동기 공통 renderer 사용."
+    },
+    "checks": {
+      "typescript": "전체 tsc --noEmit --incremental false 통과",
+      "eslint": "소유 TS 5개 파일 통과",
+      "integrationTestsAuthored": 15,
+      "integrationTestsExecutedByThisAgent": false,
+      "migrationAppliedByThisAgent": false,
+      "browserUsedByThisAgent": false,
+      "handoff": "부모가 DB 115 적용 및 통합·브라우저 검증을 직렬 수행한다. 이 에이전트는 실행 성공을 주장하지 않는다."
+    }
+  },
+  "sourceSnapshotsSha256": {
+    "src/contracts/questions.ts": "0d6928a5e809d90512744909ed1cda213a79574a7cdfd55b5afc0a5b9a4753a3",
+    "src/server/answer-validation.ts": "0b9548b37e35d2c7eed941b68eeea47418fc3f2b91aa7df1765741a671ade35c",
+    "src/server/export-renderer.ts": "c9533c537cea4a26040aac25f92dcad64c3a20e2035d8a8a3a8771e41a22f7c7",
+    "src/server/submission-management.ts": "2521203a54451e20244b3b63604d25dc80d086e52519fe149487d2c4a49d43ab",
+    "src/components/forms/QuestionInput.tsx": "96d5a0111a5d1d9bc1c76bee8c1ad16b82760388e2384a1904d373e99084b3e7",
+    "src/server/viewer.ts": "9772728bf5ca4d60107a9358c38ee3a77b8479c21e1a1feb894ba57cd5476e86",
+    "src/server/import-worker.ts": "7a8f56ca0a3ee04282984f873ebc6d437b9d12e0e1d6e8402a8de056ee82211a",
+    "src/contracts/imports.ts": "5da2c255d7d2aa6b7b86830151b52f053a732b27f38228c5fadc4f6348581152",
+    "prisma/migrations/20261025004000_contact_email_birth_questions/migration.sql": "de8bf20f011d1d9e19745b89785373a0dcc2be7165fc41276f4ef350b45f26e3"
+  }
+}

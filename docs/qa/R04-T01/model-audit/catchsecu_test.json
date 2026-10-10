@@ -1,0 +1,534 @@
+{
+  "result": "passed",
+  "database": "catchsecu_test",
+  "checkedAt": "2026-10-09T19:47:34.161Z",
+  "scope": "Five existing membership/invitation/expert models; read-only metadata, uniqueness, tenant relations, state constraints and last-owner trigger assertions. No new migration or claim of full R04 acceptance.",
+  "tables": [
+    "Membership",
+    "ServiceGrant",
+    "Invitation",
+    "ExpertAssignment",
+    "ExpertAssignmentService"
+  ],
+  "columns": [
+    {
+      "table": "ExpertAssignment",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignment",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignment",
+      "column": "expertUserId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignment",
+      "column": "assignedById",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignment",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignment",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignment",
+      "column": "revokedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "ExpertAssignment",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignment",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignment",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "column": "assignmentId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "email",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "role",
+      "type": "USER-DEFINED",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "serviceIds",
+      "type": "ARRAY",
+      "nullable": "YES"
+    },
+    {
+      "table": "Invitation",
+      "column": "tokenHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "invitedBy",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "acceptedBy",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Invitation",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Invitation",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "role",
+      "type": "USER-DEFINED",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "accessKind",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Membership",
+      "column": "expertAssignmentId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "memberId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "capabilities",
+      "type": "ARRAY",
+      "nullable": "YES"
+    },
+    {
+      "table": "ServiceGrant",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    }
+  ],
+  "constraints": [
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_assignedById_fkey",
+      "definition": "FOREIGN KEY (\"assignedById\") REFERENCES \"User\"(id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_expertUserId_fkey",
+      "definition": "FOREIGN KEY (\"expertUserId\") REFERENCES \"User\"(id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_state_check",
+      "definition": "CHECK (((version > 0) AND (\"expiresAt\" > \"createdAt\") AND (\"expertUserId\" <> \"assignedById\") AND (((status = 'active'::text) AND (\"revokedAt\" IS NULL)) OR ((status = 'revoked'::text) AND (\"revokedAt\" IS NOT NULL)))))"
+    },
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "name": "ExpertAssignmentService_assignment_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"assignmentId\") REFERENCES \"ExpertAssignment\"(\"tenantId\", id) ON DELETE CASCADE"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "name": "ExpertAssignmentService_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "name": "ExpertAssignmentService_service_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "Invitation",
+      "name": "Invitation_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Invitation",
+      "name": "Invitation_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'accepted'::text, 'revoked'::text, 'expired'::text])))"
+    },
+    {
+      "table": "Invitation",
+      "name": "Invitation_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_accessKind_check",
+      "definition": "CHECK ((((\"accessKind\" = 'direct'::text) AND (\"expertAssignmentId\" IS NULL)) OR ((\"accessKind\" = 'expert'::text) AND (\"expertAssignmentId\" IS NOT NULL) AND (role = 'viewer'::\"Role\"))))"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_expertAssignment_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"expertAssignmentId\", \"userId\") REFERENCES \"ExpertAssignment\"(\"tenantId\", id, \"expertUserId\") ON DELETE RESTRICT"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'suspended'::text, 'revoked'::text])))"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_tenantId_memberId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"memberId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_tenantId_serviceId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE CASCADE"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_pkey",
+      "definition": "CREATE UNIQUE INDEX \"ExpertAssignment_pkey\" ON public.\"ExpertAssignment\" USING btree (id)"
+    },
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_tenant_id_key",
+      "definition": "CREATE UNIQUE INDEX \"ExpertAssignment_tenant_id_key\" ON public.\"ExpertAssignment\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_tenant_id_user_key",
+      "definition": "CREATE UNIQUE INDEX \"ExpertAssignment_tenant_id_user_key\" ON public.\"ExpertAssignment\" USING btree (\"tenantId\", id, \"expertUserId\")"
+    },
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_tenant_user_key",
+      "definition": "CREATE UNIQUE INDEX \"ExpertAssignment_tenant_user_key\" ON public.\"ExpertAssignment\" USING btree (\"tenantId\", \"expertUserId\")"
+    },
+    {
+      "table": "ExpertAssignment",
+      "name": "ExpertAssignment_user_status_expiry_idx",
+      "definition": "CREATE INDEX \"ExpertAssignment_user_status_expiry_idx\" ON public.\"ExpertAssignment\" USING btree (\"expertUserId\", status, \"expiresAt\")"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "name": "ExpertAssignmentService_pkey",
+      "definition": "CREATE UNIQUE INDEX \"ExpertAssignmentService_pkey\" ON public.\"ExpertAssignmentService\" USING btree (id)"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "name": "ExpertAssignmentService_scope_key",
+      "definition": "CREATE UNIQUE INDEX \"ExpertAssignmentService_scope_key\" ON public.\"ExpertAssignmentService\" USING btree (\"tenantId\", \"assignmentId\", \"serviceId\")"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "name": "ExpertAssignmentService_service_idx",
+      "definition": "CREATE INDEX \"ExpertAssignmentService_service_idx\" ON public.\"ExpertAssignmentService\" USING btree (\"tenantId\", \"serviceId\")"
+    },
+    {
+      "table": "Invitation",
+      "name": "Invitation_pending_unique",
+      "definition": "CREATE UNIQUE INDEX \"Invitation_pending_unique\" ON public.\"Invitation\" USING btree (\"tenantId\", lower(email)) WHERE (status = 'pending'::text)"
+    },
+    {
+      "table": "Invitation",
+      "name": "Invitation_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Invitation_pkey\" ON public.\"Invitation\" USING btree (id)"
+    },
+    {
+      "table": "Invitation",
+      "name": "Invitation_tenantId_status_createdAt_id_idx",
+      "definition": "CREATE INDEX \"Invitation_tenantId_status_createdAt_id_idx\" ON public.\"Invitation\" USING btree (\"tenantId\", status, \"createdAt\", id)"
+    },
+    {
+      "table": "Invitation",
+      "name": "Invitation_tokenHash_key",
+      "definition": "CREATE UNIQUE INDEX \"Invitation_tokenHash_key\" ON public.\"Invitation\" USING btree (\"tokenHash\")"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_expertAssignmentId_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_expertAssignmentId_key\" ON public.\"Membership\" USING btree (\"expertAssignmentId\")"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Membership_pkey\" ON public.\"Membership\" USING btree (id)"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_tenantId_id_key\" ON public.\"Membership\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenantId_id_userId_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_tenantId_id_userId_key\" ON public.\"Membership\" USING btree (\"tenantId\", id, \"userId\")"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenantId_userId_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_tenantId_userId_key\" ON public.\"Membership\" USING btree (\"tenantId\", \"userId\")"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_tenant_assignment_user_key",
+      "definition": "CREATE UNIQUE INDEX \"Membership_tenant_assignment_user_key\" ON public.\"Membership\" USING btree (\"tenantId\", \"expertAssignmentId\", \"userId\")"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_userId_status_idx",
+      "definition": "CREATE INDEX \"Membership_userId_status_idx\" ON public.\"Membership\" USING btree (\"userId\", status)"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_pkey",
+      "definition": "CREATE UNIQUE INDEX \"ServiceGrant_pkey\" ON public.\"ServiceGrant\" USING btree (id)"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "ServiceGrant_tenantId_memberId_serviceId_key",
+      "definition": "CREATE UNIQUE INDEX \"ServiceGrant_tenantId_memberId_serviceId_key\" ON public.\"ServiceGrant\" USING btree (\"tenantId\", \"memberId\", \"serviceId\")"
+    }
+  ],
+  "triggers": [
+    {
+      "table": "ExpertAssignment",
+      "name": "export_expert_access",
+      "definition": "CREATE TRIGGER export_expert_access BEFORE DELETE OR UPDATE OF status, \"expiresAt\" ON public.\"ExpertAssignment\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+      "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+    },
+    {
+      "table": "ExpertAssignmentService",
+      "name": "export_expert_service_access",
+      "definition": "CREATE TRIGGER export_expert_service_access BEFORE INSERT OR DELETE OR UPDATE ON public.\"ExpertAssignmentService\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+      "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+    },
+    {
+      "table": "Membership",
+      "name": "Membership_mfa_owner_guard",
+      "definition": "CREATE TRIGGER \"Membership_mfa_owner_guard\" BEFORE DELETE OR UPDATE ON public.\"Membership\" FOR EACH ROW EXECUTE FUNCTION protect_last_mfa_owner()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_last_mfa_owner()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF OLD.role='owner' AND OLD.status='active' AND OLD.\"accessKind\"='direct'\n    AND (TG_OP='DELETE' OR NEW.role<>'owner' OR NEW.status<>'active' OR NEW.\"tenantId\"<>OLD.\"tenantId\" OR NEW.\"accessKind\"<>'direct') THEN\n    PERFORM id FROM \"Company\" WHERE id=OLD.\"tenantId\" FOR UPDATE;\n    IF EXISTS(SELECT 1 FROM \"Company\" c JOIN \"SecurityPolicy\" p ON p.\"tenantId\"=c.id WHERE c.id=OLD.\"tenantId\" AND c.status='active' AND p.\"requireMfa\")\n      AND EXISTS(SELECT 1 FROM \"User\" WHERE id=OLD.\"userId\" AND \"twoFactorEnabled\" AND status='active')\n      AND NOT EXISTS(SELECT 1 FROM \"Membership\" m JOIN \"User\" u ON u.id=m.\"userId\" WHERE m.\"tenantId\"=OLD.\"tenantId\" AND m.id<>OLD.id AND m.role='owner' AND m.status='active' AND m.\"accessKind\"='direct' AND u.\"twoFactorEnabled\" AND u.status='active' AND u.\"emailVerified\")\n    THEN RAISE EXCEPTION 'LAST_MFA_OWNER_REQUIRED' USING ERRCODE='23514'; END IF;\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF; RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "Membership",
+      "name": "export_member_access",
+      "definition": "CREATE TRIGGER export_member_access BEFORE DELETE OR UPDATE OF role, status, \"accessKind\", \"expertAssignmentId\" ON public.\"Membership\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+      "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+    },
+    {
+      "table": "Membership",
+      "name": "membership_active_account_guard",
+      "definition": "CREATE TRIGGER membership_active_account_guard BEFORE INSERT OR UPDATE ON public.\"Membership\" FOR EACH ROW EXECUTE FUNCTION guard_active_account_reference()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_active_account_reference()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE account_status text;\nBEGIN\n  IF TG_TABLE_NAME = 'Membership' THEN\n    IF NEW.status <> 'active' THEN RETURN NEW; END IF;\n  END IF;\n  SELECT status INTO account_status FROM \"User\" WHERE id = NEW.\"userId\" FOR SHARE;\n  IF account_status <> 'active' THEN\n    RAISE EXCEPTION 'ACCOUNT_UNAVAILABLE' USING ERRCODE = '23514';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "Membership",
+      "name": "membership_last_owner_guard",
+      "definition": "CREATE TRIGGER membership_last_owner_guard BEFORE DELETE OR UPDATE ON public.\"Membership\" FOR EACH ROW EXECUTE FUNCTION protect_last_company_owner()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_last_company_owner()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE company_state text;\nBEGIN\n  IF OLD.role = 'owner' AND OLD.status = 'active'\n    AND (TG_OP = 'DELETE' OR NEW.role <> 'owner' OR NEW.status <> 'active' OR NEW.\"tenantId\" <> OLD.\"tenantId\") THEN\n    SELECT status INTO company_state FROM \"Company\" WHERE id = OLD.\"tenantId\" FOR UPDATE;\n    IF company_state <> 'closed' AND NOT EXISTS (\n      SELECT 1 FROM \"Membership\" WHERE \"tenantId\" = OLD.\"tenantId\"\n        AND role = 'owner' AND status = 'active' AND id <> OLD.id\n    ) THEN\n      RAISE EXCEPTION 'LAST_OWNER_REQUIRED' USING ERRCODE = '23514';\n    END IF;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "ServiceGrant",
+      "name": "export_grant_access",
+      "definition": "CREATE TRIGGER export_grant_access BEFORE INSERT OR DELETE OR UPDATE ON public.\"ServiceGrant\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+      "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+    }
+  ],
+  "sourceFingerprints": {
+    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/migrations/20261002110000_last_owner_guard/migration.sql": "94a060c6f642eb00a37170ea335f2392eead015b5da02fa4720f5fa87d539b10",
+    "prisma/migrations/20261003150000_expert_assignments/migration.sql": "378d1bd88bbae75f5737d48152cd557677a85a411c6ae8f80db3665a3ade0e1a",
+    "src/server/members.ts": "330c517b14138bddc4770191a1ab9ad688a96bf71c1a225dd167805735215162",
+    "src/server/expert-assignments.ts": "43aa584944e4a53021082a5e210fd170208e7cbddd4dba6dc2148a6cab23b86e",
+    "src/contracts/members.ts": "f9e5d0182e147dbd158a0c2fe07c83497426e9a30e443b3ca88e49725e0da1e4"
+  }
+}

@@ -1,0 +1,31 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:17325) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/question-material-links.test.ts (18 tests) 16012ms
+   ✓ LINK wire trims inputs but preserves the original URL spelling and supports exactly three ordered items 1971ms
+   ✓ URL and label limits count UTF-16 units including supplementary characters 901ms
+   ✓ blank labels fall back to URL with a surrogate-safe 99-unit prefix plus ellipsis 743ms
+   ✓ unsafe URL forms, NUL and malformed Unicode are rejected without accepting FILE or relaxed JSON shapes 638ms
+   ✓ creates normalized links, exposes exact public metadata and never fetches their targets 1496ms
+   ✓ legacy SQL null stays absent from DTO and preserves the pre-material approval fingerprint 775ms
+   ✓ editing and reordering links preserves physical question/option IDs and supersedes the frozen approval 920ms
+   ✓ omission preserves current links while explicit empty removes them without later resurrection 623ms
+   ✓ implicit draft omission retains current links but a new logical question inherits none 657ms
+   ✓ form copy and explicit revise retain links while preserving the correct logical identity boundaries 776ms
+   ✓ template create/update/use preserves omitted lists, order and clearing with independent question IDs 845ms
+   ✓ legacy template JSON is neither enriched with defaults nor rewritten by repeated reads 499ms
+   ✓ database enforces material shape, protocol, strict keys, sequence and exact UTF-16 lengths 1085ms
+   ✓ published material rows cannot be directly altered or removed 775ms
+   ✓ stale version and revoked current authority reject material updates without changing data or audit 600ms
+   ✓ form material changes roll back with their version when audit insertion fails 736ms
+   ✓ template material changes roll back with their version when audit insertion fails 648ms
+   ✓ old response correction retains its published links and leaves consent evidence and PDF bytes unchanged 1319ms
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  15:38:17
+   Duration  17.74s (tests 91%, transform 5%, import 4%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/reference-link/after.json

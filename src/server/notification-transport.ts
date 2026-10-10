@@ -1,6 +1,7 @@
 import dns from "node:dns/promises";
 import https from "node:https";
-import { BlockList, isIP } from "node:net";
+import { isIP } from "node:net";
+import { publicOutboundAddress as publicNotificationAddress } from "./public-network";
 import { mkdir, open, link, unlink } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
@@ -27,14 +28,7 @@ export function notificationEndpoint(provider: NotificationProvider, input: stri
   }
   return url;
 }
-const denied = new BlockList();
-for (const [ip, prefix] of [["0.0.0.0", 8], ["10.0.0.0", 8], ["100.64.0.0", 10], ["127.0.0.0", 8], ["169.254.0.0", 16], ["172.16.0.0", 12], ["192.0.0.0", 24], ["192.0.2.0", 24], ["192.88.99.0", 24], ["192.168.0.0", 16], ["198.18.0.0", 15], ["198.51.100.0", 24], ["203.0.113.0", 24], ["224.0.0.0", 4], ["240.0.0.0", 4]] as const) denied.addSubnet(ip, prefix, "ipv4");
-const public6 = new BlockList(); public6.addSubnet("2000::", 3, "ipv6");
-for (const [ip, prefix] of [["2001::", 23], ["2001:db8::", 32], ["2002::", 16], ["3fff::", 20]] as const) denied.addSubnet(ip, prefix, "ipv6");
-export function publicNotificationAddress(address: string) {
-  const family = isIP(address);
-  return family === 4 ? !denied.check(address, "ipv4") : family === 6 && public6.check(address, "ipv6") && !denied.check(address, "ipv6");
-}
+export { publicNotificationAddress };
 export type NotificationResult = { kind: "success" | "retry" | "failed" | "unknown"; outcome?: "local_delivered" | "accepted"; code?: string; httpStatus?: number; retrySeconds?: number };
 export function notificationPayload(provider: NotificationProvider, text: string) {
   return provider === "slack" ? { text, mrkdwn: false, unfurl_links: false, unfurl_media: false } :

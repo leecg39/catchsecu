@@ -1,0 +1,70 @@
+{
+  "cases": [
+    {
+      "label": "query cannot expose another user's profile",
+      "status": 200
+    },
+    {
+      "label": "profile cannot change account identity",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "label": "stale profile write is rejected",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "label": "another user's session cannot be removed",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "label": "anonymous profile is denied",
+      "status": 401,
+      "code": "UNAUTHENTICATED"
+    },
+    {
+      "label": "foreign tenant cannot read review",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "label": "foreign tenant cannot act on review",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "label": "recipient cannot resolve review",
+      "status": 403,
+      "code": "REVIEW_FORBIDDEN"
+    },
+    {
+      "label": "recipient cannot request notification",
+      "status": 403,
+      "code": "REVIEW_FORBIDDEN"
+    },
+    {
+      "label": "recipient cannot approve destruction",
+      "status": 403,
+      "code": "REVIEW_FORBIDDEN"
+    },
+    {
+      "label": "owner cannot respond for recipient",
+      "status": 403,
+      "code": "REVIEW_RECIPIENT_ONLY"
+    },
+    {
+      "label": "second open review is rejected",
+      "status": 409,
+      "code": "REVIEW_ALREADY_OPEN"
+    },
+    {
+      "label": "company owner cannot close account",
+      "status": 409,
+      "code": "OWNERSHIP_TRANSFER_REQUIRED"
+    }
+  ],
+  "deniedWritesUnchanged": true,
+  "checkedAt": "2026-10-09T20:20:17.379Z"
+}

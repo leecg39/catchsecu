@@ -9,6 +9,7 @@ import { decrypt, encrypt } from "./crypto";
 import { fail, requireVersion } from "./http";
 import { audit } from "./audit";
 import { idempotent } from "./idempotency";
+import { lockSecurityEntitlements } from "./feature-entitlements";
 const maxLifetime = 86400000;
 function tenant(ctx: Context, tenantId: string) { if (tenantId !== ctx.tenantId) fail(409,"COMPANY_CHANGED","선택한 회사가 변경되었습니다."); }
 function dto(row: MfaException) { return { id:row.id,tenantId:row.tenantId,memberId:row.memberId,reason:decrypt<string>(row.reasonCipher),expiresAt:row.expiresAt.toISOString(),createdAt:row.createdAt.toISOString(),version:row.version,active:row.expiresAt>new Date() }; }
@@ -19,7 +20,9 @@ async function locked(tx: Transaction, ctx: Context, write=false) {
   const user=await tx.user.findUniqueOrThrow({where:{id:ctx.user.id}});
   if(write&&actor.member.role!=="owner") fail(403,"FORBIDDEN","최상위 관리자만 변경할 수 있습니다.");
   if(write&&!user.twoFactorEnabled) fail(409,"MFA_SETUP_REQUIRED","관리자 본인의 2단계 인증을 먼저 등록해주세요.");
-  return {...actor,user};
+  const access=await lockSecurityEntitlements(tx,ctx.tenantId);
+  if(write)access.assert("security.mfa_management");
+  return {...actor,user,access};
 }
 function expiry(value:string,createdAt=new Date()) {
   const result=new Date(value),now=new Date();
@@ -39,7 +42,7 @@ export async function listMfaMembers(ctx:Context,query:z.infer<typeof mfaMemberQ
     const filtered=members.filter(m=>(!query.search||(m.user.name+" "+m.user.email).toLowerCase().includes(query.search.toLowerCase()))&&(query.status==="all"||(query.status==="enabled"?m.user.twoFactorEnabled:query.status==="exception"?!m.user.twoFactorEnabled&&!!m.mfaException&&m.mfaException.expiresAt>now:!m.user.twoFactorEnabled&&(!m.mfaException||m.mfaException.expiresAt<=now))));
     const total=filtered.length,page=Math.min(query.page,Math.max(1,Math.ceil(total/query.pageSize))),policy=await tx.securityPolicy.findUniqueOrThrow({where:{tenantId:ctx.tenantId}});
     const enrolled=members.filter(m=>m.user.twoFactorEnabled).length,exceptions=members.filter(m=>!m.user.twoFactorEnabled&&m.mfaException&&m.mfaException.expiresAt>now).length;
-    const result={policy:{tenantId:ctx.tenantId,required:policy.requireMfa,version:policy.version,canManage:actor.member.role==="owner"&&actor.user.twoFactorEnabled,actorEnrolled:actor.user.twoFactorEnabled},items:filtered.slice((page-1)*query.pageSize,page*query.pageSize).map(m=>({id:m.id,name:m.user.name,email:m.user.email,role:m.role,enrolled:m.user.twoFactorEnabled,exception:m.mfaException?dto(m.mfaException):null})),total,page,pageSize:query.pageSize,summary:{members:members.length,enrolled,exceptions,missing:members.length-enrolled-exceptions}};
+    const result={policy:{tenantId:ctx.tenantId,required:policy.requireMfa,version:policy.version,canManage:actor.member.role==="owner"&&actor.user.twoFactorEnabled&&actor.access.snapshot()["security.mfa_management"].available,actorEnrolled:actor.user.twoFactorEnabled,entitlement:actor.access.snapshot()["security.mfa_management"]},items:filtered.slice((page-1)*query.pageSize,page*query.pageSize).map(m=>({id:m.id,name:m.user.name,email:m.user.email,role:m.role,enrolled:m.user.twoFactorEnabled,exception:m.mfaException?dto(m.mfaException):null})),total,page,pageSize:query.pageSize,summary:{members:members.length,enrolled,exceptions,missing:members.length-enrolled-exceptions}};
     assertFileDeadlines(actor.deadlines);return result;
   },{timeout:15000});
 }
@@ -53,24 +56,24 @@ export async function changeMfaPolicy(ctx:Context,input:{tenantId:string;version
     requireVersion(input,policy);
     const row=await tx.securityPolicy.update({where:{tenantId:ctx.tenantId},data:{requireMfa:input.required,version:{increment:1}}});
     await audit(tx,ctx,requestId,"mfa_policy.updated","securityPolicy",ctx.tenantId,["requireMfa"]);
-    assertFileDeadlines(actor.deadlines);return {tenantId:ctx.tenantId,required:row.requireMfa,version:row.version};
+    assertFileDeadlines(actor.deadlines);actor.access.assert("security.mfa_management");return {tenantId:ctx.tenantId,required:row.requireMfa,version:row.version};
   },{timeout:15000});
 }
 export async function createMfaException(ctx:Context,input:Omit<z.infer<typeof mfaExceptionCreate>,"password">,key:string|null,requestId:string) {
-  tenant(ctx,input.tenantId);let deadlines:Awaited<ReturnType<typeof lockServiceActor>>["deadlines"]|undefined;
+  tenant(ctx,input.tenantId);let featureCheck:(()=>void)|undefined;let deadlines:Awaited<ReturnType<typeof lockServiceActor>>["deadlines"]|undefined;
   return idempotent("mfa-exception:create:"+ctx.tenantId+":"+ctx.user.id,key,input,async tx=>{
-    const actor=await locked(tx,ctx,true);deadlines=actor.deadlines;await target(tx,ctx,input.memberId);
+    const actor=await locked(tx,ctx,true);deadlines=actor.deadlines;featureCheck=()=>actor.access.assert("security.mfa_management");await target(tx,ctx,input.memberId);
     if(input.memberId===ctx.member.id)fail(409,"MFA_SELF_EXCEPTION","본인의 예외는 다른 최상위 관리자가 등록해야 합니다.");
     if(await tx.mfaException.findUnique({where:{tenantId_memberId:{tenantId:ctx.tenantId,memberId:input.memberId}}}))fail(409,"MFA_EXCEPTION_EXISTS","기존 예외를 수정하거나 삭제해주세요.");
     const createdAt=new Date(),expiresAt=expiry(input.expiresAt,createdAt);
     const row=await tx.mfaException.create({data:{tenantId:ctx.tenantId,memberId:input.memberId,createdById:ctx.member.id,reasonCipher:encrypt(input.reason),expiresAt,createdAt}});
     await audit(tx,ctx,requestId,"mfa_exception.created","mfaException",row.id,["memberId","expiresAt"]);
     return {status:201,body:dto(row),resource:{tenantId:ctx.tenantId,resourceType:"mfa-exception" as const,resourceId:row.id}};
-  },async tx=>{deadlines=(await locked(tx,ctx,true)).deadlines;},async(tx,cached)=>{
+  },async tx=>{const actor=await locked(tx,ctx,true);deadlines=actor.deadlines;featureCheck=()=>actor.access.assert("security.mfa_management");},async(tx,cached)=>{
     const row=await tx.mfaException.findFirst({where:{id:cached.id,tenantId:ctx.tenantId}});
     if(!row||row.expiresAt<=new Date())fail(410,"MFA_EXCEPTION_EXPIRED","삭제되었거나 만료된 예외 요청입니다.");
     await target(tx,ctx,row.memberId);return dto(row);
-  },async()=>{if(deadlines)assertFileDeadlines(deadlines);});
+  },async()=>{if(deadlines)assertFileDeadlines(deadlines);featureCheck?.();});
 }
 export async function updateMfaException(ctx:Context,id:string,input:Omit<z.infer<typeof mfaExceptionPatch>,"password">,requestId:string) {
   tenant(ctx,input.tenantId);return db.$transaction(async tx=>{
@@ -78,7 +81,7 @@ export async function updateMfaException(ctx:Context,id:string,input:Omit<z.infe
     if(!row)fail(404,"NOT_FOUND","임시 예외를 찾을 수 없습니다.");requireVersion(input,row);await target(tx,ctx,row.memberId);
     const expiresAt=expiry(input.expiresAt,row.createdAt),saved=await tx.mfaException.update({where:{id},data:{reasonCipher:encrypt(input.reason),expiresAt,version:{increment:1}}});
     await audit(tx,ctx,requestId,"mfa_exception.updated","mfaException",id,["reason","expiresAt"]);
-    assertFileDeadlines(actor.deadlines);return dto(saved);
+    assertFileDeadlines(actor.deadlines);actor.access.assert("security.mfa_management");return dto(saved);
   },{timeout:15000});
 }
 export async function deleteMfaException(ctx:Context,id:string,input:{tenantId:string;version:number},requestId:string) {
@@ -88,7 +91,7 @@ export async function deleteMfaException(ctx:Context,id:string,input:{tenantId:s
     await tx.mfaException.delete({where:{id}});
     await tx.idempotencyRecord.updateMany({where:{tenantId:ctx.tenantId,resourceType:"mfa-exception",resourceId:id},data:{responseCipher:null,requestHash:null,invalidatedAt:new Date()}});
     await audit(tx,ctx,requestId,"mfa_exception.deleted","mfaException",id,[]);
-    assertFileDeadlines(actor.deadlines);
+    assertFileDeadlines(actor.deadlines);actor.access.assert("security.mfa_management");
   },{timeout:15000});
 }
 
@@ -111,6 +114,6 @@ export async function securityStatus(ctx:Context) {
       {id:"session",title:"세션 유지 정책",passed:policy.sessionMinutes>=30&&policy.sessionMinutes<=120,detail:"미사용 세션 기한 "+policy.sessionMinutes+"분, 절대 로그인 만료 7일",actionLabel:"회사 보안 정책",href:"/set/company/policy"}
     ];
     assertFileDeadlines(actor.deadlines);
-    return {tenantId:ctx.tenantId,checkedAt:now.toISOString(),checks,attention:checks.filter(c=>!c.passed).length,scope:"현재 회사의 실제 설정과 등록 상태"};
+    return {tenantId:ctx.tenantId,entitlements:actor.access.snapshot(),checkedAt:now.toISOString(),checks,attention:checks.filter(c=>!c.passed).length,scope:"현재 회사의 실제 설정과 등록 상태"};
   },{timeout:15000});
 }

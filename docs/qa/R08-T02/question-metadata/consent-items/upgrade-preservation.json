@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-10T13:16:21.565Z",
+  "result": "passed",
+  "migrationApplied": true,
+  "existingVersions": 196,
+  "legacySchemaZero": 196,
+  "legacyClassifiedVersions": 2,
+  "legacyClassifiedQuestions": 4,
+  "priorColumnsSha256": "2f694b632804fd9a9c727dea827922ee84ec7cda5616d92f524e21a9a41e0fc1",
+  "constraint": "CHECK ((((\"consentItemSchemaVersion\" = 0) AND (\"consentItems\" IS NULL)) OR ((\"consentItemSchemaVersion\" = 1) AND (\"consentItems\" IS NOT NULL) AND valid_form_consent_items(\"consentItems\"))))",
+  "triggers": [
+    {
+      "tgname": "FormVersion_consent_items_projection",
+      "definition": "CREATE CONSTRAINT TRIGGER \"FormVersion_consent_items_projection\" AFTER INSERT OR UPDATE ON public.\"FormVersion\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_form_consent_items_projection()"
+    },
+    {
+      "tgname": "Question_consent_items_projection",
+      "definition": "CREATE CONSTRAINT TRIGGER \"Question_consent_items_projection\" AFTER INSERT OR DELETE OR UPDATE ON public.\"Question\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_form_consent_items_projection()"
+    }
+  ],
+  "scope": "Local development PostgreSQL only. Existing FormVersion rows, including prior manually classified versions, were checked as schema 0/NULL and hashed without the additive columns; no row was modified and no consent item was invented retroactively."
+}

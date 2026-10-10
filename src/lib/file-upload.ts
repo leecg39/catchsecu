@@ -4,7 +4,7 @@ import { MAX_FILE_BYTES, type UploadInfo } from "@/contracts/files";
 
 export type UploadCache = Map<string, { fingerprint: string; key: string; upload?: UploadInfo }>;
 const types: Record<string, string> = { pdf: "application/pdf", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", csv: "text/csv", txt: "text/plain" };
-export async function uploadFile(file: File, target: { token: string; questionId: string } | { submissionId: string; questionId: string },
+export async function uploadFile(file: File, target: { token: string; questionId: string; participationProof?: string } | { submissionId: string; questionId: string },
   cache: UploadCache, onStatus: (message: string) => void) {
   if (file.size < 1 || file.size > MAX_FILE_BYTES) throw new Error("파일은 1바이트 이상, 10MB 이하로 첨부해주세요.");
   const mime = types[file.name.split(".").at(-1)?.toLowerCase() ?? ""];
@@ -19,7 +19,8 @@ export async function uploadFile(file: File, target: { token: string; questionId
     onStatus(file.name + " 업로드 준비 중…");
     const payload = { name: file.name, mime, size: file.size, sha256, questionId: target.questionId };
     const upload = await api<UploadInfo>("token" in target ? "/public/forms/" + target.token + "/uploads" : "/uploads/init", {
-      method: "POST", headers: { "Idempotency-Key": cached.key },
+      method: "POST", headers: { "Idempotency-Key": cached.key,
+        ...("token" in target && target.participationProof ? { "X-Participation-Proof": target.participationProof } : {}) },
       body: JSON.stringify("token" in target ? payload : { ...payload, purpose: "submission", submissionId: target.submissionId }),
     });
     cached.upload = upload;

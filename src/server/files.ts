@@ -2,9 +2,11 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { FileObject, Prisma } from "@/generated/prisma/client";
 import { memberUploadInput, publicUploadInput } from "@/contracts/files";
+import { DRAWING_QUESTION_TYPE, isFileQuestion } from "@/contracts/drawing-questions";
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
-import { env } from "./env";
+import { reserveQuota } from "./file-quota";
+export { reserveQuota } from "./file-quota";
 import { decrypt, encrypt, opaqueToken, tokenHash } from "./crypto";
 import { fail, HttpError } from "./http";
 import { idempotent } from "./idempotency";
@@ -13,14 +15,8 @@ import { fileInfo, lockFileContext, lockFilePublication, lockFileSubmission, wit
 import { privateFiles } from "./file-storage";
 import { readFileBody, validateFileBytes, validateFileName } from "./file-validation";
 import { requireFileScanner, scanFile } from "./file-scanner";
+import { requireParticipationSession } from "./participation-access";
 
-export async function reserveQuota(tx: Transaction, tenantId: string, bytes: number) {
-  // All reservations for one tenant are serialized, including public uploads.
-  await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${tenantId} FOR UPDATE`;
-  const result = await tx.fileObject.aggregate({ where: { tenantId, status: { not: "deleted" } }, _sum: { size: true } });
-  const business = await tx.companyBusinessFile.aggregate({ where: { tenantId, status: { not: "deleted" } }, _sum: { size: true } });
-  if ((result._sum.size ?? 0) + (business._sum.size ?? 0) + bytes > env.FILE_TENANT_QUOTA_BYTES) fail(409, "FILE_QUOTA_EXCEEDED", "회사의 파일 저장 한도에 도달했습니다.");
-}
 async function fileAudit(tx: Transaction, file: FileObject, requestId: string, action: string, ctx?: Context) {
   await tx.auditEvent.create({ data: { tenantId: file.tenantId, actorId: ctx?.user.id, serviceId: file.serviceId,
     resource: "file", resourceId: file.id, requestId, action, detail: { status: file.status, scanStatus: file.scanStatus } } });
@@ -30,17 +26,20 @@ export function fileData(input: { name: string; mime: string; size: number; sha2
   return { nameCipher: encrypt(input.name), mime: input.mime, size: input.size, sha256: input.sha256,
     storageKey: randomUUID(), expiresAt: new Date(Date.now() + 3600000) };
 }
-export async function initPublicUpload(token: string, input: z.infer<typeof publicUploadInput>, key: string | null, requestId: string) {
+export async function initPublicUpload(token: string, input: z.infer<typeof publicUploadInput>, key: string | null, requestId: string,
+  participationProof?: string) {
   if (!/^[A-Za-z0-9_-]{43}$/.test(token)) fail(404, "NOT_FOUND", "공개 폼을 찾을 수 없습니다.");
   const publication = await db.publication.findUnique({ where: { tokenHash: tokenHash(token) } });
   if (!publication) fail(404, "NOT_FOUND", "공개 폼을 찾을 수 없습니다.");
   validateFileName(input.name, input.mime);
   await requireFileScanner();
-  return idempotent("upload:public:" + publication.id, key, input, async tx => {
+  return idempotent("upload:public:" + publication.id, key, { ...input, participationProof }, async tx => {
     await reserveQuota(tx, publication.tenantId, input.size);
     const live = await lockFilePublication(tx, publication.id);
-    const question = live.formVersion.questions.find(item => item.stableKey === input.questionId && item.type === "파일 업로드");
+    await requireParticipationSession(tx, live, participationProof);
+    const question = live.formVersion.questions.find(item => item.stableKey === input.questionId && isFileQuestion(item.type));
     if (!question) fail(422, "INVALID_FILE_QUESTION", "첨부파일 질문을 확인해주세요.");
+    if (question.type === DRAWING_QUESTION_TYPE && input.mime !== "image/png") fail(422, "INVALID_DRAWING", "직접 그리기는 PNG 파일로 제출해주세요.");
     const uploadToken = opaqueToken();
     const file = await tx.fileObject.create({ data: { ...fileData(input), tenantId: live.tenantId, serviceId: live.form.serviceId,
       ownerKind: "public", publicationId: live.id, formVersionId: live.formVersionId, questionId: question.id,
@@ -48,7 +47,7 @@ export async function initPublicUpload(token: string, input: z.infer<typeof publ
     await fileAudit(tx, file, requestId, "file.upload_initialized");
     return { status: 201, body: { ...fileInfo(file), uploadToken },
       resource: { tenantId: file.tenantId, resourceType: "file", resourceId: file.id } };
-  }, tx => lockFilePublication(tx, publication.id));
+  }, async tx => { const live = await lockFilePublication(tx, publication.id); await requireParticipationSession(tx, live, participationProof, { allowCompleted: true }); });
 }
 export async function initMemberUpload(ctx: Context, input: z.infer<typeof memberUploadInput>, key: string | null, requestId: string) {
   validateFileName(input.name, input.mime);
@@ -64,8 +63,9 @@ export async function initMemberUpload(ctx: Context, input: z.infer<typeof membe
       if (!initial) fail(404, "NOT_FOUND", "응답을 찾을 수 없습니다.");
       await lockFileContext(tx, ctx, initial.formVersion.form.serviceId, ["submission.write", "file.read"]);
       const submission = await lockFileSubmission(tx, ctx.tenantId, input.submissionId, true);
-      const question = submission.formVersion.questions.find(item => item.stableKey === input.questionId && item.type === "파일 업로드");
+      const question = submission.formVersion.questions.find(item => item.stableKey === input.questionId && isFileQuestion(item.type));
       if (!question) fail(422, "INVALID_FILE_QUESTION", "첨부파일 질문을 확인해주세요.");
+      if (question.type === DRAWING_QUESTION_TYPE && input.mime !== "image/png") fail(422, "INVALID_DRAWING", "직접 그리기는 PNG 파일로 제출해주세요.");
       data = { ...fileData(input), tenantId: ctx.tenantId, serviceId: submission.formVersion.form.serviceId, ownerKind: "member", ownerId: ctx.user.id,
         submissionId: submission.id, publicationId: submission.publicationId, formVersionId: submission.formVersionId, questionId: question.id };
     }

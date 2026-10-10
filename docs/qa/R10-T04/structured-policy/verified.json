@@ -1,0 +1,86 @@
+{
+  "result": "passed",
+  "afterRestart": false,
+  "documentId": "b575be39-625a-4bc7-9af8-33e848e54500",
+  "version": 6,
+  "draftRevision": 4,
+  "checks": [
+    {
+      "name": "owner read",
+      "status": 200
+    },
+    {
+      "name": "anonymous read",
+      "status": 401
+    },
+    {
+      "name": "viewer read",
+      "status": 403
+    },
+    {
+      "name": "other company read",
+      "status": 404
+    },
+    {
+      "name": "viewer write",
+      "status": 403
+    },
+    {
+      "name": "other company write",
+      "status": 404
+    },
+    {
+      "name": "stale update",
+      "status": 409
+    },
+    {
+      "name": "stale archive",
+      "status": 409
+    },
+    {
+      "name": "stale publish",
+      "status": 409
+    },
+    {
+      "name": "document type isolation",
+      "status": 422
+    },
+    {
+      "name": "unknown detail field",
+      "status": 422
+    },
+    {
+      "name": "invalid nested email",
+      "status": 422
+    },
+    {
+      "name": "anonymous published version 1",
+      "status": 200
+    },
+    {
+      "name": "anonymous published version 2",
+      "status": 200
+    }
+  ],
+  "draftEqualsExpected": true,
+  "versions": 2,
+  "auditCount": 6,
+  "pdfs": [
+    {
+      "number": 1,
+      "bytes": 62454,
+      "sha256": "e1d36106a937b75d0551cdd67c5d786e0b8962de3b97487370153ef2c8cdf030",
+      "pages": 5,
+      "textVerified": true
+    },
+    {
+      "number": 2,
+      "bytes": 61451,
+      "sha256": "929eadf5f0dda782547bfc85ef05c51198b5420dfa2cb867b10872c9a2479f09",
+      "pages": 5,
+      "textVerified": true
+    }
+  ],
+  "stateHash": "1bed017cb294f6ad9a8d008afdacb0f9f16e4025fe97846e8c6879cdaa28a682",
+  "checkedAt": "2026-10-09T18:06:27.893Z"
+}

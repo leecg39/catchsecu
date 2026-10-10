@@ -1,23 +1,31 @@
 import type { Transaction } from "./db";
 import type { Context } from "./context";
 import { fail } from "./http";
-import { tokenHash } from "./crypto";
+import { decrypt, tokenHash } from "./crypto";
+import { DRAWING_QUESTION_TYPE, fileAnswerId, isDrawingAnswer, isFileQuestion } from "@/contracts/drawing-questions";
 import { audit } from "./audit";
 import type { Answers } from "./answer-validation";
 type Question = { id: string; stableKey: string; type: string };
 type Binding = { tenantId: string; formVersionId: string; publicationId: string; submissionId: string; serviceId: string; questions: Question[] };
 type Proofs = Record<string, { fileId: string; token: string }>;
 async function candidates(tx: Transaction, binding: Binding, answers: Answers) {
-  const selected = binding.questions.filter(question => question.type === "파일 업로드" && answers[question.stableKey]);
-  const ids = selected.map(question => String(answers[question.stableKey])).sort();
+  const selected = binding.questions.filter(question => isFileQuestion(question.type) && answers[question.stableKey]);
+  const ids = selected.map(question => {
+    const id = fileAnswerId(answers[question.stableKey]);
+    if (!id) fail(422, "INVALID_ATTACHMENT", "첨부파일 식별자를 확인해주세요.");
+    return id;
+  }).sort();
   if (new Set(ids).size !== ids.length) fail(422, "DUPLICATE_ATTACHMENT", "하나의 파일을 여러 질문에 사용할 수 없습니다.");
   for (const id of ids) await tx.$queryRaw`SELECT id FROM "FileObject" WHERE id=${id} AND "tenantId"=${binding.tenantId} FOR UPDATE`;
   const files = await tx.fileObject.findMany({ where: { tenantId: binding.tenantId, id: { in: ids } } });
   return selected.map(question => {
-    const file = files.find(item => item.id === answers[question.stableKey]);
+    const answer = answers[question.stableKey], file = files.find(item => item.id === fileAnswerId(answer));
     if (!file || file.serviceId !== binding.serviceId || file.publicationId !== binding.publicationId ||
       file.formVersionId !== binding.formVersionId || file.questionId !== question.id || file.scanStatus !== "clean")
       fail(422, "INVALID_ATTACHMENT", "응답과 질문에 연결된 검사 완료 파일을 첨부해주세요.");
+    if (question.type === DRAWING_QUESTION_TYPE && (!isDrawingAnswer(answer) || file.mime !== "image/png" || !file.nameCipher ||
+      answer.fileName !== decrypt<string>(file.nameCipher!) || answer.fileSize !== file.size))
+      fail(422, "INVALID_DRAWING", "그림 파일과 제출한 파일 정보가 일치하지 않습니다.");
     return { question, file };
   });
 }

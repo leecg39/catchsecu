@@ -1,0 +1,203 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 전체 구현 검증"(2): 2 managed, 0 untracked — p1* "캐치시큐 데모", p2 "캐치시큐 데모"]
+root
+  container
+    container
+      button [ref=414]
+        container
+          text "서비스명"
+          text "SSO 문맥 시험 A"
+        container
+          text "외부 ⓘ"
+          text "-"
+          image
+      container
+        anchor [ref=415, loc=href:/dashboard, url=http://localhost:3100/dashboard]
+          image
+          text "대시보드"
+        button [ref=416]
+          image
+          text "개인정보 수집/관리"
+          text "⌄"
+        button [ref=417]
+          image
+          text "동의서&처리방침"
+          text "⌄"
+        button [ref=418]
+          image
+          text "문자 서비스"
+          text "⌄"
+        button [ref=419]
+          image
+          text "이메일 서비스"
+          text "⌄"
+        button [ref=420]
+          image
+          text "알림 서비스"
+          text "⌄"
+        button [ref=421]
+          image
+          text "관리"
+          text "⌄"
+        button [ref=422]
+          image
+          text "개인정보 모니터링"
+          text "⌄"
+        button [ref=423]
+          image
+          text "라이선스"
+          text "⌄"
+        anchor [ref=424, loc=href:/shared-privacy/view, url=http://localhost:3100/shared-privacy/view]
+          image
+          text "공유받은 외부 개인정보 열람"
+      container
+        container
+          anchor [ref=425, url=http://localhost:3100/notice]
+            image
+            text "캐치시큐 업데이트 노트"
+          anchor [ref=426, loc=href:/help-center, url=http://localhost:3100/help-center]
+            image
+            text "캐치시큐 헬프센터"
+        container
+          anchor [ref=427, loc=href:https://catchsecu.com/, url=https://catchsecu.com/]
+            text "홈페이지"
+          anchor [ref=428, loc=href:/legal/privacy, url=http://localhost:3100/legal/privacy]
+            text "개인정보"
+            text "처리방침"
+          anchor [ref=429, loc=href:/legal/terms, url=http://localhost:3100/legal/terms]
+            text "서비스"
+            text "이용약관"
+    container
+      container
+        container
+          image
+          button "회사 선택" [ref=430, loc=css:button[aria-label="회사 선택"]]
+            text "SSO 문맥 시험 A"
+            text "⌄"
+        container
+          button [ref=431]
+            svg_root
+            text "검색"
+            text "Ctrl K"
+          button "키보드 단축키 안내" [ref=432, loc=css:button[aria-label="키보드 단축키 안내"]]
+            svg_root
+          button [ref=433]
+            text "서비스 개선 제안"
+          anchor "공지사항" [ref=434, loc=css:a[aria-label="공지사항"], url=http://localhost:3100/notice]
+            image
+          button "문의" [ref=435, loc=css:button[aria-label="문의"]]
+            image
+          anchor "알림" [ref=436, loc=css:a[aria-label="알림"], url=http://localhost:3100/integration/message]
+            image
+          button [ref=437]
+            image
+            text "MY"
+      container [ref=438]
+        container
+          heading
+            text "SSO 연결 관리"
+          container
+            anchor [ref=439, loc=href:/security/sso, url=http://localhost:3100/security/sso]
+              text "로그인 정책"
+            button [ref=440]
+              text "SSO 연결 등록"
+        paragraph
+          text "OIDC 또는 SAML 공급자로 회사 구성원의 로그인을 연결합니다. 등록 후 사전검사를 통과해야 활성화할 수 있습니다. 사용 중지·인증 정보 교체는 새 로그..."
+        container
+          container
+            container
+              text "SSO 연결 검색"
+              textbox [ref=441, loc=css:input[placeholder="이름·프로토콜·Issuer"]]
+                text "이름·프로토콜·Issuer"
+            container
+              text "SSO 연결 정렬"
+              combobox [ref=442]
+                text "등록일순"
+          region "SSO 연결 목록" [ref=443, loc=role:region[name="SSO 연결 목록"]]
+            table
+              table_row
+                table_cell
+                  text "이름"
+                table_cell
+                  text "프로토콜"
+                table_cell
+                  text "Issuer"
+                table_cell
+                  text "로그인 주소"
+                table_cell
+                  text "사전검사"
+                table_cell
+                  text "사용 상태"
+                table_cell
+                  text "등록일"
+              table_row
+                table_cell
+                  text "문맥 시험 OIDC"
+                table_cell
+                  text "OIDC"
+                table_cell
+                  text "https://127.0.0.1:3444"
+                table_cell
+                  text "/api/v1/auth/sso/da189306-0f53-48af-9a72-80ac8506ea5f?mode=login"
+                table_cell
+                  text "미통과 —"
+                  text "JWKS 조회 실패: 인증 제공자가 공개 인터넷 주소를 사용하지 않습니다."
+                table_cell
+                  text "사용 안 함"
+                table_cell
+                  text "2026. 10. 10."
+              table_row
+                table_cell
+                  text "문맥 시험 기관 01"
+                table_cell
+                  text "가상 GPKI"
+                table_cell
+                  text "urn:virtual:gpki"
+                table_cell
+                  text "/login/gpki"
+                table_cell
+                  text "통과"
+                table_cell
+                  text "사용 안 함"
+                table_cell
+                  text "2026. 10. 10."
+              table_row
+                table_cell
+                  text "문맥 시험 기관 02"
+                table_cell
+                  text "가상 GPKI"
+                table_cell
+                  text "urn:virtual:gpki"
+                table_cell
+                  text "/login/gpki"
+                table_cell
+                  text "통과"
+                table_cell
+                  text "사용 안 함"
+                table_cell
+                  text "2026. 10. 10."
+        dialog "SSO 연결 등록" [ref=444, loc=role:dialog[name="SSO 연결 등록"]]
+          container
+            heading
+              text "SSO 연결 등록"
+            button "닫기" [ref=445, loc=css:button[aria-label="닫기"]]
+              text "×"
+          form
+            alert
+              text "선택한 회사가 변경되었습니다. 입력을 확인한 뒤 회사와 목록을 다시 불러와주세요."
+            alert
+              text "입력은 유지했습니다. 필요한 내용을 복사한 뒤 회사와 목록을 다시 불러와주세요."
+              button [ref=456]
+                text "회사와 목록 다시 불러오기"
+            group [ref=446]
+              container
+                text "프로토콜"
+                combobox [ref=447, loc=css:select[name="protocol"]]
+                  text "가상 GPKI (mock 디렉터리)"
+              paragraph
+                text "가상 어댑터 — 외부 기관 미연동. 등록 후 목록의 “디렉터리”에서 mock 구성원을 추가해야 로그인이 동작합니다."
+              container
+                text "표시 이름"
+                textbox [ref=448, loc=css:input[name="name"]]
+                  text "두 탭 생성 보존 시험"
+            button [ref=455]
+              text "등록"

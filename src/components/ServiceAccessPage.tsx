@@ -1,6 +1,6 @@
 "use client";
-import { useState, type FormEvent } from "react";
-import Link from "next/link";
+import { useRef, useState, type FormEvent } from "react";
+import { GuardedLink as Link, useUnsavedChanges } from "./ux/navigation-guard";
 import { api, errorText, useResource } from "@/lib/api";
 import type { Application } from "./ApplicationContext";
 import type { AccessRequestList, AccessRequestRecord } from "@/contracts/access-requests";
@@ -10,29 +10,32 @@ import { useConfirm } from "./ux/confirm";
 
 export function ServiceAccessPage() {
   const context = useResource<Application>("/context");
-  const requests = useResource<AccessRequestList>(context.data?.company ? "/access-requests?scope=mine&pageSize=50" : null);
+  const [page, setPage] = useState(1);
+  const requests = useResource<AccessRequestList>(context.data?.company ? "/access-requests?scope=mine&pageSize=10&page=" + page : null);
   const [serviceId, setServiceId] = useState(""), [reason, setReason] = useState("");
   const [error, setError] = useState(""), [notice, setNotice] = useState(""), [busy, setBusy] = useState(false);
   const ask = useConfirm();
+  const lock = useRef(false);
+  useUnsavedChanges(!!serviceId || !!reason || busy);
   const options = requests.data?.availableServices ?? [];
   const expert = !!context.data?.company && context.data.memberships.some(item =>
     item.tenantId === context.data?.company?.id && item.accessKind === "expert");
   async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setError(""); setNotice(""); setBusy(true);
+    event.preventDefault(); if (lock.current) return; lock.current = true; setError(""); setNotice(""); setBusy(true);
     try {
-      const selected = serviceId || options[0]?.id;
-      if (!selected) throw new Error("요청할 서비스를 선택해주세요.");
-      await api("/access-requests", { method: "POST", body: JSON.stringify({ serviceId: selected, reason: reason.trim() }) });
-      setNotice("서비스 접근 요청을 등록했습니다."); setReason(""); setServiceId(""); requests.reload();
-    } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
+      if (!options.some(item => item.id === serviceId)) throw new Error("요청할 서비스를 선택해주세요.");
+      await api("/access-requests", { method: "POST", body: JSON.stringify({ serviceId, reason: reason.trim() }) });
+      setNotice("서비스 접근 요청을 등록했습니다."); setReason(""); setServiceId(""); setPage(1); requests.reload();
+    } catch (cause) { setError(errorText(cause)); } finally { lock.current = false; setBusy(false); }
   }
   async function cancel(item: AccessRequestRecord) {
-    if (!await ask({ title: "서비스 접근 요청 취소", message: "보낸 접근 요청을 취소합니다. 필요하면 다시 요청할 수 있습니다.", confirmLabel: "요청 취소", cancelLabel: "닫기" })) return;
-    setError(""); setNotice(""); setBusy(true);
+    if (lock.current) return; lock.current = true;
     try {
+      if (!await ask({ title: "서비스 접근 요청 취소", message: "보낸 접근 요청을 취소합니다. 필요하면 다시 요청할 수 있습니다.", confirmLabel: "요청 취소", cancelLabel: "닫기" })) return;
+      setError(""); setNotice(""); setBusy(true);
       await api("/access-requests/" + item.id, { method: "DELETE", headers: { "If-Match": String(item.version) } });
       setNotice("요청을 취소했습니다."); requests.reload();
-    } catch (cause) { setError(errorText(cause)); requests.reload(); } finally { setBusy(false); }
+    } catch (cause) { setError(errorText(cause)); requests.reload(); } finally { lock.current = false; setBusy(false); }
   }
   return <div className="public-standalone"><Panel title="서비스 접근 권한">
     {context.loading && <p role="status">회사와 서비스 권한을 확인하는 중입니다.</p>}
@@ -44,18 +47,19 @@ export function ServiceAccessPage() {
       </Link></>}
     {context.data?.company && <>
       <p><strong>{context.data.company.name}</strong>의 서비스 접근 상태입니다.</p>
-      <ActionButton secondary onClick={() => { context.reload(); requests.reload(); }}>권한 상태 새로고침</ActionButton>
+      <ActionButton secondary disabled={busy} onClick={() => { context.reload(); requests.reload(); }}>권한 상태 새로고침</ActionButton>
       {!!context.data.services.length && <div className="public-actions"><p>사용 가능한 서비스가 있습니다.</p><Link className="cs-button" href="/dashboard">대시보드로 이동</Link></div>}
       {requests.loading && <p role="status">요청 내역을 불러오는 중입니다.</p>}
       {requests.error && <><p role="alert">{requests.error.message}</p><ActionButton secondary onClick={requests.reload}>요청 내역 다시 시도</ActionButton></>}
       {requests.data && <>
         {!context.data.services.length && <p>현재 접근할 수 있는 서비스가 없습니다.</p>}
-        {options.length > 0 && <form className="service-access-form" onSubmit={submit}>
-          <label>요청할 서비스<select className="cs-input" required value={serviceId} onChange={event => setServiceId(event.target.value)}>
-            <option value="">서비스 선택</option>{options.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}
+        {(options.length > 0 || !!reason || !!serviceId) && <form className="service-access-form" onSubmit={submit}>
+          <label>요청할 서비스<select className="cs-input" required disabled={busy} value={serviceId} onChange={event => setServiceId(event.target.value)}>
+            <option value="">서비스 선택</option>{serviceId && !options.some(item => item.id === serviceId) && <option value={serviceId} disabled>선택한 서비스의 현재 권한을 확인해주세요</option>}
+            {options.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}
           </select></label>
-          <label>요청 사유<textarea className="cs-input" value={reason} maxLength={500} onChange={event => setReason(event.target.value)} placeholder="관리자에게 전달할 사유 (선택)" /></label>
-          <ActionButton disabled={busy}>{busy ? "처리 중…" : "관리자에게 권한 요청"}</ActionButton>
+          <label>요청 사유<textarea className="cs-input" disabled={busy} value={reason} maxLength={500} onChange={event => setReason(event.target.value)} placeholder="관리자에게 전달할 사유 (선택)" /></label>
+          <ActionButton disabled={busy || !options.some(item => item.id === serviceId)}>{busy ? "처리 중…" : "관리자에게 권한 요청"}</ActionButton>
         </form>}
         {!options.length && !context.data.services.length && <p>{expert
           ? "전문가 서비스 범위는 배정 담당자가 변경할 수 있습니다. 배정된 회사를 다시 확인해주세요."
@@ -68,7 +72,12 @@ export function ServiceAccessPage() {
               <small>{new Date(item.createdAt).toLocaleString("ko-KR")}</small>
               {item.decisionNote && <p>관리자 답변: {item.decisionNote}</p>}</div>
             {item.status === "pending" && <ActionButton secondary disabled={busy} onClick={() => cancel(item)}>요청 취소</ActionButton>}
-          </div>)}</div>}
+          </div>)}
+          <div className="cs-pagination"><span>총 {requests.data.total}개</span><div>
+            <button aria-label="이전 요청 페이지" disabled={busy || requests.data.page <= 1} onClick={() => setPage(requests.data!.page - 1)}>‹</button>
+            <span>{requests.data.page} / {Math.max(1, Math.ceil(requests.data.total / requests.data.pageSize))}</span>
+            <button aria-label="다음 요청 페이지" disabled={busy || requests.data.page * requests.data.pageSize >= requests.data.total} onClick={() => setPage(requests.data!.page + 1)}>›</button>
+          </div></div></div>}
       </>}
       {notice && <p role="status">{notice}</p>}{error && <p role="alert" className="auth-error">{error}</p>}
     </>}

@@ -1,0 +1,944 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-10T05:40:12.906Z",
+  "author": "bundle_analysis",
+  "scope": {
+    "type": "읽기 전용 독립 UI/계약 정적 검토",
+    "requested": [
+      "FormLanguageSettings",
+      "InternationalContactInput",
+      "QuestionInput",
+      "PublicForm",
+      "SubmissionDetail"
+    ],
+    "ownedWrite": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/ui-review.json",
+    "productCodeChanged": false,
+    "databaseAccessed": false,
+    "browserUsed": false,
+    "serverStarted": false,
+    "testsExecuted": false,
+    "sourceJavaScriptExecuted": false,
+    "newNetworkUsed": false
+  },
+  "summary": {
+    "confirmedFindings": 2,
+    "priority": {
+      "P2": 1,
+      "P3": 1
+    },
+    "resolvedByRootAndSourceVerified": 2,
+    "remainingOpenFindings": 0,
+    "conclusion": "발견한 주소 유형 action·감사 개행 두 건 모두 루트 수정 후 소스로 확인. 국제 CONTACT 값/공용 국가번호 복원/잠금에서 추가 확정 결함 없음. 실제 브라우저/서버 시험 통과라고 주장하지 않음."
+  },
+  "provenance": {
+    "mainPath": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+    "mainSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "reaEvidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "sourceReport": {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/source-review.json",
+      "sha256": "9ef4098aba315cd56e9c77db10bd9f7b1d5035e7a74e35bce228c0ff04e42e11"
+    },
+    "systemCopyReport": {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/system-copy-source.json",
+      "sha256": "9c4bf9fb1ac196561f61b5fd182b21c5e3125a7ab9c9d42231f27b5e3166762c"
+    }
+  },
+  "findings": [
+    {
+      "id": "INT-UI-01",
+      "priority": "P2",
+      "status": "resolved_source_verified",
+      "title": "외국어 설정 후 주소 유형을 새로 선택하면 국내 주소로 게시됨",
+      "basis": "정적 제어 흐름에서 확정. 브라우저 재현은 실행하지 않음.",
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+          "startLine": 119,
+          "endLine": 128,
+          "sha256": "7b4d2323ed189b18e3c30d3b13578eb1903c8a7fa073ebb0f8f96591fd5803fa",
+          "excerpt": "          <div className=\"forms-between\"><select aria-label={`Q${index + 1} 답변 형식`} value={question.type} disabled={content.questions.some(item => item.condition?.questionId === question.id)} onChange={event => {\n            const selectedType = event.target.value as Question[\"type\"];\n            const type = selectedType === \"주소\" && content.formLanguage && content.formLanguage !== \"ko\" ? \"해외 주소\" : selectedType;\n            changeQuestion(question.id, { type, textMaxLength: newTextMaxLength(type), ...(!question.subjectRole || !subjectQuestionTypeAllowed(question.subjectRole, type) ? { subjectRole: undefined } : {}),\n              rows: matrixTypes.includes(type) ? question.rows ?? [{ id: crypto.randomUUID(), label: \"행 1\" }] : undefined,\n              selectionLimits: [\"체크박스\", \"행렬형 복수 선택\"].includes(type) ? question.selectionLimits : undefined,\n              options: choiceTypes.includes(type) ? question.options ?? [] : undefined,\n              optionDefinitions: choiceTypes.includes(type) ? question.optionDefinitions ?? [] : undefined });\n          }}>\n            {questionTypes.map(type => <option key={type}>{type}</option>)}</select>"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormLanguageSettings.tsx",
+          "startLine": 23,
+          "endLine": 28,
+          "sha256": "2398fa3c162924bf37673085e64cbe8300eb6eaef01086d597e456b9cd82de31",
+          "excerpt": "          <ActionButton disabled={disabled || !!conflicts} onClick={() => {\n            if (disabled || conflicts) return;\n            onChange({ formLanguage: language, questions: content.questions.map(question =>\n              [\"주소\", \"해외 주소\"].includes(question.type) ? { ...question, type: language === \"ko\" ? \"주소\" as const : \"해외 주소\" as const } : question) });\n            setChoosing(false);\n          }}>{formLanguageLabel(language)} 선택하기</ActionButton></div>"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+          "startLine": 47,
+          "endLine": 51,
+          "sha256": "5693cba89efdb38f127e1200d19b417cae29b69f59463d243c718851d49554a5",
+          "excerpt": "  if (question.type === \"주소\") return <DomesticAddressInput question={question} value={text} onChange={onChange} disabled={disabled} />;\n  if (question.type === \"해외 주소\") return <ForeignAddressInput question={question} value={value} onChange={onChange} />;\n  if (question.type === \"연락처\") return isInternationalFormLanguage(language)\n    ? <InternationalContactInput question={question} value={text} onChange={onChange} language={language} disabled={disabled} />\n    : <ContactQuestionInput question={question} value={text} onChange={onChange} />;"
+        }
+      ],
+      "sourceEvidence": [
+        "X01",
+        "X02",
+        "E13"
+      ],
+      "reproduction": [
+        "English 등 nonko로 폼 언어를 설정한다.",
+        "질문을 새로 추가하거나 기존 질문의 답변 형식을 주소로 선택한다.",
+        "현재 FormEditor는 언어와 무관하게 주소를 그대로 저장한다.",
+        "QuestionInput은 언어와 무관하게 DomesticAddressInput을 표시한다.",
+        "언어 설정에서 같은 English를 재적용하거나 English에서 일본어로 바꾸어도 changedMode가 false여서 정규화하지 않는다."
+      ],
+      "impact": "원본 언어 기반 주소 유형 변경을 우회해 nonko 공개 폼에서 국내 카카오 검색 및 국내 문자열 답변을 사용하게 된다. 주소 필드 번역의 F5 미연결과 별개이다.",
+      "minimumFix": "유형 선택 action은 원본 CQ처럼 ADDRESS+nonko만 FOREIGN_ADDRESS로 정규화한다. 언어 적용 action은 기존 원본 reducer처럼 주소 두 타입을 선택 언어에 맞추어 매번 정규화한다. 이미 저장된 값을 로딩 시 임의 변환하지 않는다.",
+      "boundary": "CQ는 FOREIGN_ADDRESS+ko를 바꾸지 않는 비대칭 함수다. 언어 적용 reducer만 ko이면 ADDRESS/nonko이면 FOREIGN_ADDRESS로 두 타입 모두 전환한다.",
+      "scenarios": [
+        "en 설정 후 주소 선택 → 해외 주소",
+        "en→ja 또는 en 재적용 시 두 주소형 → 해외 주소",
+        "ko에서 해외 주소를 직접 선택 → 유지",
+        "ko 언어 적용 시 두 주소형 → 국내 주소",
+        "기존 게시본/과거 응답의 질문 형식과 언어는 변화 없음"
+      ],
+      "originalLocalEvidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+          "startLine": 119,
+          "endLine": 122,
+          "sha256": "9f5ec67e7027d49a0040ff5f87108fffd61a6bae06a278149f25ca8ad0740db7",
+          "excerpt": "          <div className=\"forms-between\"><select aria-label={`Q${index + 1} 답변 형식`} value={question.type} disabled={content.questions.some(item => item.condition?.questionId === question.id)} onChange={event => {\n            const type = event.target.value as Question[\"type\"];\n            changeQuestion(question.id, { type, textMaxLength: newTextMaxLength(type), ...(!question.subjectRole || !subjectQuestionTypeAllowed(question.subjectRole, type) ? { subjectRole: undefined } : {}),\n              rows: matrixTypes.includes(type) ? question.rows ?? [{ id: crypto.randomUUID(), label: \"행 1\" }] : undefined,",
+          "excerptSha256": "94386335991f0f77c24cc6795b2895e03efd0d2247c1980f7d9772f12d0e10af",
+          "capture": "수정 전 read-only 도구 출력에서 보존. 현재 파일은 이후 루트에서 수정됨."
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormLanguageSettings.tsx",
+          "startLine": 23,
+          "endLine": 28,
+          "sha256": "b01e66a1852224d6d7040786ba5c712d395d544d08866561f6420ca3204789ae",
+          "excerpt": "          <ActionButton disabled={disabled || !!conflicts} onClick={() => {\n            if (disabled || conflicts) return;\n            const changedMode = (language === \"ko\") !== (effectiveFormLanguage(content.formLanguage) === \"ko\");\n            onChange({ formLanguage: language, ...(changedMode ? { questions: content.questions.map(question =>\n              [\"주소\", \"해외 주소\"].includes(question.type) ? { ...question, type: language === \"ko\" ? \"주소\" as const : \"해외 주소\" as const } : question) } : {}) });\n            setChoosing(false);",
+          "excerptSha256": "469b41c077d0286aee65e08789b2dfe6a028266682cf64bf8527b2c3c2e27114",
+          "capture": "수정 전 read-only 도구 출력에서 보존. 현재 파일은 이후 루트에서 수정됨."
+        }
+      ],
+      "resolution": {
+        "by": "루트 구현자",
+        "verifiedAtUtc": "2026-10-10T05:40:55.215Z",
+        "method": "현재 제품 소스 재독",
+        "conclusion": "유형 선택은 ADDRESS+nonko만 해외 주소로 변경하고, 언어 적용은 매번 양쪽 주소형을 선택 언어 기준으로 변경한다. 기존 로드 및 과거 응답 값에는 이 변환을 적용하지 않는다.",
+        "runtimeExecutedByReviewer": false
+      }
+    },
+    {
+      "id": "INT-UI-02",
+      "priority": "P3",
+      "status": "resolved_source_verified",
+      "title": "감사 문구의 원본 줄바꿈 token이 일반 텍스트 공백으로 축약됨",
+      "basis": "정적 HTML/CSS 의미에서 확정. 실제 브라우저 캡처는 미실행.",
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-system-copy.ts",
+          "startLine": 7,
+          "endLine": 10,
+          "sha256": "e95df7a7274bcd4a4a78e19d09bb630d4d9c96c7e88783b7cdb08d1e19fd1b6c",
+          "excerpt": "export function formPhrase(language: string | null | undefined, key: keyof typeof copy.ko.translate.infoOwnerForm.phrase) {\n  const phrases: Record<string, string> = formSystemCopy(language).phrase;\n  // React renders plain text. Numeric translation-component markers are line breaks, never HTML.\n  return (phrases[key] ?? copy.ko.translate.infoOwnerForm.phrase[key]).replace(/<\\/?\\d+\\s*\\/?\\s*>/g, \"\\n\");"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 124,
+          "endLine": 126,
+          "sha256": "9ee2e8df24078831dea3013992faa10eb7bf6b157ad8b7e15fbc5782d024f285",
+          "excerpt": "  const locale = effectiveFormLanguage(content.formLanguage), direction = locale === \"ar\" ? \"rtl\" : \"ltr\";\n  if (receipt) return <div lang={locale} dir={direction}><h1>{locale === \"ko\" ? \"제출이 완료되었습니다.\" : formPhrase(locale, \"phrase24\")}</h1>{content.showSubmitNotice !== false && <p style={{ whiteSpace: \"pre-line\" }}>{locale === \"ko\" ? \"응답해 주셔서 감사합니다.\" : formPhrase(locale, \"phrase79\")}</p>}\n    <p>접수 번호: <span dir=\"ltr\">{receipt.id}</span></p><p>{new Date(receipt.submittedAt).toLocaleString(locale)}</p></div>;"
+        }
+      ],
+      "sourceEvidence": [
+        "S04"
+      ],
+      "reproduction": [
+        "일본어 등 phrase79 중간에 <0/>가 있는 외국어 폼을 제출 완료 상태로 표시한다.",
+        "formPhrase가 marker를 newline 문자로 바꾼다.",
+        "일반 p의 white-space 기본값에서 newline은 강제 개행으로 렌더되지 않는다."
+      ],
+      "impact": "텍스트 내용은 보존하지만 원본 br 위치의 줄바꿈이 사라진다.",
+      "minimumFix": "감사 문구에 white-space: pre-line을 적용하거나 문자열을 안전하게 나누어 br 요소로 렌더한다. HTML 실행은 필요 없다.",
+      "scenarios": [
+        "ja phrase79의 참여/감사 사이 강제 개행 확인",
+        "de/fr/ar 등 token 전후 공백 포함 문구 확인",
+        "원본 <0/> 문자열이 그대로 화면에 출력되지 않는지 확인"
+      ],
+      "originalLocalEvidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 125,
+          "endLine": 125,
+          "sha256": "dd0a0602744e684533dae21af33e00ec2d301a2f0f791716d0cfe1fc295ee04b",
+          "excerpt": "  if (receipt) return <div lang={locale} dir={direction}><h1>{locale === \"ko\" ? \"제출이 완료되었습니다.\" : formPhrase(locale, \"phrase24\")}</h1>{content.showSubmitNotice !== false && <p>{locale === \"ko\" ? \"응답해 주셔서 감사합니다.\" : formPhrase(locale, \"phrase79\")}</p>}",
+          "excerptSha256": "13b2781cbb57e4a7496036d87c1c0602a7530cae75097e036d43fc6f4ead11fa",
+          "capture": "수정 전 read-only 도구 출력에서 보존. 현재 파일은 이후 루트에서 수정됨."
+        }
+      ],
+      "resolution": {
+        "by": "루트 구현자",
+        "verifiedAtUtc": "2026-10-10T05:40:55.218Z",
+        "method": "현재 제품 소스 재독",
+        "conclusion": "감사 문구 p에 whiteSpace: pre-line이 추가돼 formPhrase의 newline을 개행으로 보존한다.",
+        "runtimeExecutedByReviewer": false
+      }
+    }
+  ],
+  "checks": [
+    {
+      "id": "C01",
+      "result": "정적 검토 통과",
+      "title": "CONTACT 분기는 전역 언어를 사용",
+      "conclusion": "QuestionInput은 ko 또는 생략 시 기존 국내 입력, 다른 15개 언어는 국제 입력으로 연결한다. 별도 질문 타입/국제 toggle을 만들지 않았다.",
+      "sourceEvidence": [
+        "E01"
+      ],
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+          "startLine": 49,
+          "endLine": 51,
+          "sha256": "5693cba89efdb38f127e1200d19b417cae29b69f59463d243c718851d49554a5",
+          "excerpt": "  if (question.type === \"연락처\") return isInternationalFormLanguage(language)\n    ? <InternationalContactInput question={question} value={text} onChange={onChange} language={language} disabled={disabled} />\n    : <ContactQuestionInput question={question} value={text} onChange={onChange} />;"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-language.ts",
+          "startLine": 24,
+          "endLine": 26,
+          "sha256": "f0f59e13a374aff4d8e853c5ac7576cde4b63a8d5a5f167b4d2585fc047ae45c",
+          "excerpt": "// Display fallback only. Writers must use the strict schema rather than coerce invalid codes.\nexport function effectiveFormLanguage(value?: string | null): FormLanguage { return formLanguageSchema.safeParse(value).data ?? \"ko\"; }\nexport function isInternationalFormLanguage(value?: string | null): boolean { return effectiveFormLanguage(value) !== \"ko\"; }"
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "result": "정적 검토 통과",
+      "title": "초기값 및 6~15 검증",
+      "conclusion": "빈 입력에는 국가 기본값을 추측하지 않는다. DOM maxLength30/ASCII 숫자 제거 필터와 국가+6~15자리 조건을 분리했다. 선택사항 완전 빈값은 허용하고 부분 입력은 native custom validity로 차단한다.",
+      "sourceEvidence": [
+        "E02",
+        "E03",
+        "E04"
+      ],
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/InternationalContactInput.tsx",
+          "startLine": 11,
+          "endLine": 36,
+          "sha256": "21632c9c89479b615e38cfca675f5b5bc5623494665ce96ecf52e9245acdc339",
+          "excerpt": "  const [initial] = useState(() => parseInternationalContact(value));\n  // Shared calling codes do not identify a country. Preserve the stored code until the person selects a country.\n  const [country, setCountry] = useState(initial.countryCode || (initial.dialCode ? \"dial:\" + initial.dialCode : \"\"));\n  const [number, setNumber] = useState(initial.number);\n  const locale = effectiveFormLanguage(language);\n  const labels = formSystemCopy(locale).internationalContact;\n  const dialCode = (selected: string) => internationalContactDialCode(selected.replace(/^dial:/, \"\")) ?? \"\";\n  const candidate = (selected: string, digits: string) => selected || digits ? dialCode(selected) + \" \" + digits : \"\";\n  const error = !country && (number || question.required) ? labels.errCountryCode\n    : internationalContactError(candidate(country, number), question.required) ? labels.errLength : undefined;\n  const update = (selected: string, digits: string) => {\n    if (disabled) return;\n    setCountry(selected); setNumber(digits); onChange(candidate(selected, digits));\n  };\n  const ambiguousNames = initial.countryCodes.map(code => internationalContactCountries.find(item => item.iso === code))\n    .filter(item => !!item).map(item => item.names[locale] || item.names.en || item.names.ko).join(\" / \");\n  return <div className=\"cs-stack\" lang={locale} dir={locale === \"ar\" ? \"rtl\" : \"ltr\"}>\n    <label className=\"cs-label\">{labels.countryCodePlaceholder}<select className=\"cs-input\" aria-label={question.label + \" · \" + labels.countryCodePlaceholder} required={question.required || !!number}\n      value={country} disabled={disabled} onChange={event => update(event.target.value, number)}>\n      <option value=\"\" disabled hidden>{labels.countryCodePlaceholder}</option>\n      {initial.countryCodes.length > 1 && <option value={\"dial:\" + initial.dialCode}>{ambiguousNames} ({initial.dialCode})</option>}\n      {internationalContactCountries.map(item => <option key={item.iso} value={item.iso}>{item.names[locale] || item.names.en || item.names.ko} ({item.dialCode})</option>)}\n    </select></label>\n    <label className=\"cs-label\">{labels.numberPlaceholder}<input className=\"cs-input\" name={question.id} aria-label={question.label + \" · \" + labels.numberPlaceholder} type=\"tel\" inputMode=\"numeric\" dir=\"ltr\"\n      autoComplete=\"tel-national\" placeholder={labels.numberPlaceholder} maxLength={30} required={question.required || !!country} value={number} disabled={disabled}\n      ref={element => element?.setCustomValidity(error ?? \"\")} onChange={event => update(country, event.target.value.replace(/\\D/g, \"\"))} /></label>"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/international-contact.ts",
+          "startLine": 21,
+          "endLine": 24,
+          "sha256": "6d817de4b36173e98ced9d47bb993fc386dd5270ef698e63ec456c521d947896",
+          "excerpt": "export function internationalContactError(value: string, required = false): string | undefined {\n  if (!value.trim()) return required ? \"국가 번호와 연락처를 입력해주세요.\" : undefined;\n  const match = /^(\\+\\d+) ([0-9]{6,15})$/.exec(value.trim());\n  if (!match || !knownDialCodes.has(match[1])) return \"국가 번호와 6~15자리 숫자를 입력해주세요.\";"
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "result": "정적 검토 통과",
+      "title": "+1/+7 공용 국가번호의 손실 없는 복원",
+      "conclusion": "parseInternationalContact는 일치 국가가 1개인 경우만 ISO로 복원한다. +1/+7은 countryCode 빈값과 복수 countryCodes를 반환하고 UI는 dial:+1 또는 dial:+7 별도 option을 표시한다. 다른 필드만 정정하면 원래 값이 그대로 부모 values에 남는다. 번호만 고쳐도 기존 dial code를 보존한다.",
+      "sourceEvidence": [
+        "E26",
+        "E27"
+      ],
+      "boundary": "원본 문자열→ISO 정정 역매핑은 미관측이다. 이 처리는 원본 보장이라고 주장하지 않는 로컬 보존 정책이다.",
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/international-contact.ts",
+          "startLine": 7,
+          "endLine": 14,
+          "sha256": "6d817de4b36173e98ced9d47bb993fc386dd5270ef698e63ec456c521d947896",
+          "excerpt": "export function internationalContactDialCode(countryOrDialCode: string): string | undefined {\n  return knownDialCodes.has(countryOrDialCode) ? countryOrDialCode : countries.find(country => country.iso === countryOrDialCode)?.dialCode;\n}\nexport function parseInternationalContact(value: string): InternationalContactParts {\n  const match = /^(\\+\\d+)(?: (.*))?$/.exec(value), dialCode = match?.[1] ?? \"\", number = match ? match[2] ?? \"\" : value;\n  const countryCodes = countries.filter(country => country.dialCode === dialCode).map(country => country.iso);\n  // +1 and +7 identify multiple countries. Keep their dial code and never guess an ISO.\n  return { dialCode, number, countryCodes, countryCode: countryCodes.length === 1 ? countryCodes[0] : \"\" };"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/InternationalContactInput.tsx",
+          "startLine": 11,
+          "endLine": 32,
+          "sha256": "21632c9c89479b615e38cfca675f5b5bc5623494665ce96ecf52e9245acdc339",
+          "excerpt": "  const [initial] = useState(() => parseInternationalContact(value));\n  // Shared calling codes do not identify a country. Preserve the stored code until the person selects a country.\n  const [country, setCountry] = useState(initial.countryCode || (initial.dialCode ? \"dial:\" + initial.dialCode : \"\"));\n  const [number, setNumber] = useState(initial.number);\n  const locale = effectiveFormLanguage(language);\n  const labels = formSystemCopy(locale).internationalContact;\n  const dialCode = (selected: string) => internationalContactDialCode(selected.replace(/^dial:/, \"\")) ?? \"\";\n  const candidate = (selected: string, digits: string) => selected || digits ? dialCode(selected) + \" \" + digits : \"\";\n  const error = !country && (number || question.required) ? labels.errCountryCode\n    : internationalContactError(candidate(country, number), question.required) ? labels.errLength : undefined;\n  const update = (selected: string, digits: string) => {\n    if (disabled) return;\n    setCountry(selected); setNumber(digits); onChange(candidate(selected, digits));\n  };\n  const ambiguousNames = initial.countryCodes.map(code => internationalContactCountries.find(item => item.iso === code))\n    .filter(item => !!item).map(item => item.names[locale] || item.names.en || item.names.ko).join(\" / \");\n  return <div className=\"cs-stack\" lang={locale} dir={locale === \"ar\" ? \"rtl\" : \"ltr\"}>\n    <label className=\"cs-label\">{labels.countryCodePlaceholder}<select className=\"cs-input\" aria-label={question.label + \" · \" + labels.countryCodePlaceholder} required={question.required || !!number}\n      value={country} disabled={disabled} onChange={event => update(event.target.value, number)}>\n      <option value=\"\" disabled hidden>{labels.countryCodePlaceholder}</option>\n      {initial.countryCodes.length > 1 && <option value={\"dial:\" + initial.dialCode}>{ambiguousNames} ({initial.dialCode})</option>}\n      {internationalContactCountries.map(item => <option key={item.iso} value={item.iso}>{item.names[locale] || item.names.en || item.names.ko} ({item.dialCode})</option>)}"
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "result": "정적 검토 통과",
+      "title": "입력 전달 및 제출 중 잠금",
+      "conclusion": "국가/번호 변경은 부모에 전체 문자열을 전달한다. 국제 컴포넌트는 disabled 시 handler를 조기 종료하고 select/input/비우기를 잠근다. PublicForm은 busy 또는 pending을, SubmissionDetail은 busy 또는 conflict를 전달한다. 네트워크 실패 후 같은 요청 재시도 동안 입력을 바꾸지 못하도록 부모 guard도 유지된다.",
+      "sourceEvidence": [
+        "E02"
+      ],
+      "boundary": "실제 비동기 응답 타이밍과 모바일 선택 UI는 실행하지 않았다.",
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/InternationalContactInput.tsx",
+          "startLine": 18,
+          "endLine": 38,
+          "sha256": "21632c9c89479b615e38cfca675f5b5bc5623494665ce96ecf52e9245acdc339",
+          "excerpt": "  const candidate = (selected: string, digits: string) => selected || digits ? dialCode(selected) + \" \" + digits : \"\";\n  const error = !country && (number || question.required) ? labels.errCountryCode\n    : internationalContactError(candidate(country, number), question.required) ? labels.errLength : undefined;\n  const update = (selected: string, digits: string) => {\n    if (disabled) return;\n    setCountry(selected); setNumber(digits); onChange(candidate(selected, digits));\n  };\n  const ambiguousNames = initial.countryCodes.map(code => internationalContactCountries.find(item => item.iso === code))\n    .filter(item => !!item).map(item => item.names[locale] || item.names.en || item.names.ko).join(\" / \");\n  return <div className=\"cs-stack\" lang={locale} dir={locale === \"ar\" ? \"rtl\" : \"ltr\"}>\n    <label className=\"cs-label\">{labels.countryCodePlaceholder}<select className=\"cs-input\" aria-label={question.label + \" · \" + labels.countryCodePlaceholder} required={question.required || !!number}\n      value={country} disabled={disabled} onChange={event => update(event.target.value, number)}>\n      <option value=\"\" disabled hidden>{labels.countryCodePlaceholder}</option>\n      {initial.countryCodes.length > 1 && <option value={\"dial:\" + initial.dialCode}>{ambiguousNames} ({initial.dialCode})</option>}\n      {internationalContactCountries.map(item => <option key={item.iso} value={item.iso}>{item.names[locale] || item.names.en || item.names.ko} ({item.dialCode})</option>)}\n    </select></label>\n    <label className=\"cs-label\">{labels.numberPlaceholder}<input className=\"cs-input\" name={question.id} aria-label={question.label + \" · \" + labels.numberPlaceholder} type=\"tel\" inputMode=\"numeric\" dir=\"ltr\"\n      autoComplete=\"tel-national\" placeholder={labels.numberPlaceholder} maxLength={30} required={question.required || !!country} value={number} disabled={disabled}\n      ref={element => element?.setCustomValidity(error ?? \"\")} onChange={event => update(country, event.target.value.replace(/\\D/g, \"\"))} /></label>\n    <p className=\"cs-muted\">{labels.errLength}</p>\n    {!question.required && (country || number) && <button type=\"button\" className=\"cs-link\" disabled={disabled} onClick={() => update(\"\", \"\")}>{formPhrase(locale, \"phrase70\")}</button>}"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 87,
+          "endLine": 92,
+          "sha256": "9ee2e8df24078831dea3013992faa10eb7bf6b157ad8b7e15fbc5782d024f285",
+          "excerpt": "  function change(id: string, value: AnswerValue) {\n    if (busy || session.current?.hasPending) return;\n    const next = { ...values, [id]: value }, shown = visibleQuestionIds(content.questions, next);\n    const nextFiles = { ...files };\n    for (const question of content.questions) if (!shown.has(question.id)) { delete next[question.id]; delete nextFiles[question.id]; uploadCache.current.delete(question.id); }\n    setValues(next); setFiles(nextFiles);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 130,
+          "endLine": 136,
+          "sha256": "9ee2e8df24078831dea3013992faa10eb7bf6b157ad8b7e15fbc5782d024f285",
+          "excerpt": "    <fieldset className=\"public-response-fields\" disabled={busy || pending}>{content.questions.filter(question => visible.has(question.id)).map(question =>\n      <fieldset className=\"public-question\" key={question.id}><legend>{question.label} {question.required && <em>*</em>}</legend>\n        <QuestionInput question={question} value={values[question.id]} file={files[question.id]} language={content.formLanguage} onChange={value => change(question.id, value)} disabled={busy || pending}\n          onFileChange={file => { if (busy || session.current!.hasPending) return;\n            setFiles(current => { const next = { ...current }; if (file) next[question.id] = file; else delete next[question.id]; return next; });\n            uploadCache.current.delete(question.id);\n          }} />"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "startLine": 67,
+          "endLine": 74,
+          "sha256": "79c96c691d2458f46aeee617fec9d742f8e7d0a5aadc468a09f8fd1e1f1e7cd3",
+          "excerpt": "  function change(id: string, value: AnswerValue) {\n    if (busy || conflict) return;\n    const next = { ...values, [id]: value }, shown = visibleQuestionIds(row.questions, next);\n    const nextFiles = { ...files };\n    for (const question of row.questions) if (!shown.has(question.id)) {\n      next[question.id] = emptyAnswer(question.type); delete nextFiles[question.id]; uploads.current.delete(question.id);\n    }\n    setValues(next); setFiles(nextFiles);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "startLine": 144,
+          "endLine": 147,
+          "sha256": "79c96c691d2458f46aeee617fec9d742f8e7d0a5aadc468a09f8fd1e1f1e7cd3",
+          "excerpt": "        </div> : <QuestionInput question={question} value={values[question.id]} language={row.formLanguage} onChange={value => change(question.id, value)} disabled={busy || conflict} />}</fieldset>)}\n      {mode === \"destruction-request\" && <p>파기 요청을 등록합니다. 실제 파기 완료 상태는 처리 결과에 따라 별도로 표시됩니다.</p>}\n      <label className=\"cs-label\">변경 사유<textarea aria-label=\"변경 사유\" className=\"cs-input\" disabled={busy} required maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} /></label>\n      <div className=\"forms-actions\"><ActionButton disabled={busy || conflict}>확인</ActionButton><ActionButton secondary type=\"button\" disabled={busy} onClick={() => void cancelMode()}>취소</ActionButton></div>"
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "result": "정적 검토 통과",
+      "title": "정정 취소·입력 버리기 및 숨김 처리",
+      "conclusion": "정정 시 값 변경은 parent values를 바꾸어 modeDirty에 반영된다. 취소는 dirty 확인 후 저장값으로 복귀하고 모드를 닫으므로 내부 국제 입력 state도 unmount된다. 조건에 의해 숨겨지는 질문은 값을 지우고 렌더에서 제외하며 다시 표시될 때 새 빈 state로 mount된다.",
+      "sourceEvidence": [],
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "startLine": 54,
+          "endLine": 74,
+          "sha256": "79c96c691d2458f46aeee617fec9d742f8e7d0a5aadc468a09f8fd1e1f1e7cd3",
+          "excerpt": "  const modeDirty = !!mode && (!!reason || Object.keys(files).length > 0 ||\n    mode === \"edit\" && JSON.stringify(values) !== JSON.stringify(row.values) || mode === \"retention\" && retention !== originalRetention);\n  const dirty = noteDirty || modeDirty;\n  useUnsavedChanges(dirty || busy);\n  async function discard(changed = dirty) {\n    return !changed || confirm({ title: \"저장하지 않은 변경 사항\", message: \"저장하지 않은 응답 또는 메모 입력을 버릴까요?\", confirmLabel: \"입력 버리기\", cancelLabel: \"계속 편집\" });\n  }\n  function failed(cause: unknown) { setError(errorText(cause)); if (cause instanceof ApiError && cause.status === 409) setConflict(true); }\n  async function cancelMode() {\n    if (busy || !await discard(modeDirty)) return;\n    setMode(undefined); setReason(\"\"); setValues(row.values); setRetention(originalRetention); setFiles({}); uploads.current.clear();\n  }\n  const visible = visibleQuestionIds(row.questions, values);\n  function change(id: string, value: AnswerValue) {\n    if (busy || conflict) return;\n    const next = { ...values, [id]: value }, shown = visibleQuestionIds(row.questions, next);\n    const nextFiles = { ...files };\n    for (const question of row.questions) if (!shown.has(question.id)) {\n      next[question.id] = emptyAnswer(question.type); delete nextFiles[question.id]; uploads.current.delete(question.id);\n    }\n    setValues(next); setFiles(nextFiles);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "startLine": 125,
+          "endLine": 147,
+          "sha256": "79c96c691d2458f46aeee617fec9d742f8e7d0a5aadc468a09f8fd1e1f1e7cd3",
+          "excerpt": "      {mode === \"edit\" && row.questions.filter(question => visible.has(question.id)).map(question => <fieldset disabled={busy} className=\"cs-label forms-correction-field\" key={question.id}><legend>{question.label}</legend>\n        {question.type === \"직접 그리기\" ? <div><p>{answerView(question.id, values[question.id])}</p>\n          <QuestionInput question={question} value={values[question.id]} file={files[question.id]} language={row.formLanguage}\n            savedPreview={row.attachments.some(item => item.id === fileAnswerId(values[question.id])) ? fileDownloadUrl(fileAnswerId(values[question.id])!, row.id, question.id) : undefined}\n            disabled={busy || conflict || row.legalHold || !app.data?.capabilities.includes(\"file.read\")}\n            onChange={value => change(question.id, value)} onFileChange={file => {\n              if (busy || conflict || row.legalHold || !app.data?.capabilities.includes(\"file.read\")) return;\n              const next = { ...files }; if (file) next[question.id] = file; else delete next[question.id];\n              setFiles(next); if (!file) setValues(current => ({ ...current, [question.id]: null })); uploads.current.delete(question.id);\n            }} />\n          <p className=\"cs-muted\">새 그림을 적용하면 검사 후 교체합니다. 이전 그림은 정정 이력에 보관됩니다.</p>\n        </div> : question.type === \"파일 업로드\" ? <div><p>{answerView(question.id, values[question.id])}</p>\n          <input className=\"cs-input\" type=\"file\" accept={FILE_ACCEPT} aria-label={question.label} required={question.required && !values[question.id]}\n            disabled={busy || row.legalHold || !app.data?.capabilities.includes(\"file.read\")} onChange={event => {\n              const next = { ...files }; if (event.target.files?.[0]) next[question.id] = event.target.files[0]; else delete next[question.id];\n              setFiles(next); uploads.current.delete(question.id);\n            }} /><p className=\"cs-muted\">새 파일을 선택하면 검사 후 첨부파일을 교체합니다. 이전 파일은 정정 이력에 보관됩니다.</p>\n          {!question.required && <label><input type=\"checkbox\" disabled={busy || row.legalHold || !app.data?.capabilities.includes(\"file.read\")} checked={!values[question.id] && !files[question.id]}\n            onChange={event => { setValues({ ...values, [question.id]: event.target.checked ? \"\" : row.values[question.id] }); const next = { ...files }; delete next[question.id]; setFiles(next); }} />첨부파일 비우기</label>}\n        </div> : <QuestionInput question={question} value={values[question.id]} language={row.formLanguage} onChange={value => change(question.id, value)} disabled={busy || conflict} />}</fieldset>)}\n      {mode === \"destruction-request\" && <p>파기 요청을 등록합니다. 실제 파기 완료 상태는 처리 결과에 따라 별도로 표시됩니다.</p>}\n      <label className=\"cs-label\">변경 사유<textarea aria-label=\"변경 사유\" className=\"cs-input\" disabled={busy} required maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} /></label>\n      <div className=\"forms-actions\"><ActionButton disabled={busy || conflict}>확인</ActionButton><ActionButton secondary type=\"button\" disabled={busy} onClick={() => void cancelMode()}>취소</ActionButton></div>"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 87,
+          "endLine": 92,
+          "sha256": "9ee2e8df24078831dea3013992faa10eb7bf6b157ad8b7e15fbc5782d024f285",
+          "excerpt": "  function change(id: string, value: AnswerValue) {\n    if (busy || session.current?.hasPending) return;\n    const next = { ...values, [id]: value }, shown = visibleQuestionIds(content.questions, next);\n    const nextFiles = { ...files };\n    for (const question of content.questions) if (!shown.has(question.id)) { delete next[question.id]; delete nextFiles[question.id]; uploadCache.current.delete(question.id); }\n    setValues(next); setFiles(nextFiles);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 130,
+          "endLine": 136,
+          "sha256": "9ee2e8df24078831dea3013992faa10eb7bf6b157ad8b7e15fbc5782d024f285",
+          "excerpt": "    <fieldset className=\"public-response-fields\" disabled={busy || pending}>{content.questions.filter(question => visible.has(question.id)).map(question =>\n      <fieldset className=\"public-question\" key={question.id}><legend>{question.label} {question.required && <em>*</em>}</legend>\n        <QuestionInput question={question} value={values[question.id]} file={files[question.id]} language={content.formLanguage} onChange={value => change(question.id, value)} disabled={busy || pending}\n          onFileChange={file => { if (busy || session.current!.hasPending) return;\n            setFiles(current => { const next = { ...current }; if (file) next[question.id] = file; else delete next[question.id]; return next; });\n            uploadCache.current.delete(question.id);\n          }} />"
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "result": "정적 검토 통과",
+      "title": "기존 응답 언어는 제출 당시 게시본에서 가져옴",
+      "conclusion": "getSubmission DTO는 row.formVersion.formLanguage를 반환하고 정정 validateAnswers에도 동일 게시본 언어를 사용한다. SubmissionDetail은 이 값을 QuestionInput으로 전달한다. 현재 초안 언어를 과거 응답에 적용하지 않는다.",
+      "sourceEvidence": [],
+      "boundary": "DB 실행으로 재검증하지 않았다. 기존 회귀 파일 174~188행의 시나리오를 읽기만 했다.",
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+          "startLine": 51,
+          "endLine": 59,
+          "sha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+          "excerpt": "  await audit(tx, ctx, requestId, \"submission.viewed\", \"submission\", id, [], row.formVersion.form.serviceId);\n  return {\n    ...(row.formVersion.formLanguage ? { formLanguage: formLanguageSchema.parse(row.formVersion.formLanguage) } : {}),\n    source: row.importJobId ? \"csv\" : \"form\", importEvidence: importEvidence ? decrypt(importEvidence.payloadCipher) : null,\n    id: row.id, formId: row.formVersion.form.id, title: row.formVersion.title, version: row.version, status: row.status,\n    createdAt: row.submittedAt, retentionUntil: row.retentionUntil, legalHold: row.legalHold,\n    originalRetentionUntil: row.originalRetentionUntil, contentAvailable: available,\n    values: available ? readableAnswerValues(answerValues(row), mayReadFiles) : {},\n    questions: contentDto(row.formVersion).questions,"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+          "startLine": 72,
+          "endLine": 80,
+          "sha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+          "excerpt": "export async function correctSubmission(ctx: Context, id: string, input: z.infer<typeof correctionInput>, requestId: string) {\n  return db.$transaction(async tx => {\n  const row = await lockSubmission(tx, ctx, id, \"submission.write\", true);\n  requireSubmissionContent(row);\n  if (row.legalHold) fail(409, \"LEGAL_HOLD\", \"보존 조치 중에는 응답을 정정할 수 없습니다.\");\n  const evidence = row.importJobId ? await tx.importEvidence.findUnique({ where: { submissionId: id } }) : null;\n  const fieldTypes = evidence ? decrypt<{ fieldTypes: string[] }>(evidence.payloadCipher).fieldTypes : [];\n  const before = answerValues(row);\n  const normalized = validateAnswers(row.formVersion.questions.map((q, i) => ({ ...q, validationKind: fieldTypes?.[i] })), input.answers, true, before, row.formVersion.formLanguage);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "startLine": 144,
+          "endLine": 144,
+          "sha256": "79c96c691d2458f46aeee617fec9d742f8e7d0a5aadc468a09f8fd1e1f1e7cd3",
+          "excerpt": "        </div> : <QuestionInput question={question} value={values[question.id]} language={row.formLanguage} onChange={value => change(question.id, value)} disabled={busy || conflict} />}</fieldset>)}"
+        }
+      ]
+    },
+    {
+      "id": "C07",
+      "result": "정적 검토 통과",
+      "title": "언어 선택 시 인증 설정 충돌 및 처리 중 이탈",
+      "conclusion": "verify=true에서 nonko 선택은 적용 버튼을 막고 안내한다. 저장 중 모달의 선택/적용/취소/닫기도 막는다. 서버 schema도 nonko+verify를 거절한다.",
+      "sourceEvidence": [
+        "E10"
+      ],
+      "boundary": "원본 본인인증/서명 전체를 구현했다는 뜻이 아니다.",
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormLanguageSettings.tsx",
+          "startLine": 10,
+          "endLine": 24,
+          "sha256": "2398fa3c162924bf37673085e64cbe8300eb6eaef01086d597e456b9cd82de31",
+          "excerpt": "  const conflicts = language !== \"ko\" && content.verify;\n  return <Panel><h2>캐치폼 서비스 언어</h2><p>선택한 언어로 캐치폼을 작성해 주세요.</p>\n    <div className=\"forms-actions\"><strong>{formLanguageLabel(content.formLanguage)}</strong>\n      <button type=\"button\" className=\"cs-button secondary\" disabled={disabled} onClick={() => { setLanguage(effectiveFormLanguage(content.formLanguage)); setChoosing(true); }}>언어변경</button></div>\n    {choosing && <Modal title=\"캐치폼 서비스 언어 설정\" onClose={() => { if (!disabled) setChoosing(false); }}>\n      <div className=\"cs-stack\"><p>본 캐치폼을 서비스할 언어를 선택해 주세요.</p>\n        <p>질문, 본문과 답변 선택항목은 선택하신 언어로 직접 입력해 주세요.</p>\n        <label className=\"cs-label\">언어<select className=\"cs-input\" aria-label=\"캐치폼 서비스 언어\" value={language} disabled={disabled} onChange={event => setLanguage(event.target.value as FormLanguage)}>\n          {formLanguages.map(item => <option key={item.code} value={item.code}>{item.label}</option>)}\n        </select></label>\n        <p>한국어와 외국어 사이에서 변경하면 주소 질문도 국내 주소 또는 해외 주소로 변경됩니다. 이미 게시된 응답은 유지됩니다.</p>\n        {conflicts && <p role=\"alert\">본인인증 및 전자서명은 한국어 캐치폼에서만 사용할 수 있습니다. 창을 닫고 해당 설정을 먼저 해제해 주세요.</p>}\n        <div className=\"forms-actions\"><ActionButton secondary disabled={disabled} onClick={() => setChoosing(false)}>취소하기</ActionButton>\n          <ActionButton disabled={disabled || !!conflicts} onClick={() => {\n            if (disabled || conflicts) return;"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/domains.ts",
+          "startLine": 24,
+          "endLine": 26,
+          "sha256": "c1a51de6cf042c32fbe7ed888ccac4584b2ef93fbeb1b7ab1c570bcbac389a9b",
+          "excerpt": "}).strict().refine(content => !content.verify || !isInternationalFormLanguage(content.formLanguage), {\n  message: \"본인인증 및 전자서명은 한국어 폼에서만 사용할 수 있습니다.\", path: [\"verify\"],\n});"
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "result": "정적 검토 통과",
+      "title": "국가 카탈로그와 번역 projection 사용",
+      "conclusion": "181개 국가/179개 calling code 원본 projection을 재사용하며 현재 언어 국가명→en→ko 순으로 표시한다. 국제 입력 4개 문구는 16개 실제 locale JSON에서 읽는다. 현대 ja resource와 legacy jp를 혼동하지 않는다.",
+      "sourceEvidence": [
+        "E27"
+      ],
+      "systemCopyEvidence": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/system-copy-source.json",
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/InternationalContactInput.tsx",
+          "startLine": 15,
+          "endLine": 16,
+          "sha256": "21632c9c89479b615e38cfca675f5b5bc5623494665ce96ecf52e9245acdc339",
+          "excerpt": "  const locale = effectiveFormLanguage(language);\n  const labels = formSystemCopy(locale).internationalContact;"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/InternationalContactInput.tsx",
+          "startLine": 25,
+          "endLine": 36,
+          "sha256": "21632c9c89479b615e38cfca675f5b5bc5623494665ce96ecf52e9245acdc339",
+          "excerpt": "  const ambiguousNames = initial.countryCodes.map(code => internationalContactCountries.find(item => item.iso === code))\n    .filter(item => !!item).map(item => item.names[locale] || item.names.en || item.names.ko).join(\" / \");\n  return <div className=\"cs-stack\" lang={locale} dir={locale === \"ar\" ? \"rtl\" : \"ltr\"}>\n    <label className=\"cs-label\">{labels.countryCodePlaceholder}<select className=\"cs-input\" aria-label={question.label + \" · \" + labels.countryCodePlaceholder} required={question.required || !!number}\n      value={country} disabled={disabled} onChange={event => update(event.target.value, number)}>\n      <option value=\"\" disabled hidden>{labels.countryCodePlaceholder}</option>\n      {initial.countryCodes.length > 1 && <option value={\"dial:\" + initial.dialCode}>{ambiguousNames} ({initial.dialCode})</option>}\n      {internationalContactCountries.map(item => <option key={item.iso} value={item.iso}>{item.names[locale] || item.names.en || item.names.ko} ({item.dialCode})</option>)}\n    </select></label>\n    <label className=\"cs-label\">{labels.numberPlaceholder}<input className=\"cs-input\" name={question.id} aria-label={question.label + \" · \" + labels.numberPlaceholder} type=\"tel\" inputMode=\"numeric\" dir=\"ltr\"\n      autoComplete=\"tel-national\" placeholder={labels.numberPlaceholder} maxLength={30} required={question.required || !!country} value={number} disabled={disabled}\n      ref={element => element?.setCustomValidity(error ?? \"\")} onChange={event => update(country, event.target.value.replace(/\\D/g, \"\"))} /></label>"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-system-copy.ts",
+          "startLine": 1,
+          "endLine": 10,
+          "sha256": "e95df7a7274bcd4a4a78e19d09bb630d4d9c96c7e88783b7cdb08d1e19fd1b6c",
+          "excerpt": "import copy from \"@/data/form-system-copy.json\";\nimport { effectiveFormLanguage } from \"./form-language\";\n\nexport function formSystemCopy(language?: string | null) {\n  return copy[effectiveFormLanguage(language)].translate.infoOwnerForm;\n}\nexport function formPhrase(language: string | null | undefined, key: keyof typeof copy.ko.translate.infoOwnerForm.phrase) {\n  const phrases: Record<string, string> = formSystemCopy(language).phrase;\n  // React renders plain text. Numeric translation-component markers are line breaks, never HTML.\n  return (phrases[key] ?? copy.ko.translate.infoOwnerForm.phrase[key]).replace(/<\\/?\\d+\\s*\\/?\\s*>/g, \"\\n\");"
+        }
+      ]
+    },
+    {
+      "id": "C09",
+      "result": "정적 검토 통과",
+      "title": "응답 수 마감 문구의 의미 매핑",
+      "conclusion": "PublicForm closed는 phrase9를 사용한다. 현재 DTO의 closed는 responseCount>=maxResponses에만 해당하여 원본의 응답 수 초과 문구와 맞는다. 모든 만료/일시중지 사유의 번역까지 연결됐다고 주장하지 않는다.",
+      "sourceEvidence": [],
+      "local": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+          "startLine": 67,
+          "endLine": 68,
+          "sha256": "f6c6f1ff6d34cb90d339a56c1d1fe78113b1999edfa563695fd8db81e63bab0b",
+          "excerpt": "  return { title: publication.formVersion.title, content, consentBundle: consentBundle(publication.formVersion),\n    closed: publication.responseCount >= publication.maxResponses, expiresAt: publication.expiresAt, verification };"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "startLine": 127,
+          "endLine": 127,
+          "sha256": "9ee2e8df24078831dea3013992faa10eb7bf6b157ad8b7e15fbc5782d024f285",
+          "excerpt": "  if (data.closed) return <div lang={locale} dir={direction}><h1>{data.title}</h1><p>{formPhrase(locale, \"phrase9\")}</p></div>;"
+        }
+      ]
+    }
+  ],
+  "originalEvidenceIndex": [
+    {
+      "id": "E01",
+      "label": "공개 CONTACT의 formLanguage 분기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8331226,
+      "end": 8331693,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "f28498e86c857380150bc3b9d09b147737c1f1763d1e72c13d9dba0d3cf1d778"
+    },
+    {
+      "id": "E02",
+      "label": "공개 국제 CONTACT C0 전체: 값·검증·잠금",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8306845,
+      "end": 8308324,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "ec1d59f755ad009b46fd41ee7fb046aedd3a9b7a64118b429aef2a16ca363429"
+    },
+    {
+      "id": "E03",
+      "label": "국가번호 select SQ 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8202419,
+      "end": 8203039,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "2e2350877e7b246c0a8dbd46c45c98768ea06948755ac3949dc9e6cf5a85b416"
+    },
+    {
+      "id": "E04",
+      "label": "국제 연락처 공통 입력 jQ 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8205022,
+      "end": 8205586,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "5fcafc6dc1c59065b4bc4cc2942cb123da36eddb329112c07887d475e3787ca3"
+    },
+    {
+      "id": "E08",
+      "label": "V3 CONTACT 편집기 스켈레톤의 국내/국제 분기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12745841,
+      "end": 12746645,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "678980b49843681c51681905b2e61dbeac1fbf0fb3a41d6b120deb97fe21d821"
+    },
+    {
+      "id": "E10",
+      "label": "전역 서비스 언어 선택 modal와 reducer dispatch",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12784970,
+      "end": 12785984,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "e310dac38e5fde6728a4a062629ce52a7cd751822f29710126a856447ee67ffa"
+    },
+    {
+      "id": "E13",
+      "label": "언어 변경 reducer: 주소 타입 전환, CONTACT 타입 유지",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 6925225,
+      "end": 6925654,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "7aea06b5b326ab0915a492578be7ababaa16bd5d32486e75ff7b4288680bed7f"
+    },
+    {
+      "id": "E14",
+      "label": "새 V3 폼의 기본 언어 ko",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 6914760,
+      "end": 6914880,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "070632e82f557a28e7c5ea34cc34518df67bdeb30e045893cb0bdaa5be07dfbe"
+    },
+    {
+      "id": "E19",
+      "label": "공개 제출 BRe: 언어에서 국제 여부 결정",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 10054475,
+      "end": 10054676,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "2c78381ffb8c244d0baa7420e1d7e94dc4410f4007cdbaf6c4d27ab4848c5b32"
+    },
+    {
+      "id": "E20",
+      "label": "BRe CONTACT 문자열 직렬화",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 10056048,
+      "end": 10056901,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "ef3644ec80dae40f51a30171dbb248290adc2d46bdc620ee32d7198787e2a2c7"
+    },
+    {
+      "id": "E26",
+      "label": "국가 ISO 조회 Hq 및 이름 fallback Wq",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8159362,
+      "end": 8159490,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "e794181d0bb4e0f3eb21e14aa7b6b0c7728e1de5eb5d79e6ea8fa1da00df3c74"
+    },
+    {
+      "id": "E27",
+      "label": "국가 및 전화코드 원본 전체 배열: 기존 추출 파일 재사용",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 7961254,
+      "end": 8159361,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "a274fd6491b6d54f9fb929ec20df64c42bc4f1592596f209191f98b495ddffb7"
+    },
+    {
+      "id": "E28",
+      "label": "지원 언어 CV 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 7903809,
+      "end": 7906041,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "ef1986a48a0eae3b37771d282778d08644e3495bb270763fb56dbefaa95c4b57"
+    },
+    {
+      "id": "E29",
+      "label": "기본 언어 SV 및 유효하지 않은 언어 fallback TV",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 7906042,
+      "end": 7906160,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "excerptSha256": "123512fc6c0a63b49c3a236ace66f1176aba277627b629a52a2e6ac5cf899c27"
+    }
+  ],
+  "additionalOriginalEvidence": [
+    {
+      "id": "X01",
+      "label": "유형 선택 CQ: ADDRESS+nonko만 해외 주소로 전환",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8202356,
+      "end": 8202419,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "raw": "const CQ=(e,t)=>\"ADDRESS\"===e&&t&&\"ko\"!==t?\"FOREIGN_ADDRESS\":e;",
+      "sha256": "28cd916d667be2013ac939fc14168ea42a4289582ccd4392dc0963b2a93b9660"
+    },
+    {
+      "id": "X02",
+      "label": "V3 유형 변경 action이 CQ(e,m) 적용",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 12727828,
+      "end": 12727948,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "raw": "de=(e,t)=>{const r=CQ(e,m);if(\"IDV\"===r&&G)return P(!1),void b(!0);const n=!nG(r)&&\"NONE\"!==dG(x).mode,a=zPt.filter((e=>",
+      "sha256": "07882fac76918f929f9871b7ad973b39b2bd6e90378e02f724b0a87c4c1a1168"
+    },
+    {
+      "id": "S04",
+      "label": "완료 모달 thanks key 및 br token",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "start": 8525120,
+      "end": 8526065,
+      "offsetUnit": "0-based UTF-16 code units; end exclusive",
+      "sha256": "22ffa3bd5f102d84df88550f42bc268845118d148f7fb8cb557934012242e014",
+      "raw": "e:r,onClick:n,onReset:a,message:o,data:i,type:s,btnColor:l}=e;const{t:c}=fa(\"translate\",{keyPrefix:\"infoOwnerForm\"}),d=Xr(),{lastTempSaveTimestamp:u}=Ut((e=>e.infoOwnerAnswer),Jt),h=Wu();return(0,nI.jsx)(qR,{className:\"center py-6 px-6 h-[75vh] m-auto\",open:t,onClose:()=>{},children:(0,nI.jsx)(x4,{width:\"TEMPORARY_SAVE\"===s?360:320,children:(0,nI.jsxs)(b4,{children:[\"COMPLETE\"===s&&(0,nI.jsx)(BU,{width:32,src:\"/img/google-icons-v2/marks/check-circle-fill.svg\",color:ij,className:\"mb-3\"}),(0,nI.jsx)(iI,{className:\"subtitle-2\",color:tj,children:o}),\"PATH_KILL\"===s&&(0,nI.jsx)(iI,{className:\"body-1 mt-4\",color:\"#575757\",children:(0,nI.jsx)(pa,{components:[(0,nI.jsx)(\"br\",{})],children:\"\\uc751\\ub2f5\\ud574 \\uc8fc\\uc154\\uc11c \\uac10\\uc0ac\\ud569\\ub2c8\\ub2e4.\"})}),\"COMPLETE\"===s&&(0,nI.jsx)(iI,{className:\"body-1 mt-4\",color:\"#575757\",children:(0,nI.jsx)(pa,{components:[(0,nI.jsx)(\"br\",{})],children:c(\"phrase.phrase79\")})}),\"NEEDS_CONSENT\"=="
+    }
+  ],
+  "acceptedDifferences": [
+    {
+      "topic": "선택사항 전체 비우기",
+      "note": "원본 SQ는 빈 국가 option이 disabled/hidden이라 국가 선택 후 완전 빈값으로 되돌릴 수 없다. 로컬은 선택사항에 phrase70 버튼을 추가해 국가/번호를 함께 비운다. 원본 동작이라고 주장하지 않는 사용성 확장이다."
+    },
+    {
+      "topic": "서버 검증",
+      "note": "로컬은 known calling code membership/ASCII 숫자/6~15를 강제한다. 원본 서버 규칙은 관측하지 않았으며 공개 C0의 조건과 동일한 서버 구현이라고 단정하지 않는다."
+    },
+    {
+      "topic": "제출 중 문구",
+      "note": "원본 dedicated submitting 키가 없어 nonko에서는 제출 원문+말줄임표로 표시한다. 독립 UI 결정이다."
+    },
+    {
+      "topic": "한국어 완료/감사",
+      "note": "PublicForm은 기존 한국어 완료/감사 문구를 유지한다. nonko 문구 연결과 구분한다."
+    }
+  ],
+  "translationScope": {
+    "connected": [
+      "국제 CONTACT 4개 문구",
+      "국제 CONTACT 국가명",
+      "제출 버튼",
+      "완료 문구",
+      "감사 문구",
+      "응답 수 초과 마감 문구"
+    ],
+    "deferredF5": [
+      "동의서 시스템 문구",
+      "주소 필드와 국가명 연결",
+      "업로드/재시도/오류 및 나머지 공개 시스템 메시지"
+    ],
+    "notClaimed": "이번 구현 또는 검토가 공개 UI 전체 번역의 완료를 뜻하지 않음."
+  },
+  "recommendedRuntimeScenarios": [
+    {
+      "id": "R01",
+      "scenario": "선택 CONTACT의 완전 빈값 제출 / 국가만 / 번호만 / 5·6·15·16자리 입력",
+      "expected": "완전 빈값과 6~15 완성값만 제출 허용; 숫자 외 입력 제거; 30자 DOM 한도 유지"
+    },
+    {
+      "id": "R02",
+      "scenario": "필수 CONTACT와 키보드 Enter 제출",
+      "expected": "국가 및 숫자6~15 충족 전 native validation 차단"
+    },
+    {
+      "id": "R03",
+      "scenario": "+1/+7 저장 응답을 열고 이름만 수정 / 번호만 수정 / 취소 / 다시 열기",
+      "expected": "임의 ISO 지정 없음, 공용 dial code 및 원문 보존, dirty 취소 확인 정상"
+    },
+    {
+      "id": "R04",
+      "scenario": "제출 중 또는 불명확 응답 재시도 상태 / 정정 409 상태에서 국가와 숫자 및 비우기 조작",
+      "expected": "세 조작 모두 차단, 제출 payload와 화면값 불일치 없음"
+    },
+    {
+      "id": "R05",
+      "scenario": "조건 질문을 숨긴 뒤 다시 표시",
+      "expected": "이전 국가/번호가 재출현하지 않고 선택 질문은 빈값, 필수 질문은 재입력 요구"
+    },
+    {
+      "id": "R06",
+      "scenario": "16개 언어 국가 selector, ar 숫자 입력, 320px 폭 모바일 표시",
+      "expected": "각 언어 카탈로그/문구, ar 외곽rtl와 번호ltr 확인. 모바일 clipping/focus는 정적검토만으로 확정하지 않음"
+    },
+    {
+      "id": "R07",
+      "scenario": "두 finding의 수정 후 source별 action 회귀",
+      "expected": "findings[].scenarios 및 감사 실제줄바꿈 확인"
+    }
+  ],
+  "localSnapshots": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormLanguageSettings.tsx",
+      "sha256": "2398fa3c162924bf37673085e64cbe8300eb6eaef01086d597e456b9cd82de31",
+      "bytes": 2797,
+      "lines": 33
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+      "sha256": "7b4d2323ed189b18e3c30d3b13578eb1903c8a7fa073ebb0f8f96591fd5803fa",
+      "bytes": 18050,
+      "lines": 160
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/InternationalContactInput.tsx",
+      "sha256": "21632c9c89479b615e38cfca675f5b5bc5623494665ce96ecf52e9245acdc339",
+      "bytes": 3514,
+      "lines": 41
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+      "sha256": "5693cba89efdb38f127e1200d19b417cae29b69f59463d243c718851d49554a5",
+      "bytes": 7509,
+      "lines": 66
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+      "sha256": "9ee2e8df24078831dea3013992faa10eb7bf6b157ad8b7e15fbc5782d024f285",
+      "bytes": 14207,
+      "lines": 159
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+      "sha256": "79c96c691d2458f46aeee617fec9d742f8e7d0a5aadc468a09f8fd1e1f1e7cd3",
+      "bytes": 20249,
+      "lines": 194
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/international-contact.ts",
+      "sha256": "6d817de4b36173e98ced9d47bb993fc386dd5270ef698e63ec456c521d947896",
+      "bytes": 1873,
+      "lines": 27
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-language.ts",
+      "sha256": "f0f59e13a374aff4d8e853c5ac7576cde4b63a8d5a5f167b4d2585fc047ae45c",
+      "bytes": 3012,
+      "lines": 32
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-system-copy.ts",
+      "sha256": "e95df7a7274bcd4a4a78e19d09bb630d4d9c96c7e88783b7cdb08d1e19fd1b6c",
+      "bytes": 647,
+      "lines": 12
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+      "sha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+      "bytes": 13896,
+      "lines": 156
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+      "sha256": "f6c6f1ff6d34cb90d339a56c1d1fe78113b1999edfa563695fd8db81e63bab0b",
+      "bytes": 10562,
+      "lines": 140
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+      "sha256": "97e9d3fc9499dcad45f803762833ea637e82dccf5f41400b0fca4ba5f2404892",
+      "bytes": 9105,
+      "lines": 100
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/domains.ts",
+      "sha256": "c1a51de6cf042c32fbe7ed888ccac4584b2ef93fbeb1b7ab1c570bcbac389a9b",
+      "bytes": 4312,
+      "lines": 70
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-international-contact.test.ts",
+      "sha256": "f40f3cf376d48228a81a0c274a3d77842189bad1bec00af26ff57903a7e8a462",
+      "bytes": 21550,
+      "lines": 254
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/forms.css",
+      "sha256": "114e037a7b161216dc3419e89864f350c95385d4606bf2b174fcc8cd89c9f861",
+      "bytes": 6667,
+      "lines": 15
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/globals.css",
+      "sha256": "203573973a6df177e197cec69f515c59bda94ae5497ba109a9770a9d0294f3e2",
+      "bytes": 8845,
+      "lines": 149
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/data/form-system-copy.json",
+      "sha256": "6c9f6f1bba196cfdd4962fe1214d62594e5e05ce8c8ca568f1ff516227ce5906",
+      "bytes": 132893,
+      "lines": 1789
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/data/form-countries.json",
+      "sha256": "c683cb1b85530af1e90f6224e000f7dddaf5dcbcd53ba41ad38a27945880cee4",
+      "bytes": 92736,
+      "lines": 3985
+    }
+  ],
+  "localEvidence": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormLanguageSettings.tsx",
+      "startLine": 7,
+      "endLine": 30,
+      "sha256": "2398fa3c162924bf37673085e64cbe8300eb6eaef01086d597e456b9cd82de31",
+      "excerpt": "export function FormLanguageSettings({ content, disabled, onChange }: { content: FormContent; disabled: boolean; onChange: (patch: Partial<FormContent>) => void }) {\n  const [choosing, setChoosing] = useState(false);\n  const [language, setLanguage] = useState<FormLanguage>(effectiveFormLanguage(content.formLanguage));\n  const conflicts = language !== \"ko\" && content.verify;\n  return <Panel><h2>캐치폼 서비스 언어</h2><p>선택한 언어로 캐치폼을 작성해 주세요.</p>\n    <div className=\"forms-actions\"><strong>{formLanguageLabel(content.formLanguage)}</strong>\n      <button type=\"button\" className=\"cs-button secondary\" disabled={disabled} onClick={() => { setLanguage(effectiveFormLanguage(content.formLanguage)); setChoosing(true); }}>언어변경</button></div>\n    {choosing && <Modal title=\"캐치폼 서비스 언어 설정\" onClose={() => { if (!disabled) setChoosing(false); }}>\n      <div className=\"cs-stack\"><p>본 캐치폼을 서비스할 언어를 선택해 주세요.</p>\n        <p>질문, 본문과 답변 선택항목은 선택하신 언어로 직접 입력해 주세요.</p>\n        <label className=\"cs-label\">언어<select className=\"cs-input\" aria-label=\"캐치폼 서비스 언어\" value={language} disabled={disabled} onChange={event => setLanguage(event.target.value as FormLanguage)}>\n          {formLanguages.map(item => <option key={item.code} value={item.code}>{item.label}</option>)}\n        </select></label>\n        <p>한국어와 외국어 사이에서 변경하면 주소 질문도 국내 주소 또는 해외 주소로 변경됩니다. 이미 게시된 응답은 유지됩니다.</p>\n        {conflicts && <p role=\"alert\">본인인증 및 전자서명은 한국어 캐치폼에서만 사용할 수 있습니다. 창을 닫고 해당 설정을 먼저 해제해 주세요.</p>}\n        <div className=\"forms-actions\"><ActionButton secondary disabled={disabled} onClick={() => setChoosing(false)}>취소하기</ActionButton>\n          <ActionButton disabled={disabled || !!conflicts} onClick={() => {\n            if (disabled || conflicts) return;\n            onChange({ formLanguage: language, questions: content.questions.map(question =>\n              [\"주소\", \"해외 주소\"].includes(question.type) ? { ...question, type: language === \"ko\" ? \"주소\" as const : \"해외 주소\" as const } : question) });\n            setChoosing(false);\n          }}>{formLanguageLabel(language)} 선택하기</ActionButton></div>\n      </div>\n    </Modal>}"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+      "startLine": 94,
+      "endLine": 127,
+      "sha256": "7b4d2323ed189b18e3c30d3b13578eb1903c8a7fa073ebb0f8f96591fd5803fa",
+      "excerpt": "  const disabled = (templateMode ? busy : !initial && (busy || !!saved)) || saved?.status === \"archived\" || savedTemplate?.scope === \"public\";\n  return <><PageHeading title={templateMode ? savedTemplate ? \"템플릿 편집\" : \"템플릿 생성\" : saved ? \"캐치폼 편집\" : \"캐치폼 생성\"}><p>개인정보 수집 목적과 응답 항목을 설정하세요.</p></PageHeading>\n    <div className=\"forms-editor\">\n      {!templateMode && saved?.published && <p className=\"cs-note\">수정한 내용은 초안으로 저장됩니다. 다시 게시하면 새 내용이 공개됩니다.</p>}\n      {saved?.status === \"archived\" && <p role=\"alert\">보관된 캐치폼입니다.</p>}\n      <fieldset disabled={disabled} className=\"forms-editor-fieldset\">\n        <FormLanguageSettings content={content} disabled={!!disabled || busy} onChange={update} />\n        {templateMode && <Panel><h2>템플릿 분류</h2><input aria-label=\"템플릿 분류\" className=\"cs-input\" maxLength={80} value={category} onChange={event => setCategory(event.target.value)} /><p>같은 서비스에 접근 권한이 있는 구성원이 이 템플릿을 사용할 수 있습니다.</p></Panel>}\n        <Panel><h2>서비스</h2><select className=\"cs-input\" aria-label=\"캐치폼 서비스\" disabled={!!saved || !!savedTemplate || (!templateMode && draft.creationPending)} value={serviceId} onChange={event => setServiceId(event.target.value)}>\n          <option value=\"\">서비스를 선택해주세요</option>{services.map(service => <option key={service.id} value={service.id}>{service.name}</option>)}</select>\n          {!templateMode && draft.creationPending && draft.phase === \"error\" && <p>생성 결과를 확인할 때까지 서비스 선택을 유지합니다. 제목과 본문은 계속 편집할 수 있습니다.</p>}</Panel>\n        <Panel><h2>캐치폼 제목</h2><p>캐치폼의 상단과 링크 공유 시 노출됩니다.</p>\n          <input className=\"cs-input\" aria-label=\"캐치폼 제목\" placeholder=\"제목을 입력하세요\" maxLength={200} value={title} onChange={event => setTitle(event.target.value)} /></Panel>\n        <Panel><h2>캐치폼 본문</h2><p>캐치폼의 본문 내용을 편집할 수 있습니다.</p>\n          <div className=\"forms-toolbar\"><button type=\"button\" aria-label=\"굵게\" aria-pressed={content.bold} onClick={() => update({ bold: !content.bold })}><b>B</b></button>\n            <select aria-label=\"폰트 크기\" value={content.font} onChange={event => update({ font: event.target.value as FormContent[\"font\"] })}>\n              {[12, 14, 15, 16, 20, 24, 32].map(size => <option key={size}>{size}px</option>)}</select></div>\n          <textarea aria-label=\"캐치폼 본문\" className=\"forms-richtext\" maxLength={20000} value={content.body} onChange={event => update({ body: event.target.value })}\n            style={{ fontSize: content.font, fontWeight: content.bold ? 700 : 400 }} /></Panel>\n        <Panel><h2>본인인증 및 전자서명 설정</h2><p>답변 제출자의 본인인증·전자서명을 수집합니다.</p>\n          <label><input type=\"radio\" name=\"verify\" checked={!!content.verify} disabled={!!content.formLanguage && content.formLanguage !== \"ko\"} onChange={() => update({ verify: true })} /> 예</label>　\n          <label><input type=\"radio\" name=\"verify\" checked={!content.verify} onChange={() => update({ verify: false })} /> 아니요</label>\n          {!!content.formLanguage && content.formLanguage !== \"ko\" && <p>본인인증 및 전자서명은 한국어로 설정된 캐치폼에서만 이용 가능합니다.</p>}\n          {content.verify && <VerificationSettings key={serviceId} serviceId={serviceId} />}</Panel>\n        {content.questions.map((question, index) => <Panel key={question.id}>\n          <div className=\"forms-between\"><select aria-label={`Q${index + 1} 답변 형식`} value={question.type} disabled={content.questions.some(item => item.condition?.questionId === question.id)} onChange={event => {\n            const selectedType = event.target.value as Question[\"type\"];\n            const type = selectedType === \"주소\" && content.formLanguage && content.formLanguage !== \"ko\" ? \"해외 주소\" : selectedType;\n            changeQuestion(question.id, { type, textMaxLength: newTextMaxLength(type), ...(!question.subjectRole || !subjectQuestionTypeAllowed(question.subjectRole, type) ? { subjectRole: undefined } : {}),\n              rows: matrixTypes.includes(type) ? question.rows ?? [{ id: crypto.randomUUID(), label: \"행 1\" }] : undefined,\n              selectionLimits: [\"체크박스\", \"행렬형 복수 선택\"].includes(type) ? question.selectionLimits : undefined,\n              options: choiceTypes.includes(type) ? question.options ?? [] : undefined,\n              optionDefinitions: choiceTypes.includes(type) ? question.optionDefinitions ?? [] : undefined });\n          }}>"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/InternationalContactInput.tsx",
+      "startLine": 8,
+      "endLine": 39,
+      "sha256": "21632c9c89479b615e38cfca675f5b5bc5623494665ce96ecf52e9245acdc339",
+      "excerpt": "export function InternationalContactInput({ question, value, onChange, language, disabled = false }: {\n  question: Question; value: string; language?: FormLanguage; disabled?: boolean; onChange: (value: string) => void;\n}) {\n  const [initial] = useState(() => parseInternationalContact(value));\n  // Shared calling codes do not identify a country. Preserve the stored code until the person selects a country.\n  const [country, setCountry] = useState(initial.countryCode || (initial.dialCode ? \"dial:\" + initial.dialCode : \"\"));\n  const [number, setNumber] = useState(initial.number);\n  const locale = effectiveFormLanguage(language);\n  const labels = formSystemCopy(locale).internationalContact;\n  const dialCode = (selected: string) => internationalContactDialCode(selected.replace(/^dial:/, \"\")) ?? \"\";\n  const candidate = (selected: string, digits: string) => selected || digits ? dialCode(selected) + \" \" + digits : \"\";\n  const error = !country && (number || question.required) ? labels.errCountryCode\n    : internationalContactError(candidate(country, number), question.required) ? labels.errLength : undefined;\n  const update = (selected: string, digits: string) => {\n    if (disabled) return;\n    setCountry(selected); setNumber(digits); onChange(candidate(selected, digits));\n  };\n  const ambiguousNames = initial.countryCodes.map(code => internationalContactCountries.find(item => item.iso === code))\n    .filter(item => !!item).map(item => item.names[locale] || item.names.en || item.names.ko).join(\" / \");\n  return <div className=\"cs-stack\" lang={locale} dir={locale === \"ar\" ? \"rtl\" : \"ltr\"}>\n    <label className=\"cs-label\">{labels.countryCodePlaceholder}<select className=\"cs-input\" aria-label={question.label + \" · \" + labels.countryCodePlaceholder} required={question.required || !!number}\n      value={country} disabled={disabled} onChange={event => update(event.target.value, number)}>\n      <option value=\"\" disabled hidden>{labels.countryCodePlaceholder}</option>\n      {initial.countryCodes.length > 1 && <option value={\"dial:\" + initial.dialCode}>{ambiguousNames} ({initial.dialCode})</option>}\n      {internationalContactCountries.map(item => <option key={item.iso} value={item.iso}>{item.names[locale] || item.names.en || item.names.ko} ({item.dialCode})</option>)}\n    </select></label>\n    <label className=\"cs-label\">{labels.numberPlaceholder}<input className=\"cs-input\" name={question.id} aria-label={question.label + \" · \" + labels.numberPlaceholder} type=\"tel\" inputMode=\"numeric\" dir=\"ltr\"\n      autoComplete=\"tel-national\" placeholder={labels.numberPlaceholder} maxLength={30} required={question.required || !!country} value={number} disabled={disabled}\n      ref={element => element?.setCustomValidity(error ?? \"\")} onChange={event => update(country, event.target.value.replace(/\\D/g, \"\"))} /></label>\n    <p className=\"cs-muted\">{labels.errLength}</p>\n    {!question.required && (country || number) && <button type=\"button\" className=\"cs-link\" disabled={disabled} onClick={() => update(\"\", \"\")}>{formPhrase(locale, \"phrase70\")}</button>}\n  </div>;"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+      "startLine": 43,
+      "endLine": 52,
+      "sha256": "5693cba89efdb38f127e1200d19b417cae29b69f59463d243c718851d49554a5",
+      "excerpt": "  const common = { name: question.id, required: question.required, \"aria-label\": question.label };\n  const text = typeof value === \"string\" ? value : \"\";\n  if (question.type === \"직접 그리기\") return <DrawingQuestionInput question={question} file={file} savedPreview={savedPreview} hasSaved={!!fileAnswerId(value)} disabled={disabled}\n    onFileChange={file => onFileChange?.(file)} />;\n  if (question.type === \"주소\") return <DomesticAddressInput question={question} value={text} onChange={onChange} disabled={disabled} />;\n  if (question.type === \"해외 주소\") return <ForeignAddressInput question={question} value={value} onChange={onChange} />;\n  if (question.type === \"연락처\") return isInternationalFormLanguage(language)\n    ? <InternationalContactInput question={question} value={text} onChange={onChange} language={language} disabled={disabled} />\n    : <ContactQuestionInput question={question} value={text} onChange={onChange} />;\n  if (question.type === \"이메일\") return <EmailQuestionInput question={question} value={text} onChange={onChange} />;"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+      "startLine": 74,
+      "endLine": 92,
+      "sha256": "9ee2e8df24078831dea3013992faa10eb7bf6b157ad8b7e15fbc5782d024f285",
+      "excerpt": "function ResponseForm({ data, token }: { data: PublicFormData; token: string }) {\n  const [receipt, setReceipt] = useState<SubmissionReceipt>(), [error, setError] = useState(\"\"), [busy, setBusy] = useState(false), [pending, setPending] = useState(false);\n  const [verification, setVerification] = useState<VerificationProof | null>(null);\n  const session = useRef<PublicSubmissionSession | null>(null), content = data.content;\n  session.current ??= new PublicSubmissionSession({ send: (payload, key) => api(\"/public/forms/\" + token + \"/submissions\", { method: \"POST\", body: payload, headers: { \"Idempotency-Key\": key } }) });\n  const uploadCache = useRef<UploadCache>(new Map()), [uploadStatus, setUploadStatus] = useState(\"\");\n  const [values, setValues] = useState<Answers>({});\n  const [files, setFiles] = useState<Record<string, File>>({});\n  const visible = visibleQuestionIds(content.questions, values);\n  useEffect(() => {\n    const leave = (event: BeforeUnloadEvent) => { if (session.current?.hasPending) { event.preventDefault(); event.returnValue = \"\"; } };\n    window.addEventListener(\"beforeunload\", leave); return () => window.removeEventListener(\"beforeunload\", leave);\n  }, []);\n  function change(id: string, value: AnswerValue) {\n    if (busy || session.current?.hasPending) return;\n    const next = { ...values, [id]: value }, shown = visibleQuestionIds(content.questions, next);\n    const nextFiles = { ...files };\n    for (const question of content.questions) if (!shown.has(question.id)) { delete next[question.id]; delete nextFiles[question.id]; uploadCache.current.delete(question.id); }\n    setValues(next); setFiles(nextFiles);"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+      "startLine": 94,
+      "endLine": 156,
+      "sha256": "9ee2e8df24078831dea3013992faa10eb7bf6b157ad8b7e15fbc5782d024f285",
+      "excerpt": "  async function submit(event: FormEvent<HTMLFormElement>) {\n    event.preventDefault();\n    if (busy || receipt) return;\n    setError(\"\");\n    const formData = new FormData(event.currentTarget), answers: Answers = {};\n    setBusy(true);\n    try {\n    if (session.current!.hasPending) {\n      setUploadStatus(\"접수 결과를 확인하고 있습니다.\"); setReceipt(await session.current!.retry()); return;\n    }\n    const attachments: Record<string, { fileId: string; token: string }> = {};\n    for (const question of content.questions) {\n      if (!visible.has(question.id)) continue;\n      if (isFileQuestion(question.type)) {\n        const file = files[question.id];\n        if (file instanceof File && file.name) {\n          const uploaded = await uploadFile(file, { token, questionId: question.id }, uploadCache.current, setUploadStatus);\n          answers[question.id] = question.type === \"직접 그리기\" ? drawingAnswerFromFile(uploaded) : uploaded.id;\n          attachments[question.id] = { fileId: uploaded.id, token: uploaded.uploadToken! };\n        } else answers[question.id] = emptyAnswer(question.type);\n        continue;\n      }\n      answers[question.id] = values[question.id] ?? emptyAnswer(question.type);\n    }\n    const payload = JSON.stringify({ answers, marketingChannels: formData.getAll(\"marketingChannels\").map(String), consent: formData.get(\"consent\") === \"on\", documentConsents: formData.getAll(\"documentConsents\").map(String), attachments,\n      ...(verification ? { verification: { attemptId: verification.attemptId, receipt: verification.receipt } } : {}) });\n      setUploadStatus(\"응답을 제출하고 있습니다.\");\n      setReceipt(await session.current!.submit(payload));\n    } catch (cause) { setError(errorText(cause)); } finally { setPending(session.current!.hasPending); setBusy(false); setUploadStatus(\"\"); }\n  }\n  const locale = effectiveFormLanguage(content.formLanguage), direction = locale === \"ar\" ? \"rtl\" : \"ltr\";\n  if (receipt) return <div lang={locale} dir={direction}><h1>{locale === \"ko\" ? \"제출이 완료되었습니다.\" : formPhrase(locale, \"phrase24\")}</h1>{content.showSubmitNotice !== false && <p style={{ whiteSpace: \"pre-line\" }}>{locale === \"ko\" ? \"응답해 주셔서 감사합니다.\" : formPhrase(locale, \"phrase79\")}</p>}\n    <p>접수 번호: <span dir=\"ltr\">{receipt.id}</span></p><p>{new Date(receipt.submittedAt).toLocaleString(locale)}</p></div>;\n  if (data.closed) return <div lang={locale} dir={direction}><h1>{data.title}</h1><p>{formPhrase(locale, \"phrase9\")}</p></div>;\n  return <form className=\"cs-stack\" lang={locale} dir={direction} onSubmit={submit}><h1>{data.title}</h1>\n    <p className=\"public-form-body\" style={{ fontSize: content.font, fontWeight: content.bold ? 700 : 400 }}>{content.body}</p>\n    <fieldset className=\"public-response-fields\" disabled={busy || pending}>{content.questions.filter(question => visible.has(question.id)).map(question =>\n      <fieldset className=\"public-question\" key={question.id}><legend>{question.label} {question.required && <em>*</em>}</legend>\n        <QuestionInput question={question} value={values[question.id]} file={files[question.id]} language={content.formLanguage} onChange={value => change(question.id, value)} disabled={busy || pending}\n          onFileChange={file => { if (busy || session.current!.hasPending) return;\n            setFiles(current => { const next = { ...current }; if (file) next[question.id] = file; else delete next[question.id]; return next; });\n            uploadCache.current.delete(question.id);\n          }} />\n        {question.type === \"파일 업로드\" && <p className=\"cs-muted\">PDF, PNG, JPG, TXT, CSV · 파일당 최대 10MB · 검사 후 제출됩니다.</p>}</fieldset>)}\n      <section className=\"public-consent\"><h2>개인정보 수집·이용 동의</h2><ConsentDisplay display={data.consentBundle?.display} />\n        <p><strong>수집·이용 목적</strong><br />{content.consentPurpose || \"별도 동의를 요청하지 않습니다.\"}</p>\n        <p><strong>보유 및 이용 기간</strong><br />제출일로부터 {content.retentionDays}일</p>\n        <p>{content.consentRequired ? data.consentBundle?.display?.requiredText : data.consentBundle?.display?.optionalText}</p>\n        <label className=\"cs-row\"><input type=\"checkbox\" name=\"consent\" required={content.consentRequired} />{content.consentRequired ? \"[필수]\" : \"[선택]\"} 개인정보 수집·이용에 동의합니다.</label>\n      </section><ConsentDocuments bundle={data.consentBundle} selectable />\n      {content.marketing && <section className=\"public-consent\"><h2>광고성 정보 수신동의 (선택)</h2><p><strong>마케팅 목적</strong><br />{content.marketing.purpose}</p><p>보유 및 이용 기간: 제출일로부터 {content.retentionDays}일 · 철회하면 발송이 중지됩니다.</p><p>동의하지 않아도 응답을 제출할 수 있습니다. 채널을 각각 선택해주세요.</p>\n        {content.marketing.emailQuestionId && <label className=\"cs-row\"><input name=\"marketingChannels\" type=\"checkbox\" value=\"email\" />[선택] 이메일 광고성 정보 수신에 동의합니다.</label>}\n        {content.marketing.smsQuestionId && <label className=\"cs-row\"><input name=\"marketingChannels\" type=\"checkbox\" value=\"sms\" />[선택] 문자 광고성 정보 수신에 동의합니다.</label>}\n        {content.marketing.kakaoQuestionId && <label className=\"cs-row\"><input name=\"marketingChannels\" type=\"checkbox\" value=\"kakao\" />[선택] 알림톡 광고성 정보 수신에 동의합니다.</label>}\n      </section>}</fieldset>\n    {content.verify && <fieldset className=\"public-response-fields\" disabled={busy || pending}>\n      {verification ? <section className=\"public-consent\"><h2>{verificationLabels[verification.kind].title}</h2><p role=\"status\">{verificationLabels[verification.kind].done} ({verification.name})</p></section>\n        : <IdentityVerification key={token} token={token} kinds={data.verification?.kinds?.length ? data.verification.kinds : [\"identity\"]} onDone={proof => setVerification(proof)} />}\n    </fieldset>}\n    {uploadStatus && <p role=\"status\">{uploadStatus}</p>}\n    {error && <p role=\"alert\">{error}</p>}\n    {pending && !busy && <p role=\"status\">접수 여부를 확인할 수 없습니다. 입력 내용과 첨부를 유지하고 같은 요청으로 결과를 다시 확인해주세요.</p>}\n    <ActionButton disabled={busy || (!!content.verify && !verification)}>{busy ? locale === \"ko\" ? \"제출 중…\" : formPhrase(locale, \"phrase44\") + \"…\" : pending ? \"같은 요청으로 결과 확인\" : formPhrase(locale, \"phrase44\")}</ActionButton>"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+      "startLine": 33,
+      "endLine": 75,
+      "sha256": "79c96c691d2458f46aeee617fec9d742f8e7d0a5aadc468a09f8fd1e1f1e7cd3",
+      "excerpt": "export function SubmissionDetail({ id, onClose, onChanged }: { id: string; onClose: () => void; onChanged: () => void }) {\n  const result = useResource<Detail>(\"/submissions/\" + id);\n  if (result.data) return <DetailView key={result.data.version + \":\" + result.data.notes.map(note => note.id + note.version).join(\",\")}\n    row={result.data} onClose={onClose} reload={() => { result.reload(); onChanged(); }} />;\n  return <Modal title=\"응답 상세\" onClose={onClose}>\n    {result.loading ? <p role=\"status\">응답을 불러오는 중입니다.</p> : result.error && <p role=\"alert\">{result.error.message}</p>}\n  </Modal>;\n}\nfunction DetailView({ row, reload, onClose }: { row: Detail; reload: () => void; onClose: () => void }) {\n  const app = useApplication(), canWrite = app.data?.capabilities.includes(\"submission.write\"), canDestroy = app.data?.capabilities.includes(\"submission.destroy\");\n  const confirm = useConfirm();\n  const [mode, setMode] = useState<\"edit\" | \"withdraw\" | \"hold\" | \"destruction-request\" | \"retention\">(), [values, setValues] = useState(row.values);\n  const [retention, setRetention] = useState(() => { const d = new Date(row.retentionUntil); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); });\n  const [reason, setReason] = useState(\"\"), [busy, setBusy] = useState(false), [error, setError] = useState(\"\");\n  const [conflict, setConflict] = useState(false);\n  const [noteText, setNoteText] = useState(\"\"), [editingNote, setEditingNote] = useState<Detail[\"notes\"][number]>(), [deleteNote, setDeleteNote] = useState(\"\");\n  const pendingNote = useRef<{ payload: string; key: string } | null>(null);\n  const uploads = useRef<UploadCache>(new Map()), [files, setFiles] = useState<Record<string, File>>({}), [uploadStatus, setUploadStatus] = useState(\"\");\n  const noteDirty = noteText !== (editingNote?.text ?? \"\");\n  const originalDate = new Date(row.retentionUntil);\n  const originalRetention = new Date(originalDate.getTime() - originalDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);\n  const modeDirty = !!mode && (!!reason || Object.keys(files).length > 0 ||\n    mode === \"edit\" && JSON.stringify(values) !== JSON.stringify(row.values) || mode === \"retention\" && retention !== originalRetention);\n  const dirty = noteDirty || modeDirty;\n  useUnsavedChanges(dirty || busy);\n  async function discard(changed = dirty) {\n    return !changed || confirm({ title: \"저장하지 않은 변경 사항\", message: \"저장하지 않은 응답 또는 메모 입력을 버릴까요?\", confirmLabel: \"입력 버리기\", cancelLabel: \"계속 편집\" });\n  }\n  function failed(cause: unknown) { setError(errorText(cause)); if (cause instanceof ApiError && cause.status === 409) setConflict(true); }\n  async function cancelMode() {\n    if (busy || !await discard(modeDirty)) return;\n    setMode(undefined); setReason(\"\"); setValues(row.values); setRetention(originalRetention); setFiles({}); uploads.current.clear();\n  }\n  const visible = visibleQuestionIds(row.questions, values);\n  function change(id: string, value: AnswerValue) {\n    if (busy || conflict) return;\n    const next = { ...values, [id]: value }, shown = visibleQuestionIds(row.questions, next);\n    const nextFiles = { ...files };\n    for (const question of row.questions) if (!shown.has(question.id)) {\n      next[question.id] = emptyAnswer(question.type); delete nextFiles[question.id]; uploads.current.delete(question.id);\n    }\n    setValues(next); setFiles(nextFiles);\n  }"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+      "startLine": 118,
+      "endLine": 161,
+      "sha256": "79c96c691d2458f46aeee617fec9d742f8e7d0a5aadc468a09f8fd1e1f1e7cd3",
+      "excerpt": "  return <Modal title=\"응답 상세\" onClose={() => { if (!busy) void discard().then(leave => { if (leave) onClose(); }); }}>\n    <div className=\"forms-submission-detail\"><h3>{row.title}</h3><p>{statuses[row.status]} · {new Date(row.createdAt).toLocaleString(\"ko-KR\")}</p>\n    <p>보유 기한: {new Date(row.retentionUntil).toLocaleDateString(\"ko-KR\")} {row.legalHold && \"· 보존 조치 중\"}</p>\n    {mode ? <form className=\"cs-stack\" onSubmit={save}>\n      <h3>{{ edit: \"응답 정정\", withdraw: \"동의 철회\", hold: row.legalHold ? \"보존 조치 해제\" : \"보존 조치\", \"destruction-request\": \"파기 요청\", retention: \"보유 기한 변경\" }[mode]}</h3>\n      {mode === \"retention\" && <label className=\"cs-label\">변경할 보유 기한<input className=\"cs-input\" aria-label=\"변경할 보유 기한\" type=\"datetime-local\" required value={retention} onChange={event => setRetention(event.target.value)} />\n        <span>회사 정책이 허용한 경우, 동의받은 원래 기한 {new Date(row.originalRetentionUntil).toLocaleString(\"ko-KR\")} 이내로 변경합니다.</span></label>}\n      {mode === \"edit\" && row.questions.filter(question => visible.has(question.id)).map(question => <fieldset disabled={busy} className=\"cs-label forms-correction-field\" key={question.id}><legend>{question.label}</legend>\n        {question.type === \"직접 그리기\" ? <div><p>{answerView(question.id, values[question.id])}</p>\n          <QuestionInput question={question} value={values[question.id]} file={files[question.id]} language={row.formLanguage}\n            savedPreview={row.attachments.some(item => item.id === fileAnswerId(values[question.id])) ? fileDownloadUrl(fileAnswerId(values[question.id])!, row.id, question.id) : undefined}\n            disabled={busy || conflict || row.legalHold || !app.data?.capabilities.includes(\"file.read\")}\n            onChange={value => change(question.id, value)} onFileChange={file => {\n              if (busy || conflict || row.legalHold || !app.data?.capabilities.includes(\"file.read\")) return;\n              const next = { ...files }; if (file) next[question.id] = file; else delete next[question.id];\n              setFiles(next); if (!file) setValues(current => ({ ...current, [question.id]: null })); uploads.current.delete(question.id);\n            }} />\n          <p className=\"cs-muted\">새 그림을 적용하면 검사 후 교체합니다. 이전 그림은 정정 이력에 보관됩니다.</p>\n        </div> : question.type === \"파일 업로드\" ? <div><p>{answerView(question.id, values[question.id])}</p>\n          <input className=\"cs-input\" type=\"file\" accept={FILE_ACCEPT} aria-label={question.label} required={question.required && !values[question.id]}\n            disabled={busy || row.legalHold || !app.data?.capabilities.includes(\"file.read\")} onChange={event => {\n              const next = { ...files }; if (event.target.files?.[0]) next[question.id] = event.target.files[0]; else delete next[question.id];\n              setFiles(next); uploads.current.delete(question.id);\n            }} /><p className=\"cs-muted\">새 파일을 선택하면 검사 후 첨부파일을 교체합니다. 이전 파일은 정정 이력에 보관됩니다.</p>\n          {!question.required && <label><input type=\"checkbox\" disabled={busy || row.legalHold || !app.data?.capabilities.includes(\"file.read\")} checked={!values[question.id] && !files[question.id]}\n            onChange={event => { setValues({ ...values, [question.id]: event.target.checked ? \"\" : row.values[question.id] }); const next = { ...files }; delete next[question.id]; setFiles(next); }} />첨부파일 비우기</label>}\n        </div> : <QuestionInput question={question} value={values[question.id]} language={row.formLanguage} onChange={value => change(question.id, value)} disabled={busy || conflict} />}</fieldset>)}\n      {mode === \"destruction-request\" && <p>파기 요청을 등록합니다. 실제 파기 완료 상태는 처리 결과에 따라 별도로 표시됩니다.</p>}\n      <label className=\"cs-label\">변경 사유<textarea aria-label=\"변경 사유\" className=\"cs-input\" disabled={busy} required maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} /></label>\n      <div className=\"forms-actions\"><ActionButton disabled={busy || conflict}>확인</ActionButton><ActionButton secondary type=\"button\" disabled={busy} onClick={() => void cancelMode()}>취소</ActionButton></div>\n    </form> : <>\n      {!row.contentAvailable && <p role=\"status\">{row.status === \"destroyed\" ? \"응답 원문과 관련 자료를 파기했습니다.\" : \"보유 기한이 지났거나 파기가 시작되어 원문 열람을 차단했습니다.\"}</p>}\n      <dl className=\"forms-response-values\">{row.questions.map(question => <div key={question.id}><dt>{question.label}</dt><dd>{row.contentAvailable ? answerView(question.id, row.values[question.id]) : row.status === \"destroyed\" ? \"파기됨\" : \"열람 차단\"}</dd></div>)}</dl>\n      <fieldset disabled={busy || noteDirty || conflict} style={{ border: 0, padding: 0, margin: 0 }}><div className=\"forms-actions\">{canWrite && row.contentAvailable && !row.legalHold && [\"submitted\", \"corrected\"].includes(row.status) && <>\n        <ActionButton secondary onClick={() => setMode(\"edit\")}>응답 정정</ActionButton><ActionButton secondary onClick={() => setMode(\"withdraw\")}>동의 철회</ActionButton></>}\n        {canDestroy && ![\"destroying\", \"destroyed\"].includes(row.status) && <>\n          <ActionButton secondary onClick={() => setMode(\"hold\")}>{row.legalHold ? \"보존 조치 해제\" : \"보존 조치\"}</ActionButton>\n          <ActionButton secondary disabled={row.legalHold || row.status === \"pendingDestruction\"} onClick={() => setMode(\"destruction-request\")}>파기 요청</ActionButton>\n          {row.contentAvailable && !row.legalHold && row.status !== \"pendingDestruction\" && <ActionButton secondary onClick={() => setMode(\"retention\")}>보유 기한 변경</ActionButton>}</>}\n      </div></fieldset>\n    </>}\n    {error && <p role=\"alert\">{error}</p>}\n    {conflict && <div><p>현재 응답이나 메모가 변경되었습니다. 입력은 유지했습니다. 최신 내용을 확인한 뒤 다시 수정해주세요.</p>\n      <ActionButton secondary disabled={busy} onClick={() => { void discard().then(leave => { if (leave) reload(); }); }}>최신 응답 다시 불러오기</ActionButton></div>}"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/international-contact.ts",
+      "startLine": 3,
+      "endLine": 24,
+      "sha256": "6d817de4b36173e98ced9d47bb993fc386dd5270ef698e63ec456c521d947896",
+      "excerpt": "export const internationalContactCountries = countries;\nexport const internationalDialCodes = [...new Set(countries.map(country => country.dialCode))];\nconst knownDialCodes = new Set(internationalDialCodes);\nexport type InternationalContactParts = { dialCode: string; number: string; countryCode: string; countryCodes: string[] };\nexport function internationalContactDialCode(countryOrDialCode: string): string | undefined {\n  return knownDialCodes.has(countryOrDialCode) ? countryOrDialCode : countries.find(country => country.iso === countryOrDialCode)?.dialCode;\n}\nexport function parseInternationalContact(value: string): InternationalContactParts {\n  const match = /^(\\+\\d+)(?: (.*))?$/.exec(value), dialCode = match?.[1] ?? \"\", number = match ? match[2] ?? \"\" : value;\n  const countryCodes = countries.filter(country => country.dialCode === dialCode).map(country => country.iso);\n  // +1 and +7 identify multiple countries. Keep their dial code and never guess an ISO.\n  return { dialCode, number, countryCodes, countryCode: countryCodes.length === 1 ? countryCodes[0] : \"\" };\n}\nexport function serializeInternationalContact(countryOrDialCode: string, number: string): string {\n  const dialCode = internationalContactDialCode(countryOrDialCode) ?? countryOrDialCode;\n  // Preserve partial candidates so required/hidden/dirty validation cannot mistake them for an empty answer.\n  return dialCode ? dialCode + \" \" + number : number;\n}\nexport function internationalContactError(value: string, required = false): string | undefined {\n  if (!value.trim()) return required ? \"국가 번호와 연락처를 입력해주세요.\" : undefined;\n  const match = /^(\\+\\d+) ([0-9]{6,15})$/.exec(value.trim());\n  if (!match || !knownDialCodes.has(match[1])) return \"국가 번호와 6~15자리 숫자를 입력해주세요.\";"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-language.ts",
+      "startLine": 3,
+      "endLine": 29,
+      "sha256": "f0f59e13a374aff4d8e853c5ac7576cde4b63a8d5a5f167b4d2585fc047ae45c",
+      "excerpt": "export const formLanguageCodes = [\"ko\", \"en\", \"ja\", \"zh-CN\", \"zh-TW\", \"de\", \"fr\", \"ru\", \"es\", \"pt\", \"id\", \"th\", \"vi\", \"tr\", \"it\", \"ar\"] as const;\nexport const formLanguageSchema = z.enum(formLanguageCodes);\nexport type FormLanguage = z.infer<typeof formLanguageSchema>;\nexport const formLanguages: readonly { code: FormLanguage; label: string; nativeName: string; koreanName: string; rtl?: boolean }[] = [\n  { code: \"ko\", label: \"한국어(기본)\", nativeName: \"한국어\", koreanName: \"한국어\" },\n  { code: \"en\", label: \"English 영어\", nativeName: \"English\", koreanName: \"영어\" },\n  { code: \"ja\", label: \"日本語 일본어\", nativeName: \"日本語\", koreanName: \"일본어\" },\n  { code: \"zh-CN\", label: \"中文(简体) 중국어(간체)\", nativeName: \"中文(简体)\", koreanName: \"중국어(간체)\" },\n  { code: \"zh-TW\", label: \"中文(繁體) 중국어(번체)\", nativeName: \"中文(繁體)\", koreanName: \"중국어(번체)\" },\n  { code: \"de\", label: \"Deutsch 독일어\", nativeName: \"Deutsch\", koreanName: \"독일어\" },\n  { code: \"fr\", label: \"Français 프랑스어\", nativeName: \"Français\", koreanName: \"프랑스어\" },\n  { code: \"ru\", label: \"Русский 러시아어\", nativeName: \"Русский\", koreanName: \"러시아어\" },\n  { code: \"es\", label: \"Español 스페인어\", nativeName: \"Español\", koreanName: \"스페인어\" },\n  { code: \"pt\", label: \"Português 포루투칼어\", nativeName: \"Português\", koreanName: \"포루투칼어\" },\n  { code: \"id\", label: \"Bahasa Indonesia 인도네시아어\", nativeName: \"Bahasa Indonesia\", koreanName: \"인도네시아어\" },\n  { code: \"th\", label: \"ภาษาไทย 태국어\", nativeName: \"ภาษาไทย\", koreanName: \"태국어\" },\n  { code: \"vi\", label: \"Tiếng Việt 베트남어\", nativeName: \"Tiếng Việt\", koreanName: \"베트남어\" },\n  { code: \"tr\", label: \"Türkçe 튀르키에어\", nativeName: \"Türkçe\", koreanName: \"튀르키에어\" },\n  { code: \"it\", label: \"Italiano 이탈리아어\", nativeName: \"Italiano\", koreanName: \"이탈리아어\" },\n  { code: \"ar\", label: \"العربية 아랍어\", nativeName: \"العربية\", koreanName: \"아랍어\", rtl: true },\n];\n// Display fallback only. Writers must use the strict schema rather than coerce invalid codes.\nexport function effectiveFormLanguage(value?: string | null): FormLanguage { return formLanguageSchema.safeParse(value).data ?? \"ko\"; }\nexport function isInternationalFormLanguage(value?: string | null): boolean { return effectiveFormLanguage(value) !== \"ko\"; }\nexport function formLanguageLabel(value?: string | null): string { return formLanguages.find(language => language.code === effectiveFormLanguage(value))!.label; }\nexport function validateFormLanguageVerification(content: { formLanguage?: string | null; verify?: boolean }) {\n  if (content.verify && isInternationalFormLanguage(content.formLanguage)) throw new Error(\"본인인증 및 전자서명은 한국어 폼에서만 사용할 수 있습니다.\");"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-system-copy.ts",
+      "startLine": 4,
+      "endLine": 10,
+      "sha256": "e95df7a7274bcd4a4a78e19d09bb630d4d9c96c7e88783b7cdb08d1e19fd1b6c",
+      "excerpt": "export function formSystemCopy(language?: string | null) {\n  return copy[effectiveFormLanguage(language)].translate.infoOwnerForm;\n}\nexport function formPhrase(language: string | null | undefined, key: keyof typeof copy.ko.translate.infoOwnerForm.phrase) {\n  const phrases: Record<string, string> = formSystemCopy(language).phrase;\n  // React renders plain text. Numeric translation-component markers are line breaks, never HTML.\n  return (phrases[key] ?? copy.ko.translate.infoOwnerForm.phrase[key]).replace(/<\\/?\\d+\\s*\\/?\\s*>/g, \"\\n\");"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+      "startLine": 51,
+      "endLine": 59,
+      "sha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+      "excerpt": "  await audit(tx, ctx, requestId, \"submission.viewed\", \"submission\", id, [], row.formVersion.form.serviceId);\n  return {\n    ...(row.formVersion.formLanguage ? { formLanguage: formLanguageSchema.parse(row.formVersion.formLanguage) } : {}),\n    source: row.importJobId ? \"csv\" : \"form\", importEvidence: importEvidence ? decrypt(importEvidence.payloadCipher) : null,\n    id: row.id, formId: row.formVersion.form.id, title: row.formVersion.title, version: row.version, status: row.status,\n    createdAt: row.submittedAt, retentionUntil: row.retentionUntil, legalHold: row.legalHold,\n    originalRetentionUntil: row.originalRetentionUntil, contentAvailable: available,\n    values: available ? readableAnswerValues(answerValues(row), mayReadFiles) : {},\n    questions: contentDto(row.formVersion).questions,"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+      "startLine": 72,
+      "endLine": 82,
+      "sha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+      "excerpt": "export async function correctSubmission(ctx: Context, id: string, input: z.infer<typeof correctionInput>, requestId: string) {\n  return db.$transaction(async tx => {\n  const row = await lockSubmission(tx, ctx, id, \"submission.write\", true);\n  requireSubmissionContent(row);\n  if (row.legalHold) fail(409, \"LEGAL_HOLD\", \"보존 조치 중에는 응답을 정정할 수 없습니다.\");\n  const evidence = row.importJobId ? await tx.importEvidence.findUnique({ where: { submissionId: id } }) : null;\n  const fieldTypes = evidence ? decrypt<{ fieldTypes: string[] }>(evidence.payloadCipher).fieldTypes : [];\n  const before = answerValues(row);\n  const normalized = validateAnswers(row.formVersion.questions.map((q, i) => ({ ...q, validationKind: fieldTypes?.[i] })), input.answers, true, before, row.formVersion.formLanguage);\n  const changedAnswers = Object.fromEntries(Object.entries(normalized).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(before[key])));\n  if (!Object.keys(changedAnswers).length) fail(422, \"NO_CHANGES\", \"변경된 답변이 없습니다.\");"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+      "startLine": 67,
+      "endLine": 81,
+      "sha256": "f6c6f1ff6d34cb90d339a56c1d1fe78113b1999edfa563695fd8db81e63bab0b",
+      "excerpt": "  return { title: publication.formVersion.title, content, consentBundle: consentBundle(publication.formVersion),\n    closed: publication.responseCount >= publication.maxResponses, expiresAt: publication.expiresAt, verification };\n}\nexport async function submitForm(token: string, input: z.infer<typeof submissionInput>, key: string | null, requestId: string) {\n  const publication = await activePublication(token);\n  if (publication.formVersion.verify && !input.verification) {\n    const integration = await db.verificationIntegration.findUnique({\n      where: { tenantId_serviceId: { tenantId: publication.tenantId, serviceId: publication.form.serviceId } } });\n    if (!integration || integration.status !== \"enabled\" || !(integration.identityProvider || integration.signatureProvider))\n      fail(503, \"IDENTITY_PROVIDER_REQUIRED\", \"본인인증·전자서명 공급자 확인이 필요합니다.\");\n    fail(422, \"VERIFICATION_REQUIRED\", \"본인인증·전자서명 영수증이 필요합니다.\");\n  }\n  const questions = publication.formVersion.questions;\n  validateDocumentConsents(publication.formVersion, input.documentConsents);\n  const answers = validateAnswers(questions, input.answers, false, undefined, publication.formVersion.formLanguage);"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+      "startLine": 65,
+      "endLine": 94,
+      "sha256": "97e9d3fc9499dcad45f803762833ea637e82dccf5f41400b0fca4ba5f2404892",
+      "excerpt": "    }\n    if (value !== undefined && typeof value === \"object\" && !Array.isArray(value)) fail(422, \"INVALID_ANSWER_TYPE\", \"답변 형식이 올바르지 않습니다.\");\n    if (value !== undefined && ((question.type === \"체크박스\") !== Array.isArray(value))) fail(422, \"INVALID_ANSWER_TYPE\", \"답변 형식이 올바르지 않습니다.\");\n    const empty = isEmptyAnswer(value);\n    if (question.required && empty) fail(422, \"REQUIRED_ANSWER\", question.label + \" 항목을 입력해주세요.\");\n    if (empty) { normalized[question.stableKey] = emptyAnswer(question.type); continue; }\n    if (question.type === \"체크박스\") {\n      if (!Array.isArray(value)) fail(422, \"INVALID_ANSWER_TYPE\", \"복수 선택 답변을 제출해주세요.\");\n      checkChoices(value, options, limits);\n    } else {\n      if (typeof value !== \"string\") fail(422, \"INVALID_ANSWER_TYPE\", \"답변 형식이 올바르지 않습니다.\");\n      if ([\"객관식 답변\", \"드롭다운\"].includes(question.type) && !options.includes(value)) fail(422, \"INVALID_OPTION\", \"유효한 선택지를 선택해주세요.\");\n      if (question.type === \"날짜\" && (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value) || Number.isNaN(Date.parse(value)) || new Date(value).toISOString().slice(0, 10) !== value)) fail(422, \"INVALID_DATE\", \"유효한 날짜를 입력해주세요.\");\n      if (question.type === \"주소\") {\n        const error = domesticAddressError(value);\n        if (error) fail(422, \"INVALID_ADDRESS\", error);\n        normalized[question.stableKey] = value.trim();\n      }\n\n      if (question.subjectRole === \"name\" && !subjectName.safeParse(value).success) fail(422, \"INVALID_SUBJECT_NAME\", \"정보주체 이름은 1~100자로 입력해주세요.\");\n      if (question.subjectRole === \"email\" && !subjectEmail.safeParse(value).success) fail(422, \"INVALID_SUBJECT_EMAIL\", \"정보주체 이메일 형식을 확인해주세요.\");\n      const specialError = question.type === \"연락처\" && isInternationalFormLanguage(formLanguage)\n        ? internationalContactError(value, question.required) : specialAnswerError(question.type, value);\n      if (specialError) fail(422, \"INVALID_SPECIAL_ANSWER\", specialError);\n      if (specialQuestionTypes.includes(question.type)) normalized[question.stableKey] = value.trim();\n      const maxLength = questionTextMaxLength(question);\n      if (maxLength !== undefined && value.length > maxLength) fail(422, \"ANSWER_TOO_LONG\", question.label + \" 답변은 \" + maxLength + \"자까지 입력할 수 있습니다.\");\n      if (question.validationKind === \"email\" && !z.email().safeParse(value.trim()).success) fail(422, \"INVALID_EMAIL\", \"이메일 형식을 확인해주세요.\");\n      if (question.validationKind === \"phone\" && !/^\\+?\\d{8,15}$/.test(value.replace(/[\\s()-]/g, \"\"))) fail(422, \"INVALID_PHONE\", \"전화번호 형식을 확인해주세요.\");\n      if (question.validationKind === \"number\" && !/^[+-]?(?:\\d+(?:\\.\\d+)?|\\.\\d+)$/.test(value.trim())) fail(422, \"INVALID_NUMBER\", \"숫자 형식을 확인해주세요.\");"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/domains.ts",
+      "startLine": 10,
+      "endLine": 26,
+      "sha256": "c1a51de6cf042c32fbe7ed888ccac4584b2ef93fbeb1b7ab1c570bcbac389a9b",
+      "excerpt": "export const formContentSchema = z.object({\n  formLanguage: formLanguageSchema.optional(),\n  body: z.string().max(20000),\n  questions: z.array(questionSchema).min(1).max(100),\n  verify: z.boolean().optional(),\n  font: z.enum([\"12px\", \"14px\", \"15px\", \"16px\", \"20px\", \"24px\", \"32px\"]).optional(),\n  bold: z.boolean().optional(),\n  consentRequired: z.boolean(),\n  consentPurpose: z.string().max(3000),\n  retentionDays: z.number().int().min(1).max(36500).nullable(),\n  maxResponses: z.number().int().min(1).max(1000000),\n  showSubmitNotice: z.boolean().optional(),\n  documentConsents: formDocumentSelections.optional(),\n  marketing: marketingConfig.nullable().optional(),\n}).strict().refine(content => !content.verify || !isInternationalFormLanguage(content.formLanguage), {\n  message: \"본인인증 및 전자서명은 한국어 폼에서만 사용할 수 있습니다.\", path: [\"verify\"],\n});"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-international-contact.test.ts",
+      "startLine": 41,
+      "endLine": 59,
+      "sha256": "f40f3cf376d48228a81a0c274a3d77842189bad1bec00af26ff57903a7e8a462",
+      "excerpt": "const languages = [\"ko\", \"en\", \"ja\", \"zh-CN\", \"zh-TW\", \"de\", \"fr\", \"ru\", \"es\", \"pt\", \"id\", \"th\", \"vi\", \"tr\", \"it\", \"ar\"];\ntest(\"language and international helpers preserve incomplete candidates and never guess shared-code country ISO\", () => {\n  expect(formLanguageCodes).toEqual(languages); expect(formLanguages.map(item => item.code)).toEqual(languages);\n  expect(effectiveFormLanguage(null)).toBe(\"ko\"); expect(isInternationalFormLanguage(undefined)).toBe(false);\n  expect(isInternationalFormLanguage(\"en\")).toBe(true); expect(formLanguageLabel(\"ko\")).toBe(\"한국어(기본)\");\n  expect(formLanguages.find(item => item.code === \"ar\")?.rtl).toBe(true);\n  expect(internationalContactCountries).toHaveLength(181); expect(internationalDialCodes).toHaveLength(179);\n  expect(parseInternationalContact(\"+1 123456\")).toEqual({ dialCode: \"+1\", number: \"123456\", countryCode: \"\", countryCodes: [\"US\", \"CA\"] });\n  const seven = parseInternationalContact(\"+7 123456\"); expect(seven.countryCode).toBe(\"\"); expect(seven.countryCodes.sort()).toEqual([\"KZ\", \"RU\"]);\n  expect(parseInternationalContact(\"+82 1012345678\").countryCode).toBe(\"KR\");\n  for (const country of internationalContactCountries) {\n    expect(internationalContactDialCode(country.iso)).toBe(country.dialCode);\n    expect(internationalContactError(serializeInternationalContact(country.iso, \"123456\"))).toBeUndefined();\n  }\n  expect(serializeInternationalContact(\"+1\", \"123456\")).toBe(\"+1 123456\");\n  expect(serializeInternationalContact(\"\", \"123456\")).toBe(\"123456\"); expect(serializeInternationalContact(\"KR\", \"\")).toBe(\"+82 \");\n  expect(serializeInternationalContact(\"\", \"\")).toBe(\"\"); expect(internationalContactError(\"\", false)).toBeUndefined();\n  expect(internationalContactError(\"\", true)).toBeDefined(); expect(internationalContactError(\"+82 \")).toBeDefined();\n  expect(internationalContactError(\"+998 123456789012345\")).toBeUndefined();"
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-international-contact.test.ts",
+      "startLine": 174,
+      "endLine": 188,
+      "sha256": "f40f3cf376d48228a81a0c274a3d77842189bad1bec00af26ff57903a7e8a462",
+      "excerpt": "test(\"corrections always use their published version language and retain legacy answers after the new draft changes language\", async () => {\n  const f = await fixture(), token = await publish(f), oldResponse = await post(f, token, \"010-1234-5678\");\n  const oldVersion = await db.formVersion.findFirstOrThrow({ where: { formId: f.form.id, status: \"published\" }, include: versionInclude }), hash = fingerprint(oldVersion);\n  const oldBytes = await db.answer.findMany({ where: { submissionId: oldResponse.body.id } });\n  await db.$transaction(tx => reviseForm(tx, ctx, f.form.id, 2, randomUUID()));\n  const draft = await readForm(ctx, f.form.id);\n  await updateForm(ctx, f.form.id, { version: 3, content: formContentSchema.parse({ ...draft.content, formLanguage: \"en\" }) }, randomUUID());\n  const internationalToken = await publish(f, 4), currentResponse = await post(f, internationalToken, \"+1 1234567890\");\n  expect(await db.formVersion.findUniqueOrThrow({ where: { id: oldVersion.id }, include: versionInclude })).toEqual(oldVersion);\n  expect(fingerprint(oldVersion)).toBe(hash); expect(await db.answer.findMany({ where: { submissionId: oldResponse.body.id } })).toEqual(oldBytes);\n  await correct(oldResponse.body.id, { [f.questions[0].id]: \"010-9876-5432\" });\n  await expect(correct(oldResponse.body.id, { [f.questions[0].id]: \"+82 1098765432\" }, 2)).rejects.toMatchObject({ status: 422 });\n  await correct(currentResponse.body.id, { [f.questions[0].id]: \"+7 1234567890\" });\n  expect((await getSubmission(ctx, currentResponse.body.id, randomUUID())).values[f.questions[0].id]).toBe(\"+7 1234567890\");\n  await expect(db.$executeRaw`UPDATE \"FormVersion\" SET \"formLanguage\"='en' WHERE id=${oldVersion.id}`).rejects.toThrow();"
+    }
+  ],
+  "limitations": [
+    "브라우저/스크린샷/DB/테스트 실행을 하지 않았음. 기존 테스트는 소스로만 읽음.",
+    "원본 서버 검증·저장 ISO·정정 역직렬화 계약은 여전히 미관측.",
+    "모바일 native selector, 실제 submit nativevalidation focus, 비동기 잠금 타이밍은 루트 실제 QA가 필요.",
+    "공유 작업 중인 제품 소스에 후속 수정이 있을 수 있어 각 snapshot SHA와 수정 재검토 상태를 기준으로 판단."
+  ],
+  "updatedAtUtc": "2026-10-10T05:40:55.218Z",
+  "verification": {
+    "jsonValid": true,
+    "localReferencesExist": true,
+    "originalExtraSlicesAndHashesMatch": true,
+    "productCodeChangedByReviewer": false,
+    "uiOrDatabaseTestsExecuted": false
+  }
+}

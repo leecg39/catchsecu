@@ -20,6 +20,7 @@ export class FormDraftSession {
   private active = false;
   private pending?: Pending;
   private running?: Promise<FormRecord | undefined>;
+  private savingHolds = 0;
   constructor(private options: Options) {
     const value = structuredClone(options.initial ? draftValue(options.initial) : options.seed);
     this.base = stamp(value);
@@ -36,11 +37,18 @@ export class FormDraftSession {
   private clearTimer() { if (this.timer !== null) clearTimeout(this.timer); this.timer = null; }
   private schedule() {
     this.clearTimer();
-    if (this.active && this.snapshot.dirty && this.snapshot.phase === "dirty" && !this.running)
+    if (this.active && this.snapshot.dirty && this.snapshot.phase === "dirty" && !this.running && !this.savingHolds)
       this.timer = setTimeout(() => { this.timer = null; void this.save(); }, this.options.delay ?? 1200);
   }
   start() { this.active = true; this.schedule(); }
   stop() { this.active = false; this.clearTimer(); }
+  /** Acquire before asynchronous asset work; a save already in flight cannot be paused. */
+  pauseSaving = (): (() => void) | undefined => {
+    if (this.running) return undefined;
+    this.savingHolds++; this.clearTimer();
+    let released = false;
+    return () => { if (released) return; released = true; this.savingHolds--; this.schedule(); };
+  };
   edit(value: FormDraftValue) {
     const serviceId = this.snapshot.record?.serviceId ?? this.pending?.value.serviceId;
     if (serviceId) value = { ...value, serviceId };
@@ -51,6 +59,7 @@ export class FormDraftSession {
   }
   save(force = false): Promise<FormRecord | undefined> {
     this.clearTimer();
+    if (this.savingHolds) return Promise.resolve(undefined);
     if (this.running) return this.running;
     if (this.snapshot.phase === "conflict") return Promise.resolve(undefined);
     if (!this.snapshot.dirty && !force) return Promise.resolve(this.snapshot.record);
@@ -87,7 +96,7 @@ export class FormDraftSession {
     return this.snapshot.record;
   }
   load(record: FormRecord) {
-    if (this.running) throw new Error("저장이 끝난 뒤 최신본을 불러와주세요.");
+    if (this.running || this.savingHolds) throw new Error("저장과 파일 업로드가 끝난 뒤 최신본을 불러와주세요.");
     this.clearTimer(); this.pending = undefined;
     const value = structuredClone(draftValue(record)); this.base = stamp(value);
     this.emit({ record, value, phase: "saved", error: "", message: "최신 내용을 불러왔습니다." });

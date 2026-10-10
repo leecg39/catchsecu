@@ -1,0 +1,118 @@
+{
+  "result": "passed",
+  "readOnly": true,
+  "checkedAt": "2026-10-09T22:06:50.322Z",
+  "database": "catchsecu_test",
+  "migrations": 106,
+  "scope": "Two new policy/provenance models; policy write API and runtime policy enforcement remain pending.",
+  "columns": [
+    {
+      "table": "SsoLoginPolicy",
+      "column": "tenantId",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "column": "mode",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "column": "version",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "column": "updatedAt",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "sessionId",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "userId",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "tenantId",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "providerId",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "accountId",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "identityProvider",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "authenticatedAt",
+      "nullable": "NO"
+    }
+  ],
+  "constraints": [
+    {
+      "name": "SsoLoginPolicy_mode_check",
+      "definition": "CHECK ((mode = ANY (ARRAY['NONE'::text, 'AZURE'::text, 'GOOGLE'::text])))",
+      "validated": true
+    },
+    {
+      "name": "SsoLoginPolicy_pkey",
+      "definition": "PRIMARY KEY (\"tenantId\")",
+      "validated": true
+    },
+    {
+      "name": "SsoLoginPolicy_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE RESTRICT ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "name": "SsoLoginPolicy_version_check",
+      "definition": "CHECK ((version > 0))",
+      "validated": true
+    },
+    {
+      "name": "SsoSessionProof_identityProvider_check",
+      "definition": "CHECK ((\"identityProvider\" = ANY (ARRAY['OTHER'::text, 'GOOGLE'::text, 'AZURE'::text])))",
+      "validated": true
+    },
+    {
+      "name": "SsoSessionProof_pkey",
+      "definition": "PRIMARY KEY (\"sessionId\")",
+      "validated": true
+    },
+    {
+      "name": "SsoSessionProof_providerId_accountId_userId_fkey",
+      "definition": "FOREIGN KEY (\"providerId\", \"accountId\", \"userId\") REFERENCES \"Account\"(\"ssoProviderId\", id, \"userId\") ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "name": "SsoSessionProof_tenantId_providerId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"providerId\") REFERENCES \"SsoProvider\"(\"tenantId\", id) ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "name": "SsoSessionProof_userId_sessionId_fkey",
+      "definition": "FOREIGN KEY (\"userId\", \"sessionId\") REFERENCES \"Session\"(\"userId\", id) ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    }
+  ],
+  "triggers": [
+    {
+      "name": "sso_session_proof_immutable",
+      "definition": "CREATE TRIGGER sso_session_proof_immutable BEFORE UPDATE ON public.\"SsoSessionProof\" FOR EACH ROW EXECUTE FUNCTION sso_session_proof_immutable()"
+    }
+  ]
+}

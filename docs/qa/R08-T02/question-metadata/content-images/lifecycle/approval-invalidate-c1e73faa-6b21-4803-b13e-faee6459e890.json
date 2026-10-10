@@ -1,0 +1,60 @@
+{
+  "mode": "approval-invalidate",
+  "runId": "c1e73faa-6b21-4803-b13e-faee6459e890",
+  "recordedAt": "2026-10-10T09:23:14.208Z",
+  "result": "passed",
+  "checks": [
+    {
+      "action": "read exact form revision",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    },
+    {
+      "action": "remove-image-after-approval",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    },
+    {
+      "action": "reject-old-approval-decision",
+      "status": 409,
+      "expected": 409,
+      "source": "live",
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "action": "read exact form revision",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    },
+    {
+      "action": "reject-publication-without-current-approval",
+      "status": 409,
+      "expected": 409,
+      "source": "live",
+      "code": "APPROVAL_REQUIRED"
+    },
+    {
+      "action": "read immutable approval assets",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    },
+    {
+      "action": "old approval image remains authorized",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    }
+  ],
+  "proof": {
+    "oldApprovalSuperseded": true,
+    "staleDecisionAndPublishBlocked": true,
+    "originalVersionReceiptPinsAndBytesUnchanged": true,
+    "hash": "120a7b18eb01ca91458c9fdd1bee11c00085d7981ee3e3166492b441b4655ac1"
+  },
+  "boundary": "Actual local API and DB observations when invoked; OTP uses local outbox. No original-site or external delivery/provider success claim.",
+  "failurePolicy": "No automatic rollback/cleanup on failure; inspect private lifecycle state before continuing."
+}

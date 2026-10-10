@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-10-10T01:01:00.713927+00:00",
+  "reviewer": "/root/prior_evidence",
+  "readOnly": true,
+  "reviewerRanTests": false,
+  "issues": [
+    {
+      "priority": "P1",
+      "issue": "NONE fallback 후보의 타 회사 SSO 제한 미검사",
+      "resolution": "후보의 활성 직접 소속과 현재 회사 정책에 맞는 공급자 검사",
+      "status": "fixed_and_reread"
+    },
+    {
+      "priority": "P1",
+      "issue": "제한 회사 신규 초대 수락과 SSO 연결의 순환 의존",
+      "resolution": "본인확인된 초대는 소속만 부여; 제한 상태는 선택 서비스 비우고 업무 접근 차단; 재전송에 현재 정책 반환",
+      "status": "fixed_and_reread"
+    }
+  ],
+  "remainingConfirmedFindings": [],
+  "scope": "이번 SSO 집행·복구 변경. 전체 제품 보안 승인이나 외부 IdP 수용 아님.",
+  "sourceHashes": {
+    "src/server/sso-accounts.ts": "a10db749f11cd34f667340693eba3b99a0a5d1eee93dd529c2542f8a4de42b68",
+    "src/server/members.ts": "fd47a2dca2693875273f7c2ed1294468b5e9dc7d873921617ebcd363163a7cc1",
+    "src/server/context-selection.ts": "d92bc2d597c5c0101b706ca350bfcdfeecd113845d2553cf4d6162de9dedca41",
+    "src/server/sso-policy-enforcement.ts": "212f7b5da18e4118dfca17f0179bad966ca0efd1e57bb5971061246398188dac",
+    "tests/server/sso-policy-enforcement.test.ts": "48a6e1060752e3d67249b98c960fa3f6a080251c07ee5cf0d2fc46f31d938df4"
+  }
+}

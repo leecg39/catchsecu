@@ -1,7 +1,7 @@
 import { createHash, createHmac, randomUUID } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { mkdir, writeFile } from "node:fs/promises";
-import { MAX_FILE_BYTES } from "../src/contracts/files";
+import { MAX_ENCRYPTED_OBJECT_BYTES, MAX_PRIVATE_OBJECT_BYTES } from "../src/contracts/storage-limits";
 import { createS3FileStorage } from "../src/server/s3-storage";
 
 const secret = randomUUID().replaceAll("-", "") + randomUUID().replaceAll("-", "");
@@ -62,9 +62,17 @@ try {
   const other = randomUUID();
   objects.set("/" + bucket + "/objects/" + other + ".enc", stored);
   await storage.read(other).then(() => failures.push("다른 키로 옮긴 암호문이 복호화되었습니다."), () => undefined);
+  const boundaryId = randomUUID(), boundary = Buffer.alloc(MAX_PRIVATE_OBJECT_BYTES, 0x61);
+  await storage.write(boundaryId, boundary);
+  if (sha256(await storage.read(boundaryId)) !== sha256(boundary)) failures.push("14 MiB S3 왕복 해시가 다릅니다.");
+  await storage.remove(boundaryId);
+  const oversizedId = randomUUID();
+  objects.set("/" + bucket + "/objects/" + oversizedId + ".enc", Buffer.alloc(MAX_ENCRYPTED_OBJECT_BYTES + 1));
+  await storage.read(oversizedId).then(() => failures.push("초과 S3 응답이 허용되었습니다."), () => undefined);
+  objects.delete("/" + bucket + "/objects/" + oversizedId + ".enc");
   const before = requests;
   await storage.write("../etc/passwd", Buffer.from("x")).then(() => failures.push("경로 탈출이 허용되었습니다."), () => undefined);
-  await storage.write(id, Buffer.alloc(MAX_FILE_BYTES + 1)).then(() => failures.push("초과 용량이 허용되었습니다."), () => undefined);
+  await storage.write(id, Buffer.alloc(MAX_PRIVATE_OBJECT_BYTES + 1)).then(() => failures.push("초과 용량이 허용되었습니다."), () => undefined);
   if (requests !== before) failures.push("거부된 요청이 S3에 전달되었습니다.");
   await storage.remove(id);
   await storage.read(id).then(() => failures.push("삭제 후 객체를 읽었습니다."), () => undefined);

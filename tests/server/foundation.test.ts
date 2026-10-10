@@ -310,7 +310,8 @@ describe("immutable forms and encrypted public submissions", () => {
     const viewer = await (await formRoute(request("/forms/" + copiedId, "GET", viewerCookie))).json();
     expect(viewer.publication.token).toBeUndefined();
     expect((await formAction(request("/forms/" + copiedId + "/pause", "POST", ownerCookie, { version: 2 }))).status).toBe(200);
-    expect((await readPublicForm(request("/public/forms/" + copiedToken))).status).toBe(410);
+    const paused = await readPublicForm(request("/public/forms/" + copiedToken));
+    expect(paused.status).toBe(200); expect(await paused.json()).toMatchObject({ closed: true });
     expect((await formAction(request("/forms/" + copiedId + "/resume", "POST", ownerCookie, { version: 3 }))).status).toBe(200);
     expect((await readPublicForm(request("/public/forms/" + copiedToken))).status).toBe(200);
   });
@@ -584,7 +585,12 @@ describe("service-scoped full-schema templates", () => {
     expect(responses.map(response => response.status)).toEqual([201, 201]);
     const rows = await Promise.all(responses.map(response => response.json()));
     expect(rows[0].id).toBe(rows[1].id); templateId = rows[0].id;
-    expect(rows[0].content).toEqual(content);
+    expect(rows[0].content).toMatchObject(content);
+    for (const question of rows[0].content.questions) {
+      expect(question.optionDefinitions ?? []).toHaveLength(question.options?.length ?? 0);
+      expect((question.optionDefinitions ?? []).map((option: { label: string; value: string }) => [option.label, option.value]))
+        .toEqual((question.options ?? []).map((option: string) => [option, option]));
+    }
     expect((await templateCreate(request("/templates", "POST", viewerCookie, input, { "idempotency-key": randomUUID() }))).status).toBe(403);
     expect((await templateCreate(request("/templates", "POST", editorCookie, { ...input, serviceId: hiddenService }, { "idempotency-key": randomUUID() }))).status).toBe(403);
     for (const invalid of [
@@ -596,7 +602,7 @@ describe("service-scoped full-schema templates", () => {
   });
   test("listing and direct access enforce company and service boundaries; public templates are read-only", async () => {
     const hidden = await db.formTemplate.create({ data: { tenantId: ids.a, serviceId: hiddenService, title: "비공개 범위", category: "교육", content } });
-    const global = await db.formTemplate.create({ data: { title: "공용 시험 템플릿", category: "교육", content } });
+    const global = await db.formTemplate.create({ data: { title: "공용 시험 템플릿", category: "교육", licenseScope: "ACTIVE_SUBSCRIPTION", content } });
     const result = await (await templateList(request("/templates?scope=company&pageSize=1&search=교육", "GET", editorCookie))).json();
     expect(result).toMatchObject({ total: 1, pageSize: 1 }); expect(result.items[0].id).toBe(templateId);
     expect((await templateGet(request("/templates/" + hidden.id, "GET", editorCookie))).status).toBe(403);
@@ -621,10 +627,18 @@ describe("service-scoped full-schema templates", () => {
     expect(result.map(response => response.status)).toEqual([201, 201]);
     const values = await Promise.all(result.map(response => response.json())); copiedFormId = values[0].id;
     expect(values[1].id).toBe(copiedFormId);
-    const actual = values[0].content;
-    expect(actual).toMatchObject({ ...content, body: "수정된 전체 본문", questions: expect.any(Array) });
-    expect(actual.questions.map((question: { id: string; options?: string[] }) => ({ ...question, id: null, options: question.options ?? [] }))).toEqual(content.questions.map(question => ({ ...question, id: null, options: question.options ?? [] })));
-    for (const question of actual.questions) expect(content.questions.some(original => original.id === question.id)).toBe(false);
+    const actual = values[0].content, source = (await (await templateGet(request(path.replace("/use", ""), "GET", editorCookie))).json()).content;
+    expect(actual).toMatchObject({ ...source, body: "수정된 전체 본문", questions: expect.any(Array) });
+    const comparable = (question: { id: string; options?: string[]; optionDefinitions?: { id: string }[] }) => ({ ...question, id: null,
+      options: question.options ?? [], optionDefinitions: (question.optionDefinitions ?? []).map(option => ({ ...option, id: null })) });
+    expect(actual.questions.map(comparable)).toEqual(source.questions.map(comparable));
+    for (const [index, question] of actual.questions.entries()) {
+      expect(source.questions[index].id).not.toBe(question.id);
+      if ((question.optionDefinitions ?? []).length > 0) {
+        expect((question.optionDefinitions ?? []).map((option: { id: string }) => option.id))
+          .not.toEqual((source.questions[index].optionDefinitions ?? []).map((option: { id: string }) => option.id));
+      }
+    }
     const published = await formAction(request("/forms/" + copiedFormId + "/publish", "POST", editorCookie, { version: 1 }, { "idempotency-key": randomUUID() }));
     expect(published.status).toBe(201);
     const token = (await published.json()).token;
@@ -648,7 +662,7 @@ describe("service-scoped full-schema templates", () => {
   test("database constraints reject mismatched company/service template ownership", async () => {
     await expect(db.formTemplate.create({ data: { tenantId: ids.b, serviceId: service, title: "cross tenant", category: "교육", content } })).rejects.toThrow();
     await expect(db.formTemplate.create({ data: { tenantId: ids.a, title: "missing service", category: "교육", content } })).rejects.toThrow();
-    await expect(db.formTemplate.create({ data: { serviceId: service, title: "global leak", category: "교육", content } })).rejects.toThrow();
+    await expect(db.formTemplate.create({ data: { serviceId: service, title: "global leak", category: "교육", licenseScope: "ACTIVE_SUBSCRIPTION", content } })).rejects.toThrow();
   });
 });
 

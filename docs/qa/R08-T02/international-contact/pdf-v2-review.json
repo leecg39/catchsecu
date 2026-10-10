@@ -1,0 +1,377 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-10T06:06:57.968512+00:00",
+  "reviewer": "bundle_analysis",
+  "status": "completed_read_only_review",
+  "scope": "PDF v1 바이트 보존, v2 RTL/혼합 글자, 자원 경계, 미지원 문자, 저장 PDF 불변",
+  "authority": {
+    "ownedFile": "docs/qa/R08-T02/international-contact/pdf-v2-review.json",
+    "productFilesEdited": false,
+    "databaseAccess": false,
+    "browserAccess": false,
+    "serverStarted": false,
+    "testsExecutedByReviewer": false,
+    "methods": [
+      "현재 제품 소스 및 설치된 PDFKit/fontkit/bidi-js/linebreak 소스 읽기",
+      "폰트 및 검토 파일 SHA-256 계산",
+      "prior_evidence가 생성한 시험 로그/JSON 재확인"
+    ]
+  },
+  "summary": {
+    "confirmedOpenDefects": 0,
+    "addressedReviewItems": 1,
+    "result": "최종 소스에서 추가 재현 가능한 구현 결함을 발견하지 못했다. 작업량 탐색 경계 수정은 원문 slice/폭 검증/진행을 유지하며, v1와 저장 PDF 조회 경로는 보존된다. Arabic PDF.js 추출은 알려진 독립 한계로 남는다.",
+    "notAcceptanceClaim": "읽기 전용 코드 검토다. production build/실 DB 회귀/최종 Ego 시각 검증은 루트가 수행하며 본 보고서의 19개 시험은 실행 담당자의 로그에 근거한다."
+  },
+  "addressedReviewItems": [
+    {
+      "id": "PDF-V2-R01",
+      "status": "remediated_and_final_evidence_read",
+      "topic": "줄바꿈 후보의 반복 prefix 측정",
+      "beforeSource": "수정 전 pdf-layout.ts line(first,candidateEnd)를 모든 break opportunity마다 순차 호출. 8,192 UTF-16 이하의 증가하는 후보도 매번 bidi/run/shape를 다시 처리했다.",
+      "reproductionInput": "ع + (U+200B U+200E) 반복. 두 문자는 visible shaping에서 제거되고 linebreak의 ZW 뒤 경계가 후보가 되어 폭은 늘지 않으면서 후보 수는 증가한다.",
+      "evidenceBoundary": "리뷰어는 이 구체 경로를 정적으로 확인하고 prior_evidence에 직접 전달했다. 수정 전 이 제어문자 입력의 wall time은 리뷰어가 실행하지 않았으며 미측정이다. 초기 500k Arabic 39초 중단과 같은 실행이라고 합치지 않는다.",
+      "finalCode": [
+        {
+          "file": "src/server/pdf-layout.ts",
+          "lines": [
+            11,
+            15
+          ],
+          "fact": "2,000,000 측정 UTF-16 단위의 명시적 작업량 예산; 초과는 PDF_TOO_COMPLEX 422."
+        },
+        {
+          "file": "src/server/pdf-layout.ts",
+          "lines": [
+            73,
+            94
+          ],
+          "fact": "문단 초기 길이 및 실제 후보 측정 전에 예산을 소비한다. 8,192보다 긴 후보는 shape 전에 Infinity로 넘긴다."
+        },
+        {
+          "file": "src/server/pdf-layout.ts",
+          "lines": [
+            137,
+            183
+          ],
+          "fact": "후보 지수 탐색+이분 탐색, 긴 토큰은 직전 실제 줄 길이 근처에서 탐색한다. accepted는 width<=maxWidth인 실제 결과만 보존하며 first=last로 원문을 연속 소비한다."
+        },
+        {
+          "file": "src/server/pdf-renderer-v2.ts",
+          "lines": [
+            79,
+            115
+          ],
+          "fact": "하나의 budget을 헤더/본문/해시/footer에 공유한다."
+        }
+      ],
+      "semanticRecheck": [
+        "측정 상한이 초과되면 원문을 잘라 성공시키는 경로가 없고 렌더 결과 반환 전에 예외로 종료된다.",
+        "shape cache 키는 font/script/direction/text 전체이며 합계 key 길이를 65,536으로 제한한다. 캐시 hit도 후보 작업량은 계산한다.",
+        "PDFKit이 mutate하는 positions는 cloneShape가 복제하므로 측정 cache의 원래 shape를 배율로 오염시키지 않는다.",
+        "fallback의 previousLength는 시작점 힌트이며 최종 채택 폭은 항상 실제 shaping 값이다. grapheme 끝점 및 원문 slice를 유지한다.",
+        "유효한 500k Arabic를 무조건 거절하지 않는다. 최종 222페이지 성공 및 원문 ActualText SHA 일치가 기록됐다. Thai/제로폭 최댓값의 거절은 페이지 수 추정이 아닌 전체 작업량 정책이다."
+      ],
+      "finalEvidence": [
+        "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-resource-single-arabic-500k.json",
+        "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-resource-single-thai-500k.json",
+        "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-resource-zero-width-breaks-500k.json"
+      ]
+    }
+  ],
+  "checkedInvariants": [
+    {
+      "topic": "v1 경로",
+      "source": [
+        "src/server/pdf-renderer.ts:23",
+        "src/server/pdf-renderer.ts:26"
+      ],
+      "finding": "기존 본문은 그대로이며 legacy cmap 밖 문자가 있을 때만 별도 v2로 dispatch한다. v1 frozen fixture와 같은 Node 런타임의 1페이지/4페이지 바이트 동등 시험 기록을 확인했다. Node 25와 24 사이 재렌더 해시가 같다고 주장하지 않는다.",
+      "evidence": "pdf-v2-legacy-node24.json"
+    },
+    {
+      "topic": "저장 PDF 불변",
+      "source": [
+        "src/server/document-pdf.ts:10",
+        "src/server/document-pdf.ts:16",
+        "src/server/consent-receipts.ts:79",
+        "prisma/migrations/20261002201000_document_pdf/migration.sql:32"
+      ],
+      "finding": "DocumentPdf existing 우선, 기존 bytes/hash 검증, 영수증은 기존 pdfCipher 복호화/hash 검증. 기존 저장물에 renderPdf 재호출이 없다. DB immutable trigger 유지. 실 DB 시험은 이 리뷰에서 실행하지 않았다."
+    },
+    {
+      "topic": "RTL/혼합 표시 및 논리 문자열",
+      "source": [
+        "src/server/pdf-layout.ts:50",
+        "src/server/pdf-layout.ts:94",
+        "src/server/pdf-layout.ts:122",
+        "src/server/pdf-renderer-v2.ts:80"
+      ],
+      "finding": "bidi level별 direction/좌표와 RTL 괄호 mirroring, source-order run/line ActualText를 분리한다. Arabic base+mark를 임의 재배정했던 임시 코드가 제거되어 독립 mark를 소거하지 않는다. 글리프별 위치 우회는 없다."
+    },
+    {
+      "topic": "폰트 및 미지원 문자",
+      "source": [
+        "src/server/pdf-font-loader.ts:17",
+        "src/server/pdf-font-loader.ts:38",
+        "src/server/pdf-renderer-v2.ts:60",
+        "src/server/pdf-layout.ts:31",
+        "src/server/pdf-layout.ts:65"
+      ],
+      "finding": "실제 3개 폰트 SHA/bytes와 manifest 및 라이선스 파일 존재 일치. title/author/header/body/hash 문자 검사와 cluster 지원 검사, glyph0 실패를 확인. missing/checksum/emoji/외로운 surrogate 회귀는 19개 최종 시험에 포함된다."
+    },
+    {
+      "topic": "원문과 저장 해시",
+      "source": [
+        "src/server/pdf-renderer-v2.ts:118",
+        "src/server/document-pdf.ts:14",
+        "src/server/consent-receipts.ts:46"
+      ],
+      "finding": "새 bytes의 pdfHash와 rendererVersion=2/fontManifest만 생성하며 canonical document/evidence 내용 정규화/번역 변경이 없다."
+    }
+  ],
+  "runtimeEvidenceFromImplementer": {
+    "runner": "prior_evidence; 리뷰어가 실행하지 않음",
+    "finalUnit": {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-unit-final.log",
+      "tests": 19,
+      "passed": 19,
+      "vitestDurationSeconds": 11.31,
+      "process": {
+        "exit": 0,
+        "seconds": 11.558956861495972,
+        "timeout": false
+      }
+    },
+    "resourceEpisodes": [
+      {
+        "episode": "초기 500k 단일 Arabic 실행",
+        "result": "약 39초 동기 CPU 실행 뒤 담당자가 직접 중단",
+        "source": "루트와 prior_evidence의 협업 메시지",
+        "fileArtifactAvailable": false,
+        "boundary": "최종 222페이지 실행과 별개이며 이 보고서는 정확한 종료 코드나 메모리를 추정하지 않는다."
+      },
+      {
+        "episode": "탐색 수정 후 초기 Arabic 시험",
+        "process": {
+          "exit": 1,
+          "seconds": 8.408346891403198,
+          "timeout": false
+        },
+        "testMilliseconds": 7661,
+        "pageCount": 222,
+        "result": "제품 렌더 성공, 시험은 무조건 거절 기대 때문에 실패했다. 제품 오류/최종 통과 로그로 분류하지 않는다."
+      },
+      {
+        "episode": "탐색+memo+공유 budget 최종 시험",
+        "resourceCases": [
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-resource-single-arabic-500k.json",
+            "sha256": "be5cc06277bade57669eb24af004302d1bc15e62810378588dfc01bbb4022e24",
+            "key": "single-arabic-500k",
+            "codeUnits": 500000,
+            "milliseconds": 3178.6265000000003,
+            "rssStart": 746684416,
+            "rssEnd": 793346048,
+            "peakRss": 799536,
+            "outcome": {
+              "status": "rendered",
+              "pageCount": 222,
+              "bytes": 224711
+            },
+            "deterministicWorkLimit": 2000000,
+            "testTimeoutMs": 25000
+          },
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-resource-single-thai-500k.json",
+            "sha256": "0c6542366308b3f42cb7663cc1d397905ec5ac4692a54afab14944919727871b",
+            "key": "single-thai-500k",
+            "codeUnits": 500000,
+            "milliseconds": 1291.108792000001,
+            "rssStart": 793378816,
+            "rssEnd": 840728576,
+            "peakRss": 832816,
+            "outcome": {
+              "status": "rejected",
+              "code": "PDF_TOO_COMPLEX"
+            },
+            "deterministicWorkLimit": 2000000,
+            "testTimeoutMs": 25000
+          },
+          {
+            "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-resource-zero-width-breaks-500k.json",
+            "sha256": "6fee2ba04b60c1f20520f9739198b0ade80c6cec583494f9c3d432071c70a596",
+            "key": "zero-width-breaks-500k",
+            "codeUnits": 499999,
+            "milliseconds": 640.0962500000005,
+            "rssStart": 840728576,
+            "rssEnd": 843415552,
+            "peakRss": 889456,
+            "outcome": {
+              "status": "rejected",
+              "code": "PDF_TOO_COMPLEX"
+            },
+            "deterministicWorkLimit": 2000000,
+            "testTimeoutMs": 25000
+          }
+        ]
+      }
+    ],
+    "memoryInterpretation": "rssStart/rssEnd는 bytes, peakRss는 Node process.resourceUsage().maxRSS 원시 값이다. 최종 수치는 같은 19개 시험 프로세스에 누적되며 각 렌더의 독립 순증 최고 메모리로 해석하지 않는다. 2m 작업량 예산은 wall-clock timeout 또는 RSS 하드 상한이 아니다."
+  },
+  "knownLimitations": [
+    {
+      "id": "PDFJS-ARABIC-EXTRACTION",
+      "status": "known_reader_limitation_not_new_review_finding",
+      "evidence": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-arabic.json",
+      "observed": {
+        "exactActualText": true,
+        "pdfJsLogicalEquality": false
+      },
+      "description": "최종 Arabic source는 ActualText에 일치하지만 PDF.js 6.3.289의 getTextContent 출력은 모음 부호/중립문자 재정렬 때문에 원문과 동일하지 않다. 시각 표시/ActualText 보존과 모든 PDF 리더의 복사·추출 보장을 구분한다."
+    },
+    {
+      "id": "VISUAL_AND_DB_SCOPE",
+      "description": "최종 페이지 시각 판독과 production/DB 회귀는 루트 소유다. 기존 visual-review.json의 직접 관찰 범위를 확대하지 않는다."
+    }
+  ],
+  "fontChecks": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/assets/fonts/NotoSans-Regular.ttf",
+      "bytes": 431364,
+      "sha256": "f3961a9cde016d41a4879aecda1474d3a36d6bf54fa0e4643de029cc2248b0e8",
+      "manifestMatch": true,
+      "license": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/assets/fonts/NotoSans-OFL.txt",
+      "licenseExists": true
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/assets/fonts/NotoSansArabic-Regular.ttf",
+      "bytes": 142140,
+      "sha256": "bd86ca02f087d7f3c3788ba458fb6b73744c7639ed276b8d870dba6def6c40d0",
+      "manifestMatch": true,
+      "license": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/assets/fonts/NotoSansArabic-OFL.txt",
+      "licenseExists": true
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/assets/fonts/NotoSansThai-Regular.ttf",
+      "bytes": 20960,
+      "sha256": "d4303fe9c63ebb72759ca8b6d2040c8ae81689f7d08d7b91c656154382b49313",
+      "manifestMatch": true,
+      "license": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/assets/fonts/NotoSansThai-OFL.txt",
+      "licenseExists": true
+    }
+  ],
+  "reviewedFiles": [
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/pdf-renderer.ts",
+      "sha256": "64769537b279db6a46e6709699a57ca2bceb0029226fac8c3a8e574254dc21e5"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/pdf-renderer-v2.ts",
+      "sha256": "23d96f6477c31c70cfbfd53621194c3b6a19f4c42679960493f2d7bba1642045"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/pdf-layout.ts",
+      "sha256": "1a4f9750625116d2d5d96aacd20c2c25bf98602c85728c1aa5c1c1c39ae15f80"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/pdf-font-loader.ts",
+      "sha256": "b4aca7cc15a09aa153828f05ddbd644f9341bfd09194ae7a49ef758fb4796ae4"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/document-pdf.ts",
+      "sha256": "85cb22811131d253662fb30923ecd0110c4d4d0ed3bc4b923a2aff9a95ce77d6"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/consent-receipts.ts",
+      "sha256": "8fd52962540ba0c9d10b4fc5e5d373512a14dfc2dc8cf82486f2bc5616741a00"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/assets/fonts/pdf-v2-manifest.json",
+      "sha256": "5463fd16d19a11f4dec8f8fc23845e01b619dab2947380bd0792ac0448ba935c"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/pdf-renderer-v2.test.ts",
+      "sha256": "24aab406ef5e48fab5a2ffc2f15aa6edd62bdc8eabdf406ad43be721ab8ac6fe"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/fixtures/pdf-renderer-v1-original.ts",
+      "sha256": "f3135dad7586046ea72a9a4ed77f0fea55842b13d13b87af2f884f44cfb5d2db"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/fixtures/pdf-actual-text.ts",
+      "sha256": "887a5d54c914fccd6347eb966187fcb914ff14540975979cacd791db8bac2c23"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/document-pdf.test.ts",
+      "sha256": "40e66d4639bfda3b71007437660654f44ae646ced5b11df59a2f8a0a6d5ff48f"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261002201000_document_pdf/migration.sql",
+      "sha256": "daa4961113782ae5785ff5b8a7d1faaa6b06305322f3c1ffd89c058413aa2027"
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-unit-final.log",
+      "exists": true,
+      "sha256": "feba74ee16f1278ed12ba8f4884e839fae4acd7ec6dd333cc7ab08209d0db469"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-unit-process.json",
+      "exists": true,
+      "sha256": "9a5aa07931b9863fc0bcd64b836ac0ccb4dfda811ab6227c12609f5e045528bd"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-legacy-node24.json",
+      "exists": true,
+      "sha256": "5d857ca76224b8e8450c87fa7637bded955024b339a97257141d7867d1eb50b4"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-arabic.json",
+      "exists": true,
+      "sha256": "a9a92396025538d12e0153d9e82cb7f5b8b1337da92aa795133514edf72ca6c0"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-arabic-isolates.json",
+      "exists": true,
+      "sha256": "80d29afbe86235a5d4e324e28637090138c9bb099887c7d041f86ab830cb1173"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-thai.json",
+      "exists": true,
+      "sha256": "ad6d1479779870c42d99dade0bef710e58b838f709fffbe89fb8ac08e87bae9c"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-turkish.json",
+      "exists": true,
+      "sha256": "6e2c293d348bb83debf992582a320e9e6a399178fb7f148f012bd8a1bc2c8caa"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-multipage.json",
+      "exists": true,
+      "sha256": "068f6ed0960d2666461cfefdb41e1c3c9debb858383fd5248155bbd05a0d5715"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-visual-review.json",
+      "exists": true,
+      "sha256": "63300f95ad4f8e43f8a48dc710ce167a32c64a326722a5bb90e8df8dc8294a2a"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-resource-arabic-process.json",
+      "exists": true,
+      "sha256": "926d5792c4acf4c0b923ae9ae0e5a33e6e9e0843a812989b984d27369e74edf9"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-resource-arabic-process.log",
+      "exists": true,
+      "sha256": "aaa8893c081459ff270f15724f7eb618ff0dc119fabdad0d422018c538b137a8"
+    },
+    {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-v2-resource-single-arabic-500k-text.json",
+      "exists": true,
+      "sha256": "442e49352448a19b9d7fbfd1cd6150c66c3b29fa294b845bb89e10c5b0d5598e"
+    }
+  ],
+  "handoff": "최종 소스 추가 결함 없음. 제품 파일 수정 없이 검토 종료; 루트 통합 빌드/실 DB/Ego 검증 대기."
+}

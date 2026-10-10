@@ -1,4 +1,5 @@
 "use client";
+import { isFileQuestion } from "@/contracts/drawing-questions";
 import { useState } from "react";
 import { api, errorText, useResource } from "@/lib/api";
 import { useApplication } from "../ApplicationContext";
@@ -38,7 +39,7 @@ export function ShareGrants({ formId }: { formId: string }) {
     <form className="forms-actions" onSubmit={e => { e.preventDefault(); setSearch(query); setPage(1); }}><label>열람자 이메일 검색 <input className="cs-input" maxLength={254} placeholder="전체 이메일 주소" value={query} onChange={e => setQuery(e.target.value)} /></label><ActionButton secondary type="submit">이메일 검색</ActionButton></form>
     {message && <p role="status">{message}</p>}{error && <p role="alert">{error}</p>}
     <RemoteTable columns={["열람자 이메일", "게시 버전 / 공유 항목", "종료일", "상태", "관리"]} rows={(list.data?.items ?? []).map(row => ({ id: row.id,
-      cells: [row.email, <span key="fields">v{row.formNumber} · {row.questions.map(q => q.label).join(", ")}</span>, new Date(row.expiresAt).toLocaleString("ko-KR"), states[row.status],
+      cells: [row.email, <span key="fields">v{row.formNumber} · {row.questions.map(q => q.label).join(", ")}{row.shareFormBody ? " · 폼 본문 포함" : ""}</span>, new Date(row.expiresAt).toLocaleString("ko-KR"), states[row.status],
         <div className="forms-actions" key="actions">{row.status !== "revoked" && <><ActionButton secondary disabled={busy || !row.actions.edit} onClick={() => setEditing(row)}>수정</ActionButton>
           <ActionButton secondary disabled={busy || !row.actions.resend} onClick={() => change(row)}>초대 재발송</ActionButton>
           <ActionButton secondary disabled={busy || !row.actions.revoke} onClick={() => { setRevoking(row); setError(""); }}>회수</ActionButton></>}
@@ -58,6 +59,7 @@ function ShareEditor({ formId, initial, onClose, onSaved }: { formId: string; in
   const options = useResource<ShareOptions>("/share-grants/options?formId=" + formId);
   const [email, setEmail] = useState(initial?.email ?? ""), [version, setVersion] = useState(initial?.formVersionId ?? ""),
     [fields, setFields] = useState(initial?.questionIds ?? []), [expiry, setExpiry] = useState(() => localDate(initial ? new Date(initial.expiresAt) : new Date(Date.now() + 7 * 86400000)));
+  const [shareFormBody, setShareFormBody] = useState(initial?.shareFormBody ?? false);
   const [error, setError] = useState(""), [busy, setBusy] = useState(false), [locked, setLocked] = useState(false);
   const [creation] = useState(() => new ShareCreationSession({ send: (body, key) => api("/share-grants", { method: "POST", body, headers: { "Idempotency-Key": key } }) }));
   const selected = options.data?.versions.find(v => v.id === (version || options.data?.versions[0]?.id));
@@ -67,7 +69,7 @@ function ShareEditor({ formId, initial, onClose, onSaved }: { formId: string; in
       if (!fields.length) throw new Error("공유할 항목을 선택해주세요.");
       if (!options.data?.permissions.canCreate) throw new Error(options.data?.permissions.reason ?? "현재 공유 권한을 다시 확인해주세요.");
       if (fields.some(id => !selected.questions.find(q => q.id === id)?.selectable)) throw new Error("현재 공유할 수 없는 파일 항목을 제외해주세요.");
-      const payload = JSON.stringify({ email: email.trim(), questionIds: fields, expiresAt: new Date(expiry).toISOString(),
+      const payload = JSON.stringify({ email: email.trim(), questionIds: fields, shareFormBody, expiresAt: new Date(expiry).toISOString(),
         ...(initial ? { version: initial.version } : { formId, formVersionId: selected.id }) });
       if (initial) await api("/share-grants/" + initial.id, { method: "PATCH", body: payload });
       else await creation.submit(payload);
@@ -86,7 +88,8 @@ function ShareEditor({ formId, initial, onClose, onSaved }: { formId: string; in
           {options.data!.versions.map(v => <option value={v.id} key={v.id}>v{v.number} · {v.title}</option>)}</select></label>
         <fieldset className="share-fields"><legend>공유할 항목 (필수)</legend>{selected.questions.map(q => <label key={q.id} className="share-check">
           <input type="checkbox" disabled={!q.selectable && !fields.includes(q.id)} checked={fields.includes(q.id)} onChange={e => setFields(current => e.target.checked ? [...current, q.id] : current.filter(id => id !== q.id))} />
-          {q.label}{q.type === "파일 업로드" ? " (첨부파일 포함)" : ""}{!q.selectable && q.type === "파일 업로드" ? " · 파일 열람 권한 필요" : ""}</label>)}</fieldset>
+          {q.label}{isFileQuestion(q.type) ? " (첨부파일 포함)" : ""}{!q.selectable && isFileQuestion(q.type) ? " · 파일 열람 권한 필요" : ""}</label>)}</fieldset>
+        <label className="share-check"><input type="checkbox" checked={shareFormBody} onChange={event => setShareFormBody(event.target.checked)} />폼 제목 아래 본문과 본문 이미지를 함께 공유</label>
         <label>공유 종료일<input className="cs-input" type="datetime-local" required value={expiry} onChange={e => setExpiry(e.target.value)} /></label>
         <p>최대 90일. 이 버전의 현재 응답과 이후 수집되는 응답 중 선택한 항목만 공유합니다. 철회·파기 요청·보유 기한 종료 응답은 제외합니다.</p>
         {initial && <p>저장하면 기존 인증을 해제하고 새 초대 메일을 발송합니다.</p>}

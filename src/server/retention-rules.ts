@@ -13,7 +13,7 @@ import { formScope, lockFormService } from "./form-access";
 
 async function withRuleAccess<T>(ctx: Context, capability: "security.read" | "security.write", operation: (tx: Transaction) => Promise<T>) {
   return db.$transaction(async tx => {
-    const actor = await lockServiceActor(tx, ctx, capability);
+    const actor = await lockServiceActor(tx, ctx, capability, { lockServices: capability === "security.read" });
     const result = await operation(tx);
     assertFileDeadlines(actor.deadlines);
     return result;
@@ -54,7 +54,7 @@ export async function readRetentionRule(ctx: Context, id: string) {
 export async function createRetentionRule(ctx: Context, input: z.infer<typeof retentionRuleCreate>, key: string | null, requestId: string) {
   let deadlines: Awaited<ReturnType<typeof lockServiceActor>>["deadlines"];
   const authorize = async (tx: Transaction) => {
-    deadlines = (await lockServiceActor(tx, ctx, "security.write")).deadlines;
+    deadlines = (await lockServiceActor(tx, ctx, "security.write", { lockServices: false })).deadlines;
     await lockRuleService(tx, ctx, input.serviceId);
   };
   return idempotent("retention-rule:create:" + ctx.member.id, key, input, async tx => {

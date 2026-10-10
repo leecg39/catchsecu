@@ -1,0 +1,45 @@
+{
+  "recordedAt": "2026-10-10T09:10:21.438789+00:00",
+  "result": "passed",
+  "scope": "Static checks only; helper was not executed.",
+  "runtime": {
+    "node": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "version": "v24.19.0"
+  },
+  "files": {
+    "helper": {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-rea-question-images-http.ts",
+      "sha256": "423d136e7d43283c257920497f6a61e28eccbd7d6e99831a5ddc0eeef1ff748d"
+    },
+    "tsconfig": {
+      "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tsconfig.rea-question-images.json",
+      "sha256": "6d2c357b2ebc520252a1a8e70e9bb693593ea23114df3039508cbb22a2d6f55a",
+      "explicitlyIncludesHelper": true
+    }
+  },
+  "checks": [
+    {
+      "name": "helper-only ESLint",
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/eslint/bin/eslint.js scripts/qa-rea-question-images-http.ts",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "specified project typecheck",
+      "command": "/Users/user01/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc -p tsconfig.rea-question-images.json --noEmit",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "helperChanges": false,
+  "databaseAccess": false,
+  "httpRequests": false,
+  "fixtureAccess": false,
+  "productCodeChanges": false,
+  "limitations": [
+    "No runtime or HTTP validation was performed.",
+    "The typecheck covers the current shared worktree and is not a production build."
+  ]
+}

@@ -60,7 +60,8 @@ test("분기·행렬·선택 수 설정을 저장하고 공개 게시본에서 �
   const result = await (await publicForm(req("/public/forms/" + token))).json();
   expect(result.content.questions).toMatchObject(f.content.questions);
   const stored = await db.question.findMany({ where: { tenantId: f.company.id }, orderBy: { order: "asc" } });
-  expect(stored[1]).toHaveProperty("condition", f.content.questions[1].condition);
+  expect(stored[1].condition).toMatchObject(f.content.questions[1].condition!);
+  expect(stored[1].condition).toHaveProperty("optionId", result.content.questions[0].optionDefinitions[0].id);
   expect(stored[2]).toHaveProperty("matrixRows", f.content.questions[2].rows);
 });
 
@@ -119,7 +120,8 @@ test("분기 정정은 새 필수 답변을 검사하고 숨겨지는 현재 값
   expect((await correct(req(path, "PATCH", f.cookie, { version: 2, reason: "다시 현장", answers: { [q[0].id]: "현장", [q[1].id]: "새 방문 안내" } }))).status).toBe(200);
   detail = await (await getSubmission(req(path, "GET", f.cookie))).json(); expect(detail.values[q[1].id]).toBe("새 방문 안내");
   expect((await patchForm(req("/forms/" + form.id, "PATCH", f.cookie, { version: 2, content: { ...f.content, body: "새 초안" } }))).status).toBe(200);
-  const stable = await (await getForm(req("/forms/" + form.id, "GET", f.cookie))).json(); expect(stable.content.questions[1].condition).toEqual(q[1].condition);
+  const stable = await (await getForm(req("/forms/" + form.id, "GET", f.cookie))).json(); expect(stable.content.questions[1].condition).toMatchObject(q[1].condition!);
+  expect(stable.content.questions[1].condition.optionId).toBe(stable.content.questions[0].optionDefinitions[0].id);
 });
 
 test("체크박스 조건과 중첩 분기는 상위 질문의 표시 상태 및 선택 수를 함께 검사한다", async () => {
@@ -157,7 +159,9 @@ test("공유 열람은 인증 후 허용한 행렬 질문의 구조화한 값과
   const verified = await viewerPost(req("/viewer/challenges/" + challengeId + "/verify", "POST", preCookie, { code: mail.text.match(/인증코드: (\d{6})/)![1] })); expect(verified.status).toBe(200);
   const cookie = verified.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
   const page = await (await viewerGet(req("/viewer/submissions", "GET", cookie))).json();
-  expect(page.viewer.questions).toEqual([{ id: q[2].id, label: q[2].label, type: q[2].type, rows: q[2].rows }]);
+  expect(page.viewer.questions).toMatchObject([{ id: q[2].id, label: q[2].label, type: q[2].type, rows: q[2].rows }]);
+  expect(page.viewer.questions).toHaveLength(1);
+  expect(page.viewer.questions[0].optionDefinitions.map((option: { label: string; value: string }) => [option.label, option.value])).toEqual(q[2].options!.map(value => [value, value]));
   expect(page.items[0].values).toEqual({ [q[2].id]: answers(f)[q[2].id] }); expect(JSON.stringify(page)).not.toContain("방문 안내");
 });
 

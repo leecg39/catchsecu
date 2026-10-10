@@ -1,0 +1,112 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-09T18:55:23.499Z",
+  "afterRestart": false,
+  "tenantId": "5e834085-5627-4f30-ad6c-f1fbd58392a5",
+  "serviceId": "0b83fe87-b83f-4859-9727-1be9bd24ab33",
+  "requestCount": 4,
+  "states": [
+    {
+      "id": "3d1daca8-78fd-4621-b0f2-babfbd62da7f",
+      "status": "cancelled",
+      "version": 2
+    },
+    {
+      "id": "d3473e3d-e882-4252-a9db-98ee9b14f6d9",
+      "status": "rejected",
+      "version": 2
+    },
+    {
+      "id": "7577df01-4adc-4b5a-abc7-015d9beb049a",
+      "status": "cancelled",
+      "version": 2
+    },
+    {
+      "id": "c1cc26a8-4845-4662-80e7-80ba7dd2c7c8",
+      "status": "approved",
+      "version": 2
+    }
+  ],
+  "requesterVersion": 2,
+  "grantCount": 1,
+  "auditCount": 8,
+  "checks": [
+    {
+      "name": "owner review after fresh login",
+      "status": 200
+    },
+    {
+      "name": "requester full history",
+      "status": 200
+    },
+    {
+      "name": "approved service appears in fresh context",
+      "status": 200
+    },
+    {
+      "name": "review page clamps after pending requests resolve",
+      "status": 200
+    },
+    {
+      "name": "review filter approved",
+      "status": 200
+    },
+    {
+      "name": "review filter rejected",
+      "status": 200
+    },
+    {
+      "name": "review filter cancelled",
+      "status": 200
+    },
+    {
+      "name": "anonymous history denied",
+      "status": 401
+    },
+    {
+      "name": "requester review denied",
+      "status": 403
+    },
+    {
+      "name": "requester decision denied",
+      "status": 403
+    },
+    {
+      "name": "other company decision denied",
+      "status": 404
+    },
+    {
+      "name": "other company cancel denied",
+      "status": 404
+    },
+    {
+      "name": "owner cannot cancel requester item",
+      "status": 404
+    },
+    {
+      "name": "stale decision denied",
+      "status": 409
+    },
+    {
+      "name": "resolved request cancel denied",
+      "status": 409
+    },
+    {
+      "name": "already granted request denied",
+      "status": 409
+    },
+    {
+      "name": "foreign service request denied",
+      "status": 404
+    },
+    {
+      "name": "invalid request denied",
+      "status": 422
+    },
+    {
+      "name": "invalid decision denied",
+      "status": 422
+    }
+  ],
+  "stateHash": "98191b48443a36e6e78fbf79d1654bfeff56235111f0de000b1fd627fb73bcc2"
+}

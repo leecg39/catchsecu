@@ -1,0 +1,390 @@
+{
+  "schemaVersion": 1,
+  "author": "bundle_analysis",
+  "reviewType": "read-only contract-plan review",
+  "scope": {
+    "plan": "docs/qa/R08-T02/question-metadata/personal-information/PLAN.md",
+    "productsChanged": false,
+    "testsExecuted": false,
+    "dbAccessed": false,
+    "browserUsed": false,
+    "serverStarted": false,
+    "onlyWrittenFile": "docs/qa/R08-T02/question-metadata/personal-information/plan-review.json"
+  },
+  "outcome": "계획 검토 통과. 2개 보완 요청은 root 확정 계획에 반영됨. 구현·실행 검증은 후속이며 현재 미해결 계획 차단점 없음.",
+  "findings": [
+    {
+      "id": "PIR-PLAN-01",
+      "kind": "plan-boundary-gap",
+      "priority": 2,
+      "title": "공개 UI 비표시와 공개 API projection을 구분해야 함",
+      "planLines": [
+        13,
+        20
+      ],
+      "evidence": [
+        {
+          "file": "src/server/submissions.ts",
+          "start": 38,
+          "end": 40
+        },
+        {
+          "file": "src/server/submissions.ts",
+          "start": 67,
+          "end": 68
+        },
+        {
+          "file": "src/server/fixed-urls.ts",
+          "start": 106,
+          "end": 106
+        },
+        {
+          "file": "src/server/forms.ts",
+          "start": 42,
+          "end": 58
+        }
+      ],
+      "confirmedFact": "publicForm은 관리자 DTO contentDto의 documentConsents만 제거하여 공개 content로 반환한다. fixed URL도 이 함수를 그대로 재사용한다. 계획대로 contentDto에 분류를 추가하는 것만으로 공개 JSON에 분류 목록이 포함된다.",
+      "implication": "현재 문구 ‘공개 화면에는 관리자 분류 목록을 추가 표시하지 않는다’는 렌더링만 정의하고 공개 API의 필드 노출 여부를 정의하지 않는다. 관리용 메타데이터로만 유지할 목적이라면 화면 비표시만으로 그 경계를 충족하지 않는다. 현재 필드가 구현되어 노출된다는 주장이나 원본에서 비공개였다는 주장은 아님.",
+      "minimumChange": "공개 API에서도 제외할 것을 계약에 명시하고 publicForm의 question projection에서 해당 필드만 제거한다. 관리용 contentDto/fingerprint/승인 snapshot/관리자 응답 상세는 그대로 보존한다.",
+      "scenarios": [
+        "분류가 존재하는 게시 폼의 /public/forms/{token}과 /public/urls/{alias} 응답에서 해당 키가 없음",
+        "form.read 경로·승인 snapshot·submission.read 상세에는 해당 게시/초안 버전의 분류가 있음",
+        "비로그인 공개 응답과 관리 미리보기를 혼동하지 않음"
+      ],
+      "status": "resolved-in-plan-implementation-pending",
+      "resolution": {
+        "authority": "root confirmed message and updated PLAN.md line 13",
+        "decision": "일반 토큰·고정URL의 공통 publicForm JSON에서 신규 관리자 분류 필드를 제외한다. 관리 DTO·승인·저장본은 유지한다.",
+        "verifiedPlanLines": [
+          13
+        ]
+      }
+    },
+    {
+      "id": "PIR-PLAN-02",
+      "kind": "plan-transition-gap",
+      "priority": 2,
+      "title": "기존 분류가 있는 질문의 행렬 전환 정책이 필요함",
+      "planLines": [
+        11,
+        19
+      ],
+      "evidence": [
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "start": 61,
+          "end": 64
+        },
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "start": 121,
+          "end": 128
+        },
+        {
+          "file": "src/server/forms.ts",
+          "start": 223,
+          "end": 244
+        },
+        {
+          "file": "src/server/templates.ts",
+          "start": 100,
+          "end": 107
+        }
+      ],
+      "confirmedFact": "현재 질문 유형 변경은 기존 question에 type/rows/options 등의 patch를 병합한다. 새 분류 필드는 patch에 포함되지 않으면 보존된다. 계획의 ‘행렬은 NONE만’ 제약을 추가하면 PERSONAL/SENSITIVE/IDENTIFICATION/RESIDENT가 있는 질문을 행렬로 변경하는 경로는 충돌한다.",
+      "implication": "계획은 분류 편집 모달의 행렬 제한과 서버/DB 검증을 정의하지만 기존 질문 유형 select에서 어떻게 충돌을 해소할지는 명시하지 않는다. 자동으로 분류를 버리는 처리는 생략보존 계약과도 다르다. 아직 구현된 버그가 아니라 유형 변경 수용 조건의 누락이다.",
+      "minimumChange": "행렬 전환을 먼저 거절하고 분류 제거/변경 안내를 표시하거나, 분류 전체 제거를 명시 확인한 뒤 type+[]를 같은 patch로 적용한다. 기본 권장안은 거절+안내이며 데이터 유실이 없다. RESIDENT 제거 뒤 required는 true 유지.",
+      "scenarios": [
+        "PERSONAL 분류+단문→행렬은 분류 보존 상태로 전환 거절/명시 안내",
+        "NONE만 있는 질문→행렬은 성공",
+        "NONE과 PERSONAL 혼합은 개인정보가 있으므로 동일 제약 적용",
+        "분류 제거→행렬 성공, 취소하면 타입/분류/required 모두 불변",
+        "오래된 client가 분류를 생략하고 행렬 type만 PATCH하면 현재 분류 보존 후 검증에서 거절, 버전·감사·승인 무변경"
+      ],
+      "status": "resolved-in-plan-implementation-pending",
+      "resolution": {
+        "authority": "root confirmed message and updated PLAN.md lines 11,19",
+        "decision": "NONE 외 분류가 있으면 행렬 옵션 비활성화 + handler 거절 + 안내. 묵시 삭제 없음. 생략값 병합 후 서버 검증. 모달 snapshot은 id/type/required/label/list를 포함한다.",
+        "verifiedPlanLines": [
+          11,
+          19
+        ],
+        "messageOnlyClarification": "label 포함 snapshot 필드 목록은 root 메시지로 확정; PLAN은 원래 질문/분류/유형/필수 변경 감지를 서술함."
+      }
+    }
+  ],
+  "confirmedAligned": [
+    {
+      "area": "읽기·쓰기 권한",
+      "basis": [
+        {
+          "file": "src/server/forms.ts",
+          "start": 125,
+          "end": 144
+        },
+        {
+          "file": "src/server/forms.ts",
+          "start": 206,
+          "end": 229
+        },
+        {
+          "file": "src/server/form-access.ts",
+          "start": 11,
+          "end": 39
+        },
+        {
+          "file": "src/server/templates.ts",
+          "start": 50,
+          "end": 68
+        }
+      ],
+      "conclusion": "새 독립 엔드포인트 없이 현재 form.read/form.write 및 서비스/회사 lock 경로를 재사용하는 계획은 맞음. 공용 템플릿 write 금지는 기존 403 유지. 원본 분류 전용 license/role gate가 별도 존재한다는 근거는 이번 조사에 없음."
+    },
+    {
+      "area": "관리 요약·승인",
+      "basis": [
+        {
+          "file": "src/components/forms/QuestionSummary.tsx",
+          "start": 6,
+          "end": 16
+        },
+        {
+          "file": "src/components/forms/FormLists.tsx",
+          "start": 126,
+          "end": 126
+        },
+        {
+          "file": "src/components/forms/TemplateGallery.tsx",
+          "start": 20,
+          "end": 21
+        },
+        {
+          "file": "src/components/forms/Approvals.tsx",
+          "start": 72,
+          "end": 72
+        },
+        {
+          "file": "src/server/approvals.ts",
+          "start": 37,
+          "end": 49
+        }
+      ],
+      "conclusion": "공통 QuestionSummary 연결은 관리 폼 미리보기/템플릿 미리보기/승인 snapshot에 도달함. 승인 시점 content snapshot을 쓰므로 최신 초안으로 치환하지 않는 계획이 맞음."
+    },
+    {
+      "area": "응답 상세의 원래 게시 버전",
+      "basis": [
+        {
+          "file": "src/server/submission-management.ts",
+          "start": 39,
+          "end": 59
+        },
+        {
+          "file": "src/components/forms/SubmissionDetail.tsx",
+          "start": 127,
+          "end": 154
+        }
+      ],
+      "conclusion": "getSubmission의 contentDto(row.formVersion).questions가 제출 당시 게시 버전을 기준으로 함. 응답 정정 및 읽기 보기에서 이 question을 사용하면 현재 폼 개정으로 과거 분류가 바뀌지 않음. contentAvailable=false 때 관리자 form metadata를 계속 표시할지 현재 제목·설명·참고자료와 같은 정책을 유지할 수 있음."
+    },
+    {
+      "area": "외부 공유",
+      "basis": [
+        {
+          "file": "src/server/sharing.ts",
+          "start": 20,
+          "end": 22
+        },
+        {
+          "file": "src/server/viewer.ts",
+          "start": 122,
+          "end": 122
+        }
+      ],
+      "conclusion": "grantQuestions는 명시적으로 id/label/type/options/rows만 투영하므로 기존 그대로 두면 새 분류를 외부 공유에 자동 전달하지 않음. 관리자 요약 컴포넌트를 외부 SharedPrivacy로 확장할 필요 없음."
+    },
+    {
+      "area": "RESIDENT·자동 유형변경",
+      "sourceEvidence": [
+        "pi_confirm",
+        "pi_manual",
+        "pi_title_detection",
+        "resident_required"
+      ],
+      "conclusion": "수동 분류 확인에서 required 잠금은 관측됨. TEXTBOX 자동 전환은 NLP 결과 경로에서 관측된 동작이므로 이번 계획의 수동-only/자동 유형변경 제외는 근거와 충돌하지 않음. 개인정보 분류를 subjectRole로 치환하지 않는 것도 맞음."
+    },
+    {
+      "area": "복제·언어·동의문 차이",
+      "planLines": [
+        12,
+        13
+      ],
+      "conclusion": "현재 전체 폼/템플릿 수동 metadata 보존을 독립 정책으로 명시하고 원본 질문·페이지 reset/NLP를 후속으로 구분한 것은 정확함. 비한국어 단일 편집에 따른 유실 방지를 위해 언어 공통 복수 편집을 택한 차이도 명시됨."
+    },
+    {
+      "area": "저장 PDF 불변",
+      "basis": [
+        {
+          "file": "src/server/consent-receipts.ts",
+          "start": 35,
+          "end": 49
+        },
+        {
+          "file": "src/server/consent-receipts.ts",
+          "start": 58,
+          "end": 66
+        }
+      ],
+      "conclusion": "현재 영수증 렌더 입력은 고정 ConsentEvidence의 목적·본문·문서 bundle이며 질문 metadata를 직접 투영하지 않는다. 기존 영수증/PDF를 재생성하지 않는 계획과 일치."
+    }
+  ],
+  "sourceProvenance": {
+    "report": "docs/qa/R08-T02/question-metadata/remaining-source-review/source-review.json",
+    "bundleSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "newOriginalExecution": false
+  },
+  "remainingLimitations": [
+    "계획 검토이므로 migration CHECK·Prisma·새 UI 구현의 정확성을 아직 검증하지 않음",
+    "DB/API/브라우저/유니트 시험 미실행. 구버전 hash/PDF 불변은 계획상 맞음을 확인했을 뿐 실행 통과를 주장하지 않음",
+    "원본 서버·라이브 role/license·NLP·분류 API 실행은 미관측"
+  ],
+  "parentNotified": true,
+  "recordedAtUtc": "2026-10-10T06:53:15.929Z",
+  "unresolvedPlanFindings": 0,
+  "fileSnapshots": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/personal-information/PLAN.md",
+      "relative": "docs/qa/R08-T02/question-metadata/personal-information/PLAN.md",
+      "bytes": 5984,
+      "sha256": "773212eeddafac5160d5d21e21da91f3c8f0a4290f2d7eed50e0e35362caf968",
+      "lines": 24
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/remaining-source-review/source-review.json",
+      "relative": "docs/qa/R08-T02/question-metadata/remaining-source-review/source-review.json",
+      "bytes": 99370,
+      "sha256": "e9d3163c55ef9f6efaa439f9731d5ec9b24c30c2fc9f1994747731b03768cc30",
+      "lines": 1008
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+      "relative": "src/server/submissions.ts",
+      "bytes": 10562,
+      "sha256": "f6c6f1ff6d34cb90d339a56c1d1fe78113b1999edfa563695fd8db81e63bab0b",
+      "lines": 140
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/fixed-urls.ts",
+      "relative": "src/server/fixed-urls.ts",
+      "bytes": 7897,
+      "sha256": "3295c0f0798b3a98f19d01e55e168189f2f6fad0fb1076c88a16a22c925a30c6",
+      "lines": 108
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts",
+      "relative": "src/server/forms.ts",
+      "bytes": 42477,
+      "sha256": "271289f7fb5a6753e5e2bf5b83ac76fc3cbe566fcf49a0f6fbf7ebf29555457b",
+      "lines": 478
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+      "relative": "src/components/forms/FormEditor.tsx",
+      "bytes": 19188,
+      "sha256": "11130436b87b8ca6f9a2aa34fdad2f70a1d1b0042d5842f29d72a5c1fa9fde3a",
+      "lines": 169
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/templates.ts",
+      "relative": "src/server/templates.ts",
+      "bytes": 11451,
+      "sha256": "6c5cd5d2b198c88d6d375c6925cef4a4976313f6223aa362a4629f3216ce2ac5",
+      "lines": 136
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/form-access.ts",
+      "relative": "src/server/form-access.ts",
+      "bytes": 2612,
+      "sha256": "2a088f47f97e0342e0717bfab47d3e25c9c292d1bc12e926f721998142babf11",
+      "lines": 42
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionSummary.tsx",
+      "relative": "src/components/forms/QuestionSummary.tsx",
+      "bytes": 1428,
+      "sha256": "463759bd625c811e57a4d5ae57a5c3e95324d12ec2e0bb189d80f65b81a7c39d",
+      "lines": 17
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormLists.tsx",
+      "relative": "src/components/forms/FormLists.tsx",
+      "bytes": 15012,
+      "sha256": "903ffe3bb91c78c73dc8151c1ad823704f3a92c5fd226df57459f072df50be01",
+      "lines": 143
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/TemplateGallery.tsx",
+      "relative": "src/components/forms/TemplateGallery.tsx",
+      "bytes": 8578,
+      "sha256": "5fb9a4a031efafe5cb087e1a777505fbb03701c3a900e20711295d198b9d19e8",
+      "lines": 78
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/Approvals.tsx",
+      "relative": "src/components/forms/Approvals.tsx",
+      "bytes": 9676,
+      "sha256": "4a0b7df1dd7016d6cd0fd03a00f1ec5ae1103a95ff871fdb8bfb686f5aea1d98",
+      "lines": 90
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/approvals.ts",
+      "relative": "src/server/approvals.ts",
+      "bytes": 10530,
+      "sha256": "f47207517872000209542c274f96cb80acd2e2ffb1a73c7c85a2587dc868c81b",
+      "lines": 126
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+      "relative": "src/server/submission-management.ts",
+      "bytes": 13896,
+      "sha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+      "lines": 156
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+      "relative": "src/components/forms/SubmissionDetail.tsx",
+      "bytes": 20757,
+      "sha256": "fc9228cf6b1ae090dd8b88aeb68a4a574617a3c303971015d3a8d9c87dd1cfdd",
+      "lines": 198
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/sharing.ts",
+      "relative": "src/server/sharing.ts",
+      "bytes": 15680,
+      "sha256": "805a534fd54426c26fdad6dd9ae033ee560b3d7301c372bb3e5ecfb42be49383",
+      "lines": 194
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/viewer.ts",
+      "relative": "src/server/viewer.ts",
+      "bytes": 17579,
+      "sha256": "6d023a948d4bfabc6caebfa3a9add9e53d8324a0ba06a53ff963cc05533aa69d",
+      "lines": 210
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/consent-receipts.ts",
+      "relative": "src/server/consent-receipts.ts",
+      "bytes": 7626,
+      "sha256": "8fd52962540ba0c9d10b4fc5e5d373512a14dfc2dc8cf82486f2bc5616741a00",
+      "lines": 94
+    }
+  ],
+  "artifactVerification": {
+    "allReferencedFilesExist": true,
+    "planRelativeLinksExist": true,
+    "fileSnapshotCount": 18,
+    "appTestsRun": false
+  }
+}

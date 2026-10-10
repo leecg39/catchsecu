@@ -1,0 +1,27 @@
+import type { PolicyDetails } from "@/contracts/document-policy";
+
+export function policyFixture(): PolicyDetails {
+  return {
+    schemaVersion: 1,
+    children: { enabled: true, purpose: "아동 교육 신청", requiredItems: ["아동 이름"], optionalItems: ["아동 별명"], guardianItems: ["보호자 연락처"],
+      periods: [{ prefix: "직접입력", customPrefix: "교육 종료일부터", amount: "3", unit: "개월", condition: "또는" }, { prefix: "관련법령에 따른 기간", customPrefix: "", amount: "", unit: "", condition: "" }] },
+    hosting: { mode: "outsourced", trustees: [{ mode: "direct", name: "합성 인프라", country: "KR", contact: "infra@example.test", work: "서비스 자료 보관", linkText: "", linkUrl: "",
+      requiredItems: ["계정 이름"], optionalItems: ["계정 사진"], legalBasis: "인프라 위탁 근거 안내", subprocessors: [
+        { mode: "direct", name: "합성 재수탁자", country: "JP", contact: "sub@example.test", work: "백업 자료 관리", linkText: "", linkUrl: "" },
+        { mode: "link", name: "", country: "US", contact: "", work: "", linkText: "재수탁자 목록", linkUrl: "https://example.test/subprocessors" },
+      ] }] },
+    development: { enabled: true, trustees: [{ mode: "link", name: "", country: "KR", contact: "", work: "", linkText: "개발 수탁자 안내", linkUrl: "https://example.test/development", requiredItems: ["문의 내용"], optionalItems: ["오류 화면"], legalBasis: "유지보수 위탁 근거 안내", subprocessors: [] }] },
+    inactiveUsers: { action: "separate", amount: "12", unit: "MONTH", customText: "" },
+    withdrawals: { action: "retain", amount: "7", unit: "DAY", items: ["탈퇴 처리 기록"] },
+    cctv: { enabled: true, purposes: ["시설안전 및 화재예방"], customPurpose: "출입 구역 점검", installations: [{ location: "합성 사무실 출입구", count: "2", operatingHours: "24시간", storagePeriod: "14", storageUnit: "DAY", storageLocation: "접근 제한 보관실", outsourced: true, trustee: { name: "합성 영상 관리사", country: "KR", contact: "cctv@example.test" } }], managers: [
+      { role: "IN_CHARGE", department: "안전 관리부", nameAndPosition: "가상 책임자·팀장" }, { role: "HANDS_ON", department: "시설 운영부", nameAndPosition: "가상 담당자·매니저" },
+    ] },
+    automatedDecisions: { enabled: true, overview: "합성 학습 과정 추천", processedInformation: "수강 이력 분석", decisionRelation: "이력과 난이도 비교", procedure: "분석 후 추천 결과 안내", specialInformation: true,
+      sensitive: { selected: true, purpose: "접근성 선택 지원", items: ["접근성 요청"] }, children: { selected: true, purpose: "아동 과정 선택 지원", items: ["아동 수강 단계"] }, contacts: [{ department: "추천 검토부", contact: "review@example.test" }] },
+    officers: { name: "가상 보호책임자", position: "개인정보 담당 이사", email: "privacy@example.test", departmentEnabled: true, department: { name: "권리 지원부", contact: "rights@example.test", officerName: "가상 권리 담당자" }, updatePath: "설정에서 정보 조회·수정 요청", deletePath: "권리 창구에 삭제 요청", domesticAgentEnabled: true,
+      domesticAgents: [{ name: "합성 국내대리인", representative: "가상 대표", email: "agent@example.test", contact: "합성 대리인 전화", address: "합성 국내 주소" }], dpoEnabled: true, dpo: { name: "가상 DPO", address: "합성 DPO 주소", contact: "dpo@example.test" } },
+    sensitiveDisclosure: { enabled: true, locations: "본인이 작성한 공개 게시물", optOut: "게시물 공개 설정 변경" }, overseasTransfer: { enabled: true, refusal: "국외 기능 이용 중단 요청", effect: "해당 기능 제공 제한" },
+    deviceProcessing: { enabled: true, functions: "기기 내부 사진 분류", items: ["로컬 사진"] }, behavioralAdvertising: { enabled: true },
+    preservation: { commerceItems: ["합성 거래 기록"], accessItems: ["합성 접속 기록"] },
+  };
+}

@@ -13,5 +13,7 @@ export const POST = ssoRoute(async request => {
     headers.append("set-cookie", result.cookie);
     return new Response(JSON.stringify({ status: result.status, redirect: result.redirect }), { status: 200, headers });
   }
-  return new Response(JSON.stringify({ status: result.status, ticket: result.ticket }), { status: 200, headers });
+  headers.append("set-cookie", result.browserCookie);
+  const { status, ticket, expiresAt, protocol } = result;
+  return new Response(JSON.stringify({ status, ticket, expiresAt, protocol }), { status: 200, headers });
 });

@@ -1,0 +1,16 @@
+.page { display: grid; gap: 24px; min-width: 0; }
+.page :global(.cs-page-heading) { display: block; margin-bottom: 0; }
+.page :global(.cs-page-heading) p { margin-top: 8px; }
+.page :global(.cs-panel) { min-width: 0; }
+.page :global(.cs-table) { min-width: 860px; }
+.page :global(.cs-pagination) { gap: 12px; flex-wrap: wrap; }
+.page :global(.mg-fields) fieldset { display: grid; gap: 16px; min-width: 0; }
+.page :global(.mg-fields) label { display: grid; gap: 8px; min-width: 0; }
+.filters { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; padding: 20px; border-radius: 8px; background: #f7f8fa; margin-bottom: 16px; }
+.filters label { display: grid; gap: 8px; font-size: 14px; min-width: 0; }
+.filters label:first-child { flex: 1 1 220px; }
+.filters select { width: 100%; max-width: 100%; }
+@media (max-width: 600px) {
+  .filters { display: grid; grid-template-columns: minmax(0, 1fr); padding: 16px; }
+  .page :global(.cs-panel) { padding: 16px; }
+}

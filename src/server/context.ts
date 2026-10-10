@@ -6,8 +6,9 @@ import { auth } from "./auth";
 import { expireAuthSession } from "./auth-mutations";
 import { APIError } from "better-auth/api";
 import { db } from "./db";
-import { fail, rateLimit } from "./http";
+import { fail, rateLimit, HttpError } from "./http";
 import { type Capability, roleCan, roleCapabilities } from "./permissions";
+import { assertSsoSession, ssoSessionState } from "./sso-policy-enforcement";
 
 export function activeMembershipWhere(userId: string, tenantId?: string) {
   return { userId, status: "active" as const, ...(tenantId ? { tenantId } : {}), tenant: { status: "active" as const },
@@ -27,6 +28,12 @@ export async function requireActor(headers: Headers) {
   return { user, session: session.session };
 }
 export async function requireContext(headers: Headers, capability?: Capability, allowMfaSetup = false, allowPasswordSetup = false) {
+  return resolveContext(headers, capability, allowMfaSetup, allowPasswordSetup, false);
+}
+export async function requireSsoRecoveryContext(headers: Headers) {
+  return resolveContext(headers, "service.read", false, false, true);
+}
+async function resolveContext(headers: Headers, capability: Capability | undefined, allowMfaSetup: boolean, allowPasswordSetup: boolean, recovery: boolean) {
   const actor = await requireActor(headers);
   const member = await db.membership.findFirst({
     where: { ...activeMembershipWhere(actor.user.id, actor.session.activeCompanyId ?? undefined),
@@ -43,6 +50,8 @@ export async function requireContext(headers: Headers, capability?: Capability, 
     && await expireAuthSession(actor.session.id, policy.sessionMinutes)) {
     fail(401, "SESSION_EXPIRED", "세션이 만료되었습니다. 다시 로그인해주세요.");
   }
+  if (recovery && member.accessKind !== "direct") fail(403, "FORBIDDEN", "직접 소속 구성원만 SSO 계정을 연결할 수 있습니다.");
+  if (!recovery) await assertSsoSession(db, member.tenantId, actor.user.id, actor.session.id);
   const mfa = await mfaState(member.tenantId, member.id, actor.user.twoFactorEnabled, !!policy?.requireMfa);
   if (mfa.required && !allowMfaSetup) fail(403, "MFA_REQUIRED", "2단계 인증 설정이 필요합니다.");
   if (policy && !allowPasswordSetup && (await passwordState(actor.user, actor.session, member)).required)
@@ -52,7 +61,7 @@ export async function requireContext(headers: Headers, capability?: Capability, 
   }
   if (capability && !roleCan(member.role, capability)) fail(403, "FORBIDDEN", "이 작업을 수행할 권한이 없습니다.");
   await rateLimit("member:" + member.id, 300);
-  return { ...actor, clientIp, member, tenantId: member.tenantId, capabilities: roleCapabilities(member.role) };
+  return { ...actor, clientIp, member, tenantId: member.tenantId, capabilities: recovery ? [] : roleCapabilities(member.role) };
 }
 export type Context = Awaited<ReturnType<typeof requireContext>>;
 export async function requireService(ctx: Context, serviceId: string, capability: Capability = "service.read") {
@@ -94,10 +103,23 @@ export async function contextDto(headers: Headers) {
   if (!memberships.length || (actor.session.activeCompanyId && !memberships.some(item => item.tenantId === actor.session.activeCompanyId)) ||
     (!actor.session.activeCompanyId && !memberships.some(item => item.accessKind === "direct")))
     return { ...base, company: null, services: [], serviceId: null, capabilities: [] };
-  const ctx = await requireContext(headers, undefined, true, true);
-  const services = await db.service.findMany({ where: { ...serviceScope(ctx), status: "active" },
-    select: { id: true, name: true, externalName: true }, orderBy: [{ name: "asc" }, { id: "asc" }] });
-  return { ...base, company: { id: ctx.tenantId, name: ctx.member.tenant.name, role: ctx.member.role },
-    services, serviceId: services.find(item => item.id === actor.session.activeServiceId)?.id ?? services[0]?.id ?? null,
-    capabilities: ctx.capabilities, requirePasswordChange: (await passwordState(ctx.user, ctx.session, ctx.member)).required, requireMfa: (await mfaState(ctx.tenantId, ctx.member.id, actor.user.twoFactorEnabled, !!ctx.member.tenant.policy?.requireMfa)).required };
+  try {
+    const ctx = await requireContext(headers, undefined, true, true);
+    return await db.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${ctx.tenantId} FOR SHARE`;
+      const ssoLogin = await assertSsoSession(tx, ctx.tenantId, ctx.user.id, ctx.session.id);
+      const services = await tx.service.findMany({ where: { ...serviceScope(ctx), status: "active" },
+        select: { id: true, name: true, externalName: true }, orderBy: [{ name: "asc" }, { id: "asc" }] });
+      return { ...base, company: { id: ctx.tenantId, name: ctx.member.tenant.name, role: ctx.member.role },
+        services, serviceId: services.find(item => item.id === actor.session.activeServiceId)?.id ?? services[0]?.id ?? null,
+        capabilities: ctx.capabilities, ssoLogin,
+        requirePasswordChange: (await passwordState(ctx.user, ctx.session, ctx.member, new Date(), tx)).required,
+        requireMfa: (await mfaState(ctx.tenantId, ctx.member.id, actor.user.twoFactorEnabled, !!ctx.member.tenant.policy?.requireMfa, tx)).required };
+    });
+  } catch (error) {
+    if (!(error instanceof HttpError) || !["GOOGLE_OAUTH_POLICY", "MS_OAUTH_POLICY"].includes(error.code)) throw error;
+    const selected = memberships.find(item => item.tenantId === actor.session.activeCompanyId) ?? memberships.find(item => item.accessKind === "direct")!;
+    return { ...base, company: { id: selected.tenantId, name: selected.tenant.name, role: selected.role },
+      services: [], serviceId: null, capabilities: [], ssoLogin: await ssoSessionState(selected.tenantId, actor.user.id, actor.session.id) };
+  }
 }

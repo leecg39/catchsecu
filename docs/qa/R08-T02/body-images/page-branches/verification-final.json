@@ -1,0 +1,212 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-10T11:12:02.975Z",
+  "database": "catchsecu_test",
+  "migrations": [
+    "20261025020000_form_page_branches",
+    "20261025020100_form_page_branch_trigger_scope",
+    "20261025020200_form_page_branch_lookup",
+    "20261025020300_author_asset_trigger_scope",
+    "20261025020400_submission_page_path_validator_fix",
+    "20261025020500_submission_page_path_edges",
+    "20261025020600_option_trigger_metadata_scope",
+    "20261025020700_submission_ineligible_guard"
+  ],
+  "implementation": {
+    "branchContract": "One always-visible RADIO/SELECT branch question per page; selected option overrides the default destination.",
+    "graph": "Every default and option edge is same-version, reachable, acyclic and terminal; custom and checkbox branches are rejected.",
+    "submission": "The server recomputes the page path, rejects unvisited answers and ineligible submission, and stores immutable-version path evidence.",
+    "correction": "Changing a branch requires newly visited required answers and clears answers that leave the path.",
+    "compatibility": "Legacy forms and submissions retain section/pagePath version 0 and null additive fields.",
+    "performance": "Asset and branch triggers run only for relevant metadata; the 5,000-option regression completes in 3.61 seconds."
+  },
+  "databaseGuards": {
+    "columns": [
+      {
+        "table_name": "QuestionOption",
+        "column_name": "branchDestinationKind",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "QuestionOption",
+        "column_name": "branchDestinationSectionId",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "Submission",
+        "column_name": "pagePathVersion",
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "table_name": "Submission",
+        "column_name": "terminationKind",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "Submission",
+        "column_name": "visitedPageKeys",
+        "is_nullable": "YES",
+        "column_default": null
+      }
+    ],
+    "checks": [
+      {
+        "table_name": "QuestionOption",
+        "conname": "QuestionOption_branch_destination_state",
+        "convalidated": true,
+        "definition": "CHECK ((((\"branchDestinationKind\" IS NULL) AND (\"branchDestinationSectionId\" IS NULL)) OR ((\"branchDestinationKind\" = 'page'::text) AND (\"branchDestinationSectionId\" IS NOT NULL)) OR ((\"branchDestinationKind\" = ANY (ARRAY['consent'::text, 'submit'::text, 'ineligible'::text])) AND (\"branchDestinationSectionId\" IS NULL))))"
+      },
+      {
+        "table_name": "Submission",
+        "conname": "Submission_page_path_state",
+        "convalidated": true,
+        "definition": "CHECK ((((\"pagePathVersion\" = 0) AND (\"visitedPageKeys\" IS NULL) AND (\"terminationKind\" IS NULL)) OR ((\"pagePathVersion\" = 1) AND valid_submission_page_path(\"visitedPageKeys\") AND (\"terminationKind\" = ANY (ARRAY['consent'::text, 'submit'::text])))))"
+      }
+    ],
+    "triggers": [
+      {
+        "table_name": "QuestionOption",
+        "tgname": "QuestionOption_section_graph_delete",
+        "proname": "check_form_section_graph",
+        "tgdeferrable": true,
+        "tginitdeferred": true
+      },
+      {
+        "table_name": "QuestionOption",
+        "tgname": "QuestionOption_section_graph_insert",
+        "proname": "check_form_section_graph",
+        "tgdeferrable": true,
+        "tginitdeferred": true
+      },
+      {
+        "table_name": "QuestionOption",
+        "tgname": "QuestionOption_section_graph_update",
+        "proname": "check_form_section_graph",
+        "tgdeferrable": true,
+        "tginitdeferred": true
+      },
+      {
+        "table_name": "Submission",
+        "tgname": "submission_page_path_guard",
+        "proname": "check_submission_page_path",
+        "tgdeferrable": false,
+        "tginitdeferred": false
+      }
+    ],
+    "functions": [
+      "assert_form_section_graph",
+      "check_form_section_graph",
+      "check_submission_page_path",
+      "valid_submission_page_path"
+    ],
+    "indexes": [
+      {
+        "indexname": "QuestionOption_branchDestinationSectionId_idx",
+        "indexdef": "CREATE INDEX \"QuestionOption_branchDestinationSectionId_idx\" ON public.\"QuestionOption\" USING btree (\"branchDestinationSectionId\")"
+      },
+      {
+        "indexname": "QuestionOption_branch_question_idx",
+        "indexdef": "CREATE INDEX \"QuestionOption_branch_question_idx\" ON public.\"QuestionOption\" USING btree (\"questionId\") WHERE (\"branchDestinationKind\" IS NOT NULL)"
+      }
+    ]
+  },
+  "validation": {
+    "focused": {
+      "files": 3,
+      "tests": 13,
+      "result": "passed"
+    },
+    "related": {
+      "files": 8,
+      "tests": 92,
+      "result": "passed",
+      "serial": true
+    },
+    "existingPageAndSubmission": {
+      "files": 4,
+      "tests": 40,
+      "result": "passed"
+    },
+    "largeChoiceRegression": {
+      "options": 5000,
+      "seconds": 3.61,
+      "result": "passed"
+    },
+    "migration": {
+      "freshInstall": 137,
+      "upgrade": "129→137",
+      "legacyOptionUnchanged": true,
+      "legacySubmissionPathVersion": 0
+    },
+    "schemaContract": {
+      "authorAssetChecks": 10,
+      "authorAssetIndexes": 1,
+      "authorAssetFunctions": 15,
+      "authorAssetTriggers": 23,
+      "unexpectedDifferences": 0
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": {
+      "result": "passed",
+      "staticPages": 82
+    },
+    "plan": {
+      "tasks": 107,
+      "sourcePaths": 186,
+      "additionalPatterns": 21,
+      "result": "passed"
+    },
+    "apiContracts": {
+      "paths": 323,
+      "operations": 458,
+      "policies": 45,
+      "unmapped": 0,
+      "result": "passed"
+    }
+  },
+  "cases": [
+    "branch round-trip",
+    "copy page remap",
+    "short and long paths",
+    "required bypass",
+    "unvisited injection",
+    "ineligible rejection",
+    "idempotent replay",
+    "branch correction and stale answer clearing",
+    "cross-version SQL bypass",
+    "impossible stored edge",
+    "5,000-option trigger performance"
+  ],
+  "externalDependencies": "No external credential or provider call is required for BI-04c backend path verification.",
+  "untouched": [
+    "production database",
+    "question-image frozen 20 fixture",
+    "localhost:3108 frozen runtime"
+  ],
+  "hashes": {
+    "prisma/migrations/20261025020000_form_page_branches/migration.sql": "1bd1edffa4d9ff902ab6ac8316101bc0e99a0b10cbba9ea8a2ce6e20a0ce09a5",
+    "prisma/migrations/20261025020100_form_page_branch_trigger_scope/migration.sql": "02bd17fe3cadd11252a4965e66ade08e01956ae2d7d42d59ec9cc6348e74ae1a",
+    "prisma/migrations/20261025020200_form_page_branch_lookup/migration.sql": "edde69eada7f098b874c42134be6aeb6c0c16b139ba39e3e792dee0974338a71",
+    "prisma/migrations/20261025020300_author_asset_trigger_scope/migration.sql": "4d15e1989e23bedd2fce573f6b3011cbbed74da44a838938b3fc5752f19efd1b",
+    "prisma/migrations/20261025020400_submission_page_path_validator_fix/migration.sql": "18cdd71fb7ea80f0293ac358de9d1c395b9253bc5902ff93e5c473a9ce7c7821",
+    "prisma/migrations/20261025020500_submission_page_path_edges/migration.sql": "5591d8be8eef74b784cfc2eda692c84d000eaeb9804e7e0760446f0ea1a4fdd7",
+    "prisma/migrations/20261025020600_option_trigger_metadata_scope/migration.sql": "b86580f7a6083aa06c1366126780401e7ebdde56df75e52eff5532c968beacb1",
+    "prisma/migrations/20261025020700_submission_ineligible_guard/migration.sql": "a51faf66c0de9ac750abfcba1158e8ae83928c87689628c08318d54d5a26101a",
+    "prisma/schema.prisma": "437e76e99c28a0f9f750f5f8a4d6d2c3c6336b1c610d945daf3812b2b8be21f6",
+    "src/contracts/questions.ts": "125c7004981bff16f73d1fd4d3ab0028da82208be7ccf3f060d644a07da8dad3",
+    "src/contracts/form-sections.ts": "0512f35340623dccfb2bd13efcc343b7d6904bc6d06fc4e5572c89e0689642d1",
+    "src/contracts/form-copy.ts": "70bc090faec2443d97c18fef0fcf945ee845f54071a9fb51f96cd3b7932a8d4e",
+    "src/contracts/option-identities.ts": "a44e31837c37827d6376b278467e8dd93f2f39ba06f6130af08258d67c29b63e",
+    "src/server/forms.ts": "afb048b6b64b6e4b8c6940acf60915c9a68891eb5dded455779beb04a0c55cf8",
+    "src/server/answer-validation.ts": "ed7a0bd68bb462b67a841e6b299aecfac2e5373f86dc2a0902f1d480fa76b3b3",
+    "src/server/submissions.ts": "fde3a3d65fbc43d8b7556114dc0eb7e820c37b4a0ed6a37777692872204f0f9f",
+    "src/server/submission-management.ts": "ad9b0a7cde334c2ea5c0c3079226166666112023347b72617c3f4a3322aa6d85",
+    "tests/server/form-page-branches.test.ts": "60450e8726209aff5c86d7ade2cc7fe8c2bddb6099e8e7d3bd409c8a3d173cdd",
+    "tests/server/form-sections-openapi.test.ts": "6623cc65ff15ef187b3ab889d770d1420084558e2b95d139fd661d99f7ab0a20"
+  }
+}

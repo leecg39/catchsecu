@@ -11,11 +11,14 @@ import { decrypt, encrypt, tokenHash } from "./crypto";
 import { contentDto } from "./forms";
 import { validateAnswers, type Answers } from "./answer-validation";
 import { submissionInput } from "@/contracts/domains";
+import { isFileQuestion } from "@/contracts/drawing-questions";
+import { formLanguageSchema } from "@/contracts/form-language";
 import { attachCorrectionFiles } from "./file-bindings";
-import { assertFileDeadlines, canReadFiles, fileInfo, lockFileContext, lockFileSubmission } from "./file-access";
+import { assertFileDeadlines, canReadFiles, fileInfo, lockFileContext, lockFileSubmission, readableAnswerValues } from "./file-access";
 import { lockSubmission, requireSubmissionContent } from "./submission-access";
 import { submissionDataAvailable } from "@/contracts/destruction";
 import { createDestruction } from "./destruction";
+import { resolveFormVisit } from "@/contracts/form-sections";
 
 export const correctionInput = z.object({
   version: z.number().int().positive(), reason: z.string().trim().min(1).max(1000),
@@ -25,7 +28,8 @@ export const actionInput = z.object({ version: z.number().int().positive(), reas
 export const noteInput = z.object({ text: z.string().trim().min(1).max(5000) }).strict();
 function answerValues(row: Awaited<ReturnType<typeof lockSubmission>>) {
   return Object.fromEntries(row.formVersion.questions.map(question => [question.stableKey,
-    row.status === "destroyed" ? "" : decrypt<Answers[string]>(row.answers.find(answer => answer.questionId === question.id)!.valueCipher)]));
+    row.status === "destroyed" ? "" : row.answers.find(answer => answer.questionId === question.id)
+      ? decrypt<Answers[string]>(row.answers.find(answer => answer.questionId === question.id)!.valueCipher) : ""]));
 }
 type CorrectionSnapshot = { answers: Answers; reason: string };
 async function recordChange(tx: Transaction, ctx: Context, id: string, reason: string, code: string, before: Answers, after: Answers) {
@@ -48,20 +52,22 @@ export async function getSubmission(ctx: Context, id: string, requestId: string)
       include: { question: { select: { stableKey: true } } }, orderBy: [{ createdAt: "asc" }, { id: "asc" }] }) : [];
   await audit(tx, ctx, requestId, "submission.viewed", "submission", id, [], row.formVersion.form.serviceId);
   return {
+    ...(row.formVersion.formLanguage ? { formLanguage: formLanguageSchema.parse(row.formVersion.formLanguage) } : {}),
     source: row.importJobId ? "csv" : "form", importEvidence: importEvidence ? decrypt(importEvidence.payloadCipher) : null,
     id: row.id, formId: row.formVersion.form.id, title: row.formVersion.title, version: row.version, status: row.status,
+    ...(row.pagePathVersion === 1 ? { visitedPageIds: row.visitedPageKeys, terminationKind: row.terminationKind } : {}),
     createdAt: row.submittedAt, retentionUntil: row.retentionUntil, legalHold: row.legalHold,
     originalRetentionUntil: row.originalRetentionUntil, contentAvailable: available,
-    values: available ? answerValues(row) : {},
+    values: available ? readableAnswerValues(answerValues(row), mayReadFiles) : {},
     questions: contentDto(row.formVersion).questions,
     attachments: attachments.map(fileInfo),
     corrections: corrections.map(item => ({ id: item.id, reason: item.payload && row.status !== "destroyed" ? decrypt<CorrectionSnapshot>(item.payload.beforeCipher).reason : item.reason, actorId: item.actorId, createdAt: item.createdAt,
       changedFields: item.changedFields, beforeHash: item.beforeHash,
-      before: item.payload && row.status !== "destroyed" ? decrypt<CorrectionSnapshot>(item.payload.beforeCipher).answers : null,
-      after: item.payload && row.status !== "destroyed" ? decrypt<Answers>(item.payload.afterCipher) : null })),
+      before: item.payload && row.status !== "destroyed" ? readableAnswerValues(decrypt<CorrectionSnapshot>(item.payload.beforeCipher).answers, mayReadFiles) : null,
+      after: item.payload && row.status !== "destroyed" ? readableAnswerValues(decrypt<Answers>(item.payload.afterCipher), mayReadFiles) : null })),
     notes: notes.map(item => ({ id: item.id, text: decrypt<string>(item.textCipher), version: item.version, actorId: item.actorId, createdAt: item.createdAt })),
     receipts: receipts.map(item => ({ id: item.id, purpose: item.purpose, retentionDays: item.retentionDays, grantedAt: item.grantedAt,
-      documentHash: item.documentHash, pdfHash: item.pdfHash, pdfAvailable: item.evidenceVersion === 1 && !!item.pdfCipher, evidence: readConsentEvidence(item),
+      documentHash: item.documentHash, pdfHash: item.pdfHash, pdfAvailable: [1, 2].includes(item.evidenceVersion) && !!item.pdfCipher, evidence: readConsentEvidence(item),
       events: item.events.map(event => ({ type: event.type, reason: event.reason, createdAt: event.createdAt })) })),
   };
   });
@@ -74,17 +80,20 @@ export async function correctSubmission(ctx: Context, id: string, input: z.infer
   const evidence = row.importJobId ? await tx.importEvidence.findUnique({ where: { submissionId: id } }) : null;
   const fieldTypes = evidence ? decrypt<{ fieldTypes: string[] }>(evidence.payloadCipher).fieldTypes : [];
   const before = answerValues(row);
-  const normalized = validateAnswers(row.formVersion.questions.map((q, i) => ({ ...q, validationKind: fieldTypes?.[i] })), input.answers, true, before);
+  const visit = row.importJobId ? null : resolveFormVisit(contentDto(row.formVersion), { ...before, ...input.answers });
+  if (visit?.terminal === "ineligible") fail(422, "INELIGIBLE_PATH", "참여 대상이 아닌 경로로 응답을 변경할 수 없습니다.");
+  const normalized = validateAnswers(row.formVersion.questions.map((q, i) => ({ ...q, validationKind: fieldTypes?.[i] })), input.answers, true, before,
+    row.formVersion.formLanguage, visit?.questionIds);
   const changedAnswers = Object.fromEntries(Object.entries(normalized).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(before[key])));
   if (!Object.keys(changedAnswers).length) fail(422, "NO_CHANGES", "변경된 답변이 없습니다.");
-    const hasFileChanges = row.formVersion.questions.some(question => question.type === "파일 업로드" && question.stableKey in changedAnswers);
+    const hasFileChanges = row.formVersion.questions.some(question => isFileQuestion(question.type) && question.stableKey in changedAnswers);
     if (hasFileChanges) {
       if (!row.publicationId) fail(409, "IMPORT_ATTACHMENT", "CSV 수집 응답에는 첨부파일을 추가할 수 없습니다.");
       await lockFileContext(tx, ctx, row.formVersion.form.serviceId, ["submission.write", "file.read"]);
       await lockFileSubmission(tx, ctx.tenantId, id, true);
     }
     const changed = await tx.submission.updateMany({ where: { id, tenantId: ctx.tenantId, version: input.version, status: { in: ["submitted", "corrected"] } },
-      data: { status: "corrected", version: { increment: 1 } } });
+      data: { status: "corrected", version: { increment: 1 }, ...(visit ? { pagePathVersion: 1, visitedPageKeys: visit.pageIds, terminationKind: visit.terminal } : {}) } });
     if (!changed.count) fail(409, "VERSION_CONFLICT", "응답이 변경되었거나 정정할 수 없는 상태입니다.");
     if (hasFileChanges) await attachCorrectionFiles(tx, ctx, { tenantId: ctx.tenantId, submissionId: id,
       publicationId: row.publicationId!, formVersionId: row.formVersionId, serviceId: row.formVersion.form.serviceId,
@@ -95,7 +104,7 @@ export async function correctSubmission(ctx: Context, id: string, input: z.infer
     }
     const erasedMarketing = await tx.marketingPreference.findMany({ where: { sourceSubmissionId: id, status: "erased" }, select: { id: true } });
     if (erasedMarketing.length) await eraseMarketingJobs(tx, { marketingPreferenceId: { in: erasedMarketing.map(r => r.id) } });
-    await bindSubmissionSubject(tx, id, row.formVersion.form.serviceId, row.formVersion.questions, { ...before, ...changedAnswers });
+    await bindSubmissionSubject(tx, id, row.formVersion.form.serviceId, row.formVersion.questions, normalized);
     const beforeChanged = Object.fromEntries(Object.keys(changedAnswers).map(key => [key, before[key]]));
     await recordChange(tx, ctx, id, input.reason, "answers_corrected", beforeChanged, changedAnswers);
     await audit(tx, ctx, requestId, "submission.corrected", "submission", id, Object.keys(changedAnswers), row.formVersion.form.serviceId);

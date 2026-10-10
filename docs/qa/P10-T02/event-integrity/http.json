@@ -1,0 +1,94 @@
+{
+  "checks": [
+    {
+      "step": "가입",
+      "status": 200
+    },
+    {
+      "step": "로그인",
+      "status": 200
+    },
+    {
+      "step": "구독 요청",
+      "status": 202
+    },
+    {
+      "step": "주문 생성",
+      "status": 201
+    },
+    {
+      "step": "결제 중 구독 취소 거절",
+      "status": 409,
+      "code": "PAYMENT_IN_PROGRESS"
+    },
+    {
+      "step": "승인에 환불 ID 혼합 거절",
+      "status": 422,
+      "code": "INVALID_PAYMENT_EVENT"
+    },
+    {
+      "step": "잘못된 JSON 거절",
+      "status": 400,
+      "code": "INVALID_JSON"
+    },
+    {
+      "step": "정상 승인",
+      "status": 202
+    },
+    {
+      "step": "환불 요청",
+      "status": 201
+    },
+    {
+      "step": "정상 환불",
+      "status": 202
+    },
+    {
+      "step": "환불 재전송 식별자 누락 거절",
+      "status": 422,
+      "code": "INVALID_PAYMENT_EVENT"
+    },
+    {
+      "step": "정상 환불 재전송",
+      "status": 202
+    },
+    {
+      "step": "두 번째 구독 요청",
+      "status": 202
+    },
+    {
+      "step": "두 번째 주문",
+      "status": 201
+    },
+    {
+      "step": "실패 결과",
+      "status": 202
+    },
+    {
+      "step": "실패 후 취소",
+      "status": 200
+    },
+    {
+      "step": "과거 취소 구독 승인 거절",
+      "status": 409,
+      "code": "SUBSCRIPTION_UNAVAILABLE"
+    },
+    {
+      "step": "로그아웃",
+      "status": 200
+    }
+  ],
+  "fingerprint": {
+    "sha256": "6ff93afef8d12d8c45503fd27d7199548e8ca9d46e6403ad99f545242d845659",
+    "counts": {
+      "orders": 3,
+      "subscriptions": 3,
+      "refunds": 1,
+      "events": 3,
+      "ledger": 2,
+      "audits": 11
+    }
+  },
+  "ownSessionsRemaining": 0,
+  "realExternalAcceptance": false
+}

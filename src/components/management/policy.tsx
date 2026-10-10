@@ -1,44 +1,61 @@
 "use client";
-import { useState } from "react";
-import Link from "next/link";
+import { SecurityEntitlementNotice } from "./SecurityEntitlementNotice";
+import { useRef, useState } from "react";
+import { GuardedLink as Link } from "../ux/navigation-guard";
 import { PageHeading, Panel, ActionButton, Modal } from "../shared";
-import { api, errorText, useResource } from "@/lib/api";
+import { api, ApiError, errorText, useResource } from "@/lib/api";
 import { policySettings, type PolicyRecord } from "@/contracts/security";
 import { useUnsavedChanges } from "../ux/navigation-guard";
+import { useConfirm } from "../ux/confirm";
+import { useApplication } from "../ApplicationContext";
 
 const settingKeys = Object.keys(policySettings.shape) as (keyof typeof policySettings.shape)[];
 const tabs = ["비밀번호 변경", "비밀번호 재사용", "세션 유지시간", "2단계 인증", "캐치폼 사용 승인", "파기일자 설정"];
 export function Policy() {
+  const app = useApplication();
+  return <PolicyContent key={(app.data?.company?.id ?? "none") + ":" + (app.data?.company?.role ?? "")} />;
+}
+function PolicyContent() {
   const result = useResource<PolicyRecord>("/security/policy");
   return <><PageHeading title="회사 보안 정책 설정" />
     <p className="mg-description">회사에 적용할 보안 정책을 설정합니다. 최상위 관리자만 변경할 수 있습니다.</p>
-    {result.error ? <Panel><p role="alert">{result.error.message}</p></Panel> : !result.data ? <Panel><p role="status">정책을 불러오는 중입니다.</p></Panel>
+    {result.error ? <Panel><p role="alert">{result.error.message}</p><ActionButton secondary onClick={result.reload}>다시 불러오기</ActionButton></Panel> : !result.data ? <Panel><p role="status">정책을 불러오는 중입니다.</p></Panel>
       : <PolicyForm initial={result.data} />}</>;
 }
 function PolicyForm({ initial }: { initial: PolicyRecord }) {
   const [policy, setPolicy] = useState(initial), [tab, setTab] = useState(0), [confirm, setConfirm] = useState<"save" | "reset">();
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [notice, setNotice] = useState("");
   const [baseline, setBaseline] = useState(initial);
-  useUnsavedChanges(policy.canManage && settingKeys.some(key => JSON.stringify(policy[key]) !== JSON.stringify(baseline[key])),
+  const [conflict, setConflict] = useState(false), lock = useRef(false), ask = useConfirm();
+  const dirty = policy.canManage && settingKeys.some(key => JSON.stringify(policy[key]) !== JSON.stringify(baseline[key]));
+  useUnsavedChanges(dirty || busy,
     "저장하지 않은 보안 정책 변경 사항이 있습니다. 이 화면을 나가면 변경 내용이 적용되지 않습니다.");
   const change = (value: Partial<PolicyRecord>) => { setPolicy(current => ({ ...current, ...value })); setNotice(""); };
   async function save(password: string) {
-    if (busy) return; setBusy(true); setError("");
+    if (lock.current || conflict) return; lock.current = true; setBusy(true); setError("");
     try {
-      const settings = policySettings.parse({ minPassword: policy.minPassword, passwordMonths: policy.passwordMonths, passwordReuse: policy.passwordReuse, passwordDeferral: policy.passwordDeferral, sessionMinutes: policy.sessionMinutes, requireMfa: policy.requireMfa, requireApproval: policy.requireApproval,
+      const settings = confirm === "reset" ? {} : policySettings.parse({ minPassword: policy.minPassword, passwordMonths: policy.passwordMonths, passwordReuse: policy.passwordReuse, passwordDeferral: policy.passwordDeferral, sessionMinutes: policy.sessionMinutes, requireMfa: policy.requireMfa, requireApproval: policy.requireApproval,
         approvalRoles: policy.approvalRoles, approvalReferenceRequired: policy.approvalReferenceRequired, approvalRequestTemplate: policy.approvalRequestTemplate,
         automaticDestruction: policy.automaticDestruction, allowRetentionAdjustment: policy.allowRetentionAdjustment, allowRetentionDesignation: policy.allowRetentionDesignation, retentionDays: policy.retentionDays,
         activityReviewRetentionDays: policy.activityReviewRetentionDays });
       const saved = await api<PolicyRecord>("/security/policy", { method: confirm === "reset" ? "DELETE" : "PATCH",
         body: JSON.stringify({ ...(confirm === "reset" ? {} : settings), tenantId: policy.tenantId, version: policy.version, password }) });
       setPolicy(saved); setBaseline(saved); setConfirm(undefined); setNotice(confirm === "reset" ? "기본 정책을 적용했습니다." : "정책을 저장했습니다. 다음 요청부터 적용됩니다.");
-    } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
+    } catch (cause) { setError(errorText(cause)); setConflict(cause instanceof ApiError && cause.code === "VERSION_CONFLICT"); } finally { lock.current = false; setBusy(false); }
   }
-  return <><div className="mg-tabs" role="tablist" aria-label="보안 정책">{tabs.map((name, index) =>
+  async function latest() {
+    if (lock.current || (dirty && !await ask({ title: "저장하지 않은 변경 사항", message: "작성한 변경 내용을 버리고 최신 보안 정책을 불러올까요?", confirmLabel: "최신 정책 불러오기", cancelLabel: "계속 편집" })) || lock.current) return;
+    lock.current = true; setBusy(true); setError("");
+    try { const value = await api<PolicyRecord>("/security/policy"); setPolicy(value); setBaseline(value); setConflict(false); setConfirm(undefined); setNotice("최신 정책을 불러왔습니다. 내용을 확인한 뒤 다시 편집해주세요."); }
+    catch (cause) { setError(errorText(cause)); } finally { lock.current = false; setBusy(false); }
+  }
+  return <><SecurityEntitlementNotice access={policy.entitlements["security.company_policy"]}/><div className="mg-tabs" role="tablist" aria-label="보안 정책">{tabs.map((name, index) =>
     <button key={name} role="tab" aria-selected={tab === index} className={tab === index ? "active" : ""} onClick={() => setTab(index)}>{name}</button>)}</div>
     <Panel><PageHeading title={tabs[tab] + " 정책"}><div className="mg-flex">
-      {policy.canManage && <><ActionButton secondary onClick={() => { setError(""); setConfirm("reset"); }}>기본값 복원</ActionButton>
-        <ActionButton onClick={() => { setError(""); setConfirm("save"); }}>저장하기</ActionButton></>}</div></PageHeading>
+      <ActionButton secondary disabled={busy} onClick={() => void latest()}>최신 정책 불러오기</ActionButton>
+      {policy.canManage && <><ActionButton secondary disabled={busy || conflict} onClick={() => { setError(""); setConfirm("reset"); }}>기본값 복원</ActionButton>
+        <ActionButton disabled={busy || conflict} onClick={() => { setError(""); setConfirm("save"); }}>저장하기</ActionButton></>}</div></PageHeading>
+      {!confirm && error && <p role="alert">{error}</p>}
       <fieldset disabled={!policy.canManage || busy} className="policy-fields">
         {tab === 0 && <><h3>비밀번호 변경 주기</h3><p>설정한 기간이 지나면 회사 기능을 사용하기 전에 비밀번호를 변경해야 합니다.</p>
           <label>변경 주기<select className="cs-input" aria-label="비밀번호 변경 주기" value={policy.passwordMonths} onChange={event => change({ passwordMonths: Number(event.target.value) })}>
@@ -55,7 +72,7 @@ function PolicyForm({ initial }: { initial: PolicyRecord }) {
             value={policy.sessionMinutes} onChange={event => change({ sessionMinutes: Number(event.target.value) })} /></label>
           <p className="mg-muted">30~120분 사이로 설정할 수 있습니다. 저장 즉시 기존 세션에도 적용됩니다.</p></>}
         {tab === 3 && <><h3>회사 구성원의 2단계 인증</h3>
-          <label className="member-check"><input type="checkbox" checked={policy.requireMfa} onChange={event => change({ requireMfa: event.target.checked })} />2단계 인증을 필수로 사용합니다.</label>
+          <label className="member-check"><input type="checkbox" disabled={!policy.entitlements["security.mfa_management"].available} checked={policy.requireMfa} onChange={event => change({ requireMfa: event.target.checked })} />2단계 인증을 필수로 사용합니다.</label>
           <p>설정하지 않은 구성원은 인증 앱을 등록한 후 회사 기능을 사용할 수 있습니다. 필수 정책이 적용되면 인증을 해제할 수 없습니다.</p>
           <p>필수 정책을 저장하려면 관리자 계정의 2단계 인증을 먼저 등록해주세요.</p><Link className="cs-link" href="/two-step-setting">내 2단계 인증 관리</Link></>}
         {tab === 4 && <><h3>캐치폼 공개 전 사용 승인</h3>
@@ -94,6 +111,6 @@ function PolicyForm({ initial }: { initial: PolicyRecord }) {
       <form className="mg-fields" onSubmit={event => { event.preventDefault(); void save(String(new FormData(event.currentTarget).get("password"))); }}>
         {confirm === "reset" && <p>비밀번호 변경 주기 3개월, 현재 비밀번호 재사용 금지, 변경 유예 없음, 최소 12자, 세션 30분, 2단계 인증 선택, 게시 승인 선택, 자동 파기 끄기, 파기일자 변경·사후 지정 끄기, 회사 기본 보유 기간 365일, 활동 검토 보유 기한 해제로 되돌립니다. 진행 중인 승인 요청도 무효화될 수 있습니다.</p>}
         <label><span>현재 비밀번호</span><input className="cs-input" type="password" name="password" aria-label="현재 비밀번호" required maxLength={128} autoComplete="current-password" /></label>
-        {error && <p role="alert">{error}</p>}<ActionButton disabled={busy}>{busy ? "적용 중…" : "정책 적용"}</ActionButton>
+        {error && <p role="alert">{error}</p>}{conflict && <><p>입력은 유지했습니다. 최신 정책을 불러온 뒤 다시 편집해주세요.</p><ActionButton secondary type="button" disabled={busy} onClick={() => void latest()}>최신 정책 불러오기</ActionButton></>}<ActionButton disabled={busy || conflict}>{busy ? "적용 중…" : "정책 적용"}</ActionButton>
       </form></Modal>}</>;
 }

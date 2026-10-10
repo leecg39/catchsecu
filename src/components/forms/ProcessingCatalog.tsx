@@ -4,7 +4,9 @@ import { useRef, useState, type FormEvent } from "react";
 import { PageHeading, Panel, ActionButton, Modal } from "../shared";
 import { RemoteTable } from "../RemoteTable";
 import { useApplication } from "../ApplicationContext";
-import { api, errorText, useResource } from "@/lib/api";
+import { api, ApiError, errorText, useResource } from "@/lib/api";
+import { useConfirm } from "../ux/confirm";
+import { useUnsavedChanges } from "../ux/navigation-guard";
 import { basisLabels, itemKinds, recipientKinds, retentionModes, purposeInput, recipientInput,
   type PurposeInput, type RecipientInput, type PurposeRecord, type RecipientRecord, type CatalogHistory } from "@/contracts/processing-catalog";
 import type { Paged } from "@/contracts/forms";
@@ -24,7 +26,7 @@ export function ProcessingCatalog({ policy = false }: { policy?: boolean }) {
   const [kind, setKind] = useState<Kind>("purposes"), [service, setService] = useState("");
   const [search, setSearch] = useState(""), [query, setQuery] = useState(""), [status, setStatus] = useState("active");
   const [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20);
-  const [editor, setEditor] = useState<{ kind: Kind; row?: Record }>(), [history, setHistory] = useState<{ kind: Kind; row: Record }>();
+  const [editor, setEditor] = useState<{ kind: Kind; row?: Record; refresh?: number }>(), [history, setHistory] = useState<{ kind: Kind; row: Record }>();
   const [action, setAction] = useState<{ kind: Kind; row: Record }>(), [busy, setBusy] = useState(false), [error, setError] = useState("");
   const serviceId = service || app.data?.serviceId || "";
   const params = new URLSearchParams({ serviceId, search, status, page: String(page), pageSize: String(pageSize) });
@@ -63,13 +65,14 @@ export function ProcessingCatalog({ policy = false }: { policy?: boolean }) {
             {canWrite && <button onClick={() => { setError(""); setAction({ kind, row }); }}>{row.status === "active" ? "보관" : "복원"}</button>}</div>,
         ] }))} total={result.data?.total ?? 0} page={page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }}
         loading={result.loading} error={result.error?.message} />
-    </Panel>{editor && <Modal title={editor.row ? editor.row.name : editor.kind === "purposes" ? "수집 목적 추가" : "제공·수탁자 추가"} onClose={() => setEditor(undefined)}>
-      <CatalogEditor kind={editor.kind} row={editor.row} serviceId={serviceId} canWrite={canWrite} onSaved={changed} />
-    </Modal>}{history && <Modal title="변경 이력" onClose={() => setHistory(undefined)}><History kind={history.kind} row={history.row} /></Modal>}
+    </Panel>{editor && <CatalogEditor key={editor.kind + ":" + (editor.row?.id ?? "new") + ":" + (editor.refresh ?? 0)}
+      kind={editor.kind} row={editor.row} serviceId={serviceId} canWrite={canWrite} onSaved={changed} onClose={() => setEditor(undefined)}
+      onReload={row => setEditor({ kind: editor.kind, row, refresh: (editor.refresh ?? 0) + 1 })} />
+    }{history && <Modal title="변경 이력" onClose={() => setHistory(undefined)}><History kind={history.kind} row={history.row} /></Modal>}
     {action && <Modal title={action.row.status === "active" ? "자료 보관" : "자료 복원"} onClose={() => { if (!busy) setAction(undefined); }}>
       <p>“{action.row.name}” 자료를 {action.row.status === "active" ? "보관합니다. 변경 이력은 유지하고 새 수집 근거에서는 선택할 수 없게 합니다." : "다시 사용합니다. 연결 자료와 중복 이름을 확인합니다."}</p>
       {action.kind === "recipients" && action.row.status === "active" && <p>사용 중인 수집 목적의 연결을 먼저 해제하거나 해당 목적을 보관해주세요.</p>}
-      {error && <p role="alert">{error}</p>}<ActionButton disabled={busy} onClick={confirmAction}>확인</ActionButton>
+      {error && <><p role="alert">{error}</p><ActionButton secondary disabled={busy} onClick={() => { setAction(undefined); result.reload(); }}>목록 새로고침</ActionButton></>}<ActionButton disabled={busy || !!error} onClick={confirmAction}>확인</ActionButton>
     </Modal>}</>;
 }
 type RetentionValue = Pick<PurposeInput, "retentionMode" | "retentionDays" | "retentionReason">;
@@ -82,7 +85,9 @@ function RetentionFields({ value, change }: { value: RetentionValue; change: (va
   </fieldset>;
 }
 const defaults = { name: "", purpose: "", retentionMode: "days" as const, retentionDays: 30, retentionReason: "" };
-function CatalogEditor({ kind, row, serviceId, canWrite, onSaved }: { kind: Kind; row?: Record; serviceId: string; canWrite: boolean; onSaved: () => void }) {
+function CatalogEditor({ kind, row, serviceId, canWrite, onSaved, onClose, onReload }: {
+  kind: Kind; row?: Record; serviceId: string; canWrite: boolean; onSaved: () => void; onClose: () => void; onReload: (row: Record) => void;
+}) {
   const initialPurpose = row && "lawfulBasis" in row ? row : undefined, initialRecipient = row && "kind" in row ? row : undefined;
   const [purpose, setPurpose] = useState<PurposeInput>(() => initialPurpose ? {
     serviceId: initialPurpose.serviceId, name: initialPurpose.name, purpose: initialPurpose.purpose, lawfulBasis: initialPurpose.lawfulBasis, basisReference: initialPurpose.basisReference,
@@ -96,12 +101,29 @@ function CatalogEditor({ kind, row, serviceId, canWrite, onSaved }: { kind: Kind
   const [itemText, setItemText] = useState(initialRecipient?.items.join("\n") ?? "");
   const [selected, setSelected] = useState<RecipientRecord[]>(initialPurpose?.recipients ?? []);
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const [conflict, setConflict] = useState(false);
   const creation = useRef<{ payload: string; key: string } | null>(null), readOnly = !canWrite || row?.status === "archived";
+  const currentInput = JSON.stringify(kind === "purposes" ? { ...purpose, recipientIds: selected.map(item => item.id) } : { ...recipient, itemText });
+  const [initialInput] = useState(currentInput);
+  const dirty = !readOnly && currentInput !== initialInput;
+  const confirm = useConfirm();
+  useUnsavedChanges(dirty || busy);
+  async function discard() {
+    return !dirty || confirm({ title: "저장하지 않은 변경 사항", message: "저장하지 않은 수집 근거 입력을 버릴까요?", confirmLabel: "입력 버리기", cancelLabel: "계속 편집" });
+  }
+  async function close() { if (!busy && await discard()) onClose(); }
+  async function reloadLatest() {
+    if (!row || busy || !await discard()) return;
+    setBusy(true); setError("");
+    try { onReload(await api<Record>(endpoint(kind) + "/" + row.id)); }
+    catch (cause) { setError(errorText(cause)); }
+    finally { setBusy(false); }
+  }
   const common = kind === "purposes" ? purpose : recipient;
   const changePurpose = (patch: Partial<PurposeInput>) => setPurpose(value => ({ ...value, ...patch }));
   const changeRecipient = (patch: Partial<RecipientInput>) => setRecipient(value => ({ ...value, ...patch }));
   async function submit(event: FormEvent) {
-    event.preventDefault(); if (busy || readOnly) return; setError("");
+    event.preventDefault(); if (busy || readOnly || conflict) return; setError("");
     const result = kind === "purposes" ? purposeInput.safeParse({ ...purpose, recipientIds: selected.map(item => item.id) }) : recipientInput.safeParse({ ...recipient, items: itemText.split(/\r?\n/).map(item => item.trim()).filter(Boolean) });
     if (!result.success) { setError(result.error.issues.map(issue => issue.message).join(" · ")); return; }
     setBusy(true);
@@ -112,9 +134,13 @@ function CatalogEditor({ kind, row, serviceId, canWrite, onSaved }: { kind: Kind
         body: JSON.stringify({ ...result.data, ...(row ? { version: row.version } : {}) }),
         ...(row ? {} : { headers: { "Idempotency-Key": creation.current.key } }) });
       onSaved();
-    } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
+    } catch (cause) {
+      setError(errorText(cause));
+      if (row && cause instanceof ApiError && cause.status === 409) setConflict(true);
+    } finally { setBusy(false); }
   }
-  return <form className="catalog-editor" onSubmit={submit}>
+  return <Modal title={row ? row.name : kind === "purposes" ? "수집 목적 추가" : "제공·수탁자 추가"} onClose={() => { void close(); }}>
+    <form className="catalog-editor" onSubmit={submit}>
     {row && <p className="cs-muted">개정 {row.version} · {new Date(row.updatedAt).toLocaleString("ko-KR")}{row.status === "archived" ? " · 보관함의 자료는 복원 후 수정할 수 있습니다." : ""}</p>}
     <fieldset disabled={readOnly || busy} className="catalog-fields">
       <label>이름<input className="cs-input" aria-label="자료 이름" required maxLength={200} value={common.name} onChange={event => kind === "purposes" ? changePurpose({ name: event.target.value }) : changeRecipient({ name: event.target.value })} /></label>
@@ -146,8 +172,11 @@ function CatalogEditor({ kind, row, serviceId, canWrite, onSaved }: { kind: Kind
       </>}
       <RetentionFields value={common} change={kind === "purposes" ? changePurpose : changeRecipient} />
       {kind === "purposes" && <RecipientPicker serviceId={purpose.serviceId} selected={selected} change={setSelected} />}
-    </fieldset>{error && <p role="alert">{error}</p>}{!readOnly && <ActionButton disabled={busy}>{busy ? "저장 중…" : "자료 저장"}</ActionButton>}
-  </form>;
+    </fieldset>{error && <p role="alert">{error}</p>}
+    {conflict && <div><p>입력한 내용은 유지했습니다. 최신 자료를 확인한 후 다시 수정해주세요.</p>
+      <ActionButton type="button" secondary disabled={busy} onClick={reloadLatest}>최신 자료 불러오기</ActionButton></div>}
+    {!readOnly && <ActionButton disabled={busy || conflict}>{busy ? "저장 중…" : "자료 저장"}</ActionButton>}
+  </form></Modal>;
 }
 function RecipientPicker({ serviceId, selected, change }: { serviceId: string; selected: RecipientRecord[]; change: (value: RecipientRecord[]) => void }) {
   const [search, setSearch] = useState(""), [page, setPage] = useState(1);

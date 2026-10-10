@@ -1,6 +1,9 @@
 "use client";
+import { AuthorAssetProvider } from "./AuthorAssetProvider";
+import { hasAuthorAssets } from "@/lib/author-assets";
+import { QuestionChoiceSummary } from "./QuestionChoiceSummary";
 import { QuestionSummary } from "./QuestionSummary";
-import { ConsentDisplay, ConsentDocuments } from "./ConsentDocuments";
+import { ConsentDisplay, ConsentDocuments, ConsentItems } from "./ConsentDocuments";
 import type { FormConsentBundle } from "@/contracts/form-documents";
 import { useRef, useState } from "react";
 import Link from "next/link";
@@ -49,7 +52,7 @@ export function ApprovalPanel({ form, dirty, onChanged }: { form: FormRecord; di
       <header><strong>{approvalStatusLabels[row.status]}</strong><span>{row.requesterName} · {new Date(row.createdAt).toLocaleString("ko-KR")}</span></header>
       <p className="approval-text">{row.message}</p>{row.reference && <p>증빙 번호: {row.reference}</p>}
       {row.reason && <p className="approval-text">처리 의견: {row.reason} · {row.reviewerName}</p>}
-      <details><summary>검토한 질문·설정 보기</summary><ApprovalSnapshot snapshot={row.snapshot} /></details>
+      <details><summary>검토한 질문·설정 보기</summary><ApprovalSnapshot id={row.id} snapshot={row.snapshot} /></details>
       {row.status === "pending" && <div className="approval-decisions">
         {data.canReview && <form onSubmit={event => { event.preventDefault(); const values = new FormData(event.currentTarget);
           const decision = (event.nativeEvent as SubmitEvent).submitter?.getAttribute("value");
@@ -65,13 +68,19 @@ export function ApprovalPanel({ form, dirty, onChanged }: { form: FormRecord; di
       <button aria-label="다음 승인 내역" disabled={data.page * pageSize >= data.total} onClick={() => setPage(data.page + 1)}>다음</button></div>}
   </Panel>;
 }
-function ApprovalSnapshot({ snapshot }: { snapshot: Approval["snapshot"] }) {
-  return <section className="approval-snapshot"><h3>{snapshot.title}</h3><p className="approval-text">{snapshot.content.body}</p>
+function ApprovalSnapshot({ id, snapshot }: { id: string; snapshot: Approval["snapshot"] }) {
+  return <AuthorAssetProvider scope={{ kind: "approval", id }} enabled={hasAuthorAssets(snapshot.content.questions)}><section className="approval-snapshot"><h3>{snapshot.title}</h3><p className="approval-text">{snapshot.content.body}</p>
     <ol>{snapshot.content.questions.map(question => <li key={question.id}><strong>{question.label}</strong> ({question.type}{question.required ? " · 필수" : ""})
-      {!!question.options?.length && <ul>{question.options.map(value => <li key={value}>{value}</li>)}</ul>}<QuestionSummary question={question} questions={snapshot.content.questions} /></li>)}</ol>
+      <QuestionSummary question={question} questions={snapshot.content.questions} language={snapshot.content.formLanguage} /><QuestionChoiceSummary question={question} language={snapshot.content.formLanguage} /></li>)}</ol>
     <dl><dt>개인정보 동의</dt><dd>{snapshot.content.consentRequired ? "필수" : "선택"}</dd><dt>수집·이용 목적</dt><dd>{snapshot.content.consentPurpose || "-"}</dd>
       <dt>보유·이용 기간</dt><dd>{snapshot.content.retentionDays}일</dd><dt>최대 응답 수</dt><dd>{snapshot.content.maxResponses}개</dd>
-      <dt>본인인증</dt><dd>{snapshot.content.verify ? "사용" : "사용 안 함"}</dd></dl><ConsentDisplay display={snapshot.consentBundle?.display} /><ConsentDocuments bundle={snapshot.consentBundle} /></section>;
+      <dt>응답 시작</dt><dd>{snapshot.content.collectionOpenAt ? new Date(snapshot.content.collectionOpenAt).toLocaleString("ko-KR") : "게시 즉시"}</dd>
+      <dt>응답 종료</dt><dd>{snapshot.content.collectionCloseAt ? new Date(snapshot.content.collectionCloseAt).toLocaleString("ko-KR") : "직접 종료할 때까지"}</dd>
+      <dt>참여 인증</dt><dd>{snapshot.content.participationAccess?.enabled
+        ? `${snapshot.content.participationAccess.method === "EMAIL" ? "이메일" : snapshot.content.participationAccess.socialProvider} · ${snapshot.content.participationAccess.targetScope === "WHITELIST" ? "지정 명단" : "전체"} · 중복 ${snapshot.content.participationAccess.limitDuplicate ? "제한" : "허용"}`
+        : "사용 안 함"}</dd>
+      <dt>본인인증</dt><dd>{snapshot.content.verify ? "사용" : "사용 안 함"}</dd></dl><ConsentItems items={snapshot.consentBundle?.collectedItems} />
+    <ConsentDisplay display={snapshot.consentBundle?.display} /><ConsentDocuments bundle={snapshot.consentBundle} /></section></AuthorAssetProvider>;
 }
 export function ApprovalLog() {
   const app = useApplication(), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20), [search, setSearch] = useState(""), [draftSearch, setDraftSearch] = useState(""), [status, setStatus] = useState("all");

@@ -1,0 +1,35 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:49390) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso.test.ts (131 tests | 1 failed | 130 skipped) 814ms
+   × E2 사설 HTTPS JWKS는 네트워크에 전달하기 전에 사전검사에서 거절한다 812ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso.test.ts > E2 사설 HTTPS JWKS는 네트워크에 전달하기 전에 사전검사에서 거절한다
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/server/sso.test.ts:120:49
+    118|       tokenUrl: "https://idp.example.test/token", jwksUrl: "https://16…
+    119|     expect(response.status).toBe(201);
+    120|     expect((await response.json()).preflightOk).toBe(false);
+       |                                                 ^
+    121|     expect(outbound).not.toHaveBeenCalled();
+    122|   } finally { vi.unstubAllGlobals(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 130 skipped (131)
+   Start at  11:09:05
+   Duration  1.83s (tests 47%, import 31%, transform 22%)
+

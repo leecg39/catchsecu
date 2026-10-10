@@ -2,6 +2,8 @@ import { assertCompanyIp } from "./ip-enforcement";
 import { assertCompanyMfa } from "./mfa-enforcement";
 import type { FileObject } from "@/generated/prisma/client";
 import type { FileInfo } from "@/contracts/files";
+import type { Answers } from "@/contracts/questions";
+import { isDrawingAnswer } from "@/contracts/drawing-questions";
 import { db, type Transaction } from "./db";
 import { activeMembershipWhere, type Context } from "./context";
 import { passwordState } from "./password-policy";
@@ -11,6 +13,7 @@ import { fail } from "./http";
 import { lockCampaignForFile } from "./campaign-file-access";
 import { lockSenderForFile } from "./sender-access";
 import { lockPublicPublication } from "./public-publication";
+import { assertSsoSession } from "./sso-policy-enforcement";
 
 export type FilePrincipal = { ctx: Context; token?: never } | { token: string; ctx?: never };
 type FileDeadlines = { session: Date; expert: Date | null; password: Date | null; mfa?: Date | null };
@@ -29,6 +32,12 @@ export function fileInfo(file: FileObject & { question?: { stableKey: string } |
   return { id: file.id, name: file.nameCipher ? decrypt<string>(file.nameCipher) : "삭제된 파일",
     mime: file.mime, size: file.size, status: file.status, scanStatus: file.scanStatus, version: file.version,
     questionId: file.question?.stableKey ?? null, submissionId: file.submissionId, expiresAt: file.expiresAt?.toISOString() ?? null };
+}
+export function readableAnswerValues(values: Answers, mayReadFiles: boolean): Answers {
+  if (mayReadFiles) return values;
+  // Match legacy FILE disclosure: only the opaque ID is visible without file.read.
+  // This is a read projection, never a stored answer or a valid DRAW correction payload.
+  return Object.fromEntries(Object.entries(values).map(([id, value]) => [id, isDrawingAnswer(value) ? value.s3Key : value]));
 }
 export async function canReadFiles(tx: Transaction, ctx: Pick<Context, "tenantId"> & { member: { id: string } }, serviceId: string) {
   await tx.$queryRaw`SELECT id FROM "ServiceGrant" WHERE "memberId"=${ctx.member.id} AND "tenantId"=${ctx.tenantId} FOR SHARE`;
@@ -78,6 +87,7 @@ export async function lockFileContext(tx: Transaction, ctx: Context, serviceId: 
   if (!session || (member.tenant.policy && Date.now() - session.updatedAt.getTime() > member.tenant.policy.sessionMinutes * 60000))
     fail(401, "SESSION_EXPIRED", "세션이 만료되었습니다. 다시 로그인해주세요.");
   if (session.activeCompanyId && session.activeCompanyId !== ctx.tenantId) fail(403, "COMPANY_CHANGED", "선택한 회사가 변경되었습니다. 화면을 다시 불러와주세요.");
+  await assertSsoSession(tx, ctx.tenantId, ctx.user.id, session.id);
   const password = await passwordState(user, session, member, new Date(), tx);
   if (password.required)
     fail(403, "PASSWORD_CHANGE_REQUIRED", "회사 정책에 따라 비밀번호를 변경해주세요.");

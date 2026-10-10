@@ -1,0 +1,1118 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-10T05:09:36.422Z",
+  "author": "/root/bundle_analysis",
+  "purpose": "R08 F3 DRAW 직접 그리기 원본 역공학 및 SIGNATURE/IDV 경계",
+  "method": {
+    "sourceReadOnly": true,
+    "originalExecuted": false,
+    "networkUsed": false,
+    "databaseAccessed": false,
+    "browserUsed": false,
+    "implementationFilesChanged": false,
+    "onlyWrittenArtifact": "docs/qa/R08-T02/drawing-questions/source-review.json",
+    "analysis": "보존 번들과 기존 REA symbol index를 읽고 문자열/함수/호출 데이터 흐름을 대조함. 한국어 리소스는 JSON.parse 인자의 문자열 literal을 정적으로 파싱함."
+  },
+  "provenance": {
+    "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+    "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "sourceBytes": 15337385,
+    "sourceUtf16Length": 15329557,
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "reaSummary": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/static/rea-evidence-summary.json",
+    "reaRaw": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/static/rea-application-evidence.json.gz",
+    "reaOriginalParse": {
+      "parsedJavascriptFiles": 1,
+      "parseFailures": 0,
+      "truncatedScopes": 0
+    },
+    "offsetConvention": "0-based Node.js String UTF-16 code unit, end exclusive. 파일 byte offset이 아님.",
+    "credentialHandling": "공급자 자격/키 상수는 보고서 발췌에서 제외함. endpoint/공개 필드 계약만 기록."
+  },
+  "scope": {
+    "currentImplementationTarget": "단순 DRAW 직접 그리기",
+    "separateFollowup": "SIGNATURE y0의 인증/occupancy/hash/IDV 자동입력",
+    "notEquivalent": [
+      "DRAW는 SIGNATURE 인증 기능이 아님",
+      "편집기 preview dataURL은 최종 제출 value가 아님",
+      "FILE 배열은 DRAW 단일 metadata가 아님",
+      "구형 fileId/key는 AI_V3 s3Key와 다름"
+    ]
+  },
+  "koreanUi": {
+    "typeLabel": "직접 그리기",
+    "placeholder": "이곳에 직접 그려주세요.",
+    "editorHint": "입력받은 그림은 캐치폼 답변 목록에서 확인할 수 있습니다.",
+    "buttons": {
+      "clear": "지우기",
+      "apply": "적용하기",
+      "reenter": "다시 입력하기",
+      "previous": "이전"
+    },
+    "signatureOnly": {
+      "placeholder": "서명을 입력해주세요.",
+      "apply": "서명 적용하기",
+      "typeLabel": "전자서명"
+    },
+    "namedCancelOrClose": "a0→r0 인라인 경로에 없음; 이전은 재입력 중 기존 적용값으로 복귀",
+    "evidence": [
+      "E01",
+      "E02",
+      "E03",
+      "E04",
+      "E09"
+    ]
+  },
+  "schemas": {
+    "drawAiV3Initial": {
+      "file": null,
+      "fileName": "",
+      "previewImg": null
+    },
+    "drawAppliedLocal": {
+      "file": "File(image/png, userSignImage.png)",
+      "fileName": "userSignImage.png",
+      "previewImg": "data:image/png;base64,...",
+      "isValid": "boolean"
+    },
+    "drawUploadedLocal": {
+      "fileSize": "number",
+      "s3Key": "fileKeys[0]",
+      "fileName": "value.fileName || draw.png",
+      "previewImg": "existing dataURL || null",
+      "hash": "existing hash || null; 일반 DRAW 생성부에는 hash 계산 없음"
+    },
+    "drawReplyValue": "{s3Key:string,fileName:string,fileSize:number} | null",
+    "fileReplyValue": "Array<{s3Key:string,fileName:string,fileSize:number}>",
+    "signatureOnlyLocal": "{file:File,fileName:string,previewImg:string,hash:SHA256(base64-text)} 및 Redux signSavedStatus/authCompleted/expiredAt",
+    "readModel": "replyFileInfos:[{fileId,fileName,...}] — DRAW/SIGNATURE 화면은 첫 파일 사용",
+    "schemaBoundary": "필드 이름과 프런트 구성식 관측이며 서버 스키마·타입 강제 검증을 입증하지 않음."
+  },
+  "observations": [
+    {
+      "id": "DRAW-01",
+      "status": "관측",
+      "title": "유형명은 직접 그리기",
+      "conclusion": "한국어 편집기 aiQuestions.draw는 직접 그리기다. DRAW와 IDV는 palette에서 별도 항목이다. 화면 안내는 이곳에 직접 그려주세요., 입력받은 그림은 캐치폼 답변 목록에서 확인할 수 있습니다.이다.",
+      "evidence": [
+        "E01",
+        "E02",
+        "E04"
+      ]
+    },
+    {
+      "id": "DRAW-02",
+      "status": "관측",
+      "title": "실제 입력은 인라인 자유 그리기 캔버스",
+      "conclusion": "a0가 r0를 type DRAW로 호출한다. r0의 전체 JSX에는 텍스트로 서명을 생성하는 input, 글꼴 선택, 이미지 파일 선택, 펜색·폭 선택, 지우개, 획별 undo/redo, 모달 onClose가 없다. 이 부정 관측의 범위는 실제 a0→r0와 preview zMt→n0로 한정된다.",
+      "evidence": [
+        "E05",
+        "E09",
+        "E23",
+        "E24"
+      ]
+    },
+    {
+      "id": "DRAW-03",
+      "status": "관측",
+      "title": "캔버스·펜·PNG 출력",
+      "conclusion": "penColor black, backgroundColor #fff, canvas height120, width는 signature-canvas-test 클래스의 첫 요소 offsetWidth−3이다. wrapper의 clearOnResize는 false. 적용하면 전체 캔버스 toDataURL(image/png)을 atob→Uint8Array→Blob(image/png)→File(userSignImage.png,image/png)로 변환하고 File과 dataURL을 함께 상위로 전달한다. 잘라내기 getTrimmedCanvas는 이 경로에서 사용하지 않는다.",
+      "evidence": [
+        "E09",
+        "E10",
+        "E11",
+        "E14",
+        "E15"
+      ]
+    },
+    {
+      "id": "DRAW-04",
+      "status": "관측",
+      "title": "적용 전 획과 적용된 값은 분리된다",
+      "conclusion": "처음에는 빈 캔버스와 안내가 보인다. onBegin이 n=true가 되게 하지만 부모 값은 적용하기를 누르기 전까지 바뀌지 않는다. 적용 후에는 encodedSign 이미지가 보이고 다시 입력하기 버튼이 나타난다. 다시 입력하기는 기존 s/부모값을 유지하고 새로운 빈 캔버스를 열며, 이전은 기존 적용 이미지로 돌아간다. 취소/닫기라는 별도 버튼은 없고 이전이 재입력 취소에 해당한다.",
+      "evidence": [
+        "E03",
+        "E09"
+      ]
+    },
+    {
+      "id": "DRAW-05",
+      "status": "관측",
+      "title": "초기화와 빈 값·필수 검사",
+      "conclusion": "지우기는 canvas.clear 및 local flags/preview 초기화 뒤 handleChange(null,null)을 호출한다. a0 AI_V3 초기값은 file:null,fileName:\"\",previewImg:null이고 기존 객체는 그대로 쓴다. aK는 필수 MM이면 value가 있고 file 또는 previewImg가 있을 때 통과한다. s3Key만 존재하는 객체는 aK를 통과하지 않는다. 선택 MS는 비어 있어도 통과한다. 적용 버튼은 r.current가 있고 !isEmpty()일 때만 파일을 생성한다.",
+      "evidence": [
+        "E05",
+        "E06",
+        "E08",
+        "E09",
+        "E37"
+      ]
+    },
+    {
+      "id": "DRAW-06",
+      "status": "관측",
+      "title": "최소 획·면적 기준은 없고 점 하나도 비어 있지 않다",
+      "conclusion": "engine clear는 _isEmpty=true, isEmpty는 이 flag 반환이다. strokeEnd는 긴 획이 없을 때 dot을 그리며 _drawPoint에서 _isEmpty=false를 설정한다. 따라서 이 프런트 경로의 빈값 판정은 의미 있는 서명 여부나 최소 면적이 아니라 점/획이 그려졌는지이다. 서버의 픽셀·파일 내용 검사 여부는 미관측이다.",
+      "evidence": [
+        "E19",
+        "E20",
+        "E22"
+      ]
+    },
+    {
+      "id": "DRAW-07",
+      "status": "관측",
+      "title": "disabled/readOnly는 캔버스에만 직접 적용된다",
+      "conclusion": "a0는 disabled||readOnly를 r0.disabled로 전달한다. KZ disabled 스타일은 canvas pointer-events:none과 배경/커서를 바꾼다. r0의 지우기 disabled는 !o&&!n만 검사하고 재입력·이전·적용 버튼은 e.disabled를 검사하지 않는다. authCompleted이면 편집 버튼을 숨긴다. 원본의 이 제한을 전체 readonly 보장으로 해석하면 안 된다.",
+      "evidence": [
+        "E05",
+        "E09",
+        "E10"
+      ]
+    },
+    {
+      "id": "DRAW-08",
+      "status": "관측",
+      "title": "FILE 다중과 DRAW 단일의 계약이 다르다",
+      "conclusion": "FILE UI는 multiple:true이고 formQuestionOptionDataList[0].value 또는1을 최대개수로 사용한다. AI_V3 FILE은 값 배열에서 신규 File을 업로드하고 기존 metadata와 합친다. DRAW/SIGNATURE는 value.file 하나를 업로드하고 fileKeys[0] 하나를 읽는다. 최종 FILE은 metadata 배열, DRAW/SIGNATURE는 metadata 객체 또는 null이다.",
+      "evidence": [
+        "E08",
+        "E30",
+        "E31",
+        "E34",
+        "E62"
+      ]
+    },
+    {
+      "id": "DRAW-09",
+      "status": "관측",
+      "title": "실제 응답과 미리보기는 업로드를 분리한다",
+      "conclusion": "f4는 INFO_OWNER에서 we를, 그 밖의 preview에서 Ce를 onUpdateObject로 사용한다. we는 files multipart를 POST temp-files 하고 DRAW value를 fileSize,s3Key,fileName,previewImg,hash로 교체한다. 실패하면 alert 후 value:null로 바꾸며 업로드 flag를 해제한다. Ce는 size/name/preview만 기록하고 업로드하지 않는다. 업로드 중 submit/next는 안내로 막는다.",
+      "evidence": [
+        "E27",
+        "E28",
+        "E30",
+        "E31",
+        "E32",
+        "E33",
+        "E57"
+      ]
+    },
+    {
+      "id": "DRAW-10",
+      "status": "관측",
+      "title": "제출·임시저장·읽기 표현",
+      "conclusion": "BRe는 DRAW/SIGNATURE에서 s3Key 있는 객체만 s3Key,fileName,fileSize로 직렬화하고 없으면 null을 보낸다. previewImg, file, hash는 최종 DRAW value에서 빠진다. 질문 envelope에는 questionId,questionType,@type,subType,questionIndex,required,value가 있다. 임시저장은 페이지 배열을 JSON.stringify/parse하여 value.previewImg도 그대로 복원할 수 있다. 응답 확인 화면은 previewImg를 img로 보여준다.",
+      "evidence": [
+        "E34",
+        "E35",
+        "E38",
+        "E39",
+        "E40"
+      ]
+    },
+    {
+      "id": "DRAW-11",
+      "status": "관측",
+      "title": "저장된 응답 열람은 파일 조회 경로",
+      "conclusion": "관리자 읽기 모델은 replyFileInfos를 fileId/fileName 배열로 확장한다. DRAW/SIGNATURE 표시는 첫 파일을 사용하며 바로보기로 blob을 조회해 object URL 이미지 표시, 팝업, 다운로드를 제공한다. 공유 상태에서는 다운로드 버튼을 숨기는 분기가 있다. 여기서 서버 접근제어의 구현/효과는 확인할 수 없다.",
+      "evidence": [
+        "E41",
+        "E42",
+        "E43",
+        "E44",
+        "E45"
+      ]
+    },
+    {
+      "id": "DRAW-12",
+      "status": "관측",
+      "title": "편집기 미리보기는 dataURL만 유지",
+      "conclusion": "zMt→n0는 handlePreviewChange로 dataURL 문자열만 올린다. n0 안에서 PNG File을 구성하는 코드는 있지만 생성값을 반환하거나 업로드하지 않는다. 부모 preview는 이 문자열을 질문.value에 넣는다. 실제 응답 a0의 파일/metadata 객체와 같은 계약으로 취급하면 안 된다.",
+      "evidence": [
+        "E23",
+        "E24",
+        "E25"
+      ]
+    },
+    {
+      "id": "DRAW-13",
+      "status": "관측",
+      "title": "SIGNATURE는 인증 계열의 별도 범위",
+      "conclusion": "SIGNATURE y0는 r0를 재사용하지만 PNG dataURL 접두사를 제거한 base64 문자들의 UTF-8 바이트에 SHA-256을 계산한다. raw PNG bytes digest와 다르다. hashedSignature,encodedSignatureFile,signSavedStatus를 보관하고 인증 진입 전 적용 상태를 확인한다. occupancy 요청 itemCode는 E_SIGN이며 단순 본인인증은 SIMPLE_IDENTIFY다. 인증 완료 후 IDV 이름/연락처/생년월일을 자동 입력하고 disabled/authCompleted/expiredAt를 설정하며 SIGNATURE 이미지도 고정한다.",
+      "evidence": [
+        "E26",
+        "E36",
+        "E47",
+        "E48",
+        "E49",
+        "E50",
+        "E51",
+        "E52",
+        "E53"
+      ]
+    },
+    {
+      "id": "DRAW-14",
+      "status": "관측",
+      "title": "IDV_SIGNATURE는 편집기의 IDV 옵션",
+      "conclusion": "IDV 설정에서 전자서명 Y를 선택하면 questionOptionList에 value:3,optionQuestionName:IDV_SIGNATURE,isCustomValue:false를 넣고 개인정보 서명 감지항목을 추가한다. 정렬은 IDV_SIGNATURE,IDV_NAME,IDV_CONTACT,IDV_BIRTH 순서이다. C_t는 이를 일반 questionOptionList와 함께 catchFormQuestionType 및 개인정보 분류 payload에 싣는다. 번들에서 이 옵션을 서버 응답 questionType SIGNATURE/subType IDV로 바꾸는 서버 변환 구현은 미관측이다.",
+      "evidence": [
+        "E54",
+        "E55",
+        "E56",
+        "E36"
+      ]
+    },
+    {
+      "id": "DRAW-15",
+      "status": "관측",
+      "title": "구형 업로드/제출 경로는 별도로 존재",
+      "conclusion": "구형 CH는 multipartFile을 POST /company-operated-service/form/v2/file에 전송하고 fileId/key를 받는다. 구형 v2 제출은 reply=fileId,sub=key를 쓴다. 더 오래된 form/add_reply 경로는 File 자체를 FormData에 넣는다. AI_V3의 s3Key metadata 계약과 섞으면 안 된다.",
+      "evidence": [
+        "E58",
+        "E59",
+        "E60",
+        "E61"
+      ]
+    },
+    {
+      "id": "DRAW-16",
+      "status": "관측 및 제한된 추론",
+      "title": "라이브러리 resize/모바일 경계",
+      "conclusion": "wrapper module37538은 engine80761을 사용한다. engine은 mousedown/mousemove/document mouseup 및 touchstart/touchmove/touchend를 직접 등록하며 touchAction=none, touchmove preventDefault를 사용한다. 해당 engine 구현에 pointerdown/move/up 또는 압력 처리 분기는 없다. 기본 minWidth0.5,maxWidth2.5,velocityFilterWeight0.7,throttle16,minDistance5이다. wrapper clearOnResize=false는 자동 _resizeCanvas를 막지만 r0는 별도 resize handler로 React canvas.width를 바꾼다. canvas 폭 재할당 시 비트맵 소실 가능성이 있으며 toData/fromData 복원은 이 경로에 없다. 이 resize 결과는 실행으로 관측하지 않았다.",
+      "evidence": [
+        "E09",
+        "E14",
+        "E15",
+        "E16",
+        "E17",
+        "E18",
+        "E20",
+        "E21"
+      ]
+    }
+  ],
+  "inferences": [
+    {
+      "id": "I01",
+      "statement": "단순 DRAW 구현은 이름 입력이나 본인인증을 요구하지 않고, 적용된 그림 PNG 한 개와 기존 파일 권한 체계를 결합하는 구조가 원본 AI_V3 경로에 대응한다.",
+      "evidence": [
+        "E05",
+        "E09",
+        "E31",
+        "E34"
+      ],
+      "kind": "구현 대응 제안, 원본 서버 사실 아님"
+    },
+    {
+      "id": "I02",
+      "statement": "원본의 disabled 버튼 누락이나 resize 비트맵 유실 가능성을 복제 요구사항으로 삼지 말고 로컬 제품에서는 입력 잠금과 적용/미적용 데이터 보존을 명확히 해야 한다.",
+      "evidence": [
+        "E07",
+        "E09",
+        "E10",
+        "E15"
+      ],
+      "kind": "독립 구현 권고"
+    },
+    {
+      "id": "I03",
+      "statement": "업로드 계층의 공통 FILE 다중 처리와 DRAW 단일 응답 제약을 분리하면 기존 파일 검역·권한·다운로드를 재사용할 수 있다.",
+      "evidence": [
+        "E30",
+        "E31",
+        "E34",
+        "E43"
+      ],
+      "kind": "로컬 제품 설계 제안; 원본 서버 구현 추정 아님"
+    }
+  ],
+  "apiInventory": [
+    {
+      "method": "POST",
+      "path": "${PE}/company-operated-service/v3/outer/forms/reply/temp-files",
+      "request": "FormData files: 단순 DRAW 1개, FILE 여러 개",
+      "responseRead": "data.fileKeys: 배열; DRAW는 [0]",
+      "evidence": [
+        "E30",
+        "E31"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "${PE}/company-operated-service/v3/outer/forms/add-reply",
+      "request": "BRe JSON pages[].replies[].value에 단일 metadata|null",
+      "evidence": [
+        "E34",
+        "E35"
+      ]
+    },
+    {
+      "method": "PUT / GET",
+      "path": "${PE}/company-operated-service/v3/outer/forms/temp-reply",
+      "request": "페이지 배열 data JSON 문자열; 복원 시 JSON.parse",
+      "evidence": [
+        "E38",
+        "E39"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "${PE}/company-operated-service/file/decrypt_image_view",
+      "request": "params.fileId, responseType blob",
+      "evidence": [
+        "E43",
+        "E45"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "${PE}/payment-service/user/occupancy",
+      "request": "{formToken,itemCode:E_SIGN|SIMPLE_IDENTIFY}",
+      "scope": "SIGNATURE 후속 전용",
+      "evidence": [
+        "E49"
+      ]
+    },
+    {
+      "method": "POST (browser form)",
+      "path": "https://sa.inicis.com/auth",
+      "scope": "SIGNATURE/본인인증 후속 전용",
+      "evidence": [
+        "E50"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "${PE}/company-operated-service/user/users/${mTxId}",
+      "scope": "인증 성공 후 결과 조회",
+      "evidence": [
+        "E50"
+      ]
+    }
+  ],
+  "unknowns": [
+    {
+      "area": "원본 서버",
+      "details": "PNG 매직바이트/디코딩/빈 그림/최대 픽셀/압축폭탄/파일 크기/보관/정정 이력/실제 권한/악성파일 검사/삭제 정책은 서버 구현과 런타임 미관측. No-Token-Check는 요청 설정명이지 서버 무인증 접근 보장이 아님."
+    },
+    {
+      "area": "라이브러리 정확 버전",
+      "details": "보존 bundle은 main JS 한 개뿐이다. webpack37538 React canvas wrapper와80761 engine 코드/연결은 확인했다. signature_pad,react-signature-canvas 패키지명·정확 버전 literal 또는 lockfile이 없어 npm 이름/버전을 확정하지 않는다."
+    },
+    {
+      "area": "새 렌더 환경",
+      "details": "실제 모바일 터치, DPR별 PNG 치수, resize 시 픽셀 보존/손실, 여러 DRAW의 첫 클래스 폭 공유 효과, disabled 버튼 실제 상위차단 효과는 미실행."
+    },
+    {
+      "area": "인증 결과 의미",
+      "details": "클라이언트 해시/occupancy/자동입력 분기는 관측했지만 provider 검증, 법적 효력, 서버 IDV_SIGNATURE 변환 및 hash 검증은 미관측."
+    },
+    {
+      "area": "본문 개인정보 감지",
+      "details": "C_t가 catchFormPersonalInformationRequests를 보내는 것은 확인했으나 그림 내용 인식/OCR이나 서명 진위 판정의 근거는 없음."
+    }
+  ],
+  "recommendedVerificationForLocalDraw": [
+    "필수 최초 빈값·미적용 획은 제출 불가, 적용한 점/획은 PNG 단일 파일로 업로드",
+    "선택 미입력·지우기는 empty/null 계약, 재입력 후 이전은 기존 적용 파일 유지",
+    "교체 적용은 단일 파일 한 개 유지, 다중 FILE 배열 및 foreign-address/matrix 답변과 서로 주입 불가",
+    "업로드 지연·실패·재시도·제출 잠금·늦은 callback에도 적용값/preview/payload 일치",
+    "기존 저장값 읽기·정정·취소·전체 초기화에서 파일 권한과 감사/보관 정책 유지",
+    "마우스 클릭 점, 짧은 획, 터치, resize/DPR, 복수 DRAW, disabled/readOnly, 미리보기 실제 화면 검증",
+    "단순 DRAW 저장 경로에 SIGNATURE occupancy/hash/idv 인증 요구가 섞이지 않음"
+  ],
+  "evidence": [
+    {
+      "id": "E01",
+      "description": "한국어 aiQuestions.draw 유형 라벨",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 263590,
+      "end": 263630,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "06fe44da6477459557e4479df80b7ab1e8d05c71a7e84bf1703b4358dd43e08e",
+      "raw": "\"draw\":\"\\uc9c1\\uc811 \\uadf8\\ub9ac\\uae30\""
+    },
+    {
+      "id": "E02",
+      "description": "편집기 그리기 안내/답변 목록 설명",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 257449,
+      "end": 257691,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "38e6b16d5b70eddf1ddc9e7270aeb089e9c648ba392f99d6d972070d5f91811a",
+      "raw": "\"phrase21\":\"\\uc774\\uacf3\\uc5d0 \\uc9c1\\uc811 \\uadf8\\ub824\\uc8fc\\uc138\\uc694.\",\"phrase22\":\"\\uc785\\ub825\\ubc1b\\uc740 \\uadf8\\ub9bc\\uc740 \\uce90\\uce58\\ud3fc \\ub2f5\\ubcc0 \\ubaa9\\ub85d\\uc5d0\\uc11c \\ud655\\uc778\\ud560 \\uc218 \\uc788\\uc2b5\\ub2c8\\ub2e4.\""
+    },
+    {
+      "id": "E03",
+      "description": "한국어 signature 네임스페이스 버튼·안내 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 1027047,
+      "end": 1027602,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "a446688ec27d7436445c6fb667720667b24c2050191af48881050105da7bfe02",
+      "raw": "\"signature\":{\"phrase1\":\"\\uc774\\uacf3\\uc5d0 \\uc9c1\\uc811 \\uadf8\\ub824\\uc8fc\\uc138\\uc694.\",\"phrase2\":\"\\uc11c\\uba85\\uc744 \\uc785\\ub825\\ud574\\uc8fc\\uc138\\uc694.\",\"phrase3\":\"\\ub2e4\\uc2dc \\uc785\\ub825\\ud558\\uae30\",\"phrase4\":\"\\uc11c\\uba85\\uc774 \\uc644\\ub8cc\\ub41c \\ub3d9\\uc758\\uc11c\\ub294 \\ub3d9\\uc758\\uc774\\ub825 \\uc870\\ud68c \\ud398\\uc774\\uc9c0\\uc5d0\\uc11c \\ud655\\uc778\\ud558\\uc2e4 \\uc218 \\uc788\\uc2b5\\ub2c8\\ub2e4.\",\"clear\":\"\\uc9c0\\uc6b0\\uae30\",\"before\":\"\\uc774\\uc804\",\"apply\":\"\\uc801\\uc6a9\\ud558\\uae30\",\"applySignature\":\"\\uc11c\\uba85 \\uc801\\uc6a9\\ud558\\uae30\"}"
+    },
+    {
+      "id": "E04",
+      "description": "편집기 palette의 DRAW와 IDV 매핑",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 12719080,
+      "end": 12719560,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "cfe49a422660ff7122f6f2e56a2e0df95f0b1c2f160ca770753f3ae121eb47ce",
+      "raw": "ice\")},RADIO:{img:REt,text:u(\"singleChoice\")},SELECTBOX:{img:kEt,text:u(\"dropdown\")},FILE:{img:OEt,text:u(\"fileUpload\")},ADDRESS:{img:SEt,text:u(\"address\")},FOREIGN_ADDRESS:{img:SEt,text:u(\"address\")},CONTACT:{img:_Et,text:u(\"contact\")},EMAIL:{img:IEt,text:u(\"email\")},EMAIL_DIRECT:{img:IEt,text:u(\"customEmail\")},BIRTH:{img:TEt,text:u(\"birth\")},DRAW:{img:NEt,text:u(\"draw\")},MATRIX_CHECKBOX:{img:xIt,text:u(\"matrixMultiple\")},MATRIX_RADIO:{img:AIt,text:u(\"matrixSingle\")},IDV:{im"
+    },
+    {
+      "id": "E05",
+      "description": "DRAW 공개 질문 렌더러 및 값·검증 동기화",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8282523,
+      "end": 8283225,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "a2c1126b4a294906a2aadd386daa429e641a056c63099f11c22ffb2050266d63",
+      "raw": "a0=(0,yt.memo)((e=>{let{item:t,onUpdate:r,formCreateType:n,disabled:a,readOnly:o}=e;const i=mK(t.questionType,n),[s,l]=(0,yt.useState)((()=>i.getInitialValue(t.value))),c=((0,yt.useMemo)((()=>i.validate(s,t)),[s,t,i]),(0,yt.useCallback)(((e,n)=>{const a=i.handleChange(e,n,s,t);l(a);const o={...t,value:a,isValid:a.isValid,file:e};r(t.htmlFormInputName,o)}),[s,t,r,i]));return(0,yt.useEffect)((()=>{const e=i.getInitialValue(t.value);JSON.stringify(s)!==JSON.stringify(e)&&l(e);const n=i.validate(e,t);r(t.htmlFormInputName,{...t,value:e,isValid:n},!0)}),[t.value]),(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(r0,{type:\"DRAW\",encodedSign:i.getPreviewImage(s),handleChange:(e,t)=>{c(e,t)},disabled:a||o})})}))"
+    },
+    {
+      "id": "E06",
+      "description": "DRAW 필수·미응답 판정 함수",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8218499,
+      "end": 8218584,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "686e0c72b4ef13d76a0d52fd50cb856de27ba2a429d5ca20ad27a7e5a9738015",
+      "raw": "function aK(e,t){return!(\"MM\"===t.questionElementType&&(!e||!e.file&&!e.previewImg))}"
+    },
+    {
+      "id": "E07",
+      "description": "NEW/AI/AI_V2 DRAW adapter",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8218590,
+      "end": 8218840,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "8b17e8c51694796ccc8901f07ab13d4e3bbdaff5c96ae10e669ee2e826284a44",
+      "raw": "oK={getInitialValue:e=>e||{file:null,fileName:\"\"},getPreviewImage:e=>null,handleChange:(e,t,r)=>{const n={...t,file:e,fileName:(null===e||void 0===e?void 0:e.name)||\"draw.png\"};return n.isValid=!(\"MM\"===r.questionElementType&&!n.file),n},validate:aK}"
+    },
+    {
+      "id": "E08",
+      "description": "AI_V3 DRAW의 초기값·previewImg·handleChange",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8224691,
+      "end": 8225083,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "fed18cca31a0aaec0323b45f4fdb9f48cb74a61033216c4af8dff9927e0042e9",
+      "raw": "DRAW:{NEW:oK,AI:oK,AI_V2:oK,AI_V3:{getInitialValue:e=>e||{file:null,fileName:\"\",previewImg:null},getPreviewImage:e=>(null===e||void 0===e?void 0:e.previewImg)||null,handleChange:(e,t,r,n)=>{const a={file:e,fileName:(null===e||void 0===e?void 0:e.name)||\"draw.png\",previewImg:t},o=aK(a,n);return{...a,isValid:o}},validate:aK}},MATRIX_CHECKBOX:{AI:cK,AI_V2:cK,AI_V3:dK},MATRIX_RADIO:{AI:cK,AI_V"
+    },
+    {
+      "id": "E09",
+      "description": "실제 응답용 캔버스 상태·초기화·재입력·적용 전체",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8277141,
+      "end": 8279975,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "50d7d31f4117ab256209387227d82fe7414ffb730e1fab88467784d44e286578",
+      "raw": "function r0(e){const{t:t}=fa(\"translate\",{keyPrefix:\"signature\"}),r=(0,yt.useRef)(null),[n,a]=(0,yt.useState)(!1),[o,i]=(0,yt.useState)(!(null===e||void 0===e||!e.encodedSign)),[s,l]=(0,yt.useState)((null===e||void 0===e?void 0:e.encodedSign)||null),[c,d]=(0,yt.useState)(0),u=(e,t)=>{const r=(e=>{for(var t=window.atob(e),r=t.length,n=new Uint8Array(r),a=0;a<r;a++)n[a]=t.charCodeAt(a);return n.buffer})(t.replace(/^data:image\\/\\w+;base64,/,\"\")),n=new Blob([r],{type:\"image/png\"});return new File([n],`${e}.png`,{type:\"image/png\"})};return(0,yt.useEffect)((()=>{const e=window.document.getElementsByClassName(\"signature-canvas-test\"),t=()=>{var t,r;null!==(t=e[0])&&void 0!==t&&t.offsetWidth&&d((null===(r=e[0])||void 0===r?void 0:r.offsetWidth)-3)};return t(),window.addEventListener(\"resize\",t),()=>{window.removeEventListener(\"resize\",t)}}),[]),(0,yt.useEffect)((()=>{l((null===e||void 0===e?void 0:e.encodedSign)||null),i(!(null===e||void 0===e||!e.encodedSign)),null!==e&&void 0!==e&&e.encodedSign||!r.current||(r.current.clear(),a(!1))}),[null===e||void 0===e?void 0:e.encodedSign]),(0,nI.jsx)(nI.Fragment,{children:(0,nI.jsxs)(\"div\",{children:[!e.authCompleted&&(0,nI.jsx)(\"div\",{className:\"flex justify-end\",children:(0,nI.jsx)(ZZ,{disabled:!o&&!n,className:\"mb-2\",onClick:()=>{a(!1),i(!1),l(null),r.current&&r.current.clear(),e.handleChange(null,null),null!==e&&void 0!==e&&e.isSignature&&(e.handleStateReset(),e.handleSaveState(!1))},children:(0,nI.jsxs)(\"div\",{className:\"center\",children:[(0,nI.jsx)(t0,{className:\"mr-1\",showIconOnly:!0,name:o||n?\"delete-icon-v2\":\"delete-icon-disabled-v2\"}),t(\"clear\")]})})}),o&&s?(0,nI.jsx)(JZ,{src:s,alt:\"\",className:`${e.authCompleted&&\"my-2\"}`}):(0,nI.jsxs)(KZ,{className:\"signature-canvas-test\",disabled:e.disabled,children:[!n&&(!r.current||r.current.isEmpty())&&(0,nI.jsxs)(XZ,{children:[\" \",\"DRAW\"===e.type?t(\"phrase1\"):t(\"phrase2\")]}),(0,nI.jsx)(GZ(),{ref:r,clearOnResize:!1,penColor:\"black\",backgroundColor:\"#fff\",canvasProps:{className:\"signature-canvas\",width:c,height:120},onBegin:()=>{a(!0)},onEnd:()=>{o&&i(!1)}})]}),!e.authCompleted&&(o?(0,nI.jsx)(e0,{onClick:()=>{i(!1),null!==e&&void 0!==e&&e.isSignature&&e.handleSaveState(!1)},className:\"mt-2\",children:t(\"phrase3\")}):(0,nI.jsxs)(\"div\",{className:`flex justify-between ${(s||n)&&\"mt-2\"}`,children:[s?(0,nI.jsxs)(e0,{onClick:()=>{i(!0),a(!1),r.current&&r.current.clear(),null!==e&&void 0!==e&&e.isSignature&&e.handleSaveState(!0)},children:[\"< \",t(\"before\")]}):(0,nI.jsx)(\"div\",{}),(n||r.current&&!r.current.isEmpty())&&(0,nI.jsx)(e0,{onClick:()=>{if(r.current&&!r.current.isEmpty()){const t=r.current.toDataURL(\"image/png\");l(t),i(!0),a(!1);const n=u(\"userSignImage\",t);e.handleChange(n,t)}null!==e&&void 0!==e&&e.isSignature&&e.handleSaveState(!0)},children:\"DRAW\"===e.type?t(\"apply\"):t(\"applySignature\")})]}))]})})}"
+    },
+    {
+      "id": "E10",
+      "description": "캔버스 border 및 disabled 처리",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8276027,
+      "end": 8276314,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "98d23a7d4d0380350a3831b22132218f597e6de2c566283a3c302b6138b4bce9",
+      "raw": "KZ=as.div`\n  position: relative;\n  border: 1px solid ${oj};\n  box-sizing: border-box;\n  border-radius: 6px;\n  ${e=>e.disabled&&\"\\n      background-color: var(--GREY200);\\n      cursor: not-allowed;\\n      canvas { pointer-events: none; }\\n    \"}\n\n  canvas {\n    border-radius: 6px;\n  }\n`"
+    },
+    {
+      "id": "E11",
+      "description": "적용한 그림의 이미지 미리보기 크기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8276476,
+      "end": 8276590,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "4ab7ad735afd34bfd55f4fe9618ad776d637fe83c56d0166adb9bdad74c7071b",
+      "raw": "JZ=as.img`\n  width: 100%;\n  height: 120px;\n  border: 1px solid ${uj};\n  background: ${wj};\n  border-radius: 6px;\n`"
+    },
+    {
+      "id": "E12",
+      "description": "지우기 버튼 크기·스타일",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8276591,
+      "end": 8276868,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "3cf2fef0b70c46cbac0fcd9e303eb8512f8a2f600b28e949be6dc3aea57ca8ae",
+      "raw": "ZZ=as.button`\n  width: 84px;\n  height: 40px;\n\n  border-radius: 4px;\n  font-size: 13px;\n  background-color: #fff;\n  ${e=>e.disabled?\"\\n        border: 1px solid #FFCDC7;\\n        color: #FFCDC7;\\n      \":\"\\n        border: 1px solid #ffa69a;\\n        color: #e2331b;\\n      \"}\n`"
+    },
+    {
+      "id": "E13",
+      "description": "적용/이전/재입력 버튼 스타일",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8276869,
+      "end": 8277037,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "049f8823243f1e28f0343a9a893bd6ac487115ab1de1afacbbac69f1a142c4ac",
+      "raw": "e0=as.button`\n  background: #ffffff;\n  border: 1px solid #ccccd7;\n  border-radius: 4px;\n  height: 40px;\n  color: #1f1f2a;\n  padding-left: 12px;\n  padding-right: 12px;\n`"
+    },
+    {
+      "id": "E14",
+      "description": "캔버스 React wrapper webpack module37538 연결",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8275513,
+      "end": 8275571,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "8cedb518e4b5b30be2d8082a7c9a84b2bde1b559855ec71c47112ed1b3aca1c8",
+      "raw": "qZ=__webpack_require__(37538),GZ=__webpack_require__.n(qZ)"
+    },
+    {
+      "id": "E15",
+      "description": "wrapper resize/on/off/isEmpty/toDataURL 구현",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 2414580,
+      "end": 2415580,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "5ebcb649776fad1b0af9f03bc9117116ce369e99a0c05d04f7ea20787b64e426",
+      "raw": ".width,e.height=n._canvas.height,e.getContext(\"2d\").drawImage(n._canvas,0,0),(0,m.default)(e)},n.getSignaturePad=function(){return n._sigPad},n._checkClearOnResize=function(){n.props.clearOnResize&&n._resizeCanvas()},n._resizeCanvas=function(){var e=n.props.canvasProps||{},t=e.width,r=e.height;if(!t||!r){var a=n._canvas,o=Math.max(window.devicePixelRatio||1,1);t||(a.width=a.offsetWidth*o),r||(a.height=a.offsetHeight*o),a.getContext(\"2d\").scale(o,o),n.clear()}},n.on=function(){return window.addEventListener(\"resize\",n._checkClearOnResize),n._sigPad.on()},n.off=function(){return window.removeEventListener(\"resize\",n._checkClearOnResize),n._sigPad.off()},n.clear=function(){return n._sigPad.clear()},n.isEmpty=function(){return n._sigPad.isEmpty()},n.fromDataURL=function(e,t){return n._sigPad.fromDataURL(e,t)},n.toDataURL=function(e,t){return n._sigPad.toDataURL(e,t)},n.fromData=function(e){return n._sigPad.fromData(e)},n.toData=function(){return n._sigPad.toData()},i(n,r)}return s(t,e),c(t"
+    },
+    {
+      "id": "E16",
+      "description": "wrapper props·defaultProps 및 engine80761 연결",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 2416054,
+      "end": 2416580,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "6f24187585bde6016e5213752287a5ae7a0486391882fbd43ee916b9662262cd",
+      "raw": "velocityFilterWeight:d.default.number,minWidth:d.default.number,maxWidth:d.default.number,minDistance:d.default.number,dotSize:d.default.oneOfType([d.default.number,d.default.func]),penColor:d.default.string,throttle:d.default.number,onEnd:d.default.func,onBegin:d.default.func,canvasProps:d.default.object,clearOnResize:d.default.bool},f.defaultProps={clearOnResize:!0},t.default=f},function(t,r){t.exports=e},function(e,r){e.exports=t},function(e,t){e.exports=r},function(e,t){e.exports=n}])}(r(7936),r(4662),r(80761),r(9055"
+    },
+    {
+      "id": "E17",
+      "description": "engine 기본 펜 폭·속도필터·throttle·거리 및 앱에서 덮어쓰는 색",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 5500650,
+      "end": 5501580,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "9cedb64faa00d848032556a3ffa0a276c2b42e1747034c5351f9a59c7bf6a561",
+      "raw": "tion o(e,t){var r=this,n=t||{};this.velocityFilterWeight=n.velocityFilterWeight||.7,this.minWidth=n.minWidth||.5,this.maxWidth=n.maxWidth||2.5,this.throttle=\"throttle\"in n?n.throttle:16,this.minDistance=\"minDistance\"in n?n.minDistance:5,this.throttle?this._strokeMoveUpdate=function(e,t,r){var n,a,o,i=null,s=0;r||(r={});var l=function(){s=!1===r.leading?0:Date.now(),i=null,o=e.apply(n,a),i||(n=a=null)};return function(){var c=Date.now();s||!1!==r.leading||(s=c);var d=t-(c-s);return n=this,a=arguments,d<=0||d>t?(i&&(clearTimeout(i),i=null),s=c,o=e.apply(n,a),i||(n=a=null)):i||!1===r.trailing||(i=setTimeout(l,d)),o}}(o.prototype._strokeUpdate,this.throttle):this._strokeMoveUpdate=o.prototype._strokeUpdate,this.dotSize=n.dotSize||function(){return(this.minWidth+this.maxWidth)/2},this.penColor=n.penColor||\"black\",this.backgroundColor=n.backgroundColor||\"rgba(0,0,0,0)\",this.onBegin=n.onBegin,this.onEnd=n.onEnd,this._canvas"
+    },
+    {
+      "id": "E18",
+      "description": "engine 마우스·터치 개시/이동/종료 이벤트 처리",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 5501660,
+      "end": 5502220,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "13aeef725d443b610390241edaad173105589076c9ebea3ba6a471ab0503be6c",
+      "raw": "===e.which&&(r._mouseButtonDown=!0,r._strokeBegin(e))},this._handleMouseMove=function(e){r._mouseButtonDown&&r._strokeMoveUpdate(e)},this._handleMouseUp=function(e){1===e.which&&r._mouseButtonDown&&(r._mouseButtonDown=!1,r._strokeEnd(e))},this._handleTouchStart=function(e){if(1===e.targetTouches.length){var t=e.changedTouches[0];r._strokeBegin(t)}},this._handleTouchMove=function(e){e.preventDefault();var t=e.targetTouches[0];r._strokeMoveUpdate(t)},this._handleTouchEnd=function(e){e.target===r._canvas&&(e.preventDefault(),r._strokeEnd(e))},this.on()}r.r("
+    },
+    {
+      "id": "E19",
+      "description": "engine clear 및 image dataURL 로드 경계",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 5502960,
+      "end": 5503166,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "8cbe862ac2f578ea08bd2b230f6639de2ed52260a32e25ae79f78ee5395cd37b",
+      "raw": "o.prototype.clear=function(){var e=this._ctx,t=this._canvas;e.fillStyle=this.backgroundColor,e.clearRect(0,0,t.width,t.height),e.fillRect(0,0,t.width,t.height),this._data=[],this._reset(),this._isEmpty=!0},"
+    },
+    {
+      "id": "E20",
+      "description": "engine isEmpty·strokeBegin/Update/End·단일 점 처리",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 5504204,
+      "end": 5505076,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "310f74731c6f0d1a305e2050c3235b40d57f197812dc73ce3cd740a8e2300425",
+      "raw": "o.prototype.isEmpty=function(){return this._isEmpty},o.prototype._strokeBegin=function(e){this._data.push([]),this._reset(),this._strokeUpdate(e),\"function\"===typeof this.onBegin&&this.onBegin(e)},o.prototype._strokeUpdate=function(e){var t=e.clientX,r=e.clientY,n=this._createPoint(t,r),a=this._data[this._data.length-1],o=a&&a[a.length-1],i=o&&n.distanceTo(o)<this.minDistance;if(!o||!i){var s=this._addPoint(n),l=s.curve,c=s.widths;l&&c&&this._drawCurve(l,c.start,c.end),this._data[this._data.length-1].push({x:n.x,y:n.y,time:n.time,color:this.penColor})}},o.prototype._strokeEnd=function(e){var t=this.points.length>2,r=this.points[0];if(!t&&r&&this._drawDot(r),r){var n=this._data[this._data.length-1],a=n[n.length-1];r.equals(a)||n.push({x:r.x,y:r.y,time:r.time,color:this.penColor})}\"function\"===typeof this.onEnd&&this.onEnd(e)},o.prototype._handleMouseEvents=func"
+    },
+    {
+      "id": "E21",
+      "description": "engine DOM mouse/touch 이벤트 및 touchAction none",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 5505090,
+      "end": 5505840,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "c8d85d1f078e904c10b7e9612a488e9fb866f138835eb4dfa426007d125d11e4",
+      "raw": "ouseButtonDown=!1,this._canvas.addEventListener(\"mousedown\",this._handleMouseDown),this._canvas.addEventListener(\"mousemove\",this._handleMouseMove),document.addEventListener(\"mouseup\",this._handleMouseUp)},o.prototype._handleTouchEvents=function(){this._canvas.style.msTouchAction=\"none\",this._canvas.style.touchAction=\"none\",this._canvas.addEventListener(\"touchstart\",this._handleTouchStart),this._canvas.addEventListener(\"touchmove\",this._handleTouchMove),this._canvas.addEventListener(\"touchend\",this._handleTouchEnd)},o.prototype._reset=function(){this.points=[],this._lastVelocity=0,this._lastWidth=(this.minWidth+this.maxWidth)/2,this._ctx.fillStyle=this.penColor},o.prototype._createPoint=function(e,t,r){var a=this._canvas.getBoundingClientRe"
+    },
+    {
+      "id": "E22",
+      "description": "그린 점에서 isEmpty=false가 되는 위치",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 5506907,
+      "end": 5507028,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "989dc5ed311f4b0bf3cae0af3c399afda960b8e4953103a2bc00841f39fb7f47",
+      "raw": "o.prototype._drawPoint=function(e,t,r){var n=this._ctx;n.moveTo(e,t),n.arc(e,t,r,0,2*Math.PI,!1),this._isEmpty=!1},o.prot"
+    },
+    {
+      "id": "E23",
+      "description": "편집기 미리보기 전용 canvas: dataURL만 전달",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8279975,
+      "end": 8282517,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "afed42ca8f612ea2445c1abbbdca68e954013af1c161595c4cd6dc2cf288aaf0",
+      "raw": "function n0(e){const{t:t}=fa(\"translate\",{keyPrefix:\"signature\"}),r=(Wu(),(0,yt.useRef)(null)),[n,a]=(0,yt.useState)(!1),[o,i]=(0,yt.useState)(!(null===e||void 0===e||!e.encodedSign)),[s,l]=(0,yt.useState)((null===e||void 0===e?void 0:e.encodedSign)||null),[c,d]=(0,yt.useState)(0),u=e=>{for(var t=window.atob(e),r=t.length,n=new Uint8Array(r),a=0;a<r;a++)n[a]=t.charCodeAt(a);return n.buffer};return(0,yt.useEffect)((()=>{const e=window.document.getElementsByClassName(\"signature-canvas-test\"),t=()=>{var t,r;null!==(t=e[0])&&void 0!==t&&t.offsetWidth&&d((null===(r=e[0])||void 0===r?void 0:r.offsetWidth)-3)};return t(),window.addEventListener(\"resize\",t),()=>{window.removeEventListener(\"resize\",t)}}),[]),(0,nI.jsx)(nI.Fragment,{children:(0,nI.jsxs)(\"div\",{children:[!e.authCompleted&&(0,nI.jsx)(\"div\",{className:\"flex justify-end\",children:(0,nI.jsx)(ZZ,{disabled:e.disabled||o||!n,className:\"mb-2\",onClick:()=>{a(!1),r.current.clear(),null!==e&&void 0!==e&&e.isSignature&&e.handleStateReset()},children:(0,nI.jsxs)(\"div\",{className:\"center\",children:[(0,nI.jsx)(t0,{className:\"mr-1\",showIconOnly:!0,name:\"\"+(o||!n?\"delete-icon-disabled-v2\":\"delete-icon-v2\")}),t(\"clear\")]})})}),o?(0,nI.jsx)(JZ,{src:s,alt:\"\",className:`${e.authCompleted&&\"my-2\"}`}):(0,nI.jsxs)(KZ,{className:\"signature-canvas-test\",disabled:e.disabled,children:[!n&&(0,nI.jsxs)(XZ,{children:[\" \",\"DRAW\"===e.type?t(\"phrase1\"):t(\"phrase2\")]}),(0,nI.jsx)(GZ(),{ref:r,clearOnResize:!1,penColor:\"black\",backgroundColor:\"#fff\",canvasProps:{className:\"signature-canvas\",width:c,height:120},onBegin:()=>{a(!0)}})]}),!e.authCompleted&&(o?(0,nI.jsx)(e0,{onClick:()=>{i(!1),a(!1),null!==e&&void 0!==e&&e.isSignature&&e.handleSaveState(!1)},className:\"mt-2 mb-2\",children:t(\"phrase3\")}):(0,nI.jsxs)(\"div\",{className:`flex justify-between ${(s||n)&&\"mt-2\"}`,children:[s?(0,nI.jsxs)(e0,{onClick:()=>{s&&i(!0),null!==e&&void 0!==e&&e.isSignature&&e.handleSaveState(!0)},children:[\"< \",t(\"before\")]}):(0,nI.jsx)(\"div\",{}),n&&(0,nI.jsx)(e0,{onClick:()=>{var t;if(null!==(t=r.current)&&void 0!==t&&t.toDataURL()&&n){var o,s;i(!0),a(!1);(e=>{const t=r.current.toDataURL(\"image/png\").replace(/^data:image\\/\\w+;base64,/,\"\"),n=u(t),a=new Blob([n],{type:\"image/png\"});new File([a],`${e}.png`,{type:\"image/png\"})})(\"userSignImage\");e.handlePreviewChange(null===(o=r.current)||void 0===o?void 0:o.toDataURL()),l(null===(s=r.current)||void 0===s?void 0:s.toDataURL())}null!==e&&void 0!==e&&e.isSignature&&e.handleSaveState(!0)},children:\"DRAW\"===e.type?t(\"apply\"):t(\"applySignature\")})]}))]})})}"
+    },
+    {
+      "id": "E24",
+      "description": "편집기 DRAW 미리보기 n0 호출",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 12856093,
+      "end": 12856381,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "f82f52c8df48277e833a402a208facc1cfe1732772735e24cd5168594968f7ee",
+      "raw": "function zMt(e){let{item:t,handleChange:r,disabled:n,type:a}=e;const[o,i]=(0,yt.useState)(t||null),s=(0,yt.useCallback)((e=>{r(e)}),[o,t,r]);return(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(n0,{type:\"idv\"===a?\"SIGNATURE\":\"DRAW\",disabled:n,handlePreviewChange:e=>{s(e)},encodedSign:t.value})})}"
+    },
+    {
+      "id": "E25",
+      "description": "편집기 preview DRAW에서 value dataURL 저장",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 12873243,
+      "end": 12873490,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "ea19f6fd6b7998650da1efac95ec350c50c91514937c591201b4c936a74ad9b3",
+      "raw": "\"DRAW\"===e.elementType&&(0,nI.jsx)(zMt,{item:e,handleChange:e=>{var t;const n=(0,tK.cloneDeep)(null!==(t=d.current)&&void 0!==t?t:s);n[r].value=e,h(n)}}),(\"MATRIX_CHECKBOX\"===e.elementType||\"MATRIX_RADIO\"===e.elementType)&&(0,nI.jsx)(ZMt,{item:e,h"
+    },
+    {
+      "id": "E26",
+      "description": "DRAW→a0 및 SIGNATURE→y0 질문 타입별 분기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8331930,
+      "end": 8332560,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "eb9c279e0e8a185a83527e8bab3ef18713a242df4ed760fef34d3a62c8f4029f",
+      "raw": " 0:P.authCompleted),disabled:P.disabled||u,readOnly:h,matchQuestionMapping:c});case\"DRAW\":return(0,nI.jsx)(a0,{item:P,onUpdate:s,disabled:P.disabled||u,readOnly:h,formCreateType:R,type:w});case\"SIGNATURE\":return(0,nI.jsx)(y0,{item:P,onUpdateObject:s,onUpdateList:l,elementGuideGroup:D,authCompleted:d||(null===P||void 0===P?void 0:P.authCompleted),disabled:P.disabled||u,readOnly:h,outerToken:p,setMTxId:m,formInfo:f,saveTemp:g,type:w,handleAuthenticationPreview:v,handleOccupancyError:b,idvCount:C});case\"MATRIX_CHECKBOX\":case\"MATRIX_RADIO\":return(0,nI.jsx)(J0,{index:n,item:P,onUpdate:s,authCompleted:d,disabled:P.disabled||u,re"
+    },
+    {
+      "id": "E27",
+      "description": "INFO_OWNER는 실업로드 we, 미리보기는 Ce로 분기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8520490,
+      "end": 8521230,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "0e8721fb7516c8d4730e25ee52dbf481b4769c129c08917d3da592993d4132d1",
+      "raw": "=>{var n,a,o;let i=!1;return\"IDV\"!==(null===t||void 0===t?void 0:t.questionSubType)||e||(i=!0,e=!0),(0,nI.jsx)(s1,{questionIndex:r,item:t,onUpdate:ye,onUpdateObject:\"INFO_OWNER\"===W?we:Ce,onUpdateList:Ae,authCompleted:J,formCreateType:null!==(n=null!==(a=null===b||void 0===b||null===(o=b.formV3)||void 0===o?void 0:o.formCreateType)&&void 0!==a?a:null===b||void 0===b?void 0:b.formCreateType)&&void 0!==n?n:\"AI_V3\",formInfo:b,outerToken:T,setMTxId:D,errorFocus:E,isIDV:i,saveTemp:I,type:W,handleAuthenticationPreview:_,handleOccupancyError:R,idvCount:xe,fileLoading:oe,uploadingFileQuestionName:se,onFileLoadingChange:ue,previewDevice:Q},t.htmlFormInputName||r)})))})(),w&&(null===y||void 0===y?void 0:y.length)>0&&(0,nI.jsx)(v4,{padding:z"
+    },
+    {
+      "id": "E28",
+      "description": "f4 uploadLoading 및 100MiB 상수/handler 입구",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8512740,
+      "end": 8513340,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "e8f3e49d358b99784ab57b38f2aadfd8545a95cf4cb73af30e58aa429138e7bc",
+      "raw": ",yt.useState)(!1),[fe,ge]=(0,yt.useState)({show:!1,token:\"\",data:null}),ve=104857600,be=(0,yt.useCallback)((()=>{ie(!1),le(null)}),[]),xe=(0,yt.useMemo)((()=>x?x.filter((e=>\"IDV\"===(null===e||void 0===e?void 0:e.questionSubType))).length:0),[x]),Ae=(0,yt.useCallback)((e=>{P(e)}),[]),ye=(0,yt.useCallback)(((e,t,r)=>{P((n=>n.map((n=>n.htmlFormInputName===e?{...n,value:t,isValid:r}:n))))}),[]),we=(0,yt.useCallback)(((e,t)=>{if(\"FILE\"!==t.questionType&&\"DRAW\"!==t.questionType&&\"SIGNATURE\"!==t.questionType)return void P((r=>r.map((r=>r.htmlFormInputName===e?t:r))));const r=e=>e instanceof File||e i"
+    },
+    {
+      "id": "E29",
+      "description": "업로드 size 계산식 및 FILE 기존·신규 분리",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8513190,
+      "end": 8514050,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "9f3206ede2589b2b8ec0401794c8d75f0055a31e1d68a25a02b55bcc963857a7",
+      "raw": "e&&\"DRAW\"!==t.questionType&&\"SIGNATURE\"!==t.questionType)return void P((r=>r.map((r=>r.htmlFormInputName===e?t:r))));const r=e=>e instanceof File||e instanceof Blob?e.size||0:e&&\"object\"===typeof e&&\"number\"===typeof e.fileSize&&e.fileSize||0,n=x.reduce(((t,n)=>{if(\"FILE\"===n.questionType&&n.htmlFormInputName!==e&&n.value){return t+(Array.isArray(n.value)?n.value:[n.value]).reduce(((e,t)=>e+r(t)),0)}return t}),0)+(Array.isArray(t.value)?t.value:t.value?[t.value]:[]).reduce(((e,t)=>e+r(t)),0);if(n>ve)return L({...N,show:!0,message:K(\"phrase.phrase13\")}),void be();if(F(n),ie(!0),le(e),\"FILE\"===t.questionType){const r=Array.isArray(t.value)?t.value:[],n=r.filter((e=>e instanceof File)),a=r.filter((e=>!(e instanceof File)));n.length>0?(async()=>{try{const r=await function(e){const t=new FormData;return e.forEach((e=>{t.append(\"files\",e)})),At.post(`${P"
+    },
+    {
+      "id": "E30",
+      "description": "FILE multi-file temp 업로드 및 fileKeys 배열 대응",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8514050,
+      "end": 8514803,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "54ec744bf7b2c01945a29801f7910adac2e9c3ab08b0dff2c21b22bd499b7cb8",
+      "raw": "E}/company-operated-service/v3/outer/forms/reply/temp-files`,t,{headers:{\"Check-Multipart\":!0,\"No-Token-Check\":!0}})}(n),o=r.data.fileKeys,i=n.map(((e,t)=>({fileSize:e.size,s3Key:o[t],fileName:e.name}))),s=[...a,...i];P((r=>r.map((r=>r.htmlFormInputName===e?{...r,...t,value:s}:r))))}catch(Ovr){var r,o;console.error(\"File upload error:\",Ovr),\"UNSUPPORTED_MEDIA_TYPE\"===(null===(r=Ovr.response)||void 0===r||null===(o=r.data)||void 0===o?void 0:o.error)?alert(K(\"phrase.phrase14\")):L({...N,show:!0,message:\"\\ud30c\\uc77c \\uc5c5\\ub85c\\ub4dc \\uc911 \\uc624\\ub958\\uac00 \\ubc1c\\uc0dd\\ud588\\uc2b5\\ub2c8\\ub2e4.\"}),P((r=>r.map((r=>r.htmlFormInputName===e?{...r,...t,value:a}:r))))}finally{be()}})():(P((r=>r.map((r=>r.htmlFormInputName===e?t:r)))),be())}else if("
+    },
+    {
+      "id": "E31",
+      "description": "DRAW/SIGNATURE 단일 temp 업로드·응답 metadata·실패 처리",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8514803,
+      "end": 8515799,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "7131188053b7ea315c346b58b0117db23c8a9492525e85ab5a7d54158ae758f1",
+      "raw": "\"DRAW\"===t.questionType||\"SIGNATURE\"===t.questionType){var a,o;const r=null===(a=t.value)||void 0===a?void 0:a.file;r instanceof File||r instanceof Blob?(async()=>{try{var n,a,o;const i=(await function(e){const t=new FormData;return t.append(\"files\",e),At.post(`${PE}/company-operated-service/v3/outer/forms/reply/temp-files`,t,gH)}(r)).data.fileKeys[0],s={fileSize:r.size,s3Key:i,fileName:(null===(n=t.value)||void 0===n?void 0:n.fileName)||\"draw.png\",previewImg:(null===(a=t.value)||void 0===a?void 0:a.previewImg)||null,hash:(null===(o=t.value)||void 0===o?void 0:o.hash)||null};P((r=>r.map((r=>r.htmlFormInputName===e?{...r,...t,value:s}:r))))}catch{L({...N,show:!0,message:\"\\ud30c\\uc77c \\uc5c5\\ub85c\\ub4dc \\uc911 \\uc624\\ub958\\uac00 \\ubc1c\\uc0dd\\ud588\\uc2b5\\ub2c8\\ub2e4.\"}),P((r=>r.map((r=>r.htmlFormInputName===e?{...r,...t,value:null}:r))))}finally{be()}})():(null===t.value||null===(o=t.value)||void 0===o||o.file,P((r=>r.map((r=>r.htmlFormInputName===e?t:r)))),be())}}),[x,K,N,be,F,P,ve])"
+    },
+    {
+      "id": "E32",
+      "description": "미리보기 DRAW/SIGNATURE는 네트워크 없이 metadata 구성",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8516808,
+      "end": 8517340,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "7c54c7cbc4fee7d216b35bae3db0551bb7be6f61cd02d3e62476a4a97203ea33",
+      "raw": "\"DRAW\"===t.questionType||\"SIGNATURE\"===t.questionType){var a,o;const r=null===(a=t.value)||void 0===a?void 0:a.file;if(r instanceof File||r instanceof Blob){var i,s;const n={fileSize:r.size,fileName:(null===(i=t.value)||void 0===i?void 0:i.fileName)||\"draw.png\",previewImg:(null===(s=t.value)||void 0===s?void 0:s.previewImg)||null};P((r=>r.map((r=>r.htmlFormInputName===e?{...r,...t,value:n}:r)))),be()}else null===t.value||null===(o=t.value)||void 0===o||o.file,P((r=>r.map((r=>r.htmlFormInputName===e?t:r)))),be()}}),[x,K,N,be,F,"
+    },
+    {
+      "id": "E33",
+      "description": "업로드 중 제출/다음 페이지 진행 차단",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8522200,
+      "end": 8522980,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "ee72a93a2ef796158ae93e29bc65a5a8e5f92a414aae1c89f74e26c4749c01f8",
+      "raw": "REVIEW\"===W,className:`gtm-catch-form-submit ${!te&&\"min-w-[144px]\"}`,onClick:()=>{he?L({...N,show:!0,message:K(\"phrase.fileUploadingTitle\"),type:\"UPLOAD_IN_PROGRESS\"}):B()},text:l4().has(T)?K(\"phrase.phrase34\"):K(\"phrase.phrase44\"),leftIcon:\"/img/google-icons-v2/marks/Info_owner_check.svg\"}):(0,nI.jsxs)(\"div\",{className:\"flex items-center gap-3 flex-wrap\",children:[0!==k&&(\"full\"===q||(null===b||void 0===b||null===(v=b.catchformConstraintResponse)||void 0===v?void 0:v.allowPageBack))&&(0,nI.jsx)(DY,{disabled:oe,onClick:z,text:K(\"prevPage\"),type:\"secondary\",className:`${!te&&\"min-w-[144px]\"}`}),(0,nI.jsx)(DY,{onClick:e=>{he?L({...N,show:!0,message:K(\"phrase.fileUploadingTitle\"),type:\"UPLOAD_IN_PROGRESS_WAIT\"}):U(e)},text:K(\"nextPage\"),className:`${!te&&\"min-w-[144px]\"}`"
+    },
+    {
+      "id": "E34",
+      "description": "최종 FILE 배열과 DRAW/SIGNATURE 단일 metadata 직렬화, 질문 envelope",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 10058018,
+      "end": 10058839,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "59af8cc0aaa9284e84ddf2b6c85bb12d0d11eb09c3ed78d53e8ffb89de49d72a",
+      "raw": "onValue&&void 0!==y.optionValue||(y=null);break;case\"FILE\":const P=e.value;y=Array.isArray(P)?P.filter((e=>e&&\"object\"===typeof e&&e.s3Key)).map((e=>({s3Key:e.s3Key,fileName:e.fileName,fileSize:e.fileSize}))):[];break;case\"SIGNATURE\":case\"DRAW\":const O=e.value;y=O&&\"object\"===typeof O&&O.s3Key?{s3Key:O.s3Key,fileName:O.fileName,fileSize:O.fileSize}:null;break;case\"MATRIX_RADIO\":case\"MATRIX_CHECKBOX\":y=e.value;break;default:y=\"string\"===typeof e.value?e.value.trim():(null!==e.value&&e.value,\"\")}return{questionId:e.questionId,questionType:e.questionType,\"@type\":e.questionType,subType:e.questionSubType,questionIndex:e.orderNumber,required:e.questionElementType,value:y}}));return{pageId:e.pageId,pageIndex:t,replies:r}}));return{formId:t.formId,passedPath:m,requestUser:l,userMTxId:c||null,pages:g,agreeTokenList:p}}"
+    },
+    {
+      "id": "E35",
+      "description": "V3 최종 add-reply POST",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 10072935,
+      "end": 10073630,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "244168dcad8ff898c367f395f7e6d4ff8fdd74844348e69fdf900210fab70ef8",
+      "raw": "f,pageList:l,pageMoveList:oe,pageIndex:s,questionElements:v,agreementTokens:y,nonAgreementTokens:C,apiParams:ce,mTxId:T,t:t,formLanguage:null===f||void 0===f?void 0:f.formLanguage});O(!0);(function(e,t,r,n){const a={\"No-Token-Check\":!0};n&&(a[\"Gate-Authorization\"]=n);const o=bH(a,t,r);return At.post(`${PE}/company-operated-service/v3/outer/forms/add-reply`,e,o)})(X.token?{...r,emailVerificationToken:X.token}:r,null===f||void 0===f?void 0:f.formLanguage,RT(),X.token).then((e=>{if(\"success\"===e.data.status){if(\"7498f4a1639055f\"===a)GT();else if(\"be749bb661e0f53\"===a)eE();else if(\"string\"===typeof a&&l4().has(a)){const e=document.getElementsByClassName(\"qxCTlb\");e[e.length-1].click(),ZT()}"
+    },
+    {
+      "id": "E36",
+      "description": "IDV SIGNATURE 인증 완료 검사",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 10068868,
+      "end": 10069190,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "d8f47d087182c49d272ac5b4dfb7a90c6e303d1309a434d7f1ec1a90d45c1928",
+      "raw": "be=()=>{const e=v.find((e=>\"IDV\"===e.questionSubType&&\"SIGNATURE\"===e.questionType&&!e.authCompleted));if(e)return U({...B,show:!0,message:\"\\ubcf8\\uc778 \\ud655\\uc778\\uc744 \\uc704\\ud574 \\uc778\\uc99d\\uc744 \\uc644\\ub8cc\\ud574 \\uc8fc\\uc138\\uc694.\",onClick:()=>ve(e.htmlFormInputName)}),!1;const r=zq(v),n=yG(v),a=r?v.indexOf(r"
+    },
+    {
+      "id": "E37",
+      "description": "필수 미입력 DRAW에서 적용 안내 메시지",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 10071088,
+      "end": 10071444,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "769da04e7f48b92178e8b91ad834dfda2813c332f829a7f113302947cce5df50",
+      "raw": "const{questionElementType:o,questionType:i,value:s}=r;let l=\"phrase.phrase14\";if(\"MM\"===o&&!s)if(\"FILE\"===i)l=\"phrase.phrase17\";else if(\"SIGNATURE\"===i)l=\"phrase.phrase19\";else{if(\"DRAW\"!==i)return ve(r.htmlFormInputName),!1;l=\"phrase.phrase20\"}else Vq(r)&&(l=\"phrase.phrase16\");return U({...B,show:!0,message:t(l),onClick:()=>ve(r.htmlFormInputName)}),!1}"
+    },
+    {
+      "id": "E38",
+      "description": "페이지 상태 JSON 임시저장 PUT",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 10060165,
+      "end": 10060617,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "69f0d7f1d4e1c84055f454771b64c97371b5922678ddfad760a678c48c421db9",
+      "raw": "{return!1}const r=null!==(e=t)&&void 0!==e?e:{};try{const e={...a,data:JSON.stringify(r)};return await function(e,t){const r=vH(fH.headers,t);return At.put(`${PE}/company-operated-service/v3/outer/forms/temp-reply`,e,r)}(e,null===n||void 0===n?void 0:n.formLanguage),m(iu({timestamp:Date.now()})),A(!0),w(!0),!0}catch(u){return p((e=>({...e,show:!0,message:f(\"phrase.phrase81\")}))),!1}}),[y,a,null===n||void 0===n?void 0:n.formLanguage,o,c,d,i,s,l,m,p,"
+    },
+    {
+      "id": "E39",
+      "description": "임시저장 GET JSON.parse 및 질문 복원",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 10061030,
+      "end": 10061587,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "1e4946a08209938fd4687748833de9dd5af907b8d772dd56511fa3be7b6041b6",
+      "raw": ":n.version,m,p,h]),T=(0,yt.useCallback)((()=>{var e;(e=a,At.get(`${PE}/company-operated-service/v3/outer/forms/temp-reply`,{params:e,...fH})).then((e=>{let{data:t}=e;if(!t)return;const a=JSON.parse(t.data),o=g.find((e=>e.formToken===r));var i;(null!==n&&void 0!==n&&n.version&&n.version!==(null===o||void 0===o?void 0:o.version)&&(alert(f(\"phrase.phrase82\")),S()),a&&Object.keys(a).length>0)&&(m(v0(a)),u(null===(i=a[0])||void 0===i?void 0:i.questions),b(!0))})).catch((()=>{p((e=>({...e,show:!0,message:f(\"phrase.phrase83\")})))})).finally((()=>{p({show:!1}"
+    },
+    {
+      "id": "E40",
+      "description": "응답 결과 previewImg 렌더",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8503507,
+      "end": 8503909,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "f9df35ae78d802d23ce800f819218a1178d6ad3d8558b90d2b0a8bf4c4175418",
+      "raw": "case\"DRAW\":case\"SIGNATURE\":return null!==t&&void 0!==t&&null!==(h=t.value)&&void 0!==h&&h.previewImg?(0,nI.jsx)(i4,{children:(0,nI.jsx)(\"img\",{src:null===t||void 0===t||null===(p=t.value)||void 0===p?void 0:p.previewImg,alt:null===t||void 0===t||null===(m=t.value)||void 0===m?void 0:m.fileName})}):(0,nI.jsx)(iI,{className:\"label-1\",color:tj,children:\"-\"});case\"MATRIX_CHECKBOX\":case\"MATRIX_RADIO\":ret"
+    },
+    {
+      "id": "E41",
+      "description": "관리자 읽기 모델 replyFileInfos/fileId/fileName 배열 정리",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8481910,
+      "end": 8482950,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "ddb698f38f11e59c726a371351e747411cbf20113a3e40af501cf648bbad0e2c",
+      "raw": "length>0?e.push(t.replyFileInfos.map((e=>({...t,fileId:e.fileId,fileName:e.fileName})))):e.push([t])}))}));else{if(null===r||void 0===r||!r.formQuestionList)return;e=Object.values(r.formQuestionList.reduce(((e,t)=>((e[t.questionId]||=[]).push(t),e)),{}))}y(e),N(e.map((()=>({loading:!1}))))}),[null===r||void 0===r?void 0:r.pages,null===r||void 0===r?void 0:r.formQuestionList]);const H=(0,yt.useMemo)((()=>(null===A||void 0===A?void 0:A.map((e=>{var t;return Array.isArray(e)&&q5.includes(null===(t=e[0])||void 0===t?void 0:t.questionType)?e.map((e=>{var t;return{value:(null===e||void 0===e?void 0:e.fileId)||\"\",type:(null===e||void 0===e||null===(t=e.fileName)||void 0===t?void 0:t.split(\".\").pop())||\"\",text:(null===e||void 0===e?void 0:e.fileName)||\"\"}})):[]})))||[]),[A]);(0,yt.useEffect)((()=>{C(null===H||void 0===H?void 0:H.map((e=>{var t;return(null===(t=e[0])||void 0===t?void 0:t.value)||\"\"})))}),[H]),(0,yt.useEffect)((()=>{j(Array.isArray(null===r||void 0===r?void 0:r.agreementTokenList)?r.agreementTokenList:[]),_(Array.isAr"
+    },
+    {
+      "id": "E42",
+      "description": "관리자 DRAW/SIGNATURE 첫 파일 조회·미리보기·팝업·다운로드",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8490132,
+      "end": 8491416,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "5454f6c8d98c6bc37be4c626861f7bf77e44f3cfebe7298fff5d0735774a9ba6",
+      "raw": "hildren:(0,nI.jsx)(iI,{className:\"body-1\",color:sj,children:\"DRAW\"===e.questionType?F(\"phrase.phrase1\"):F(\"phrase.phrase2\")})});const i=null===(n=H[t])||void 0===n?void 0:n[0];if(null===i||void 0===i||!i.value||null===i||void 0===i||!i.type||null===i||void 0===i||!i.text)return\"DRAW\"===e.questionType?(0,nI.jsx)(F5,{children:(0,nI.jsx)(iI,{className:\"body-1\",color:sj,children:F(\"phrase.phrase1\")})}):(0,nI.jsx)(R5,{children:(0,nI.jsx)(iI,{className:\"subhead-weak\",color:ej,children:\"-\"})});const s=null===(o=E[t])||void 0===o?void 0:o.loading;return(0,nI.jsxs)(\"div\",{children:[(s||(null===r||void 0===r?void 0:r.url))&&(0,nI.jsx)(K5,{loading:s,url:null===r||void 0===r?void 0:r.url}),(0,nI.jsxs)(\"div\",{dir:\"ltr\",className:\"flex items-center gap-2 justify-end\",children:[!(null!==r&&void 0!==r&&r.url)&&(0,nI.jsx)(M_,{className:\"bg-white\",size:\"sm\",type:\"secondary\",text:g(\"viewNow\"),disabled:!1,onClick:()=>z(t,w[t],a)}),(0,nI.jsx)(M_,{size:\"sm\",type:\"secondary\",text:`${g(\"viewNow\")}(${g(\"popup\")})`,disabled:!1,onClick:()=>V(e.questionId,w[t]),className:\"whitespace-nowrap\"}),!a&&(0,nI.jsx)(M_,{size:\"sm\",type:\"secondary\",text:g(\"download\"),disabled:!1,onClick:()=>$(t),className:\"whitespace-nowrap\"})]})]})},ae=(e,t,r)=>{var n,o,i,s,l,c,d;let{filePreview:h,isFilePdf:p,isFilePr"
+    },
+    {
+      "id": "E43",
+      "description": "관리자 저장 이미지 조회 endpoint",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 7913157,
+      "end": 7913307,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "f9d366132dc49e2601a4773afd50e0798e801dcce77b01c108ea948dbd74fd6a",
+      "raw": "function XV(e,t){return At.get(`${PE}/company-operated-service/file/decrypt_image_view`,{params:{fileId:e},responseType:\"blob\",onDownloadProgress:t})}"
+    },
+    {
+      "id": "E44",
+      "description": "초대자/고객 파일 조회 endpoint",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8471035,
+      "end": 8471201,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "090cde4fa250039dbc4d0f585bada1a56ca81158d18fdefcb5f1064c06cd489d",
+      "raw": "function d5(e,t,r,n){return At.get(`${PE}/company-operated-service/inviters/forms/${e}/customers/${t}/files/${r}`,{...i5(),responseType:\"blob\",onDownloadProgress:n})}"
+    },
+    {
+      "id": "E45",
+      "description": "관리자 이미지 blob 조회·object URL 생성",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8480700,
+      "end": 8481310,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "1ed1d048da90e710746a31b4524d79c80292a0df107dcf62616eae3d66b751a7",
+      "raw": "eturn;const n=t=>N((r=>r.map(((r,n)=>n===e?{...r,loading:t}:r))));n(!0);try{const e=await g5((()=>o?d5(o,i,t):r?function(e){return At.get(`${PE}/company-operated-service/file/invite_decrypt_image_view`,{params:{fileId:e},responseType:\"blob\"})}(t):XV(t)));if(!e||!e.data)return;const n=URL.createObjectURL(e.data);T((e=>e.some((e=>e.fileId===t))?e:[...e,{fileId:t,url:n}]))}catch(Ovr){var a;m5(Ovr)?alert(g(\"alert.phrase5\")):415!==(null===Ovr||void 0===Ovr?void 0:Ovr.status)&&415!==(null===Ovr||void 0===Ovr||null===(a=Ovr.response)||void 0===a?void 0:a.status)||alert(g(\"alert.phrase6\"))}finally{n(!1)}},V=(e,"
+    },
+    {
+      "id": "E46",
+      "description": "SIGNATURE 초기 유효성 관련 렌더 계산",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8299800,
+      "end": 8300070,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "778b7fec864faea4dbf2143bfeeeb7bfb970a17bb26d7fe6e1988ac00d5dde95",
+      "raw": "),v=Wu(),{pageList:b,pageIndex:x}=Ut((e=>e.infoOwnerAnswer),Jt),A=((0,nP.useMediaQuery)({maxWidth:639}),(0,yt.useMemo)((()=>{var e,t;return\"SIGNATURE\"===r.questionType?!!(\"MM\"!==r.questionElementType||l||null!==(e=r.value)&&void 0!==e&&e.s3Key||null!==(t=r.value)&&void "
+    },
+    {
+      "id": "E47",
+      "description": "SIGNATURE base64문자열 SHA256·Redux·single-file value 구성",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8300140,
+      "end": 8301810,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "5a982f717de4d8ee7fd9e927f8e977391a4415171b81780ff2c7e5eea003997b",
+      "raw": "),async e=>{const t=e.replace(/^data:image\\/\\w+;base64,/,\"\"),r=(new TextEncoder).encode(t),n=await crypto.subtle.digest(\"SHA-256\",r);return Array.from(new Uint8Array(n)).map((e=>e.toString(16).padStart(2,\"0\"))).join(\"\")}),y=(0,yt.useCallback)((async(e,t)=>{var a;let o=null,i=t;if(e instanceof File)try{const t=await(async e=>new Promise(((t,r)=>{const n=new FileReader;n.onload=async e=>{try{var n;const r=null===(n=e.target)||void 0===n?void 0:n.result;if(\"string\"!==typeof r)throw new Error(\"File to Base64 encode failed\");const a=await A(r);t({base64:r,hash:a})}catch(a){r(a)}},n.onerror=e=>r(e),n.readAsDataURL(e)})))(e);t&&(o=t.hash,i=t.base64,v(A0.hashedSignatureFetched({file:o})),v(A0.encodedSignatureFileFetched({file:i})))}catch(l){return alert(m(\"phrase.phrase13\")||\"\\uc11c\\uba85 \\ucc98\\ub9ac \\uc911 \\uc624\\ub958\\uac00 \\ubc1c\\uc0dd\\ud588\\uc2b5\\ub2c8\\ub2e4.\"),void n(r.htmlFormInputName,{...r,value:null,isValid:!1})}else if(!e&&!t)return v(A0.hashedSignatureFetched({file:null})),v(A0.encodedSignatureFileFetched({file:null})),v(A0.signSavedStatusFetched({data:!1})),void n(r.htmlFormInputName,{...r,value:null,isValid:\"MM\"!==r.questionElementType});const s={file:e,fileName:(null===e||void 0===e?void 0:e.name)||(null===(a=r.value)||void 0===a?void 0:a.fileName)||\"signature.png\",previewImg:i,hash:o};n(r.htmlFormInputName,{...r,value:s,isValid:!(\"MM\"===r.questionElementType&&!s.file&&!s.previewImg)})}),[r,n,v,m]);return(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(nI.Fragment,{children:(0,nI.jsxs)(\"div\",{children:[\"SIGNATURE\"===(null===r||void 0===r?void 0:r.questionType)?!l&&!(null!==r&&void 0!==r&&r.authCompleted)&&(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(r0,"
+    },
+    {
+      "id": "E48",
+      "description": "SIGNATURE canvas 및 저장 상태 hook",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8301810,
+      "end": 8302260,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "cc0b68b06c11f561507aa3aa9aae5cbd455622ead641422d27329bca0e560c45",
+      "raw": "{type:\"SIGNATURE\",encodedSign:(null===(t=r.value)||void 0===t?void 0:t.previewImg)||null,handleChange:y,isSignature:!0,authCompleted:l,handleStateReset:()=>{v(A0.encodedSignatureFileFetched({file:null})),v(A0.hashedSignatureFetched({file:null}))},handleSaveState:e=>{v(A0.signSavedStatusFetched({data:e}))},disabled:r.disabled,readOnly:r.readOnly})}):(0,nI.jsxs)(iI,{className:\"subhead-strong relative\",color:ej,children:[(0,nI.jsx)(iI,{span:!0,class"
+    },
+    {
+      "id": "E49",
+      "description": "전자서명 적용 상태 선행조건 및 occupancy E_SIGN/SIMPLE_IDENTIFY",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8297840,
+      "end": 8298763,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "7dbb55e45bcd57b63896d9f43fa582cdfeb3e2a75df9cb9009a09ffe1533875c",
+      "raw": "uc911 \\uc624\\ub958\\uac00 \\ubc1c\\uc0dd\\ud588\\uc2b5\\ub2c8\\ub2e4.\")}if(e.isSignature){const r=$u.getState().infoOwner.signSavedStatus;if(\"AI_V3\"===(null===e||void 0===e?void 0:e.formCreateType)){var t;if(null===e||void 0===e||null===(t=e.item)||void 0===t||!t.value||!r)return void alert(n(\"phrase.phrase4\"))}else{if(!$u.getState().infoOwner.hashedSignature||!r)return void alert(n(\"phrase.phrase4\"))}}if(c)return void m();const r={formToken:null===e||void 0===e?void 0:e.outerToken,itemCode:null!==e&&void 0!==e&&e.isSignature?\"E_SIGN\":\"SIMPLE_IDENTIFY\"};try{const e=await function(e){return At.post(`${PE}/payment-service/user/occupancy`,e,fH)}(r);if(e.data){const t=`${window.location.origin}/payment-service/user/identity?occupancyId=${e.data.occupancyId}`;p((e=>({...e,successUrl:t})));const r=document.getElementById(\"successUrl\");r&&(r.value=t),d(!0),m()}}catch(o){e.handleOccupancyError(o)}},className:\"w-full\"})})]})}"
+    },
+    {
+      "id": "E50",
+      "description": "인증 팝업·완료 조회·provider form POST; 소스의 공급자 키 구간 제외",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8295078,
+      "end": 8295866,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "0a00494beea97450577890f936ea9a52fd6d7897e2aa5752a853077a2889b4c0",
+      "raw": "m=(0,yt.useCallback)((async()=>{u.current||window.addEventListener(\"message\",(t=>{var r;\"string\"===typeof t.data&&(\"success\"===t.data?(r=h.mTxId,At.get(`${PE}/company-operated-service/user/users/${r}`,fH)).then((t=>{e.handleAuthentication(t.data,h.mTxId)})).catch((e=>{})):\"fail\"===t.data&&alert(n(\"phrase.phrase1\")))}));const t=document.body.offsetWidth/2-200,r=window.open(\"\",\"sa_popup\",\"width=400, height=620, left=\"+t+\", menubar=yes, status=yes, titlebar=yes, resizable=yes\");if(!r||r.closed||\"undefined\"===typeof r.closed)return alert(n(\"phrase.phrase6\")),null;const a=document.getElementById(\"saForm\");return a.setAttribute(\"target\",\"sa_popup\"),a.setAttribute(\"method\",\"post\"),a.setAttribute(\"action\",\"https://sa.inicis.com/auth\"),a.submit(),r}),[h.mTxId,e.handleAuthentication,n]);"
+    },
+    {
+      "id": "E51",
+      "description": "SIGNATURE hash를 identifier에 연결하는 코드; 공급자 키 제외",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8296019,
+      "end": 8296509,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "28f4465a8ab6b5fcd6111b5b55825d6d335b5bd0462b38e023045dc47a0a1cb8",
+      "raw": "const n=o||(null===(t=e.item)||void 0===t||null===(r=t.value)||void 0===r?void 0:r.hash)||null,a=function(e){const t={\"&\":\"&amp;\",\"<\":\"&lt;\",\">\":\"&gt;\",'\"':\"&quot;\",\"'\":\"&#039;\",\"\\\\\":\"\"};return e.replace(/[&<>\"'\\\\]/g,(e=>t[e]||e))}(`\\uce90\\uce58\\ud3fc\\uba85:${e.content},\\uce90\\uce58\\ud3fc:${e.formId},\\uc11c\\uba85:${n}`);l(a),p((e=>({...e,identifier:\"02\"===e.reqSvcCd?a:e.identifier})))}),[o,e.content,e.formId,null===(t=e.item)||void 0===t||null===(r=t.value)||void 0===r?void 0:r.hash]),"
+    },
+    {
+      "id": "E52",
+      "description": "인증 완료 후 IDV 응답 자동 입력·disabled/authCompleted·expiry",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8303090,
+      "end": 8305470,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "9e0b2f9cd59e4678e2607abbfcd8b47c668e8567a55ddb2092a378a10b3576c9",
+      "raw": "v(A0.authStatusFetched({data:!0})),i(t),g(_q(e.expiredAt));const r=$u.getState().infoOwnerAnswer.pageList,n=(0,tK.cloneDeep)(r);if(!n||!n[x])return;const o=n[x].questions;o.forEach(((t,r)=>{if(\"IDV\"===t.questionSubType)if(t.questionName===m(\"name\"))o[r]={...t,disabled:!0,value:e.userName,authCompleted:!0,isValid:!0,expiredAt:null===e||void 0===e?void 0:e.expiredAt};else if(t.questionName===m(\"phone\")){var n;const a=((null===e||void 0===e||null===(n=e.userPhone)||void 0===n?void 0:n.replace(/(^02.{0}|^01.{1}|[0-9]{3})([0-9]+)([0-9]{4})/,\"$1-$2-$3\"))||\"\").split(\"-\"),i={countryCode:a[0]||\"\",customCountryCode:\"\",extraNumber:(a[1]||\"\")+(a[2]||\"\")};o[r]={...t,disabled:!0,value:i,authCompleted:!0,isValid:!0,expiredAt:null===e||void 0===e?void 0:e.expiredAt}}else t.questionName===m(\"birthday\")&&(o[r]={...t,disabled:!0,value:e.userBirthDay,authCompleted:!0,isValid:!0,expiredAt:null===e||void 0===e?void 0:e.expiredAt})}));const s=$u.getState().infoOwner.encodedSignatureFile;if(s){const t=function(e){let t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:\"signature.png\";try{const r=null===e||void 0===e?void 0:e.split(\",\");if(!r||r.length<2)throw new Error(\"Invalid Base64 string\");const n=r[0].match(/:(.*?);/);if(!n||!n[1])throw new Error(\"Cannot find MIME type\");const a=n[1],o=atob(r[1]);let i=o.length;const s=new Uint8Array(i);for(;i--;)s[i]=o.charCodeAt(i);return new File([s],t,{type:a})}catch(r){return console.error(\"Base64 to File conversion error:\",r),null}}(s,\"userSignImage.png\"),r=o.findIndex((e=>\"SIGNATURE\"===e.questionType));var l,c;if(-1!==r&&t)o[r]={...o[r],disabled:!0,value:{fileSize:t.size,fileName:t.name,previewImg:s,file:t,s3Key:null===(l=o[r])||void 0===l||null===(c=l.value)||void 0===c?void 0:c.s3Key},authCompleted:!0,isValid:!0,expiredAt:null===e||void 0===e?void 0:e.expiredAt}}else{const t=o.findIndex((e=>\"SIGNATURE\"===e.questionType));-1!==t&&(o[t]={...o[t],disabled:!0,authCompleted:!0,isValid:!0,expiredAt:null===e||void 0===e?void 0:e.expiredAt})}v(b0(x,n[x])),a&&a(o)},tempAuthCompleted:r.authCompleted,saveTemp:c,type:d,item:r,formCreateType:null===s||void 0===s?void 0:s.formCreateType})]}),(l||(null===r||void 0===r?void 0:r.authCompleted))&&(0,nI.jsx)(w0,{className:\"py-[10px] px-[24px] mt-3\",children:(0,nI.jsxs)(iI,{className:\"body-2 text-center\",color:Ij,children:[m(\"phrase.phrase54\"),\" \",(0,nI.jsx)(iI,{span:!0,className"
+    },
+    {
+      "id": "E53",
+      "description": "SIGNATURE 별도 카드의 인증후 이미지 및 안내",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8333000,
+      "end": 8334190,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "bf4116440e16f79dea640eff7e89634e532cd93a01c5e0829cadbe5de74187b2",
+      "raw": "sValid&&x,className:\"mt-[10px]\",children:[(0,nI.jsxs)(iI,{className:\"subhead-strong relative\",color:ej,children:[(0,nI.jsx)(iI,{span:!0,className:\"absolute top-[0px] [inset-inline-start:-10px] subhead-strong\",color:\"#F24E4E\",children:\"*\"}),\"AI_V3\"===R&&null!=(null===P||void 0===P?void 0:P.orderNumber)?`${Number(P.orderNumber)+1}. `:\"\",I(\"signature\")]}),null!==P&&void 0!==P&&null!==(t=P.value)&&void 0!==t&&t.previewImg&&(d||null!==P&&void 0!==P&&P.authCompleted)?(0,nI.jsx)(c1,{className:\"mt-3\",children:(0,nI.jsx)(\"img\",{src:null===P||void 0===P||null===(r=P.value)||void 0===r?void 0:r.previewImg,alt:\"userSignImage.png\"})}):(0,nI.jsxs)(c1,{className:\"mt-3 min-h-[120px] flex justify-center items-center\",children:[(0,nI.jsx)(iI,{className:\"subhead-weak relative\",color:ij,children:\"\\ubcf8\\uc778\\uc778\\uc99d \\uc2dc \\uc790\\ub3d9 \\uc785\\ub825\\ub429\\ub2c8\\ub2e4.\"}),\" \"]}),(0,nI.jsxs)(iI,{className:\"body-2 mt-2\",color:Zk,children:[(0,nI.jsx)(BU,{src:\"/media/google-icons/info.svg\",color:Zk}),\" \\uc11c\\uba85\\uc774 \\uc644\\ub8cc\\ub41c \\ub3d9\\uc758\\uc11c\\ub294 \\ub3d9\\uc758\\uc774\\ub825 \\uc870\\ud68c \\ud398\\uc774\\uc9c0\\uc5d0\\uc11c \\ud655\\uc778\\ud558\\uc2e4 \\uc218 \\uc788\\uc2b5\\ub2c8\\ub2e4.\"]})"
+    },
+    {
+      "id": "E54",
+      "description": "IDV_SIGNATURE 옵션 value3 및 개인정보 서명 항목·정렬",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 12654640,
+      "end": 12655680,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "5156023d4d9404e995e39ff508b35a2b1245f86c7fd9b741f1ffa8d26fa3552a",
+      "raw": ",labelList:b,value:(null===(a=o.questionOptionList)||void 0===a?void 0:a.filter((e=>\"IDV_SIGNATURE\"===e.optionQuestionName)).length)>0?\"Y\":\"N\",onChange:e=>{let t=(0,tK.cloneDeep)(o.questionOptionList),r=(0,tK.cloneDeep)(o.detectedItems);var n,a,s;\"Y\"===e.target.value?((null===(n=t)||void 0===n?void 0:n.filter((e=>\"IDV_SIGNATURE\"===e.optionQuestionName)).length)<=0&&t.push({value:3,optionQuestionName:\"IDV_SIGNATURE\",isCustomValue:!1}),r.push({nlpFeedbackId:-99,type:\"PERSONAL_INFORMATION\",name:\"\\uc11c\\uba85\",detectedType:\"PERSONAL_INFORMATION\",detectedName:\"\\uc11c\\uba85\",personalInformationSource:\"NLP\",isConfirm:!0,detectedTypeErrorStyle:!1,detectedNameErrorStyle:!1,confirmErrorStyle:!1})):(t=null===(a=t)||void 0===a?void 0:a.filter((e=>\"IDV_SIGNATURE\"!==e.optionQuestionName)),r=null===(s=r)||void 0===s?void 0:s.filter((e=>\"\\uc11c\\uba85\"!==e.detectedName)));const l=t.sort(((e,t)=>{const r={IDV_SIGNATURE:0,IDV_NAME:1,IDV_CONTACT:2,IDV_BIRTH:3};return r[e.optionQuestionName]-r[t.optionQuestionName]}));x({...o,questionOptionList:"
+    },
+    {
+      "id": "E55",
+      "description": "편집 질문 payload serializer",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 12625323,
+      "end": 12626122,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "bb08505761bbdf7ff33863c0e74262b328b16794c5b6aeb03c740684876123c8",
+      "raw": "C_t=e=>{const t=[];return e.pageList.forEach(((e,r)=>{t.push({page:e.page,pageTitle:0===r?\"\":e.pageTitle,pageContent:0===r?\"\":e.pageContent,pageOffset:e.pageOffset,questionList:e.questionList.map((e=>{return{nlpFeedbackId:e.nlpFeedbackId,title:e.title,additionalExplanation:e.description,catchFormQuestionType:e.elementType,questionOptionList:(t=kG(e.elementType,e.questionOptionList),Array.isArray(t)?t.map((e=>{const{optionImageUrl:t,imageUrl:r,optionImageFileSize:n,optionImageUploadToken:a,...o}=null!==e&&void 0!==e?e:{};return{...o,optionImageKey:SG(e)}})):[]),matrixOptionData:e.matrixOptionData,usePageOffset:e.usePageOffset,required:e.isRequired,useSecureKeyStroke:!1,...hG(e),...qY(e),materialList:lQ(e),...h_t(e),catchFormPersonalInformationRequests:w_t(e.detectedItems)};var t}))})})),t}"
+    },
+    {
+      "id": "E56",
+      "description": "IDV_SIGNATURE 존재 여부에 따른 편집기 IDV 미리보기",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 12862925,
+      "end": 12863580,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "df5912f28ac1b288f6920d8a075270a9a37b25160fd5b8a8863f6869aa85cbde",
+      "raw": "function JMt(e){let{item:t,handleChange:r,idvCount:n}=e;const[a,o]=(0,yt.useState)(!1);(0,yt.useEffect)((()=>{t.questionOptionList.find((e=>\"IDV_SIGNATURE\"===e.optionQuestionName))&&o(!0)}),[]);const i=e=>`${t.questionNumber+e}. `;return(0,nI.jsxs)(\"div\",{className:\"flex flex-col gap-3\",children:[(0,nI.jsxs)(KMt,{children:[(0,nI.jsx)(\"div\",{className:\"mb-3\",style:{marginLeft:\"-8px\"},children:(0,nI.jsxs)(iI,{className:\"body-2-strong\",color:\"#F24E4E\",children:[\"*\",\" \",(0,nI.jsx)(iI,{span:!0,className:\"subhead-strong\",color:ej,children:a?n>1?\"\\ubcf8\\uc778\\uc778\\uc99d & \\uc804\\uc790\\uc11c\\uba85\":\"\\uc804\\uc790\\uc11c\\uba85\":\"\\ubcf8\\uc778\\uc778\\uc99d\"})]"
+    },
+    {
+      "id": "E57",
+      "description": "multipart/no-token-check 요청 설정(서버 권한의 증거 아님)",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 7926997,
+      "end": 7927052,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "589ccd15ac3d6642d4cd8163a17be44eb2c586d5e9717db1deafeab8cd9cc9ce",
+      "raw": "gH={headers:{\"Check-Multipart\":!0,\"No-Token-Check\":!0}}"
+    },
+    {
+      "id": "E58",
+      "description": "구형 v2 단일 파일 업로드",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 7927797,
+      "end": 7927928,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "07db58c1f4eef1586b0f56b1ab5718865116b36f46f65994d03f8379937868e9",
+      "raw": "function CH(e){const t=new FormData;return t.append(\"multipartFile\",e),At.post(`${PE}/company-operated-service/form/v2/file`,t,gH)}"
+    },
+    {
+      "id": "E59",
+      "description": "구형 v2 DRAW 업로드 후 fileId/key 상태",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 10097690,
+      "end": 10098240,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "2f379fb8b38d9e5ae014d002d4b576cd76564a1a8a4473ced405c5503a463a06",
+      "raw": "i]={...o[i],fileId:null,key:null,file:\"\",filename:\"\"}}else if(\"SIGNATURE\"===r||\"DRAW\"===r){const e=n;p(!0),CH(e).then((t=>{o[i]={...o[i],fileId:t.data.fileId,key:t.data.key,file:e,filename:e.name}})).catch((e=>{var r,n;\"UNSUPPORTED_MEDIA_TYPE\"===(null===(r=e.response)||void 0===r||null===(n=r.data)||void 0===n?void 0:n.error)&&(alert(t(\"phrase.phrase14\")),o[i]={...o[i],fileId:null,key:null,file:\"\",filename:\"\"})})).finally((()=>{p(!1),C(o)}))}else if(8===a.infoPatternId){const e=n.target.value.replace(/[^0-9]/g,\"\");o[i]={...o[i],value:e}}else o["
+    },
+    {
+      "id": "E60",
+      "description": "구형 v2 reply/sub로 fileId/key 제출",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 10100891,
+      "end": 10101460,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "a865d05b3cbb0f5e04dbb61011ccaad469d9d12f18ac8744f7221f5512a28c04",
+      "raw": "e.questionId,type:r[1],order:parseInt(r[2]),reply:\"FILE\"===e.questionType||\"SIGNATURE\"===e.questionType||\"DRAW\"===e.questionType?e.fileId:n,sub:\"FILE\"===e.questionType||\"SIGNATURE\"===e.questionType||\"DRAW\"===e.questionType?e.key:null}),a.append(e.htmlFormInputName,\"FILE\"===e.questionType||\"SIGNATURE\"===e.questionType||\"DRAW\"===e.questionType?e.file:n)}));const i={formId:g.formId,formQuestionReplies:o,mTxId:m||null,agreeTokenList:e};_(!1),function(e){return At.post(`${PE}/company-operated-service/form/v2/add_reply`,e,fH)}(i).then((e=>{\"success\"===e.data.status&&(\""
+    },
+    {
+      "id": "E61",
+      "description": "구형 multipart form/add_reply 경계",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 10147040,
+      "end": 10147470,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "e934d5d017e443298986353db38d68ab7bad00f4cc59d6cc3ea8209c56315a85",
+      "raw": "value)||void 0===x?void 0:x.trim())||\"\"}u.append(e.htmlFormInputName+\"-\"+e.questionElementType,\"FILE\"===e.questionType||\"SIGNATURE\"===e.questionType||\"DRAW\"===e.questionType?e.file:t)})),u.append(\"agreeTokenList\",`[${n}]`),g&&u.append(\"mTxId\",`${g}`),P(!0),wH(u).then((e=>{\"success\"===e.data.status&&($({show:!0,message:o(\"phrase.phrase24\"),data:{historyData:{pathname:\"/infoOwner/formComplete\",state:{companyId:b.companyId,subjec"
+    },
+    {
+      "id": "E62",
+      "description": "FILE 다중 선택 UI 및 option count/업로드 busy/삭제",
+      "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "offsetUnit": "JavaScript UTF-16 code units",
+      "start": 8288623,
+      "end": 8290930,
+      "range": "half-open [start,end)",
+      "sha256OfUtf8Excerpt": "4c43ac9b225a88011543aeb81d104d15262c764b702dfc1584fc20ddf2d2a3d7",
+      "raw": "d0=(0,yt.memo)((e=>{var t,r;let{item:n,onUpdate:a,setAlertData:o,alertData:i,disabled:s,readOnly:l,formCreateType:c,type:d,uploadLoading:u,onLoadingChange:h}=e;const{t:p}=fa(\"translate\",{keyPrefix:\"infoOwnerForm\"}),m=mK(n.questionType,\"PREVIEW\"===d?\"AI_V2\":c),[f,g]=(0,yt.useState)(!1);let v=[];const b=null===n||void 0===n?void 0:n[m.filesProp];Array.isArray(b)?v=b:b&&(v=[b]);const x=(null===n||void 0===n||null===(t=n.formQuestionOptionDataList)||void 0===t||null===(r=t[0])||void 0===r?void 0:r.value)||1,A=f||u,y=v.length>=x||s||l||A,w=(0,yt.useMemo)((()=>m.validate(n)),[n,m]);return(0,yt.useEffect)((()=>{a(n.htmlFormInputName,{...n,isValid:w})}),[w,n.htmlFormInputName]),(0,yt.useEffect)((()=>{null===h||void 0===h||h(n.htmlFormInputName,A)}),[A,n.htmlFormInputName]),(0,yt.useEffect)((()=>()=>null===h||void 0===h?void 0:h(n.htmlFormInputName,!1)),[]),(0,nI.jsxs)(\"div\",{className:\"form-group\",children:[(0,nI.jsx)(\"input\",{type:\"file\",multiple:!0,accept:\".jpeg,.jpg,.png,.ai,.AI,.pdf,.PDF,.docx,.DOCX\",className:\"hidden\",id:n.htmlFormInputName,disabled:y,onChange:async e=>{g(!0);try{const t=await m.handleChange(e,n);a(n.htmlFormInputName,t)}finally{g(!1)}}}),(0,nI.jsxs)(u0,{htmlFor:n.htmlFormInputName,disabled:y,children:[A?(0,nI.jsx)(_I,{size:18,color:\"inherit\"}):(0,nI.jsx)(BU,{src:\"/img/google-icons-v2/arrows/upload.svg\",color:y?ij:ej,width:18}),(0,nI.jsx)(iI,{className:\"label-2-strong\",color:y?ij:ej,children:p(\"attachFile\")})]}),v.length>0&&(0,nI.jsx)(\"div\",{className:\"flex flex-col gap-3 mt-3\",children:v.map(((e,t)=>{var r;return(0,nI.jsxs)(h0,{children:[(0,nI.jsxs)(\"div\",{className:\"flex items-center gap-[10px] min-w-0\",children:[(0,nI.jsx)(BU,{src:null!==e&&void 0!==e&&null!==(r=e.type)&&void 0!==r&&r.includes(\"image\")?\"/media/catchsecu/image-file-icon.svg\":\"/media/catchsecu/file-attachment.svg\",color:sj,width:20}),(0,nI.jsx)(p0,{className:\"label-2\",children:m.getFileName(e)})]}),(0,nI.jsx)(BU,{src:\"/img//google-icons-v2/system/close.svg\",color:sj,width:20,onClick:()=>(e=>{const t=m.handleDelete(n,e);a(n.htmlFormInputName,t)})(t),className:\"cursor-pointer\"})]},t)}))}),(0,nI.jsxs)(iI,{className:\"label-2-weak mt-3\",color:sj,children:[p(\"phrase.phrase59\"),\" \",x,p(\"phrase.phrase62\")]}),(0,nI.jsx)(iI,{className:\"label-2-weak\",color:sj,children:p(\"phrase.phrase60\")})]})}))"
+    }
+  ],
+  "localImplementationBoundary": {
+    "agreedByParent": "이번 체크포인트는 DRAW 직접 그리기만 구현한다. SIGNATURE 인증/occupancy는 별도 F3 후속 범위.",
+    "independentImprovements": [
+      "resize 시 적용 전 획 및 적용된 그림 보존",
+      "disabled/readOnly에서 캔버스와 지우기·재입력·이전·적용을 모두 차단"
+    ],
+    "provenance": "부모의 구현 결정이며 원본에서 관측한 보장으로 표시하지 않음"
+  }
+}

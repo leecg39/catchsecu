@@ -45,7 +45,7 @@ function VerificationResend({ email, returnTo }: { email: string; returnTo: stri
     {action.errorCode === "EMAIL_MISMATCH" && <Link className="auth-back" href="/logout">로그아웃하기</Link>}</>;
 }
 export function LoginForm() {
-  const action = useAction(), router = useRouter(), returnTo = safeReturnTo(useSearchParams().get("returnTo"));
+  const action = useAction(), router = useRouter(), params = useSearchParams(), returnTo = safeReturnTo(params.get("returnTo"));
   const [email, setEmail] = useState(""), [remember, setRemember] = useState(false);
   useEffect(() => {
     let stored: string | null = null;
@@ -64,7 +64,7 @@ export function LoginForm() {
       router.replace(result.twoFactorRedirect ? authPath("/login-otp", returnTo) : returnTo); router.refresh();
     });
   }
-  return <form onSubmit={submit}><input className="auth-email" type="email" name="email" autoComplete="username" aria-label="이메일" placeholder="이메일을 입력해주세요" required value={email} onChange={event => setEmail(event.target.value)} />
+  return <form onSubmit={submit}>{params.get("accountClosed") === "1" && <p role="status" className="auth-note">회원탈퇴가 완료되었습니다. 모든 기기의 로그인이 해제되었습니다.</p>}<input className="auth-email" type="email" name="email" autoComplete="username" aria-label="이메일" placeholder="이메일을 입력해주세요" required value={email} onChange={event => setEmail(event.target.value)} />
     <Password current /><Link className="auth-forgot" href={authPath("/password-change-email", returnTo)}>비밀번호를 잊으셨나요?</Link>
     <AuthCallbackError /><Status action={action} />
     {action.errorCode === "EMAIL_NOT_VERIFIED" && <VerificationResend email={email} returnTo={returnTo} />}
@@ -91,7 +91,7 @@ export function SignupOrResetForm({ signup }: { signup: boolean }) {
   return <form className="auth-recover-form" onSubmit={submit}>
     {signup && <input name="name" aria-label="이름" placeholder="이름" required maxLength={100} />}
     <input type="email" name="email" aria-label="이메일" placeholder="이메일을 입력해주세요" required />
-    {signup && <><Password /><p className="auth-note">비밀번호는 12~128자로 입력해주세요.</p><label className="auth-remember"><input type="checkbox" required /><a href="/legal/terms" target="_blank" rel="noreferrer">서비스 이용약관</a> 및 <a href="/legal/privacy" target="_blank" rel="noreferrer">개인정보 처리방침</a>에 동의합니다.</label></>}
+    {signup && <><Password /><p className="auth-note">비밀번호는 12~128자로 입력해주세요.</p><label className="auth-remember auth-consent"><input type="checkbox" required /><span><a href="/legal/terms" target="_blank" rel="noreferrer">서비스 이용약관</a> 및 <a href="/legal/privacy" target="_blank" rel="noreferrer">개인정보 처리방침</a>에 동의합니다.</span></label></>}
     <Status action={action} /><button disabled={action.pending} className="auth-primary auth-block">{action.pending ? "처리 중…" : signup ? "회원가입" : "비밀번호 재설정 메일 받기"}</button>
   </form>;
 }
@@ -117,6 +117,8 @@ export function PasswordForm() {
   if (!token && policy.loading) return <p role="status" className="auth-note">비밀번호 정책을 확인하고 있습니다.</p>;
   if (!token && policy.error?.status === 401) return <><p role="alert" className="auth-error">로그인하거나 이메일 재설정 링크를 이용해주세요.</p>
     <Link className="auth-primary auth-block" href={authPath("/login", returnTo)}>로그인</Link><Link className="auth-back" href={authPath("/password-change-email", returnTo)}>재설정 메일 받기</Link></>;
+  if (!token && policy.error) return <><p role="alert" className="auth-error">{policy.error.message}</p>
+    <button type="button" className="auth-primary auth-block" onClick={policy.reload}>다시 시도</button></>;
   return <>{policy.data?.required && <section className="auth-policy-note"><strong>{policy.data.companyName} 비밀번호 변경 안내</strong>
       <p>비밀번호 변경 기한이 지났습니다. 회사 기능을 사용하려면 새 비밀번호를 설정해주세요.</p>
       {policy.data.deadline && <p>변경 기한: {new Date(policy.data.deadline).toLocaleString("ko-KR")}</p>}</section>}
@@ -131,8 +133,7 @@ export function PasswordForm() {
     {policy.data?.canDefer && <button className="auth-text-button" disabled={action.pending} onClick={() => action.run(async () => {
       await api("/me/password-policy", { method: "POST", body: JSON.stringify({ tenantId: policy.data!.tenantId, passwordRevision: policy.data!.passwordRevision }) });
       router.replace(returnTo); router.refresh();
-    })}>{policy.data.deferralMode === "session" ? "다음 로그인 시 변경하기" : "지금부터 " + policy.data.passwordMonths + "개월 후 변경하기"}</button>}
-    {policy.error && <p className="auth-note">{policy.error.status === 401 ? "로그인하거나 이메일 재설정 링크를 이용해주세요." : policy.error.message}</p>}</>;
+    })}>{policy.data.deferralMode === "session" ? "다음 로그인 시 변경하기" : "지금부터 " + policy.data.passwordMonths + "개월 후 변경하기"}</button>}</>;
 }
 export function VerificationForm({ email }: { email: boolean }) {
   const action = useAction(), router = useRouter(), returnTo = safeReturnTo(useSearchParams().get("returnTo")), [backup, setBackup] = useState(false);
@@ -157,7 +158,9 @@ export function MfaForm() {
   const [confirmed, setConfirmed] = useState(false);
   const [setup, setSetup] = useState<{ totpURI: string; backupCodes: string[] }>();
   if (context.loading) return <p role="status" className="auth-note">인증 설정을 확인하고 있습니다.</p>;
-  if (context.error) return <><p role="alert" className="auth-error">{context.error.message}</p><Link className="auth-primary auth-block" href={authPath("/login", returnTo)}>다시 로그인</Link></>;
+  if (context.error) return <><p role="alert" className="auth-error">{context.error.message}</p>
+    {context.error.status === 401 ? <Link className="auth-primary auth-block" href={authPath("/login", returnTo)}>다시 로그인</Link>
+      : <button type="button" className="auth-primary auth-block" onClick={context.reload}>다시 시도</button>}</>;
   const enabled = confirmed || context.data?.user.twoFactorEnabled;
   return <><p className="auth-description">현재 비밀번호를 확인한 후 인증 앱을 등록합니다.</p>
     {!enabled && <>
@@ -193,7 +196,7 @@ export function IpDeniedCompanies() {
   const result = useResource<{ items: { id: string; name: string }[]; total: number; page: number; pageSize: number; blockedTotal: number }>("/companies?" + new URLSearchParams({ search, page: String(page), pageSize: "20" }));
   const action = useAction();
   return <><label>회사 검색<input className="cs-input" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} /></label>
-    {result.error ? <p role="alert">{result.error.message}</p> : !result.data ? <p role="status">접근할 수 있는 회사를 불러오는 중입니다.</p> : <>
+    {result.error ? <><p role="alert">{result.error.message}</p><button type="button" className="auth-primary auth-block" onClick={result.reload}>다시 시도</button></> : !result.data ? <p role="status">접근할 수 있는 회사를 불러오는 중입니다.</p> : <>
       {result.data.items.map(company => <button key={company.id} className="auth-primary auth-block" disabled={action.pending} onClick={() => action.run(async () => { await api("/context", { method: "POST", body: JSON.stringify({ companyId: company.id }) }); router.push("/dashboard"); router.refresh(); })}>{company.name} 선택</button>)}
       {!result.data.items.length && <p>현재 IP에서 접근할 수 있는 회사가 없습니다. 회사에서 허용한 장소에서 다시 접속해주세요.</p>}
       {result.data.total > result.data.pageSize && <div className="mg-flex"><button disabled={result.data.page <= 1} onClick={() => setPage(result.data!.page - 1)}>이전</button><button disabled={result.data.page * result.data.pageSize >= result.data.total} onClick={() => setPage(result.data!.page + 1)}>다음</button></div>}

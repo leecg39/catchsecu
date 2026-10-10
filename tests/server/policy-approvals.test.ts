@@ -1,3 +1,5 @@
+import { beforeEach as beforeSecurityCase } from "vitest";
+import { grantSecurityTestTrials } from "../fixtures/security-subscription";
 import { randomUUID } from "node:crypto";
 import { beforeAll, beforeEach, afterAll, describe, expect, test } from "vitest";
 import { createOTP } from "@better-auth/utils/otp";
@@ -262,3 +264,5 @@ describe("company policy and approval enforcement", () => {
     expect((await services(req("/services", "GET", "editor"))).status).toBe(200);
   });
 });
+
+beforeSecurityCase(grantSecurityTestTrials);

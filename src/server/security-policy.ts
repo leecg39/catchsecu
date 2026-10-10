@@ -8,8 +8,10 @@ import { auth } from "./auth";
 import { audit } from "./audit";
 import { lockServiceActor } from "./service-actor";
 import { assertFileDeadlines } from "./file-access";
+import { lockSecurityEntitlements } from "./feature-entitlements";
+import type { SecurityEntitlements } from "@/contracts/feature-entitlements";
 
-export function policyDto(policy: SecurityPolicy, ctx: Context) {
+export function policyDto(policy: SecurityPolicy, ctx: Context, entitlements: SecurityEntitlements) {
   return { tenantId: ctx.tenantId, minPassword: policy.minPassword, passwordMonths: policy.passwordMonths,
     passwordReuse: policy.passwordReuse, passwordDeferral: policy.passwordDeferral, passwordRevision: policy.passwordRevision, sessionMinutes: policy.sessionMinutes, requireMfa: policy.requireMfa, requireApproval: policy.requireApproval,
     approvalRoles: policy.approvalRoles, approvalReferenceRequired: policy.approvalReferenceRequired,
@@ -17,12 +19,18 @@ export function policyDto(policy: SecurityPolicy, ctx: Context) {
     automaticDestruction: policy.automaticDestruction, allowRetentionAdjustment: policy.allowRetentionAdjustment,
     allowRetentionDesignation: policy.allowRetentionDesignation, retentionDays: policy.retentionDays,
     activityReviewRetentionDays: policy.activityReviewRetentionDays,
-    version: policy.version, updatedAt: policy.updatedAt, canManage: ctx.member.role === "owner" };
+    version: policy.version, updatedAt: policy.updatedAt, entitlements, canManage: ctx.member.role === "owner" && ctx.member.accessKind === "direct" && entitlements["security.company_policy"].available };
 }
 export async function readPolicy(ctx: Context) {
-  const policy = await db.securityPolicy.findUnique({ where: { tenantId: ctx.tenantId } });
-  if (!policy) fail(404, "NOT_FOUND", "회사 보안 정책을 찾을 수 없습니다.");
-  return policyDto(policy, ctx);
+  return db.$transaction(async tx => {
+    const actor = await lockServiceActor(tx, ctx, "security.read");
+    const policy = await tx.securityPolicy.findUnique({ where: { tenantId: ctx.tenantId } });
+    if (!policy) fail(404, "NOT_FOUND", "회사 보안 정책을 찾을 수 없습니다.");
+    const access = await lockSecurityEntitlements(tx, ctx.tenantId);
+    const result = policyDto(policy, { ...ctx, member: actor.member }, access.snapshot());
+    assertFileDeadlines(actor.deadlines);
+    return result;
+  }, { timeout: 15000 });
 }
 export async function confirmPassword(ctx: Context, headers: Headers, password: string) {
   await rateLimit("policy-password:" + ctx.user.id, 5);
@@ -59,6 +67,9 @@ export async function updatePolicy(ctx: Context, version: number, settings: z.in
     await tx.$queryRaw`SELECT "tenantId" FROM "SecurityPolicy" WHERE "tenantId" = ${ctx.tenantId} FOR UPDATE`;
     const current = await tx.securityPolicy.findUniqueOrThrow({ where: { tenantId: ctx.tenantId } });
     if (current.version !== version) fail(409, "VERSION_CONFLICT", "다른 곳에서 수정되었습니다. 최신 정책을 불러와주세요.");
+    const access = await lockSecurityEntitlements(tx, ctx.tenantId);
+    access.assert("security.company_policy");
+    if (settings.requireMfa !== current.requireMfa) access.assert("security.mfa_management");
     const user = await tx.user.findUniqueOrThrow({ where: { id: ctx.user.id } });
     if (settings.requireMfa && !user.twoFactorEnabled) fail(409, "MFA_SETUP_REQUIRED", "관리자 계정의 2단계 인증을 먼저 등록해주세요.");
     const passwordChanged = current.minPassword !== settings.minPassword || current.passwordMonths !== settings.passwordMonths
@@ -94,7 +105,9 @@ export async function updatePolicy(ctx: Context, version: number, settings: z.in
       data: { ...settings, version: { increment: 1 }, passwordRevision: { increment: passwordChanged ? 1 : 0 }, approvalRevision: { increment: approvalChanged || retentionChanged ? 1 : 0 } } });
     await audit(tx, ctx, requestId, reset ? "policy.reset" : "policy.updated", "securityPolicy", ctx.tenantId, Object.keys(settings));
     assertFileDeadlines(actor.deadlines);
-    return policyDto(saved, ctx);
+    access.assert("security.company_policy");
+    if (settings.requireMfa !== current.requireMfa) access.assert("security.mfa_management");
+    return policyDto(saved, { ...ctx, member: actor.member }, access.snapshot());
   }, { timeout: 15000 });
 }
 export { policyDefaults };

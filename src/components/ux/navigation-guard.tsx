@@ -3,10 +3,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useId, useMemo, useRef, type ComponentProps, type ReactNode } from "react";
 import { useConfirm } from "./confirm";
+import { protectHistoryNavigation, type HistoryNavigation } from "@/lib/history-guard";
 
 const defaultMessage = "저장하지 않은 변경 사항이 있습니다. 이 화면을 나가면 입력한 내용이 사라집니다.";
-type Guard = { set: (id: string, message: string | null) => void; blocked: () => boolean; confirmLeave: () => Promise<boolean> };
-const GuardContext = createContext<Guard>({ set: () => {}, blocked: () => false, confirmLeave: async () => true });
+type Guard = { set: (id: string, message: string | null) => void; blocked: () => boolean; confirmLeave: () => Promise<boolean>; discardConfirmedChanges: () => void };
+const GuardContext = createContext<Guard>({ set: () => {}, blocked: () => false, confirmLeave: async () => true, discardConfirmedChanges: () => {} });
 export const useNavigationGuard = () => useContext(GuardContext);
 
 export function NavigationGuardProvider({ children }: { children: ReactNode }) {
@@ -25,7 +26,13 @@ export function NavigationGuardProvider({ children }: { children: ReactNode }) {
     set: (id, message) => { if (message) guards.current.set(id, message); else guards.current.delete(id); },
     blocked: () => guards.current.size > 0,
     confirmLeave: async () => !guards.current.size || ask({ title: "저장하지 않은 변경 사항", message: guards.current.values().next().value ?? defaultMessage, confirmLabel: "나가기", cancelLabel: "계속 편집" }),
+    // Use only after the user confirmed and a context change committed, immediately before navigation.
+    discardConfirmedChanges: () => guards.current.clear(),
   }), [ask]);
+  useEffect(() => {
+    const navigation = (window as Window & { navigation?: HistoryNavigation }).navigation;
+    if (navigation) return protectHistoryNavigation(navigation, guard.blocked, guard.confirmLeave);
+  }, [guard]);
   return <GuardContext.Provider value={guard}>{children}</GuardContext.Provider>;
 }
 

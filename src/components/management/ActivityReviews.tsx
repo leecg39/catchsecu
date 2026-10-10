@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { GuardedLink as Link, useUnsavedChanges } from "../ux/navigation-guard";
 import { useSearchParams } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import { ApiError, api, errorText, useResource } from "@/lib/api";
@@ -7,6 +7,7 @@ import { reviewAction, reviewCreate, reviewDestruction, reviewStatuses, type Rev
 import type { AuditEventRecord } from "@/contracts/audit-events";
 import { useApplication, type Application } from "../ApplicationContext";
 import { ActionButton, EmptyState, Modal, PageHeading, Panel } from "../shared";
+import { useConfirm } from "../ux/confirm";
 
 const statuses: Record<ReviewRecord["status"], string> = { requested: "답변 대기", responded: "답변 도착", resolved: "처리 완료", cancelled: "요청 취소" };
 const destructionStatuses: Record<ReviewRecord["destructionStatus"], string> = { none: "파기 일정 없음", awaiting: "파기 승인 대기", kept: "보존 처리", destroyed: "메시지 파기 완료" };
@@ -19,6 +20,13 @@ function manager(app: Application) { return ["security.write", "audit.read"].eve
 export function ActivityReviewRequest({ event, onClose }: { event: AuditEventRecord; onClose: () => void }) {
   const [title, setTitle] = useState("개인정보 활동 검토"), [message, setMessage] = useState(""), [busy, setBusy] = useState(false), [error, setError] = useState(""), [createdId, setCreatedId] = useState("");
   const lock = useRef(false), request = useRef({ payload: "", key: "" });
+  const dirty = !createdId && (title !== "개인정보 활동 검토" || !!message), confirm = useConfirm();
+  useUnsavedChanges(dirty || busy);
+  async function close() {
+    if (lock.current) return;
+    if (dirty && !await confirm({ title: "저장하지 않은 변경 사항", message: "작성한 검토 요청을 버릴까요?", confirmLabel: "입력 버리기", cancelLabel: "계속 편집" })) return;
+    onClose();
+  }
   async function submit(e: FormEvent) {
     e.preventDefault(); if (lock.current) return; lock.current = true; setBusy(true); setError("");
     try {
@@ -30,7 +38,7 @@ export function ActivityReviewRequest({ event, onClose }: { event: AuditEventRec
       setCreatedId(result.id);
     } catch (cause) { setError(problem(cause)); } finally { lock.current = false; setBusy(false); }
   }
-  return <Modal title="개인정보 활동 검토 요청" onClose={() => { if (!lock.current) onClose(); }}>
+  return <Modal title="개인정보 활동 검토 요청" onClose={() => { void close(); }}>
     {createdId ? <div className="activity-review-fields"><p role="status">검토 요청을 등록했습니다. 대상자는 마이페이지에서 확인하고 답변할 수 있습니다.</p><Link className="cs-button" href={"/my-page/info-activity-log?reviewId=" + createdId}>검토 이력 열기</Link></div> : <form className="activity-review-fields" onSubmit={submit}>
       <p>{event.serviceName ?? "서비스"} · {event.actorName ?? "처리자"} · {when(event.createdAt)}</p><p>{event.action}</p>
       <p className="mg-muted">요청은 이 기록의 처리자에게 전달됩니다. 주민번호·연락처 등 개인정보 원문을 입력하지 마세요.</p>
@@ -81,64 +89,74 @@ function ReviewWorkspace({ app, initialId }: { app: Application; initialId: stri
   </div>;
 }
 function ReviewDialog({ id, onClose, onChanged }: { id: string; onClose: () => void; onChanged: () => void }) {
-  const result = useResource<ReviewDetail>("/activity-reviews/" + id), busy = useRef(false);
-  return <Modal title="개인정보 활동 검토 상세" onClose={() => { if (!busy.current) onClose(); }}>
+  const result = useResource<ReviewDetail>("/activity-reviews/" + id);
+  if (result.data) return <ReviewConversation key={id + ":" + result.data.version} row={result.data} onClose={onClose} onReload={result.reload} onChanged={() => { result.reload(); onChanged(); }} />;
+  return <Modal title="개인정보 활동 검토 상세" onClose={onClose}>
     {result.loading && <p role="status">검토 내용을 불러오는 중입니다.</p>}
     {result.error && <div><p role="alert">{problem(result.error)}</p><ActionButton secondary onClick={result.reload}>검토 상세 다시 불러오기</ActionButton></div>}
-    {result.data && <ReviewConversation key={id + ":" + result.data.version} row={result.data} onBusy={value => { busy.current = value; }} onReload={result.reload} onChanged={() => { result.reload(); onChanged(); }} />}
   </Modal>;
 }
-function ReviewConversation({ row, onBusy, onReload, onChanged }: { row: ReviewDetail; onBusy: (value: boolean) => void; onReload: () => void; onChanged: () => void }) {
+function ReviewConversation({ row, onClose, onReload, onChanged }: { row: ReviewDetail; onClose: () => void; onReload: () => void; onChanged: () => void }) {
   const notificationKey = useRef("");
-  const [action, setAction] = useState<"response" | "resolve" | "cancel">(row.canRespond ? "response" : row.status === "responded" ? "resolve" : "cancel"), [message, setMessage] = useState("");
+  const initialAction = row.canRespond ? "response" : row.status === "responded" ? "resolve" : "cancel";
+  const [action, setAction] = useState<"response" | "resolve" | "cancel">(initialAction), [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [conflict, setConflict] = useState(false), request = useRef({ payload: "", key: "" }), lock = useRef(false);
+  const dirty = !!message || action !== initialAction, confirm = useConfirm();
+  useUnsavedChanges(dirty || busy);
+  async function discard() {
+    return !dirty || await confirm({ title: "저장하지 않은 변경 사항", message: "작성한 검토 메시지를 버릴까요?", confirmLabel: "입력 버리기", cancelLabel: "계속 편집" });
+  }
+  async function close() { if (!lock.current && await discard()) onClose(); }
+  async function reload() { if (!lock.current && await discard()) onReload(); }
   async function submit(e: FormEvent) {
-    e.preventDefault(); if (lock.current || conflict) return; lock.current = true; setBusy(true); onBusy(true); setError("");
+    e.preventDefault(); if (lock.current || conflict) return; lock.current = true; setBusy(true); setError("");
     try {
       const parsed = reviewAction.safeParse({ version: row.version, action, message }); if (!parsed.success) throw new Error(parsed.error.issues.map(i => i.message).join(" "));
       const payload = JSON.stringify(parsed.data); if (request.current.payload !== payload) request.current = { payload, key: crypto.randomUUID() };
       await api("/activity-reviews/" + row.id + "/actions", { method: "POST", headers: { "Idempotency-Key": request.current.key }, body: payload }); onChanged();
     } catch (cause) { setError(problem(cause)); setConflict(cause instanceof ApiError && cause.status === 409); }
-    finally { lock.current = false; setBusy(false); onBusy(false); }
+    finally { lock.current = false; setBusy(false); }
   }
   async function notify() {
-    if (lock.current || conflict) return; lock.current = true; setBusy(true); onBusy(true); setError("");
+    if (lock.current || conflict || !await discard() || lock.current) return; lock.current = true; setBusy(true); setError("");
     try {
       notificationKey.current ||= crypto.randomUUID();
       await api("/activity-reviews/" + row.id + "/notifications", { method: "POST", headers: { "Idempotency-Key": notificationKey.current }, body: JSON.stringify({ version: row.version }) });
       onChanged();
     } catch (cause) { setError(problem(cause)); setConflict(cause instanceof ApiError && cause.status === 409); }
-    finally { lock.current = false; setBusy(false); onBusy(false); }
+    finally { lock.current = false; setBusy(false); }
   }
-  const [deciding, setDeciding] = useState<"destroy" | "keep" | "">(""), destructionKey = useRef("");
+  const [deciding, setDeciding] = useState<"destroy" | "keep" | "">(""), destructionRequest = useRef({ payload: "", key: "" });
   async function decide(action: "destroy" | "keep") {
-    if (lock.current || conflict) return; lock.current = true; setBusy(true); onBusy(true); setError("");
+    if (lock.current || conflict) return; lock.current = true; setBusy(true); setError("");
     try {
       const parsed = reviewDestruction.safeParse({ version: row.version, action }); if (!parsed.success) throw new Error(parsed.error.issues.map(i => i.message).join(" "));
-      destructionKey.current ||= crypto.randomUUID();
-      await api("/activity-reviews/" + row.id + "/destruction", { method: "POST", headers: { "Idempotency-Key": destructionKey.current }, body: JSON.stringify(parsed.data) });
+      const payload = JSON.stringify(parsed.data);
+      if (destructionRequest.current.payload !== payload) destructionRequest.current = { payload, key: crypto.randomUUID() };
+      await api("/activity-reviews/" + row.id + "/destruction", { method: "POST", headers: { "Idempotency-Key": destructionRequest.current.key }, body: payload });
       setDeciding(""); onChanged();
     } catch (cause) { setError(problem(cause)); setConflict(cause instanceof ApiError && cause.status === 409); }
-    finally { lock.current = false; setBusy(false); onBusy(false); }
+    finally { lock.current = false; setBusy(false); }
   }
-  return <div className="activity-review-fields"><h3>{row.title}</h3><p>{row.serviceName} · {row.action}</p><p>요청자 {row.requesterName} · 대상자 {row.recipientName}</p><p role="status">{statuses[row.status]} · 버전 {row.version}</p>
+  return <Modal title="개인정보 활동 검토 상세" onClose={() => { void close(); }}><div className="activity-review-fields"><h3>{row.title}</h3><p>{row.serviceName} · {row.action}</p><p>요청자 {row.requesterName} · 대상자 {row.recipientName}</p><p role="status">{statuses[row.status]} · 버전 {row.version}</p>
+    {error && <p role="alert">{error}</p>}
+    {conflict && <div><p>최신 상태를 확인해주세요. 저장하지 않은 입력이 있으면 불러오기 전에 확인합니다.</p><ActionButton type="button" secondary onClick={() => { void reload(); }}>최신 검토 불러오기</ActionButton></div>}
     {row.status === "resolved" || row.status === "cancelled" ? <p role="status">{destructionStatuses[row.destructionStatus]}{row.retentionUntil ? ` · 보유 기한 ${new Date(row.retentionUntil).toLocaleString("ko-KR")}` : ""}</p> : null}
     {row.destructionStatus === "destroyed" && <p className="mg-muted">검토 메시지 원문은 삭제되었습니다. 검토 이력과 감사 기록은 보존됩니다.</p>}
     {row.canDecideDestruction && <div><p>보유 기한이 지났습니다. 파기를 승인하면 메시지 원문이 삭제되고 되돌릴 수 없습니다. 보존을 선택하면 이 검토는 더 이상 파기 대상이 되지 않습니다.</p>
       {deciding ? <div className="mg-flex"><p role="status">{deciding === "destroy" ? "메시지 원문을 파기합니다. 계속하시겠습니까?" : "이 검토를 보존 처리합니다. 계속하시겠습니까?"}</p>
-        <ActionButton type="button" disabled={busy} onClick={() => void decide(deciding)}>{busy ? "처리 중…" : deciding === "destroy" ? "파기 승인 확정" : "보존 처리 확정"}</ActionButton>
+        <ActionButton type="button" disabled={busy || conflict} onClick={() => void decide(deciding)}>{busy ? "처리 중…" : deciding === "destroy" ? "파기 승인 확정" : "보존 처리 확정"}</ActionButton>
         <ActionButton type="button" secondary disabled={busy} onClick={() => setDeciding("")}>취소</ActionButton></div>
       : <div className="mg-flex"><ActionButton type="button" disabled={busy || conflict} onClick={() => setDeciding("destroy")}>메시지 파기 승인</ActionButton>
         <ActionButton type="button" secondary disabled={busy || conflict} onClick={() => setDeciding("keep")}>보존 처리</ActionButton></div>}</div>}
-    {row.notification && <div><p role="status">이메일 알림: {notificationStatuses[row.notification.status] ?? "상태 확인 필요"}</p><small>{when(row.notification.createdAt)} 요청 · 외부 수신 완료를 뜻하지 않습니다.</small><ActionButton type="button" secondary disabled={busy} onClick={onReload}>알림 상태 새로고침</ActionButton></div>}
+    {row.notification && <div><p role="status">이메일 알림: {notificationStatuses[row.notification.status] ?? "상태 확인 필요"}</p><small>{when(row.notification.createdAt)} 요청 · 외부 수신 완료를 뜻하지 않습니다.</small><ActionButton type="button" secondary disabled={busy} onClick={() => { void reload(); }}>알림 상태 새로고침</ActionButton></div>}
     {row.canNotify && <div><p>대상자의 등록 이메일로 확인 안내만 보냅니다. 검토 제목과 본문은 메일에 포함하지 않습니다.</p><ActionButton type="button" secondary disabled={busy || conflict} onClick={notify}>{busy ? "처리 중…" : "이메일 알림 요청"}</ActionButton></div>}
     <ol className="activity-review-messages">{row.messages.map(m => <li key={m.id}><strong>{messageKinds[m.kind] ?? m.kind} · {m.authorName}</strong><time dateTime={m.createdAt}>{when(m.createdAt)}</time><p>{m.body}</p></li>)}</ol>
     {(row.canRespond || row.canClose) && <form className="activity-review-fields" onSubmit={submit}><fieldset disabled={busy || conflict}>
       {row.canClose && <label>처리 방식<select className="cs-input" aria-label="검토 처리 방식" value={action} onChange={e => setAction(e.target.value as "resolve" | "cancel")}>{row.status === "responded" && <option value="resolve">처리 완료</option>}<option value="cancel">요청 취소</option></select></label>}
       <label>{row.canRespond ? "답변 내용" : "처리 내용"}<textarea className="cs-input" aria-label="검토 메시지" required maxLength={4000} value={message} onChange={e => setMessage(e.target.value)} /></label><small>{message.length} / 4000</small>
-    </fieldset>{error && <p role="alert">{error}</p>}
-      {conflict && <div><p>저장하지 않은 입력은 유지됩니다. 최신 이력을 불러오면 현재 입력이 초기화됩니다.</p><ActionButton type="button" secondary onClick={onReload}>최신 검토 불러오기</ActionButton></div>}
+    </fieldset>
       <ActionButton disabled={busy || conflict}>{busy ? "저장 중…" : action === "response" ? "답변 보내기" : action === "resolve" ? "처리 완료" : "요청 취소"}</ActionButton>
     </form>}
-  </div>;
+  </div></Modal>;
 }

@@ -4,6 +4,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { authMutationScope } from "./auth-mutation-scope";
 import { authAudit, lockAuthUser, removeAuthSessions, withAuthTransaction } from "./auth-mutations";
 import { db, outsideAuthTransaction } from "./db";
+import { recordSsoSessionProof, copySsoSessionProof } from "./sso-session-proof";
 
 export function auditedAuthAdapter(options: BetterAuthOptions) {
   const adapter = prismaAdapter(db, { provider: "postgresql" })(options);
@@ -84,7 +85,12 @@ export function auditedAuthAdapter(options: BetterAuthOptions) {
         const consumed = await tx.verification.deleteMany({ where: { id: sso.bindingId, expiresAt: { gt: new Date() } } });
         if (consumed.count !== 1 || session.userId !== sso.userId || session.activeCompanyId !== sso.tenantId)
           throw new APIError("UNAUTHORIZED", { message: "SSO 인증이 만료되었습니다. 다시 시작해주세요." });
+        const provider = await tx.ssoProvider.findUniqueOrThrow({ where: { id: sso.providerId } });
+        await recordSsoSessionProof(tx, session.id, session.userId, provider, sso.accountId, sso.authenticatedAt);
         await authAudit(tx, session.userId, session.activeCompanyId, "sso.login", "user", session.userId);
+      } else {
+        const rotated = authMutationScope.getStore()?.rotatedSsoProof;
+        if (rotated) await copySsoSessionProof(tx, session.id, session.userId, rotated.source);
       }
       if (input.select && !input.select.includes("id")) {
         const selected = { ...created }; delete (selected as { id?: string }).id;

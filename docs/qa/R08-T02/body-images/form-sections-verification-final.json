@@ -1,0 +1,54 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-10T10:36:07Z",
+  "scope": "BI-04a/F4a version-owned FormSection, question placement, completion/closed notice persistence, compatibility and additive migrations only",
+  "red": { "exitCode": 1, "reason": "form-sections contract module did not exist" },
+  "database": {
+    "name": "catchsecu_test", "migrations": 128, "freshInstall": 128, "upgradeFrom": 126, "upgradeTo": 128,
+    "legacyRowsUnchanged": true, "checks": 10, "foreignKeys": 3, "functions": 3, "triggers": 4, "columnsChecked": 21, "schemaDrift": 0
+  },
+  "tests": {
+    "focused": { "files": 3, "tests": 14, "passed": 14 },
+    "relatedRegression": { "files": 12, "tests": 85, "passed": 85, "fileParallelism": false },
+    "coverage": [
+      "legacy DTO omission and approval fingerprint surface",
+      "page and question placement persistence",
+      "old-client omission preservation and explicit null removal",
+      "form revision identity, form/template copy remapping and public read",
+      "cross-version FK, cycle, missing placement and notice SQL bypass rejection",
+      "published section/version immutability and corrupt projection fail-closed",
+      "body image persistence remains rejected before BI-04b ownership pins"
+    ]
+  },
+  "contracts": { "openapiPaths": 323, "operations": 458, "policies": 45, "unmappedOperations": 0 },
+  "quality": {
+    "typecheck": "passed", "relatedLint": "passed with 0 warnings",
+    "productionBuild": "passed with build-only ALLOW_LOCAL_MAIL/KAKAO/PAYMENT/SSO flags; no provider call was made",
+    "planVerification": { "tasks": 107, "sourcePaths": 186, "additionalPaths": 21, "dependencyCycles": 0 },
+    "diffCheck": "passed"
+  },
+  "migrationCorrection": {
+    "detected": "migration127 deferred trigger referenced a child-only record field on FormVersion",
+    "resolution": "migration127 remained immutable; additive migration128 replaced the trigger function with explicit table branches"
+  },
+  "hashes": {
+    "src/contracts/form-sections.ts": "901849cd0921e6601b0b622edfe80b9a3d892b1a8af5937c1cc43f025537250a",
+    "src/server/forms.ts": "99f4fa9ad57d2d5a03d518e6ebc7db7a698828444a3103569ae318c1481dd3a1",
+    "src/server/templates.ts": "2c37eda2226ca01020480f21f1f8f417488bad5fd30c983e2f756761b928e61e",
+    "prisma/schema.prisma": "a6ccf5d2050b23c87bdebc2df2185aea6d3f6eb05c89ee995c56dc3dbdf4bb51",
+    "migration127": "308204c9a272c7e9ccbe22d01ac375770e6dfa3f34fd0a7777b17534222488bf",
+    "migration128": "00bf22f5e498b4cb9672006c76b04c24bbb2baa0b00c4462af7f209072840664"
+  },
+  "evidence": [
+    "form-sections/migration-install-final.json",
+    "form-sections/schema-guards-final.json",
+    "form-sections/schema-current/catchsecu_test-contract.json"
+  ],
+  "remaining": [
+    "BI-04b full rich-content ownership pin graph, locking, GC and asset copy",
+    "BI-04c page CRUD UI, branch graph and visited-path submission validation",
+    "BI-05 completion/closed display and browser acceptance",
+    "BI-06 evidence v2 and rich PDF"
+  ],
+  "untouched": ["production database", "question-image frozen 20 fixture", "localhost:3108 frozen runtime"]
+}

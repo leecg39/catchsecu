@@ -7,11 +7,17 @@ export const marketingConfig = z.object({
   emailQuestionId: z.uuid().optional(), smsQuestionId: z.uuid().optional(), kakaoQuestionId: z.uuid().optional(),
 }).strict().refine(v => !!v.emailQuestionId || !!v.smsQuestionId || !!v.kakaoQuestionId, "하나 이상의 연락 채널을 선택해주세요.");
 export type MarketingConfig = z.infer<typeof marketingConfig>;
+export type MarketingQuestionKind = "name" | MarketingChannel;
+export function marketingQuestionTypeAllowed(kind: MarketingQuestionKind, type: string): boolean {
+  if (["단문형 답변", "장문형 답변"].includes(type)) return true;
+  return kind === "email" ? ["이메일", "이메일 직접 입력"].includes(type) : (kind === "sms" || kind === "kakao") && type === "연락처";
+}
 export function validateMarketingConfig(config: MarketingConfig | null | undefined, questions: { id: string; type: string }[]) {
   if (!config) return;
-  const ids = [config.nameQuestionId, config.emailQuestionId, config.smsQuestionId, config.kakaoQuestionId].filter((v): v is string => !!v);
-  if (new Set(ids).size !== ids.length || ids.some(id => !questions.some(q => q.id === id && ["단문형 답변", "장문형 답변"].includes(q.type))))
-    throw new Error("마케팅 이름과 연락처를 서로 다른 텍스트 질문에 지정해주세요.");
+  const bindings: [MarketingQuestionKind, string | undefined][] = [["name", config.nameQuestionId], ["email", config.emailQuestionId], ["sms", config.smsQuestionId], ["kakao", config.kakaoQuestionId]];
+  const ids = bindings.map(([, id]) => id).filter((id): id is string => !!id);
+  if (new Set(ids).size !== ids.length || bindings.some(([kind, id]) => id && !questions.some(q => q.id === id && marketingQuestionTypeAllowed(kind, q.type))))
+    throw new Error("마케팅 이름과 채널에 맞는 연락처를 서로 다른 질문에 지정해주세요.");
 }
 export function normalizeMarketingContact(channel: MarketingChannel, value: string) {
   if (channel === "email") return normalizeSubjectEmail(value);
@@ -50,7 +56,7 @@ export type MarketingRecord = {
   pendingLocalCopies: number;
 };
 export type MarketingPage = { items: MarketingRecord[]; total: number; page: number; pageSize: number; permissions: { canCreate: boolean; canExport: boolean } };
-export type MarketingSource = { id: string; title: string; createdAt: string; retentionUntil: string; questions: { id: string; label: string; value: string }[] };
+export type MarketingSource = { id: string; title: string; createdAt: string; retentionUntil: string; questions: { id: string; type: string; label: string; value: string }[] };
 export type MarketingSummary = {
   asOf: string; period: { from: string; to: string };
   items: { id: string; name: string; granted: number; withdrawn: number; erased: number;

@@ -1,0 +1,698 @@
+{
+  "schemaVersion": 1,
+  "author": "/root/bundle_analysis",
+  "recordedAtUtc": "2026-10-10T07:16:32.893Z",
+  "reviewKind": "기타 보기 UI 초안의 독립 읽기 전용 소스 검토",
+  "status": "최종 읽기 검토 완료. 세 확정 지적의 소스 수정과 관련 root UI 3파일14시험 통과 기록을 확인했다. 잔여 확정 결함은 없다. 실제 브라우저·DB·비동기 모달 race 검증은 별도다.",
+  "scope": {
+    "allowedWrite": "docs/qa/R08-T02/custom-choice/frontend-review.json",
+    "requestedFiles": [
+      "src/components/forms/CustomChoiceQuestionInput.tsx",
+      "src/components/forms/QuestionInput.tsx",
+      "src/components/forms/QuestionOptions.tsx",
+      "src/components/forms/FormEditor.tsx",
+      "src/components/forms/forms.css",
+      "tests/server/question-custom-choice-render.test.ts"
+    ],
+    "referencePlans": [
+      "docs/qa/R08-T02/custom-choice/PLAN.md",
+      "docs/qa/R08-T02/custom-choice/PLAN-draft.md"
+    ],
+    "supportingReads": [
+      "src/components/forms/PublicForm.tsx",
+      "src/components/forms/SubmissionDetail.tsx",
+      "src/components/shared.tsx",
+      "src/components/ux/confirm.tsx",
+      "src/components/ux/focus.ts",
+      "src/components/ux/navigation-guard.tsx",
+      "src/lib/use-form-draft.ts",
+      "src/lib/form-draft.ts"
+    ],
+    "notRun": [
+      "제품 테스트",
+      "빌드",
+      "타입 검사",
+      "브라우저",
+      "DB",
+      "원본 코드 실행"
+    ],
+    "knownIntegrationWait": "초기 검토 당시 contracts/custom-choice.ts와 옵션 타입은 backend RED 후 구현 대기였다. 당시 import 미해결을 결함으로 집계하지 않았다. 최종 root UI 시험은 helper를 포함해 수집·실행에 성공했으나 backend 전체 구현 검증을 이 보고서가 대신하지 않는다."
+  },
+  "findings": [
+    {
+      "id": "CC-UI-01",
+      "priority": "P2",
+      "status": "최종 소스 수정 및 root 이벤트 회귀 통과 기록 확인",
+      "title": "기타를 선택하지 않은 일반 배열도 재정렬해 되돌린 정정을 변경으로 만든다.",
+      "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+      "startLine": 20,
+      "endLine": 24,
+      "evidence": "emit은 항상 options.filter(...).map(...)로 ordered를 만든 뒤 custom 선택이 없어도 multiple ? ordered를 반환한다.",
+      "scenario": [
+        "기타 옵션이 있는 체크박스의 기존 일반 저장값이 ['B','A']이고 보기 정의 순서는 A,B,C,기타다.",
+        "정정에서 C를 선택한 뒤 다시 해제한다.",
+        "emit 결과는 ['A','B']가 되어 원래 ['B','A']와 JSON 표현이 달라진다."
+      ],
+      "impact": "일반 답변 배열 순서를 보존하는 계약을 깨고, 같은 선택으로 되돌렸는데도 dirty 및 정정 변경을 만들 수 있다.",
+      "planBasis": "PLAN-draft.md 4절: canonical option 순서는 새 custom 구조체에만 적용하며 일반 string[] 기존 순서는 변경하지 않는다.",
+      "supportingReferences": [
+        {
+          "file": "src/components/forms/SubmissionDetail.tsx",
+          "startLine": 58,
+          "endLine": 58
+        },
+        {
+          "file": "src/server/submission-management.ts",
+          "startLine": 79,
+          "endLine": 82
+        }
+      ],
+      "requestedFix": "custom 객체를 만드는 분기에서만 option 순서를 canonicalize한다. 일반 배열은 입력 selected 순서를 보존하며 해제는 filter, 신규 선택은 append로 처리한다.",
+      "requiredVerification": "ordinary ['B','A'] → C 추가 → C 해제 시 ['B','A'] 유지. custom 선택 중에는 게시 option 순서 canonical 보존.",
+      "confidence": "확정 소스 경로; 시험 미실행",
+      "resolution": {
+        "references": [
+          {
+            "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+            "startLine": 21,
+            "endLine": 25
+          },
+          {
+            "file": "tests/server/custom-choice-input-events.test.ts",
+            "startLine": 21,
+            "endLine": 31
+          },
+          {
+            "file": "docs/qa/R08-T02/custom-choice/PLAN.md",
+            "startLine": 11,
+            "endLine": 12
+          }
+        ],
+        "detail": "UI 임시 custom 구조체의 selectedValues와 ordinary 배열 모두 입력 values 순서를 보존한다. custom 저장 정규화는 서버 책임으로 분리했다. [B,A]→custom 선택→텍스트 입력→custom 해제→[B,A] 및 재선택 시 text 초기화 이벤트 회귀를 root가 통과했다."
+      },
+      "previousResidualScenario": {
+        "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+        "startLine": 21,
+        "endLine": 25,
+        "detail": "기존 일반 [B,A]에서 custom 선택 시 UI가 [A,B,custom]으로 정렬하고 custom 해제 시 [A,B]가 된다. 원래 선택으로 돌아와도 원래 배열 [B,A]가 복구되지 않는다.",
+        "requestedFix": "UI 임시 custom 선택은 입력 순서를 유지하고 저장 canonicalization을 서버에서 수행하거나, custom 왕복 이전 ordinary 순서를 별도로 보존한다.",
+        "status": "최종 수정으로 해소"
+      }
+    },
+    {
+      "id": "CC-UI-02",
+      "priority": "P2",
+      "status": "LF/CR/CRLF 소스 수정 및 root helper·이벤트 회귀 통과 기록 확인; native 브라우저 미검증",
+      "title": "단일행 native input은 로컬 계약이 보존하는 개행 답변을 조용히 바꿀 수 있다.",
+      "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+      "startLine": 26,
+      "endLine": 30,
+      "evidence": "text는 그대로 value로 넣지만 입력 컨트롤은 기본 type=text의 input이며 onChange가 event.target.value 전체로 기존 text를 교체한다.",
+      "scenario": [
+        "독립 API 계약으로 허용한 custom.text='a\\nb'를 제출해 저장한다.",
+        "해당 답변을 정정 UI에서 열면 text input의 native value는 LF를 포함할 수 없다.",
+        "한 글자를 추가하면 native value 전체가 onChange로 전달되어 기존 줄바꿈이 사라진다."
+      ],
+      "impact": "원문 개행 보존을 약속한 유효 저장값의 부분 편집에서 사용자 의도 밖의 값 손실이 발생할 수 있다.",
+      "planBasis": "PLAN-draft.md 4절은 text의 pipe/쉼표/따옴표/개행/BOM 등을 원문 보존한다고 명시한다. PLAN.md는 원문 보존 및 엄격한 100 UTF-16 검증을 확정했다.",
+      "sourceBoundary": "원본 other_checkbox_input UTF-16 [8172460,8173670) 역시 단일행 type=text다. 따라서 textarea 등 보존 수단은 독립 로컬 계약을 위한 보완이며 원본이 다중행 UI였다고 주장하지 않는다.",
+      "requestedFix": "개행 저장값을 변형 없이 보여 주고 수정할 컨트롤 또는 명시적 보존 편집 경로를 사용한다. 서버에서 이미 허용하기로 한 개행을 조용히 제거하지 않는다.",
+      "requiredVerification": "LF를 포함한 유효 저장 답변의 초기 표시·무변경 저장·한 글자 추가·취소 후 복원. CR/CRLF를 허용한다면 native normalization 경계도 별도로 확인한다.",
+      "confidence": "확정 HTML input 값 모델과 소스 경로; 실제 브라우저 실행 미실행",
+      "resolution": {
+        "references": [
+          {
+            "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+            "startLine": 27,
+            "endLine": 31
+          },
+          {
+            "file": "src/lib/preserve-text-line-endings.ts",
+            "startLine": 1,
+            "endLine": 16
+          },
+          {
+            "file": "tests/server/custom-choice-text-edit.test.ts",
+            "startLine": 4,
+            "endLine": 22
+          }
+        ],
+        "detail": "textarea의 LF 표시와 preserveTextLineEndings의 longest common prefix/suffix 매핑으로 수정 범위 밖 원문 CR/CRLF를 보존한다. 무변경 입력은 원문을 반환한다. 새 줄바꿈은 LF라는 독립 정책을 PLAN에 명시했다. native 길이와 별도로 원문 text.length>100 validity를 적용한다.",
+        "limits": "사용자가 편집한 범위 안의 줄바꿈은 새 LF로 교체한다. 완전한 편집 이력 추적을 주장하지 않는다. helper 자체의 static 근거와 root 단위시험 로그를 확인했으며 이 에이전트가 테스트를 실행하지 않았다."
+      }
+    },
+    {
+      "id": "CC-UI-03",
+      "priority": "P2",
+      "status": "immutable snapshot 비교 소스 수정 확인; 모달/자동저장 race 실제 실행 미검증",
+      "title": "비동기 기타 제거 확인은 저장 완료·충돌 후에도 오래된 결정을 적용한다.",
+      "file": "src/components/forms/FormEditor.tsx",
+      "startLine": 102,
+      "endLine": 120,
+      "evidence": "snapshot은 content/serviceId만 포함하며 current.disabled는 현재 busy만 반영한다. draft.phase나 saved.version 변화는 비교하지 않는다.",
+      "scenario": [
+        "기존 폼에서 변경 후 자동저장 지연 1.2초 이내에 기타 제거/유형 전환 확인창을 연다.",
+        "창이 열린 동안 자동저장이 완료되거나 409 conflict로 끝난다.",
+        "content가 동일하면 busy=false가 되어 current.disabled 검사를 통과하고, 오래된 확인으로 질문 유형·옵션 제거가 적용된다."
+      ],
+      "impact": "확인 도중 저장 상태가 달라지면 적용을 거절한다는 확정 계획을 충족하지 못한다. 충돌이 난 편집 상태에도 이전 확인이 추가 변경을 적용할 수 있다.",
+      "planBasis": "PLAN.md:14 비동기 확인 중 문항·권한·저장 상태가 달라지면 오래된 변경을 적용하지 않는다.",
+      "supportingReferences": [
+        {
+          "file": "src/lib/use-form-draft.ts",
+          "startLine": 45,
+          "endLine": 45,
+          "detail": "saving은 phase==='saving'일 때만 true"
+        },
+        {
+          "file": "src/lib/form-draft.ts",
+          "startLine": 37,
+          "endLine": 40,
+          "detail": "1.2초 자동저장"
+        },
+        {
+          "file": "src/lib/form-draft.ts",
+          "startLine": 70,
+          "endLine": 83,
+          "detail": "완료·conflict 전이"
+        }
+      ],
+      "requestedFix": "확인 시작 시 phase/version 또는 편집·저장 세대를 함께 캡처하고 완료 후 비교한다. 저장이 시작했다가 원래 상태로 돌아온 경우도 구분할 수 있는 단조로운 revision이 가장 명확하다.",
+      "requiredVerification": "확인 중 saving 시작/완료, 409, 권한 회수, 서비스/문항 변경, unmount 후 완료 각각 변경 미적용. 내용과 상태가 그대로일 때만 적용.",
+      "confidence": "확정 소스 경로; 실제 race 실행 미실행",
+      "resolution": {
+        "references": [
+          {
+            "file": "src/components/forms/FormEditor.tsx",
+            "startLine": 102,
+            "endLine": 121
+          },
+          {
+            "file": "src/lib/use-form-draft.ts",
+            "startLine": 45,
+            "endLine": 45
+          },
+          {
+            "file": "src/components/forms/QuestionOptions.tsx",
+            "startLine": 24,
+            "endLine": 30
+          },
+          {
+            "file": "src/components/forms/QuestionOptions.tsx",
+            "startLine": 67,
+            "endLine": 71
+          }
+        ],
+        "detail": "기존 immutable session.getSnapshot을 읽기 함수로 노출하고 확인 전후 객체 동일성을 비교한다. FormDraftSession.emit은 저장 시작/완료/실패마다 새 객체를 만들므로 같은 phase로 돌아와도 세대가 다르면 거절한다. 옵션 삭제와 긴 이름 적용도 같은 검사를 한다."
+      }
+    }
+  ],
+  "checkedBehaviors": [
+    {
+      "area": "선택 해제·일반 전환",
+      "conclusion": "custom option이 selected에서 빠지면 emit이 scalar/string[]로 돌아가 custom.text를 값에서 제거한다. 별도의 text state가 없어 다시 기타 선택 시 빈 값이다.",
+      "references": [
+        {
+          "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+          "startLine": 16,
+          "endLine": 24
+        },
+        {
+          "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+          "startLine": 34,
+          "endLine": 48
+        }
+      ],
+      "limitation": "공용 selectedChoiceValues의 구현은 이 시점 통합 대기다."
+    },
+    {
+      "area": "optional 기타 빈값·개수",
+      "conclusion": "선택한 기타 text에는 질문 required 여부와 별개로 required 및 trim-empty custom validity를 설정한다. custom option을 selected 한 개로 세고 미선택 checkbox는 max에 도달하면 잠근다. exact는 선택된 활성 input에 validity를 설정한다.",
+      "references": [
+        {
+          "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+          "startLine": 26,
+          "endLine": 29
+        },
+        {
+          "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+          "startLine": 39,
+          "endLine": 48
+        }
+      ],
+      "limitation": "ref의 setCustomValidity와 native submit 차단은 SSR 시험으로 실행되지 않으며 실제 브라우저 확인이 필요하다. min/max 서버 검증은 별도 backend 범위다."
+    },
+    {
+      "area": "busy/부모 fieldset",
+      "conclusion": "새 custom 컨트롤은 select/radio/checkbox/text에 disabled를 직접 전달하고 emit에서도 거절한다. PublicForm은 busy/pending 부모 fieldset과 prop을 전달하고 SubmissionDetail은 busy/conflict prop을 전달한다.",
+      "references": [
+        {
+          "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+          "startLine": 20,
+          "endLine": 44
+        },
+        {
+          "file": "src/components/forms/QuestionInput.tsx",
+          "startLine": 23,
+          "endLine": 24
+        },
+        {
+          "file": "src/components/forms/PublicForm.tsx",
+          "startLine": 132,
+          "endLine": 135
+        },
+        {
+          "file": "src/components/forms/SubmissionDetail.tsx",
+          "startLine": 128,
+          "endLine": 149
+        }
+      ],
+      "limitation": "처리 중 이벤트 타이밍의 실제 DOM 확인은 미실행. 기존 일반 입력 disabled 처리 전체를 이번 변경의 새 결함으로 집계하지 않았다."
+    },
+    {
+      "area": "보기 순서·조건 source·3종 경계",
+      "conclusion": "새 일반 보기는 기타 앞에 삽입하고 기타 추가는 max100/기존 기타 유무로 제한한다. 기타의 이동 및 일반 보기의 기타 아래 이동을 막는다. 참조된 보기 삭제를 막고 두 유형 전환 경로 모두 source 참조를 차단한다.",
+      "references": [
+        {
+          "file": "src/components/forms/QuestionOptions.tsx",
+          "startLine": 18,
+          "endLine": 32
+        },
+        {
+          "file": "src/components/forms/QuestionOptions.tsx",
+          "startLine": 50,
+          "endLine": 64
+        },
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "startLine": 104,
+          "endLine": 120
+        },
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "startLine": 186,
+          "endLine": 190
+        }
+      ]
+    },
+    {
+      "area": "명시 제거·identity 보존",
+      "conclusion": "비선택형 전환 승인 시 options/optionDefinitions=[]를 명시한다. 행렬 전환은 기존 option id/value를 유지하며 false로 내린다. 취소 시 changeQuestion을 호출하지 않는다. 저장 상태 변경 경계는 CC-UI-03으로 별도 지적했다.",
+      "references": [
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "startLine": 109,
+          "endLine": 121
+        }
+      ]
+    },
+    {
+      "area": "legacy251–500 이름",
+      "conclusion": "250 UTF-16을 넘는 일반 이름은 readonly이며 원문 길이만큼 maxLength를 유지한다. 별도 모달에서 기존 이름을 초기값으로 두고250 이하의 nonempty text만 적용한다. 취소 확인 및 question JSON snapshot 변경 거절이 있다. 자동 절단은 없다.",
+      "references": [
+        {
+          "file": "src/components/forms/QuestionOptions.tsx",
+          "startLine": 34,
+          "endLine": 47
+        },
+        {
+          "file": "src/components/forms/QuestionOptions.tsx",
+          "startLine": 66,
+          "endLine": 78
+        }
+      ],
+      "limitation": "maxLength보다 긴 초기값에서 삭제/선택 바꾸기와 모달의 중첩 focus 동작은 실제 브라우저에서 미검증이다."
+    },
+    {
+      "area": "평문·언어·레이아웃",
+      "conclusion": "option label과 custom.text는 React 텍스트/폼 value로 렌더하며 HTML 주입 API가 없다. phrase16과 phrase38, 선택 수 문구를 기존 언어 helper에서 읽는다. CSS는 긴 텍스트 줄바꿈과 min-width:0을 포함한다.",
+      "references": [
+        {
+          "file": "src/components/forms/CustomChoiceQuestionInput.tsx",
+          "startLine": 19,
+          "endLine": 51
+        },
+        {
+          "file": "src/components/forms/forms.css",
+          "startLine": 19,
+          "endLine": 19
+        }
+      ],
+      "limitation": "390/768/1440 및 RTL 실제 layout·키보드·터치 검증은 수행하지 않았다. 관리자 한국어 문구를 전체 다국어 지원으로 평가하지 않았다."
+    }
+  ],
+  "testReview": {
+    "file": "tests/server/question-custom-choice-render.test.ts",
+    "readOnly": true,
+    "executed": false,
+    "existingCoverage": [
+      "세 타입의 선택된 기타 텍스트와 required HTML",
+      "평문 이스케이프",
+      "일반/빈 값에서 text 필드 숨김",
+      "16개 언어 prompt 및 disabled radio/text HTML",
+      "추가된 LF 저장 답변 textarea HTML 보존 회귀(46–48줄), 읽기만 수행"
+    ],
+    "notCoveredByStaticMarkup": [
+      "실제 DOM native validity(trim-empty/exact/원문100 초과)와 브라우저 submit 차단",
+      "비동기 confirmation/자동저장·충돌 stale의 실제 타이밍",
+      "legacy 긴 이름 모달 적용·취소·입력 길이 및 중첩 focus",
+      "실제 textarea native LF/CR/CRLF와 IME/키보드 입력",
+      "390/768/1440 및 RTL 시각 검증"
+    ],
+    "finalEventCoverage": {
+      "file": "tests/server/custom-choice-input-events.test.ts",
+      "rootExecuted": true,
+      "reviewerExecuted": false,
+      "passedTests": 4,
+      "scope": "컴포넌트가 반환한 ReactElement의 onChange를 직접 호출한다. 실제 DOM/native validation/브라우저 이벤트 시험은 아니다.",
+      "cases": [
+        "기타 왕복 시 일반 배열 순서 보존 및 재선택 text 초기화",
+        "객관식/드롭다운 scalar 복귀·재선택 초기화",
+        "CRLF 부분 편집 보존",
+        "disabled callback이 변경을 emit하지 않음"
+      ]
+    }
+  },
+  "snapshots": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/PLAN.md",
+      "relative": "docs/qa/R08-T02/custom-choice/PLAN.md",
+      "sha256": "ccd21bf42d31f8fceb6e03e28ee3e45a3e06780055f7412de74b466f2806e487",
+      "bytes": 6249,
+      "lines": 34
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/PLAN-draft.md",
+      "relative": "docs/qa/R08-T02/custom-choice/PLAN-draft.md",
+      "sha256": "47b1de829f4d50860978e3a22d3dd1445aa64367d47aa4a3a9d582db8793146d",
+      "bytes": 23919,
+      "lines": 172
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/CustomChoiceQuestionInput.tsx",
+      "relative": "src/components/forms/CustomChoiceQuestionInput.tsx",
+      "sha256": "86f366b19aaa1381d92e51c89dd0fc4cb6f8bd0d942d102b8f19727d6a8a074f",
+      "bytes": 4321,
+      "lines": 56
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+      "relative": "src/components/forms/QuestionInput.tsx",
+      "sha256": "a6ec806e12a6e2f70028972e5130545da7a4cc7f1db9cc672090a278f23bcb62",
+      "bytes": 8432,
+      "lines": 75
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionOptions.tsx",
+      "relative": "src/components/forms/QuestionOptions.tsx",
+      "sha256": "19e62e6aca8685c09878fd0949284c267eda735afbe0454138574d2aa79b977d",
+      "bytes": 8071,
+      "lines": 83
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+      "relative": "src/components/forms/FormEditor.tsx",
+      "sha256": "49e84857c272522adbbf4eeee40186c1b673dc8f0ceaf5c9d6eb6dc1a1be1d32",
+      "bytes": 23258,
+      "lines": 210
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/forms.css",
+      "relative": "src/components/forms/forms.css",
+      "sha256": "270db9a32b05f239c64f201f230b27f7689689f8c6cb7c72b213fef316024084",
+      "bytes": 9413,
+      "lines": 20
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-custom-choice-render.test.ts",
+      "relative": "tests/server/question-custom-choice-render.test.ts",
+      "sha256": "b112b7a810b7c217bb7f50f2e9d126be405ba1e69e4efcf52545f2c2f8980087",
+      "bytes": 3458,
+      "lines": 49
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+      "relative": "src/components/forms/PublicForm.tsx",
+      "sha256": "54d5865a0590f43cbf444571c9342d4e937069a1f240c80e7e63a852753f7af9",
+      "bytes": 14751,
+      "lines": 162
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+      "relative": "src/components/forms/SubmissionDetail.tsx",
+      "sha256": "5919a9069a311dfcb9229ec4272fa9c8dc3c91e2b48c1500d4e146d8a527fefb",
+      "bytes": 20936,
+      "lines": 199
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/shared.tsx",
+      "relative": "src/components/shared.tsx",
+      "sha256": "9d10bb9079ae059e3b93a4b01bcf98a536680296def8f3825bd86fa3152d4ace",
+      "bytes": 4518,
+      "lines": 15
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/ux/confirm.tsx",
+      "relative": "src/components/ux/confirm.tsx",
+      "sha256": "7dd40629e2d0bde6a718cfcbb60d17977d7558ae6fecbd8b125491014463c07d",
+      "bytes": 2463,
+      "lines": 44
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/ux/focus.ts",
+      "relative": "src/components/ux/focus.ts",
+      "sha256": "358813dc0af903bd21f8dd0f07294a032afdee4ba32b6642db319be57c2af0eb",
+      "bytes": 2802,
+      "lines": 48
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/ux/navigation-guard.tsx",
+      "relative": "src/components/ux/navigation-guard.tsx",
+      "sha256": "f26d77a57f7bd3bcbe95c606e01c7337a1faf97552ec6e838af0aa8dc5ec4778",
+      "bytes": 3493,
+      "lines": 65
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/use-form-draft.ts",
+      "relative": "src/lib/use-form-draft.ts",
+      "sha256": "78a52ef3ecf3d163e017f07a64238f3713ff515c81cf282c5f10baee84fc9654",
+      "bytes": 3761,
+      "lines": 53
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/form-draft.ts",
+      "relative": "src/lib/form-draft.ts",
+      "sha256": "40702887f440702fbccc1adbef7dfc69908aade1a6ed7bc1eed2b7e24b4f5bbc",
+      "bytes": 6156,
+      "lines": 96
+    },
+    {
+      "relative": "src/lib/preserve-text-line-endings.ts",
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/preserve-text-line-endings.ts",
+      "sha256": "787859df6b585b6de2fc668972bfb65248519573765424a9caa16e9877caffc9",
+      "bytes": 888,
+      "lines": 17
+    },
+    {
+      "relative": "tests/server/custom-choice-text-edit.test.ts",
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/custom-choice-text-edit.test.ts",
+      "sha256": "f290a79d6a11df08f62f05e5aa3e8770e55cb81241f726edde7cbbaacfd3bf6e",
+      "bytes": 1331,
+      "lines": 23
+    },
+    {
+      "relative": "docs/qa/R08-T02/custom-choice/text-edit.json",
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/text-edit.json",
+      "sha256": "1c76f3d1c819e35c14663e2d71608b61506928a791e2b63066a1afb7d02c43c7",
+      "bytes": 1933,
+      "lines": 1
+    },
+    {
+      "relative": "docs/qa/R08-T02/custom-choice/text-edit.log",
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/text-edit.log",
+      "sha256": "061b8961d6f403444244c887ba129d08d49d7f0a06babda1f6ffe982de5aad3e",
+      "bytes": 131,
+      "lines": 2
+    },
+    {
+      "relative": "tests/server/custom-choice-input-events.test.ts",
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/custom-choice-input-events.test.ts",
+      "sha256": "9bb9244f836e258d9ec1af361735efffade8b1e274db10804d0af1f9c1ae500a",
+      "bytes": 3496,
+      "lines": 45
+    },
+    {
+      "relative": "docs/qa/R08-T02/custom-choice/ui-after.json",
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/ui-after.json",
+      "sha256": "124902ad618fe509a9fe74685fef14618fe2ef0552862063fee3492d5b6252a5",
+      "bytes": 5800,
+      "lines": 1
+    },
+    {
+      "relative": "docs/qa/R08-T02/custom-choice/ui-after.log",
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/ui-after.log",
+      "sha256": "c943cb3f1088c51973b301d93f223dc5cdd1a8fc90d0cd46d772d3e7ac78f782",
+      "bytes": 130,
+      "lines": 2
+    }
+  ],
+  "sourceProvenance": {
+    "bundleSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "reference": "docs/qa/R08-T02/custom-choice/backend-impact.json",
+    "boundary": "이 검토는 기존 검증된 원본 발췌를 재사용한다. 새 원본 네트워크 접근/서버 동작 검증은 하지 않았다."
+  },
+  "recheckedAtUtc": "2026-10-10T07:19:16.441Z",
+  "initialSnapshots": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/PLAN.md",
+      "relative": "docs/qa/R08-T02/custom-choice/PLAN.md",
+      "sha256": "e6cea2f1880c7297e5301d70c9ea11b3d4677ec23798801f861d7b65554b8e17",
+      "bytes": 5827,
+      "lines": 33
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/PLAN-draft.md",
+      "relative": "docs/qa/R08-T02/custom-choice/PLAN-draft.md",
+      "sha256": "47b1de829f4d50860978e3a22d3dd1445aa64367d47aa4a3a9d582db8793146d",
+      "bytes": 23919,
+      "lines": 172
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/CustomChoiceQuestionInput.tsx",
+      "relative": "src/components/forms/CustomChoiceQuestionInput.tsx",
+      "sha256": "e666390cbb77b89b9c7167572ff30e3961464cb7d6bd3e6c5e732fed90187798",
+      "bytes": 4094,
+      "lines": 54
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+      "relative": "src/components/forms/QuestionInput.tsx",
+      "sha256": "a6ec806e12a6e2f70028972e5130545da7a4cc7f1db9cc672090a278f23bcb62",
+      "bytes": 8432,
+      "lines": 75
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionOptions.tsx",
+      "relative": "src/components/forms/QuestionOptions.tsx",
+      "sha256": "5282fd4d99a861b3f838f7ff395873ffc4dfcf288689b63cb0f56ea81bd8b69d",
+      "bytes": 7783,
+      "lines": 83
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+      "relative": "src/components/forms/FormEditor.tsx",
+      "sha256": "e8c74b8eb78fd19988ac4410af6e1b43f5476d807c675cd6cf267d203bef3215",
+      "bytes": 23039,
+      "lines": 209
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/forms.css",
+      "relative": "src/components/forms/forms.css",
+      "sha256": "270db9a32b05f239c64f201f230b27f7689689f8c6cb7c72b213fef316024084",
+      "bytes": 9413,
+      "lines": 20
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-custom-choice-render.test.ts",
+      "relative": "tests/server/question-custom-choice-render.test.ts",
+      "sha256": "b112b7a810b7c217bb7f50f2e9d126be405ba1e69e4efcf52545f2c2f8980087",
+      "bytes": 3458,
+      "lines": 49
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+      "relative": "src/components/forms/PublicForm.tsx",
+      "sha256": "54d5865a0590f43cbf444571c9342d4e937069a1f240c80e7e63a852753f7af9",
+      "bytes": 14751,
+      "lines": 162
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+      "relative": "src/components/forms/SubmissionDetail.tsx",
+      "sha256": "5919a9069a311dfcb9229ec4272fa9c8dc3c91e2b48c1500d4e146d8a527fefb",
+      "bytes": 20936,
+      "lines": 199
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/shared.tsx",
+      "relative": "src/components/shared.tsx",
+      "sha256": "9d10bb9079ae059e3b93a4b01bcf98a536680296def8f3825bd86fa3152d4ace",
+      "bytes": 4518,
+      "lines": 15
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/ux/confirm.tsx",
+      "relative": "src/components/ux/confirm.tsx",
+      "sha256": "7dd40629e2d0bde6a718cfcbb60d17977d7558ae6fecbd8b125491014463c07d",
+      "bytes": 2463,
+      "lines": 44
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/ux/focus.ts",
+      "relative": "src/components/ux/focus.ts",
+      "sha256": "358813dc0af903bd21f8dd0f07294a032afdee4ba32b6642db319be57c2af0eb",
+      "bytes": 2802,
+      "lines": 48
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/ux/navigation-guard.tsx",
+      "relative": "src/components/ux/navigation-guard.tsx",
+      "sha256": "f26d77a57f7bd3bcbe95c606e01c7337a1faf97552ec6e838af0aa8dc5ec4778",
+      "bytes": 3493,
+      "lines": 65
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/use-form-draft.ts",
+      "relative": "src/lib/use-form-draft.ts",
+      "sha256": "8ecb44b48a89b26d8ad22a7ac3f1a4dc280fb33ef7bfd68719b9da8fe4bc01c4",
+      "bytes": 3727,
+      "lines": 53
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/form-draft.ts",
+      "relative": "src/lib/form-draft.ts",
+      "sha256": "40702887f440702fbccc1adbef7dfc69908aade1a6ed7bc1eed2b7e24b4f5bbc",
+      "bytes": 6156,
+      "lines": 96
+    }
+  ],
+  "externalExecutionEvidence": [
+    {
+      "executor": "/root",
+      "readOnlyVerification": true,
+      "report": "docs/qa/R08-T02/custom-choice/text-edit.json",
+      "log": "docs/qa/R08-T02/custom-choice/text-edit.log",
+      "numTotalTests": 4,
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "scope": "preserveTextLineEndings pure 단위시험만. DOM/브라우저/통합/DB 검증 아님"
+    },
+    {
+      "executor": "/root",
+      "readOnlyVerification": true,
+      "report": "docs/qa/R08-T02/custom-choice/ui-after.json",
+      "log": "docs/qa/R08-T02/custom-choice/ui-after.log",
+      "numTotalTestSuites": 3,
+      "numPassedTestSuites": 3,
+      "numTotalTests": 14,
+      "numPassedTests": 14,
+      "numFailedTests": 0,
+      "success": true,
+      "exitCodeReportedByRoot": 0,
+      "scope": "4개 직접 callback 이벤트 회귀 + 4개 줄바꿈 helper 회귀 + 6개 SSR 렌더 시험. DB·브라우저·전체 backend 회귀 아님"
+    }
+  ],
+  "finalizedAtUtc": "2026-10-10T07:22:14.578Z",
+  "summary": {
+    "confirmedFindings": 3,
+    "sourceFixesVerified": 3,
+    "remainingConfirmedFindings": 0,
+    "rootUiTests": {
+      "files": 3,
+      "passed": 14,
+      "failed": 0
+    },
+    "reviewerTestsExecuted": 0
+  }
+}

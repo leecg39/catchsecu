@@ -64,9 +64,15 @@ prefix: `/api/v1`. 매핑 CSV의 `CRUD /resources`는 다음을 의미한다. �
 
 ## 공개 조회·접수 계약 보강 (2026-10-04)
 
+### 버전 페이지·완료·마감 모델 (2026-10-10)
+
+폼·템플릿 작성 계약의 `sections`는 1~50개이며 안정적 UUID `id`, 제목, 평문/rich 본문, `allowBack`, 기본 목적지를 갖는다. 기본 목적지는 `{kind:"page",pageId}` 또는 `consent|submit|ineligible` 종료점이다. 페이지형 폼의 모든 질문은 같은 버전의 `pageId`를 가져야 하고 첫 페이지 제목/본문은 비운다. 객관식/드롭다운 보기의 `branchDestination`도 같은 목적지 형태를 사용하며 한 페이지에서 항상 표시되는 질문 하나만 분기할 수 있다. 선택한 보기의 목적지가 기본 목적지보다 우선한다. 사용자 직접 입력 보기·체크박스 분기, 자기 이동·없는 목적지·도달 불가 페이지·기본/보기 전체 그래프 순환은 422와 DB 지연 트리거에서 거절한다. 기존 폼은 `sections`, 질문 `pageId`, 보기 `branchDestination`을 생략한다.
+
+`completionPage`와 `closedPage`는 `{mode:"default"}` 또는 `{mode:"custom",body,bodyRich?}`다. 새 필드 생략은 잠긴 현재 초안의 값을 보존하며 `null`은 명시적 제거다. rich 텍스트 투영이 달라지거나 서식을 생략한 채 평문만 바꾸면 422다. 본문·페이지·완료·마감 문서의 이미지 ID는 같은 회사·서비스의 검사 완료 자산이고 문서 슬롯과 용도가 일치할 때만 저장한다. 없거나 다른 소유자의 자산은 404, 만료·삭제 자산은 410, 상태·부모 충돌은 409, 용도·서비스·문서 상한 오류는 422다. 복제와 템플릿 사용은 새 자산 ID로 치환한다. 자산 수명주기는 [BI-04b 검증](../qa/R08-T02/body-images/rich-assets/verification-final.json), 보기별 분기와 서버 방문 경로는 [BI-04c 검증](../qa/R08-T02/body-images/page-branches/verification-final.json)에 고정했다. 페이지 편집·공개 이동 화면은 BI-05b/F4c 범위다.
+
 `GET /public/forms/{token}`는 현재 회사/폼/서비스/게시본을 잠금 순서로 검사하고 현재 게시 버전의 질문/동의만 제공한다. 한도 도달은 `closed=true`로 표시한다. 종료/중지/회수/만료는 410이며 내부 관리자·게시/문서 버전 ID·토큰 암호문은 공개 DTO에 포함하지 않는다.
 
-`POST /public/forms/{token}/submissions`는 strict 입력과 16~128자의 Idempotency-Key를 검사한다. 한도 증가·응답/암호화 답변·검사 완료 파일 연결·동의 영수증/이벤트·감사는 같은 transaction이다. 같은 키/본문은 같은 ID/시각/submitted 상태를 반환하고 다른 유효 본문은 409다. 정상 마지막 한도 접수의 재전송은 한도를 다시 소비하지 않는다. 캐시 재전송도 잠금 대기 후 현재 공개 상태를 검사하며 종료는 410이다. 성공 여부가 불확실한 화면은 원래 본문/키·첨부로 재확인하고 새 입력을 추가 접수하지 않는다. [실행 증거와 남은 범위](../qa/P06-T01/README.md).
+`POST /public/forms/{token}/submissions`는 strict 입력과 16~128자의 Idempotency-Key를 검사한다. 페이지형 폼은 서버가 답변으로 방문 경로와 활성 질문을 다시 계산하며 미방문 답변 주입·방문 필수 질문 누락·`ineligible` 종료를 거절한다. 정상 제출은 경로 버전·방문 page ID·종료 종류를 응답과 함께 저장한다. 한도 증가·응답/암호화 답변·검사 완료 파일 연결·동의 영수증/이벤트·감사는 같은 transaction이다. 같은 키/본문은 같은 ID/시각/submitted 상태를 반환하고 다른 유효 본문은 409다. 정상 마지막 한도 접수의 재전송은 한도를 다시 소비하지 않는다. 캐시 재전송도 잠금 대기 후 현재 공개 상태를 검사하며 종료는 410이다. 성공 여부가 불확실한 화면은 원래 본문/키·첨부로 재확인하고 새 입력을 추가 접수하지 않는다. [실행 증거와 남은 범위](../qa/P06-T01/README.md), [분기·방문 경로 검증](../qa/R08-T02/body-images/page-branches/verification-final.json).
 
 ## 응답 목록·CSV 내보내기 계약 (2026-10-03)
 
@@ -446,3 +452,20 @@ PATCH는 활성 공급자를 비활성화하는 요청에 대해 연결 구성�
 ### 결제수단·주문 권한 보완 (2026-10-06)
 
 결제수단 CRUD와 주문 생성/조회/복귀는 현재 권한·세션·회사 정책 및 최종 기한을 검사한다. 주문 POST는 필수 Idempotency-Key와 선택 methodId를 받으며 기존 성공 요청 재전송도 최신 주문을 반환한다. 다른 수단의 대기 주문은409 ORDER_METHOD_CONFLICT다. 대표수단을 교체하면 이전 수단도 version을 증가시킨다. [검증](../qa/P10-T02/current-authority/README.md).
+
+### 결제 이벤트·취소 계약 (2026-10-07)
+
+POST /billing/provider-events는 raw body HMAC-SHA256의 X-Payment-Signature가 필수이고 쿠키/Origin은 필요하지 않다. paid/failed에는 refundId를 금지하며 refunded/refund_rejected에는 필수다. 잘못된 JSON400, 입력 불일치422, 충돌409를 반환한다. pending 결제 주문이 있는 구독 요청 취소는409 PAYMENT_IN_PROGRESS다. 과거 취소 구독의 paid 이벤트는409 SUBSCRIPTION_UNAVAILABLE로 거절해 구독 없이 원장만 충전하지 않는다. 실제 공급자 승인/대사는 별도 수용이다.
+
+### 처리방침의 수탁 항목·재수탁자 확장 (2026-10-10)
+
+`GET /documents/options?serviceId={id}`는 `policyItems: { requiredItems: string[], optionalItems: string[] }`를 함께 반환한다. 현재 회사·허용된 서비스의 활성 수집 목적 전체를 집계하며 문서에서 선택한 목적에 한정하지 않는다. 이름의 NFKC·대소문자 중복은 필수/선택 각 배열 안에서 제거한다. 문서 read 권한·서비스 범위·최종 세션/MFA 기한 검사는 기존 옵션 조회와 동일하다.
+
+`policyDetails.hosting.trustees[].subprocessors[]` 및 `development.trustees[].subprocessors[]`에 선택 속성 `requiredItems`, `optionalItems`, `legalBasis`를 지원한다. 항목 배열은 각각100개/문자열200자 이내, 근거는3000자 이내다. 과거 payload에서 생략된 속성에 기본값을 주입하지 않아 기존 게시 해시를 보존한다. 새 속성이 있는 직접 입력 행은 게시 시 항목을 요구하며 초안은 미완성 저장을 허용한다. 링크형 재수탁자의 직접 입력 항목·근거는 공개 JSON/본문에서 제거한다. 저장·게시·삭제의 version·감사 원자성 및 구버전 PDF 불변 규칙은 그대로 적용한다. [DB/API/브라우저 수용 기록](../qa/R10-T04/trustee-items/README.md).
+
+
+## R02 인증 일회 링크·실패 복구 보완 (2026-10-10)
+
+`GET /api/v1/auth/verify-email`은 유효한 서명 링크라도 이미 인증된 계정이면 다시 성공하지 않는다. 사용자 잠금 안에서 판정해 동시 확인의 실제 인증 전이는 한 번만 커밋한다. 안전한 callbackURL이 있으면 returnTo를 보존하면서 `error=EMAIL_ALREADY_VERIFIED`로302, 없으면400과 같은 오류코드를 반환한다. 외부/비정상 callback은 이 분기보다 먼저 거부한다. 세션을 새로 발급하지 않으며 기존 감사·실패 롤백 경계를 유지한다.
+
+기존 MFA/복구/암호 변경 API는 재사용했다. 복구코드 재사용 안내는 한국어로 제공하고, context/암호 정책/접근 회사 목록의 네트워크 오류에는 재시도를 연결했다. 인증15개 UI 경로, 실제 메일5건의 로컬 worker 전달, 암호변경/MFA/세션폐기·감사67건·재시작 지문을 확인했다. [증거](../qa/R02-T04/authentication/README.md). 실제 외부 SMTP 수신을 확인했다는 뜻은 아니다.

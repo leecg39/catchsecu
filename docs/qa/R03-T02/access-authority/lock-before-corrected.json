@@ -1,0 +1,38 @@
+[
+  {
+    "operation": "create",
+    "kind": "session",
+    "holderPid": 34679,
+    "blocked": [
+      {
+        "pid": 34680,
+        "query": "SELECT id FROM \"Company\" WHERE id=$1 FOR UPDATE"
+      }
+    ],
+    "status": 201
+  },
+  {
+    "operation": "approve",
+    "kind": "session",
+    "holderPid": 34681,
+    "blocked": [
+      {
+        "pid": 34659,
+        "query": "SELECT id FROM \"Company\" WHERE id=$1 FOR UPDATE"
+      }
+    ],
+    "status": 200
+  },
+  {
+    "operation": "cancel",
+    "kind": "session",
+    "holderPid": 34683,
+    "blocked": [
+      {
+        "pid": 34661,
+        "query": "SELECT id FROM \"Company\" WHERE id=$1 FOR UPDATE"
+      }
+    ],
+    "status": 204
+  }
+]

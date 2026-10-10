@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { join, resolve, sep } from "node:path";
 import { hashPassword } from "better-auth/crypto";
 import { db } from "../src/server/db";
 import { env } from "../src/server/env";
@@ -22,8 +23,11 @@ export const fixtureIds = {
   serviceB: "20000000-0000-4000-8000-000000000003",
 };
 async function main() {
-  await mkdir(".local", { recursive: true, mode: 0o700 });
-  const credentialFile = ".local/" + url.pathname.slice(1) + "-accounts.json";
+  const credentialDir = resolve(process.env.SEED_OUTPUT_DIR ?? ".local");
+  const localRoot = resolve(".local");
+  if (credentialDir !== localRoot && !credentialDir.startsWith(localRoot + sep)) throw new Error("Seed 계정 파일은 프로젝트 .local 안에 저장해주세요.");
+  await mkdir(credentialDir, { recursive: true, mode: 0o700 });
+  const credentialFile = join(credentialDir, url.pathname.slice(1) + "-accounts.json");
   let passwords: Record<string, string> = {};
   try { passwords = JSON.parse(await readFile(credentialFile, "utf8")); } catch {}
   const roles: Role[] = ["owner", "admin", "editor", "viewer", "privacy", "sender", "billing", "security", "auditor"];

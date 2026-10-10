@@ -1,0 +1,310 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:42175) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/question-international-contact.test.ts (13 tests | 13 failed) 5221ms
+   × all sixteen language codes round trip and invalid or null API values fail 572ms
+   × legacy null language is omitted and retains the exact pre-language approval fingerprint and domestic answer contract 461ms
+   × old-client content updates preserve the current explicit language in drafts, implicit revisions and templates 374ms
+   × non-Korean verification is rejected by create/update/template API and direct DB writes 366ms
+   × international contacts store encrypted original strings at both six and fifteen national-digit boundaries 383ms
+   × international invalid codes, incomplete pairs, lengths, non-ASCII digits and object/scalar injections fail atomically 375ms
+   × Korean explicit language preserves domestic numbers and international display language never changes email or birth validation 351ms
+   × corrections always use their published version language and retain legacy answers after the new draft changes language 694ms
+   × failed mixed correction retains scalar, version, ciphertext, correction payload and audit atomically 366ms
+   × copy and template use retain language, while explicit change affects the approval fingerprint 318ms
+   × hidden international contacts reject supplied values and clear prior answers during correction 330ms
+   × CSV retains exact international scalar including shared dial codes and values beyond complete E164 length 305ms
+   × marketing retains stronger complete-E164 policy: unsuitable consent rolls back everything but no-consent storage succeeds 324ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > all sixteen language codes round trip and invalid or null API values fail
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:69:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > legacy null language is omitted and retains the exact pre-language approval fingerprint and domestic answer contract
+AssertionError: expected { …(24) } to have property "formLanguage" with value null
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/server/question-international-contact.test.ts:85:56
+     83|   expect(prior).not.toHaveProperty("formLanguage");
+     84|   const expected = createHash("sha256").update(JSON.stringify({ title:…
+     85|   expect(fingerprint(old)).toBe(expected); expect(old).toHaveProperty(…
+       |                                                        ^
+     86|   const token = await publish(f); expect((await publicForm(token)).con…
+     87|   const result = await post(f, token, "010-1234-5678");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > old-client content updates preserve the current explicit language in drafts, implicit revisions and templates
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:93:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > non-Korean verification is rejected by create/update/template API and direct DB writes
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:107:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > international contacts store encrypted original strings at both six and fifteen national-digit boundaries
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:121:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > international invalid codes, incomplete pairs, lengths, non-ASCII digits and object/scalar injections fail atomically
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:132:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > Korean explicit language preserves domestic numbers and international display language never changes email or birth validation
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:143:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > corrections always use their published version language and retain legacy answers after the new draft changes language
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ tests/server/question-international-contact.test.ts:158:77
+    156|   await db.$transaction(tx => reviseForm(tx, ctx, f.form.id, 2, random…
+    157|   const draft = await readForm(ctx, f.form.id);
+    158|   await updateForm(ctx, f.form.id, { version: 3, content: formContentS…
+       |                                                                             ^
+    159|   const internationalToken = await publish(f, 4), currentResponse = aw…
+    160|   expect(await db.formVersion.findUniqueOrThrow({ where: { id: oldVers…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > failed mixed correction retains scalar, version, ciphertext, correction payload and audit atomically
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:170:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > copy and template use retain language, while explicit change affects the approval fingerprint
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:182:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > hidden international contacts reject supplied values and clear prior answers during correction
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:195:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > CSV retains exact international scalar including shared dial codes and values beyond complete E164 length
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:204:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/13]⎯
+
+ FAIL  tests/server/question-international-contact.test.ts > marketing retains stronger complete-E164 policy: unsuitable consent rolls back everything but no-consent storage succeeds
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "formLanguage"
+    ],
+    "path": [],
+    "message": "Unrecognized key: \"formLanguage\""
+  }
+]
+ ❯ fixture tests/server/question-international-contact.test.ts:44:37
+     42| }
+     43| async function fixture(language?: string, qs = questions(), extra: Rec…
+     44|   const content = formContentSchema.parse({ body: "International conta…
+       |                                     ^
+     45|     retentionDays: 30, maxResponses: 100, ...(language ? { formLanguag…
+     46|   const form = await db.$transaction(tx => createForm(ctx, { serviceId…
+ ❯ tests/server/question-international-contact.test.ts:215:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/13]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  13 failed (13)
+   Start at  14:32:11
+   Duration  6.52s (tests 81%, import 11%, transform 8%)
+

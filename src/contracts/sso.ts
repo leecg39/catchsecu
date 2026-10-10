@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ssoLoginMode } from "./sso-login-policy";
 
 const endpoint = z.string().trim().min(8).max(500)
   .refine(value => /^https:\/\/|^http:\/\/(127\.0\.0\.1|localhost|\[::1\])[:/]/.test(value) && !value.includes("@"),
@@ -8,6 +9,7 @@ const pem = z.string().trim().min(60).max(8000)
     "PEM 형식의 X.509 인증서가 필요합니다.");
 
 const base = {
+  tenantId: z.uuid(),
   name: z.string().trim().min(1).max(60),
   issuer: z.string().trim().min(1).max(500),
   clientId: z.string().trim().min(1).max(300),
@@ -25,10 +27,11 @@ export const ssoProviderCreate = z.discriminatedUnion("protocol", [
     tokenUrl: endpoint, jwksUrl: endpoint,
     scopes: z.string().trim().min(6).max(300).default("openid profile email") }).strict(),
   z.object({ protocol: z.literal("saml"), ...base, idpCert: pem }).strict(),
-  z.object({ protocol: z.enum(virtualOrgProtocols), name: base.name }).strict(),
+  z.object({ protocol: z.enum(virtualOrgProtocols), name: base.name, tenantId: base.tenantId }).strict(),
 ]);
 
 export const ssoProviderPatch = z.object({
+  tenantId: z.uuid().optional(),
   version: z.number().int().min(1),
   name: z.string().trim().min(1).max(60).optional(),
   enabled: z.boolean().optional(),
@@ -48,7 +51,7 @@ export const ssoProviderRecord = z.object({
 export const ssoProviderCheckedRecord = ssoProviderRecord.extend({ preflight: z.object({ ok: z.boolean(), detail: z.string() }).strict() });
 export type SsoProviderRecord = z.infer<typeof ssoProviderRecord>;
 export const ownSsoAccounts = z.object({
-  companyName: z.string(), reauthenticate: z.boolean(),
+  companyName: z.string(), reauthenticate: z.boolean(), loginPolicy: ssoLoginMode,
   providers: z.array(z.object({ id: z.uuid(), name: z.string(), protocol: z.string(), available: z.boolean() }).strict()),
   items: z.array(z.object({ id: z.uuid(), providerId: z.uuid(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(), canUnlink: z.boolean() }).strict()),
 }).strict();
@@ -69,6 +72,15 @@ export const orgMemberRecord = z.object({
   version: z.number().int().positive(), createdAt: z.iso.datetime(),
 }).strict();
 export const orgMemberRemove = z.object({ version: z.number().int().min(1) }).strict();
+export const orgMemberPatch = z.object({
+  version: orgMemberRemove.shape.version,
+  name: orgMemberCreate.shape.name.optional(),
+  email: orgMemberCreate.shape.email.unwrap().nullable().optional(),
+  pin: orgMemberCreate.shape.pin.optional(),
+}).strict().refine(input => input.name !== undefined || input.email !== undefined || input.pin !== undefined,
+  "수정할 항목을 입력해주세요.");
+export const orgMemberList = z.object({ items: z.array(orgMemberRecord), canManage: z.boolean() }).strict();
+export const ssoProviderList = z.object({ tenantId: z.uuid(), items: z.array(ssoProviderRecord), canManage: z.boolean() }).strict();
 
 export const orgLoginBody = z.object({
   protocol: z.enum(virtualOrgProtocols),
@@ -77,13 +89,20 @@ export const orgLoginBody = z.object({
   pin: z.string().min(4).max(64),
   state: z.string().regex(/^[A-Za-z0-9_-]{32,64}$/).optional(),
 }).strict();
-export const orgEmailRegisterBody = z.object({
+export const orgEmailChallengeBody = z.object({
   ticket: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
   email: z.string().trim().email().max(320),
+}).strict();
+export const orgEmailRegisterBody = orgEmailChallengeBody.extend({
+  challengeId: z.uuid(), code: z.string().regex(/^\d{6}$/),
+}).strict();
+export const orgEmailChallengeResult = z.object({
+  challengeId: z.uuid(), expiresAt: z.iso.datetime(), retryAt: z.iso.datetime(),
 }).strict();
 export const orgLoginResult = z.object({
   status: z.enum(["verified", "email-register"]),
   redirect: z.string().optional(), ticket: z.string().optional(),
+  expiresAt: z.iso.datetime().optional(), protocol: z.enum(virtualOrgProtocols).optional(),
 }).strict();
 
 export const ssoInvitationToken = z.object({ token: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict();

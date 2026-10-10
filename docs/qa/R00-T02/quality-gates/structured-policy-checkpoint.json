@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-10-10",
+  "node": "24.19.0",
+  "build": {
+    "result": "passed",
+    "directory": ".next-rea",
+    "localMail": true,
+    "localPayment": true
+  },
+  "typecheck": "passed",
+  "changedLint": {
+    "result": "passed",
+    "errors": 0,
+    "warnings": 0
+  },
+  "databaseMigrations": 104,
+  "schemaUnexpectedDifferences": 0,
+  "fullTests": {
+    "result": "passed",
+    "files": 122,
+    "total": 1834,
+    "passed": 1834,
+    "failed": 0,
+    "pending": 0,
+    "report": "../full-tests-policy-final.json",
+    "scope": "structured-policy checkpoint before management changes"
+  },
+  "priorFullTests": {
+    "total": 1815,
+    "passed": 1814,
+    "failed": 1,
+    "repairRetestPassed": 41,
+    "report": "../full-tests-recipient-final.json"
+  },
+  "targetedTests": [
+    {
+      "passed": 55,
+      "failed": 0,
+      "report": "../../R10-T01/structured-policy/server-first.json"
+    },
+    {
+      "passed": 23,
+      "failed": 0,
+      "report": "../../R10-T01/structured-policy/form-binding-regression.json"
+    }
+  ],
+  "scope": "local implementation checkpoint; not all route CRUD or external provider acceptance",
+  "sourceFingerprints": {
+    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/migrations/20261019000000_document_policy_draft/migration.sql": "20475a516d3da834fc7eb7f7e75f3bc6e6ce466d280707046dada7b059f35ed8",
+    "src/contracts/document-policy.ts": "3ce1284f45754cbc8eb82c9ffb662756b431b116966550576c82eab143f99640",
+    "src/contracts/documents.ts": "427d518a2363ff0f246f24849015a8b28d38e9ee73ce5cd400d84d40f10435ec",
+    "src/server/document-policy-render.ts": "ea1af638548e147de2acf4f903d65379bd33db790719b9b5f2be26d74fa90a44",
+    "src/server/documents.ts": "1a5e826dfb3a51f597e3f2441803f5b5a2e79764a69f40b3880599f1d67b8e48",
+    "src/components/forms/PolicyDetailsEditor.tsx": "74faf02ac1017b46068fd30fd3dc47a76c305b7c7069449f040cb351bf2a9145",
+    "src/components/forms/Documents.tsx": "fe203d79a50a7fd5780bcf671e15ba8db0d1afd235d5967b1e449c8844d63ac1",
+    "src/components/forms/documents.css": "361654a55dd041ede2dfdc4d22ad89ede617d5218c72c0cc3be4e2b22c1dfb0e",
+    "tests/server/document-policy.test.ts": "6e6d0b694c797a4cd65a94997633e6dbca715e08f88ee686926e913b63ec1219",
+    "tests/server/document-policy-contract.test.ts": "297882927f061d9fd048c585e24f6f86a380319c4b142da31c48e3aeec70e066",
+    "tests/fixtures/policy-details.ts": "6b742c7c25fd20c2f7b862ee10450ac74778f964a0b7e4eafb54cbe296832d9b",
+    "scripts/generate-openapi.ts": "1f18fd1aea2e23b1199d07df466226de2427bb6d08379e896c20aeb5496612d0"
+  }
+}

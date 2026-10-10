@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-10-10T12:50:35.990Z",
+  "result": "passed",
+  "existingQuestions": 415,
+  "nonNeutralPatterns": 0,
+  "priorColumnsSha256": "796a2048a063038c6efdc92730f098c5d0338f402a5d818aaa020cea99866ddc",
+  "migrationApplied": true,
+  "constraint": "CHECK (((\"infoPatternId\" IS NULL) OR ((\"infoPatternId\" = 1) AND (type = '단문형 답변'::text)) OR ((\"infoPatternId\" = 3) AND (type = '단문형 답변'::text) AND (\"subjectRole\" IS NULL)) OR ((\"infoPatternId\" = 2) AND (type = '장문형 답변'::text)) OR ((\"infoPatternId\" = 4) AND (type = '이메일 직접 입력'::text)) OR ((\"infoPatternId\" = 7) AND (type = '주소'::text)) OR ((\"infoPatternId\" = 8) AND (type = '생년월일'::text))))",
+  "scope": "Local development PostgreSQL only. Existing Question rows were asserted NULL for the additive field and hashed without that field; no row was modified."
+}

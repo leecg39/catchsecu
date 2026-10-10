@@ -1,0 +1,15 @@
+Captured validation results from bundle_analysis tools. No DB/browser/server build or restart.
+
+$ node node_modules/vitest/vitest.mjs run tests/server/form-system-copy.test.ts
+RUN v5.0.3
+Test Files 1 passed (1)
+Tests 6 passed (6)
+Start at 14:54:36
+Duration 498ms (transform 52%, import 33%, tests 14%, worker 1%)
+Exit code: 0
+
+$ node node_modules/typescript/bin/tsc --project docs/qa/R08-T02/international-contact/f5-typecheck.tsconfig.json --pretty false
+No stdout/stderr. Exit code: 0
+
+$ node node_modules/eslint/bin/eslint.js src/contracts/form-system-copy.ts src/components/forms/AddressQuestionInput.tsx src/components/forms/QuestionInput.tsx src/components/forms/PublicForm.tsx src/components/forms/ConsentDocuments.tsx tests/server/form-system-copy.test.ts
+No stdout/stderr. Exit code: 0

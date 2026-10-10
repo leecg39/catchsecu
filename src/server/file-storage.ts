@@ -3,7 +3,7 @@ import { mkdir, lstat, open, rename, unlink, chmod } from "node:fs/promises";
 import { resolve, join, dirname } from "node:path";
 import { createCipheriv, createDecipheriv, randomBytes, randomUUID } from "node:crypto";
 import { env } from "./env";
-import { MAX_FILE_BYTES } from "@/contracts/files";
+import { MAX_ENCRYPTED_OBJECT_BYTES, MAX_PRIVATE_OBJECT_BYTES } from "@/contracts/storage-limits";
 
 const magic = Buffer.from("CSF1");
 const key = Buffer.from(env.DATA_ENCRYPTION_KEY, "hex");
@@ -18,7 +18,7 @@ export function storageObjectName(name: string) {
   return name + ".enc";
 }
 export function encryptStoredObject(name: string, bytes: Buffer) {
-  if (!bytes.length || bytes.length > MAX_FILE_BYTES) throw new Error("Invalid file size");
+  if (!bytes.length || bytes.length > MAX_PRIVATE_OBJECT_BYTES) throw new Error("Invalid file size");
   storageObjectName(name);
   const iv = randomBytes(12), cipher = createCipheriv("aes-256-gcm", key, iv);
   cipher.setAAD(Buffer.from(name));
@@ -27,7 +27,7 @@ export function encryptStoredObject(name: string, bytes: Buffer) {
 }
 export function decryptStoredObject(name: string, data: Buffer) {
   storageObjectName(name);
-  if (data.length < 33 || data.length > MAX_FILE_BYTES + 32 || !data.subarray(0, 4).equals(magic)) throw new Error("Invalid encrypted file");
+  if (data.length < 33 || data.length > MAX_ENCRYPTED_OBJECT_BYTES || !data.subarray(0, 4).equals(magic)) throw new Error("Invalid encrypted file");
   const decipher = createDecipheriv("aes-256-gcm", key, data.subarray(4, 16));
   decipher.setAAD(Buffer.from(name));
   decipher.setAuthTag(data.subarray(16, 32));

@@ -19,6 +19,7 @@ DELEGATED_AUTH = {"/auth/sign-up/email", "/auth/sign-in/email", "/auth/request-p
                   "/auth/two-factor/verify-backup-code", "/auth/two-factor/disable"}
 REDIRECT_SUCCESS = {("get", "/auth/sso/{providerId}"), ("get", "/auth/sso/callback"), ("post", "/auth/sso/saml")}
 NO_BODY = {("post", "/security/sso/{id}/preflight"), ("post", "/uploads/{id}/complete"), ("put", "/forms/{id}/favorite"),
+           ("post", "/author-assets/uploads/{id}/complete"),
            ("post", "/viewer/logout"), ("post", "/subjects/logout"),
            ("post", "/subjects/me/withdrawals/{id}/confirm"),
            ("post", "/subjects/me/withdrawals/{id}/cancel"),

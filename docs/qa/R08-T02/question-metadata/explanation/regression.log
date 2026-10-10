@@ -1,0 +1,233 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:936) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/question-identities.test.ts (16 tests) 17793ms
+   ✓ title-only draft save preserves question and option rows 2081ms
+   ✓ draft reorder preserves question and option row identities 1650ms
+   ✓ explicit revise preserves logical questions and leaves the published version untouched 1371ms
+   ✓ label edits and legacy reorders preserve identity, answer value and branch references 1101ms
+   ✓ invalid projections, duplicate/reparented IDs, changed values and deleted branch targets roll back 580ms
+   ✓ removing an unreferenced option only removes that row; same ID cannot reinterpret a published answer 1768ms
+   ✓ form copy and template use allocate independent question, option and condition IDs 1170ms
+   ✓ legacy template reads derive repeatable option identities without rewriting JSON 405ms
+   ✓ legacy approval fingerprints remain unchanged and draft metadata upgrade retains physical IDs 453ms
+   ✓ database enforces immutable option identity/value, cross-question ownership and branch identity 569ms
+   ✓ published labels, encrypted answers, correction, sharing and CSV remain bound to the response version 837ms
+   ✓ normalizer rejects stable option IDs when their question is replaced 415ms
+   ✓ large choice sets can be created and reordered within normal transaction limits 1187ms
+   ✓ all five choice types submit stored values and display version-specific labels 2906ms
+   ✓ subject name/email roles can be swapped atomically without replacing question rows 759ms
+   ✓ non-choice option metadata cannot reinterpret free-text or date answers 538ms
+(node:1341) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/form-module-concurrency.test.ts (6 tests | 6 failed) 15320ms
+   × 아홉 질문의 같은 version 저장 두 건이 실제 잠금 대기 후 한 번만 반영된다 1694ms
+   × 승인 요청과 초안 수정의 잠금 경합은 하나의 현재 내용만 승인 대상으로 만든다 3378ms
+   × 승인 결정과 새 수정의 잠금 경합에서 수정된 내용은 이전 승인을 사용할 수 없다 5546ms
+   × 서로 다른 승인 결정 두 건은 실제 잠금 대기 후 결정·감사를 한 번만 남긴다 1981ms
+   × 새 게시와 수정의 잠금 경합 후 최초 아홉 응답·첨부·영수증 PDF는 그대로 유지된다 1331ms
+   × 이전 응답 파기와 새 게시본 제출·영수증 읽기는 새 아홉 응답을 보존하고 파기 뒤 원문을 차단한다 1384ms
+(node:1642) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/question-international-contact.test.ts (14 tests) 17014ms
+   ✓ language and international helpers preserve incomplete candidates and never guess shared-code country ISO 620ms
+   ✓ all sixteen language codes round trip and invalid or null API values fail 2772ms
+   ✓ legacy null language is omitted and retains the exact pre-language approval fingerprint and domestic answer contract 1106ms
+   ✓ old-client content updates preserve the current explicit language in drafts, implicit revisions and templates 837ms
+   ✓ non-Korean verification is rejected by create/update/template API and direct DB writes 468ms
+   ✓ international contacts store encrypted original strings at both six and fifteen national-digit boundaries 869ms
+   ✓ international invalid codes, incomplete pairs, lengths, non-ASCII digits and object/scalar injections fail atomically 2100ms
+   ✓ Korean explicit language preserves domestic numbers and international display language never changes email or birth validation 985ms
+   ✓ corrections always use their published version language and retain legacy answers after the new draft changes language 1094ms
+   ✓ failed mixed correction retains scalar, version, ciphertext, correction payload and audit atomically 1060ms
+   ✓ copy and template use retain language, while explicit change affects the approval fingerprint 1209ms
+   ✓ hidden international contacts reject supplied values and clear prior answers during correction 1722ms
+   ✓ CSV retains exact international scalar including shared dial codes and values beyond complete E164 length 1360ms
+   ✓ marketing retains stronger complete-E164 policy: unsuitable consent rolls back everything but no-consent storage succeeds 809ms
+(node:2010) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/form-crud-gate.test.ts (10 tests) 10614ms
+   ✓ 폼 복제는 질문·선택지·버전 ID를 독립 생성하고 재전송 및 원본 편집과 분리된다 1468ms
+   ✓ 게시본의 질문·선택지·본문은 DB에서 불변이고 편집·복제는 새 초안을 사용한다 1119ms
+   ✓ 게시 중지·재개는 현재 권한과 세션·만료·버전을 검사하고 실패 시 그대로 둔다 1021ms
+   ✓ 보관된 폼은 독립 초안으로 복제할 수 있고 최대 길이의 이름도 제한 내에서 생성한다 881ms
+   ✓ 즐겨찾기도 권한 회수 후의 오래된 Context를 거부한다 1201ms
+   ✓ 권한 회수 후의 오래된 Context는 폼 보관과 템플릿 삭제를 거부한다 836ms
+   ✓ 로그아웃과 이메일 인증 취소 후에는 오래된 Context로 템플릿을 변경할 수 없다 746ms
+   ✓ 복제 요청을 재전송할 때도 원본 서비스의 현재 권한을 검사한다 872ms
+   ✓ 서비스 보관 후 템플릿 삭제를 거부하고 복원 후에는 버전을 검사한다 833ms
+   ✓ 실제 변경이 없는 version-only 저장은 거부하고 즐겨찾기는 구성원별로 격리한다 1634ms
+(node:2274) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/form-module-flow.test.ts (1 test) 3286ms
+   ✓ 열여섯 질문의 생성·템플릿·동의·반려/승인·게시·파일과 그림 응답·공유·새 버전·중단을 하나의 DB 흐름으로 검증한다 3282ms
+(node:2343) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/form-documents.test.ts (18 tests) 10070ms
+   ✓ versioned form documents and consent receipt PDFs (18)
+     ✓ publishes ar consent text and preserves its encrypted v2 receipt on every read 1079ms
+     ✓ publishes th consent text and preserves its encrypted v2 receipt on every read 466ms
+     ✓ publishes tr consent text and preserves its encrypted v2 receipt on every read 436ms
+     ✓ publishes frozen display and policy text without leaking internal scope identifiers 307ms
+     ✓ stores one encrypted immutable receipt for retry and parses its actual Korean PDF bytes 470ms
+     ✓ optional refusals never become granted documents and an all-refused response has no receipt 368ms
+     ✓ source edits, display changes and public-link revocation preserve published forms and receipt bytes 552ms
+     ✓ approval freezes document display and saving refreshed settings requires approval again 514ms
+     ✓ database rejects published binding edits and cross-service draft references 599ms
+     ✓ current grants, tenant and retention control PDF access even with a previously loaded context 849ms
+     ✓ approved destruction removes encrypted evidence, PDF and events then blocks downloads 582ms
+(node:2590) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/question-explanations.test.ts (14 tests) 8454ms
+   ✓ accepts literal text, whitespace and exact UTF-16 boundaries while rejecting invalid wire values 548ms
+   ✓ stores literal explanation unchanged and exposes the published version through the public DTO 688ms
+   ✓ legacy null metadata is absent from DTO and keeps the pre-extension approval fingerprint shape 388ms
+   ✓ description-only update preserves physical identities, changes the fingerprint and supersedes approval 524ms
+   ✓ omitted draft metadata is preserved, explicit empty removes it and never returns on a later omitted save 599ms
+   ✓ omitted metadata survives the implicit new draft path and new logical questions inherit nothing 641ms
+   ✓ explicit revise and form/template copies preserve values while allocating only the intended new identities 611ms
+   ✓ template updates preserve omitted descriptions and explicit clearing stays cleared when used 471ms
+   ✓ legacy template JSON is read without adding empty description keys or rewriting its stored payload 931ms
+   ✓ database counts supplementary code points as two UTF-16 units and protects published metadata 797ms
+   ✓ stale versions and revoked current authority never alter descriptions or create update audits 466ms
+   ✓ form explanation changes and version increments roll back when audit insertion fails 491ms
+   ✓ template explanation changes and version increments roll back when audit insertion fails 494ms
+   ✓ old response corrections and receipt evidence/bytes stay bound to the original published form 802ms
+(node:2793) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/template-access-gate.test.ts (9 tests) 7253ms
+   ✓ 목록은 오래된 Context의 회수된 조회 grant와 다른 서비스 양식을 노출하지 않는다 860ms
+   ✓ 이전 Context의 역할 회수·이메일 미인증·종료 세션은 공용 목록도 우회하지 못한다 625ms
+   ✓ 회사·구성원 정지 이후 오래된 Context로 템플릿 목록을 읽지 못한다 600ms
+   ✓ 템플릿 검색·회사/공용 범위와 마지막·빈 페이지를 실제 결과에 맞춰 보정한다 733ms
+   ✓ 조회·작성 grant와 선택 서비스 상태를 GET 작업 및 생성 대상에 반영한다 737ms
+   ✓ 전문가의 배정 외 grant·실제 배정 만료를 템플릿 목록에서도 차단한다 1343ms
+   ✓ 전문가의 보관 서비스 양식은 목록·상세에서 숨기고 직접 구성원의 읽기는 유지한다 984ms
+   ✓ 목록 입력은 알 수 없는 키를 거부하고 이름 정렬을 처리한다 620ms
+   ✓ 삭제한 템플릿의 생성 캐시는 내용·해시를 지우고 새/이전 형식의 재전송을 410으로 막는다 748ms
+(node:2940) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/form-draft-save.test.ts (8 tests) 4962ms
+   ✓ 같은 키의 동시 초안 저장은 한 번의 version 증가와 감사만 만든다 743ms
+   ✓ 성공 응답을 잃어버린 저장은 같은 키/내용으로 복구하고 후속 변경과 분리된다 586ms
+   ✓ 같은 저장 키에 다른 내용은 키 불일치로 거부하고 원문을 유지한다 477ms
+   ✓ 다른 기기의 같은 version 저장은 하나만 반영되고 최신본을 다시 읽을 수 있다 465ms
+   ✓ 로그아웃 후 저장 재전송은 이전 결과를 열람할 수 없다 462ms
+   ✓ 서비스 권한 회수와 보관은 저장 재전송을 차단한다 442ms
+   ✓ 키 없는 수동 저장의 version 충돌 계약도 유지한다 1044ms
+   ✓ 게시 권한 회수 후 이전 초안 저장 캐시에서 게시 토큰을 받을 수 없다 738ms
+(node:3043) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/question-text-limits.test.ts (6 tests) 4231ms
+   ✓ explicit short/long limits persist and enforce UTF-16 N/N+1 at public submission 1048ms
+   ✓ legacy null lengths retain 1000/20000 and unrelated correction remains valid after a stricter revision 795ms
+   ✓ length-only edits save without replacing rows, change fingerprints, and deletion restores legacy semantics 583ms
+   ✓ limits copy into forms/templates and corrections reject overlong values atomically 678ms
+   ✓ question contract and database reject invalid type/range without modifying stored rows 491ms
+   ✓ legacy subject values keep trim-based identity checks during unrelated corrections 632ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 아홉 질문의 같은 version 저장 두 건이 실제 잠금 대기 후 한 번만 반영된다
+AssertionError: expected [ { …(6) }, { …(6) }, { …(6) }, …(13) ] to have a length of 9 but got 16
+
+- Expected
++ Received
+
+- 9
++ 16
+
+ ❯ tests/server/form-module-concurrency.test.ts:132:162
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 승인 요청과 초안 수정의 잠금 경합은 하나의 현재 내용만 승인 대상으로 만든다
+AssertionError: REQUIRED_ANSWER: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ ok tests/server/form-module-concurrency.test.ts:38:169
+
+ ❯ submit tests/server/form-module-concurrency.test.ts:116:22
+ ❯ tests/server/form-module-concurrency.test.ts:146:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 승인 결정과 새 수정의 잠금 경합에서 수정된 내용은 이전 승인을 사용할 수 없다
+AssertionError: REQUIRED_ANSWER: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ ok tests/server/form-module-concurrency.test.ts:38:169
+
+ ❯ submit tests/server/form-module-concurrency.test.ts:116:22
+ ❯ tests/server/form-module-concurrency.test.ts:157:98
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 서로 다른 승인 결정 두 건은 실제 잠금 대기 후 결정·감사를 한 번만 남긴다
+AssertionError: REQUIRED_ANSWER: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ ok tests/server/form-module-concurrency.test.ts:38:169
+
+ ❯ submit tests/server/form-module-concurrency.test.ts:116:22
+ ❯ tests/server/form-module-concurrency.test.ts:163:86
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 새 게시와 수정의 잠금 경합 후 최초 아홉 응답·첨부·영수증 PDF는 그대로 유지된다
+AssertionError: REQUIRED_ANSWER: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ ok tests/server/form-module-concurrency.test.ts:38:169
+
+ ❯ submit tests/server/form-module-concurrency.test.ts:116:22
+ ❯ tests/server/form-module-concurrency.test.ts:166:89
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/server/form-module-concurrency.test.ts > 이전 응답 파기와 새 게시본 제출·영수증 읽기는 새 아홉 응답을 보존하고 파기 뒤 원문을 차단한다
+AssertionError: REQUIRED_ANSWER: expected 422 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 422
+
+ ❯ ok tests/server/form-module-concurrency.test.ts:38:169
+
+ ❯ submit tests/server/form-module-concurrency.test.ts:116:22
+ ❯ tests/server/form-module-concurrency.test.ts:179:89
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed | 9 passed (10)
+      Tests  6 failed | 96 passed (102)
+   Start at  15:23:30
+   Duration  106.78s (tests 93%, import 6%, transform 1%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/explanation/regression.json

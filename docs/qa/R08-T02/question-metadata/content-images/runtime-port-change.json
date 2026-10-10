@@ -1,0 +1,28 @@
+{
+  "at": "2026-10-10T09:16:21.680239+00:00",
+  "reason": "Another app opened IPv6 *:3100 while this task listened on IPv4 127.0.0.1:3100. localhost requests could reach the unrelated application.",
+  "observed": {
+    "catchsecuPid": 89606,
+    "otherListenerPid": 4590,
+    "ipv4Health": {
+      "status": "ok",
+      "database": "ready"
+    },
+    "localhostHealthAtConflict": {
+      "status": 404,
+      "title": "AEO Platform Clone"
+    }
+  },
+  "action": "Stopped only own PID89606; restarted same build on unoccupied localhost:3108. Unrelated process unchanged.",
+  "after": {
+    "pid": 6937,
+    "port": 3108,
+    "health": {
+      "status": "ok",
+      "database": "ready"
+    },
+    "build": "MLIZWDu2FFMbod3QOy68r"
+  },
+  "failedBrowserAction": "Correction PATCH received non-JSON error; prior published/response data must be rechecked before retry.",
+  "helperChange": "flow/http use BETTER_AUTH_URL origin, restricted to localhost 3100 or3108. No product code changes."
+}

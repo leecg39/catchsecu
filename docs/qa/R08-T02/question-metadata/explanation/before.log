@@ -1,0 +1,329 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:94500) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/question-explanations.test.ts (14 tests | 13 failed) 5506ms
+   × accepts literal text, whitespace and exact UTF-16 boundaries while rejecting invalid wire values 544ms
+   × stores literal explanation unchanged and exposes the published version through the public DTO 377ms
+   × legacy null metadata is absent from DTO and keeps the pre-extension approval fingerprint shape 395ms
+   × description-only update preserves physical identities, changes the fingerprint and supersedes approval 331ms
+   × omitted draft metadata is preserved, explicit empty removes it and never returns on a later omitted save 371ms
+   × omitted metadata survives the implicit new draft path and new logical questions inherit nothing 357ms
+   × explicit revise and form/template copies preserve values while allocating only the intended new identities 327ms
+   × template updates preserve omitted descriptions and explicit clearing stays cleared when used 332ms
+   ✓ legacy template JSON is read without adding empty description keys or rewriting its stored payload 702ms
+   × database counts supplementary code points as two UTF-16 units and protects published metadata 376ms
+   × stale versions and revoked current authority never alter descriptions or create update audits 317ms
+   × form explanation changes and version increments roll back when audit insertion fails 395ms
+   × template explanation changes and version increments roll back when audit insertion fails 348ms
+   × old response corrections and receipt evidence/bytes stay bound to the original published form 332ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/question-explanations.test.ts > accepts literal text, whitespace and exact UTF-16 boundaries while rejecting invalid wire values
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ tests/server/question-explanations.test.ts:67:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > stores literal explanation unchanged and exposes the published version through the public DTO
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ fixture tests/server/question-explanations.test.ts:55:17
+ ❯ tests/server/question-explanations.test.ts:75:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > legacy null metadata is absent from DTO and keeps the pre-extension approval fingerprint shape
+PrismaClientKnownRequestError: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `42703`. Message: `column "additionalExplanation" does not exist`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/question-explanations.test.ts:85:19
+     83| test("legacy null metadata is absent from DTO and keeps the pre-extens…
+     84|   const f = await fixture(), row = await stored(f.id);
+     85|   const columns = await db.$queryRaw<{ additionalExplanation: string |…
+       |                   ^
+     86|   expect(columns.every(q => q.additionalExplanation === null)).toBe(tr…
+     87|   const dto = contentDto(row);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > description-only update preserves physical identities, changes the fingerprint and supersedes approval
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ fixture tests/server/question-explanations.test.ts:55:17
+ ❯ tests/server/question-explanations.test.ts:94:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > omitted draft metadata is preserved, explicit empty removes it and never returns on a later omitted save
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ fixture tests/server/question-explanations.test.ts:55:17
+ ❯ tests/server/question-explanations.test.ts:107:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > omitted metadata survives the implicit new draft path and new logical questions inherit nothing
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ fixture tests/server/question-explanations.test.ts:55:17
+ ❯ tests/server/question-explanations.test.ts:119:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > explicit revise and form/template copies preserve values while allocating only the intended new identities
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ fixture tests/server/question-explanations.test.ts:55:17
+ ❯ tests/server/question-explanations.test.ts:131:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > template updates preserve omitted descriptions and explicit clearing stays cleared when used
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ tests/server/question-explanations.test.ts:148:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > database counts supplementary code points as two UTF-16 units and protects published metadata
+PrismaClientKnownRequestError: 
+Invalid `prisma.$executeRaw()` invocation:
+
+
+Raw query failed. Code: `42703`. Message: `column "additionalExplanation" of relation "Question" does not exist`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/question-explanations.test.ts:167:3
+    165| test("database counts supplementary code points as two UTF-16 units an…
+    166|   const f = await fixture(), q = (await stored(f.id)).questions[0], ex…
+    167|   await db.$executeRaw`UPDATE "Question" SET "additionalExplanation"=$…
+       |   ^
+    168|   expect((await current(f.id)).questions[0].additionalExplanation).toB…
+    169|   for (const value of [exact + "a", "가".repeat(3001)])
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > stale versions and revoked current authority never alter descriptions or create update audits
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ fixture tests/server/question-explanations.test.ts:55:17
+ ❯ tests/server/question-explanations.test.ts:178:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > form explanation changes and version increments roll back when audit insertion fails
+ FAIL  tests/server/question-explanations.test.ts > template explanation changes and version increments roll back when audit insertion fails
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ fixture tests/server/question-explanations.test.ts:55:17
+ ❯ tests/server/question-explanations.test.ts:186:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/13]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > old response corrections and receipt evidence/bytes stay bound to the original published form
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "additionalExplanation"
+    ],
+    "path": [
+      "questions",
+      0
+    ],
+    "message": "Unrecognized key: \"additionalExplanation\""
+  }
+]
+ ❯ content tests/server/question-explanations.test.ts:49:28
+     47| });
+     48| function content(explanation?: unknown): FormContent {
+     49|   return formContentSchema.parse({ body: "기존 폼 안내", questions: [
+       |                            ^
+     50|     { id: randomUUID(), type: "객관식 답변", label: "선택", required: false, …
+     51|     { id: randomUUID(), type: "단문형 답변", label: "내용", required: false },
+ ❯ fixture tests/server/question-explanations.test.ts:55:17
+ ❯ tests/server/question-explanations.test.ts:203:69
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/13]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  13 failed | 1 passed (14)
+   Start at  15:18:08
+   Duration  6.64s (tests 84%, import 9%, transform 7%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/explanation/before.json

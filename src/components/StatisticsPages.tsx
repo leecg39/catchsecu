@@ -63,7 +63,7 @@ export function PrivacyStatistics({ path }: { path: string }) {
   </div>;
 }
 
-export function CompliancePage() {
+export function CompliancePage({ monthly = false }: { monthly?: boolean } = {}) {
   const result = useResource<AnalyticsDashboard>("/analytics/dashboard");
   const data = result.data;
   const app = useApplication();
@@ -84,7 +84,7 @@ export function CompliancePage() {
     try { await api("/analytics/closes", { method: "POST", body: JSON.stringify({ month, ...(selected ? { serviceId: selected } : {}) }) }); setMessage("선택한 월과 범위의 집계를 마감했습니다. 준수 통과로 판정하지 않습니다."); closed.reload(); }
     catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
   }
-  return <div className="public-statistics"><PageHeading title="개인정보 보호현황 점검 결과" />
+  return <div className="public-statistics"><PageHeading title={monthly ? "마감 데이터 조회" : "개인정보 보호현황 점검 결과"} />
     <Panel title="점검 상태"><p role="status">법적 준수 여부는 미판정입니다.</p>
       <p className="public-stat-note">월마감에 실제 등록·게시·보유 기한과 회사 인증 설정의 점검 근거를 저장합니다. 조건 확인은 준수 통과를 뜻하지 않으며 점수나 과태료를 산정하지 않습니다.</p>
       <div className="public-stat-filters">

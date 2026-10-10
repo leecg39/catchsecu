@@ -1,3 +1,4 @@
+import { questionMaterialsSchema } from "@/contracts/question-materials";
 import type { Context } from "./context";
 import { randomUUID } from "node:crypto";
 import { db, type Transaction } from "./db";
@@ -8,23 +9,40 @@ import { audit } from "./audit";
 import { enqueueMail } from "./jobs";
 import { env } from "./env";
 import type { ShareInput, ShareUpdate, ShareRecord, SharePermissions } from "@/contracts/sharing";
+import { storedOptionDefinitions } from "./question-options";
 import { rowSchema } from "@/contracts/questions";
+import { isFileQuestion } from "@/contracts/drawing-questions";
 import { idempotent } from "./idempotency";
 import { invalidateShareCache } from "./share-cache";
+import { richDocumentSchema } from "@/contracts/rich-content";
 
-export const shareInclude = { fields: { include: { question: true } }, formVersion: true, creator: { select: { userId: true } } } as const;
+export const shareInclude = { fields: { include: { question: { include: { options: { orderBy: { order: "asc" } }, section: true } } } },
+  formVersion: { include: { sections: { orderBy: { order: "asc" } } } }, creator: { select: { userId: true } } } as const;
 export type Grant = NonNullable<Awaited<ReturnType<typeof findShare>>>;
 export const findShare = (tx: Transaction, id: string) => tx.shareGrant.findUnique({ where: { id }, include: shareInclude });
 export const grantQuestions = (row: Grant) => row.fields.map(field => field.question).sort((a, b) => a.order - b.order)
-  .map(question => ({ id: question.stableKey, label: question.label, type: question.type,
+  .map(question => ({ id: question.stableKey, label: question.label, type: question.type, optionDefinitions: storedOptionDefinitions(question.options),
+    ...(question.questionImageKey != null ? { questionImageKey: question.questionImageKey } : {}),
+    ...(question.materialList != null ? { materialList: questionMaterialsSchema.parse(question.materialList) } : {}),
     ...(question.matrixRows ? { rows: rowSchema.array().parse(question.matrixRows) } : {}) }));
+export function grantPresentation(row: Grant) {
+  const selectedSections = new Set(row.fields.flatMap(field => field.question.sectionId ? [field.question.sectionId] : []));
+  const pages = row.formVersion.sections.filter(section => selectedSections.has(section.id)).map(section => ({
+    id: section.pageKey, title: section.title, body: section.body,
+    ...(section.bodyRich ? { bodyRich: richDocumentSchema.parse(section.bodyRich) } : {}),
+  }));
+  return {
+    ...(row.shareFormBody ? { formBody: { body: row.formVersion.body,
+      ...(row.formVersion.bodyRich ? { bodyRich: richDocumentSchema.parse(row.formVersion.bodyRich) } : {}) } } : {}), pages,
+  };
+}
 export function shareDto(row: Grant, permissions: SharePermissions): ShareRecord {
   return { id: row.id, formId: row.formId, formVersionId: row.formVersionId, formTitle: row.formVersion.title,
     formNumber: row.formVersion.number, email: decrypt<string>(row.emailCipher), questions: grantQuestions(row),
-    questionIds: grantQuestions(row).map(q => q.id), expiresAt: row.expiresAt.toISOString(),
+    questionIds: grantQuestions(row).map(q => q.id), shareFormBody: row.shareFormBody, expiresAt: row.expiresAt.toISOString(),
     status: row.revokedAt ? "revoked" : row.expiresAt <= new Date() ? "expired" : "active", version: row.version, createdAt: row.createdAt.toISOString(),
     actions: { edit: permissions.canCreate && !row.revokedAt, revoke: !row.revokedAt,
-      resend: permissions.canCreate && !row.revokedAt && row.expiresAt > new Date() && (permissions.canSelectFiles || !row.fields.some(f => f.question.type === "파일 업로드")) } };
+      resend: permissions.canCreate && !row.revokedAt && row.expiresAt > new Date() && (permissions.canSelectFiles || !row.fields.some(f => isFileQuestion(f.question.type))) } };
 }
 export async function lockShareForm(tx: Transaction, ctx: Context, id: string, active = false) {
   const first = await tx.form.findFirst({ where: { id, tenantId: ctx.tenantId } });
@@ -66,7 +84,7 @@ async function checkedFields(tx: Transaction, ctx: Context, formId: string, form
   if (!row) fail(404, "VERSION_NOT_FOUND", "게시된 폼 버전을 찾을 수 없습니다.");
   const selected = row.questions.filter(question => ids.includes(question.stableKey));
   if (selected.length !== ids.length) fail(422, "INVALID_SHARE_FIELDS", "이 게시 버전에 포함된 항목만 공유할 수 있습니다.");
-  if (selected.some(question => question.type === "파일 업로드")) await lockFileContext(tx, ctx, row.form.serviceId, ["file.read"]);
+  if (selected.some(question => isFileQuestion(question.type))) await lockFileContext(tx, ctx, row.form.serviceId, ["file.read"]);
   return selected;
 }
 async function invitationMail(tx: Transaction, row: Grant, code: string) {
@@ -91,7 +109,7 @@ export async function shareOptions(ctx: Context, formId: string) {
       include: { questions: { orderBy: { order: "asc" } } }, orderBy: { number: "desc" } });
     const permissions = await sharePermissions(tx, ctx, form);
     const result = { formCode: formId, permissions, versions: versions.map(row => ({ id: row.id, number: row.number, title: row.title,
-      questions: row.questions.map(q => ({ id: q.stableKey, label: q.label, type: q.type, selectable: permissions.canCreate && (q.type !== "파일 업로드" || permissions.canSelectFiles), ...(q.matrixRows ? { rows: rowSchema.array().parse(q.matrixRows) } : {}) })) })) };
+      questions: row.questions.map(q => ({ id: q.stableKey, label: q.label, type: q.type, selectable: permissions.canCreate && (!isFileQuestion(q.type) || permissions.canSelectFiles), ...(q.matrixRows ? { rows: rowSchema.array().parse(q.matrixRows) } : {}) })) })) };
     assertFileDeadlines(form.deadlines);
     return result;
   });
@@ -125,7 +143,7 @@ export async function createShareRequest(ctx: Context, input: ShareInput, key: s
     const { row, form } = await managerGrant(tx, ctx, cached.id, false, true);
     if (row.formId !== input.formId || row.formVersionId !== input.formVersionId || row.createdBy !== ctx.member.id || row.revokedAt || row.expiresAt <= new Date() || row.version !== cached.version)
       fail(410, "SHARE_REQUEST_EXPIRED", "공유 권한이 변경되었거나 종료되었습니다. 최신 공유 목록을 확인해주세요.");
-    if (row.fields.some(f => f.question.type === "파일 업로드")) await lockFileContext(tx, ctx, form.serviceId, ["file.read"]);
+    if (row.fields.some(f => isFileQuestion(f.question.type))) await lockFileContext(tx, ctx, form.serviceId, ["file.read"]);
     const result = shareDto(row, await sharePermissions(tx, ctx, form)); assertFileDeadlines(form.deadlines);
     await audit(tx, ctx, requestId, "share.viewed", "shareGrant", row.id, [], form.serviceId);
     assertFileDeadlines(form.deadlines);
@@ -138,11 +156,12 @@ export async function createShare(ctx: Context, input: ShareInput, requestId: st
   const fields = await checkedFields(tx, ctx, form.id, input.formVersionId, input.questionIds), code = opaqueToken();
   const row = await tx.shareGrant.create({ data: { tenantId: ctx.tenantId, serviceId: form.serviceId, formId: form.id,
     formVersionId: input.formVersionId, createdBy: ctx.member.id, emailCipher: encrypt(input.email), emailHash: tokenHash(input.email),
+    shareFormBody: input.shareFormBody ?? false,
     codeHash: tokenHash(code), expiresAt }, include: shareInclude });
   await tx.shareField.createMany({ data: fields.map(q => ({ tenantId: ctx.tenantId, grantId: row.id, formVersionId: input.formVersionId, questionId: q.id })) });
   const saved = (await findShare(tx, row.id))!;
   await invitationMail(tx, saved, code);
-  await audit(tx, ctx, requestId, "share.created", "shareGrant", row.id, ["email", "questionIds", "expiresAt"], form.serviceId);
+  await audit(tx, ctx, requestId, "share.created", "shareGrant", row.id, ["email", "questionIds", "shareFormBody", "expiresAt"], form.serviceId);
   const result = shareDto(saved, await sharePermissions(tx, ctx, form));
   assertFileDeadlines(form.deadlines);
   if (expiresAt <= new Date()) fail(422, "INVALID_EXPIRY", "공유 종료일이 지났습니다. 다시 설정해주세요.");
@@ -154,7 +173,7 @@ export async function changeShare(ctx: Context, id: string, input: ShareUpdate |
     requireVersion(input, row);
     if (row.revokedAt) fail(409, "SHARE_REVOKED", "회수한 공유 권한은 다시 사용할 수 없습니다. 새로 초대해주세요.");
     if (action === "resend" && row.expiresAt <= new Date()) fail(409, "SHARE_EXPIRED", "공유 기한을 변경한 뒤 초대해주세요.");
-    if (action === "resend" && row.fields.some(f => f.question.type === "파일 업로드")) await lockFileContext(tx, ctx, row.serviceId, ["file.read"]);
+    if (action === "resend" && row.fields.some(f => isFileQuestion(f.question.type))) await lockFileContext(tx, ctx, row.serviceId, ["file.read"]);
     const next = action === "update" ? input as ShareUpdate : null;
     const expiresAt = next ? checkedExpiry(next.expiresAt) : row.expiresAt;
     const fields = next ? await checkedFields(tx, ctx, row.formId, row.formVersionId, next.questionIds) : null;
@@ -163,7 +182,7 @@ export async function changeShare(ctx: Context, id: string, input: ShareUpdate |
     await invalidateShareCache(tx, row.tenantId, row.createdBy, row.id);
     await tx.shareGrant.update({ where: { id }, data: { version: { increment: 1 },
       ...(action === "revoke" ? { revokedAt: new Date() } : { codeHash: tokenHash(code), expiresAt }),
-      ...(next ? { emailCipher: encrypt(next.email), emailHash: tokenHash(next.email) } : {}) } });
+      ...(next ? { emailCipher: encrypt(next.email), emailHash: tokenHash(next.email), shareFormBody: next.shareFormBody ?? false } : {}) } });
     if (fields) {
       await tx.shareField.deleteMany({ where: { grantId: id } });
       await tx.shareField.createMany({ data: fields.map(q => ({ tenantId: ctx.tenantId, grantId: id, formVersionId: row.formVersionId, questionId: q.id })) });
@@ -171,7 +190,7 @@ export async function changeShare(ctx: Context, id: string, input: ShareUpdate |
     const updated = (await findShare(tx, id))!;
     if (action !== "revoke") await invitationMail(tx, updated, code);
     await audit(tx, ctx, requestId, "share." + ({ update: "updated", resend: "resent", revoke: "revoked" }[action]), "shareGrant", id,
-      next ? ["email", "questionIds", "expiresAt"] : ["status"], row.serviceId);
+      next ? ["email", "questionIds", "shareFormBody", "expiresAt"] : ["status"], row.serviceId);
     const result = shareDto(updated, await sharePermissions(tx, ctx, form));
     assertFileDeadlines(form.deadlines);
     if (action !== "revoke" && expiresAt <= new Date()) fail(409, "SHARE_EXPIRED", "공유 기한이 종료되었습니다. 기한을 변경한 뒤 다시 초대해주세요.");

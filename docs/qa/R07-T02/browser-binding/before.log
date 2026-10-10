@@ -1,0 +1,34 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:35951) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/sso.test.ts (124 tests | 2 failed | 122 skipped) 1254ms
+   × E1 login 콜백은 시작 브라우저 쿠키가 없으면 취소 응답도 소비하지 않는다 747ms
+   × E1 link 콜백은 시작 브라우저 쿠키가 없으면 취소 응답도 소비하지 않는다 504ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso.test.ts > E1 login 콜백은 시작 브라우저 쿠키가 없으면 취소 응답도 소비하지 않는다
+ FAIL  tests/server/sso.test.ts > E1 link 콜백은 시작 브라우저 쿠키가 없으면 취소 응답도 소비하지 않는다
+AssertionError: expected 'PROVIDER_DENIED' to be 'SSO_BROWSER_MISMATCH' // Object.is equality
+
+Expected: "SSO_BROWSER_MISMATCH"
+Received: "PROVIDER_DENIED"
+
+ ❯ tests/server/sso.test.ts:1270:46
+    1268|   const response = await rawCallback(new Request(origin + "/api/v1/aut…
+    1269|   expect(response.status).toBe(401);
+    1270|   expect((await response.json()).error.code).toBe("SSO_BROWSER_MISMATC…
+       |                                              ^
+    1271|   expect(await db.ssoState.count()).toBe(1);
+    1272|   expect(await db.account.count({ where: { providerId: "sso:" + f.prov…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 122 skipped (124)
+   Start at  10:52:41
+   Duration  2.26s (tests 57%, import 25%, transform 17%)
+

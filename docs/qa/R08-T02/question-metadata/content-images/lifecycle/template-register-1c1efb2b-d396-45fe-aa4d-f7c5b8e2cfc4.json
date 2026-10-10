@@ -1,0 +1,28 @@
+{
+  "mode": "template-register",
+  "runId": "1c1efb2b-d396-45fe-aa4d-f7c5b8e2cfc4",
+  "recordedAt": "2026-10-10T09:21:57.561Z",
+  "result": "passed",
+  "checks": [
+    {
+      "action": "read exact form revision",
+      "status": 200,
+      "expected": 200,
+      "source": "live"
+    },
+    {
+      "action": "template-register",
+      "status": 201,
+      "expected": 201,
+      "source": "live"
+    }
+  ],
+  "proof": {
+    "templateId": "6e5d1c66-deb4-4a86-b5d5-45952f9f6772",
+    "registrationReusesSameServiceOwners": true,
+    "originalVersionReceiptPinsAndBytesUnchanged": true,
+    "hash": "120a7b18eb01ca91458c9fdd1bee11c00085d7981ee3e3166492b441b4655ac1"
+  },
+  "boundary": "Actual local API and DB observations when invoked; OTP uses local outbox. No original-site or external delivery/provider success claim.",
+  "failurePolicy": "No automatic rollback/cleanup on failure; inspect private lifecycle state before continuing."
+}

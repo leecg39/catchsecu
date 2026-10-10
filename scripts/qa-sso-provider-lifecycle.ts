@@ -86,7 +86,7 @@ try {
   } else {
     if (existsSync(marker) || existsSync(evidence + "http.json")) throw new Error("Review existing run before repeating");
     await login();
-    const created = ssoProviderCheckedRecord.parse(await (await request("/security/sso", "POST", { protocol: "saml", name: "QA lifecycle " + randomUUID(),
+    const created = ssoProviderCheckedRecord.parse(await (await request("/security/sso", "POST", { tenantId: original.tenantId, protocol: "saml", name: "QA lifecycle " + randomUUID(),
       issuer: original.issuer, clientId: original.clientId, authorizationUrl: original.authorizationUrl,
       idpCert: readFileSync(".local/qa-sso-provider-cert.pem", "utf8") }, 201)).json());
     targetProviderId = created.id;

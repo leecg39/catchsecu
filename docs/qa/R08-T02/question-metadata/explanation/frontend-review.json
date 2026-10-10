@@ -1,0 +1,155 @@
+{
+  "checkedAt": "2026-10-10T06:28:53.200Z",
+  "mode": "독립 읽기 전용 프런트 리뷰",
+  "scope": "추가 설명의 평문 출력·공백/개행·조건부 숨김·접근성 연결·편집/제거·미리보기/정정/조회 일관성",
+  "basis": [
+    "docs/qa/R08-T02/question-metadata/source-review.json",
+    "docs/qa/R08-T02/question-metadata/PLAN.md"
+  ],
+  "result": {
+    "confirmedDefectCount": 0,
+    "conclusion": "검토한 현재 변경에서 확정 결함을 발견하지 못했다. 실제 브라우저 및 접근성 검증 통과를 의미하지 않는다."
+  },
+  "observations": [
+    {
+      "id": "plain-text",
+      "path": "src/components/forms/QuestionExplanation.tsx",
+      "lines": [
+        3,
+        5
+      ],
+      "result": "빈 문자열은 생략하고 추가 설명을 React children으로 렌더한다. HTML 실행 경로가 없으며 공백만 있는 문자열은 그대로 유지한다."
+    },
+    {
+      "id": "whitespace-mobile",
+      "path": "src/components/forms/forms.css",
+      "lines": [
+        15,
+        15
+      ],
+      "result": "pre-wrap, overflow-wrap:anywhere, min-width:0, max-width:100%가 설정되어 개행·공백·긴 문자열의 줄바꿈을 허용한다. 실제 390px 시각 검증은 미실행."
+    },
+    {
+      "id": "editor",
+      "path": "src/components/forms/FormEditor.tsx",
+      "lines": [
+        138,
+        143
+      ],
+      "result": "3000 UTF-16 textarea와 .length 카운터. onChange는 문자열을 trim하지 않고 저장하며 제거는 명시적 빈 문자열을 보낸다. 기존 질문 ID 기반 patch로 유형/보기 metadata를 보존한다."
+    },
+    {
+      "id": "public-hidden-a11y",
+      "path": "src/components/forms/PublicForm.tsx",
+      "lines": [
+        131,
+        139
+      ],
+      "result": "visible 필터 내부에서 설명과 입력을 함께 렌더. 설명이 있을 때 fieldset aria-describedby가 동일 질문 설명 ID를 참조한다. 상위 form의 lang/dir를 상속하며 상위 fieldset이 busy/pending 입력을 잠근다."
+    },
+    {
+      "id": "correction-hidden-a11y",
+      "path": "src/components/forms/SubmissionDetail.tsx",
+      "lines": [
+        126,
+        147
+      ],
+      "result": "정정의 visible 필터 내부에서 설명을 함께 렌더하고 fieldset aria-describedby에 연결한다."
+    },
+    {
+      "id": "read-only-detail",
+      "path": "src/components/forms/SubmissionDetail.tsx",
+      "lines": [
+        151,
+        153
+      ],
+      "result": "일반 상세 조회는 기존 전체 질문 나열 정책을 유지하며 해당 버전 설명도 표시한다. 공개/정정의 조건부 입력 숨김과 구분한다. 답변의 열람 차단은 dd에서 기존대로 처리."
+    },
+    {
+      "id": "shared-summary",
+      "path": "src/components/forms/QuestionSummary.tsx",
+      "lines": [
+        5,
+        12
+      ],
+      "result": "공유 QuestionSummary에 설명을 추가하여 FormLists 미리보기, TemplateGallery, Approvals snapshot에서 누락 없이 표시한다."
+    }
+  ],
+  "callSites": [
+    {
+      "path": "src/components/forms/FormLists.tsx",
+      "line": 126
+    },
+    {
+      "path": "src/components/forms/TemplateGallery.tsx",
+      "line": 21
+    },
+    {
+      "path": "src/components/forms/Approvals.tsx",
+      "line": 72
+    }
+  ],
+  "limits": [
+    "코드·DB·브라우저·서버 상태 변경 및 테스트 실행 없음.",
+    "스크린리더 실제 낭독/키보드, 390·768·1440px 시각 배치, Arabic 혼합 방향은 소스 읽기만으로 검증 완료라고 주장하지 않는다.",
+    "저장 중 입력/자동저장·409 충돌의 실제 타이밍, API/DB 보존·PDF SHA 회귀는 실행 담당자의 별도 증거 범위.",
+    "확정 결함만 보고하는 리뷰이며 제품 전체 품질/원본 기능 전체 복원 보증이 아니다."
+  ],
+  "files": [
+    {
+      "path": "src/components/forms/QuestionExplanation.tsx",
+      "sha256": "6ad4263b39d43500b1bebbb090bb460d598fd005f0300bb1c5b39f603f0da316",
+      "lines": 6
+    },
+    {
+      "path": "src/components/forms/forms.css",
+      "sha256": "158fa8e7c1491e8d9bb0a8debcf1eb3fc8d253b5b87e3a4bf51c996f721b3fdd",
+      "lines": 15
+    },
+    {
+      "path": "src/components/forms/FormEditor.tsx",
+      "sha256": "a5970966a026e4dea8a5bcc8ac77df66f3e0477381e928331f87290ee98ac33e",
+      "lines": 166
+    },
+    {
+      "path": "src/components/forms/PublicForm.tsx",
+      "sha256": "c5e1af4c8ccd26313022f69a4c399ff43ccebfa739fee71dc82f4a85358c9eff",
+      "lines": 160
+    },
+    {
+      "path": "src/components/forms/SubmissionDetail.tsx",
+      "sha256": "7635a37551b016f918c373e85ddabba702537ab8c8c903a2cbf697855efbb83e",
+      "lines": 196
+    },
+    {
+      "path": "src/components/forms/QuestionSummary.tsx",
+      "sha256": "4f481a7a79c4b86d11c8af0af71176f639afd93bf10677e5f5a9123c9451ad10",
+      "lines": 14
+    },
+    {
+      "path": "src/components/forms/FormLists.tsx",
+      "sha256": "903ffe3bb91c78c73dc8151c1ad823704f3a92c5fd226df57459f072df50be01",
+      "lines": 142
+    },
+    {
+      "path": "src/components/forms/TemplateGallery.tsx",
+      "sha256": "5fb9a4a031efafe5cb087e1a777505fbb03701c3a900e20711295d198b9d19e8",
+      "lines": 77
+    },
+    {
+      "path": "src/components/forms/Approvals.tsx",
+      "sha256": "4a0b7df1dd7016d6cd0fd03a00f1ec5ae1103a95ff871fdb8bfb686f5aea1d98",
+      "lines": 89
+    },
+    {
+      "path": "src/components/forms/QuestionInput.tsx",
+      "sha256": "44a09aaac8c0b9b348715ca0e0735b0335ef661f2bd1a53e11c6ecf2fc8da8d1",
+      "lines": 71
+    },
+    {
+      "path": "src/contracts/question-explanations.ts",
+      "sha256": "82cc8ca19d0314a03745c01051e2aa78ab6c262433e87d6db5032727e46403fd",
+      "lines": 23
+    }
+  ]
+}

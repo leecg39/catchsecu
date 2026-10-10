@@ -1,4 +1,5 @@
 "use client";
+import { fileAnswerId, isFileQuestion } from "@/contracts/drawing-questions";
 import { AuditLogs } from "../management/AuditLogs";
 import { z } from "zod";
 import { ExportJobs } from "./ExportJobs";
@@ -10,7 +11,7 @@ import { RemoteTable } from "../RemoteTable";
 import { ShareGrants } from "./ShareGrants";
 import "./sharing.css";
 import { SubmissionDetail } from "./SubmissionDetail";
-import { ConsentDisplay, ConsentDocuments, FormDocumentsEditor } from "./ConsentDocuments";
+import { ConsentDisplay, ConsentDocuments, ConsentItems, FormDocumentsEditor } from "./ConsentDocuments";
 import { ApprovalPanel } from "./Approvals";
 import { useToast } from "../ux/toast";
 import { useApplication } from "../ApplicationContext";
@@ -23,6 +24,9 @@ import { useFormDraft } from "@/lib/use-form-draft";
 import { draftValue } from "@/lib/form-draft";
 import { DraftStatus } from "./DraftStatus";
 import { FormPublicationSession } from "@/lib/form-publication";
+import { collectConsentItems, hasConsentItemReview } from "@/contracts/consent-items";
+import { datetimeLocalIso, datetimeLocalValue } from "@/contracts/form-collection-window";
+import { ParticipationPolicyFields, ParticipationTargetManager } from "./ParticipationAccessSettings";
 
 export function Workflow({ path }: { path: string }) {
   const params = useSearchParams(), applicant = path.includes("/applicant");
@@ -85,9 +89,9 @@ function Responses({ form }: { form: FormRecord }) {
         !row.contentAvailable ? <span key="unavailable">{row.status === "destroyed" ? "파기됨" : row.status === "destroying" ? "파기 처리 중 · 열람 차단" : "보유 기한 종료 · 열람 차단"}</span> :
         <dl className="forms-response-values" key="answers">{row.questions.map(question => <div key={question.id}><dt>{question.label}</dt>
           <dd>{row.status === "destroyed" ? "파기됨" : (() => {
-            const file = row.attachments.find(item => item.id === row.values[question.id]);
+            const file = row.attachments.find(item => item.id === fileAnswerId(row.values[question.id]));
             return file ? <a className="cs-link" href={fileDownloadUrl(file.id, row.id, question.id)}>{file.name}</a> :
-              question.type === "파일 업로드" && row.values[question.id] ? "첨부파일" : formatAnswer(row.values[question.id], question.rows);
+              isFileQuestion(question.type) && row.values[question.id] ? "첨부파일" : formatAnswer(row.values[question.id], question.rows, question.optionDefinitions, question.type);
           })()}</dd></div>)}</dl>,
         new Date(row.created).toLocaleString("ko-KR"), new Date(row.retentionUntil).toLocaleDateString("ko-KR"),
         ({ submitted: "제출 완료", corrected: "정정", withdrawn: "철회", pendingDestruction: "파기 요청", destroying: "파기 처리 중", destroyed: "파기" } as Record<string, string>)[row.status] ?? row.status],
@@ -171,10 +175,29 @@ function Settings({ initial, path }: { initial: FormRecord; path: string }) {
     </> : <fieldset disabled={transitioning || form.status === "archived" || !canWrite} className="forms-settings-fields">{setting ? <>
       <label><input type="checkbox" checked={content.showSubmitNotice ?? true} onChange={event => update({ showSubmitNotice: event.target.checked })} /> 답변 제출 후 안내 표시</label>
       <label>최대 응답 수<input aria-label="최대 응답 수" className="cs-input" type="number" min="1" max="1000000" value={content.maxResponses} onChange={event => update({ maxResponses: Number(event.target.value) })} /></label>
+      <label><input type="checkbox" checked={!!content.collectionOpenAt} onChange={event => update({ collectionOpenAt: event.target.checked
+        ? new Date(Math.ceil((Date.now() + 3_600_000) / 3_600_000) * 3_600_000).toISOString() : null })} /> 응답 수집 시작 일시 예약</label>
+      {!!content.collectionOpenAt && <label>응답 수집 시작 일시<input aria-label="응답 수집 시작 일시" className="cs-input" type="datetime-local"
+        min={datetimeLocalValue(new Date().toISOString())} value={datetimeLocalValue(content.collectionOpenAt)}
+        onChange={event => update({ collectionOpenAt: datetimeLocalIso(event.target.value) })} /></label>}
+      <label><input type="checkbox" checked={!!content.collectionCloseAt} onChange={event => update({ collectionCloseAt: event.target.checked
+        ? new Date(Math.max(Date.now(), content.collectionOpenAt ? new Date(content.collectionOpenAt).getTime() : 0) + 7 * 86_400_000).toISOString() : null })} /> 응답 수집 종료 일시 예약</label>
+      {!!content.collectionCloseAt && <label>응답 수집 종료 일시<input aria-label="응답 수집 종료 일시" className="cs-input" type="datetime-local"
+        min={content.collectionOpenAt ? datetimeLocalValue(new Date(new Date(content.collectionOpenAt).getTime() + 60_000).toISOString()) : undefined} value={datetimeLocalValue(content.collectionCloseAt)}
+        onChange={event => update({ collectionCloseAt: datetimeLocalIso(event.target.value) })} /></label>}
+      <p className="cs-note">일시는 현재 브라우저 시간대로 입력하고 서버에는 같은 시각의 UTC 값으로 저장합니다. 시작 전에는 예정 안내가, 종료 후에는 마감 안내가 표시됩니다.</p>
+      <ParticipationPolicyFields content={content} onChange={update} />
+      {content.participationAccess?.enabled && content.participationAccess.method === "EMAIL" && content.participationAccess.targetScope === "WHITELIST" &&
+        <ParticipationTargetManager formId={form.id} disabled={busy || !canWrite}
+          beforeMutation={async () => { const saved = await draft.save(true); if (!saved) throw new Error("설정을 먼저 저장해주세요."); return saved.version; }}
+          afterMutation={async () => { const current = await readCurrent(form.id); draft.accept(current); }} />}
     </> : <>{!recipient && <>
+      <ConsentItems items={hasConsentItemReview(content.questions) ? collectConsentItems(content.questions) : undefined}
+        emptyMessage="검토한 문항에는 개인정보 수집 항목이 없습니다." />
+      {!hasConsentItemReview(content.questions) && <p className="cs-note">질문 단계에서 문항별 개인정보 분류를 확인하면 수집 항목이 여기에 자동으로 집계됩니다.</p>}
       <label><input type="checkbox" checked={content.consentRequired} onChange={event => update({ consentRequired: event.target.checked })} /> 개인정보 수집·이용 동의를 받습니다.</label>
       <label>수집·이용 목적<input className="cs-input" aria-label="수집·이용 목적" maxLength={3000} placeholder="수집·이용 목적을 입력해주세요" value={content.consentPurpose} onChange={event => update({ consentPurpose: event.target.value })} /></label>
-      <label className="member-check"><input type="checkbox" checked={content.retentionDays === null} onChange={event => update({ retentionDays: event.target.checked ? null : 365 })} /> 보유 기간 미지정 (제출 시점의 회사 기본 보유 기간 적용)</label>
+      <label className="member-check"><input type="checkbox" checked={content.retentionDays === null} onChange={event => update({ retentionDays: event.target.checked ? null : 365 })} /> 보유 기간 미지정 (제출 시점의 서비스 규칙 또는 회사 기본 보유 기간 적용)</label>
       {content.retentionDays !== null
         ? <label>보유·이용 기간 (일)<input className="cs-input" aria-label="보유·이용 기간" type="number" min="1" max="36500" value={content.retentionDays} onChange={event => update({ retentionDays: Number(event.target.value) })} /></label>
         : <p>이 폼의 응답은 접수 시점의 회사 기본 보유 기간으로 보유·이용 기간을 계산합니다. 회사 정책 변경은 이후 접수 건부터 반영됩니다.</p>}

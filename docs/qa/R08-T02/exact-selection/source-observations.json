@@ -1,0 +1,64 @@
+{
+  "checkedAt": "2026-10-10T04:12:57.935Z",
+  "sourcePath": "../outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+  "bundleSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+  "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+  "offsetUnit": "zero-based UTF-16 code units",
+  "scope": "Client static validation and call sites only; original backend not observed. Text UI maxLength100/1000 is distinct from server enforcement.",
+  "excerpts": [
+    {
+      "topic": "matrix-exact-validator",
+      "start": 8166309,
+      "end": 8167319,
+      "text": "xG=(e,t,r)=>{const n=(e=>{var t;const r=Number(null===e||void 0===e||null===(t=e.matrixOptionData)||void 0===t?void 0:t.rows);if(!Number.isFinite(r)||r<=0)return[];const n=new Array(r).fill(0);return(Array.isArray(null===e||void 0===e?void 0:e.value)?e.value:[]).forEach((e=>{const t=Number(\"string\"===typeof e?e.split(\",\")[0]:null===e||void 0===e?void 0:e.row);Number.isInteger(t)&&t>=1&&t<=r&&(n[t-1]+=1)})),n})(e);if(0===n.length)return null;const a=\"MM\"===(null===e||void 0===e?void 0:e.questionElementType),o=n.every((e=>0===e));if(!a&&o)return null;if(\"MAX\"===t){for(let t=0;t<n.length;t+=1){const o=n[t];if(o>r)return{messageKey:\"selectLimit.errorMaxOverMatrix\",params:{count:r,row:bG(e,t)},exceedsLimit:!0};if(a&&0===o)return{messageKey:\"selectLimit.errorMaxMatrix\",params:{count:r,row:bG(e,t)}}}return null}const i=n.findIndex((e=>e!==r));return i<0?null:{messageKey:a?\"selectLimit.errorExactMatrix\":\"selectLimit.errorExactOptionalMatrix\",params:{count:r,row:bG(e,i)},...n[i]>r?{exceedsLimit:!0}:{}}},"
+    },
+    {
+      "topic": "matrix-validator-routing",
+      "start": 8167319,
+      "end": 8168900,
+      "text": "AG=e=>{const t=iG(e),{mode:r,count:n}=dG(e);if(!nG(t)||\"NONE\"===r||n<=0)return null;if(\"MATRIX_CHECKBOX\"===t)return xG(e,r,n);const a=\"MM\"===(null===e||void 0===e?void 0:e.questionElementType),o=gG(null===e||void 0===e?void 0:e.value,e);return\"MAX\"===r?o>n?{messageKey:\"selectLimit.errorMaxOver\",params:{count:n},exceedsLimit:!0}:a&&0===o?{messageKey:\"selectLimit.errorMax\",params:{count:n}}:null:o===n?null:a||0!==o?{messageKey:a?\"selectLimit.errorExact\":\"selectLimit.errorExactOptional\",params:{count:n},...o>n?{exceedsLimit:!0}:{}}:null},yG=e=>{if(!Array.isArray(e))return null;for(let t=0;t<e.length;t+=1){const r=e[t],n=AG(r);if(n)return{index:t,item:r,violation:n}}return null},wG=[\"image/jpeg\",\"image/jpg\",\"image/png\"];function CG(e){var t;const r=null!==(t=null===e||void 0===e?void 0:e.optionImageUrl)&&void 0!==t?t:null===e||void 0===e?void 0:e.imageUrl;return\"string\"===typeof r&&\"\"!==r.trim()?r:null}function SG(e){const t=null===e||void 0===e?void 0:e.optionImageKey;return\"string\"===typeof t&&\"\"!==t.trim()?t:null}function TG(e,t){return Array.isArray(e)?e.filter(((e,r)=>r!==t&&(null!==CG(e)||null!==SG(e)))).length:0}function EG(e){return Array.isArray(e)&&e.some((e=>null!==CG(e)))}function NG(e){return null!==CG(e)||null!==SG(e)}function kG(e,t){if(!Array.isArray(t))return[];const r=(e=>\"RADIO\"===e||\"CHECKBOX\"===e)(e),n=e=>NG(e)&&(!r||(e=>!0===(null===e||void 0===e?void 0:e.isCustomValue)||\"Y\"===(null===e||void 0===e?void 0:e.customValueYn))(e));return t.some(n)?t.map((e=>n(e)?{...e,optionImageKey:null,optionImageUrl:null,imageUrl:null,optionImageFileSize:"
+    },
+    {
+      "topic": "public-validation",
+      "start": 10069169,
+      "end": 10069700,
+      "text": "yG(v),a=r?v.indexOf(r):-1;if(n&&(a<0||n.index<=a)){const{messageKey:e,params:r}=n.violation,a=n.item,{mode:o}=dG(a);return n.violation.exceedsLimit||((e,t,r)=>{Tt().dataLayer({dataLayer:{event:\"respondent_limit_invalid\",question_type:e,limit_mode:t,reason:r}})})(\"MATRIX_CHECKBOX\"===(null===a||void 0===a?void 0:a.questionType)?\"matrix_checkbox\":\"checkbox\",o.toLowerCase(),0===gG(null===a||void 0===a?void 0:a.value)?\"under\":\"partial\"),U({...B,show:!0,message:t(e,r),onClick:()=>ve(n.item.htmlFormInputName)}),!1}if(!r)return!0;if("
+    },
+    {
+      "topic": "public-submit-check",
+      "start": 10072651,
+      "end": 10073000,
+      "text": "be())return void F(!0);if(N>104857600)return void U({...B,show:!0,message:t(\"phrase.phrase13\")});let e=0;if(y.forEach((t=>{\"MM\"===t.agreementElementType&&\"Y\"!==t.agreeYn&&e++})),e>0)return void U({...B,show:!0,message:t(\"phrase.phrase18\"),type:\"NEEDS_CONSENT\"});const r=BRe({formInfo:f,pageList:l,pageMoveList:oe,pageIndex:s,questionElements:v,agree"
+    },
+    {
+      "topic": "public-next-page-check",
+      "start": 10080557,
+      "end": 10080900,
+      "text": "be())return void F(!0);F(!1);const n=null!==(e=null===l||void 0===l?void 0:l.length)&&void 0!==e?e:0,a=l[s],o=v;let i=(null===a||void 0===a?void 0:a.pageOffset)||1;const c=null===o||void 0===o?void 0:o.find((e=>(\"RADIO\"===e.questionType||\"SELECTBOX\"===e.questionType)&&e.usePageOffset));if(c&&c.value){const e=c.value;let t=null;if(\"object\"==="
+    },
+    {
+      "topic": "basic-matrix-validator",
+      "start": 8219823,
+      "end": 8220600,
+      "text": "function lK(e,t,r){var n;const a=(null===(n=t.matrixOptionData)||void 0===n?void 0:n.rows)||0;if(0===a)return!0;const o=Array.isArray(e)?e:[],i=new Set(o.map(r)).size;return\"MM\"===t.questionElementType?i===a:\"MS\"!==t.questionElementType||(0===i||i===a)}const cK={getInitialValue:e=>Array.isArray(e)?e:[],parse:(e,t)=>Array.isArray(e)?e:[],format:(e,t)=>Array.isArray(e)?e:[],validate:(e,t)=>lK(e,t,(e=>parseInt(null===e||void 0===e?void 0:e.split(\",\")[0],10)))},dK={getInitialValue:e=>Array.isArray(e)?e:[],parse:(e,t)=>Array.isArray(e)?e.map((e=>`${e.row},${e.col}`)):[],format:(e,t)=>Array.isArray(e)?e.map((e=>{const t=e.split(\",\");return{row:parseInt(t[0],10),col:parseInt(t[1],10)}})):[],validate:(e,t)=>lK(e,t,(e=>null===e||void 0===e?void 0:e.row))},uK={parse:e=>{if(!e|"
+    },
+    {
+      "topic": "textarea-maxlength",
+      "start": 8324350,
+      "end": 8324515,
+      "text": "value]),(0,nI.jsx)(jY,{inputSize:\"lg\",rows:4,placeholder:o(\"phrase.phrase65\"),value:i,maxLength:1e3,onChange:c,resize:!0,disabled:n,readOnly:a})},r1=(0,yt.memo)(t1),"
+    },
+    {
+      "topic": "textbox-maxlength",
+      "start": 8326190,
+      "end": 8326550,
+      "text": "ha\",id:`${t.htmlFormInputName},${t.questionType}`,placeholder:!a&&\"IDV\"===t.questionSubType||s?l(\"noAuthPlaceholder\"):d,value:t.value||\"\",maxLength:100,error:!!t.value&&!c,hintText:u,hintTextColor:Uj,onChange:m,type:\"text\",inputmode:3===(null===t||void 0===t?void 0:t.infoPatternId)?\"numeric\":\"text\",infoPatternId:null===t||void 0===t?void 0:t.infoPatternId,au"
+    },
+    {
+      "topic": "pattern-guide",
+      "start": 8327785,
+      "end": 8328300,
+      "text": "infoPatternId:1,patternName:I(\"common\")},{infoPatternId:2,patternName:I(\"additionalInquiries\")},{infoPatternId:3,patternName:I(\"residentRegistration\"),placeholder:I(\"phrase.phrase1\"),helperText:I(\"phrase.phrase2\")},{infoPatternId:4,patternName:I(\"email\"),placeholder:I(\"phrase.phrase3\"),helperText:I(\"phrase.phrase4\")},{infoPatternId:7,patternName:I(\"address\"),placeholder:\"\",helpText:I(\"phrase.phrase5\")},{infoPatternId:8,patternName:I(\"birth\"),placeholder:I(\"phrase.phrase6\"),helperText:I(\"phrase.phrase7\")}]),[])"
+    }
+  ]
+}

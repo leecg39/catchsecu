@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { catalogItem } from "./processing-catalog";
+import { policyDetailsInput, type PolicyDetails } from "./document-policy";
 
 export const documentTypes = { consent: "개인정보 수집·이용 동의서", privacy_policy: "개인정보 처리방침", overseas_transfer: "개인정보 국외이전 동의서" } as const;
 export const documentType = z.enum(["consent", "privacy_policy", "overseas_transfer"]);
@@ -12,9 +13,11 @@ const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value => {
 const uniqueIds = z.array(z.uuid()).max(100).refine(value => new Set(value).size === value.length, "연결 항목이 중복되었습니다.");
 export const documentInput = z.object({ serviceId: z.uuid(), type: documentType, title: text.min(1).max(200),
   body: text.max(20000), refusalNotice: text.max(3000), rightsContact: text.max(2000), effectiveDate: date,
-  purposeIds: uniqueIds, recipientIds: uniqueIds,
-}).strict();
-export const documentPatch = documentInput.extend({ version: z.number().int().positive() });
+  purposeIds: uniqueIds, recipientIds: uniqueIds, policyDetails: policyDetailsInput.nullable().optional(),
+}).strict().superRefine((value, ctx) => {
+  if (value.policyDetails != null && value.type !== "privacy_policy") ctx.addIssue({ code: "custom", path: ["policyDetails"], message: "처리방침에서만 세부 항목을 저장할 수 있습니다." });
+});
+export const documentPatch = documentInput.safeExtend({ version: z.number().int().positive() });
 export const documentAction = z.object({ version: z.number().int().positive() }).strict();
 export const documentPublish = documentAction.extend({ expiresAt: z.iso.datetime({ offset: true }).nullable() });
 export const clauseInput = z.object({ serviceId: z.uuid(), type: documentType, title: text.min(1).max(200), body: text.min(1).max(20000) }).strict();
@@ -44,9 +47,9 @@ export type ClauseRecord = ClauseInput & { id: string; version: number; status: 
 export type PublicPurpose = { name: string; purpose: string; lawfulBasis: string; basisReference: string; items: z.infer<typeof catalogItem>[]; retentionMode: string; retentionDays: number | null; retentionReason: string };
 export type PublicRecipient = { name: string; kind: string; countryCode: string; purpose: string; items: string[]; retentionMode: string; retentionDays: number | null; retentionReason: string; contact: string; transferMethod: string; transferTiming: string; refusalNotice: string };
 export type DocumentSnapshot = { schemaVersion: 1; type: DocumentInput["type"]; title: string; body: string; refusalNotice: string; rightsContact: string; effectiveDate: string;
-  companyName: string; serviceName: string; purposes: PublicPurpose[]; recipients: PublicRecipient[] };
+  companyName: string; serviceName: string; purposes: PublicPurpose[]; recipients: PublicRecipient[]; policyDetails?: PolicyDetails };
 export type PublicationRecord = { id: string; status: "active" | "revoked" | "expired"; createdAt: string; expiresAt: string | null; revokedAt: string | null; url?: string; displayCount: number };
 export type DocumentVersionRecord = { id: string; number: number; draftRevision: number; createdAt: string; snapshot: DocumentSnapshot; renderedText: string; contentHash: string; publications: PublicationRecord[] };
 export type DocumentPreview = { snapshot: DocumentSnapshot; renderedText: string; contentHash: string; publishErrors: string[] };
-export type DocumentOptions = { purposes: { id: string; name: string; status: string; version: number }[]; recipients: { id: string; name: string; kind: string; countryCode: string; status: string; version: number }[];
+export type DocumentOptions = { policyItems: { requiredItems: string[]; optionalItems: string[] }; purposes: { id: string; name: string; status: string; version: number }[]; recipients: { id: string; name: string; kind: string; countryCode: string; status: string; version: number }[];
   templates: ClauseRecord[]; policies: { publicationId: string; title: string; number: number; expiresAt: string | null }[] };

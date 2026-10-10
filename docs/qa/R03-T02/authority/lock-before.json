@@ -1,0 +1,44 @@
+[
+  {
+    "kind": "member",
+    "holderPid": 7255,
+    "blocked": [
+      {
+        "pid": 7256,
+        "query": "UPDATE \"public\".\"Company\" SET \"address\" = $1, \"version\" = (\"public\".\"Company\".\"version\" + $2), \"updatedAt\" = $3 WHERE (\"public\".\"Company\".\"id\" = $4 AND \"public\".\"Company\".\"version\" = $5)"
+      }
+    ],
+    "status": 200,
+    "beforeVersion": 1,
+    "afterVersion": 2,
+    "audits": 1
+  },
+  {
+    "kind": "session",
+    "holderPid": 7257,
+    "blocked": [
+      {
+        "pid": 7236,
+        "query": "UPDATE \"public\".\"Company\" SET \"address\" = $1, \"version\" = (\"public\".\"Company\".\"version\" + $2), \"updatedAt\" = $3 WHERE (\"public\".\"Company\".\"id\" = $4 AND \"public\".\"Company\".\"version\" = $5)"
+      }
+    ],
+    "status": 200,
+    "beforeVersion": 1,
+    "afterVersion": 2,
+    "audits": 1
+  },
+  {
+    "kind": "mfa",
+    "holderPid": 7258,
+    "blocked": [
+      {
+        "pid": 7239,
+        "query": "UPDATE \"public\".\"Company\" SET \"address\" = $1, \"version\" = (\"public\".\"Company\".\"version\" + $2), \"updatedAt\" = $3 WHERE (\"public\".\"Company\".\"id\" = $4 AND \"public\".\"Company\".\"version\" = $5)"
+      }
+    ],
+    "status": 200,
+    "beforeVersion": 1,
+    "afterVersion": 2,
+    "audits": 1
+  }
+]

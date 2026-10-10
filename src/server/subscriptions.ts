@@ -4,6 +4,7 @@ import { idempotent } from "./idempotency";
 import type { Context } from "./context";
 import { lockServiceActor } from "./service-actor";
 import { assertFileDeadlines } from "./file-access";
+import { lockSecurityEntitlements } from "./feature-entitlements";
 import type { PlanRecord, SubscriptionRecord, EntitlementRecord, AssetOverview } from "@/contracts/subscriptions";
 
 async function billingRead<T>(ctx: Context, read: (tx: Transaction) => Promise<T>) {
@@ -46,7 +47,7 @@ export async function plans(ctx: Context): Promise<PlanRecord[]> {
     return rows.map(p => ({ id: p.id, name: p.name, description: p.description,
       versions: p.versions.map(v => ({ id: v.id, number: v.number, cycle: v.cycle, priceKrw: v.priceKrw,
         currency: v.currency, serviceLimit: v.serviceLimit, memberLimit: v.memberLimit,
-        subjectLimit: v.subjectLimit, formLimit: v.formLimit,
+        subjectLimit: v.subjectLimit, formLimit: v.formLimit, capabilities: v.capabilities,
         orderable: v.orderable && v.effectiveFrom <= new Date() && (!v.effectiveTo || v.effectiveTo > new Date()),
         effectiveFrom: v.effectiveFrom.toISOString(), effectiveTo: v.effectiveTo?.toISOString() ?? null })) }));
   });
@@ -71,6 +72,7 @@ export async function entitlement(ctx: Context): Promise<EntitlementRecord> {
   return billingRead(ctx, tx => readEntitlement(tx, ctx));
 }
 async function readEntitlement(tx: Transaction, ctx: Context): Promise<EntitlementRecord> {
+  const security = await lockSecurityEntitlements(tx, ctx.tenantId);
   const now = new Date();
   const [selected, services, members, subjects, forms] = await Promise.all([
     tx.billingSubscription.findFirst({ where: { tenantId: ctx.tenantId, status: { in: ["trialing", "active"] }, periodStart: { lte: now }, periodEnd: { gt: now },
@@ -82,7 +84,7 @@ async function readEntitlement(tx: Transaction, ctx: Context): Promise<Entitleme
   ]);
   const end = selected?.cancelAt ?? selected?.periodEnd;
   const current = end && end > new Date() ? selected : null;
-  return { active: !!current, status: current?.status ?? "expired", periodEnd: current?.cancelAt?.toISOString() ?? current?.periodEnd?.toISOString() ?? null,
+  return { security: security.snapshot(), active: !!current, status: current?.status ?? "expired", periodEnd: current?.cancelAt?.toISOString() ?? current?.periodEnd?.toISOString() ?? null,
     limits: { services: current?.planVersion.serviceLimit ?? null, members: current?.planVersion.memberLimit ?? null,
       subjects: current?.planVersion.subjectLimit ?? null, forms: current?.planVersion.formLimit ?? null },
     usage: { services, members, subjects, forms } };
@@ -127,6 +129,8 @@ export async function cancelPurchase(ctx: Context, id: string, version: number, 
     if (!row) fail(404, "NOT_FOUND", "구독 요청을 찾을 수 없습니다.");
     requireVersion({ version }, row);
     if (row.status !== "pending") fail(409, "INVALID_STATUS", "대기 중인 요청만 취소할 수 있습니다.");
+    const payment = await tx.paymentOrder.findFirst({ where: { tenantId: ctx.tenantId, subscriptionId: id, status: "pending" }, select: { id: true } });
+    if (payment) fail(409, "PAYMENT_IN_PROGRESS", "결제 처리 중에는 구독 요청을 취소할 수 없습니다. 결제 결과를 확인한 뒤 다시 시도해주세요.");
     const updated = await tx.billingSubscription.update({ where: { id, tenantId: ctx.tenantId, version }, data: {
       status: "cancelled", version: { increment: 1 }, events: { create: { version: version + 1, kind: "request_cancelled", detail: {} } },
     }, include: { plan: true } });

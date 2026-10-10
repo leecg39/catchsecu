@@ -23,7 +23,7 @@ export function SsoAccounts() {
     {resource.error.status === 401 ? <Link href={login}>로그인 후 연결 관리</Link> : <button className="auth-text-button" onClick={resource.reload}>다시 불러오기</button>}
     <Link className="auth-back" href="/dashboard">회사 선택 화면으로 돌아가기</Link></>;
   if (!resource.data) return <p role="status">연결 계정을 확인하고 있습니다.</p>;
-  const { providers, items, companyName, reauthenticate } = resource.data;
+  const { providers, items, companyName, reauthenticate, loginPolicy } = resource.data;
   const available = providers.filter(p => p.available);
   const providerId = available.find(p => p.id === selected)?.id ?? available[0]?.id;
   return <><p className="auth-description">{companyName}의 내 SSO 연결 계정을 관리합니다.</p>
@@ -32,7 +32,8 @@ export function SsoAccounts() {
     {items.length ? <ul className="auth-sso-accounts">{items.map(item => <li key={item.id}>
       <strong>{providers.find(p => p.id === item.providerId)?.name ?? "회사 SSO"}</strong>
       <p className="auth-note">연결일: {new Date(item.createdAt).toLocaleDateString("ko-KR")}</p>
-      {!item.canUnlink && <p className="auth-note">마지막 로그인 수단입니다. 다른 SSO를 연결하거나 이메일 비밀번호를 설정한 뒤 해제해주세요. <Link href="/password-change-email">비밀번호 설정 메일 요청</Link></p>}
+      {!item.canUnlink && (loginPolicy !== "NONE" ? <p className="auth-note">회사가 {loginPolicy === "GOOGLE" ? "Google" : "Microsoft"} 로그인을 제한하고 있어 연결을 해제할 수 없습니다.</p>
+        : <p className="auth-note">마지막 로그인 수단입니다. 다른 SSO를 연결하거나 이메일 비밀번호를 설정한 뒤 해제해주세요. <Link href="/password-change-email">비밀번호 설정 메일 요청</Link></p>)}
       {removing === item.id ? <div>
         <p className="auth-note">연결을 해제하면 모든 기기의 로그인과 대기 중 인증이 종료됩니다. 다른 로그인 수단으로 다시 로그인해야 합니다.</p>
         <button type="button" className="auth-primary" disabled={busy} onClick={() => void unlink(item.id, item.updatedAt)}>{busy ? "해제 중…" : "연결 해제 확인"}</button>

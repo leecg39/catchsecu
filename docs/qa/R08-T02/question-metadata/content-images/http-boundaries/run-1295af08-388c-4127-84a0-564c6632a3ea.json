@@ -1,0 +1,317 @@
+{
+  "format": 1,
+  "mode": "run",
+  "runId": "1295af08-388c-4127-84a0-564c6632a3ea",
+  "recordedAt": "2026-10-10T09:13:20.365Z",
+  "result": "passed",
+  "executedCases": [
+    {
+      "name": "anonymous member request is 401",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:18.735Z",
+      "finishedAt": "2026-10-10T09:13:18.742Z"
+    },
+    {
+      "name": "stale form scope is 409",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:18.743Z",
+      "finishedAt": "2026-10-10T09:13:18.784Z"
+    },
+    {
+      "name": "mixed and repeated scope queries are 422",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:18.784Z",
+      "finishedAt": "2026-10-10T09:13:18.797Z"
+    },
+    {
+      "name": "QUESTION_IMAGE oversize and non-image MIME init are 422 before reservation",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:18.798Z",
+      "finishedAt": "2026-10-10T09:13:18.860Z"
+    },
+    {
+      "name": "non-UUID question image key is rejected without changing published or draft rows",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:18.861Z",
+      "finishedAt": "2026-10-10T09:13:18.888Z"
+    },
+    {
+      "name": "pinned historical question image cannot be discarded",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:18.889Z",
+      "finishedAt": "2026-10-10T09:13:18.964Z"
+    },
+    {
+      "name": "raw wrong MIME, hash mismatch and forged PNG body remain pending",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:19.044Z",
+      "finishedAt": "2026-10-10T09:13:19.231Z"
+    },
+    {
+      "name": "real PNG init replay PUT and ClamAV complete give inline own-preview with exact hash",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:19.232Z",
+      "finishedAt": "2026-10-10T09:13:19.603Z"
+    },
+    {
+      "name": "ready unbound question image is absent from public and member parent scopes",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:19.604Z",
+      "finishedAt": "2026-10-10T09:13:19.638Z"
+    },
+    {
+      "name": "QUESTION_IMAGE cannot be attached as FILE and leaves the entire protected graph unchanged",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:19.638Z",
+      "finishedAt": "2026-10-10T09:13:19.707Z"
+    },
+    {
+      "name": "QUESTION_IMAGE cannot be attached as an option image and rolls back",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:19.708Z",
+      "finishedAt": "2026-10-10T09:13:19.772Z"
+    },
+    {
+      "name": "OPTION_IMAGE cannot be attached as question image and rolls back",
+      "result": "passed",
+      "startedAt": "2026-10-10T09:13:19.773Z",
+      "finishedAt": "2026-10-10T09:13:20.034Z"
+    }
+  ],
+  "checks": [
+    {
+      "action": "positive control: current member manifest",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "positive control: active public manifest",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "anonymous manifest",
+      "status": 401,
+      "code": "UNAUTHENTICATED",
+      "expectedStatus": 401,
+      "expectedCode": "UNAUTHENTICATED"
+    },
+    {
+      "action": "stale form scope",
+      "status": 409,
+      "code": "VERSION_CONFLICT",
+      "expectedStatus": 409,
+      "expectedCode": "VERSION_CONFLICT"
+    },
+    {
+      "action": "mixed parent query",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "expectedStatus": 422,
+      "expectedCode": "VALIDATION_ERROR"
+    },
+    {
+      "action": "duplicate version query",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "expectedStatus": 422,
+      "expectedCode": "VALIDATION_ERROR"
+    },
+    {
+      "action": "question image over 1MiB",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "expectedStatus": 422,
+      "expectedCode": "VALIDATION_ERROR"
+    },
+    {
+      "action": "question image PDF MIME",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "expectedStatus": 422,
+      "expectedCode": "VALIDATION_ERROR"
+    },
+    {
+      "action": "external URL as question image key",
+      "status": 422,
+      "code": "VALIDATION_ERROR",
+      "expectedStatus": 422,
+      "expectedCode": "VALIDATION_ERROR"
+    },
+    {
+      "action": "read pinned image revision",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "discard pinned question image",
+      "status": 409,
+      "code": "AUTHOR_ASSET_IN_USE",
+      "expectedStatus": 409,
+      "expectedCode": "AUTHOR_ASSET_IN_USE"
+    },
+    {
+      "action": "clean question PNG: reserve upload",
+      "status": 201,
+      "expectedStatus": 201
+    },
+    {
+      "action": "wrong raw upload MIME",
+      "status": 415,
+      "code": "FILE_CONTENT_TYPE",
+      "expectedStatus": 415,
+      "expectedCode": "FILE_CONTENT_TYPE"
+    },
+    {
+      "action": "same-size SHA mismatch",
+      "status": 422,
+      "code": "AUTHOR_ASSET_INTEGRITY",
+      "expectedStatus": 422,
+      "expectedCode": "AUTHOR_ASSET_INTEGRITY"
+    },
+    {
+      "action": "forged question PNG: reserve upload",
+      "status": 201,
+      "expectedStatus": 201
+    },
+    {
+      "action": "forged PNG with matching SHA",
+      "status": 422,
+      "code": "AUTHOR_ASSET_CONTENT",
+      "expectedStatus": 422,
+      "expectedCode": "AUTHOR_ASSET_CONTENT"
+    },
+    {
+      "action": "same init key replay",
+      "status": 201,
+      "expectedStatus": 201
+    },
+    {
+      "action": "upload valid question PNG",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "scan actual question PNG",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "own preview inline bytes and SHA",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "public unbound question image",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "expectedStatus": 404,
+      "expectedCode": "NOT_FOUND"
+    },
+    {
+      "action": "member unbound question image",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "expectedStatus": 404,
+      "expectedCode": "NOT_FOUND"
+    },
+    {
+      "action": "question image in material slot",
+      "status": 422,
+      "code": "AUTHOR_ASSET_PURPOSE",
+      "expectedStatus": 422,
+      "expectedCode": "AUTHOR_ASSET_PURPOSE"
+    },
+    {
+      "action": "question image in option slot",
+      "status": 422,
+      "code": "AUTHOR_ASSET_PURPOSE",
+      "expectedStatus": 422,
+      "expectedCode": "AUTHOR_ASSET_PURPOSE"
+    },
+    {
+      "action": "clean option PNG: reserve upload",
+      "status": 201,
+      "expectedStatus": 201
+    },
+    {
+      "action": "upload real option PNG",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "scan real option PNG",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "option image in question slot",
+      "status": 422,
+      "code": "AUTHOR_ASSET_PURPOSE",
+      "expectedStatus": 422,
+      "expectedCode": "AUTHOR_ASSET_PURPOSE"
+    },
+    {
+      "action": "clean question PNG: read current cleanup version",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "clean question PNG: delete unreferenced reservation",
+      "status": 204,
+      "expectedStatus": 204
+    },
+    {
+      "action": "clean question PNG: deleted reservation is unavailable",
+      "status": 410,
+      "code": "AUTHOR_ASSET_EXPIRED",
+      "expectedStatus": 410,
+      "expectedCode": "AUTHOR_ASSET_EXPIRED"
+    },
+    {
+      "action": "forged question PNG: read current cleanup version",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "forged question PNG: delete unreferenced reservation",
+      "status": 204,
+      "expectedStatus": 204
+    },
+    {
+      "action": "forged question PNG: deleted reservation is unavailable",
+      "status": 410,
+      "code": "AUTHOR_ASSET_EXPIRED",
+      "expectedStatus": 410,
+      "expectedCode": "AUTHOR_ASSET_EXPIRED"
+    },
+    {
+      "action": "clean option PNG: read current cleanup version",
+      "status": 200,
+      "expectedStatus": 200
+    },
+    {
+      "action": "clean option PNG: delete unreferenced reservation",
+      "status": 204,
+      "expectedStatus": 204
+    },
+    {
+      "action": "clean option PNG: deleted reservation is unavailable",
+      "status": 410,
+      "code": "AUTHOR_ASSET_EXPIRED",
+      "expectedStatus": 410,
+      "expectedCode": "AUTHOR_ASSET_EXPIRED"
+    }
+  ],
+  "failures": [],
+  "protectedDatabaseUnchanged": true,
+  "probeCleanupComplete": true,
+  "databaseFingerprint": {
+    "before": "4e2f83be371bcde307c6d1f5fdbc510e09f1f49221c6ae02f54239c674224129",
+    "after": "4e2f83be371bcde307c6d1f5fdbc510e09f1f49221c6ae02f54239c674224129",
+    "protectedAssets": 3
+  },
+  "originalProbeRunResult": "passed",
+  "scope": "Local question-image production HTTP only; database observations only; no mocked scan/ready writes; not original-site or external-provider verification",
+  "executionPolicy": "run once; cleanup resumes interrupted reservation cleanup only; verify does not imply the twelve scenarios passed"
+}

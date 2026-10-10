@@ -1,0 +1,226 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:64938) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/payment-event-integrity.test.ts (7 tests | 7 failed) 1512ms
+   × paid: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다 235ms
+   × failed: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다 133ms
+   × refunded: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다 171ms
+   × refund_rejected: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다 146ms
+   × 서명은 유효해도 잘못된 JSON은 서버500 대신400으로 거절한다 131ms
+   × 결제 진행 중 구독 취소는 거절하고 업무·감사·요청 키를 유지한다 136ms
+   × 이미 취소된 과거 구독의 뒤늦은 승인은 원장만 충전하지 않는다 114ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > paid: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "duplicate": false,
++   "id": "3a72406b-e801-41c4-b9b3-8cc02577b939",
++   "methodId": null,
++   "status": "paid",
++   "subscriptionId": "7fc31f4d-5b00-4b2e-99fd-9834e2303b09",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:51:68
+     49|   test(`${outcome}: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다`, async () => {
+     50|     const before = await state();
+     51|     await expect(apply(event(outcome, { refundId: randomUUID() }))).re…
+       |                                                                    ^
+     52|     expect(await state()).toEqual(before);
+     53|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > failed: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "duplicate": false,
++   "id": "0837e8a2-5692-4238-86be-c5d32640fa71",
++   "methodId": null,
++   "status": "failed",
++   "subscriptionId": "33137079-ab03-4320-bd0e-9218ad4dfe2e",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:51:68
+     49|   test(`${outcome}: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다`, async () => {
+     50|     const before = await state();
+     51|     await expect(apply(event(outcome, { refundId: randomUUID() }))).re…
+       |                                                                    ^
+     52|     expect(await state()).toEqual(before);
+     53|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > refunded: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "duplicate": true,
++   "id": "043b4778-6708-4826-8156-62e0451bb94e",
++   "methodId": null,
++   "status": "paid",
++   "subscriptionId": "9afdcfc7-8cae-489a-8c35-5d89d281165e",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:61:69
+     59|     const done = event(outcome, { refundId: refund.id }); await apply(…
+     60|     const before = await state();
+     61|     await expect(apply({ orderId, eventId: done.eventId, outcome })).r…
+       |                                                                     ^
+     62|     expect(await state()).toEqual(before);
+     63|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > refund_rejected: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "duplicate": true,
++   "id": "226905fa-f486-41a7-8560-68cbb359d55c",
++   "methodId": null,
++   "status": "paid",
++   "subscriptionId": "a1421381-2d8c-468d-91f2-cb8148e6e6ee",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:61:69
+     59|     const done = event(outcome, { refundId: refund.id }); await apply(…
+     60|     const before = await state();
+     61|     await expect(apply({ orderId, eventId: done.eventId, outcome })).r…
+       |                                                                     ^
+     62|     expect(await state()).toEqual(before);
+     63|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > 서명은 유효해도 잘못된 JSON은 서버500 대신400으로 거절한다
+AssertionError: expected SyntaxError: Unexpected end of JSON input to match object { status: 400, code: 'INVALID_JSON' }
+
+- Expected
++ Received
+
+- {
+-   "code": "INVALID_JSON",
+-   "status": 400,
++ SyntaxError {
++   "message": "Unexpected end of JSON input",
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:67:40
+     65| test("서명은 유효해도 잘못된 JSON은 서버500 대신400으로 거절한다", async () => {
+     66|   const before = await state();
+     67|   await expect(applyRaw('{"orderId":')).rejects.toMatchObject({ status…
+       |                                        ^
+     68|   expect(await state()).toEqual(before);
+     69| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > 결제 진행 중 구독 취소는 거절하고 업무·감사·요청 키를 유지한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-07T02:02:12.899Z",
++     "currency": "KRW",
++     "id": "08164ec5-746d-4d45-b5a0-3847fb6f4d37",
++     "periodEnd": null,
++     "periodStart": null,
++     "planId": "45b84769-6826-4628-b26f-790b835496c9",
++     "planName": "합성 상품",
++     "planVersionId": "299bbec0-c707-43c0-a9f1-76e0740d5c19",
++     "priceKrw": 12000,
++     "status": "cancelled",
++     "version": 2,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:72:74
+     70| test("결제 진행 중 구독 취소는 거절하고 업무·감사·요청 키를 유지한다", async () => {
+     71|   const key = randomUUID(), before = await state();
+     72|   await expect(cancelPurchase(ctx, subscriptionId, 1, key, randomUUID(…
+       |                                                                          ^
+     73|   expect(await state()).toEqual(before); expect(await db.idempotencyRe…
+     74| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > 이미 취소된 과거 구독의 뒤늦은 승인은 원장만 충전하지 않는다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "duplicate": false,
++   "id": "08ad5b42-61f9-4435-b445-03d336e9e8fe",
++   "methodId": null,
++   "status": "paid",
++   "subscriptionId": "8fb91056-36d3-4d99-8025-2f972846c5f3",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:79:37
+     77|   await db.billingSubscription.update({ where: { id: subscriptionId },…
+     78|   const before = await state();
+     79|   await expect(apply(event("paid"))).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     80|   expect(await state()).toEqual(before);
+     81| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed (7)
+   Start at  11:02:10
+   Duration  2.23s (tests 70%, import 17%, transform 13%)
+

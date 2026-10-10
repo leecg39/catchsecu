@@ -1,0 +1,138 @@
+{
+  "result": "passed",
+  "checkpoint": "BI-06",
+  "recordedAt": "2026-10-10T21:15:28+09:00",
+  "scope": "rich consent evidence v2, pinned image PDF, largest-composition preflight, stored PDF download, legacy v1 preservation",
+  "implementation": {
+    "evidenceV2": "root and actually visited page rich documents, exact page path, termination kind, source/render image hashes and display metadata",
+    "pdf": "verified published-version image bytes are converted to bounded PNG and embedded; finalized PDF bytes are encrypted at submission time",
+    "exclusions": [
+      "completion notice",
+      "closed notice",
+      "remote image fetch",
+      "current draft lookup during receipt creation"
+    ],
+    "limits": {
+      "totalDecodedPixels": 100663296,
+      "totalConvertedImageBytes": 16777216,
+      "singleImagePixels": 25165824,
+      "singleImageDimension": 16384,
+      "pdfPages": 250,
+      "pdfBytes": 16777216
+    },
+    "compatibility": "ConsentEvidence v1 and stored v1 PDF bytes remain readable and byte-identical through migration 139."
+  },
+  "automatedValidation": {
+    "files": 7,
+    "tests": 68,
+    "breakdown": {
+      "richReceiptV2": 3,
+      "pdfRendererV2": 19,
+      "legacyFormDocuments": 18,
+      "formSectionsPersistence": 7,
+      "publicSubmissionState": 6,
+      "publicSubmissionGate": 10,
+      "formPageBranches": 5
+    },
+    "typecheck": "passed",
+    "eslint": "passed",
+    "prismaValidate": "passed",
+    "productionBuild": {
+      "status": "passed",
+      "staticPages": 82,
+      "testOnlyProviderFlags": [
+        "ALLOW_LOCAL_MAIL=1",
+        "ALLOW_LOCAL_KAKAO=1",
+        "ALLOW_LOCAL_PAYMENT=1"
+      ]
+    },
+    "apiContracts": {
+      "paths": 323,
+      "operations": 458,
+      "policies": 45,
+      "unmapped": 0
+    },
+    "plan": {
+      "tasks": 107,
+      "sourcePaths": 186,
+      "concretePaths": 184,
+      "fallbackPaths": 2,
+      "additionalPaths": 21,
+      "cycles": 0
+    },
+    "diffCheck": "passed"
+  },
+  "migration": {
+    "database": "catchsecu_test",
+    "freshInstallMigrations": 139,
+    "upgrade": "138→139",
+    "v2CompleteAccepted": true,
+    "v2IncompleteRejected": true,
+    "legacyEvidenceCipherUnchanged": true,
+    "legacyPdfCipherUnchanged": true,
+    "legacyPdfBytesUnchanged": true,
+    "legacyDocumentHashUnchanged": true,
+    "legacyPdfHashUnchanged": true,
+    "evidence": "migration-install-final.json"
+  },
+  "schema": {
+    "database": "catchsecu_test",
+    "unexpectedDiffs": 0,
+    "intentionalSqlOnlyDiffs": 1,
+    "evidence": [
+      "schema-current/catchsecu_test-contract.json",
+      "schema-current/catchsecu_test-checked-diff.sql"
+    ]
+  },
+  "browser": {
+    "browser": "Ego Lite",
+    "server": "development server on localhost:3114; separate production build passed",
+    "database": "catchsecu_test",
+    "steps": [
+      "two ClamAV-clean PNG assets pinned to root and second page",
+      "two-page form published and submitted through the visible browser UI",
+      "completion notice and submission identifier displayed",
+      "administrator detail displayed evidence v2, three documents, two images, exact two-page path and both hashes",
+      "PDF download endpoint returned 200 and opened the native save dialog"
+    ],
+    "databaseAndPdf": {
+      "evidenceVersion": 2,
+      "pagePathVersion": 1,
+      "documents": 3,
+      "images": 2,
+      "pdfBytes": 56669,
+      "pdfPages": 2,
+      "pdfImageOperators": 2,
+      "pdfSha256": "24e71a0a17d572cce95cc586957225850027f24f1059156b4510516b7f5b5899",
+      "storedPdfDownloadExact": true,
+      "completionAndClosedExcluded": true
+    },
+    "evidence": [
+      "browser/prepare.json",
+      "browser/browser-db.json",
+      "browser/receipt-v2-browser.pdf"
+    ]
+  },
+  "hashes": {
+    "prisma/migrations/20261025020900_rich_consent_evidence_v2/migration.sql": "3c543b5f793018826c27b3400fdf23230240182f429161ac037e987040df1ca4",
+    "src/contracts/form-documents.ts": "e835a77c6e803630cdb30475dcc8f4db5c88fdd34ed51bbdbedb67bf7e877c76",
+    "src/server/consent-receipts.ts": "9109274d8882090dcddf8e796717f0181b65a8a5be579df5b0c8623d855c42a1",
+    "src/server/pdf-renderer-v2.ts": "5ed4d8db10120829a85b7b56b2907dcb2739ba27129f34a621aca3452228f452",
+    "tests/server/consent-receipt-rich.test.ts": "415908487ebd133b2c8d1d0b7ca13e3bd6bb5810de45d8320cd24deafa56c9bd",
+    "scripts/qa-rea-rich-receipt-migration.ts": "e97b22e7e3223a6560ed91dc7dc446e155aa0538dc877a3ffc2e7ea9bb04718c",
+    "scripts/qa-rea-rich-receipt-browser.ts": "48f6959603e8de4fadf40f521326d6dedd051e3c5c86f80a7cf739fa9927187c",
+    "browser/receipt-v2-browser.pdf": "24e71a0a17d572cce95cc586957225850027f24f1059156b4510516b7f5b5899"
+  },
+  "externalDependencies": [],
+  "remaining": [
+    "BI-07a four-surface full lifecycle acceptance",
+    "BI-07b responsive, RTL, keyboard, failure and restart acceptance",
+    "remaining R08-T02 and active 107-task plan acceptance"
+  ],
+  "officialPlanState": {
+    "complete": 0,
+    "inProgress": 53,
+    "planned": 54
+  },
+  "overallGoalComplete": false
+}

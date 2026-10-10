@@ -1,3 +1,5 @@
+import { beforeEach as beforeSecurityCase } from "vitest";
+import { grantSecurityTestTrials } from "../fixtures/security-subscription";
 import { randomUUID } from "node:crypto";
 import { beforeAll,beforeEach,afterAll,describe,test,expect } from "vitest";
 import { createOTP } from "@better-auth/utils/otp";
@@ -185,3 +187,5 @@ describe("company MFA policy and recovery exceptions",()=>{
   const reused=await auth.handler(req("/auth/two-factor/verify-backup-code","POST",{code:backupCode},"owner",{cookie:cookieOf(second)}));expect(reused.status).toBe(401);
  });
 });
+
+beforeSecurityCase(grantSecurityTestTrials);

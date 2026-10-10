@@ -1,0 +1,738 @@
+{
+  "result": "passed",
+  "database": "catchsecu_test",
+  "checkedAt": "2026-10-09T19:26:59.770Z",
+  "scope": "Eight existing authentication models; read-only metadata, uniqueness, relation, deferral and credential-trigger assertions. No new migration or claim of full R02 acceptance.",
+  "tables": [
+    "User",
+    "Account",
+    "Session",
+    "Verification",
+    "TwoFactor",
+    "RateLimit",
+    "PasswordHistory",
+    "PasswordDeferral"
+  ],
+  "columns": [
+    {
+      "table": "Account",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "accountId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "providerId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "accessToken",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "refreshToken",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "idToken",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "accessTokenExpiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "refreshTokenExpiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "scope",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "password",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "ssoProviderId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "memberId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "passwordChangedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "passwordRevision",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "mode",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "sessionId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordDeferral",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordHistory",
+      "column": "id",
+      "type": "bigint",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordHistory",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordHistory",
+      "column": "passwordHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "PasswordHistory",
+      "column": "changedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "RateLimit",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "RateLimit",
+      "column": "key",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "RateLimit",
+      "column": "count",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "RateLimit",
+      "column": "lastRequest",
+      "type": "bigint",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "token",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "ipAddress",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Session",
+      "column": "userAgent",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Session",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "activeCompanyId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Session",
+      "column": "activeServiceId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "TwoFactor",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "TwoFactor",
+      "column": "secret",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "TwoFactor",
+      "column": "backupCodes",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "TwoFactor",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "TwoFactor",
+      "column": "verified",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "TwoFactor",
+      "column": "failedVerificationCount",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "TwoFactor",
+      "column": "lockedUntil",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "name",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "email",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "emailVerified",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "image",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "twoFactorEnabled",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "platformAdmin",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "phone",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "department",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "locale",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "passwordChangedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "jobTitle",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Verification",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Verification",
+      "column": "identifier",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Verification",
+      "column": "value",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Verification",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Verification",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Verification",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    }
+  ],
+  "constraints": [
+    {
+      "table": "Account",
+      "name": "Account_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Account",
+      "name": "Account_ssoProviderId_fkey",
+      "definition": "FOREIGN KEY (\"ssoProviderId\") REFERENCES \"SsoProvider\"(id) ON UPDATE RESTRICT ON DELETE RESTRICT"
+    },
+    {
+      "table": "Account",
+      "name": "Account_sso_provider_match",
+      "definition": "CHECK ((((\"left\"(\"providerId\", 4) = 'sso:'::text) AND (\"ssoProviderId\" IS NOT NULL) AND (\"providerId\" = ('sso:'::text || \"ssoProviderId\"))) OR ((\"left\"(\"providerId\", 4) <> 'sso:'::text) AND (\"ssoProviderId\" IS NULL))))"
+    },
+    {
+      "table": "Account",
+      "name": "Account_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "PasswordDeferral",
+      "name": "PasswordDeferral_mode",
+      "definition": "CHECK ((((mode = 'session'::text) AND (\"sessionId\" IS NOT NULL)) OR ((mode = 'period'::text) AND (\"sessionId\" IS NULL))))"
+    },
+    {
+      "table": "PasswordDeferral",
+      "name": "PasswordDeferral_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "PasswordDeferral",
+      "name": "PasswordDeferral_tenantId_memberId_userId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"memberId\", \"userId\") REFERENCES \"Membership\"(\"tenantId\", id, \"userId\") ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "PasswordDeferral",
+      "name": "PasswordDeferral_version",
+      "definition": "CHECK (((version > 0) AND (\"passwordRevision\" > 0)))"
+    },
+    {
+      "table": "PasswordHistory",
+      "name": "PasswordHistory_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "PasswordHistory",
+      "name": "PasswordHistory_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "RateLimit",
+      "name": "RateLimit_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_activeCompanyId_fkey",
+      "definition": "FOREIGN KEY (\"activeCompanyId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table": "Session",
+      "name": "Session_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "TwoFactor",
+      "name": "TwoFactor_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "TwoFactor",
+      "name": "TwoFactor_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "User",
+      "name": "User_email_normalized",
+      "definition": "CHECK ((email = lower(email)))"
+    },
+    {
+      "table": "User",
+      "name": "User_jobTitle_length_check",
+      "definition": "CHECK (((\"jobTitle\" IS NULL) OR (char_length(\"jobTitle\") <= 100)))"
+    },
+    {
+      "table": "User",
+      "name": "User_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "User",
+      "name": "User_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'suspended'::text, 'closed'::text])))"
+    },
+    {
+      "table": "Verification",
+      "name": "Verification_pkey",
+      "definition": "PRIMARY KEY (id)"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "Account",
+      "name": "Account_one_credential_per_user",
+      "definition": "CREATE UNIQUE INDEX \"Account_one_credential_per_user\" ON public.\"Account\" USING btree (\"userId\") WHERE (\"providerId\" = 'credential'::text)"
+    },
+    {
+      "table": "Account",
+      "name": "Account_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Account_pkey\" ON public.\"Account\" USING btree (id)"
+    },
+    {
+      "table": "Account",
+      "name": "Account_providerId_accountId_key",
+      "definition": "CREATE UNIQUE INDEX \"Account_providerId_accountId_key\" ON public.\"Account\" USING btree (\"providerId\", \"accountId\")"
+    },
+    {
+      "table": "Account",
+      "name": "Account_ssoProviderId_idx",
+      "definition": "CREATE INDEX \"Account_ssoProviderId_idx\" ON public.\"Account\" USING btree (\"ssoProviderId\")"
+    },
+    {
+      "table": "Account",
+      "name": "Account_userId_idx",
+      "definition": "CREATE INDEX \"Account_userId_idx\" ON public.\"Account\" USING btree (\"userId\")"
+    },
+    {
+      "table": "PasswordDeferral",
+      "name": "PasswordDeferral_expiresAt_idx",
+      "definition": "CREATE INDEX \"PasswordDeferral_expiresAt_idx\" ON public.\"PasswordDeferral\" USING btree (\"expiresAt\")"
+    },
+    {
+      "table": "PasswordDeferral",
+      "name": "PasswordDeferral_pkey",
+      "definition": "CREATE UNIQUE INDEX \"PasswordDeferral_pkey\" ON public.\"PasswordDeferral\" USING btree (id)"
+    },
+    {
+      "table": "PasswordDeferral",
+      "name": "PasswordDeferral_tenantId_memberId_key",
+      "definition": "CREATE UNIQUE INDEX \"PasswordDeferral_tenantId_memberId_key\" ON public.\"PasswordDeferral\" USING btree (\"tenantId\", \"memberId\")"
+    },
+    {
+      "table": "PasswordDeferral",
+      "name": "PasswordDeferral_userId_idx",
+      "definition": "CREATE INDEX \"PasswordDeferral_userId_idx\" ON public.\"PasswordDeferral\" USING btree (\"userId\")"
+    },
+    {
+      "table": "PasswordHistory",
+      "name": "PasswordHistory_pkey",
+      "definition": "CREATE UNIQUE INDEX \"PasswordHistory_pkey\" ON public.\"PasswordHistory\" USING btree (id)"
+    },
+    {
+      "table": "PasswordHistory",
+      "name": "PasswordHistory_userId_id_idx",
+      "definition": "CREATE INDEX \"PasswordHistory_userId_id_idx\" ON public.\"PasswordHistory\" USING btree (\"userId\", id)"
+    },
+    {
+      "table": "RateLimit",
+      "name": "RateLimit_key_key",
+      "definition": "CREATE UNIQUE INDEX \"RateLimit_key_key\" ON public.\"RateLimit\" USING btree (key)"
+    },
+    {
+      "table": "RateLimit",
+      "name": "RateLimit_pkey",
+      "definition": "CREATE UNIQUE INDEX \"RateLimit_pkey\" ON public.\"RateLimit\" USING btree (id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Session_pkey\" ON public.\"Session\" USING btree (id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_token_key",
+      "definition": "CREATE UNIQUE INDEX \"Session_token_key\" ON public.\"Session\" USING btree (token)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_userId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Session_userId_id_key\" ON public.\"Session\" USING btree (\"userId\", id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_userId_idx",
+      "definition": "CREATE INDEX \"Session_userId_idx\" ON public.\"Session\" USING btree (\"userId\")"
+    },
+    {
+      "table": "TwoFactor",
+      "name": "TwoFactor_pkey",
+      "definition": "CREATE UNIQUE INDEX \"TwoFactor_pkey\" ON public.\"TwoFactor\" USING btree (id)"
+    },
+    {
+      "table": "TwoFactor",
+      "name": "TwoFactor_secret_idx",
+      "definition": "CREATE INDEX \"TwoFactor_secret_idx\" ON public.\"TwoFactor\" USING btree (secret)"
+    },
+    {
+      "table": "TwoFactor",
+      "name": "TwoFactor_userId_idx",
+      "definition": "CREATE INDEX \"TwoFactor_userId_idx\" ON public.\"TwoFactor\" USING btree (\"userId\")"
+    },
+    {
+      "table": "User",
+      "name": "User_email_key",
+      "definition": "CREATE UNIQUE INDEX \"User_email_key\" ON public.\"User\" USING btree (email)"
+    },
+    {
+      "table": "User",
+      "name": "User_pkey",
+      "definition": "CREATE UNIQUE INDEX \"User_pkey\" ON public.\"User\" USING btree (id)"
+    },
+    {
+      "table": "Verification",
+      "name": "Verification_identifier_idx",
+      "definition": "CREATE INDEX \"Verification_identifier_idx\" ON public.\"Verification\" USING btree (identifier)"
+    },
+    {
+      "table": "Verification",
+      "name": "Verification_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Verification_pkey\" ON public.\"Verification\" USING btree (id)"
+    }
+  ],
+  "triggers": [
+    {
+      "table": "Account",
+      "name": "Account_derive_sso_provider",
+      "definition": "CREATE TRIGGER \"Account_derive_sso_provider\" BEFORE INSERT OR UPDATE OF \"providerId\", \"ssoProviderId\" ON public.\"Account\" FOR EACH ROW EXECUTE FUNCTION derive_account_sso_provider()",
+      "function": "CREATE OR REPLACE FUNCTION public.derive_account_sso_provider()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  NEW.\"ssoProviderId\" := CASE WHEN left(NEW.\"providerId\",4)='sso:' THEN substring(NEW.\"providerId\" from 5) ELSE NULL END;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "Account",
+      "name": "Account_password_history",
+      "definition": "CREATE TRIGGER \"Account_password_history\" AFTER INSERT OR UPDATE OF password ON public.\"Account\" FOR EACH ROW EXECUTE FUNCTION record_credential_change()",
+      "function": "CREATE OR REPLACE FUNCTION public.record_credential_change()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n audit_request_id text;\nBEGIN\n IF NEW.\"providerId\" <> 'credential' OR NEW.password IS NULL THEN RETURN NEW; END IF;\n IF TG_OP = 'UPDATE' AND NEW.password IS NOT DISTINCT FROM OLD.password THEN RETURN NEW; END IF;\n audit_request_id := current_setting('app.auth_request_id', true);\n IF audit_request_id IS NULL OR audit_request_id !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' THEN\n   audit_request_id := gen_random_uuid()::text;\n END IF;\n IF TG_OP = 'UPDATE' AND OLD.password IS NOT NULL THEN\n   INSERT INTO \"PasswordHistory\" (\"userId\",\"passwordHash\",\"changedAt\") VALUES (NEW.\"userId\",OLD.password,(clock_timestamp() AT TIME ZONE 'UTC'));\n   DELETE FROM \"PasswordHistory\" WHERE \"userId\" = NEW.\"userId\" AND id NOT IN\n     (SELECT id FROM \"PasswordHistory\" WHERE \"userId\" = NEW.\"userId\" ORDER BY id DESC LIMIT 9);\n END IF;\n UPDATE \"User\" SET \"passwordChangedAt\" = (clock_timestamp() AT TIME ZONE 'UTC'), \"updatedAt\" = (clock_timestamp() AT TIME ZONE 'UTC') WHERE id = NEW.\"userId\";\n DELETE FROM \"PasswordDeferral\" WHERE \"userId\" = NEW.\"userId\";\n -- Audit the exact rows removed by this trigger, including sessions that the\n -- library's later adapter deletion can no longer see. Any insert failure\n -- aborts the credential update, proofs and every session removal together.\n WITH ended AS (\n   DELETE FROM \"Session\" WHERE \"userId\" = NEW.\"userId\" RETURNING id,\"userId\",\"activeCompanyId\"\n )\n INSERT INTO \"AuditEvent\" (id,\"actorId\",\"tenantId\",action,resource,\"resourceId\",\"requestId\",detail,\"createdAt\")\n SELECT gen_random_uuid()::text,\"userId\",\"activeCompanyId\",'session.ended','session',id,audit_request_id,\n   '{\"changedFields\":[]}'::jsonb,(clock_timestamp() AT TIME ZONE 'UTC') FROM ended;\n DELETE FROM \"Verification\" WHERE value = NEW.\"userId\";\n INSERT INTO \"AuditEvent\" (id,\"actorId\",action,resource,\"resourceId\",\"requestId\",detail,\"createdAt\")\n VALUES (gen_random_uuid()::text,NEW.\"userId\",CASE WHEN TG_OP = 'INSERT' THEN 'password.created' ELSE 'password.changed' END,\n   'user',NEW.\"userId\",audit_request_id,'{\"changedFields\":[\"password\"]}'::jsonb,(clock_timestamp() AT TIME ZONE 'UTC'));\n RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "Session",
+      "name": "session_active_account_guard",
+      "definition": "CREATE TRIGGER session_active_account_guard BEFORE INSERT OR UPDATE ON public.\"Session\" FOR EACH ROW EXECUTE FUNCTION guard_active_account_reference()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_active_account_reference()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE account_status text;\nBEGIN\n  IF TG_TABLE_NAME = 'Membership' THEN\n    IF NEW.status <> 'active' THEN RETURN NEW; END IF;\n  END IF;\n  SELECT status INTO account_status FROM \"User\" WHERE id = NEW.\"userId\" FOR SHARE;\n  IF account_status <> 'active' THEN\n    RAISE EXCEPTION 'ACCOUNT_UNAVAILABLE' USING ERRCODE = '23514';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "User",
+      "name": "User_mfa_owner_guard",
+      "definition": "CREATE TRIGGER \"User_mfa_owner_guard\" BEFORE UPDATE ON public.\"User\" FOR EACH ROW EXECUTE FUNCTION protect_last_mfa_owner_account()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_last_mfa_owner_account()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE company_id TEXT;\nBEGIN\n  IF OLD.\"twoFactorEnabled\" AND OLD.status='active' AND (NOT NEW.\"twoFactorEnabled\" OR NEW.status<>'active') THEN\n    FOR company_id IN SELECT m.\"tenantId\" FROM \"Membership\" m JOIN \"Company\" c ON c.id=m.\"tenantId\" JOIN \"SecurityPolicy\" p ON p.\"tenantId\"=c.id\n      WHERE m.\"userId\"=OLD.id AND m.role='owner' AND m.status='active' AND m.\"accessKind\"='direct' AND c.status='active' AND p.\"requireMfa\" ORDER BY m.\"tenantId\"\n    LOOP\n      PERFORM id FROM \"Company\" WHERE id=company_id FOR UPDATE;\n      IF NOT EXISTS(SELECT 1 FROM \"Membership\" m JOIN \"User\" u ON u.id=m.\"userId\" WHERE m.\"tenantId\"=company_id AND m.\"userId\"<>OLD.id AND m.role='owner' AND m.status='active' AND m.\"accessKind\"='direct' AND u.status='active' AND u.\"emailVerified\" AND u.\"twoFactorEnabled\")\n      THEN RAISE EXCEPTION 'LAST_MFA_OWNER_REQUIRED' USING ERRCODE='23514'; END IF;\n    END LOOP;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "User",
+      "name": "export_user_access",
+      "definition": "CREATE TRIGGER export_user_access BEFORE DELETE OR UPDATE OF status, \"emailVerified\" ON public.\"User\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+      "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+    },
+    {
+      "table": "User",
+      "name": "export_user_mfa_access",
+      "definition": "CREATE TRIGGER export_user_mfa_access BEFORE UPDATE OF \"twoFactorEnabled\" ON public.\"User\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+      "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+    },
+    {
+      "table": "User",
+      "name": "user_closed_account_guard",
+      "definition": "CREATE TRIGGER user_closed_account_guard BEFORE UPDATE ON public.\"User\" FOR EACH ROW EXECUTE FUNCTION guard_closed_account()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_closed_account()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF OLD.status = 'closed' AND NEW.status <> 'closed' THEN\n    RAISE EXCEPTION 'CLOSED_ACCOUNT_IMMUTABLE' USING ERRCODE = '23514';\n  END IF;\n  IF NEW.status = 'closed' AND OLD.status <> 'closed' THEN\n    IF EXISTS (SELECT 1 FROM \"Membership\" m JOIN \"Company\" c ON c.id = m.\"tenantId\"\n      WHERE m.\"userId\" = OLD.id AND m.role = 'owner' AND m.status = 'active' AND c.status <> 'closed') THEN\n      RAISE EXCEPTION 'OWNERSHIP_TRANSFER_REQUIRED' USING ERRCODE = '23514';\n    END IF;\n    IF OLD.\"platformAdmin\" THEN\n      PERFORM pg_advisory_xact_lock(hashtextextended('platform-admin-closure', 0));\n      IF NOT EXISTS (SELECT 1 FROM \"User\" WHERE id <> OLD.id AND status = 'active' AND \"platformAdmin\") THEN\n        RAISE EXCEPTION 'PLATFORM_ADMIN_REQUIRED' USING ERRCODE = '23514';\n      END IF;\n    END IF;\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    }
+  ],
+  "sourceFingerprints": {
+    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/migrations/20261005090000_credential_audit/migration.sql": "3aa460d5ec9b177c2cbfb83a664300edff63f44b99fe70d841d3cf62b03cab5d",
+    "src/server/auth.ts": "c286c2ddb74ce4fec6dceaa0473f7f51cf02f08d3e7d45042afaf443b6f8a780",
+    "src/server/auth-adapter.ts": "2c6b62c42d0cfbbef2b0be82f7897f508707dd06f3abdd816e1def835c8c6c2d",
+    "src/server/auth-mutations.ts": "7ec9b624a229b9d721e11b9a07778e99872f4dd0bd504cf95f6444fc666d31ff",
+    "src/server/credential-lock.ts": "e127c7c753a60ed30e7a84ba3c01461362ab90402977fe40f25e17e404790795",
+    "src/server/password-policy.ts": "33c134d363894a146452710af86cd58c6874e300f065598e2e343391e55e756c"
+  }
+}

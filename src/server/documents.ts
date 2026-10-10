@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { documentTypes, documentType, emptyDisplay, type DocumentInput, type ClauseInput, type DisplayInput, type DisplayKind, type DocumentSnapshot, type PublicPurpose, type PublicRecipient } from "@/contracts/documents";
-import { basisLabels, itemKinds, recipientKinds } from "@/contracts/processing-catalog";
+import { basisLabels, catalogItem, itemKinds, recipientKinds } from "@/contracts/processing-catalog";
+import { policyItemOptions } from "@/contracts/policy-item-options";
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
 import { roleCan, type Capability } from "./permissions";
@@ -12,10 +13,12 @@ import { decrypt, encrypt, opaqueToken, tokenHash } from "./crypto";
 import { fail, listQuery, requireVersion } from "./http";
 import { lockServiceActor } from "./service-actor";
 import { assertFileDeadlines } from "./file-access";
+import { policyDetailsInput, policyPublishErrors } from "@/contracts/document-policy";
+import { publishedPolicyDetails, renderPolicyDetails } from "./document-policy-render";
 
 export const documentQuery = listQuery.omit({ sort: true, direction: true }).extend({ serviceId: z.uuid().optional(), type: documentType.optional(), status: z.enum(["all", "draft", "published", "private", "archived"]).default("all") });
 export const clauseQuery = documentQuery.omit({ status: true }).extend({ status: z.enum(["active", "archived", "all"]).default("active") });
-const include = { service: { include: { tenant: { select: { publicName: true } } } },
+const include = { policyDraft: true, service: { include: { tenant: { select: { publicName: true } } } },
   purposes: { orderBy: { purposeId: "asc" as const }, include: { purpose: { include: { recipients: { include: { recipient: true } } } } } },
   recipients: { orderBy: { recipientId: "asc" as const }, include: { recipient: true } }, versions: { orderBy: { number: "desc" as const }, take: 1 },
   publications: { where: { status: "active" }, select: { documentVersionId: true, expiresAt: true } } };
@@ -44,6 +47,7 @@ async function locate(tx: Transaction, ctx: Context, id: string, write: boolean)
 function dto(row: StoredDocument) {
   return { id: row.id, serviceId: row.serviceId, serviceName: row.service.name, type: row.type, title: row.title, body: row.body,
     refusalNotice: row.refusalNotice, rightsContact: row.rightsContact, effectiveDate: row.effectiveDate,
+    ...(row.policyDraft ? { policyDetails: policyDetailsInput.parse(row.policyDraft.payload) } : {}),
     purposeIds: row.purposes.map(item => item.purposeId), recipientIds: row.recipients.map(item => item.recipientId),
     status: row.status, version: row.version, draftRevision: row.draftRevision, createdAt: iso(row.createdAt), updatedAt: iso(row.updatedAt),
     latestNumber: row.versions[0]?.number ?? 0, hasUnpublishedChanges: !row.versions[0] || row.versions[0].contentHash !== preview(row).contentHash,
@@ -66,8 +70,9 @@ async function writeLinks(tx: Transaction, ctx: Context, id: string, input: Docu
 }
 export async function createDocument(tx: Transaction, ctx: Context, input: DocumentInput, requestId: string) {
   await lockDocumentService(tx, ctx, input.serviceId, "document.write"); await validateLinks(tx, ctx, input);
-  const { purposeIds: _purposes, recipientIds: _recipients, ...data } = input; void _purposes; void _recipients;
+  const { purposeIds: _purposes, recipientIds: _recipients, policyDetails, ...data } = input; void _purposes; void _recipients;
   const row = await tx.document.create({ data: { ...data, tenantId: ctx.tenantId, createdBy: ctx.user.id } });
+  await writePolicyDetails(tx, ctx, row.id, input.serviceId, policyDetails);
   await writeLinks(tx, ctx, row.id, input); await audit(tx, ctx, requestId, "document.created", "document", row.id, Object.keys(input), row.serviceId);
   return dto(await tx.document.findUniqueOrThrow({ where: { id: row.id }, include }));
 }
@@ -86,11 +91,19 @@ export async function updateDocument(ctx: Context, id: string, input: DocumentIn
     const row = await locate(tx, ctx, id, true); editable(row, input.version);
     if (row.serviceId !== input.serviceId || row.type !== input.type) fail(422, "IMMUTABLE_DOCUMENT_SCOPE", "문서의 서비스와 유형은 변경할 수 없습니다.");
     await validateLinks(tx, ctx, input);
-    const { purposeIds: _p, recipientIds: _r, version, ...data } = input; void _p; void _r;
+    const { purposeIds: _p, recipientIds: _r, policyDetails, version, ...data } = input; void _p; void _r;
     await tx.document.update({ where: { id }, data: { ...data, version: version + 1, draftRevision: { increment: 1 } } }); await writeLinks(tx, ctx, id, input);
+    await writePolicyDetails(tx, ctx, id, input.serviceId, policyDetails);
     await audit(tx, ctx, requestId, "document.draft_updated", "document", id, Object.keys(input), row.serviceId);
     return dto(await tx.document.findUniqueOrThrow({ where: { id }, include }));
   });
+}
+async function writePolicyDetails(tx: Transaction, ctx: Context, documentId: string, serviceId: string, details: DocumentInput["policyDetails"]) {
+  if (details === undefined) return; // Older clients preserve the extension on PATCH.
+  if (details === null) { await tx.documentPolicyDraft.deleteMany({ where: { documentId, tenantId: ctx.tenantId, serviceId } }); return; }
+  const payload = policyDetailsInput.parse(details) as Prisma.InputJsonObject;
+  await tx.documentPolicyDraft.upsert({ where: { documentId },
+    create: { documentId, tenantId: ctx.tenantId, serviceId, schemaVersion: 1, payload }, update: { payload } });
 }
 function purposeSnapshot(row: StoredDocument["purposes"][number]["purpose"]): PublicPurpose {
   return { name: row.name, purpose: row.purpose, lawfulBasis: row.lawfulBasis, basisReference: row.basisReference, items: row.items as PublicPurpose["items"],
@@ -116,16 +129,22 @@ export function renderDocument(snapshot: DocumentSnapshot) {
     ...(recipient.contact ? ["연락처: " + recipient.contact] : []), ...(recipient.countryCode !== "KR" ? ["이전 방법: " + recipient.transferMethod, "이전 시기: " + recipient.transferTiming, "거부 안내: " + recipient.refusalNotice] : []));
   if (snapshot.refusalNotice) lines.push("", "동의 거부 안내", snapshot.refusalNotice);
   if (snapshot.rightsContact) lines.push("", "권리 행사·문의", snapshot.rightsContact);
+  if (snapshot.policyDetails) lines.push(...renderPolicyDetails(snapshot.policyDetails));
   return lines.join("\n");
 }
-function preview(row: StoredDocument) {
+function documentRecipients(row: StoredDocument) {
   const map = new Map(row.recipients.map(link => [link.recipient.id, link.recipient]));
   for (const link of row.purposes) for (const rel of link.purpose.recipients) if (rel.recipient.kind !== "source") map.set(rel.recipient.id, rel.recipient);
-  const recipients = [...map.values()].sort((a, b) => a.id.localeCompare(b.id));
+  return [...map.values()].sort((a, b) => a.id.localeCompare(b.id));
+}
+function preview(row: StoredDocument) {
+  const recipients = documentRecipients(row);
   const snapshot: DocumentSnapshot = { schemaVersion: 1, type: row.type as DocumentInput["type"], title: row.title, body: row.body, refusalNotice: row.refusalNotice,
     rightsContact: row.rightsContact, effectiveDate: row.effectiveDate, companyName: row.service.tenant.publicName, serviceName: row.service.externalName,
-    purposes: row.purposes.map(link => purposeSnapshot(link.purpose)), recipients: recipients.map(recipientSnapshot) };
+    purposes: row.purposes.map(link => purposeSnapshot(link.purpose)), recipients: recipients.map(recipientSnapshot),
+    ...(row.policyDraft ? { policyDetails: publishedPolicyDetails(policyDetailsInput.parse(row.policyDraft.payload)) } : {}) };
   const publishErrors: string[] = [];
+  if (snapshot.policyDetails) publishErrors.push(...policyPublishErrors(snapshot.policyDetails));
   if (!row.purposes.length) publishErrors.push("수집 목적을 하나 이상 선택해주세요.");
   if (row.purposes.some(link => link.purpose.status !== "active") || recipients.some(item => item.status !== "active")) publishErrors.push("보관된 목적 또는 제공·수탁자 연결을 수정해주세요.");
   if (row.type !== "privacy_policy") {
@@ -148,6 +167,9 @@ export async function publishDocument(ctx: Context, id: string, input: { version
     const published = await tx.documentVersion.create({ data: { tenantId: row.tenantId, serviceId: row.serviceId, documentId: id,
       number: (row.versions[0]?.number ?? 0) + 1, draftRevision: row.draftRevision, snapshot: result.snapshot as unknown as Prisma.InputJsonValue,
       contentHash: result.contentHash, renderedText: result.renderedText } });
+    const recipientSources = documentRecipients(row).map(recipient => ({ tenantId: row.tenantId, serviceId: row.serviceId,
+      documentId: row.id, documentVersionId: published.id, recipientId: recipient.id }));
+    if (recipientSources.length) await tx.documentVersionRecipient.createMany({ data: recipientSources });
     const token = opaqueToken();
     const link = await tx.documentPublication.create({ data: { tenantId: row.tenantId, serviceId: row.serviceId, documentId: id, documentVersionId: published.id,
       tokenHash: tokenHash(token), tokenCipher: encrypt(token), expiresAt } });
@@ -266,7 +288,9 @@ export async function documentOptions(ctx: Context, serviceId: string) {
     if (!await tx.service.count({ where: { AND: [actor.scope, { id: serviceId }] } }))
       fail(403, "SERVICE_FORBIDDEN", "해당 서비스에 대한 권한이 없습니다.");
     const where = { tenantId: ctx.tenantId, serviceId, status: "active" };
-    const purposes = await tx.processingPurpose.findMany({ where, select: { id: true, name: true, version: true, status: true }, orderBy: { name: "asc" } });
+    const sourcePurposes = await tx.processingPurpose.findMany({ where, select: { id: true, name: true, version: true, status: true, items: true }, orderBy: [{ name: "asc" }, { id: "asc" }] });
+    const policyItems = policyItemOptions(sourcePurposes.map(row => ({ items: catalogItem.array().parse(row.items) })));
+    const purposes = sourcePurposes.map(({ items: _items, ...row }) => { void _items; return row; });
     const recipients = await tx.recipient.findMany({ where: { ...where, kind: { not: "source" } }, select: { id: true, name: true, kind: true, countryCode: true, version: true, status: true }, orderBy: { name: "asc" } });
     const templates = (await tx.clauseTemplate.findMany({ where, orderBy: { title: "asc" } })).map(clauseDto);
     const publications = await tx.documentPublication.findMany({ where: { ...where, document: { type: "privacy_policy", status: "published" }, OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
@@ -275,7 +299,7 @@ export async function documentOptions(ctx: Context, serviceId: string) {
     const now = new Date();
     const policies = publications.filter(item => !item.expiresAt || item.expiresAt > now)
       .map(item => ({ publicationId: item.id, title: (item.documentVersion.snapshot as unknown as DocumentSnapshot).title, number: item.documentVersion.number, expiresAt: item.expiresAt ? iso(item.expiresAt) : null }));
-    return { purposes, recipients, templates, policies };
+    return { purposes, recipients, templates, policies, policyItems };
   });
 }
 function displayDto(row: Prisma.ServiceConsentDisplayGetPayload<{ include: { publication: true } }> | null, serviceId: string, kind: DisplayKind) {

@@ -5,6 +5,7 @@ import { assertFileDeadlines } from "./file-access";
 import { fail } from "./http";
 import { assertCompanyIp } from "./ip-enforcement";
 import { lockServiceActor } from "./service-actor";
+import { ssoSessionState } from "./sso-policy-enforcement";
 
 type Actor = Awaited<ReturnType<typeof requireActor>>;
 async function lockSelection(tx: Transaction, sessionId: string) {
@@ -14,7 +15,7 @@ async function lockSelection(tx: Transaction, sessionId: string) {
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${"context:" + sessionId}, 0))`;
 }
 export async function selectCompany(actor: Actor, companyId: string, clientIp: string | null, requestId: string) {
-  await db.$transaction(async tx => {
+  return db.$transaction(async tx => {
     await lockSelection(tx, actor.session.id);
     await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${companyId} FOR SHARE`;
     const initial = await tx.membership.findFirst({ where: { userId: actor.user.id, tenantId: companyId } });
@@ -41,6 +42,10 @@ export async function selectCompany(actor: Actor, companyId: string, clientIp: s
     await tx.$queryRaw`SELECT id FROM "Session" WHERE id=${actor.session.id} AND "userId"=${actor.user.id} FOR UPDATE`;
     const session = await tx.session.findFirst({ where: { id: actor.session.id, userId: actor.user.id } });
     if (!session) fail(401, "SESSION_EXPIRED", "세션이 만료되었습니다. 다시 로그인해주세요.");
+    // Selecting a company also selects where account recovery/linking happens.
+    // A blocked company has no selected service; contextDto and every business
+    // transaction still require its own SSO proof before exposing any work.
+    const ssoLogin = await ssoSessionState(companyId, actor.user.id, session.id, tx);
     const deadlines = { session: new Date(Math.min(session.expiresAt.getTime(), member.tenant.policy
       ? session.updatedAt.getTime() + member.tenant.policy.sessionMinutes * 60000 : Infinity)),
       expert: member.accessKind === "expert" ? member.expertAssignment!.expiresAt : null, password: null };
@@ -49,6 +54,7 @@ export async function selectCompany(actor: Actor, companyId: string, clientIp: s
     await audit(tx, { tenantId: companyId, user: actor.user }, requestId, "context.company_selected", "session", session.id,
       ["activeCompanyId", "activeServiceId"]);
     assertFileDeadlines(deadlines);
+    return { ssoLogin };
   }, { timeout: 15000 });
 }
 

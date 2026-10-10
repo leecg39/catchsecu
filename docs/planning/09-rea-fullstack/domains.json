@@ -1,0 +1,4145 @@
+{
+  "2": {
+    "id": "R02",
+    "name": "계정 인증·세션·복구",
+    "models": [
+      "User",
+      "Account",
+      "Session",
+      "Verification",
+      "TwoFactor",
+      "RateLimit",
+      "PasswordHistory",
+      "PasswordDeferral"
+    ],
+    "server_files": [
+      "src/server/auth.ts",
+      "src/server/auth-adapter.ts",
+      "src/server/auth-mutations.ts",
+      "src/server/credential-lock.ts",
+      "src/server/password-policy.ts",
+      "src/server/password-deferral.ts"
+    ],
+    "ui_files": [
+      "src/components/auth/AuthPages.tsx",
+      "src/components/auth/LiveAuth.tsx"
+    ],
+    "api_prefixes": [
+      "/auth",
+      "/me/sessions",
+      "/me/password-policy"
+    ],
+    "crud": "C 가입·인증 challenge; R 세션/암호정책; U 암호·2FA; D 세션 폐기·2FA 해제. 계정 삭제는 R05.",
+    "data_work": "현재 Better Auth 테이블을 재사용한다. 이메일 중복·만료·한 번만 쓰는 인증, 암호 이력, 복구코드 소비, 세션 폐기를 DB 제약과 트랜잭션으로 대조한다.",
+    "api_work": "이메일 가입→인증→로그인→로그아웃, 재설정, OTP/TOTP·복구코드 계약을 실제 handler와 대조한다. 재전송 rate limit, 계정 존재 노출 방지, returnTo 검증 및 정책 변경 후 기존 세션 집행을 확인한다.",
+    "ui_work": "로그인/가입/이메일·OTP/복구/암호변경/2단계/만료 경로 각각 서버 상태에 연결한다. 전송 중·잘못된 코드·만료·재전송 대기·로그아웃 완료를 표시한다.",
+    "verification": "A 계정 가입 후 로컬 시험메일 링크를 한 번 사용, 재사용 거부; 틀린 암호·만료 OTP·복구코드 재사용 거부; 다른 브라우저 세션 폐기; 재시작 뒤 인증 유지/폐기 일치.",
+    "actors": "익명 challenge 또는 자기 계정; 회사 권한 이전에 인증 검증",
+    "dependencies": [
+      1
+    ],
+    "legacy_tasks": [
+      "P02-T01",
+      "P02-T02",
+      "P02-T04",
+      "P02-T05"
+    ],
+    "existing_files": [
+      "src/server/auth.ts",
+      "src/server/auth-adapter.ts",
+      "src/server/auth-mutations.ts",
+      "src/server/credential-lock.ts",
+      "src/server/password-policy.ts",
+      "src/server/password-deferral.ts",
+      "src/components/auth/AuthPages.tsx",
+      "src/components/auth/LiveAuth.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/me/sessions"
+      },
+      {
+        "method": "DELETE",
+        "path": "/me/sessions/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/sign-up/email"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/sign-in/email"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/request-password-reset"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/reset-password"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/change-password"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/sign-out"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/two-factor/enable"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/two-factor/verify-totp"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/two-factor/send-otp"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/two-factor/verify-otp"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/two-factor/verify-backup-code"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/two-factor/disable"
+      },
+      {
+        "method": "GET",
+        "path": "/auth/get-session"
+      },
+      {
+        "method": "GET",
+        "path": "/me/password-policy"
+      },
+      {
+        "method": "POST",
+        "path": "/me/password-policy"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/org/login"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/org/email-register"
+      },
+      {
+        "method": "GET",
+        "path": "/auth/sso/{providerId}"
+      },
+      {
+        "method": "GET",
+        "path": "/auth/sso/callback"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/sso/saml"
+      }
+    ],
+    "model_status": {
+      "User": "existing",
+      "Account": "existing",
+      "Session": "existing",
+      "Verification": "existing",
+      "TwoFactor": "existing",
+      "RateLimit": "existing",
+      "PasswordHistory": "existing",
+      "PasswordDeferral": "existing"
+    }
+  },
+  "3": {
+    "id": "R03",
+    "name": "회사·서비스·초기 설정",
+    "models": [
+      "Company",
+      "CompanyBusinessFile",
+      "Service",
+      "Membership",
+      "ServiceGrant",
+      "AccessRequest"
+    ],
+    "server_files": [
+      "src/server/company-management.ts",
+      "src/server/service-management.ts",
+      "src/server/context-selection.ts",
+      "src/server/service-access.ts",
+      "src/server/access-requests.ts"
+    ],
+    "ui_files": [
+      "src/components/management/live.tsx",
+      "src/components/ServiceAccessPage.tsx",
+      "src/components/ApplicationContext.tsx"
+    ],
+    "api_prefixes": [
+      "/companies",
+      "/services",
+      "/context",
+      "/access-requests"
+    ],
+    "crud": "C 회사/서비스/접근요청; R 목록·상세·현재 컨텍스트; U 기본정보/이름/요청결정; D 서비스 보관·회사 종료요청. 참조 데이터 즉시 cascade 삭제 금지.",
+    "data_work": "Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceGrant 관계, 사업자 파일 소유권과 version을 검사한다. 회사 종료와 구성원 탈퇴를 구분한다.",
+    "api_work": "회사·서비스 CRUD, 사업자 파일, 컨텍스트 전환 및 서비스 접근 요청 API에 tenant·활성 상태·version·권한 재검사를 적용한다. 서비스 폐기 시 게시·예약·공유 접근과의 일관성을 확인한다.",
+    "ui_work": "회사 조회/편집, 서비스 목록·추가 모달·편집/보관, 회사 최초 등록, 서비스 없음→접근요청 흐름. 전환 시 목록·권한·선택값 캐시를 함께 갱신한다.",
+    "verification": "회사 A 생성→서비스2개→수정→보관→재로그인; B 회사 serviceId를 본문/URL에 주입해 거부; 같은 이름 동시생성 하나409; 사용 중 서비스 삭제 의존성 안내.",
+    "actors": "company.manage/service.manage; 접근요청은 자기 멤버십·허용 서비스",
+    "dependencies": [
+      2
+    ],
+    "legacy_tasks": [
+      "P03-T01"
+    ],
+    "existing_files": [
+      "src/server/company-management.ts",
+      "src/server/service-management.ts",
+      "src/server/context-selection.ts",
+      "src/server/service-access.ts",
+      "src/server/access-requests.ts",
+      "src/components/management/live.tsx",
+      "src/components/ServiceAccessPage.tsx",
+      "src/components/ApplicationContext.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/companies"
+      },
+      {
+        "method": "POST",
+        "path": "/companies"
+      },
+      {
+        "method": "GET",
+        "path": "/companies/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/companies/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/companies/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/services"
+      },
+      {
+        "method": "POST",
+        "path": "/services"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/services/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/context"
+      },
+      {
+        "method": "POST",
+        "path": "/context"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "POST",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "DELETE",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "POST",
+        "path": "/companies/{id}/closure"
+      },
+      {
+        "method": "GET",
+        "path": "/companies/{id}/business-file"
+      },
+      {
+        "method": "POST",
+        "path": "/companies/{id}/business-file"
+      },
+      {
+        "method": "DELETE",
+        "path": "/companies/{id}/business-file"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/consent-display/{kind}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}/consent-display/{kind}"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/subprocessors"
+      },
+      {
+        "method": "POST",
+        "path": "/services/{id}/subprocessors"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/subprocessors/{subId}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}/subprocessors/{subId}"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/subprocessor-notices"
+      },
+      {
+        "method": "POST",
+        "path": "/services/{id}/subprocessor-notices"
+      },
+      {
+        "method": "GET",
+        "path": "/access-requests"
+      },
+      {
+        "method": "POST",
+        "path": "/access-requests"
+      },
+      {
+        "method": "PATCH",
+        "path": "/access-requests/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/access-requests/{id}"
+      }
+    ],
+    "model_status": {
+      "Company": "existing",
+      "CompanyBusinessFile": "existing",
+      "Service": "existing",
+      "Membership": "existing",
+      "ServiceGrant": "existing",
+      "AccessRequest": "existing"
+    }
+  },
+  "4": {
+    "id": "R04",
+    "name": "구성원·초대·권한·전문가",
+    "models": [
+      "Membership",
+      "ServiceGrant",
+      "Invitation",
+      "AccessRequest",
+      "ExpertAssignment",
+      "ExpertAssignmentService"
+    ],
+    "server_files": [
+      "src/server/members.ts",
+      "src/server/permissions.ts",
+      "src/server/service-access.ts",
+      "src/server/expert-assignments.ts"
+    ],
+    "ui_files": [
+      "src/components/management/members.tsx",
+      "src/components/auth/InvitationAccept.tsx",
+      "src/components/ExpertSelectPage.tsx",
+      "src/components/ExpertAssignmentsAdmin.tsx"
+    ],
+    "api_prefixes": [
+      "/members",
+      "/invitations",
+      "/access-requests",
+      "/expert-assignments"
+    ],
+    "crud": "C 초대/서비스 권한/전문가 배정; R 목록·초대미리보기; U 역할·담당범위·소유권 이전; D 초대취소/권한회수/배정해제.",
+    "data_work": "회사별 멤버십·서비스 권한의 복합 FK 및 중복 초대 방지, 초대 만료/수락 1회, 전문가 배정 범위·기간·version을 확인한다. 마지막 owner 제거를 차단한다.",
+    "api_work": "초대·재전송·수락·취소, 멤버 변경/삭제/owner 이전, 서비스 접근요청 결정과 전문가 배정 API를 역할 허용표에 대조한다. 회수 후 세션과 진행 중 작업에서 권한을 다시 검사한다.",
+    "ui_work": "구성원 목록/검색/초대/편집/삭제와 /set/authority 서비스별 범위 편집, 전문가 회사 선택을 연결한다. 관리자용 배정 페이지는 별도 부가 경로로 관리한다.",
+    "verification": "A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 실패; owner2명이 동시탈퇴/이전해도 최소1명 보장; 초대 중복·만료·전문가 기간 만료/재배정409.",
+    "actors": "member.manage, company.manage, platformAdmin; 원본 ROOT 등과 로컬 역할은 별도 매핑",
+    "dependencies": [
+      3
+    ],
+    "legacy_tasks": [
+      "P02-T03",
+      "P03-T02",
+      "P03-T05"
+    ],
+    "existing_files": [
+      "src/server/members.ts",
+      "src/server/permissions.ts",
+      "src/server/service-access.ts",
+      "src/server/expert-assignments.ts",
+      "src/components/management/members.tsx",
+      "src/components/auth/InvitationAccept.tsx",
+      "src/components/ExpertSelectPage.tsx",
+      "src/components/ExpertAssignmentsAdmin.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/invitations"
+      },
+      {
+        "method": "POST",
+        "path": "/invitations"
+      },
+      {
+        "method": "DELETE",
+        "path": "/invitations/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/members"
+      },
+      {
+        "method": "GET",
+        "path": "/members/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/members/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/members/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/members/{id}/transfer"
+      },
+      {
+        "method": "POST",
+        "path": "/invitations/{id}/resend"
+      },
+      {
+        "method": "POST",
+        "path": "/invitations/preview"
+      },
+      {
+        "method": "POST",
+        "path": "/invitations/accept"
+      },
+      {
+        "method": "POST",
+        "path": "/invitations/sso/options"
+      },
+      {
+        "method": "POST",
+        "path": "/invitations/sso/start"
+      },
+      {
+        "method": "GET",
+        "path": "/access-requests"
+      },
+      {
+        "method": "POST",
+        "path": "/access-requests"
+      },
+      {
+        "method": "PATCH",
+        "path": "/access-requests/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/access-requests/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/expert-assignments"
+      },
+      {
+        "method": "POST",
+        "path": "/expert-assignments"
+      },
+      {
+        "method": "GET",
+        "path": "/expert-assignments/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/expert-assignments/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/expert-assignments/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/expert-assignments/options"
+      }
+    ],
+    "model_status": {
+      "Membership": "existing",
+      "ServiceGrant": "existing",
+      "Invitation": "existing",
+      "AccessRequest": "existing",
+      "ExpertAssignment": "existing",
+      "ExpertAssignmentService": "existing"
+    }
+  },
+  "5": {
+    "id": "R05",
+    "name": "MY·프로필·활동 검토·탈퇴",
+    "models": [
+      "User",
+      "AccountClosure",
+      "Session",
+      "Account",
+      "ActivityReview",
+      "ActivityReviewMessage"
+    ],
+    "server_files": [
+      "src/server/account-closure.ts",
+      "src/server/account-actor.ts",
+      "src/server/activity-reviews.ts",
+      "src/server/activity-review-mail.ts",
+      "src/server/auth-mutations.ts",
+      "src/server/sso-accounts.ts"
+    ],
+    "ui_files": [
+      "src/components/management/live.tsx",
+      "src/components/management/AccountClosure.tsx",
+      "src/components/management/ActivityReviews.tsx",
+      "src/components/auth/SsoAccounts.tsx"
+    ],
+    "api_prefixes": [
+      "/me",
+      "/activity-reviews"
+    ],
+    "crud": "C 활동 검토요청·탈퇴요청; R 프로필/내 활동/검토; U 이름·연락처·검토 응답; D 세션·연결 계정 해제, 탈퇴는 상태 전이.",
+    "data_work": "자기 사용자 범위와 회사별 활동 검토 scope를 분리한다. 탈퇴요청 사유 암호화·보존, 마지막 owner 제약, 검토 메시지/답변의 수정 정책과 감사 근거를 정리한다.",
+    "api_work": "프로필 PATCH·세션 DELETE·연결 계정 해제·closure 및 활동검토 actions/notifications/destruction의 상태 전이를 검사한다. 권한회수/탈퇴 경합 중 다른 회사 자료 조회를 막는다.",
+    "ui_work": "/my-page 별칭→프로필, 편집/탈퇴 확인, 내 활동로그, 개인정보 활동검토 목록·상세·사유응답·처리결과·재시도를 구현 또는 보완한다.",
+    "verification": "자기 프로필 수정 재로그인 확인; B 사용자 프로필 노출없음; 최종 로그인 수단 해제 차단; 탈퇴 후 세션 폐기와 보존대상 분리; 검토 만료·중복처리·알림실패 재시도.",
+    "actors": "자기 계정; 검토자는 security.write/audit.read 및 해당 서비스",
+    "dependencies": [
+      4
+    ],
+    "legacy_tasks": [
+      "P03-T03",
+      "P06-T02"
+    ],
+    "existing_files": [
+      "src/server/account-closure.ts",
+      "src/server/account-actor.ts",
+      "src/server/activity-reviews.ts",
+      "src/server/activity-review-mail.ts",
+      "src/server/auth-mutations.ts",
+      "src/server/sso-accounts.ts",
+      "src/components/management/live.tsx",
+      "src/components/management/AccountClosure.tsx",
+      "src/components/management/ActivityReviews.tsx",
+      "src/components/auth/SsoAccounts.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/me"
+      },
+      {
+        "method": "PATCH",
+        "path": "/me"
+      },
+      {
+        "method": "GET",
+        "path": "/me/sso-accounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/me/sso-accounts/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/me/sessions"
+      },
+      {
+        "method": "DELETE",
+        "path": "/me/sessions/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/me/closure"
+      },
+      {
+        "method": "POST",
+        "path": "/me/closure"
+      },
+      {
+        "method": "GET",
+        "path": "/me/audit-events"
+      },
+      {
+        "method": "GET",
+        "path": "/me/audit-events/export"
+      },
+      {
+        "method": "GET",
+        "path": "/me/password-policy"
+      },
+      {
+        "method": "POST",
+        "path": "/me/password-policy"
+      },
+      {
+        "method": "GET",
+        "path": "/activity-reviews"
+      },
+      {
+        "method": "POST",
+        "path": "/activity-reviews"
+      },
+      {
+        "method": "GET",
+        "path": "/activity-reviews/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/activity-reviews/{id}/actions"
+      },
+      {
+        "method": "POST",
+        "path": "/activity-reviews/{id}/notifications"
+      },
+      {
+        "method": "POST",
+        "path": "/activity-reviews/{id}/destruction"
+      }
+    ],
+    "model_status": {
+      "User": "existing",
+      "AccountClosure": "existing",
+      "Session": "existing",
+      "Account": "existing",
+      "ActivityReview": "existing",
+      "ActivityReviewMessage": "existing"
+    }
+  },
+  "6": {
+    "id": "R06",
+    "name": "회사 보안정책·IP·MFA",
+    "models": [
+      "SecurityPolicy",
+      "IpAccessPolicy",
+      "IpRule",
+      "MfaException",
+      "PasswordHistory",
+      "PasswordDeferral",
+      "TwoFactor"
+    ],
+    "server_files": [
+      "src/server/security-policy.ts",
+      "src/server/ip-access.ts",
+      "src/server/ip-enforcement.ts",
+      "src/server/client-ip.ts",
+      "src/server/mfa-policy.ts",
+      "src/server/mfa-enforcement.ts",
+      "src/server/password-policy.ts"
+    ],
+    "ui_files": [
+      "src/components/management/policy.tsx",
+      "src/components/management/SecurityOverview.tsx",
+      "src/components/management/IpAccess.tsx",
+      "src/components/management/MfaPolicy.tsx"
+    ],
+    "api_prefixes": [
+      "/security/policy",
+      "/security/ip-rules",
+      "/security/mfa-policy",
+      "/security/status"
+    ],
+    "crud": "C IP 규칙/MFA 예외; R 정책·보안현황; U 정책·예외기간·활성; D 규칙·예외 삭제/정책 초기화.",
+    "data_work": "회사 단일 정책, IP/CIDR 정규화·중복, IPv4/IPv6, MFA 예외 만료와 version을 점검한다. 보안 수치의 원본 미확인 기본값을 확정 사실로 기록하지 않는다.",
+    "api_work": "저장된 정책이 로그인·매 API·파일/내보내기·worker에 실제 집행되게 한다. 프록시 IP 신뢰 경계, 잘못된 정책으로 관리자 전원 잠금 방지와 예외 갱신 경합을 시험한다.",
+    "ui_work": "회사 정책 조회/설정, 보안 대시보드, IP 목록·편집·삭제, 2FA 강제·예외 사용자/기간을 API로 연결한다. Enterprise 미가입과 권한 부족을 구분한다.",
+    "verification": "IP 차단 후 기존 로그인에서도 API403; 잘못된 CIDR400; 신뢰하지 않는 X-Forwarded-For 우회실패; MFA 예외만료 즉시 재인증; 정책초기화 이후 DB와 화면 일치.",
+    "actors": "security.read/write + 서비스 범위 + entitlements",
+    "dependencies": [
+      4
+    ],
+    "legacy_tasks": [
+      "P11-T01",
+      "P11-T02",
+      "P11-T05"
+    ],
+    "existing_files": [
+      "src/server/security-policy.ts",
+      "src/server/ip-access.ts",
+      "src/server/ip-enforcement.ts",
+      "src/server/client-ip.ts",
+      "src/server/mfa-policy.ts",
+      "src/server/mfa-enforcement.ts",
+      "src/server/password-policy.ts",
+      "src/components/management/policy.tsx",
+      "src/components/management/SecurityOverview.tsx",
+      "src/components/management/IpAccess.tsx",
+      "src/components/management/MfaPolicy.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/security/policy"
+      },
+      {
+        "method": "PATCH",
+        "path": "/security/policy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/security/policy"
+      },
+      {
+        "method": "GET",
+        "path": "/security/ip-rules"
+      },
+      {
+        "method": "POST",
+        "path": "/security/ip-rules"
+      },
+      {
+        "method": "GET",
+        "path": "/security/ip-rules/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/security/ip-rules/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/security/ip-rules/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/security/ip-rules/settings"
+      },
+      {
+        "method": "GET",
+        "path": "/security/mfa-policy"
+      },
+      {
+        "method": "PATCH",
+        "path": "/security/mfa-policy"
+      },
+      {
+        "method": "POST",
+        "path": "/security/mfa-policy/exceptions"
+      },
+      {
+        "method": "GET",
+        "path": "/security/mfa-policy/exceptions/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/security/mfa-policy/exceptions/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/security/mfa-policy/exceptions/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/security/status"
+      }
+    ],
+    "model_status": {
+      "SecurityPolicy": "existing",
+      "IpAccessPolicy": "existing",
+      "IpRule": "existing",
+      "MfaException": "existing",
+      "PasswordHistory": "existing",
+      "PasswordDeferral": "existing",
+      "TwoFactor": "existing"
+    }
+  },
+  "7": {
+    "id": "R07",
+    "name": "SSO·OAuth·기관 인증",
+    "models": [
+      "SsoProvider",
+      "SsoState",
+      "Account",
+      "Session",
+      "VirtualOrgMember",
+      "Verification",
+      "SsoLoginPolicy",
+      "SsoSessionProof"
+    ],
+    "server_files": [
+      "src/server/sso.ts",
+      "src/server/sso-provider-lifecycle.ts",
+      "src/server/sso-route.ts",
+      "src/server/saml-validation.ts",
+      "src/server/sso-accounts.ts",
+      "src/server/org-auth.ts",
+      "src/server/sso-mfa.ts"
+    ],
+    "ui_files": [
+      "src/components/management/SsoProviders.tsx",
+      "src/components/auth/AuthPages.tsx",
+      "src/components/auth/SsoRecovery.tsx",
+      "src/components/auth/SsoAccounts.tsx"
+    ],
+    "api_prefixes": [
+      "/security/sso",
+      "/auth/sso",
+      "/auth/org",
+      "/me/sso-accounts",
+      "/invitations/sso"
+    ],
+    "crud": "C SSO 공급자/인증 state/계정연결; R 설정·preflight; U 설정·활성; D 공급자 비활성/계정연결 해제. callback은 검증 후 1회 처리.",
+    "data_work": "기관별 issuer·client·인증서와 암호화 secret, state/nonce·만료·소비 제약을 대조한다. VirtualOrgMember는 가상시험용임을 유지하며 실제 기관 신원 모델과 혼동하지 않는다.",
+    "api_work": "OIDC/SAML 검증·계정연결 및 신규 /login/gpki/callback·/login/saeol/callback 경로를 정식 어댑터 계약에 연결한다. GPKI/새올/그룹웨어 규격은 제공사 확인 후 확정하며 callback URL만으로 성공시키지 않는다.",
+    "ui_work": "SSO 목록·등록·수정·삭제·연결시험, OAuth/SAML 시작/성공/실패/초대가입, GPKI 이메일등록/기관 실패/새올 callback 화면을 서버 결과와 연결한다.",
+    "verification": "잘못된 issuer/audience/state·만료/재사용 assertion 거부; 별도 시험 IdP로 로그인·연결·해제; 기관2곳 tenant 분리; 가상기관 테스트와 실제기관 수신 증거를 분리.",
+    "actors": "관리 security.write; 익명 callback의 일회성 state; 자기 계정연결",
+    "dependencies": [
+      6
+    ],
+    "legacy_tasks": [
+      "P11-T03",
+      "P11-T04",
+      "P02-T04"
+    ],
+    "existing_files": [
+      "src/server/sso.ts",
+      "src/server/sso-provider-lifecycle.ts",
+      "src/server/sso-route.ts",
+      "src/server/saml-validation.ts",
+      "src/server/sso-accounts.ts",
+      "src/server/org-auth.ts",
+      "src/server/sso-mfa.ts",
+      "src/components/management/SsoProviders.tsx",
+      "src/components/auth/AuthPages.tsx",
+      "src/components/auth/SsoRecovery.tsx",
+      "src/components/auth/SsoAccounts.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/me/sso-accounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/me/sso-accounts/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/invitations/sso/options"
+      },
+      {
+        "method": "POST",
+        "path": "/invitations/sso/start"
+      },
+      {
+        "method": "GET",
+        "path": "/security/sso"
+      },
+      {
+        "method": "POST",
+        "path": "/security/sso"
+      },
+      {
+        "method": "PATCH",
+        "path": "/security/sso/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/security/sso/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/security/sso/{id}/preflight"
+      },
+      {
+        "method": "GET",
+        "path": "/security/sso/{id}/directory"
+      },
+      {
+        "method": "POST",
+        "path": "/security/sso/{id}/directory"
+      },
+      {
+        "method": "DELETE",
+        "path": "/security/sso/{id}/directory/{memberId}"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/org/login"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/org/email-register"
+      },
+      {
+        "method": "GET",
+        "path": "/auth/sso/{providerId}"
+      },
+      {
+        "method": "GET",
+        "path": "/auth/sso/callback"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/sso/saml"
+      }
+    ],
+    "model_status": {
+      "SsoProvider": "existing",
+      "SsoState": "existing",
+      "Account": "existing",
+      "Session": "existing",
+      "VirtualOrgMember": "existing",
+      "Verification": "existing",
+      "SsoLoginPolicy": "schema_and_local_provenance_verified_policy_api_pending",
+      "SsoSessionProof": "schema_and_local_provenance_verified_policy_api_pending"
+    }
+  },
+  "8": {
+    "id": "R08",
+    "name": "캐치폼·질문·템플릿·단계 편집",
+    "models": [
+      "Form",
+      "FormVersion",
+      "Question",
+      "QuestionOption",
+      "FormFavorite",
+      "FormTemplate",
+      "FormDocumentBinding"
+    ],
+    "server_files": [
+      "src/server/forms.ts",
+      "src/server/templates.ts",
+      "src/server/form-access.ts",
+      "src/server/form-documents.ts",
+      "src/server/answer-validation.ts"
+    ],
+    "ui_files": [
+      "src/components/forms/FormEditor.tsx",
+      "src/components/forms/FormLists.tsx",
+      "src/components/forms/TemplateGallery.tsx",
+      "src/components/forms/Workflow.tsx",
+      "src/components/forms/QuestionInput.tsx",
+      "src/components/forms/QuestionSettings.tsx"
+    ],
+    "api_prefixes": [
+      "/forms",
+      "/templates"
+    ],
+    "crud": "C 폼/초안/질문/보기/템플릿/복제; R 목록·상세·초안; U 순서·문구·유형·단계 설정; D 미사용 초안·질문·템플릿 보관.",
+    "data_work": "Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 순서·필수·조건·옵션 ID 안정성을 확인한다. 원본 번들 question·policy 세부항목과 현재 계약의 누락 필드 표를 만든다.",
+    "api_work": "폼·템플릿 CRUD/use/copy/revise/draft/favorite 계약과 편집 저장 payload를 대조한다. 질문 유형별 필수/길이/선택/첨부 검증과 충돌409를 서버에서 집행한다.",
+    "ui_work": "템플릿→신규 폼, create/basic-frame/v3/recipient/agreement/set/setting 각 단계로 직접진입·저장·재개; 전체 단계 경로/query의 formId 유지. 목록 검색/필터/복제/삭제와 미저장 이동 경고.",
+    "verification": "질문3종+제공자+동의서로 초안 작성→모든 단계 새로고침→다른 브라우저 재개; 2탭409; A 문서를 B 폼에 연결 차단; 게시본 수정 시 원래 응답의 질문·문구 불변.",
+    "actors": "form.read/write; service grant; 문서 read 권한",
+    "dependencies": [
+      4,
+      6
+    ],
+    "legacy_tasks": [
+      "P04-T01",
+      "P04-T02",
+      "P04-T04"
+    ],
+    "existing_files": [
+      "src/server/forms.ts",
+      "src/server/templates.ts",
+      "src/server/form-access.ts",
+      "src/server/form-documents.ts",
+      "src/server/answer-validation.ts",
+      "src/components/forms/FormEditor.tsx",
+      "src/components/forms/FormLists.tsx",
+      "src/components/forms/TemplateGallery.tsx",
+      "src/components/forms/Workflow.tsx",
+      "src/components/forms/QuestionInput.tsx",
+      "src/components/forms/QuestionSettings.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/forms"
+      },
+      {
+        "method": "POST",
+        "path": "/forms"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/forms/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/forms/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/publish"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/copy"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/pause"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/revise"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/submissions"
+      },
+      {
+        "method": "PATCH",
+        "path": "/forms/{id}/retention"
+      },
+      {
+        "method": "PATCH",
+        "path": "/forms/{id}/draft"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/deletion"
+      },
+      {
+        "method": "DELETE",
+        "path": "/forms/{id}/purge"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/resume"
+      },
+      {
+        "method": "PUT",
+        "path": "/forms/{id}/favorite"
+      },
+      {
+        "method": "DELETE",
+        "path": "/forms/{id}/favorite"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/audit-events"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/audit-events/export"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/submissions/export"
+      },
+      {
+        "method": "GET",
+        "path": "/templates"
+      },
+      {
+        "method": "POST",
+        "path": "/templates"
+      },
+      {
+        "method": "GET",
+        "path": "/templates/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/templates/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/templates/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/templates/{id}/use"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/approvals"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/approvals"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/document-options"
+      }
+    ],
+    "model_status": {
+      "Form": "existing",
+      "FormVersion": "existing",
+      "Question": "existing",
+      "QuestionOption": "existing",
+      "FormFavorite": "existing",
+      "FormTemplate": "existing",
+      "FormDocumentBinding": "existing"
+    }
+  },
+  "9": {
+    "id": "R09",
+    "name": "폼 승인·게시·고정 URL",
+    "models": [
+      "ApprovalRequest",
+      "Publication",
+      "FixedUrl",
+      "Form",
+      "FormVersion"
+    ],
+    "server_files": [
+      "src/server/approvals.ts",
+      "src/server/public-publication.ts",
+      "src/server/fixed-urls.ts",
+      "src/server/forms.ts",
+      "src/server/form-cache.ts"
+    ],
+    "ui_files": [
+      "src/components/forms/Approvals.tsx",
+      "src/components/forms/Workflow.tsx",
+      "src/components/forms/FixedUrls.tsx",
+      "src/components/forms/DraftStatus.tsx"
+    ],
+    "api_prefixes": [
+      "/approvals",
+      "/fixed-urls",
+      "/public/urls",
+      "/forms"
+    ],
+    "crud": "C 승인요청/게시/고정URL; R 승인상세·게시상태; U 승인결정·URL 대상·재개; D 승인취소·URL 폐기·게시중단.",
+    "data_work": "승인대상 버전 해시·게시 포인터·토큰 hash·고정slug unique와 만료를 확인한다. 승인 뒤 내용 변경 시 승인 유효성 및 참조 버전 고정을 명시한다.",
+    "api_work": "요청/승인/거절/취소와 publish/pause/resume/고정URL CRUD를 트랜잭션으로 연결한다. 자기승인 허용 여부를 계약으로 확정하고 만료 라이선스에서 write gate를 검증한다.",
+    "ui_work": "공유 단계에서 게시전 검증·승인상태·URL 복사·중단·재개, 고정URL 추가/이름변경/대상교체/삭제, 승인로그 상세/결정/사유 입력을 연결한다.",
+    "verification": "초안→승인→게시→외부접속→중단410→재개; 승인본 바꿔치기 거부; 고정URL 대상 교체와 이전 링크 정책; 같은slug 경쟁409; 링크 복사만으로 게시되지 않음.",
+    "actors": "form.publish/form.approve 분리; fixed URL 관리 권한",
+    "dependencies": [
+      8,
+      10,
+      21
+    ],
+    "legacy_tasks": [
+      "P04-T03",
+      "P04-T05"
+    ],
+    "existing_files": [
+      "src/server/approvals.ts",
+      "src/server/public-publication.ts",
+      "src/server/fixed-urls.ts",
+      "src/server/forms.ts",
+      "src/server/form-cache.ts",
+      "src/components/forms/Approvals.tsx",
+      "src/components/forms/Workflow.tsx",
+      "src/components/forms/FixedUrls.tsx",
+      "src/components/forms/DraftStatus.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/forms"
+      },
+      {
+        "method": "POST",
+        "path": "/forms"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/forms/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/forms/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/publish"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/copy"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/pause"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/revise"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/submissions"
+      },
+      {
+        "method": "GET",
+        "path": "/fixed-urls"
+      },
+      {
+        "method": "POST",
+        "path": "/fixed-urls"
+      },
+      {
+        "method": "GET",
+        "path": "/fixed-urls/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/fixed-urls/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/fixed-urls/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/forms/{id}/retention"
+      },
+      {
+        "method": "PATCH",
+        "path": "/forms/{id}/draft"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/deletion"
+      },
+      {
+        "method": "DELETE",
+        "path": "/forms/{id}/purge"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/resume"
+      },
+      {
+        "method": "PUT",
+        "path": "/forms/{id}/favorite"
+      },
+      {
+        "method": "DELETE",
+        "path": "/forms/{id}/favorite"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/audit-events"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/audit-events/export"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/submissions/export"
+      },
+      {
+        "method": "GET",
+        "path": "/public/urls/{slug}"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/approvals"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/approvals"
+      },
+      {
+        "method": "GET",
+        "path": "/approvals"
+      },
+      {
+        "method": "GET",
+        "path": "/approvals/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/approvals/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/approvals/{id}/decision"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/document-options"
+      }
+    ],
+    "model_status": {
+      "ApprovalRequest": "existing",
+      "Publication": "existing",
+      "FixedUrl": "existing",
+      "Form": "existing",
+      "FormVersion": "existing"
+    }
+  },
+  "10": {
+    "id": "R10",
+    "name": "처리 목적·동의서·처리방침·서비스 공개문서",
+    "models": [
+      "ProcessingPurpose",
+      "Recipient",
+      "Subprocessor",
+      "PurposeRecipient",
+      "PurposeRevision",
+      "RecipientRevision",
+      "Document",
+      "DocumentPurpose",
+      "DocumentRecipient",
+      "DocumentVersion",
+      "DocumentPdf",
+      "DocumentPublication",
+      "ClauseTemplate",
+      "ServiceConsentDisplay",
+      "FormDocumentBinding",
+      "SubprocessorNotice"
+    ],
+    "server_files": [
+      "src/server/processing-catalog.ts",
+      "src/server/documents.ts",
+      "src/server/document-pdf.ts",
+      "src/server/public-service-documents.ts",
+      "src/server/subprocessors.ts",
+      "src/server/form-documents.ts"
+    ],
+    "ui_files": [
+      "src/components/forms/ProcessingCatalog.tsx",
+      "src/components/forms/Documents.tsx",
+      "src/components/forms/ConsentDocuments.tsx",
+      "src/components/forms/PublicServiceDocuments.tsx",
+      "src/components/management/ConsentDisplay.tsx",
+      "src/components/management/SubprocessorMail.tsx"
+    ],
+    "api_prefixes": [
+      "/processing-purposes",
+      "/recipients",
+      "/documents",
+      "/clause-templates",
+      "/public/documents",
+      "/public/services",
+      "/services"
+    ],
+    "crud": "C 목적/제공·수탁자/문서/문구; R 목록·버전·공개/PDF; U 초안·표시문구·재위탁; D 보관·복구·게시폐기. 증거 참조 버전은 불변.",
+    "data_work": "목적↔항목↔제공자와 DocumentVersion 스냅샷 관계를 대조한다. 국외이전·아동·CCTV·자동화 결정·권리담당자 등 역공학 상태에 있는 필드를 실제 schema/DTO 지원 여부별로 확정한다.",
+    "api_work": "목적/제공자/문구/문서 CRUD·restore/history/publish/unpublish/revoke/PDF와 서비스 동의표시·재위탁고지의 상태 전이를 연결한다. HTML 정제·PDF 폰트·공개 토큰 권한을 확인한다.",
+    "ui_work": "이용목적 wizard, 동의서 생성/목록/편집/문구, 처리방침 목록·미리보기·버전·게시, 서비스 표시동의/수탁자 고지 화면. 모든 /services/... 공개 변형은 경로 파라미터에 맞는 문서 분기.",
+    "verification": "목적+제공자 CRUD→문서생성/개정→공개토큰/PDF 내용일치; 소프트삭제/복구; 게시문서와 이전동의영수증 불변; 국내/국외/수신자/agree 변형 DB fixture로 각각검증.",
+    "actors": "document.read/write; 공개문서는 게시토큰·공개허용 필드",
+    "dependencies": [
+      3,
+      6
+    ],
+    "legacy_tasks": [
+      "P05-T01",
+      "P05-T02",
+      "P05-T03",
+      "P05-T04",
+      "P03-T04"
+    ],
+    "existing_files": [
+      "src/server/processing-catalog.ts",
+      "src/server/documents.ts",
+      "src/server/document-pdf.ts",
+      "src/server/public-service-documents.ts",
+      "src/server/subprocessors.ts",
+      "src/server/form-documents.ts",
+      "src/components/forms/ProcessingCatalog.tsx",
+      "src/components/forms/Documents.tsx",
+      "src/components/forms/ConsentDocuments.tsx",
+      "src/components/forms/PublicServiceDocuments.tsx",
+      "src/components/management/ConsentDisplay.tsx",
+      "src/components/management/SubprocessorMail.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/services"
+      },
+      {
+        "method": "POST",
+        "path": "/services"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/services/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/documents"
+      },
+      {
+        "method": "POST",
+        "path": "/documents"
+      },
+      {
+        "method": "GET",
+        "path": "/documents/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/documents/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/documents/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/public/services/{serviceId}/documents"
+      },
+      {
+        "method": "GET",
+        "path": "/processing-purposes"
+      },
+      {
+        "method": "POST",
+        "path": "/processing-purposes"
+      },
+      {
+        "method": "GET",
+        "path": "/processing-purposes/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/processing-purposes/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/processing-purposes/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/recipients"
+      },
+      {
+        "method": "POST",
+        "path": "/recipients"
+      },
+      {
+        "method": "GET",
+        "path": "/recipients/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/recipients/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/recipients/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/clause-templates"
+      },
+      {
+        "method": "POST",
+        "path": "/clause-templates"
+      },
+      {
+        "method": "GET",
+        "path": "/clause-templates/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/clause-templates/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/clause-templates/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "POST",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "DELETE",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "POST",
+        "path": "/processing-purposes/{id}/restore"
+      },
+      {
+        "method": "GET",
+        "path": "/processing-purposes/{id}/history"
+      },
+      {
+        "method": "POST",
+        "path": "/recipients/{id}/restore"
+      },
+      {
+        "method": "GET",
+        "path": "/recipients/{id}/history"
+      },
+      {
+        "method": "POST",
+        "path": "/documents/{id}/restore"
+      },
+      {
+        "method": "POST",
+        "path": "/clause-templates/{id}/restore"
+      },
+      {
+        "method": "GET",
+        "path": "/documents/options"
+      },
+      {
+        "method": "GET",
+        "path": "/documents/{id}/preview"
+      },
+      {
+        "method": "GET",
+        "path": "/documents/{id}/versions"
+      },
+      {
+        "method": "POST",
+        "path": "/documents/{id}/publish"
+      },
+      {
+        "method": "POST",
+        "path": "/documents/{id}/unpublish"
+      },
+      {
+        "method": "POST",
+        "path": "/documents/{id}/revoke"
+      },
+      {
+        "method": "POST",
+        "path": "/documents/{id}/apply-clause"
+      },
+      {
+        "method": "GET",
+        "path": "/public/documents/{token}"
+      },
+      {
+        "method": "GET",
+        "path": "/documents/{id}/versions/{number}/pdf"
+      },
+      {
+        "method": "GET",
+        "path": "/public/documents/{token}/pdf"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/consent-display/{kind}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}/consent-display/{kind}"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/subprocessors"
+      },
+      {
+        "method": "POST",
+        "path": "/services/{id}/subprocessors"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/subprocessors/{subId}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}/subprocessors/{subId}"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/subprocessor-notices"
+      },
+      {
+        "method": "POST",
+        "path": "/services/{id}/subprocessor-notices"
+      }
+    ],
+    "model_status": {
+      "ProcessingPurpose": "existing",
+      "Recipient": "existing",
+      "Subprocessor": "existing",
+      "PurposeRecipient": "existing",
+      "PurposeRevision": "existing",
+      "RecipientRevision": "existing",
+      "Document": "existing",
+      "DocumentPurpose": "existing",
+      "DocumentRecipient": "existing",
+      "DocumentVersion": "existing",
+      "DocumentPdf": "existing",
+      "DocumentPublication": "existing",
+      "ClauseTemplate": "existing",
+      "ServiceConsentDisplay": "existing",
+      "FormDocumentBinding": "existing",
+      "SubprocessorNotice": "existing"
+    }
+  },
+  "11": {
+    "id": "R11",
+    "name": "공개 폼·응답·첨부·정정",
+    "models": [
+      "Submission",
+      "Answer",
+      "ConsentReceipt",
+      "ConsentEvent",
+      "Correction",
+      "CorrectionPayload",
+      "SubmissionNote",
+      "FileObject",
+      "ExportJob",
+      "ExportChunk",
+      "ExportSource"
+    ],
+    "server_files": [
+      "src/server/submissions.ts",
+      "src/server/submission-management.ts",
+      "src/server/submission-access.ts",
+      "src/server/consent-receipts.ts",
+      "src/server/files.ts",
+      "src/server/file-access.ts",
+      "src/server/file-download.ts",
+      "src/server/submission-export.ts"
+    ],
+    "ui_files": [
+      "src/components/forms/PublicForm.tsx",
+      "src/components/forms/SubmissionDetail.tsx",
+      "src/components/forms/FileView.tsx",
+      "src/components/forms/ExportJobs.tsx",
+      "src/components/forms/FormLists.tsx"
+    ],
+    "api_prefixes": [
+      "/public/forms",
+      "/submissions",
+      "/files",
+      "/uploads",
+      "/exports",
+      "/forms"
+    ],
+    "crud": "C 제출/동의영수증/첨부/메모; R 응답·파일·내보내기; U 정정/메모/보유기간; D 메모·미참조첨부, 개인정보 삭제는 파기요청.",
+    "data_work": "Submission→FormVersion→Answer/ConsentReceipt와 파일 바인딩, 원본문항·동의문구·timestamp 보존을 검증한다. 정정 payload 암호화, 파일 검사 상태, export source 참조 및 purge 후 불가역 비노출을 설계한다.",
+    "api_work": "외부 토큰 조회/제출과 응답 list/read/PATCH/withdraw/hold/retention/note/export API를 점검한다. 응답+영수증+outbox 원자성, 공개 제출 중복과 최대응답 경합, 파일 owner 검증을 수행한다.",
+    "ui_work": "project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이를 명세한다. 응답목록·상세·정정·철회·첨부 실제다운로드·로그; file-view 일반/공유 및 파일 지정/목록 네 변형을 각각 연결한다.",
+    "verification": "게시된폼 외부제출→관리자응답조회→정정→영수증/PDF→첨부hash비교→재시작; 2회제출 멱등; 필수동의누락400; 만료게시/타회사파일/공유범위밖파일 거부; 내보내기 재권한검사.",
+    "actors": "외부 publication 토큰; 내부 submission.read/write/file.read; 공유별 scope",
+    "dependencies": [
+      9
+    ],
+    "legacy_tasks": [
+      "P06-T01",
+      "P06-T02",
+      "P06-T03",
+      "P06-T07"
+    ],
+    "existing_files": [
+      "src/server/submissions.ts",
+      "src/server/submission-management.ts",
+      "src/server/submission-access.ts",
+      "src/server/consent-receipts.ts",
+      "src/server/files.ts",
+      "src/server/file-access.ts",
+      "src/server/file-download.ts",
+      "src/server/submission-export.ts",
+      "src/components/forms/PublicForm.tsx",
+      "src/components/forms/SubmissionDetail.tsx",
+      "src/components/forms/FileView.tsx",
+      "src/components/forms/ExportJobs.tsx",
+      "src/components/forms/FormLists.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/forms"
+      },
+      {
+        "method": "POST",
+        "path": "/forms"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/forms/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/forms/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/uploads/init"
+      },
+      {
+        "method": "POST",
+        "path": "/public/forms/{token}/uploads"
+      },
+      {
+        "method": "GET",
+        "path": "/uploads/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/uploads/{id}"
+      },
+      {
+        "method": "PUT",
+        "path": "/uploads/{id}/content"
+      },
+      {
+        "method": "POST",
+        "path": "/uploads/{id}/complete"
+      },
+      {
+        "method": "GET",
+        "path": "/files"
+      },
+      {
+        "method": "GET",
+        "path": "/files/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/files/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/files/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/files/{id}/download"
+      },
+      {
+        "method": "GET",
+        "path": "/public/forms/{token}"
+      },
+      {
+        "method": "POST",
+        "path": "/public/forms/{token}/submissions"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/publish"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/copy"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/pause"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/revise"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/submissions"
+      },
+      {
+        "method": "GET",
+        "path": "/submissions/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/submissions/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/forms/{id}/retention"
+      },
+      {
+        "method": "PATCH",
+        "path": "/forms/{id}/draft"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/deletion"
+      },
+      {
+        "method": "DELETE",
+        "path": "/forms/{id}/purge"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/resume"
+      },
+      {
+        "method": "PUT",
+        "path": "/forms/{id}/favorite"
+      },
+      {
+        "method": "DELETE",
+        "path": "/forms/{id}/favorite"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/audit-events"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/audit-events/export"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/submissions/export"
+      },
+      {
+        "method": "POST",
+        "path": "/submissions/{id}/withdraw"
+      },
+      {
+        "method": "POST",
+        "path": "/submissions/{id}/destruction-request"
+      },
+      {
+        "method": "POST",
+        "path": "/submissions/{id}/hold"
+      },
+      {
+        "method": "POST",
+        "path": "/submissions/{id}/notes"
+      },
+      {
+        "method": "PATCH",
+        "path": "/submissions/{id}/notes/{noteId}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/submissions/{id}/notes/{noteId}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/submissions/{id}/retention"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/{id}/approvals"
+      },
+      {
+        "method": "POST",
+        "path": "/forms/{id}/approvals"
+      },
+      {
+        "method": "GET",
+        "path": "/forms/document-options"
+      },
+      {
+        "method": "GET",
+        "path": "/submissions/{id}/receipts/{receiptId}/pdf"
+      },
+      {
+        "method": "POST",
+        "path": "/exports"
+      },
+      {
+        "method": "GET",
+        "path": "/exports"
+      },
+      {
+        "method": "GET",
+        "path": "/exports/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/exports/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/exports/{id}/cancel"
+      },
+      {
+        "method": "GET",
+        "path": "/exports/{id}/download"
+      }
+    ],
+    "model_status": {
+      "Submission": "existing",
+      "Answer": "existing",
+      "ConsentReceipt": "existing",
+      "ConsentEvent": "existing",
+      "Correction": "existing",
+      "CorrectionPayload": "existing",
+      "SubmissionNote": "existing",
+      "FileObject": "existing",
+      "ExportJob": "existing",
+      "ExportChunk": "existing",
+      "ExportSource": "existing"
+    }
+  },
+  "12": {
+    "id": "R12",
+    "name": "외부 공유·열람자 인증",
+    "models": [
+      "ShareGrant",
+      "ShareField",
+      "ViewerChallenge",
+      "ViewerSession"
+    ],
+    "server_files": [
+      "src/server/sharing.ts",
+      "src/server/viewer.ts",
+      "src/server/share-query.ts",
+      "src/server/share-cache.ts",
+      "src/server/sender-access.ts"
+    ],
+    "ui_files": [
+      "src/components/forms/ShareGrants.tsx",
+      "src/components/forms/SharedPrivacy.tsx"
+    ],
+    "api_prefixes": [
+      "/share-grants",
+      "/viewer"
+    ],
+    "crud": "C 공유권한/열람 challenge; R 공유목록·허용 응답; U 허용필드·기간·대상; D 권한회수/열람세션 폐기.",
+    "data_work": "공유권한은 회사·서비스·폼버전·허용필드·대상범위·만료를 가진다. 코드/인증 challenge hash·시도제한·세션 generation으로 권한 수정/회수 뒤 기존세션을 무효화한다.",
+    "api_work": "공유 CRUD/resend/events와 challenge→verify→session→submissions/files/logout API에서 매번 허용필드/범위를 적용한다. 사용자가 전달한 filter로 범위를 넓힐 수 없게 한다.",
+    "ui_work": "공유생성/편집/회수/초대재전송, /shared-privacy/verify·email-verify·view 각 단계와 만료/권한없음. 이메일·공유코드 입력값과 필수동의 확인을 구분한다.",
+    "verification": "공유범위2필드/응답1개 지정→별도브라우저코드인증→그 범위만조회; 필드회수·만료·완전회수 즉시적용; 다른공유의 id 주입·재사용OTP·토큰로그노출 차단.",
+    "actors": "share.manage; 외부 viewer 전용 세션과 필드 allowlist",
+    "dependencies": [
+      11
+    ],
+    "legacy_tasks": [
+      "P06-T04"
+    ],
+    "existing_files": [
+      "src/server/sharing.ts",
+      "src/server/viewer.ts",
+      "src/server/share-query.ts",
+      "src/server/share-cache.ts",
+      "src/server/sender-access.ts",
+      "src/components/forms/ShareGrants.tsx",
+      "src/components/forms/SharedPrivacy.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/share-grants"
+      },
+      {
+        "method": "POST",
+        "path": "/share-grants"
+      },
+      {
+        "method": "GET",
+        "path": "/share-grants/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/share-grants/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/share-grants/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/share-grants/options"
+      },
+      {
+        "method": "POST",
+        "path": "/share-grants/{id}/resend"
+      },
+      {
+        "method": "GET",
+        "path": "/share-grants/{id}/events"
+      },
+      {
+        "method": "POST",
+        "path": "/viewer/challenges"
+      },
+      {
+        "method": "POST",
+        "path": "/viewer/challenges/{challengeId}/verify"
+      },
+      {
+        "method": "GET",
+        "path": "/viewer/session"
+      },
+      {
+        "method": "POST",
+        "path": "/viewer/logout"
+      },
+      {
+        "method": "GET",
+        "path": "/viewer/submissions"
+      },
+      {
+        "method": "GET",
+        "path": "/viewer/submissions/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/viewer/files"
+      },
+      {
+        "method": "GET",
+        "path": "/viewer/files/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/viewer/files/{id}/download"
+      }
+    ],
+    "model_status": {
+      "ShareGrant": "existing",
+      "ShareField": "existing",
+      "ViewerChallenge": "existing",
+      "ViewerSession": "existing"
+    }
+  },
+  "13": {
+    "id": "R13",
+    "name": "정보주체·동의이력·본인인증",
+    "models": [
+      "DataSubject",
+      "SubjectAccessRequest",
+      "SubjectAccessScope",
+      "SubjectSession",
+      "SubjectWithdrawal",
+      "VerificationIntegration",
+      "VerificationIntegrationRevision",
+      "VerificationAttempt",
+      "VerificationEvent",
+      "VerificationReceipt",
+      "Suppression"
+    ],
+    "server_files": [
+      "src/server/subjects.ts",
+      "src/server/subject-identity.ts",
+      "src/server/subject-scope.ts",
+      "src/server/verification.ts",
+      "src/server/verification-flow.ts"
+    ],
+    "ui_files": [
+      "src/components/forms/SubjectPortal.tsx",
+      "src/components/forms/VerificationSettings.tsx"
+    ],
+    "api_prefixes": [
+      "/subjects",
+      "/services",
+      "/verification"
+    ],
+    "crud": "C 본인조회 challenge/철회요청/인증설정; R 자기동의·처리이력; U 인증설정·철회확정/취소; D 인증설정 비활성·세션종료.",
+    "data_work": "동명이인/동일이메일 다른서비스 분리 기준을 확정하고 SubjectAccessScope를 서버에서 좁힌다. 본인인증 결과와 폼버전/사용 목적을 불변 결합하고 secret은 암호화한다.",
+    "api_work": "access-requests→sessions→consents/events/withdrawals(confirm/cancel), 서비스별 verification CRUD와 검증된 provider callback을 연결한다. 검증 미설정이면 성공 영수증을 만들지 않는다.",
+    "ui_work": "find/find-complete, 동의이력·행위이력 토큰, formComplete/form-interrupt 및 /identification/:result에 서버 확인결과를 표시한다. 토큰/URL 문구를 신원증명으로 신뢰하지 않는다.",
+    "verification": "주체A 링크로 B동의 접근거부; 같은이메일 회사간격리; 철회확정→마케팅억제 반영; 취소·반복확정 멱등; 인증만료/중복callback/대상폼교체 거부; 실제기관시험 별도.",
+    "actors": "주체 전용 세션·검증 scope; 설정은 service.manage",
+    "dependencies": [
+      11
+    ],
+    "legacy_tasks": [
+      "P06-T05",
+      "P06-T06"
+    ],
+    "existing_files": [
+      "src/server/subjects.ts",
+      "src/server/subject-identity.ts",
+      "src/server/subject-scope.ts",
+      "src/server/verification.ts",
+      "src/server/verification-flow.ts",
+      "src/components/forms/SubjectPortal.tsx",
+      "src/components/forms/VerificationSettings.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/services"
+      },
+      {
+        "method": "POST",
+        "path": "/services"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/services/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "POST",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "DELETE",
+        "path": "/services/{id}/verification"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/consent-display/{kind}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}/consent-display/{kind}"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/subprocessors"
+      },
+      {
+        "method": "POST",
+        "path": "/services/{id}/subprocessors"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/subprocessors/{subId}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/services/{id}/subprocessors/{subId}"
+      },
+      {
+        "method": "GET",
+        "path": "/services/{id}/subprocessor-notices"
+      },
+      {
+        "method": "POST",
+        "path": "/services/{id}/subprocessor-notices"
+      },
+      {
+        "method": "POST",
+        "path": "/subjects/access-requests"
+      },
+      {
+        "method": "POST",
+        "path": "/subjects/sessions"
+      },
+      {
+        "method": "POST",
+        "path": "/subjects/logout"
+      },
+      {
+        "method": "GET",
+        "path": "/subjects/me"
+      },
+      {
+        "method": "GET",
+        "path": "/subjects/me/consents"
+      },
+      {
+        "method": "GET",
+        "path": "/subjects/me/events"
+      },
+      {
+        "method": "POST",
+        "path": "/subjects/me/withdrawals"
+      },
+      {
+        "method": "GET",
+        "path": "/subjects/me/withdrawals/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/subjects/me/withdrawals/{id}/confirm"
+      },
+      {
+        "method": "POST",
+        "path": "/subjects/me/withdrawals/{id}/cancel"
+      }
+    ],
+    "model_status": {
+      "DataSubject": "existing",
+      "SubjectAccessRequest": "existing",
+      "SubjectAccessScope": "existing",
+      "SubjectSession": "existing",
+      "SubjectWithdrawal": "existing",
+      "VerificationIntegration": "existing",
+      "VerificationIntegrationRevision": "existing",
+      "VerificationAttempt": "existing",
+      "VerificationEvent": "existing",
+      "VerificationReceipt": "existing",
+      "Suppression": "existing"
+    }
+  },
+  "14": {
+    "id": "R14",
+    "name": "개인정보 업로드·이관",
+    "models": [
+      "ImportJob",
+      "ImportRow",
+      "ImportEvidence",
+      "Submission",
+      "Answer",
+      "FileObject"
+    ],
+    "server_files": [
+      "src/server/imports.ts",
+      "src/server/import-csv.ts",
+      "src/server/import-worker.ts",
+      "src/server/legacy-migration.ts"
+    ],
+    "ui_files": [
+      "src/components/forms/Imports.tsx",
+      "src/components/management/LegacyImport.tsx"
+    ],
+    "api_prefixes": [
+      "/imports",
+      "/uploads"
+    ],
+    "crud": "C 업로드job·행; R 검사결과·오류CSV·진행상태; U 매핑/동의증빙·재검증; D 미실행작업취소·파일정리. commit 이후 증빙은 보존.",
+    "data_work": "파일→헤더매핑→행검증→동의/출처증빙→Submission 변환 관계와 (tenant,job,rowNo)unique를 검사한다. 오류행·부분성공 정책과 원본파일 보존/삭제 시점을 명시한다.",
+    "api_work": "init/upload/inspect/validate/commit/retry/cancel/rows/errors.csv를 상태기계로 연결한다. 인코딩·크기·확장자·수식 주입·동의 근거 없는 데이터·중복행을 검사한다.",
+    "ui_work": "업로드 기본/동의/제공자 세 페이지에서 파일·매핑·검증오류·미리보기·확정·진행·재시도·취소를 연결한다. 기존 localStorage 이관은 사용자 선택 dry-run과 중복 보고 후 실행한다.",
+    "verification": "정상CSV3행+오류1행→검증수정→확정; 같은commit2번/worker재시작에도 중복없음; B파일주입차단; UTF8/한글·대용량·잘못된동의 증빙·CSV수식 안전성.",
+    "actors": "import.read/write + 대상폼권한",
+    "dependencies": [
+      11,
+      10
+    ],
+    "legacy_tasks": [
+      "P07-T01",
+      "P14-T01"
+    ],
+    "existing_files": [
+      "src/server/imports.ts",
+      "src/server/import-csv.ts",
+      "src/server/import-worker.ts",
+      "src/server/legacy-migration.ts",
+      "src/components/forms/Imports.tsx",
+      "src/components/management/LegacyImport.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "POST",
+        "path": "/uploads/init"
+      },
+      {
+        "method": "GET",
+        "path": "/uploads/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/uploads/{id}"
+      },
+      {
+        "method": "PUT",
+        "path": "/uploads/{id}/content"
+      },
+      {
+        "method": "POST",
+        "path": "/uploads/{id}/complete"
+      },
+      {
+        "method": "GET",
+        "path": "/imports"
+      },
+      {
+        "method": "POST",
+        "path": "/imports"
+      },
+      {
+        "method": "GET",
+        "path": "/imports/options"
+      },
+      {
+        "method": "GET",
+        "path": "/imports/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/imports/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/imports/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/imports/{id}/inspect"
+      },
+      {
+        "method": "POST",
+        "path": "/imports/{id}/validate"
+      },
+      {
+        "method": "POST",
+        "path": "/imports/{id}/commit"
+      },
+      {
+        "method": "POST",
+        "path": "/imports/{id}/retry"
+      },
+      {
+        "method": "GET",
+        "path": "/imports/{id}/rows"
+      },
+      {
+        "method": "GET",
+        "path": "/imports/{id}/errors.csv"
+      }
+    ],
+    "model_status": {
+      "ImportJob": "existing",
+      "ImportRow": "existing",
+      "ImportEvidence": "existing",
+      "Submission": "existing",
+      "Answer": "existing",
+      "FileObject": "existing"
+    }
+  },
+  "15": {
+    "id": "R15",
+    "name": "광고 동의·수신거부",
+    "models": [
+      "MarketingPreference",
+      "MarketingEvent",
+      "Suppression",
+      "SubjectWithdrawal"
+    ],
+    "server_files": [
+      "src/server/marketing.ts",
+      "src/server/marketing-jobs.ts",
+      "src/server/suppression.ts",
+      "src/server/subject-query.ts"
+    ],
+    "ui_files": [
+      "src/components/forms/Marketing.tsx",
+      "src/components/forms/MarketingSettings.tsx",
+      "src/components/forms/FormLists.tsx"
+    ],
+    "api_prefixes": [
+      "/marketing",
+      "/email-suppressions"
+    ],
+    "crud": "C 근거 있는 동의등록; R 동의목록·집계·내보내기; U 채널별 동의/철회; D 근거 삭제가 아닌 동의회수·보존정책 적용.",
+    "data_work": "주체·서비스·채널별 동의, 취득출처/일시/문구버전, 철회이벤트와 억제목록의 연결을 확인한다. 중복수신자 통합 기준과 목적별 동의범위를 명시한다.",
+    "api_work": "preferences CRUD/withdrawals/export/sources/summary를 실제 ConsentReceipt와 연결한다. 철회는 예약발송이 claim되는 시점에도 재검사되며 재동의는 새로운 근거를 요구한다.",
+    "ui_work": "/form/ad-manage 검색조건(동의일·이메일/전화 존재·중복제거), 채널/서비스/폼 필터, 선택철회·수정·내보내기와 marketing-detail 집계를 연결한다.",
+    "verification": "동의→검색→철회→예약발송억제; 중복제거 on/off 집계 대조; 원본 응답정정 시 잘못된 주체 재동의 방지; 권한없는 복호화·타회사 export 실패.",
+    "actors": "marketing.read/write + 주체의 본인 철회",
+    "dependencies": [
+      11,
+      13
+    ],
+    "legacy_tasks": [
+      "P07-T02"
+    ],
+    "existing_files": [
+      "src/server/marketing.ts",
+      "src/server/marketing-jobs.ts",
+      "src/server/suppression.ts",
+      "src/server/subject-query.ts",
+      "src/components/forms/Marketing.tsx",
+      "src/components/forms/MarketingSettings.tsx",
+      "src/components/forms/FormLists.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/marketing/preferences"
+      },
+      {
+        "method": "POST",
+        "path": "/marketing/preferences"
+      },
+      {
+        "method": "GET",
+        "path": "/marketing/preferences/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/marketing/preferences/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/marketing/preferences/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/marketing/preferences/withdrawals"
+      },
+      {
+        "method": "GET",
+        "path": "/marketing/preferences/export"
+      },
+      {
+        "method": "GET",
+        "path": "/marketing/sources"
+      },
+      {
+        "method": "GET",
+        "path": "/marketing/summary"
+      },
+      {
+        "method": "GET",
+        "path": "/email-suppressions"
+      }
+    ],
+    "model_status": {
+      "MarketingPreference": "existing",
+      "MarketingEvent": "existing",
+      "Suppression": "existing",
+      "SubjectWithdrawal": "existing"
+    }
+  },
+  "16": {
+    "id": "R16",
+    "name": "보유기간·파기 일정·증명서",
+    "models": [
+      "RetentionRule",
+      "DestructionRequest",
+      "DestructionCertificate",
+      "Submission",
+      "FileObject",
+      "Job",
+      "ExportSource"
+    ],
+    "server_files": [
+      "src/server/retention-rules.ts",
+      "src/server/destruction.ts",
+      "src/server/destruction-worker.ts",
+      "src/server/collect-destruction.ts",
+      "src/server/destruction-access.ts"
+    ],
+    "ui_files": [
+      "src/components/management/destruction.tsx",
+      "src/components/management/CollectDestruction.tsx"
+    ],
+    "api_prefixes": [
+      "/retention-rules",
+      "/destruction-requests",
+      "/destruction-certificates",
+      "/submissions"
+    ],
+    "crud": "C 보유규칙/파기요청; R 기간·예정목록·증명서; U 보유기간·승인·보류·재예약; D 규칙보관·요청취소·승인된 실제파기. 증명서 수정/임의삭제 없음.",
+    "data_work": "RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선순위, legalHold·승인·파기증명서를 대조한다. 파일/내보내기/캠페인 복제본까지 파기 범위를 추적한다.",
+    "api_work": "기존 retention-rules CRUD와 /log/retention 신규 화면을 연결할 계약을 명시한다(원본 정상화면 미확인, 독립 제안). 파기 승인/거절/취소/재시도/재예약과 worker의 참조차단·재실행 안전성을 점검한다.",
+    "ui_work": "/log/retention 기간규칙목록/추가/편집/보관, 수집파기현황, 파기예정·요청상세·승인/보류·재예약, 증명서조회/다운로드. 파기 이후 빈값이 아닌 파기 상태/근거를 표시한다.",
+    "verification": "짧은보유fixture→보류→만료worker실행(유지)→보류해제/승인→실제DB·파일삭제→증명서; 다운로드/발송/정정과 파기경합; worker중단후재개 중복증명서없음.",
+    "actors": "security.read/write·submission.destroy 분리; 승인자 범위",
+    "dependencies": [
+      11,
+      6
+    ],
+    "legacy_tasks": [
+      "P07-T03",
+      "P07-T04"
+    ],
+    "existing_files": [
+      "src/server/retention-rules.ts",
+      "src/server/destruction.ts",
+      "src/server/destruction-worker.ts",
+      "src/server/collect-destruction.ts",
+      "src/server/destruction-access.ts",
+      "src/components/management/destruction.tsx",
+      "src/components/management/CollectDestruction.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/submissions/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/submissions/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/retention-rules"
+      },
+      {
+        "method": "POST",
+        "path": "/retention-rules"
+      },
+      {
+        "method": "GET",
+        "path": "/retention-rules/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/retention-rules/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/retention-rules/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/submissions/{id}/withdraw"
+      },
+      {
+        "method": "POST",
+        "path": "/submissions/{id}/destruction-request"
+      },
+      {
+        "method": "POST",
+        "path": "/submissions/{id}/hold"
+      },
+      {
+        "method": "POST",
+        "path": "/submissions/{id}/notes"
+      },
+      {
+        "method": "PATCH",
+        "path": "/submissions/{id}/notes/{noteId}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/submissions/{id}/notes/{noteId}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/submissions/{id}/retention"
+      },
+      {
+        "method": "GET",
+        "path": "/destruction-requests"
+      },
+      {
+        "method": "POST",
+        "path": "/destruction-requests/{id}/approve"
+      },
+      {
+        "method": "POST",
+        "path": "/destruction-requests/{id}/reject"
+      },
+      {
+        "method": "POST",
+        "path": "/destruction-requests/{id}/cancel"
+      },
+      {
+        "method": "POST",
+        "path": "/destruction-requests/{id}/retry"
+      },
+      {
+        "method": "POST",
+        "path": "/destruction-requests/{id}/reschedule"
+      },
+      {
+        "method": "GET",
+        "path": "/destruction-certificates"
+      },
+      {
+        "method": "GET",
+        "path": "/destruction-certificates/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/destruction-certificates/{id}/download"
+      },
+      {
+        "method": "GET",
+        "path": "/submissions/{id}/receipts/{receiptId}/pdf"
+      }
+    ],
+    "model_status": {
+      "RetentionRule": "existing",
+      "DestructionRequest": "existing",
+      "DestructionCertificate": "existing",
+      "Submission": "existing",
+      "FileObject": "existing",
+      "Job": "existing",
+      "ExportSource": "existing"
+    }
+  },
+  "17": {
+    "id": "R17",
+    "name": "발신번호·문자 캠페인",
+    "models": [
+      "Sender",
+      "SenderVerification",
+      "SenderEvent",
+      "Campaign",
+      "CampaignDelivery",
+      "CampaignEvent",
+      "SmsReceipt",
+      "MessageTemplate",
+      "MessageTemplateRevision"
+    ],
+    "server_files": [
+      "src/server/senders.ts",
+      "src/server/sender-providers.ts",
+      "src/server/campaigns.ts",
+      "src/server/campaign-scheduling.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/sms-adapter.ts",
+      "src/server/campaign-ledger.ts"
+    ],
+    "ui_files": [
+      "src/components/services/Senders.tsx",
+      "src/components/services/Campaigns.tsx",
+      "src/components/services/MessageTemplates.tsx"
+    ],
+    "api_prefixes": [
+      "/senders",
+      "/campaigns",
+      "/message-templates",
+      "/sms/receipts"
+    ],
+    "crud": "C 발신자·초안·수신자·템플릿; R 인증/발송내역; U 초안·예약·기본발신자; D 초안·발신자 비활성/예약취소. 발송완료는 receipt 이력 유지.",
+    "data_work": "발신번호 검증·증빙파일 및 Campaign→Delivery→Receipt 고유키, 크레딧예약/정산을 확인한다. 전화번호 정규화·중복 제거·예약 timezone·발신자 변경 버전 고정을 명시한다.",
+    "api_work": "발신자 CRUD/검증증빙/disable, 폼응답·직접수신자 구성, 캠페인 preview/schedule/reschedule/cancel/retry와 receipt 서명/순서/중복 검증. 발송직전 동의·권한·잔액 재검사.",
+    "ui_work": "sms 기본/폼선택/직접작성/번호관리/내역/번호없음 모두 실데이터. 번호등록 모달의 번호·설명·증빙4종·파일제한을 최신 캡처와 맞추고 작성내용·주소록·비용·예약확인을 구현한다.",
+    "verification": "번호등록→시험검증→수신자2명→예약→취소/발송→receipt→잔액대조; 미승인번호거부; 철회직후발송차단; provider timeout 재시도 중복비용없음. 실제SMS도착증거 별도.",
+    "actors": "sender.manage·message.send/manage·service scope",
+    "dependencies": [
+      15,
+      21
+    ],
+    "legacy_tasks": [
+      "P08-T01",
+      "P08-T02",
+      "P08-T03",
+      "P08-T04"
+    ],
+    "existing_files": [
+      "src/server/senders.ts",
+      "src/server/sender-providers.ts",
+      "src/server/campaigns.ts",
+      "src/server/campaign-scheduling.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/sms-adapter.ts",
+      "src/server/campaign-ledger.ts",
+      "src/components/services/Senders.tsx",
+      "src/components/services/Campaigns.tsx",
+      "src/components/services/MessageTemplates.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/senders"
+      },
+      {
+        "method": "POST",
+        "path": "/senders"
+      },
+      {
+        "method": "GET",
+        "path": "/senders/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/senders/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/senders/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/campaigns/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/campaigns/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/message-templates"
+      },
+      {
+        "method": "POST",
+        "path": "/message-templates"
+      },
+      {
+        "method": "GET",
+        "path": "/message-templates/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/message-templates/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/message-templates/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/sms/receipts"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/default"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/disable"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/renew"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/cleanup"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/request-email"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/confirm-email"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/dns"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/check"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/evidence"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/evidence/{fileId}/attach"
+      },
+      {
+        "method": "DELETE",
+        "path": "/senders/{id}/evidence/{fileId}"
+      },
+      {
+        "method": "GET",
+        "path": "/senders/{id}/evidence/{fileId}/download"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/sources"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/recipients"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/recipients"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/deliveries"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/export"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/preview"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/schedule"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/reschedule"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/cancel"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/archive"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/retry"
+      },
+      {
+        "method": "GET",
+        "path": "/message-templates/{id}/revisions/{version}"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/files/{fileId}/download"
+      },
+      {
+        "method": "POST",
+        "path": "/message-templates/{id}/archive"
+      },
+      {
+        "method": "POST",
+        "path": "/message-templates/{id}/restore"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/apply-template"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/files"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/files/{fileId}/attach"
+      },
+      {
+        "method": "DELETE",
+        "path": "/campaigns/{id}/files/{fileId}"
+      }
+    ],
+    "model_status": {
+      "Sender": "existing",
+      "SenderVerification": "existing",
+      "SenderEvent": "existing",
+      "Campaign": "existing",
+      "CampaignDelivery": "existing",
+      "CampaignEvent": "existing",
+      "SmsReceipt": "existing",
+      "MessageTemplate": "existing",
+      "MessageTemplateRevision": "existing"
+    }
+  },
+  "18": {
+    "id": "R18",
+    "name": "발신메일·이메일 발송·수신거부",
+    "models": [
+      "Sender",
+      "SenderVerification",
+      "Campaign",
+      "CampaignDelivery",
+      "CampaignEvent",
+      "MessageTemplate",
+      "MessageTemplateRevision",
+      "EmailFeedback",
+      "EmailSuppression",
+      "FileObject"
+    ],
+    "server_files": [
+      "src/server/email-policy.ts",
+      "src/server/email-feedback.ts",
+      "src/server/message-content.ts",
+      "src/server/message-templates.ts",
+      "src/server/campaign-files.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/senders.ts"
+    ],
+    "ui_files": [
+      "src/components/services/Senders.tsx",
+      "src/components/services/Campaigns.tsx",
+      "src/components/services/MessageContent.tsx",
+      "src/components/services/EmailSuppressions.tsx",
+      "src/components/services/EmailUnsubscribe.tsx",
+      "src/components/services/CampaignFiles.tsx"
+    ],
+    "api_prefixes": [
+      "/senders",
+      "/campaigns",
+      "/message-templates",
+      "/message-content",
+      "/email-feedback",
+      "/email-suppressions",
+      "/email-unsubscribe"
+    ],
+    "crud": "C 발신주소/메일초안/첨부/템플릿; R DNS·내역·반송; U 내용·예약·템플릿; D 초안·첨부·예약취소, 발신주소 비활성. 구독취소는 억제 이벤트.",
+    "data_work": "템플릿 revision/발송당 HTML·첨부 snapshot, email suppression unique, 반송이벤트 idempotency를 대조한다. 발신 DNS/주소인증 상태는 서버 증거로만 변경한다.",
+    "api_work": "발신주소 request/confirm/DNS/check, HTML 정제·개인화 preview·첨부다운로드, 송신/반송/불만/구독취소 token 처리와 retry를 연결한다. 조작된 수신거부 토큰·다른회사 receipt를 거부한다.",
+    "ui_work": "mail 폼/직접발송·발신주소/발송내역/주소없음 화면, 편집기·템플릿·미리보기·첨부·예약/취소·반송사유를 연결한다. 401/403을 빈목록으로 표시하지 않는다.",
+    "verification": "메일작성/첨부→로컬메일함 수신본문과hash대조→반송→억제→재발송차단; 실제SMTP·DNS·수신함·unsubscribe 및 재시작 검증을 분리 기록.",
+    "actors": "sender.manage·message.send/manage; 구독취소 서명토큰",
+    "dependencies": [
+      17
+    ],
+    "legacy_tasks": [
+      "P09-T01",
+      "P09-T02",
+      "P09-T06"
+    ],
+    "existing_files": [
+      "src/server/email-policy.ts",
+      "src/server/email-feedback.ts",
+      "src/server/message-content.ts",
+      "src/server/message-templates.ts",
+      "src/server/campaign-files.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/senders.ts",
+      "src/components/services/Senders.tsx",
+      "src/components/services/Campaigns.tsx",
+      "src/components/services/MessageContent.tsx",
+      "src/components/services/EmailSuppressions.tsx",
+      "src/components/services/EmailUnsubscribe.tsx",
+      "src/components/services/CampaignFiles.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/senders"
+      },
+      {
+        "method": "POST",
+        "path": "/senders"
+      },
+      {
+        "method": "GET",
+        "path": "/senders/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/senders/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/senders/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/campaigns/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/campaigns/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/message-templates"
+      },
+      {
+        "method": "POST",
+        "path": "/message-templates"
+      },
+      {
+        "method": "GET",
+        "path": "/message-templates/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/message-templates/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/message-templates/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/default"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/disable"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/renew"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/cleanup"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/request-email"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/confirm-email"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/dns"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/check"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/evidence"
+      },
+      {
+        "method": "POST",
+        "path": "/senders/{id}/evidence/{fileId}/attach"
+      },
+      {
+        "method": "DELETE",
+        "path": "/senders/{id}/evidence/{fileId}"
+      },
+      {
+        "method": "GET",
+        "path": "/senders/{id}/evidence/{fileId}/download"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/sources"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/recipients"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/recipients"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/deliveries"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/export"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/preview"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/schedule"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/reschedule"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/cancel"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/archive"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/retry"
+      },
+      {
+        "method": "GET",
+        "path": "/message-templates/{id}/revisions/{version}"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/files/{fileId}/download"
+      },
+      {
+        "method": "POST",
+        "path": "/message-templates/{id}/archive"
+      },
+      {
+        "method": "POST",
+        "path": "/message-templates/{id}/restore"
+      },
+      {
+        "method": "POST",
+        "path": "/message-content/preview"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/apply-template"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/files"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/files/{fileId}/attach"
+      },
+      {
+        "method": "DELETE",
+        "path": "/campaigns/{id}/files/{fileId}"
+      },
+      {
+        "method": "POST",
+        "path": "/email-feedback"
+      },
+      {
+        "method": "GET",
+        "path": "/email-suppressions"
+      },
+      {
+        "method": "GET",
+        "path": "/email-unsubscribe/{token}"
+      },
+      {
+        "method": "POST",
+        "path": "/email-unsubscribe/{token}"
+      }
+    ],
+    "model_status": {
+      "Sender": "existing",
+      "SenderVerification": "existing",
+      "Campaign": "existing",
+      "CampaignDelivery": "existing",
+      "CampaignEvent": "existing",
+      "MessageTemplate": "existing",
+      "MessageTemplateRevision": "existing",
+      "EmailFeedback": "existing",
+      "EmailSuppression": "existing",
+      "FileObject": "existing"
+    }
+  },
+  "19": {
+    "id": "R19",
+    "name": "알림톡 채널·템플릿·발송",
+    "models": [
+      "KakaoChannel",
+      "KakaoTemplate",
+      "KakaoMockReceipt",
+      "Campaign",
+      "CampaignDelivery",
+      "CampaignEvent"
+    ],
+    "server_files": [
+      "src/server/kakao.ts",
+      "src/server/kakao-binding.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/campaigns.ts"
+    ],
+    "ui_files": [
+      "src/components/services/KakaoTemplates.tsx",
+      "src/components/services/KakaoTemplateDetail.tsx",
+      "src/components/services/Campaigns.tsx",
+      "src/components/services/kakao.tsx"
+    ],
+    "api_prefixes": [
+      "/kakao",
+      "/campaigns"
+    ],
+    "crud": "C 채널·템플릿·발송초안; R 목록·상세·심사/발송내역; U 초안·반려수정·활성; D 미사용채널/템플릿보관. 승인본 수정은 재심사.",
+    "data_work": "채널귀속·템플릿버전/심사상태/변수·버튼·이미지·fallback snapshot을 대조한다. KakaoMockReceipt는 실제카카오 receipt로 집계하지 않는다.",
+    "api_work": "채널 CRUD/verify, 템플릿 CRUD/preview/submit/review/send 및 심사 callback, 수신결과·SMS 대체발송의 과금 멱등성을 점검한다.",
+    "ui_work": "/alimtalk/channels 현재 dispatcher 누락을 연결하고 /alimtalk·templates/register·id·id/edit·send·history 전부 실제 상태에 맞춘다. Playground는 미리보기 도구로서 저장이 필요한 동작만 템플릿 계약에 연결한다.",
+    "verification": "채널등록→검증→템플릿등록→반려/수정/승인→변수발송→receipt; 승인템플릿수정시 재심사; 비활성채널거부; fallback중복방지; 실제카카오 승인/수신은 제공사시험 증거필수.",
+    "actors": "message/sender capability + 알림톡 entitlement + service scope",
+    "dependencies": [
+      17
+    ],
+    "legacy_tasks": [
+      "P09-T03",
+      "P09-T04",
+      "P09-T06"
+    ],
+    "existing_files": [
+      "src/server/kakao.ts",
+      "src/server/kakao-binding.ts",
+      "src/server/campaign-worker.ts",
+      "src/server/campaigns.ts",
+      "src/components/services/KakaoTemplates.tsx",
+      "src/components/services/KakaoTemplateDetail.tsx",
+      "src/components/services/Campaigns.tsx",
+      "src/components/services/kakao.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/campaigns"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/campaigns/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/campaigns/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/kakao/channels/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/kakao/channels/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/kakao/channels/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/kakao/templates/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/kakao/templates/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/kakao/templates/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/kakao/channels"
+      },
+      {
+        "method": "POST",
+        "path": "/kakao/channels"
+      },
+      {
+        "method": "POST",
+        "path": "/kakao/channels/{id}/verify"
+      },
+      {
+        "method": "GET",
+        "path": "/kakao/templates"
+      },
+      {
+        "method": "POST",
+        "path": "/kakao/templates"
+      },
+      {
+        "method": "POST",
+        "path": "/kakao/templates/preview"
+      },
+      {
+        "method": "POST",
+        "path": "/kakao/templates/{id}/submit"
+      },
+      {
+        "method": "GET",
+        "path": "/kakao/templates/{id}/review"
+      },
+      {
+        "method": "POST",
+        "path": "/kakao/templates/{id}/send"
+      },
+      {
+        "method": "POST",
+        "path": "/kakao/reviews"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/sources"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/recipients"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/recipients"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/deliveries"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/export"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/preview"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/schedule"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/reschedule"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/cancel"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/archive"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/retry"
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/{id}/files/{fileId}/download"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/apply-template"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/files"
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/{id}/files/{fileId}/attach"
+      },
+      {
+        "method": "DELETE",
+        "path": "/campaigns/{id}/files/{fileId}"
+      }
+    ],
+    "model_status": {
+      "KakaoChannel": "existing",
+      "KakaoTemplate": "existing",
+      "KakaoMockReceipt": "existing",
+      "Campaign": "existing",
+      "CampaignDelivery": "existing",
+      "CampaignEvent": "existing"
+    }
+  },
+  "20": {
+    "id": "R20",
+    "name": "알림 받기·웹훅·이메일 알림",
+    "models": [
+      "NotificationIntegration",
+      "NotificationSubscription",
+      "NotificationEvent",
+      "NotificationDelivery",
+      "NotificationAttempt"
+    ],
+    "server_files": [
+      "src/server/notifications.ts",
+      "src/server/notification-worker.ts",
+      "src/server/notification-transport.ts"
+    ],
+    "ui_files": [
+      "src/components/services/Notifications.tsx"
+    ],
+    "api_prefixes": [
+      "/integrations"
+    ],
+    "crud": "C 알림설정/이벤트구독; R 설정·전송이력; U 대상·채널·활성; D 설정해제·일괄삭제. 전달결과는 append-only.",
+    "data_work": "integration→subscription(service/form/event)과 delivery/attempt, 암호화endpoint 및 generation을 검사한다. 화면에서 본 9이벤트를 서버 발생지와 일대일 대응시킨다.",
+    "api_work": "CRUD/options/test/enabled/bulk-delete/deliveries/retry를 검증하고 실제 업무 트랜잭션에서 outbox를 만든다. HTTPS목적지·내부주소차단·secret마스킹·재시도 상한을 점검한다.",
+    "ui_work": "목록·추가/편집 모달의 이름, webhook/email, 전체/선택 서비스·폼, 9이벤트, 활성토글·테스트·삭제·전송결과/재시도까지 연결한다.",
+    "verification": "폼응답이벤트→정확한 대상1회전송→실패/재시도→비활성/삭제 즉시중단; 다른서비스이벤트누출없음; endpoint변경경합·타임아웃·내부망URL거부. Slack/Teams실제수신 별도.",
+    "actors": "integration.read/manage + 설정 대상 서비스 권한",
+    "dependencies": [
+      11
+    ],
+    "legacy_tasks": [
+      "P09-T05",
+      "P09-T06"
+    ],
+    "existing_files": [
+      "src/server/notifications.ts",
+      "src/server/notification-worker.ts",
+      "src/server/notification-transport.ts",
+      "src/components/services/Notifications.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/integrations/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/integrations/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/integrations/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/integrations/options"
+      },
+      {
+        "method": "POST",
+        "path": "/integrations/delete"
+      },
+      {
+        "method": "POST",
+        "path": "/integrations/{id}/enabled"
+      },
+      {
+        "method": "POST",
+        "path": "/integrations/{id}/test"
+      },
+      {
+        "method": "GET",
+        "path": "/integrations/{id}/deliveries"
+      },
+      {
+        "method": "POST",
+        "path": "/integrations/{id}/deliveries/{deliveryId}/retry"
+      }
+    ],
+    "model_status": {
+      "NotificationIntegration": "existing",
+      "NotificationSubscription": "existing",
+      "NotificationEvent": "existing",
+      "NotificationDelivery": "existing",
+      "NotificationAttempt": "existing"
+    }
+  },
+  "21": {
+    "id": "R21",
+    "name": "라이선스·결제수단·주문·원장·환불",
+    "models": [
+      "BillingPlan",
+      "BillingPlanVersion",
+      "BillingSubscription",
+      "BillingSubscriptionEvent",
+      "PaymentMethod",
+      "PaymentOrder",
+      "PaymentEvent",
+      "PaymentRefund",
+      "BillingMonthClose",
+      "CreditAccount",
+      "LedgerTransaction",
+      "LedgerEntry"
+    ],
+    "server_files": [
+      "src/server/admin-plans.ts",
+      "src/server/entitlements.ts",
+      "src/server/payment-methods.ts",
+      "src/server/payments.ts",
+      "src/server/subscriptions.ts",
+      "src/server/subscription-worker.ts",
+      "src/server/billing-settlement.ts",
+      "src/server/ledger.ts",
+      "src/server/billing-reads.ts",
+      "src/server/billing-history.ts"
+    ],
+    "ui_files": [
+      "src/components/services/payment.tsx",
+      "src/components/services/InvoiceDetail.tsx"
+    ],
+    "api_prefixes": [
+      "/plans",
+      "/admin/plans",
+      "/entitlements",
+      "/assets",
+      "/subscriptions",
+      "/billing",
+      "/billing-history",
+      "/invoices",
+      "/usage-events",
+      "/ledger"
+    ],
+    "crud": "C 구독/결제수단/주문/환불요청; R 상품·자산·원장·청구서; U 기본수단·예약해지/취소; D 수단삭제·구독해지. 승인결제/원장은 보정 이벤트만.",
+    "data_work": "가격버전·회사구독·billing method·order/event/refund·복식원장 제약을 확인한다. 금액은 정수, 통화/가격snapshot, eventId unique, 잔액합계·환불누계 불변조건을 정의한다.",
+    "api_work": "provider event 검증·order return·승인/실패/환불 상태기계와 멱등성을 재검증한다. 수정 중인 payment-events/payments/subscriptions를 보존하고 새계획의 검증만 추가한다. success URL은 조회 전용.",
+    "ui_work": "license-service/membership/detail/method/billing-policy/history/usage/service-asset/bill/creditBill/refund와 성공/실패/type/errorCode 모든 변형을 연결한다. 대기/중복callback/권한없음·영수증·해지철회를 구분한다.",
+    "verification": "시험주문→승인중복/역순event→1회잔액충전→부분/전액환불→원장합계0검증; 결제중해지409·과거취소구독충전차단 기존회귀 보존; 임의successURL로승인불가; 실제PG시험은 별도.",
+    "actors": "billing.read/write; 상품관리는 platformAdmin; webhook검증",
+    "dependencies": [
+      4
+    ],
+    "legacy_tasks": [
+      "P10-T01",
+      "P10-T02",
+      "P10-T03",
+      "P10-T04",
+      "P10-T05"
+    ],
+    "existing_files": [
+      "src/server/admin-plans.ts",
+      "src/server/entitlements.ts",
+      "src/server/payment-methods.ts",
+      "src/server/payments.ts",
+      "src/server/subscriptions.ts",
+      "src/server/subscription-worker.ts",
+      "src/server/billing-settlement.ts",
+      "src/server/ledger.ts",
+      "src/server/billing-reads.ts",
+      "src/server/billing-history.ts",
+      "src/components/services/payment.tsx",
+      "src/components/services/InvoiceDetail.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/billing-history"
+      },
+      {
+        "method": "GET",
+        "path": "/ledger"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/plans"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/plans"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/plans/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/admin/plans/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/admin/plans/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/usage-events"
+      },
+      {
+        "method": "GET",
+        "path": "/invoices"
+      },
+      {
+        "method": "GET",
+        "path": "/plans"
+      },
+      {
+        "method": "GET",
+        "path": "/entitlements"
+      },
+      {
+        "method": "GET",
+        "path": "/assets"
+      },
+      {
+        "method": "GET",
+        "path": "/subscriptions"
+      },
+      {
+        "method": "POST",
+        "path": "/subscriptions"
+      },
+      {
+        "method": "GET",
+        "path": "/billing/methods"
+      },
+      {
+        "method": "POST",
+        "path": "/billing/methods"
+      },
+      {
+        "method": "PATCH",
+        "path": "/billing/methods/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/billing/methods/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/billing/orders"
+      },
+      {
+        "method": "POST",
+        "path": "/billing/orders"
+      },
+      {
+        "method": "GET",
+        "path": "/billing/orders/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/billing/orders/{id}/return"
+      },
+      {
+        "method": "POST",
+        "path": "/billing/provider-events"
+      },
+      {
+        "method": "POST",
+        "path": "/billing/orders/{id}/virtual-checkout"
+      },
+      {
+        "method": "POST",
+        "path": "/billing/refunds/{id}/virtual-settle"
+      },
+      {
+        "method": "GET",
+        "path": "/subscriptions/entitlement"
+      },
+      {
+        "method": "POST",
+        "path": "/subscriptions/{id}/cancel"
+      },
+      {
+        "method": "POST",
+        "path": "/subscriptions/{id}/undo-cancel"
+      },
+      {
+        "method": "POST",
+        "path": "/subscriptions/{id}/schedule-cancel"
+      }
+    ],
+    "model_status": {
+      "BillingPlan": "existing",
+      "BillingPlanVersion": "existing",
+      "BillingSubscription": "existing",
+      "BillingSubscriptionEvent": "existing",
+      "PaymentMethod": "existing",
+      "PaymentOrder": "existing",
+      "PaymentEvent": "existing",
+      "PaymentRefund": "existing",
+      "BillingMonthClose": "existing",
+      "CreditAccount": "existing",
+      "LedgerTransaction": "existing",
+      "LedgerEntry": "existing"
+    }
+  },
+  "22": {
+    "id": "R22",
+    "name": "개인정보·권한·활동 감사로그",
+    "models": [
+      "AuditEvent",
+      "ActivityReview",
+      "ActivityReviewMessage",
+      "ExportJob"
+    ],
+    "server_files": [
+      "src/server/audit.ts",
+      "src/server/audit-events.ts",
+      "src/server/form-audit-events.ts",
+      "src/server/activity-reviews.ts",
+      "src/server/exports.ts"
+    ],
+    "ui_files": [
+      "src/components/management/AuditLogs.tsx",
+      "src/components/management/ActivityReviews.tsx"
+    ],
+    "api_prefixes": [
+      "/audit-events",
+      "/me/audit-events",
+      "/activity-reviews",
+      "/exports"
+    ],
+    "crud": "C 실제업무 처리시 서버가 이벤트 추가; R 필터·상세·CSV; U/D 원장 직접 조작 없음. 검토요청·응답은 별도 resource 상태전이.",
+    "data_work": "tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드를 대조한다. 현재 UI에서 IP·고객번호·사유가 - 처리되는 영역은 합법적 수집근거/보존과 함께 수집·마스킹 계약을 확정한다.",
+    "api_work": "각 kind(info/marketing/service/member/authority/external/access/customer/mail)와 mine/form 범위 조회·export가 동일 필터를 사용하게 한다. 업무변경과 audit append 원자성, 개인정보원문 최소화·보존집행을 검증한다.",
+    "ui_work": "9종 로그와 내 활동·폼로그의 기간/서비스/처리자/검색/페이지크기/상세/내보내기, 개인정보활동 검토요청을 실제 컬럼에 연결한다. 403을 건수0으로 표시하지 않는다.",
+    "verification": "각 도메인 실제변경1회→해당kind1건→화면/CSV같음; 읽기전용 권한·타회사·허용필드 마스킹; 로그PATCH/DELETE미노출; 경계날짜/KST·대량export·동일시각페이지 누락없음.",
+    "actors": "audit.read + service scope; mine는 actor 강제",
+    "dependencies": [
+      4
+    ],
+    "legacy_tasks": [
+      "P12-T01",
+      "P12-T04"
+    ],
+    "existing_files": [
+      "src/server/audit.ts",
+      "src/server/audit-events.ts",
+      "src/server/form-audit-events.ts",
+      "src/server/activity-reviews.ts",
+      "src/server/exports.ts",
+      "src/components/management/AuditLogs.tsx",
+      "src/components/management/ActivityReviews.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/audit-events"
+      },
+      {
+        "method": "GET",
+        "path": "/audit-events/export"
+      },
+      {
+        "method": "GET",
+        "path": "/me/audit-events"
+      },
+      {
+        "method": "GET",
+        "path": "/me/audit-events/export"
+      },
+      {
+        "method": "POST",
+        "path": "/exports"
+      },
+      {
+        "method": "GET",
+        "path": "/exports"
+      },
+      {
+        "method": "GET",
+        "path": "/exports/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/exports/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/exports/{id}/cancel"
+      },
+      {
+        "method": "GET",
+        "path": "/exports/{id}/download"
+      },
+      {
+        "method": "GET",
+        "path": "/activity-reviews"
+      },
+      {
+        "method": "POST",
+        "path": "/activity-reviews"
+      },
+      {
+        "method": "GET",
+        "path": "/activity-reviews/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/activity-reviews/{id}/actions"
+      },
+      {
+        "method": "POST",
+        "path": "/activity-reviews/{id}/notifications"
+      },
+      {
+        "method": "POST",
+        "path": "/activity-reviews/{id}/destruction"
+      }
+    ],
+    "model_status": {
+      "AuditEvent": "existing",
+      "ActivityReview": "existing",
+      "ActivityReviewMessage": "existing",
+      "ExportJob": "existing"
+    }
+  },
+  "23": {
+    "id": "R23",
+    "name": "대시보드·통계·준수·월마감",
+    "models": [
+      "Submission",
+      "MarketingPreference",
+      "AuditEvent",
+      "ComplianceClose",
+      "ComplianceExportJob",
+      "BillingMonthClose"
+    ],
+    "server_files": [
+      "src/server/analytics.ts",
+      "src/server/scoped-analytics.ts",
+      "src/server/compliance-evidence.ts",
+      "src/server/compliance-close.ts",
+      "src/server/compliance-exports.ts",
+      "src/server/analytics-period.ts"
+    ],
+    "ui_files": [
+      "src/components/Dashboard.tsx",
+      "src/components/StatisticsPages.tsx",
+      "src/components/forms/Marketing.tsx"
+    ],
+    "api_prefixes": [
+      "/analytics",
+      "/compliance"
+    ],
+    "crud": "C 월마감 snapshot/출력job; R 대시보드·개인정보/광고통계·마감자료; U/D 수치 직접변경 없음, 출력취소/파일만 삭제 정책.",
+    "data_work": "원천조회→서비스필터→기간버킷→snapshot과 근거hash를 대조한다. ComplianceClose와 BillingMonthClose를 다른 모델로 유지한다. 근거없는 점수/과태료를 실제 계산으로 제시하지 않는다.",
+    "api_work": "dashboard/privacy/marketing/compliance/closes/exports의 분모·시점·동의철회·파기 반영 기준을 계약화한다. 마감 unique와 정정이력·실패재시도·읽기권한을 검증한다.",
+    "ui_work": "대시보드7경로의 전체/서비스 선택과 기간/드릴다운, /log/month-monitoring의 고정Enterprise gate를 실제 월목록·상세·출력에 연결한다. 근거부족은 미평가로 표시한다.",
+    "verification": "수집3→철회1→파기1 fixture로 각통계DB대조; 서비스B제외; KST월말 경계; 마감중복1개; 파기후snapshot의 개인정보비노출; export재시작/취소·다운로드권한.",
+    "actors": "허용서비스 집계; audit/security·license별 마감권한",
+    "dependencies": [
+      15,
+      16,
+      21,
+      22
+    ],
+    "legacy_tasks": [
+      "P12-T02",
+      "P12-T03",
+      "P12-T04"
+    ],
+    "existing_files": [
+      "src/server/analytics.ts",
+      "src/server/scoped-analytics.ts",
+      "src/server/compliance-evidence.ts",
+      "src/server/compliance-close.ts",
+      "src/server/compliance-exports.ts",
+      "src/server/analytics-period.ts",
+      "src/components/Dashboard.tsx",
+      "src/components/StatisticsPages.tsx",
+      "src/components/forms/Marketing.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/analytics/privacy"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics/marketing"
+      },
+      {
+        "method": "GET",
+        "path": "/compliance"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics/closes"
+      },
+      {
+        "method": "POST",
+        "path": "/analytics/closes"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics/closes/{id}/export"
+      },
+      {
+        "method": "POST",
+        "path": "/analytics/exports"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics/exports"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics/exports/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/analytics/exports/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/analytics/exports/{id}/cancel"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics/exports/{id}/download"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics/dashboard"
+      }
+    ],
+    "model_status": {
+      "Submission": "existing",
+      "MarketingPreference": "existing",
+      "AuditEvent": "existing",
+      "ComplianceClose": "existing",
+      "ComplianceExportJob": "existing",
+      "BillingMonthClose": "existing"
+    }
+  },
+  "24": {
+    "id": "R24",
+    "name": "공지·도움말·문의·공통 경로",
+    "models": [
+      "Notice",
+      "NoticeAttachment",
+      "Guide",
+      "SupportTicket",
+      "AccessRequest"
+    ],
+    "server_files": [
+      "src/server/notices.ts",
+      "src/server/notice-attachments.ts",
+      "src/server/guides.ts",
+      "src/server/support-tickets.ts"
+    ],
+    "ui_files": [
+      "src/components/NoticePages.tsx",
+      "src/components/GuidePages.tsx",
+      "src/components/SupportPages.tsx",
+      "src/components/LoadingTransition.tsx",
+      "src/components/AccessDeniedPage.tsx",
+      "src/components/AppShell.tsx",
+      "src/components/CloneApp.tsx"
+    ],
+    "api_prefixes": [
+      "/notices",
+      "/admin/notices",
+      "/guides",
+      "/admin/guides",
+      "/support-tickets",
+      "/feedback"
+    ],
+    "crud": "C 관리자 공지/가이드·사용자문의; R 게시콘텐츠/상태; U 초안·답변·게시; D 초안/첨부보관. 로딩/오류/wildcard는 별도 CRUD 없음.",
+    "data_work": "공지·첨부/가이드 게시상태·정렬·문의소유자/답변관계를 확인한다. 원본에 없는 관리자 authoring 경로는 독립운영 부가화면으로 별도 등록한다.",
+    "api_work": "콘텐츠 CRUD/게시·파일, 문의 생성/답변/종결/재개에 systemAdmin·자기문의 접근을 적용한다. 공개/로그인 경계와 안내 페이지의 실제 상태조회 계약을 명시한다.",
+    "ui_work": "notice/id/help-center·관리자작성/편집·내문의, /·/IE·loading·access-not-allow와 /*·/security/* fallback을 명시적으로 처리한다. wildcards를 임의모든경로 허용 정규식으로 합치지 않는다.",
+    "verification": "관리자공지생성/게시→일반조회→수정/보관·첨부검증; 일반계정관리CRUD거부; 문의A/B격리; 잘못된경로404·보안fallback·새로고침·뒤로가기·키보드·모바일까지 검증.",
+    "actors": "platformAdmin; 게시문서공개정책; 자기문의 및 지원담당",
+    "dependencies": [
+      2
+    ],
+    "legacy_tasks": [
+      "P13-T01",
+      "P13-T02",
+      "P13-T03",
+      "P13-T04"
+    ],
+    "existing_files": [
+      "src/server/notices.ts",
+      "src/server/notice-attachments.ts",
+      "src/server/guides.ts",
+      "src/server/support-tickets.ts",
+      "src/components/NoticePages.tsx",
+      "src/components/GuidePages.tsx",
+      "src/components/SupportPages.tsx",
+      "src/components/LoadingTransition.tsx",
+      "src/components/AccessDeniedPage.tsx",
+      "src/components/AppShell.tsx",
+      "src/components/CloneApp.tsx"
+    ],
+    "proposed_or_missing_files": [],
+    "api_operations": [
+      {
+        "method": "GET",
+        "path": "/admin/notices"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/notices"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/notices/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/admin/notices/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/admin/notices/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/guides"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/guides"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/guides/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/admin/guides/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/admin/guides/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/feedback"
+      },
+      {
+        "method": "POST",
+        "path": "/feedback"
+      },
+      {
+        "method": "GET",
+        "path": "/feedback/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/feedback/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/feedback/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/notices"
+      },
+      {
+        "method": "POST",
+        "path": "/notices"
+      },
+      {
+        "method": "GET",
+        "path": "/notices/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/notices/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/notices/{id}"
+      },
+      {
+        "method": "GET",
+        "path": "/notices/{id}/attachments/{attachmentId}"
+      },
+      {
+        "method": "PUT",
+        "path": "/notices/{id}/attachments/{attachmentId}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/notices/{id}/attachments/{attachmentId}"
+      },
+      {
+        "method": "GET",
+        "path": "/guides"
+      },
+      {
+        "method": "POST",
+        "path": "/guides"
+      },
+      {
+        "method": "GET",
+        "path": "/guides/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/guides/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/guides/{id}"
+      },
+      {
+        "method": "PUT",
+        "path": "/guides/{id}/file"
+      },
+      {
+        "method": "GET",
+        "path": "/guides/{id}/download"
+      },
+      {
+        "method": "GET",
+        "path": "/support-tickets"
+      },
+      {
+        "method": "POST",
+        "path": "/support-tickets"
+      },
+      {
+        "method": "GET",
+        "path": "/support-tickets/{id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/support-tickets/{id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/support-tickets/{id}"
+      },
+      {
+        "method": "POST",
+        "path": "/support-tickets/{id}/reply"
+      },
+      {
+        "method": "POST",
+        "path": "/support-tickets/{id}/close"
+      },
+      {
+        "method": "POST",
+        "path": "/support-tickets/{id}/reopen"
+      }
+    ],
+    "model_status": {
+      "Notice": "existing",
+      "NoticeAttachment": "existing",
+      "Guide": "existing",
+      "SupportTicket": "existing",
+      "AccessRequest": "existing"
+    }
+  }
+}

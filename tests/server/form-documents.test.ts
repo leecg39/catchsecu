@@ -10,6 +10,8 @@ import { roleCapabilities } from "@/server/permissions";
 import { decrypt } from "@/server/crypto";
 import { canonicalDocument } from "@/server/documents";
 import { sha256 } from "@/server/pdf-renderer";
+import { PDF_V2_FONT_HASH } from "@/server/pdf-font-loader";
+import { pdfActualText } from "../fixtures/pdf-actual-text";
 import { privateConsentReceiptPdf } from "@/server/consent-receipts";
 import { runOneDestruction } from "@/server/destruction-worker";
 import { emptyDisplay, type DocumentInput, type DocumentRecord, type DisplayRecord } from "@/contracts/documents";
@@ -91,6 +93,34 @@ beforeEach(async () => { await db.apiRateLimit.deleteMany(); await db.rateLimit.
 afterAll(async () => { await db.$disconnect(); });
 
 describe("versioned form documents and consent receipt PDFs", () => {
+  test.each([
+    { language: "ar" as const, text: "مرحبا بالعالم" },
+    { language: "th" as const, text: "ข้อมูลส่วนบุคคล" },
+    { language: "tr" as const, text: "İstanbul kişisel şıİŞğ" },
+  ])("publishes $language consent text and preserves its encrypted v2 receipt on every read", async ({ language, text }) => {
+    const row = await ok<FormRecord>(await formCreate(req("/forms", "POST", "owner", { serviceId: service, title: text,
+      content: content([], { formLanguage: language, verify: false, body: text, consentPurpose: text }) }, { "idempotency-key": randomUUID() })), 201);
+    const published = await live(row);
+    expect(published.body).toMatchObject({ title: text, content: { formLanguage: language, body: text, consentPurpose: text } });
+    const submission = await ok<{ id: string }>(await submit(published), 201);
+    const stored = await db.consentReceipt.findFirstOrThrow({ where: { submissionId: submission.id } });
+    expect(stored).toMatchObject({ evidenceVersion: 1, purpose: text, pdfHash: expect.any(String) });
+    const evidence = decrypt<ConsentEvidence>(stored.evidenceCipher!);
+    expect(evidence).toMatchObject({ schemaVersion: 1, formTitle: text, formBody: text, purpose: text, generalConsent: true });
+    expect(sha256(canonicalDocument(evidence))).toBe(stored.documentHash);
+    const bytes = Buffer.from(decrypt<string>(stored.pdfCipher!), "base64");
+    expect(sha256(bytes)).toBe(stored.pdfHash);
+    expect(pdfActualText(bytes).join("\n")).toContain(text);
+    const task = getDocument({ data: new Uint8Array(bytes), useSystemFonts: false });
+    try { expect((await (await task.promise).getMetadata()).info).toMatchObject({ Creator: "Catchsecu document renderer v2", Keywords: expect.stringContaining(PDF_V2_FONT_HASH) }); }
+    finally { await task.destroy(); }
+    for (let i = 0; i < 2; i++) {
+      const response = await download(submission.id, stored.id); expect(response.status).toBe(200);
+      expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes);
+      expect(response.headers.get("x-pdf-sha256")).toBe(stored.pdfHash);
+    }
+    expect(await db.consentReceipt.findUniqueOrThrow({ where: { id: stored.id } })).toEqual(stored);
+  });
   test("publishes frozen display and policy text without leaking internal scope identifiers", async () => {
     const policy = await document({ type: "privacy_policy" }), doc = await document(); await display("고정된 수집 안내", policy.publicationId);
     const row = await form([selection(doc)]), published = await live(row);

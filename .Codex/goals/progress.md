@@ -1,4 +1,65 @@
+## 최신 작업: 템플릿 카탈로그 메타데이터·입력 보호
+
+2026-10-10 F6 템플릿 카탈로그 체크포인트: 설명·썸네일·공개/라이선스 범위를 모델·API·화면에 연결하고, 공용 템플릿 읽기 전용·구독/체험 사용 조건과 썸네일 자산 pin을 DB에서 보호했다. 목록/미리보기 재시도, dirty 보호, 저장 동기 잠금, 409 입력 보존과 명시적 최신본 적용을 구현했다. PostgreSQL 회귀 117개, 계약326경로/463작업, 스키마147migration·DDL 차이0을 확인했다. 실제 Ego 전체 흐름과 외부 결제 라이선스는 남아 있어 goal active·공식0/53/54를 유지한다. [검증](../../docs/qa/R08-T03/template-catalog/README.md).
+
+## 이전 작업: 작성자 참고자료 파일·보기 이미지
+
+2026-10-10 F5 참여자 인증 체크포인트: 이메일 OTP·전체/허용 대상·대상 CRUD·폼 범위 중복 참여 제한·게시본 세션/proof·파일 권한을 구현했다. migration143~145, 새 설치145개, 기존버전196개 기본값 보존, 관련16파일171시험, production 브라우저 제출·중복 차단과 재시작 hash가 통과했다. [검증](../../docs/qa/R08-T02/participation-access/README.md). 카카오·네이버 실제 OAuth와 SMTP 실수신, R08 전수 수용은 남아 있으며 goal active·공식0/53/54를 유지한다.
+
+2026-10-10 F5 응답 수집 일정 체크포인트: 버전별 시작·종료 시각과 게시본 경계를 독립 컬럼/제약으로 구현했다. 시작 전 공개 내용 비노출·제출425, 시작 후 실제 제출, 종료 후410/사용자 지정 마감을 확인했다. migration142 빈 설치와 기존196버전/154게시본 지문 보존, 전용5·회귀158시험·Ego Lite·production82페이지·재시작 hash가 통과했다. [검증](../../docs/qa/R08-T02/collection-window/README.md). R08 전수 수용은 남아 있으며 goal active·공식0/53/54를 유지한다.
+
+2026-10-10 F3 동의 항목 자동 집계 체크포인트 완료: 수동 문항 분류의 NONE 제외·순서/중복 보존 투영을 폼 버전, 편집/승인/공개 화면, 영수증 증거/PDF에 연결했다. migration141·지연 트리거2개·기존196버전 무백필, 집중24·통합25·확장43시험, Ego 실제 제출과 production 재시작 해시가 통과했다. [검증](../../docs/qa/R08-T02/question-metadata/consent-items/README.md). NLP/AI 분류와 법정 동의 문안 전체 생성은 남아 있다. 전체 goal active·공식0/53/54 유지.
+
+2026-10-10 F3 입력 패턴 체크포인트 완료: 확인된 ID 1·2·3·4·7·8의 nullable 모델·DB 제약·폼 CRUD/복제/템플릿/게시/정정·편집/공개 화면을 연결했다. 호출자 정규식은 거부하며 주민등록번호는 고정 문자 검사로 처리한다. 집중6·관련27·frozen fixture20/20, migration140 빈 설치·기존 질문415개 보존, Ego 잘못된 값 거부/정상 제출·production 재시작 hash와 82페이지 build 통과. [검증](../../docs/qa/R08-T02/question-patterns/README.md). 전체 goal active·공식0/53/54 유지.
+
+2026-10-10 BI-07 본문 이미지 전체 수용을 완료했다. Ego Lite 실제 4슬롯 CRUD·게시·2페이지 제출·개정/과거 이력·복제/템플릿, 390/768/1440·RTL·키보드·active/completion/closed를 확인했다. 장애 회귀22·production82페이지·재시작 hash7049fafd…와 기존 frozen fixture20/20이 통과했다. 본문 이미지 모듈은 완료했으며 공식107작업 상태 완료0/진행53/계획54와 전체 goal active를 유지한다. 증거: ../../docs/qa/R08-T02/body-images/full-acceptance/README.md
+
+원본 발췌40개/로컬 영향45개를 대조하고 25단계 [구현 계획](../../docs/qa/R08-T02/question-metadata/author-assets/PLAN.md)을 작성했다. 계약15시험, DB21·형식검사58·참조/복사20·문맥별다운로드8·UI상태/렌더55개 통과(중복 포함, 합산하지 않음). 실제 ClamAV 업로드13개 및 재전송 최종만료 추가1개 통과 후 통합 회귀 중이다. migration122/123·dev8테이블 보존·빈DB123개 설치·기존18fixture 해시 보존을 확인했다. HTTP DB오류6개 RED5→GREEN6, dedicated TypeScript 통과. API/schema/감사 문맥 마무리·실제 Ego·production build/재시작은 잔여다. 공식107작업 상태 완료0/진행53/계획54 및 전체 목표를 유지한다. 앞선 기타 직접입력629소스 checkpoint는 보존했으며 새 작업트리의 게이트 결과로 사용하지 않는다.
+
+# 실행 진행판 — 2026-10-10
+
+F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. [검증](../../docs/qa/R08-T02/question-metadata/reference-link/README.md). 공식 상태 완료0/진행53/계획54 유지.
+
+F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. [검증](../../docs/qa/R08-T02/question-metadata/explanation/README.md).
+
+F3/F5 국제 연락처·언어·PDF: 원본16언어·181국가/179코드·nullable 게시 언어/migration117 구현. 고유13파일192시험 후 PDF/번역 최종8파일126시험 통과(중복 합산 안 함). 원본 문구1952개 중 연결 범위 명시. Arabic 발행 실패를 v2 PDF로 수정하고 실제 Ego 발행/RTL/제출/암호화 저장 확인. 폼2/응답2/정정1/감사25·production 재시작 hash 일치, 기존13fixture 보존. PDF.js 복합 Arabic 추출·전체 시각/번역·인증 서명·메타데이터/여러 페이지·전체수용은 잔여. [검증](../../docs/qa/R08-T02/international-contact/README.md).
+
+F3 직접 그리기: 질문16유형·PNG 파일 수명주기·메타데이터 계약·권한 마스킹·migration116 구현. 고유11파일201시험·HTTP10·Ego 제출/재입력/취소/정정/이력 다운로드/CSV·터치와390/768/1440px 획 보존 통과. 실제 목록 질문 순서 결함 수정. 재시작 폼1/응답1/정정1/파일2/감사30건과 기존12세트 보존. 최초 resize 전 캡처의 바이트 불일치는 한계로 기록하고 정정 적용 Blob/저장/다운로드 해시 일치 확인. 전체 화면 시각 검증·국제전화/언어·서명/메타데이터/다중페이지 및 전체수용 잔여. [검증](../../docs/qa/R08-T02/drawing-questions/README.md).
+
+F3 국내/해외 주소: 질문15유형·국내 문자열/해외7필드·181국가·migration115·검증/정정/CSV 구현. 고유7파일85개·준비/게시HTTP10·실제 Kakao 검색/SDK 실패복구·Ego 제출/취소복원/정정/CSV·재시작 폼1/응답1/정정1/감사12건 및 기존11세트 보존 통과. 지연 SDK 결과의 화면/전송값 불일치 경로 수정. 이미지 원본 일치·PDF/모든 지연 조합·나머지 특수유형/메타데이터/다중페이지와 전체수용은 잔여. [검증](../../docs/qa/R08-T02/address-questions/README.md).
+
+F3 국내 연락처·이메일2종·생년월일: 질문13유형·역할/채널 바인딩·migration114·원본 문자열 직렬화·고정 검증 구현. 고유7파일125개·HTTP11·Ego 제출/취소복원/정정·재시작 폼1/응답1/정정1/동의3/감사15건 및 기존10세트 보존 통과. 이미지 캡처 시간초과는 미검증으로 남기며 국제전화/주소/서명/메타데이터/다중페이지 및 전체수용은 계속 진행. [검증](../../docs/qa/R08-T02/special-questions/README.md).
+
+F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구1000/20000·승인지문·공백 포함 정보주체 정정 호환 구현. 관련89·최종38개(중복), HTTP12·Ego·113migration/기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/페이지 및 전체 수용은 계속 진행. [검증](../../docs/qa/R08-T02/text-limits/README.md).
+
+사용자 승인으로 상세 계획 후 구현·검증을 계속한다. 전체 완료가 아니다.
+
+- 활성 계획107개: 완료0·진행53·계획54. 기존72개 상태는 이력으로 보존한다.
+- BI-06 rich 동의 증거·이미지 PDF 영수증 v2까지 구현했다. 관련68시험·migration139 빈 설치/138→139·Ego 2페이지 제출/관리자 증거/PDF 다운로드·PostgreSQL/PDF.js 대조·82페이지 build 통과. 다음 R08 단위는 BI-07a/07b 전체 수용이다.
+- 실제 UI/HTTP/DB: 보유기간CRUD, 폼 게시·응답, 정정·메모·PDF, 감사조회/CSV, 채널CRUD, 월마감과 서버재시작 확인.
+- 수집 근거CRUD·HTTP26·개정4/6·감사10 확인. 문서 게시3본·P/C/OC연결·회수거부·PDF한글/해시·감사8·재시작 확인. 문서 회귀46개 통과.
+- 격리DB 설치104개·업그레이드·시드 반복·131테이블/암호화파일 복구 통과. dev/test 스키마 예상밖 차이0·SQL전용FK1개 확인·회귀88개 통과.
+- 문구/표시설정 HTTP29개·감사18건·개정6/5/5·2·실제 UI·재시작 일치 확인. 관련34개 회귀 통과.
+- 전체시험 첫 실행1605통과·157실패·34미실행 보존. ClamAV 복구 후 실패18파일400개 통과. 관리자 설치 불필요. 전체 재실행1814통과/1실패. 임시DB객체 정리 후 가져오기41개 통과.
+- 구조화 처리방침 시점 전체122파일1,834개 통과. 이후 회사/서비스135개·접근요청89개 회귀 통과(중복 포함). 실제 UI·HTTP23개/19개·감사14건/8건·각 서버재시작 지문 일치. R03 전체 역할·다중페이지·원본 동등성 수용은 남아 있다.
+- 수탁 항목/재수탁자 후속58개·네트워크3개 통과. UI·초안3개정/게시2본/감사5건/PDF2개·재시작 지문 일치. 과거 처리방침 JSON/PDF 불변도 확인.
+- 인증141개+정책64개 통과. 실제가입·암호·MFA·로컬메일5건·15경로/45폭·감사67건과 재시작 지문을 확인했다. 링크 재사용, 조회실패 재시도, 한국어 오류, 모바일 약관 보완.
+- 외부 SMS·SMTP·카카오·PG·기관 인증 수용은 미검증이며 통과로 집계하지 않는다.
+- 구성원·전문가 후속 서버68개·권한11개·최종11개와 재시작 지문 통과. 모델5개·멤버3/초대3/배정1·감사45·메일4건을 대조했고 입력 보호/409복구/실패 재시도를 보완했다.
+
+세부 상태는 활성 tasks.json과 docs/qa/rea-fullstack-2026-10-10/README.md를 따른다.
+
+- R08 권한/최종만료: 현재정책/최종기한11개 실제 실패 재현 후 폼·템플릿·승인·고정URL·동의서 선택 가드 보완. 18파일193개·실제HTTP29개·Ego 저장/MFA거부·감사22건/production 재시작 지문 통과. 옵션ID·원본추가필드·전체단계 수용은 잔여.
+
+- R08 F2: 질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. [증거](../../docs/qa/R08-T02/identities/README.md).
+
+F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. [검증](../../docs/qa/R08-T02/exact-selection/README.md).
+
 # 구현 진행 현황
+
+## 2026-10-07 재개 후 결제 이벤트 보완
+
+2026-10-07 결제 이벤트 후속: 승인/실패와 환불 입력 계약을 분리하고, 잘못된 JSON400·환불 식별자 검증·결제 중 구독 취소409·과거 취소 구독의 원장 단독 충전 방지를 구현했다. 유효 fixture에서7개 실패를 재현했고 최종 PostgreSQL74개·HTTP23개(재시작5)·타입/린트/production 빌드·계약308경로440작업을 통과했다. 실제 PG/브라우저/원본 대조는 미완료다. [상세 검증](../../docs/qa/P10-T02/event-integrity/README.md). 전체17/72 완료 상태를 유지한다. 아래 기록은 각 수행 당시 상태다.
 
 ## 최신 상태: 전문가 배정 상태 복구 보완 검증 종료·일시 정지 요청
 
@@ -284,3 +345,75 @@ P03-T01 검증: 사업자등록증 실제 검사·바이트 다운로드·교체
 2026-10-06 최신 Mock 복구: 이전 턴은 progress. 최신100마이그레이션의 격리 Mock DB128테이블617행과 객체1개를 pg_dump/pg_restore+별도폴더로 복원. 스키마2,747항목/시퀀스/행/객체 해시 동일. CHECK10개 AND괄호 정규표시 차이와 시험의 ShareGrant.status 오조회 수정 후 전체 재실행 통과. 복원본 앱 로그인/내부파일/익명거부/공유파일/공유회수/재파기6검사 통과; 답변0·실제객체삭제·증명서1·410. 이후 원본 DB/객체 해시 보존. docs/qa/mock-completion/restore/. 전체 타입·스크립트 lint 통과. 원본/브라우저 및 실제WAL/PITR 수용은 미완료 유지.
 
 2026-10-06 수용 감사: 직전은 최신복구 progress. 현재438계약/181경로 검사 재통과, 전체회귀 이후 앱코드 변경은 billing-reads.ts뿐이며 후속40시험 근거 확인. 현재 production빌드 재통과. CHANGELOG와 요구조건별 acceptance-audit 작성. Ego listTaskSpaces로56 agentDelegatedToUser 재확인, 앞선 제어권 질문 미응답. 동일 제어권 대기는3회이상 연속목표턴의 잔여로 유지됐으며 로컬독립 검증을 마친 뒤 다음 필수 UI/원본 수용이 이 조건에 의존한다. 원본제한128·전페이지수용 미충족 때문에 전체완료금지. 제어권 회수 답변/외부상태 변경 전에는 진척 가능한 필수 다음 단계가 없어 blocked 전환 대상이다.
+
+2026-10-07 목표 재개: 현재 저장소308a003·기존 동시 처리/Mock 후속 증거를 다시 읽었다. 이번 턴은7개 실패 재현→코드 수정→74개/HTTP23개 및 재시작 해시 보존으로 progress다. 기존 Ego56 소실을 현재 목록에서 확인했고 새 공간 생성 질문을 남겼다. 사용자 응답 없는 상태에서 새 공간/다른 공간을 제어하지 않았다. QA3197 두 프로세스 종료·QA세션0. 새 마이그레이션/커밋/푸시 없음. 다음 브라우저 재개 및 원본·외부 공급자 수용은 대기; 미구현/미검증을 완료로 올리지 않는다.
+
+
+2026-10-10 R05 로컬 체크포인트: 프로필/검토/탈퇴 입력보호·충돌/실패 복구·완료안내. 서버225, 모델6, 원본6경로18폭, HTTP13+8, 감사75/검토3/폐쇄v6, 서버재시작 SHA256 447616fcf1df22f82192de883b57c40639235614687ca5847b651c670fd98764. 계획43진행/64계획/0완료. 외부/원본 전체수용 미완료, goal active. docs/qa/R05-T04/profile-flow/README.md.
+
+- 2026-10-10 R06: 정책 readPolicy 현재권한8실패→수정104통과, 파일worker77별도. IP/MFA CRUD·6탭/초기화·IP20/MFA8/최종8 HTTP·감사126·재시작해시 cef31de2e955306df2870a5612210634923503080b2d12c289892a82a720e7ed. 8경로24폭/모달3폭. 전체47진행/60계획/0완료. 다음 필수작업 보안 기능별 entitlement. ClamAV 사용자설치1.5.4 및 기존daemon clean/EICAR 재검증 통과.
+
+- 2026-10-10 R06 entitlement 후속: 명시적 불변 capabilities3종·migration105·dev/test스키마차이0. 모든 보안 변경과 재시도에402검사, 읽기와기존보호유지. expiryworker 교착P2010재현→회사부터잠금수정. 관련고유225통과, HTTP23+6, Ego상태18/만료24/상품6, 회사6·구독5·감사31·재시작해시0fe82444d7fa26ed9f71bdbe81a11d70d6e8346b14566b36df114ea06cb84332. 전체47진행/60계획/0완료, goal active. 다음은 남은 R07 실제화면/CRUD/백엔드 수용 점검이며 원본/외부 제한은 완료로 집계하지 않음.
+
+- 2026-10-10 R07 공급자/가상디렉터리 체크포인트: idempotency·owner권한·PATCH·대기티켓/캐시 원자정리·입력보호/충돌복구. 고유236시험·HTTP35·Ego12관측·9폭 넘침0·6모델 대조·실제 브라우저 재인증 통과. 공급자3/구성원12/감사32, 재시작해시 ec15bd3c00474e4dca566ee42e2b19fea29c5d7086b67031be1da7cd4f0949dd. 전체51진행/56계획/0완료, goal active. 다음 필수는 원본 NONE/AZURE/GOOGLE 로그인 정책·SSO기능권한과 남은20경로 인증 수용. docs/qa/R07-T04/management-flow/README.md.
+
+- 2026-10-10 R07 후속: 이메일 등록 티켓 발급/폐기 경합2실패 재현→회사/공급자/구성원 잠금·최신 스냅샷·감사 원자성으로 수정. 최종7파일241개 통과, 추가 실제HTTP12개 통과·대기티켓0. 최신 .next-rea-final 빌드/타입/린트 및 재시작 상태해시 일치. 원본 로그인 정책/전체 인증 경로는 미완료이며 goal active 유지.
+
+- 2026-10-10 R07 인증 근거 기반: SsoLoginPolicy/SsoSessionProof 및 migration106, 공식 endpoint 조합 분류, SSO/MFA 발급·설정/해제 회전의 원래 인증 시각 보존, 비밀번호 로그인 근거 없음. 현재 소스 관련 고유12파일339시험·HTTP15·Ego·재시작해시368aae9c06b010862a11d53f9975cc3dbd464c93e7f9e96ffb857dd4e9fbd44d 통과. 기존 R07 CRUD hash 보존. 전체51진행/56계획/0완료, goal active. 원본 정책 저장/집행/UI는 아직 미완료: 다음 C4 후반~C8의 구독 gate·회사 접근/초대/전환·복구·이메일 재인증·정책 화면 구현. 외부 Google/Microsoft/기관 성공으로 집계하지 않음.
+
+- 2026-10-10 R07 정책 집행·계정 복구: 현재 회사 인증 근거 검사와 SSO/MFA/파일/업무 guard, 제한 회사 선택·초대의 소속 부여와 업무 차단 분리, 마지막 허용 로그인 수단 보호. 고유14파일373시험·실제HTTP13/재시작HTTP1·DB해시 bbbb99eb0c32c88318614abb158f5b0c9b298cca415f69e4fc92e41344b4aa3b 통과. 빌드/typecheck/lint 오류0. 정책은 QA DB fixture로 준비했으며 정책 저장 API·이메일 재인증·원본 정책 UI는 다음 필수 작업. Ego 공간3 소실/새 공간 생성 확인 대기, 브라우저·외부 제공사 수용 미완료. 전체51진행/56계획/0완료, goal active.
+
+- 2026-10-10 SSO 정책 writer/이메일 재인증/구독 gate와 원본 정책 UI·별도 공급자 화면 구현. migration107/Prisma133, 고유8파일128시험·실제HTTP13/재시작HTTP1·로컬 메일·정책v1/코드소비/감사9 해시 일치. 여러 탭 tenant 결합과 문맥 불일치 편집 차단 수정. 실제 외부 IdP와 Ego 새 정책/복구 화면 및 전체 인증경로 수용 미완료. 전체51진행/56계획/0완료, goal active. 증거: `docs/qa/R07-T04/policy-writer/README.md`.
+
+
+- 2026-10-10 조직 이메일 소유 확인·state 로그인/초대 등록 전환·전용 복구 화면 구현. migration108/Prisma134, 고유7파일274시험·실제HTTP16/재시작HTTP1·로컬 메일·디렉터리v2/티켓0/감사12 해시 일치. 독립검토의 만료티켓 발급한도 소모 수정. 시작 브라우저 결합(login CSRF)·SSO outbound DNS/사설IP 차단·HTTPS IdP·Ego 화면 및 외부 인증 수용은 필수 후속. 전체51진행/56계획/0완료, goal active. 증거: `docs/qa/R07-T04/org-email/README.md`.
+
+- 2026-10-10 Ego2/p1 복구 후 이메일 등록·저장소 오류·5회/재전송·만료/복구 및 정책 저장/제한 세션 복구를 실제 화면으로 검증했다. 정책5번째 오답 terminal 누락과 설명/구독 문구 겹침 수정, 최종41시험·빌드/타입·lint0·390/768/1440폭·재시작해시 b891f5e8b670f8f76ab9f6cfe22f26a933d61f15155e86bacb138c6ec66eb9ff 일치. Google proof는 합성 DB fixture, 외부 인증 성공 아님. E1~E4·전체 인증경로·SPA history 입력보호 잔여. 전체51진행/56계획/0완료, goal active. [증거](../../docs/qa/R07-T04/browser-followup/README.md).
+
+## 2026-10-10 SSO 시작 브라우저 결합
+
+SsoState.browserHash/migration109와 HttpOnly 쿠키 대조를 OIDC·SAML·초대/연결·기관 이메일 티켓에 구현했다. 최초 동시 탭 경합을 재현·수정했으며 최종269시험·실제HTTP22·Ego 등록/복구/쿠키·HTTP/Ego 서버 재시작을 확인했다. 등록2/감사19/메일2의 해시 cc4e04b8… 및 이전 동결 기준을 보존했다. 타입/린트/production빌드, dev/test 구조 차이0. 실제 HTTPS cross-site와 E2~E5·나머지 메뉴/외부 제공사 검증이 남아 있다. 전체107개 작업 완료0·진행51·계획56, goal active. [기록](../../docs/qa/R07-T04/browser-binding/README.md).
+
+## 2026-10-10 SSO 외부 통신
+
+2026-10-10 E1 브라우저 결합/migration109·Ego 후속에 이어 E2 DNS 전체 검사/주소 고정/TLS/전송 상한 구현. 사설 HTTPS 사전검사 결함 재현→회귀12파일409개·실제TLS6·production HTTP9·Ego·재시작HTTP1 및 관계행 해시3965f075… 통과. 앞선 동결 해시 유지. E3 HTTPS OIDC/SAML 브라우저, E1 cross-site, E4 문맥/입력보호, E5 전체 인증 화면·외부 수용 잔여. 전체51진행/56계획/0완료, goal active. [기록](../../docs/qa/R07-T02/outbound/README.md).
+
+2026-10-10 목표 후속: E4 회사 결합5실패→회귀247/HTTP23/실제 Ego 두 탭·버전/동일버전 충돌·처리중 이탈·검색/정렬/10+2페이지 검증. disabled로 복사 초점 불가 문제를 readOnly로 수정해 키보드 전체선택/입력불변·복구 재검증. 최종빌드 .next-rea-sso-context-copy, 재시작HTTP1/Ego, 동결해시03a81972…(공급자13/감사27/세션2). E1/E2 해시 유지. E3 실제HTTPS HTTP48 후 CA 신뢰 사용자승인, 사용자SSL 신뢰 등록 완료·Ego왕복 진행중, 제거 의무 남음. 전체107의0완료/51진행/56계획·goalactive. 일정 질문에는 수일~1주 이상 거친추정 안내. 다음 E3 브라우저/CA제거/동결재시작·E5 잔여.
+
+2026-10-10 E3/E5 후속: 실제 HTTPS OIDC 로그인/연결·SAML cross-site POST 연결/로그인, DB 세션근거OTHER 및 서버재시작/Ego 조회 통과. 원본 동결hash e53cfe4a… 보존 + 읽기감사2행의 ID/행 해시 고정으로 현재hash a8b8479c… 대조. 임시 시험CA 신뢰/인증서 제거 exit0, 부재/시스템 CSSMERR_TP_NOT_TRUSTED(exit1) 확인. E5 공급자 목록/일반 편집창390·768·1440px 보완 및 빌드/린트 통과. 브라우저 뒤로 입력유실 재현, 공통 history 보호 구현/단위10통과·실제브라우저 후속 진행. 전체0완료/51진행/56계획 유지.
+
+2026-10-10 history 후속: 공통 같은 문서 뒤/앞 이탈 가드 구현, 단위10·production빌드/타입·린트 및 Ego 취소/승인/Tab/Escape/초점/390px 통과. 새 서버85965/.next-rea-history-guard, E4동결해시03a81972… 유지. Native reload 취소는 확인창이 도구에 노출되지 않아 미검증으로 남긴다. 전체0완료/51진행/56계획·goal active. 다음 E5 원본20경로 상태표와 초대/MFA 및 미검증 화면 수용.
+
+2026-10-10 E5 직접진입: 인증/정책20경로·60폭 가로넘침0, 유형별390px9화면 직접확인. OAuth/SAML 결과없이 진입한 안내를 수정하고2경로6폭·복귀링크2개/새빌드·타입·린트 통과. 서버90794/.next-rea-auth-states, E4해시 보존. 원본 부모선언5개/이메일 가입 대체 등 차이를 route-states/README에 명시. 전체0완료/51진행/56계획·goal active 유지.
+
+2026-10-10 E5 인증 여정: 가상GPKI 실제연결/잘못된PIN재시도→MFA등록/잘못된코드·대기401/세션0→정상로그인→해제/전체세션삭제→잘못된초대이메일거부/올바른수락→마지막수단409/초대재진입중복없음. 준비HTTP10·Ego/DB단언·3폭·현재타입/린트·PID97203재시작 hash2824c95fd260d9ffd09377378ed6b207c55405d71e38251186a58b7716e6aea4 일치. 기존5개동결fixture 보존. 제품코드는직전빌드동일. 전체0완료/51진행/56계획·goal active. 다음R08 모델/필드대조. docs/qa/R07-T04/journey/README.md.
+
+2026-10-10 R08 모델대조 시작: dev/test7모델72컬럼31제약23인덱스8트리거 동일, 기존10파일105시험 통과. 원본14발췌로 특수질문/페이지분기/추가설정 누락·옵션ID/현재정책 가드 후속 식별. 상세 forms-execution.md. 제품코드변경 없음. 전체0완료/52진행/55계획·goal active.
+
+2026-10-10 F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. 전체0완료/53진행/54계획·goal active. 증거: docs/qa/R08-T02/question-metadata/personal-information/README.md
+
+
+F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여.
+
+
+2026-10-10 작성자 자료 체크포인트: F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여. PID39075→61290, build NOLFnUmFxwm9AXW08VXwx, 재시작hash610d9f3893a8ea490fbb36bdd39e2d9cac570b748d52119c38bf6fa224bc3adb. 새fixture동결·이후HTTP/UI읽기금지·read-only verify만 허용. 이전시험CA제거완료 유지. 다음 원본부가이미지/NLP·자동동의·다중페이지설계. 전체0완료/53진행/54계획·goalactive. 커밋/푸시없음.
+
+2026-10-10 문항 이미지 체크포인트: migration124·원본61발췌·관련23파일323시험·HTTP경계12·수명주기71요청·Ego 편집/게시/제출/교체/과거응답정정·3폭·템플릿/승인표시·선택viewer/회수 통과. 폼3/자산11/pin14/blob3 및 이전19 frozen 세트 보존. 원영수증42,202bytes 다운로드 hash 일치. 새 fixture `.local/rea-fullstack/question-images/fixture.json`은 hash f12cfcd75a4975a15b6b5741c6de6c3a0944e808c9afc016865a63be9f2303e4로 동결했고 이후 UI/HTTP 읽기 금지. 자체서버 PID6937→19911, session57589, localhost3108, build MLIZWDu2FFMbod3QOy68r/.next-rea-question-images. 별도 앱 IPv6 3100 충돌 때문에 자체 포트만 변경했고 다른 앱은 유지했다. Ego TaskSpace2/p1은 /legal/terms에 위치. 다음은 content-images/PLAN.md의 BI-01~07 본문/페이지/완료/마감 이미지와 다중페이지 모델 설계. 전체0완료/53진행/54계획·goal active, 외부 제공사/전체 원본 수용 잔여, 커밋/푸시없음. 증거: docs/qa/R08-T02/question-metadata/content-images/README.md.
+
+2026-10-10 BI 계획/계약 진행: 원본90발췌/현재47파일 SHA 대조 후 BI-02a RichDocumentV1 strict 계약·상한·표격자·텍스트투영·이미지탐색/remap/구형body helper와 BI-02b strict HTML parser·owned image ID·iframe 제거/media 정규화·React typed renderer/같은 origin 이미지 경계를 구현했다. getter/toJSON/XSS/원격이미지/CSS/URL/깊이/UTF/표/RTL을 포함한 최종4파일55시험·관련8파일lint·전체typecheck·diff check 통과. 초기 HTML 오류형식/DOM타입/시험include/RTL dir 결함을 수정했다. BI-02a/02b 독립 체크포인트만 완료했고 DB/FormContent/API/OpenAPI/editor/upload/실브라우저는 미연결이다. 이전 QI 런타임 localhost3108·PID19911/session57589 및 frozen20세트는 열지 않고 유지했다. 다음 BI-02c, 전체0완료/53진행/54계획·goal active. 증거: docs/qa/R08-T02/body-images/README.md.
+2026-10-10 BI-02c 체크포인트: FormContent optional/nullable bodyRich, FormVersion JSONB migration125, 구형 SQL null DTO 생략/승인지문 불변, 잠근 현재 초안만 생략 보존, 본문 변경+생략 422, 명시 null 평문 전환, 과거 게시본 비복원, 템플릿 동일 규칙을 구현했다. 소유 pin 전 이미지 ID 저장은 RICH_BODY_IMAGES_UNAVAILABLE로 차단한다. 격리 catchsecu_test migration 적용/status와 PostgreSQL+실제 POST/GET/PATCH·승인지문·폼/템플릿 복제 6시험, 폼/템플릿/승인/복제/게시 회귀11파일114시험, 순수 계약/HTML/React/OpenAPI 5파일56시험, OpenAPI323경로458작업45정책·Prisma validate·관련 lint·전체 typecheck·diff check 통과. 잘못된 OpenAPI #/$defs 재귀 참조와 기존 bodyless author-asset complete verifier 누락을 수정했다. editor/upload/owned pin/페이지4슬롯/PDF/Ego는 잔여이며 전체0완료/53진행/54계획·goal active. QI runtime/frozen20은 열지 않았다. 증거: docs/qa/R08-T02/body-images/body-rich-persistence-verification-final.json.
+
+2026-10-10 BI-03a 체크포인트: FORM/PAGE/END/PRIVATE_PAGE_CONTENT_IMAGE 4용도와 각14MiB 계약, migration126 DB blob/asset/MIME guard, 용도별 HTTP stream·scanner 전달, 내부 AES-GCM local/S3 14MiB 및 S3 선행/후행 길이검사를 구현했다. ClamAV를 Stream/File15M·Scan32M로 올리고 정확히14,680,064B PNG(hash 1a749928…)를 실제 HTTP→암호화저장→ClamAV→download 왕복했다. 실제 EICAR 차단, S3 14MiB/초과응답, DB 10 CHECK·14함수·15트리거와 관련12파일202시험 통과. 기존 질문1MiB/자료5MiB/응답파일10MiB는 유지한다. 소유 pin 전 rich image 저장422, BI-03b/04b·editor/Ego 잔여. 전체0완료/53진행/54계획·goal active, production/QI frozen20 미접근. 증거: docs/qa/R08-T02/body-images/body-image-transport-verification-final.json.
+
+2026-10-10 BI-03b 체크포인트: 본문 이미지24MiPixels/16,384px, 기존 문항8MiPixels/8,192px, 단일프레임/4채널/공유동시decode2/3초상한을 같은 PNG/JPEG 구조+native decode 경계에 구현했다. 정확히25,165,824픽셀·16,384px 본문 이미지는 통과하고 기존용도/16,385px/APNG/메타폭탄은 거절했다. 자원거절 뒤 bytes/ref 없음, 명시취소와 만료worker 각각 asset/blob tombstone·quota0을 실제 DB로 확인했다. 관련8파일157시험, 독립30초 watchdog(878ms), OpenAPI323/458/45·plan107·lint/type/diff 통과. BI-04a/04b 페이지/소유pin 전 rich image 저장422 유지. 전체0완료/53진행/54계획·goal active, production/QI frozen20 미접근. 증거: docs/qa/R08-T02/body-images/body-image-resource-verification-final.json.
+2026-10-10 BI-04a/F4a 체크포인트: FormSection의 DB행ID/안정pageID·0..49순서·평문/rich본문·기본목적지·뒤로정책, Question same-version section FK, 완료/마감 default/custom 설정을 FormVersion에 구현했다. 구형DTO/승인지문 생략, 현재초안만 생략보존/명시null제거, 개정ID유지·폼/템플릿 복사전체remap을 확인했다. migration127 trigger record-field 결함을 실제DB 첫 실행에서 잡고 적용이력은 수정하지 않은 채 migration128로 교정했다. 빈설치128·126→128 기존행불변, DB10CHECK/3FK/3함수/4트리거/21열·drift0, SQL우회/게시불변/공개읽기 포함 관련12파일85시험·집중3파일14시험, OpenAPI323/458/45·production build·type/lint/plan/diff 통과. rich이미지pin/페이지UI·분기방문경로/PDF는 잔여, 전체0완료/53진행/54계획·goal active, production/QI frozen20 미접근. 증거: docs/qa/R08-T02/body-images/form-sections-verification-final.json.
+
+2026-10-10 BI-04b 체크포인트: 질문 자료/보기/이미지와 폼 본문·페이지·완료·마감 rich 문서를 한 FormContent 자산 그래프로 잠그는 AuthorAssetReference를 구현했다. migration129에서 nullable questionKey와 documentKey/nodeKey, 4문서 slot, 부모·용도·tenant·service·ready·물리자산 검증, FormVersion/FormSection 불변·일관성 trigger와 GC projection을 추가했다. 같은 자산 반복노드는 독립pin/용량1회, 폼복제·템플릿사용은 논리자산1회복사 후 전체문서 remap한다. 승인·게시/개정이력·wrong purpose/service/expiry·SQL우회·감사rollback·attach/GC경쟁을 실제 PostgreSQL로 검증했다. 빈설치129와128→129 기존참조불변, DB10CHECK/1index/15함수/18trigger/drift0, 집중4파일51·관련14파일153·참조전체27시험, production82페이지 build/type/lint/OpenAPI/plan/diff 통과. UI/Ego·재시작은 이 backend 체크포인트에서 미실행, frozen QI fixture 미접근. 다음 BI-04c/F4b 페이지CRUD·분기·제출 방문경로. 전체0완료/53진행/54계획·goal active. 증거: docs/qa/R08-T02/body-images/rich-assets/verification-final.json.
+
+2026-10-10 BI-04c/F4b 체크포인트: 객관식/드롭다운의 보기별 목적지, 페이지당 항상 표시되는 분기 질문 하나, 기본+보기 전체 DAG/도달성/같은 버전 DB guard를 구현했다. 서버는 제출·정정 방문 경로를 재계산해 미방문 답변 주입·필수 우회·ineligible 제출을 거절하고 pagePathVersion1/방문 page ID/종료 종류를 저장하며 경로에서 빠진 답변을 정리한다. migration130~137, 빈설치137·129→137 기존 보기/Submission 불변, 집중3파일13·관련8파일92·기존 경로4파일40·5,000보기3.61초, schema drift0·production82페이지 build/type/lint/OpenAPI323/458/45·plan107/186+21 통과. 외부 자격증명 없음. UI/Ego·재시작은 이 backend 체크포인트에서 미실행, production DB·frozen QI fixture·localhost3108 미접근. 다음 BI-05a rich editor와 BI-05b/F4c 페이지 편집·공개 제출 화면. 전체0완료/53진행/54계획·goal active. 증거: docs/qa/R08-T02/body-images/page-branches/verification-final.json.
+
+2026-10-10 BI-05a 체크포인트: 폼 본문 controlled rich editor에 문단/제목/인용·서식·목록/들여쓰기·정렬/방향·링크/미디어/표·undo/redo를 연결하고 canonical HTML→typed 문서 경계로 임의 HTML·원격 이미지·iframe 영속화를 막았다. FORM_CONTENT_IMAGE 업로드/교체/삭제·alt/caption/정렬/폭과 save hold/stale 결과 폐기, 409 typed 문서·자산 ID 보존을 구현했다. 순수4파일48·통합5파일54·초안1파일14시험, type/lint·production82페이지 build 통과. Ego 저장/새로고침/재시작, 이미지 undo/redo와390/768/1440px 넘침0, test DB bodyRich·ready/clean·현재버전 pin1·재다운로드 hash3cd6eb44…를 확인했다. production DB·frozen QI/localhost3108 미접근, 외부 자격증명 없음. 다음 BI-05b/F4c 페이지 편집·공개 분기 제출 UI. 전체0완료/53진행/54계획·goal active. 증거: docs/qa/R08-T02/body-images/rich-editor/verification-final.json.
+
+2026-10-10 BI-05b/F4c 체크포인트: 페이지 사용 전환, 추가·복제·정렬·안전 삭제, rich 본문, 질문 배치, 기본/보기 목적지와 앞뒤 이동을 편집기에 연결했다. 공개 화면은 같은 목적지 resolver로 페이지별 질문을 표시하고 분기 변경 시 미방문 답변·파일·업로드 cache를 정리한다. Ego에서 장기3페이지·단축2페이지·ineligible 경로, 명시 제출, 저장/새로고침, 2탭409 입력 보존, 재시작과 편집/공개 390/768/1440px 넘침0을 확인했다. 마지막 Next click의 React DOM 재사용으로 동의 단계가 자동 제출되던 결함을 발견해 preventDefault 뒤 이동하도록 수정했다. 페이지/초안2파일19·PostgreSQL1파일5시험, type/lint·production82페이지 build 통과. 두 응답의 방문 경로와 단축 경로 상세 답변 제거를 DB에서 대조했다. production DB·frozen QI/localhost3108 미접근, 외부 자격증명 없음. 다음 BI-05c 완료·마감 편집기와 읽기 권한. 전체0완료/53진행/54계획·goal active. 증거: docs/qa/R08-T02/body-images/page-ui/verification-final.json.
+
+2026-10-10 BI-06 체크포인트: 기존 ConsentEvidenceV1과 저장 PDF bytes를 유지하면서 root와 실제 방문 페이지의 rich 문서·고정 이미지 메타데이터를 담는 v2 증거를 구현했다. 게시 버전의 clean 자산 bytes/hash를 검증해 제한된 PNG로 PDF에 넣고, 게시 preflight는 전체 페이지 최대 조합을 검사하며, 제출 시 완성 PDF를 암호화 저장한다. 완료·마감 문구와 현재 초안·원격 이미지는 증거에서 제외한다. 관련7파일68시험, type/lint/Prisma/OpenAPI323/458/45·plan107/186+21·production82페이지 build, migration139 빈 설치와138→139(v1 암호문/PDF bytes 불변), schema drift0 통과. Ego localhost3114에서 clean PNG2개·2페이지 폼을 제출하고 관리자 증거v2/문서3/이미지2/정확한 경로와 PDF GET200을 확인했다. PostgreSQL 복호화 PDF와 다운로드 bytes가 일치했고 PDF.js는56,669bytes·2페이지·이미지연산자2개를 확인했다. 외부 자격증명 없음. 다음 BI-07a/07b 전체 상태 수용. 전체0완료/53진행/54계획·goal active. 증거: docs/qa/R08-T02/body-images/receipt-v2/verification-final.json.

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { planCapabilities } from "./feature-entitlements";
 
 const limit = z.number().int().nonnegative().max(100000000).nullable().optional();
 export const planVersionInput = z.object({
@@ -11,6 +12,7 @@ export const planVersionInput = z.object({
   subjectLimit: limit,
   formLimit: limit,
   features: z.array(z.string().trim().min(1).max(100)).max(100).default([]),
+  capabilities: planCapabilities,
   orderable: z.boolean().default(false),
   effectiveFrom: z.iso.datetime().optional(),
   effectiveTo: z.iso.datetime().nullable().optional(),

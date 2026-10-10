@@ -1,0 +1,43 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/pdf-renderer-v2.test.ts (19 tests | 1 failed | 15 skipped) 5497ms
+   ❯ PDF renderer v2 without database (19)
+     × bounds actual v2 resource work for single-arabic-500k 3530ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/pdf-renderer-v2.test.ts > PDF renderer v2 without database > bounds actual v2 resource work for single-arabic-500k
+AssertionError: expected AssertionError: expected 'd5e7224fe5757bf… { …(4) } to match object { Object (status, code) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "code": "PDF_TOO_COMPLEX",
+-   "status": 422,
++ AssertionError {
++   "message": "expected 'd5e7224fe5757bfeb4b869be0f8df2a4d2bd7…' to be 'd398dc6907b33820a43db28faf7ea0c107a26…' // Object.is equality",
++   "actual": "d5e7224fe5757bfeb4b869be0f8df2a4d2bd786b220b96024fd5c72a2b5ca55b",
++   "expected": "d398dc6907b33820a43db28faf7ea0c107a261b0db0d45ce23a7ad54dd44e2c9",
++   "showDiff": true,
++   "operator": "strictEqual",
+  }
+
+ ❯ tests/server/pdf-renderer-v2.test.ts:163:21
+    161|       outcome = { status: "rendered", pageCount: result.pageCount, byt…
+    162|     } catch (error) {
+    163|       expect(error).toMatchObject({ status: 422, code: "PDF_TOO_COMPLE…
+       |                     ^
+    164|       outcome = { status: "rejected", code: "PDF_TOO_COMPLEX" };
+    165|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed | 15 skipped (19)
+   Start at  15:04:14
+   Duration  5.94s (tests 94%, import 5%, transform 2%)
+

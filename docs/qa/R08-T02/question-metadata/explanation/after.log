@@ -1,0 +1,66 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:96505) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/question-explanations.test.ts (14 tests | 2 failed) 8937ms
+   × accepts literal text, whitespace and exact UTF-16 boundaries while rejecting invalid wire values 735ms
+   ✓ stores literal explanation unchanged and exposes the published version through the public DTO 855ms
+   ✓ legacy null metadata is absent from DTO and keeps the pre-extension approval fingerprint shape 429ms
+   ✓ description-only update preserves physical identities, changes the fingerprint and supersedes approval 754ms
+   ✓ omitted draft metadata is preserved, explicit empty removes it and never returns on a later omitted save 743ms
+   ✓ omitted metadata survives the implicit new draft path and new logical questions inherit nothing 763ms
+   ✓ explicit revise and form/template copies preserve values while allocating only the intended new identities 681ms
+   ✓ template updates preserve omitted descriptions and explicit clearing stays cleared when used 617ms
+   ✓ legacy template JSON is read without adding empty description keys or rewriting its stored payload 454ms
+   ✓ database counts supplementary code points as two UTF-16 units and protects published metadata 512ms
+   × stale versions and revoked current authority never alter descriptions or create update audits 481ms
+   ✓ form explanation changes and version increments roll back when audit insertion fails 552ms
+   ✓ template explanation changes and version increments roll back when audit insertion fails 520ms
+   ✓ old response corrections and receipt evidence/bytes stay bound to the original published form 836ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/question-explanations.test.ts > accepts literal text, whitespace and exact UTF-16 boundaries while rejecting invalid wire values
+AssertionError: expected [Function] to throw an error
+ ❯ tests/server/question-explanations.test.ts:71:34
+     69|   }
+     70|   for (const value of ["가".repeat(3001), "😀".repeat(1500) + "a", "\0"…
+     71|     expect(() => content(value)).toThrow();
+       |                                  ^
+     72|   }
+     73| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/server/question-explanations.test.ts > stale versions and revoked current authority never alter descriptions or create update audits
+PrismaClientKnownRequestError: 
+Invalid `db.membership.update()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-explanations.test.ts:181:23
+
+  178 const f = await fixture("원래 설명"), before = await stored(f.id), value = await current(f.id); value.questions[0].additionalExplanation = "거절 설명";
+  179 const count = () => db.auditEvent.count({ where: { resourceId: f.id, action: "form.draft_updated" } });
+  180 await expect(updateForm(ctx, f.id, { version: 999, content: value }, randomUUID())).rejects.toMatchObject({ status: 409 });
+→ 181 await db.membership.update(
+Database error. Code: `23514`. Message: `LAST_OWNER_REQUIRED`
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/question-explanations.test.ts:181:3
+    179|   const count = () => db.auditEvent.count({ where: { resourceId: f.id,…
+    180|   await expect(updateForm(ctx, f.id, { version: 999, content: value },…
+    181|   await db.membership.update({ where: { id: ctx.member.id }, data: { r…
+       |   ^
+    182|   await expect(updateForm(ctx, f.id, { version: 1, content: value }, r…
+    183|   expect(await stored(f.id)).toEqual(before); expect(await count()).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 12 passed (14)
+   Start at  15:19:50
+   Duration  10.94s (tests 82%, import 11%, transform 6%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/explanation/after.json

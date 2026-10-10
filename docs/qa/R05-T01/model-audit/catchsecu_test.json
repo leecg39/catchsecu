@@ -1,0 +1,765 @@
+{
+  "result": "passed",
+  "database": "catchsecu_test",
+  "checkedAt": "2026-10-09T20:19:06.742Z",
+  "scope": "Six existing profile/session/account/closure/review models; read-only metadata, unique keys, tenant relations, immutable messages, destruction approval and account closure guards. No new migration or claim of full R05 acceptance.",
+  "tables": [
+    "User",
+    "Session",
+    "Account",
+    "AccountClosure",
+    "ActivityReview",
+    "ActivityReviewMessage"
+  ],
+  "columns": [
+    {
+      "table": "Account",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "accountId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "providerId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "accessToken",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "refreshToken",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "idToken",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "accessTokenExpiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "refreshTokenExpiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "scope",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "password",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "ssoProviderId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AccountClosure",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccountClosure",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccountClosure",
+      "column": "requestedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccountClosure",
+      "column": "completedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "AccountClosure",
+      "column": "reasonCipher",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "auditEventId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "recipientUserId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "requesterId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "recipientId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "title",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "respondedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "closedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "retentionUntil",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "destructionStatus",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "destroyedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "ActivityReview",
+      "column": "destroyApproverId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "column": "reviewId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "column": "authorId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "column": "kind",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "column": "bodyCipher",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "token",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "ipAddress",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Session",
+      "column": "userAgent",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Session",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "activeCompanyId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Session",
+      "column": "activeServiceId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "name",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "email",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "emailVerified",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "image",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "twoFactorEnabled",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "platformAdmin",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "phone",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "department",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "locale",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "User",
+      "column": "passwordChangedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "User",
+      "column": "jobTitle",
+      "type": "text",
+      "nullable": "YES"
+    }
+  ],
+  "constraints": [
+    {
+      "table": "Account",
+      "name": "Account_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Account",
+      "name": "Account_ssoProviderId_fkey",
+      "definition": "FOREIGN KEY (\"ssoProviderId\") REFERENCES \"SsoProvider\"(id) ON UPDATE RESTRICT ON DELETE RESTRICT"
+    },
+    {
+      "table": "Account",
+      "name": "Account_sso_provider_match",
+      "definition": "CHECK ((((\"left\"(\"providerId\", 4) = 'sso:'::text) AND (\"ssoProviderId\" IS NOT NULL) AND (\"providerId\" = ('sso:'::text || \"ssoProviderId\"))) OR ((\"left\"(\"providerId\", 4) <> 'sso:'::text) AND (\"ssoProviderId\" IS NULL))))"
+    },
+    {
+      "table": "Account",
+      "name": "Account_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "AccountClosure",
+      "name": "AccountClosure_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "AccountClosure",
+      "name": "AccountClosure_time_check",
+      "definition": "CHECK ((\"completedAt\" >= \"requestedAt\"))"
+    },
+    {
+      "table": "AccountClosure",
+      "name": "AccountClosure_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON DELETE RESTRICT"
+    },
+    {
+      "table": "AccountClosure",
+      "name": "AccountClosure_userId_key",
+      "definition": "UNIQUE (\"userId\")"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_auditEvent_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"auditEventId\", \"recipientUserId\") REFERENCES \"AuditEvent\"(\"tenantId\", \"serviceId\", id, \"actorId\") ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_dates",
+      "definition": "CHECK ((((status = 'requested'::text) AND (\"respondedAt\" IS NULL) AND (\"closedAt\" IS NULL)) OR ((status = 'responded'::text) AND (\"respondedAt\" IS NOT NULL) AND (\"closedAt\" IS NULL)) OR ((status = 'resolved'::text) AND (\"respondedAt\" IS NOT NULL) AND (\"closedAt\" IS NOT NULL)) OR ((status = 'cancelled'::text) AND (\"closedAt\" IS NOT NULL))))"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_destroyApprover_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"destroyApproverId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_destruction",
+      "definition": "CHECK (((\"destructionStatus\" = ANY (ARRAY['none'::text, 'awaiting'::text, 'kept'::text, 'destroyed'::text])) AND ((\"destructionStatus\" = 'destroyed'::text) = (\"destroyedAt\" IS NOT NULL)) AND ((\"destructionStatus\" = 'destroyed'::text) = (\"destroyApproverId\" IS NOT NULL)) AND ((status = ANY (ARRAY['resolved'::text, 'cancelled'::text])) OR ((\"retentionUntil\" IS NULL) AND (\"destructionStatus\" = 'none'::text)))))"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_recipient_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"recipientId\", \"recipientUserId\") REFERENCES \"Membership\"(\"tenantId\", id, \"userId\") ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_requester_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"requesterId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_service_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_state",
+      "definition": "CHECK (((status = ANY (ARRAY['requested'::text, 'responded'::text, 'resolved'::text, 'cancelled'::text])) AND (version > 0) AND ((char_length(title) >= 1) AND (char_length(title) <= 200))))"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "name": "ActivityReviewMessage_author_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"authorId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "name": "ActivityReviewMessage_kind",
+      "definition": "CHECK ((kind = ANY (ARRAY['request'::text, 'response'::text, 'resolve'::text, 'cancel'::text])))"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "name": "ActivityReviewMessage_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "name": "ActivityReviewMessage_review_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"reviewId\") REFERENCES \"ActivityReview\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "table": "Session",
+      "name": "Session_activeCompanyId_fkey",
+      "definition": "FOREIGN KEY (\"activeCompanyId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE SET NULL"
+    },
+    {
+      "table": "Session",
+      "name": "Session_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    },
+    {
+      "table": "User",
+      "name": "User_email_normalized",
+      "definition": "CHECK ((email = lower(email)))"
+    },
+    {
+      "table": "User",
+      "name": "User_jobTitle_length_check",
+      "definition": "CHECK (((\"jobTitle\" IS NULL) OR (char_length(\"jobTitle\") <= 100)))"
+    },
+    {
+      "table": "User",
+      "name": "User_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table": "User",
+      "name": "User_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'suspended'::text, 'closed'::text])))"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "Account",
+      "name": "Account_one_credential_per_user",
+      "definition": "CREATE UNIQUE INDEX \"Account_one_credential_per_user\" ON public.\"Account\" USING btree (\"userId\") WHERE (\"providerId\" = 'credential'::text)"
+    },
+    {
+      "table": "Account",
+      "name": "Account_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Account_pkey\" ON public.\"Account\" USING btree (id)"
+    },
+    {
+      "table": "Account",
+      "name": "Account_providerId_accountId_key",
+      "definition": "CREATE UNIQUE INDEX \"Account_providerId_accountId_key\" ON public.\"Account\" USING btree (\"providerId\", \"accountId\")"
+    },
+    {
+      "table": "Account",
+      "name": "Account_ssoProviderId_idx",
+      "definition": "CREATE INDEX \"Account_ssoProviderId_idx\" ON public.\"Account\" USING btree (\"ssoProviderId\")"
+    },
+    {
+      "table": "Account",
+      "name": "Account_userId_idx",
+      "definition": "CREATE INDEX \"Account_userId_idx\" ON public.\"Account\" USING btree (\"userId\")"
+    },
+    {
+      "table": "AccountClosure",
+      "name": "AccountClosure_pkey",
+      "definition": "CREATE UNIQUE INDEX \"AccountClosure_pkey\" ON public.\"AccountClosure\" USING btree (id)"
+    },
+    {
+      "table": "AccountClosure",
+      "name": "AccountClosure_userId_key",
+      "definition": "CREATE UNIQUE INDEX \"AccountClosure_userId_key\" ON public.\"AccountClosure\" USING btree (\"userId\")"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_destructionStatus_retentionUntil_idx",
+      "definition": "CREATE INDEX \"ActivityReview_destructionStatus_retentionUntil_idx\" ON public.\"ActivityReview\" USING btree (\"destructionStatus\", \"retentionUntil\")"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_open_event_key",
+      "definition": "CREATE UNIQUE INDEX \"ActivityReview_open_event_key\" ON public.\"ActivityReview\" USING btree (\"tenantId\", \"auditEventId\") WHERE (status = ANY (ARRAY['requested'::text, 'responded'::text]))"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_pkey",
+      "definition": "CREATE UNIQUE INDEX \"ActivityReview_pkey\" ON public.\"ActivityReview\" USING btree (id)"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"ActivityReview_tenantId_id_key\" ON public.\"ActivityReview\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_tenantId_recipientId_status_createdAt_id_idx",
+      "definition": "CREATE INDEX \"ActivityReview_tenantId_recipientId_status_createdAt_id_idx\" ON public.\"ActivityReview\" USING btree (\"tenantId\", \"recipientId\", status, \"createdAt\", id)"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_tenantId_requesterId_status_createdAt_id_idx",
+      "definition": "CREATE INDEX \"ActivityReview_tenantId_requesterId_status_createdAt_id_idx\" ON public.\"ActivityReview\" USING btree (\"tenantId\", \"requesterId\", status, \"createdAt\", id)"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "ActivityReview_tenantId_serviceId_status_createdAt_id_idx",
+      "definition": "CREATE INDEX \"ActivityReview_tenantId_serviceId_status_createdAt_id_idx\" ON public.\"ActivityReview\" USING btree (\"tenantId\", \"serviceId\", status, \"createdAt\", id)"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "name": "ActivityReviewMessage_pkey",
+      "definition": "CREATE UNIQUE INDEX \"ActivityReviewMessage_pkey\" ON public.\"ActivityReviewMessage\" USING btree (id)"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "name": "ActivityReviewMessage_tenantId_reviewId_createdAt_id_idx",
+      "definition": "CREATE INDEX \"ActivityReviewMessage_tenantId_reviewId_createdAt_id_idx\" ON public.\"ActivityReviewMessage\" USING btree (\"tenantId\", \"reviewId\", \"createdAt\", id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Session_pkey\" ON public.\"Session\" USING btree (id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_token_key",
+      "definition": "CREATE UNIQUE INDEX \"Session_token_key\" ON public.\"Session\" USING btree (token)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_userId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Session_userId_id_key\" ON public.\"Session\" USING btree (\"userId\", id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_userId_idx",
+      "definition": "CREATE INDEX \"Session_userId_idx\" ON public.\"Session\" USING btree (\"userId\")"
+    },
+    {
+      "table": "User",
+      "name": "User_email_key",
+      "definition": "CREATE UNIQUE INDEX \"User_email_key\" ON public.\"User\" USING btree (email)"
+    },
+    {
+      "table": "User",
+      "name": "User_pkey",
+      "definition": "CREATE UNIQUE INDEX \"User_pkey\" ON public.\"User\" USING btree (id)"
+    }
+  ],
+  "triggers": [
+    {
+      "table": "Account",
+      "name": "Account_derive_sso_provider",
+      "definition": "CREATE TRIGGER \"Account_derive_sso_provider\" BEFORE INSERT OR UPDATE OF \"providerId\", \"ssoProviderId\" ON public.\"Account\" FOR EACH ROW EXECUTE FUNCTION derive_account_sso_provider()",
+      "function": "CREATE OR REPLACE FUNCTION public.derive_account_sso_provider()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  NEW.\"ssoProviderId\" := CASE WHEN left(NEW.\"providerId\",4)='sso:' THEN substring(NEW.\"providerId\" from 5) ELSE NULL END;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "Account",
+      "name": "Account_password_history",
+      "definition": "CREATE TRIGGER \"Account_password_history\" AFTER INSERT OR UPDATE OF password ON public.\"Account\" FOR EACH ROW EXECUTE FUNCTION record_credential_change()",
+      "function": "CREATE OR REPLACE FUNCTION public.record_credential_change()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n audit_request_id text;\nBEGIN\n IF NEW.\"providerId\" <> 'credential' OR NEW.password IS NULL THEN RETURN NEW; END IF;\n IF TG_OP = 'UPDATE' AND NEW.password IS NOT DISTINCT FROM OLD.password THEN RETURN NEW; END IF;\n audit_request_id := current_setting('app.auth_request_id', true);\n IF audit_request_id IS NULL OR audit_request_id !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' THEN\n   audit_request_id := gen_random_uuid()::text;\n END IF;\n IF TG_OP = 'UPDATE' AND OLD.password IS NOT NULL THEN\n   INSERT INTO \"PasswordHistory\" (\"userId\",\"passwordHash\",\"changedAt\") VALUES (NEW.\"userId\",OLD.password,(clock_timestamp() AT TIME ZONE 'UTC'));\n   DELETE FROM \"PasswordHistory\" WHERE \"userId\" = NEW.\"userId\" AND id NOT IN\n     (SELECT id FROM \"PasswordHistory\" WHERE \"userId\" = NEW.\"userId\" ORDER BY id DESC LIMIT 9);\n END IF;\n UPDATE \"User\" SET \"passwordChangedAt\" = (clock_timestamp() AT TIME ZONE 'UTC'), \"updatedAt\" = (clock_timestamp() AT TIME ZONE 'UTC') WHERE id = NEW.\"userId\";\n DELETE FROM \"PasswordDeferral\" WHERE \"userId\" = NEW.\"userId\";\n -- Audit the exact rows removed by this trigger, including sessions that the\n -- library's later adapter deletion can no longer see. Any insert failure\n -- aborts the credential update, proofs and every session removal together.\n WITH ended AS (\n   DELETE FROM \"Session\" WHERE \"userId\" = NEW.\"userId\" RETURNING id,\"userId\",\"activeCompanyId\"\n )\n INSERT INTO \"AuditEvent\" (id,\"actorId\",\"tenantId\",action,resource,\"resourceId\",\"requestId\",detail,\"createdAt\")\n SELECT gen_random_uuid()::text,\"userId\",\"activeCompanyId\",'session.ended','session',id,audit_request_id,\n   '{\"changedFields\":[]}'::jsonb,(clock_timestamp() AT TIME ZONE 'UTC') FROM ended;\n DELETE FROM \"Verification\" WHERE value = NEW.\"userId\";\n INSERT INTO \"AuditEvent\" (id,\"actorId\",action,resource,\"resourceId\",\"requestId\",detail,\"createdAt\")\n VALUES (gen_random_uuid()::text,NEW.\"userId\",CASE WHEN TG_OP = 'INSERT' THEN 'password.created' ELSE 'password.changed' END,\n   'user',NEW.\"userId\",audit_request_id,'{\"changedFields\":[\"password\"]}'::jsonb,(clock_timestamp() AT TIME ZONE 'UTC'));\n RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "AccountClosure",
+      "name": "account_closure_immutable",
+      "definition": "CREATE TRIGGER account_closure_immutable BEFORE DELETE OR UPDATE ON public.\"AccountClosure\" FOR EACH ROW EXECUTE FUNCTION preserve_account_closure()",
+      "function": "CREATE OR REPLACE FUNCTION public.preserve_account_closure()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'ACCOUNT_CLOSURE_IMMUTABLE' USING ERRCODE = '23514';\nEND;\n$function$\n"
+    },
+    {
+      "table": "ActivityReview",
+      "name": "activity_review_transition",
+      "definition": "CREATE TRIGGER activity_review_transition BEFORE UPDATE ON public.\"ActivityReview\" FOR EACH ROW EXECUTE FUNCTION protect_activity_review_transition()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_activity_review_transition()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n IF ROW(NEW.\"tenantId\",NEW.\"serviceId\",NEW.\"auditEventId\",NEW.\"recipientUserId\",NEW.\"requesterId\",NEW.\"recipientId\",NEW.\"title\",NEW.\"createdAt\") IS DISTINCT FROM ROW(OLD.\"tenantId\",OLD.\"serviceId\",OLD.\"auditEventId\",OLD.\"recipientUserId\",OLD.\"requesterId\",OLD.\"recipientId\",OLD.\"title\",OLD.\"createdAt\") OR NEW.\"version\"<>OLD.\"version\"+1 THEN RAISE EXCEPTION 'immutable review scope or invalid version' USING ERRCODE='23514'; END IF;\n IF OLD.\"destructionStatus\" IN ('destroyed','kept') THEN RAISE EXCEPTION 'terminal review destruction state' USING ERRCODE='23514'; END IF;\n IF NEW.\"status\" IS DISTINCT FROM OLD.\"status\" AND NOT ((OLD.\"status\"='requested' AND NEW.\"status\" IN ('responded','cancelled')) OR (OLD.\"status\"='responded' AND NEW.\"status\" IN ('resolved','cancelled'))) THEN RAISE EXCEPTION 'invalid review transition' USING ERRCODE='23514'; END IF;\n IF NEW.\"destructionStatus\" IS DISTINCT FROM OLD.\"destructionStatus\" AND NOT ((OLD.\"destructionStatus\"='none' AND NEW.\"destructionStatus\"='awaiting') OR (OLD.\"destructionStatus\"='awaiting' AND NEW.\"destructionStatus\" IN ('destroyed','kept','none'))) THEN RAISE EXCEPTION 'invalid review destruction transition' USING ERRCODE='23514'; END IF;\n IF NEW.\"status\" NOT IN ('resolved','cancelled') AND (NEW.\"retentionUntil\" IS NOT NULL OR NEW.\"destructionStatus\"<>'none' OR NEW.\"destroyedAt\" IS NOT NULL OR NEW.\"destroyApproverId\" IS NOT NULL) THEN RAISE EXCEPTION 'destruction requires closed review' USING ERRCODE='23514'; END IF;\n IF NEW.\"destructionStatus\"='destroyed' AND (NEW.\"destroyedAt\" IS NULL OR NEW.\"destroyApproverId\" IS NULL) THEN RAISE EXCEPTION 'destroyed review requires evidence' USING ERRCODE='23514'; END IF;\n RETURN NEW;\nEND; $function$\n"
+    },
+    {
+      "table": "ActivityReviewMessage",
+      "name": "activity_review_message_immutable",
+      "definition": "CREATE TRIGGER activity_review_message_immutable BEFORE DELETE OR UPDATE ON public.\"ActivityReviewMessage\" FOR EACH ROW EXECUTE FUNCTION protect_activity_review_message()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_activity_review_message()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n IF TG_OP='DELETE' AND current_setting('app.activity_review_destroy', true)='on'\n   AND EXISTS (SELECT 1 FROM \"ActivityReview\" r WHERE r.\"tenantId\"=OLD.\"tenantId\" AND r.id=OLD.\"reviewId\" AND r.\"destructionStatus\"='awaiting')\n THEN RETURN OLD; END IF;\n RAISE EXCEPTION 'activity review messages are immutable' USING ERRCODE='23514';\nEND; $function$\n"
+    },
+    {
+      "table": "Session",
+      "name": "session_active_account_guard",
+      "definition": "CREATE TRIGGER session_active_account_guard BEFORE INSERT OR UPDATE ON public.\"Session\" FOR EACH ROW EXECUTE FUNCTION guard_active_account_reference()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_active_account_reference()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE account_status text;\nBEGIN\n  IF TG_TABLE_NAME = 'Membership' THEN\n    IF NEW.status <> 'active' THEN RETURN NEW; END IF;\n  END IF;\n  SELECT status INTO account_status FROM \"User\" WHERE id = NEW.\"userId\" FOR SHARE;\n  IF account_status <> 'active' THEN\n    RAISE EXCEPTION 'ACCOUNT_UNAVAILABLE' USING ERRCODE = '23514';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "User",
+      "name": "User_mfa_owner_guard",
+      "definition": "CREATE TRIGGER \"User_mfa_owner_guard\" BEFORE UPDATE ON public.\"User\" FOR EACH ROW EXECUTE FUNCTION protect_last_mfa_owner_account()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_last_mfa_owner_account()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE company_id TEXT;\nBEGIN\n  IF OLD.\"twoFactorEnabled\" AND OLD.status='active' AND (NOT NEW.\"twoFactorEnabled\" OR NEW.status<>'active') THEN\n    FOR company_id IN SELECT m.\"tenantId\" FROM \"Membership\" m JOIN \"Company\" c ON c.id=m.\"tenantId\" JOIN \"SecurityPolicy\" p ON p.\"tenantId\"=c.id\n      WHERE m.\"userId\"=OLD.id AND m.role='owner' AND m.status='active' AND m.\"accessKind\"='direct' AND c.status='active' AND p.\"requireMfa\" ORDER BY m.\"tenantId\"\n    LOOP\n      PERFORM id FROM \"Company\" WHERE id=company_id FOR UPDATE;\n      IF NOT EXISTS(SELECT 1 FROM \"Membership\" m JOIN \"User\" u ON u.id=m.\"userId\" WHERE m.\"tenantId\"=company_id AND m.\"userId\"<>OLD.id AND m.role='owner' AND m.status='active' AND m.\"accessKind\"='direct' AND u.status='active' AND u.\"emailVerified\" AND u.\"twoFactorEnabled\")\n      THEN RAISE EXCEPTION 'LAST_MFA_OWNER_REQUIRED' USING ERRCODE='23514'; END IF;\n    END LOOP;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "User",
+      "name": "export_user_access",
+      "definition": "CREATE TRIGGER export_user_access BEFORE DELETE OR UPDATE OF status, \"emailVerified\" ON public.\"User\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+      "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+    },
+    {
+      "table": "User",
+      "name": "export_user_mfa_access",
+      "definition": "CREATE TRIGGER export_user_mfa_access BEFORE UPDATE OF \"twoFactorEnabled\" ON public.\"User\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+      "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+    },
+    {
+      "table": "User",
+      "name": "user_closed_account_guard",
+      "definition": "CREATE TRIGGER user_closed_account_guard BEFORE UPDATE ON public.\"User\" FOR EACH ROW EXECUTE FUNCTION guard_closed_account()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_closed_account()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF OLD.status = 'closed' AND NEW.status <> 'closed' THEN\n    RAISE EXCEPTION 'CLOSED_ACCOUNT_IMMUTABLE' USING ERRCODE = '23514';\n  END IF;\n  IF NEW.status = 'closed' AND OLD.status <> 'closed' THEN\n    IF EXISTS (SELECT 1 FROM \"Membership\" m JOIN \"Company\" c ON c.id = m.\"tenantId\"\n      WHERE m.\"userId\" = OLD.id AND m.role = 'owner' AND m.status = 'active' AND c.status <> 'closed') THEN\n      RAISE EXCEPTION 'OWNERSHIP_TRANSFER_REQUIRED' USING ERRCODE = '23514';\n    END IF;\n    IF OLD.\"platformAdmin\" THEN\n      PERFORM pg_advisory_xact_lock(hashtextextended('platform-admin-closure', 0));\n      IF NOT EXISTS (SELECT 1 FROM \"User\" WHERE id <> OLD.id AND status = 'active' AND \"platformAdmin\") THEN\n        RAISE EXCEPTION 'PLATFORM_ADMIN_REQUIRED' USING ERRCODE = '23514';\n      END IF;\n    END IF;\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    }
+  ],
+  "sourceFingerprints": {
+    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/migrations/20261003190000_account_closure/migration.sql": "19e9cfcec38e3a9e1a3fa1019bbd25873f37914247287bcda927c49902042ff7",
+    "prisma/migrations/20261005070000_activity_reviews/migration.sql": "010697dc6f273112352ad2445a4d1e69ca4f50c42cac436fad53d3989b86a5ce",
+    "prisma/migrations/20261014000000_activity_review_retention/migration.sql": "3e158703f797ba2b550078709433a11b18c7cef5a54e5a17eb7c1cdf044e2d12",
+    "prisma/migrations/20261014100000_activity_review_destruction_tighten/migration.sql": "3047f2bd2bdea59b305df74c74c1a18ce8c989a382656ce5383c9ce41dbd4233",
+    "src/app/api/v1/me/route.ts": "7b2ce923e39cd5670bbff913b5a5b52703fdc9e24cc447d4b4a61b9ebfccaea7",
+    "src/server/account-closure.ts": "a90c4501153bd744d079c87f361b182e634a415379096ded593a3b0ee0686f30",
+    "src/server/account-actor.ts": "c292c620571d2a6ca07980713c392345724788688dbd907011f2244b6ff4f8d6",
+    "src/server/activity-reviews.ts": "ebeb4ea6536fb2446c474bf9ce688a5018d31eff4e04904054c84a54ebe66fd5",
+    "src/server/activity-review-mail.ts": "4ed5a1792af3e009d511ec2b14b4573757fca60b5df2feaccf018bf08c96e4cf",
+    "src/server/sso-accounts.ts": "30441e5d93647f6341eff42051819236ed90eef5b03907c73d9aea8aa2a70ea6"
+  }
+}

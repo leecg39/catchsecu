@@ -1,0 +1,933 @@
+{
+  "schemaVersion": 1,
+  "author": "/root/bundle_analysis",
+  "recordedAtUtc": "2026-10-10T07:09:53.857Z",
+  "reviewKind": "독립 읽기 전용 계획·계약 검토",
+  "status": "검토 통과: 두 구체 보완점과 root의 전체 options 생략/명시 제거 경계가 확정 PLAN.md에 반영되어 실행 가능한 계획이다. 기능 성공은 구현 후 별도 검증한다.",
+  "scope": {
+    "requested": [
+      "docs/qa/R08-T02/custom-choice/PLAN-draft.md",
+      "docs/qa/R08-T02/custom-choice/backend-impact.json"
+    ],
+    "alsoRead": "검토 중 생성된 PLAN.md를 읽고 root가 수용한 DB 보완의 반영을 확인했다.",
+    "allowedWrite": "docs/qa/R08-T02/custom-choice/plan-review.json",
+    "readOnlyConstraints": [
+      "제품 코드·DB·브라우저·빌드·테스트를 실행하거나 수정하지 않았다.",
+      "번들 원문은 UTF-16 slice 및 SHA-256 비교로만 확인했다. 원본 JavaScript를 실행하지 않았다.",
+      "다른 작업자의 변경을 되돌리지 않았다."
+    ],
+    "assumptions": [
+      "일반 보기 API500 code point 유지",
+      "새 UI250 UTF-16",
+      "isCustomValue:true 보기 label의 서버250 UTF-16",
+      "새 custom answer 계약은 원본 숫자/pipe wire와 구분한 독립 설계"
+    ]
+  },
+  "summary": {
+    "sourceEvidenceVerified": 15,
+    "sourceEvidenceMismatches": 0,
+    "impactLocalSnapshotHashesVerified": 43,
+    "impactLocalSnapshotHashMismatches": 0,
+    "confirmedPlanAdditions": 2,
+    "resolvedPlanAdditions": 2,
+    "newConfirmedImplementationDefects": 0,
+    "meaning": "신기능 구현 전 계획 검토다. 아래 항목은 현재 기타 기능의 실행 결함이라는 주장이 아니라 현 코드에 근거한 반드시 다뤄야 할 구현 경계다.",
+    "remainingBlockingPlanAdditions": 0
+  },
+  "findings": [
+    {
+      "id": "CC-PLAN-01",
+      "priority": "P1",
+      "status": "root PLAN.md에 반영 확인; 구현·실행 결과는 미확인",
+      "title": "기타 해제와 부모 유형 변경은 최종 상태 기준으로 허용해야 한다.",
+      "basis": "현 소스의 확정 쓰기 순서 + 제안된 부모 유형 guard를 조합한 구현 위험",
+      "references": [
+        {
+          "file": "src/server/forms.ts",
+          "startLine": 164,
+          "endLine": 179,
+          "detail": "질문별 loop에서 Question.type을 먼저 UPDATE한다."
+        },
+        {
+          "file": "src/server/forms.ts",
+          "startLine": 180,
+          "endLine": 201,
+          "detail": "이후 기존 옵션 제거 및 옵션 batch UPDATE/INSERT를 수행한다."
+        },
+        {
+          "file": "prisma/migrations/20261025000000_question_option_identities/migration.sql",
+          "startLine": 23,
+          "endLine": 35,
+          "detail": "기존 option identity guard는 Form 행 잠금 후 이력을 검사한다."
+        },
+        {
+          "file": "docs/qa/R08-T02/custom-choice/PLAN.md",
+          "startLine": 18,
+          "endLine": 20,
+          "detail": "last-order 서버 검사, true 해제 순서/deferred 최종 검사, READ COMMITTED 범위를 확정했다."
+        }
+      ],
+      "scenario": "현재 선택형에 true 옵션이 있고 한 요청에서 옵션을 명시 해제/제거하며 질문을 비선택형으로 바꾸는 최종 유효 요청. 즉시 Question.type guard가 기존 true 자식을 읽으면 옵션 정리 전에 거절한다.",
+      "requiredImplementation": "기존 true 해제를 부모 유형 변경 전에 수행하거나 적절한 deferred 최종 상태 검사를 적용한다. A→B true 이동도 A 해제를 먼저 수행한다. question/option ID 또는 value를 새로 만들지 않는다.",
+      "acceptanceScenarios": [
+        "기타→단문 최종 유효 요청 성공, old true 및 옵션 제거 확인",
+        "기타→행렬에서 false 명시·기존 옵션 ID/value 유지 성공",
+        "true가 남은 비선택형·행렬 최종 상태는 거절",
+        "A true→B true 성공 및 감사 실패 전체 rollback",
+        "부모 type/옵션 추가 직접 SQL 경합은 READ COMMITTED 실제 두 transaction 결과로 확인"
+      ],
+      "limitations": "고정 스냅샷 격리의 child/parent write skew 보호까지 단순 잠금으로 일반화하지 않는다. 이번 검토는 DB 실행이나 새 트리거 검증을 하지 않았다."
+    },
+    {
+      "id": "CC-PLAN-02",
+      "priority": "P2",
+      "status": "root PLAN.md에 반영 확인; 구현·실행 결과는 미확인",
+      "title": "정보주체 지정이 일으키는 암묵적 유형 전환에도 기타 제거 확인이 필요하다.",
+      "basis": "확정된 현재 UI 진입점. 초안의 명시 제거·확인 정책을 구현할 때 누락하기 쉬운 두 번째 handler.",
+      "references": [
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "startLine": 123,
+          "endLine": 133,
+          "detail": "주 답변 형식 select의 유형 전환 경로"
+        },
+        {
+          "file": "src/components/forms/FormEditor.tsx",
+          "startLine": 161,
+          "endLine": 161,
+          "detail": "정보주체 조회 항목 select는 선택형을 단문형으로 바꾸고 options/optionDefinitions를 undefined로 만든다."
+        },
+        {
+          "file": "src/contracts/subjects.ts",
+          "startLine": 9,
+          "endLine": 16,
+          "detail": "선택형 자체에 subjectRole 지정은 불가하므로 이 UI는 유형을 자동 전환한다."
+        },
+        {
+          "file": "docs/qa/R08-T02/custom-choice/PLAN-draft.md",
+          "startLine": 37,
+          "endLine": 37,
+          "detail": "비선택형 전환 시 명시 제거·확인을 요구하는 정책"
+        },
+        {
+          "file": "docs/qa/R08-T02/custom-choice/PLAN.md",
+          "startLine": 14,
+          "endLine": 14,
+          "detail": "유형 선택과 정보주체 지정의 명시 제거 확인·취소 보존·조건 source 보호·비동기 stale 적용 차단을 확정했다."
+        }
+      ],
+      "scenario": "기타가 설정된 객관식/체크박스/드롭다운 질문에서 답변 형식 select를 사용하지 않고 '정보주체 이름' 또는 '이메일'을 지정한다. 현 handler는 즉시 옵션 전체를 제거한다. 새 기타 제거 확인을 주 type select에만 넣으면 이 경로는 확인을 우회한다.",
+      "requiredPlanAddition": "기타가 있는 질문의 모든 비선택형 전환을 공용 전환 함수 또는 동일 guard로 처리한다. 정보주체 지정 진입점에서 제거 확인을 거치거나 먼저 기타를 명시 제거하도록 안내한다. 취소·비동기 확인 사이 변경 시 기존 질문 전체와 옵션 ID/value/조건 연결을 유지한다.",
+      "acceptanceScenarios": [
+        "기타 포함 세 선택형에서 정보주체 이름/이메일 지정 → 제거 안내 또는 확인",
+        "취소 시 type/required/subjectRole/options/optionDefinitions 및 ID/value 완전 유지",
+        "승인 시 서버에 기타가 남지 않는 최종 단문형 정의 제출",
+        "조건 source인 질문은 기존 타입 변경 제한을 우회해 잘못된 연결 상태가 되지 않음",
+        "기타 없는 기존 정보주체 지정 흐름 유지"
+      ]
+    }
+  ],
+  "verifiedCoverage": [
+    {
+      "area": "옵션 identity·생략 병합·복제",
+      "conclusion": "초안의 identityHistory/currentQuestions 분리가 현재 코드에 필요한 변경을 정확히 짚는다. 명시 false를 병합 전에 버리지 않는 정책과 legacy value exact fallback이 명시되어 있다.",
+      "references": [
+        {
+          "file": "src/contracts/option-identities.ts",
+          "startLine": 6,
+          "endLine": 25
+        },
+        {
+          "file": "src/server/forms.ts",
+          "startLine": 237,
+          "endLine": 256
+        },
+        {
+          "file": "src/server/templates.ts",
+          "startLine": 101,
+          "endLine": 114
+        },
+        {
+          "file": "src/contracts/form-copy.ts",
+          "startLine": 4,
+          "endLine": 22
+        }
+      ],
+      "requiredTestsAlreadyPlanned": [
+        "현재 true 생략 보존",
+        "false 해제 뒤 history true 부활 방지",
+        "legacy options[] 정확한 value 대응",
+        "같은 ID value 변경/다른 질문 ID 거절",
+        "복제·template use에서 새 ID와 condition remap, flag 유지"
+      ]
+    },
+    {
+      "area": "일반 500 / UI250 / 기타 서버250",
+      "conclusion": "전역 schema를250으로 줄이지 않는 전제는 기존 API/DB와 일치한다. 기존 긴 값 표시·무변경 저장·복제 보존과 기타 전환 시250 제한이 초안에 이미 분리되어 있다.",
+      "references": [
+        {
+          "file": "src/contracts/questions.ts",
+          "startLine": 11,
+          "endLine": 25
+        },
+        {
+          "file": "prisma/migrations/20261025000000_question_option_identities/migration.sql",
+          "startLine": 4,
+          "endLine": 8
+        },
+        {
+          "file": "src/components/forms/QuestionOptions.tsx",
+          "startLine": 1,
+          "endLine": 35
+        }
+      ],
+      "boundary": "새 UI 입력 상한을 원본과 맞추면서도 일반 서버500은 의도적으로 유지하는 독립 호환 정책이다."
+    },
+    {
+      "area": "조건은 label이 아닌 value·optionId",
+      "conclusion": "현재 조건 편집은 value를 저장하고 optionId를 결합한다. custom.text를 조건 비교에 쓰지 않고 selectedChoiceValues만 투영하는 안이 맞다.",
+      "references": [
+        {
+          "file": "src/components/forms/QuestionSettings.tsx",
+          "startLine": 15,
+          "endLine": 20
+        },
+        {
+          "file": "src/contracts/questions.ts",
+          "startLine": 75,
+          "endLine": 90
+        }
+      ],
+      "requiredTestsAlreadyPlanned": [
+        "기타 선택 시 분기 표시",
+        "text만 변경해도 분기 불변",
+        "label 편집·순서 변경에도 조건 target 유지",
+        "숨긴 source의 하위도 숨김"
+      ]
+    },
+    {
+      "area": "답변 codec·형태·정정",
+      "conclusion": "현재 strict union/서버 object 거절/JSON.stringify 비교의 세 접점을 초안이 모두 포함한다. 새 객체의 strict 검사, 선택 순서 canonicalization을 제출 시부터 적용하고 ordinary 배열 순서는 유지해야 한다.",
+      "references": [
+        {
+          "file": "src/contracts/questions.ts",
+          "startLine": 33,
+          "endLine": 37
+        },
+        {
+          "file": "src/server/answer-validation.ts",
+          "startLine": 17,
+          "endLine": 76
+        },
+        {
+          "file": "src/server/submission-management.ts",
+          "startLine": 79,
+          "endLine": 103
+        }
+      ],
+      "requiredTestsAlreadyPlanned": [
+        "custom extra key·wrong ID/value/type 거절",
+        "선택한 custom의 공백 입력은 optional도 거절",
+        "hidden real custom은 HIDDEN_ANSWER",
+        "고정 FormVersion으로 정정",
+        "key/selected 순서만 다른 정정은 NO_CHANGES",
+        "관련 없는 수정이 기존 scalar/array/cipher를 재작성하지 않음"
+      ],
+      "implementationAttention": "초안은 직접입력 LF 보존도 독립 계약으로 포함한다. 원본은 type=text input이므로 UI를 선택할 때 LF가 있는 API 저장값의 초기 표시/부분 편집을 조용히 변형하지 않는 검증이 필요하다. 이는 원본 서버에서 관측한 규칙은 아니다."
+    },
+    {
+      "area": "CSV·공유·파일 권한",
+      "conclusion": "초안은 object→빈 셀 분기, optionDefinitions 투영, 비동기 layoutCipher까지 포함한다. 현재 파일 마스킹은 strict DRAW에만 적용되어 custom 객체와 구분할 수 있다.",
+      "references": [
+        {
+          "file": "src/server/export-renderer.ts",
+          "startLine": 20,
+          "endLine": 51
+        },
+        {
+          "file": "src/server/exports.ts",
+          "startLine": 149,
+          "endLine": 177
+        },
+        {
+          "file": "src/server/sharing.ts",
+          "startLine": 20,
+          "endLine": 22
+        },
+        {
+          "file": "src/server/viewer.ts",
+          "startLine": 136,
+          "endLine": 159
+        },
+        {
+          "file": "src/server/file-access.ts",
+          "startLine": 36,
+          "endLine": 40
+        },
+        {
+          "file": "src/contracts/drawing-questions.ts",
+          "startLine": 5,
+          "endLine": 17
+        }
+      ],
+      "requiredTestsAlreadyPlanned": [
+        "동기/비동기 CSV 동일한 신규 JSON 셀",
+        "구 CSV 바이트 및 queued layout 호환",
+        "게시 당시 label/value/ID 투영",
+        "허용 질문만 custom text 공개",
+        "file.read 없이도 권한 있는 text 표시",
+        "철회·만료·파기 차단"
+      ]
+    },
+    {
+      "area": "subject·marketing 투영",
+      "conclusion": "선택형은 현재 subject 및 marketing 대상 유형에서 제외된다. 서버 제한 유지 계획은 적절하다. UI의 자동 유형 변경 확인만 CC-PLAN-02로 보완한다.",
+      "references": [
+        {
+          "file": "src/contracts/subjects.ts",
+          "startLine": 9,
+          "endLine": 16
+        },
+        {
+          "file": "src/contracts/marketing.ts",
+          "startLine": 11,
+          "endLine": 20
+        },
+        {
+          "file": "src/server/subject-identity.ts",
+          "startLine": 20,
+          "endLine": 25
+        },
+        {
+          "file": "src/server/marketing.ts",
+          "startLine": 128,
+          "endLine": 145
+        }
+      ],
+      "boundary": "객체를 String(object)로 신원 값에 연결하는 새 경로를 추가하지 않는다."
+    },
+    {
+      "area": "공개 UI·정정 UI·읽기 UI",
+      "conclusion": "PublicForm과 SubmissionDetail은 현재 value를 JSON 그대로 보내고 숨김 값을 정리한다. QuestionInput과 공용 formatAnswer/displayOptions 변경을 같이 수용하는 계획이며 Workflow/SharedPrivacy도 공용 renderer를 사용한다.",
+      "references": [
+        {
+          "file": "src/components/forms/PublicForm.tsx",
+          "startLine": 89,
+          "endLine": 135
+        },
+        {
+          "file": "src/components/forms/SubmissionDetail.tsx",
+          "startLine": 69,
+          "endLine": 100
+        },
+        {
+          "file": "src/components/forms/QuestionInput.tsx",
+          "startLine": 14,
+          "endLine": 64
+        },
+        {
+          "file": "src/components/forms/Workflow.tsx",
+          "startLine": 89,
+          "endLine": 91
+        },
+        {
+          "file": "src/components/forms/SharedPrivacy.tsx",
+          "startLine": 72,
+          "endLine": 72
+        }
+      ],
+      "boundary": "수정 중 빈 text를 저장 wire의 유효 답변으로 오인하지 않고 native validation·선택 수·busy/readonly를 실제 UI에서 검증해야 한다. 아직 실행하지 않았다."
+    }
+  ],
+  "sourceValidation": {
+    "bundleFile": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+    "sha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "method": "보존 번들 전체 bytes SHA-256 후 JS string.slice(start,end) 결과를 UTF-8 SHA-256으로 비교",
+    "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+    "all15ExcerptHashesMatch": true,
+    "excerpts": [
+      {
+        "id": "question_serializer",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 12625116,
+        "end": 12626800,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "a259d2e54335d6eab7fdff7f66877c2d1a1b09477d6da0ccb284976dbd26f2f0",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_add",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 12676950,
+        "end": 12678710,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "e8e519cee9868312153504bd27ed02b8b2c53c09956aed015dade72cecc26f0c",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_editor",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 12682500,
+        "end": 12684690,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "08fe5dd0d19b2af41216323bdf7d138e684f40d739bc2fc74a150efce310d32d",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_remove",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 12679500,
+        "end": 12680820,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "76c70fad11c0182d52432f4ef6c982057f4abee5bee3f103f7ee99b9efdc1a8e",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_next_labels",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 12800470,
+        "end": 12801715,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "8a8c779a2eb75e0c7ff774804aace849f853f06c4d368ecd5470cfbb0ee14170",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_next_count",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 12802900,
+        "end": 12804040,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "1230054578978291f821a403163bce73a6b46ddaabb9b06d43cb05de625c8920",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_checkbox_input",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 8172460,
+        "end": 8173670,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "cb1aad61d47ef1f2ea2356e41bf709b4f678bea3d8d097f164409f6d91256735",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_radio_input",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 8179620,
+        "end": 8180700,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "d2a352d1243c11aaa2c4c6cffc6e1d873daa7d20e068340077b02b57d522990c",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_dropdown_input",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 8184310,
+        "end": 8187020,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "6306955c1f80cd0e5bad9d2f62843f2478530f0277560e6cb66986bdd8b4e491",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_codecs",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 8221674,
+        "end": 8223900,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "2529be4584e66b7fc83dfa6770d34c77b0dcdfd4f6870f4abbd3b2b0a48de4d4",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_legacy_codecs",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 8220410,
+        "end": 8221674,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "174384812fad29b90a50a4276f009e873be97d817fbc0d6f4fc15fee3e312f79",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_submit",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 10057077,
+        "end": 10058066,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "6c9aa10eff63d9dbe0241114ff8143344efbefb16aba8f008920d90aa4b875fc",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_selection_count",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 8165438,
+        "end": 8165955,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "d1ddb29714ca31dee7cf4303b44c428a29b31b023cb53be6b29bfa7c8efeb251",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "choice_type_transition",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 12715818,
+        "end": 12716400,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "f6b1edb0c71db07606df6f7455039cde6a7b43632deeb008fe389028f2e9ec87",
+        "verifiedAgainstRetainedBundle": true
+      },
+      {
+        "id": "other_delete_button",
+        "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+        "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+        "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+        "start": 12687211,
+        "end": 12687561,
+        "offsetUnit": "0-based JavaScript UTF-16 code units; end exclusive",
+        "sha256OfUtf8Excerpt": "c758a14d3b95e083997d19b2e7ace09d4cc5c10d44a9d6ac86bff8970c3daa55",
+        "verifiedAgainstRetainedBundle": true
+      }
+    ],
+    "facts": [
+      "원본은 별도 질문 타입이 아니라 isCustomValue:true 보기 한 개다.",
+      "원본 UI 직접입력100·선택 해제 시 text clear·선택한 기타 trim-empty 거절이 정적 코드에 있다.",
+      "AI_V3 UI 상태와 최종 제출 wire가 다르며 과거 pipe codec과도 구분되어 있다."
+    ],
+    "unobserved": [
+      "원본 서버 저장·정정·CSV 실행",
+      "원본 DB 스키마/동시성/권한 강제",
+      "원본의 개행·Unicode 입력을 실제 브라우저와 서버가 끝까지 보존하는지"
+    ]
+  },
+  "localSnapshotVerification": {
+    "method": "backend-impact의 43개 file bytes를 다시 읽어 sha256과 비교. 모두 일치; 코드 읽기 범위는 verifiedCoverage의 reference들.",
+    "all43HashesMatch": true,
+    "snapshots": [
+      {
+        "id": "contracts/questions.ts",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+        "relative": "src/contracts/questions.ts",
+        "sha256": "6411141905b34ccbea17c67125c201eed6711a937a9d22375013a0a164116340",
+        "bytes": 11750,
+        "lines": 132
+      },
+      {
+        "id": "option-identities",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/option-identities.ts",
+        "relative": "src/contracts/option-identities.ts",
+        "sha256": "f8af42eb5d67c93cfd03e0b4d07f7cd17954fb50745d1fa0fbd81623529d85b0",
+        "bytes": 1952,
+        "lines": 27
+      },
+      {
+        "id": "form-copy",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/form-copy.ts",
+        "relative": "src/contracts/form-copy.ts",
+        "sha256": "f7116f6021716937822e1eb5074d8ec1b21323e7d24fe558829ea99c7074f260",
+        "bytes": 1553,
+        "lines": 23
+      },
+      {
+        "id": "question-options",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/question-options.ts",
+        "relative": "src/server/question-options.ts",
+        "sha256": "2889cdff7285f80604323fdda87132172aeb2cdda0cd031b7fa5066447df27c6",
+        "bytes": 805,
+        "lines": 11
+      },
+      {
+        "id": "answer-validation",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+        "relative": "src/server/answer-validation.ts",
+        "sha256": "97e9d3fc9499dcad45f803762833ea637e82dccf5f41400b0fca4ba5f2404892",
+        "bytes": 9105,
+        "lines": 99
+      },
+      {
+        "id": "schema",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/schema.prisma",
+        "relative": "prisma/schema.prisma",
+        "sha256": "ee57dd2cf33794c84541c5e7d959e1da34a77af206dc8ff60f97e9472cceceda",
+        "bytes": 94785,
+        "lines": 2583
+      },
+      {
+        "id": "forms",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/forms.ts",
+        "relative": "src/server/forms.ts",
+        "sha256": "a50ce9c5241b5b3ae8bfdba9999c82c2d5611fb9551ddf4548e8edd61042a7c5",
+        "bytes": 43716,
+        "lines": 489
+      },
+      {
+        "id": "templates",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/templates.ts",
+        "relative": "src/server/templates.ts",
+        "sha256": "f1bfe44e6d3ab53c597a3b8eb046f7448220b5aca42cf5bc49e05f926e175818",
+        "bytes": 11652,
+        "lines": 136
+      },
+      {
+        "id": "domains",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/domains.ts",
+        "relative": "src/contracts/domains.ts",
+        "sha256": "c1a51de6cf042c32fbe7ed888ccac4584b2ef93fbeb1b7ab1c570bcbac389a9b",
+        "bytes": 4312,
+        "lines": 69
+      },
+      {
+        "id": "submissions",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+        "relative": "src/server/submissions.ts",
+        "sha256": "e199495671ee028ee30e85bc1e81ed9f7534de6920d5cf329671681fa87ee02a",
+        "bytes": 10908,
+        "lines": 144
+      },
+      {
+        "id": "submission-management",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+        "relative": "src/server/submission-management.ts",
+        "sha256": "bc2239963ee6bdf368dcf5495133223497daed2047d8d011e5f3905b1d9aa788",
+        "bytes": 13896,
+        "lines": 155
+      },
+      {
+        "id": "submission-access",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-access.ts",
+        "relative": "src/server/submission-access.ts",
+        "sha256": "86081a23b8a344bb1d43b40d5b274ae99cdf13ea8540d902e030a1af5f50da22",
+        "bytes": 1448,
+        "lines": 21
+      },
+      {
+        "id": "sharing",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/sharing.ts",
+        "relative": "src/server/sharing.ts",
+        "sha256": "805a534fd54426c26fdad6dd9ae033ee560b3d7301c372bb3e5ecfb42be49383",
+        "bytes": 15680,
+        "lines": 193
+      },
+      {
+        "id": "viewer",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/viewer.ts",
+        "relative": "src/server/viewer.ts",
+        "sha256": "6d023a948d4bfabc6caebfa3a9add9e53d8324a0ba06a53ff963cc05533aa69d",
+        "bytes": 17579,
+        "lines": 209
+      },
+      {
+        "id": "sharing-contract",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/sharing.ts",
+        "relative": "src/contracts/sharing.ts",
+        "sha256": "526ba45fc36bbea3ffe4b3c5aba803058b718408b06b33ea194afe0bd93b60bf",
+        "bytes": 3508,
+        "lines": 36
+      },
+      {
+        "id": "export-renderer",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/export-renderer.ts",
+        "relative": "src/server/export-renderer.ts",
+        "sha256": "0b3669e761ee4c5e6589d4d66027b6adfd6a41bea46a913d184aa8a8eb4a21df",
+        "bytes": 5245,
+        "lines": 59
+      },
+      {
+        "id": "sync-export",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-export.ts",
+        "relative": "src/server/submission-export.ts",
+        "sha256": "0168806a05e70ea1138db0b37c313048ace248eb8f134c0681ac8f1b384ebc8b",
+        "bytes": 2912,
+        "lines": 34
+      },
+      {
+        "id": "async-export",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/exports.ts",
+        "relative": "src/server/exports.ts",
+        "sha256": "8e5d2ceec923b7e2ecfb2abef6894fc9e2b085d2bd11e92933f8ead3288a8af8",
+        "bytes": 20139,
+        "lines": 211
+      },
+      {
+        "id": "csv-safe",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/import-csv.ts",
+        "relative": "src/server/import-csv.ts",
+        "sha256": "fd9869246f6dd33c9c5f9ad6687e9c16e8ef28fb7be280daed990e930a6911b5",
+        "bytes": 9275,
+        "lines": 103
+      },
+      {
+        "id": "import",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/import-worker.ts",
+        "relative": "src/server/import-worker.ts",
+        "sha256": "7a8f56ca0a3ee04282984f873ebc6d437b9d12e0e1d6e8402a8de056ee82211a",
+        "bytes": 12836,
+        "lines": 155
+      },
+      {
+        "id": "subject-contract",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/subjects.ts",
+        "relative": "src/contracts/subjects.ts",
+        "sha256": "308f2f42f2202fdffd7ed9876d849658c53ece5247973ddb6de671f4022fa4df",
+        "bytes": 3093,
+        "lines": 30
+      },
+      {
+        "id": "subject-identity",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/subject-identity.ts",
+        "relative": "src/server/subject-identity.ts",
+        "sha256": "0dd37378d3cdb5a742ce5e8fcbff5fdb72ebb547e6e4d797f26031a5389195e0",
+        "bytes": 3774,
+        "lines": 44
+      },
+      {
+        "id": "marketing-contract",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/marketing.ts",
+        "relative": "src/contracts/marketing.ts",
+        "sha256": "7825d16f3fd7af85ff0c72422cb054d067cdc4e78d6305d2c6e2937ed2b90cf3",
+        "bytes": 5928,
+        "lines": 67
+      },
+      {
+        "id": "marketing-server",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/marketing.ts",
+        "relative": "src/server/marketing.ts",
+        "sha256": "099bf04ecf448a00c870ef56fe765f410ed12d3e4cec29bd62db127a3a9c8f6b",
+        "bytes": 29807,
+        "lines": 326
+      },
+      {
+        "id": "receipt",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/consent-receipts.ts",
+        "relative": "src/server/consent-receipts.ts",
+        "sha256": "8fd52962540ba0c9d10b4fc5e5d373512a14dfc2dc8cf82486f2bc5616741a00",
+        "bytes": 7626,
+        "lines": 93
+      },
+      {
+        "id": "file-mask",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-access.ts",
+        "relative": "src/server/file-access.ts",
+        "sha256": "5d69c3b1ec143b709fb32a829cd5e97d6c5d36e6701536660d798286bc992feb",
+        "bytes": 12927,
+        "lines": 149
+      },
+      {
+        "id": "destruction",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/destruction-worker.ts",
+        "relative": "src/server/destruction-worker.ts",
+        "sha256": "d54767c5e2a876a771ae0cb6849c1b4d1a6c872036deb6ceb89114d511cd751c",
+        "bytes": 14152,
+        "lines": 166
+      },
+      {
+        "id": "current-authority",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/form-access.ts",
+        "relative": "src/server/form-access.ts",
+        "sha256": "2a088f47f97e0342e0717bfab47d3e25c9c292d1bc12e926f721998142babf11",
+        "bytes": 2612,
+        "lines": 41
+      },
+      {
+        "id": "published-immutable",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261002094000_forms/migration.sql",
+        "relative": "prisma/migrations/20261002094000_forms/migration.sql",
+        "sha256": "df2545e63def70b8c0ee8c3fd334368253ce5c3c77fea6c976a722ec76ca9025",
+        "bytes": 15510,
+        "lines": 373
+      },
+      {
+        "id": "option-guard",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261025000000_question_option_identities/migration.sql",
+        "relative": "prisma/migrations/20261025000000_question_option_identities/migration.sql",
+        "sha256": "769accfdc91c919863eedb93580e751cfef69fc8316024c2fad97a7823e51f60",
+        "bytes": 4508,
+        "lines": 64
+      },
+      {
+        "id": "latest-question-settings",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/prisma/migrations/20261025002000_question_exact_selection/migration.sql",
+        "relative": "prisma/migrations/20261025002000_question_exact_selection/migration.sql",
+        "sha256": "9d032ab4ab54244392adfcc9d705923966228b33aac46d821a66f390a8754406",
+        "bytes": 3010,
+        "lines": 45
+      },
+      {
+        "id": "zod-length",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/zod/v4/core/checks.cjs",
+        "relative": "node_modules/zod/v4/core/checks.cjs",
+        "sha256": "9a2a428602fe9e380ea2a08495a47101a56710d814fe18fb0e6e30f65686a703",
+        "bytes": 21692,
+        "lines": 561
+      },
+      {
+        "id": "ui-options",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionOptions.tsx",
+        "relative": "src/components/forms/QuestionOptions.tsx",
+        "sha256": "792f0a21170d2051ec0d5c8659671b37ee296e7384d7c14d1967f86bacab351a",
+        "bytes": 2399,
+        "lines": 28
+      },
+      {
+        "id": "ui-input",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+        "relative": "src/components/forms/QuestionInput.tsx",
+        "sha256": "44a09aaac8c0b9b348715ca0e0735b0335ef661f2bd1a53e11c6ecf2fc8da8d1",
+        "bytes": 8059,
+        "lines": 71
+      },
+      {
+        "id": "ui-public",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+        "relative": "src/components/forms/PublicForm.tsx",
+        "sha256": "54d5865a0590f43cbf444571c9342d4e937069a1f240c80e7e63a852753f7af9",
+        "bytes": 14751,
+        "lines": 161
+      },
+      {
+        "id": "ui-correction",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+        "relative": "src/components/forms/SubmissionDetail.tsx",
+        "sha256": "5919a9069a311dfcb9229ec4272fa9c8dc3c91e2b48c1500d4e146d8a527fefb",
+        "bytes": 20936,
+        "lines": 198
+      },
+      {
+        "id": "ui-workflow",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/Workflow.tsx",
+        "relative": "src/components/forms/Workflow.tsx",
+        "sha256": "23c7c3ba329cb4c9d5c0b3bf5b448aaf35f9fbba93eaace4a4b32ce0e1fa91b5",
+        "bytes": 19306,
+        "lines": 201
+      },
+      {
+        "id": "ui-shared",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SharedPrivacy.tsx",
+        "relative": "src/components/forms/SharedPrivacy.tsx",
+        "sha256": "c0cb5ec4fda800d82c52e4f8b383e48a5f62afdadc5661495e86491c7cef728c",
+        "bytes": 8044,
+        "lines": 78
+      },
+      {
+        "id": "tests-identities",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-identities.test.ts",
+        "relative": "tests/server/question-identities.test.ts",
+        "sha256": "75a22259946e9bff7f790228f81444aaa597dbf39abfb24512e9d51a88d0da4d",
+        "bytes": 22177,
+        "lines": 274
+      },
+      {
+        "id": "tests-rules",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-rules.test.ts",
+        "relative": "tests/server/question-rules.test.ts",
+        "sha256": "a24d495b94e4b812c42175f70e9055ad33ca03a30e14b33f16b0117615c728ab",
+        "bytes": 19116,
+        "lines": 185
+      },
+      {
+        "id": "tests-exact",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-exact-selection.test.ts",
+        "relative": "tests/server/question-exact-selection.test.ts",
+        "sha256": "559f8563261a2fb997308771aaf93620e987bce5e6719bb8a5cb3faaf4e82acd",
+        "bytes": 8252,
+        "lines": 98
+      },
+      {
+        "id": "tests-flow",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/form-module-flow.test.ts",
+        "relative": "tests/server/form-module-flow.test.ts",
+        "sha256": "a36edd09435cce5a8ec31d1aa0cd7e7d96067f1bd4f5b0fed7989fea5137c3c4",
+        "bytes": 18541,
+        "lines": 158
+      },
+      {
+        "id": "tests-concurrency",
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/form-module-concurrency.test.ts",
+        "relative": "tests/server/form-module-concurrency.test.ts",
+        "sha256": "138ba30d1e10b9392a7ee2502913fc441aec81a08c43b424dd4366f8acb07d2c",
+        "bytes": 26760,
+        "lines": 245
+      }
+    ],
+    "reviewedPlanAndAdditionalSnapshots": [
+      {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/PLAN-draft.md",
+        "relative": "docs/qa/R08-T02/custom-choice/PLAN-draft.md",
+        "sha256": "47b1de829f4d50860978e3a22d3dd1445aa64367d47aa4a3a9d582db8793146d",
+        "bytes": 23919,
+        "lines": 172
+      },
+      {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/PLAN.md",
+        "relative": "docs/qa/R08-T02/custom-choice/PLAN.md",
+        "sha256": "6518340f0bdc40e3ec288c3ea9899200485a80d927f357f9e41fbea8499f2b97",
+        "bytes": 5501,
+        "lines": 32
+      },
+      {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/custom-choice/backend-impact.json",
+        "relative": "docs/qa/R08-T02/custom-choice/backend-impact.json",
+        "sha256": "1ac41f1a3d3a8bf5b0bec3aecce75ab5da76fa91496744433ed017f044d8c637",
+        "bytes": 61015,
+        "lines": 1389
+      },
+      {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/FormEditor.tsx",
+        "relative": "src/components/forms/FormEditor.tsx",
+        "sha256": "104ba195815bfcbf4200a3d0675f398acf400bcdf9cdca51e12b07d7604bcbab",
+        "bytes": 20888,
+        "lines": 180
+      }
+    ]
+  },
+  "executionLimits": {
+    "productTestsRun": 0,
+    "buildsRun": 0,
+    "browserOperations": 0,
+    "databaseOperations": 0,
+    "notes": [
+      "이 보고서의 SHA 확인은 파일 무결성 검사이며 제품 테스트 실행이 아니다.",
+      "기능 구현·migration·경합·브라우저 수용 성공은 주장하지 않는다.",
+      "parent가 별도 진행한 개인정보 분류 QA 결과를 재실행하거나 새 custom 기능의 검증 근거로 전용하지 않았다."
+    ]
+  },
+  "finalizedAtUtc": "2026-10-10T07:11:09.766Z",
+  "finalPlanClarifications": [
+    {
+      "file": "docs/qa/R08-T02/custom-choice/PLAN.md",
+      "startLine": 13,
+      "endLine": 14,
+      "confirmation": "현재 기타가 있는 문항의 전체 options/optionDefinitions 생략을 묵시 제거로 해석하지 않고 거절한다. 명시 [] 제거 또는 matrix 전환의 명시 false/옵션 제거와 구분한다. 두 UI 전환 경로에도 확인을 적용한다."
+    },
+    {
+      "file": "docs/qa/R08-T02/custom-choice/PLAN.md",
+      "startLine": 18,
+      "endLine": 20,
+      "confirmation": "last-order 서버 최종 목록 검사·부모/자식 쓰기 순서 조정·A 해제 후 B 지정·READ COMMITTED 실행 범위를 확정했다."
+    }
+  ]
+}

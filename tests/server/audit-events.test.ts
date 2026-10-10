@@ -215,8 +215,13 @@ describe("폼별 감사 조회·내보내기", () => {
     const r = await formLog(request(`/forms/${formA}/audit-events?pageSize=100`, "GET", adminCookie)); expect(r.status).toBe(200);
     const data = await r.json(); expect(data.total).toBe(3); expect(data.items.map((r: { id: string }) => r.id).sort()).toEqual(formEventIds.sort());
     expect(JSON.stringify(data)).not.toContain("form-log-must-not-leak");
+    expect(data.items.every((row: { formName: string }) => row.formName === "감사 범위 시험")).toBe(true);
+    const submitted = data.items.find((row: { resource: string }) => row.resource === "submission");
+    expect(submitted.submissionId).toBe(submitted.resourceId);
+    expect(data.items.find((row: { resource: string }) => row.resource === "file").submissionId).toBe(submitted.resourceId);
     const limited = await (await formLog(request(`/forms/${formA}/audit-events`, "GET", privacyCookie))).json();
     expect(limited.items.every((r: { actorName: string | null; resourceId: string | null }) => r.actorName === null && r.resourceId === null)).toBe(true);
+    expect(limited.items.every((r: { formName: string | null; submissionId: string | null }) => r.formName === null && r.submissionId === null)).toBe(true);
     expect((await formLog(request(`/forms/${foreignForm}/audit-events`, "GET", adminCookie))).status).toBe(404);
     expect((await formLog(request(`/forms/${randomUUID()}/audit-events`, "GET", adminCookie))).status).toBe(404);
   });
@@ -227,6 +232,10 @@ describe("폼별 감사 조회·내보내기", () => {
     expect(csv.headers.get("cache-control")).toBe("private, no-store");
     const rows = parse(await csv.text(), { bom: true }) as string[][];
     expect(rows.slice(1).map(row => row[0]).sort()).toEqual(formEventIds.sort()); expect(rows[1][2]).toBe("'=2+2");
+    expect(rows[0].slice(-2)).toEqual(["캐치폼·개인정보 업로드명", "응답 ID"]);
+    expect(rows.slice(1).every(row => row[7] === "감사 범위 시험")).toBe(true);
+    const limitedCsv = await formLog(request(`/forms/${formA}/audit-events/export`, "GET", privacyCookie));
+    expect((parse(await limitedCsv.text(), { bom: true }) as string[][]).slice(1).every(row => row[7] === "" && row[8] === "")).toBe(true);
     const literal = await (await formLog(request(`/forms/${formA}/audit-events?search=%25_`, "GET", adminCookie))).json(); expect(literal.total).toBe(0);
     const access = await db.auditEvent.findFirstOrThrow({ where: { requestId: csv.headers.get("x-request-id")! } }); expect(access).toMatchObject({ action: "audit.exported", serviceId: serviceA1, detail: { rowCount: 3 } });
   });
@@ -250,5 +259,41 @@ describe("폼별 감사 조회·내보내기", () => {
     await db.auditEvent.createMany({ data: Array.from({ length: 5001 }, () => ({ tenantId: companyA, serviceId: serviceA1, actorId: adminId, resource: "form", resourceId: formA, action: "form.audit_overflow", requestId: randomUUID(), detail: {} })) });
     const r = await formLog(request(`/forms/${formA}/audit-events/export?search=form.audit_overflow`, "GET", adminCookie)); expect(r.status).toBe(413);
     expect(await db.auditEvent.count({ where: { requestId: r.headers.get("x-request-id")! } })).toBe(0);
+  });
+  test("회사·서비스가 어긋난 원장 참조와 없는 ID로 다른 폼의 이름을 추론하지 않는다", async () => {
+    const ids: string[] = [];
+    for (const [resourceId, serviceId] of [[foreignForm, serviceA1], [formA, serviceA2], [randomUUID(), serviceA1]]) {
+      const row = await db.auditEvent.create({ data: { tenantId: companyA, serviceId, actorId: adminId,
+        resource: "form", resourceId, action: "form.context_test", requestId: randomUUID(), detail: {} } });
+      ids.push(row.id);
+    }
+    const response = await list(request("/audit-events?search=form.context_test", "GET", adminCookie));
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.items.map((row: { id: string }) => row.id).sort()).toEqual(ids.sort());
+    expect(data.items.every((row: { formName: string | null; submissionId: string | null }) => row.formName === null && row.submissionId === null)).toBe(true);
+  });
+  test("회사 목록과 CSV의 응답 참조가 같고 제목의 CSV 수식을 실행하지 않는다", async () => {
+    await db.form.update({ where: { id: formA }, data: { title: "=2+3" } });
+    const row = await db.auditEvent.findFirstOrThrow({ where: { id: { in: formEventIds }, resource: "submission" } });
+    const listResponse = await list(request("/audit-events?kind=info&search=submission.corrected&pageSize=100", "GET", adminCookie));
+    const item = (await listResponse.json()).items.find((item: { id: string }) => item.id === row.id);
+    expect(item).toMatchObject({ formName: "=2+3", submissionId: row.resourceId });
+    const csv = await exportCsv(request("/audit-events/export?kind=info&search=submission.corrected", "GET", adminCookie));
+    const exported = (parse(await csv.text(), { bom: true }) as string[][]).find(item => item[0] === row.id)!;
+    expect(exported[7]).toBe("'=2+3"); expect(exported[8]).toBe(row.resourceId);
+  });
+  test("내보내기 사건은 연결 폼만 표시하며 검색 조건이나 응답 원문을 노출하지 않는다", async () => {
+    const job = await db.exportJob.create({ data: { tenantId: companyA, serviceId: serviceA1, formId: formA,
+      requesterId: adminId, requestKeyHash: randomUUID(), filtersCipher: encrypt({ secret: "export-filter-private" }),
+      expiresAt: new Date(Date.now() + 86400000) } });
+    const row = await db.auditEvent.create({ data: { tenantId: companyA, serviceId: serviceA1, actorId: adminId,
+      resource: "export", resourceId: job.id, action: "export.created", requestId: randomUUID(), detail: {} } });
+    const response = await formLog(request(`/forms/${formA}/audit-events?search=export.created`, "GET", adminCookie));
+    expect(response.status).toBe(200); const data = await response.json();
+    expect(data.items).toHaveLength(1);
+    expect(data.items[0]).toMatchObject({ id: row.id, formName: "=2+3", submissionId: null });
+    expect(JSON.stringify(data)).not.toContain("export-filter-private");
+    expect(JSON.stringify(data)).not.toContain(job.filtersCipher);
   });
 });

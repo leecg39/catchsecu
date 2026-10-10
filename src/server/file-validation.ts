@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { extname } from "node:path";
 import { MAX_FILE_BYTES } from "@/contracts/files";
+import { MAX_PRIVATE_OBJECT_BYTES } from "@/contracts/storage-limits";
 import { fail } from "./http";
 
 const extensions: Record<string, string[]> = {
@@ -27,7 +28,9 @@ export function validateFileBytes(bytes: Buffer, meta: { name: string; size: num
   }
   if (!valid) fail(422, "FILE_CONTENT_MISMATCH", "선택한 형식과 실제 파일 내용이 일치하지 않습니다.");
 }
-export async function readFileBody(request: Request, expectedSize: number, expectedMime: string) {
+export async function readFileBody(request: Request, expectedSize: number, expectedMime: string, maxBytes = MAX_FILE_BYTES) {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > MAX_PRIVATE_OBJECT_BYTES) throw new Error("Invalid trusted upload byte limit");
+  if (!Number.isSafeInteger(expectedSize) || expectedSize < 1 || expectedSize > maxBytes) fail(413, "FILE_TOO_LARGE", "파일 크기 제한을 초과했습니다.");
   if (request.headers.get("content-type")?.split(";")[0].trim() !== expectedMime) fail(415, "FILE_CONTENT_TYPE", "파일 형식을 확인해주세요.");
   if (request.headers.has("content-encoding")) fail(415, "FILE_CONTENT_ENCODING", "압축되지 않은 파일을 업로드해주세요.");
   const declared = request.headers.get("content-length");
@@ -40,7 +43,7 @@ export async function readFileBody(request: Request, expectedSize: number, expec
     while (true) {
       const item = await reader.read(); if (item.done) break;
       size += item.value.length;
-      if (size > MAX_FILE_BYTES || size > expectedSize) { await reader.cancel(); fail(413, "FILE_TOO_LARGE", "파일 크기 제한을 초과했습니다."); }
+      if (size > maxBytes || size > expectedSize) { await reader.cancel(); fail(413, "FILE_TOO_LARGE", "파일 크기 제한을 초과했습니다."); }
       chunks.push(item.value);
     }
   } finally { reader.releaseLock(); }

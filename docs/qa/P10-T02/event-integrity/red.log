@@ -1,0 +1,252 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:64642) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/payment-event-integrity.test.ts (7 tests | 7 failed) 1566ms
+   × paid: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다 205ms
+   × failed: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다 130ms
+   × refunded: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다 139ms
+   × refund_rejected: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다 137ms
+   × 서명은 유효해도 잘못된 JSON은 서버500 대신400으로 거절한다 112ms
+   × 결제 진행 중 구독 취소는 거절하고 업무·감사·요청 키를 유지한다 127ms
+   × 이미 취소된 과거 구독의 뒤늦은 승인은 원장만 충전하지 않는다 116ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > paid: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "duplicate": false,
++   "id": "6bb8bfaa-121f-47c4-a8e5-5c678aa1f1cd",
++   "methodId": null,
++   "status": "paid",
++   "subscriptionId": "79dfaa98-acda-432e-97a4-69e851b408cd",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:51:68
+     49|   test(`${outcome}: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다`, async () => {
+     50|     const before = await state();
+     51|     await expect(apply(event(outcome, { refundId: randomUUID() }))).re…
+       |                                                                    ^
+     52|     expect(await state()).toEqual(before);
+     53|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > failed: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "duplicate": false,
++   "id": "a6992bf7-a2dc-46ea-badc-9af13b0031c9",
++   "methodId": null,
++   "status": "failed",
++   "subscriptionId": "c52e40ef-a2ca-4a69-9647-5b3a2fcf7c62",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:51:68
+     49|   test(`${outcome}: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다`, async () => {
+     50|     const before = await state();
+     51|     await expect(apply(event(outcome, { refundId: randomUUID() }))).re…
+       |                                                                    ^
+     52|     expect(await state()).toEqual(before);
+     53|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > refunded: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다
+PrismaClientValidationError: 
+Invalid `db.paymentRefund.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/payment-event-integrity.test.ts:58:43
+
+  55 for (const outcome of ["refunded", "refund_rejected"] as const) {
+  56   test(`${outcome}: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다`, async () => {
+  57     await apply(event("paid"));
+→ 58     const refund = await db.paymentRefund.create({
+           data: {
+             tenantId: "87c17a8b-9010-4090-9494-bec6cd25f1d2",
+             orderId: "8867d27e-6dc5-4cdd-9844-df285183f09c",
+             amount: 2000,
+             currency: "KRW",
+             reason: "합성 환불",
+             requestedBy: "c3406a1f-e15e-49a6-9911-da6aded64676",
+             ~~~~~~~~~~~
+         ?   id?: String,
+         ?   status?: String,
+         ?   providerRef?: String | Null,
+         ?   version?: Int,
+         ?   createdAt?: DateTime,
+         ?   updatedAt?: DateTime
+           }
+         })
+
+Unknown argument `requestedBy`. Available options are marked with ?.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/payment-event-integrity.test.ts:58:20
+     56|   test(`${outcome}: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다`, async () => {
+     57|     await apply(event("paid"));
+     58|     const refund = await db.paymentRefund.create({ data: { tenantId: c…
+       |                    ^
+     59|     const done = event(outcome, { refundId: refund.id }); await apply(…
+     60|     const before = await state();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > refund_rejected: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다
+PrismaClientValidationError: 
+Invalid `db.paymentRefund.create()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/payment-event-integrity.test.ts:58:43
+
+  55 for (const outcome of ["refunded", "refund_rejected"] as const) {
+  56   test(`${outcome}: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다`, async () => {
+  57     await apply(event("paid"));
+→ 58     const refund = await db.paymentRefund.create({
+           data: {
+             tenantId: "a2bf877b-d483-4ac0-b631-b7a1d3cadf4e",
+             orderId: "57a1b541-2280-42c9-b43b-b88761a7117a",
+             amount: 2000,
+             currency: "KRW",
+             reason: "합성 환불",
+             requestedBy: "c3406a1f-e15e-49a6-9911-da6aded64676",
+             ~~~~~~~~~~~
+         ?   id?: String,
+         ?   status?: String,
+         ?   providerRef?: String | Null,
+         ?   version?: Int,
+         ?   createdAt?: DateTime,
+         ?   updatedAt?: DateTime
+           }
+         })
+
+Unknown argument `requestedBy`. Available options are marked with ?.
+ ❯ Fr node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:46:9
+ ❯ throwValidationException node_modules/@prisma/client/src/runtime/RequestHandler.ts:212:7
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/payment-event-integrity.test.ts:58:20
+     56|   test(`${outcome}: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다`, async () => {
+     57|     await apply(event("paid"));
+     58|     const refund = await db.paymentRefund.create({ data: { tenantId: c…
+       |                    ^
+     59|     const done = event(outcome, { refundId: refund.id }); await apply(…
+     60|     const before = await state();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > 서명은 유효해도 잘못된 JSON은 서버500 대신400으로 거절한다
+AssertionError: expected SyntaxError: Unexpected end of JSON input to match object { status: 400, code: 'INVALID_JSON' }
+
+- Expected
++ Received
+
+- {
+-   "code": "INVALID_JSON",
+-   "status": 400,
++ SyntaxError {
++   "message": "Unexpected end of JSON input",
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:67:40
+     65| test("서명은 유효해도 잘못된 JSON은 서버500 대신400으로 거절한다", async () => {
+     66|   const before = await state();
+     67|   await expect(applyRaw('{"orderId":')).rejects.toMatchObject({ status…
+       |                                        ^
+     68|   expect(await state()).toEqual(before);
+     69| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > 결제 진행 중 구독 취소는 거절하고 업무·감사·요청 키를 유지한다
+AssertionError: promise resolved "{ status: 200, body: { …(12) } }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "body": {
++     "cancelAt": null,
++     "createdAt": "2026-10-07T02:02:03.517Z",
++     "currency": "KRW",
++     "id": "4b68705c-b5ba-4c1e-b04f-f5718d96999f",
++     "periodEnd": null,
++     "periodStart": null,
++     "planId": "19f4b9e1-9a48-4790-9a98-5bbd16b6cfe2",
++     "planName": "합성 상품",
++     "planVersionId": "80f78512-12f8-4383-80e7-4d24085040fc",
++     "priceKrw": 12000,
++     "status": "cancelled",
++     "version": 2,
++   },
++   "status": 200,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:72:74
+     70| test("결제 진행 중 구독 취소는 거절하고 업무·감사·요청 키를 유지한다", async () => {
+     71|   const key = randomUUID(), before = await state();
+     72|   await expect(cancelPurchase(ctx, subscriptionId, 1, key, randomUUID(…
+       |                                                                          ^
+     73|   expect(await state()).toEqual(before); expect(await db.idempotencyRe…
+     74| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/server/payment-event-integrity.test.ts > 이미 취소된 과거 구독의 뒤늦은 승인은 원장만 충전하지 않는다
+AssertionError: promise resolved "{ …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 12000,
++   "currency": "KRW",
++   "duplicate": false,
++   "id": "e80fb05d-cbc7-4ab2-b703-453d4ab09516",
++   "methodId": null,
++   "status": "paid",
++   "subscriptionId": "c28284dc-fcc3-4757-ade5-21262701d853",
++   "version": 2,
+  }
+
+ ❯ tests/server/payment-event-integrity.test.ts:79:37
+     77|   await db.billingSubscription.update({ where: { id: subscriptionId },…
+     78|   const before = await state();
+     79|   await expect(apply(event("paid"))).rejects.toMatchObject({ status: 4…
+       |                                     ^
+     80|   expect(await state()).toEqual(before);
+     81| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed (7)
+   Start at  11:02:01
+   Duration  2.58s (tests 63%, import 25%, transform 12%)
+

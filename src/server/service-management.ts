@@ -1,5 +1,14 @@
 import type { Transaction } from "./db";
 import { fail } from "./http";
+import type { Context } from "./context";
+import type { Capability } from "./permissions";
+import { lockServiceActor } from "./service-actor";
+
+/** Management writes follow the same company-first order as member and security changes. */
+export async function lockManagementActor(tx: Transaction, ctx: Context, capability: Capability) {
+  await tx.$queryRaw`SELECT id FROM "Company" WHERE id=${ctx.tenantId} FOR UPDATE`;
+  return lockServiceActor(tx, ctx, capability);
+}
 export async function assertServiceArchivable(tx: Transaction, tenantId: string, id: string) {
   await tx.$queryRaw`SELECT id FROM "Service" WHERE id=${id} AND "tenantId"=${tenantId} FOR UPDATE`;
   const row = await tx.service.findFirst({ where: { id, tenantId }, select: { _count: { select: {

@@ -68,6 +68,11 @@ const authInstance = betterAuth({
     } },
   })],
   hooks: { before: createAuthMiddleware(async ctx => {
+    // Validate before any custom redirect, including a previously used verification link.
+    for (const callback of [ctx.body?.callbackURL, ctx.body?.redirectTo, ctx.query?.callbackURL]) {
+      if (callback !== undefined && !isSafeAuthCallback(callback, env.BETTER_AUTH_URL))
+        throw new APIError("BAD_REQUEST", { code: "INVALID_CALLBACK_URL", message: "인증 후 이동할 주소가 올바르지 않습니다." });
+    }
     if (["/unlink-account", "/list-accounts"].includes(ctx.path))
       throw new APIError("FORBIDDEN", { code: "SSO_ACCOUNT_SCREEN_REQUIRED", message: "회사 SSO 연결 관리 화면을 사용해주세요." });
     if (ctx.path.startsWith("/two-factor/")) {
@@ -89,13 +94,19 @@ const authInstance = betterAuth({
         const target = await db.user.findUnique({ where: { email: token.email }, select: { id: true } });
         const user = target && await lockAuthUser(scope.client, target.id);
         if (!user || user.status !== "active") throw new APIError("UNAUTHORIZED", { code: "INVALID_TOKEN", message: "링크가 만료되었거나 사용할 수 없습니다." });
+        // The account lock serializes simultaneous confirmations. A signed link
+        // cannot produce another successful confirmation after the flag commits.
+        if (user.emailVerified) {
+          if (typeof ctx.query.callbackURL === "string") {
+            const callback = new URL(ctx.query.callbackURL, env.BETTER_AUTH_URL);
+            callback.searchParams.set("error", "EMAIL_ALREADY_VERIFIED");
+            throw ctx.redirect(callback.href);
+          }
+          throw new APIError("BAD_REQUEST", { code: "EMAIL_ALREADY_VERIFIED", message: "이미 이메일 인증을 마쳤습니다. 로그인해주세요." });
+        }
         scope.actorId = user.id;
         if (typeof token.exp === "number" && Number.isFinite(token.exp)) scope.proofDeadline = new Date(token.exp * 1000);
       }
-    }
-    for (const callback of [ctx.body?.callbackURL, ctx.body?.redirectTo, ctx.query?.callbackURL]) {
-      if (callback !== undefined && !isSafeAuthCallback(callback, env.BETTER_AUTH_URL))
-        throw new APIError("BAD_REQUEST", { code: "INVALID_CALLBACK_URL", message: "인증 후 이동할 주소가 올바르지 않습니다." });
     }
     if (["/change-password", "/reset-password"].includes(ctx.path)) {
       const operation = credentialOperation();
@@ -170,6 +181,12 @@ const authInstance = betterAuth({
             if (session.userId !== sso.userId || sso.deadline <= new Date())
               throw new APIError("UNAUTHORIZED", { message: "SSO 인증을 다시 시작해주세요." });
             return { data: { ...session, activeCompanyId: sso.tenantId } };
+          }
+          const rotated = authMutationScope.getStore()?.rotatedSsoProof;
+          if (rotated) {
+            if (rotated.source.userId !== session.userId)
+              throw new APIError("UNAUTHORIZED", { message: "SSO 인증 사용자가 변경되었습니다." });
+            return { data: { ...session, activeCompanyId: rotated.activeCompanyId } };
           }
           const user = await db.user.findUnique({ where: { id: session.userId }, select: { status: true } });
           if (!user || user.status !== "active") throw new APIError("FORBIDDEN", { message: "사용할 수 없는 계정입니다." });

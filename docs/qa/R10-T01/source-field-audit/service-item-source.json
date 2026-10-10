@@ -1,0 +1,7 @@
+{
+  "source": "../outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+  "sha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+  "offset": 11720922,
+  "context": "t(){const{t:e}=fa(\"translate\",{keyPrefix:\"infoManagementPage\"}),t=Wu(),r=Qr(),n=Xr(),[a,o]=(0,yt.useState)({show:!1}),i=r.state.serviceId,[s,l]=(0,yt.useState)(0),c=(0,nP.useMediaQuery)({maxWidth:767});return(0,yt.useEffect)((()=>{let r=null;Mdt(i).then((e=>{e&&e.data.cnt>0?l(e.data.cnt):l(0)})),t(Vdt(i)).then((a=>{(function(e){return At.get(`${PE}/company-operated-service/output/services/${e}/items`)})(i).then((e=>{const n={hasPaymentPurpose:e.data.hasPaymentPurpose,hasProviderOutSea:e.data.hasProviderOutSea,hasSensitive:e.data.hasSensitive,mandatoryItems:e.data.mandatoryItems,optionalItems:e.data.optionalItems},o=a||null;if(o){var i,s,l,c;if(r={...o},0===r.cctvManagerInfo.length){const e=[...r.cctvManagerInfo];e.push({department:\"\",managerInfo:\"\",cctvManagerType:\"IN_CHARGE\"}),r.cctvManagerInfo=e}if(0===r.cctvSubManagerInfo.length){const e=[...r.cctvSubManagerInfo];e.push({department:\"\",managerInfo:\"\",cctvManagerType:\"HANDS_ON\"}),r.cctvSubManagerInfo=e}if(0===r.cctvInstallInfoList.len",
+  "finding": "Eft의 서비스 ID로 전체 수집 항목을 조회한 뒤 initMandatoryItems/initOptionalItems에 대입. 목적 ID 필터는 이 호출에 없다."
+}

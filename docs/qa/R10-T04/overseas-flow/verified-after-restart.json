@@ -1,0 +1,170 @@
+{
+  "checkedAt": "2026-10-09T18:07:56.804Z",
+  "result": "passed",
+  "documentId": "b3f61db9-3094-4464-a9b2-f2c94bff639e",
+  "rowVersion": 10,
+  "draftRevision": 4,
+  "publishedVersions": 3,
+  "recipientSources": 6,
+  "checks": [
+    {
+      "name": "owner read",
+      "status": 200
+    },
+    {
+      "name": "anonymous read",
+      "status": 401,
+      "code": "UNAUTHENTICATED"
+    },
+    {
+      "name": "viewer read",
+      "status": 403,
+      "code": "SERVICE_FORBIDDEN"
+    },
+    {
+      "name": "viewer create",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "name": "other tenant GET",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "other tenant PATCH",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "other tenant DELETE",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "name": "stale update",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "stale archive",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "stale unpublish",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "invalid restore",
+      "status": 409,
+      "code": "INVALID_TRANSITION"
+    },
+    {
+      "name": "type immutable",
+      "status": 422,
+      "code": "IMMUTABLE_DOCUMENT_SCOPE"
+    },
+    {
+      "name": "tenant injection",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "view=overseas",
+      "status": 200
+    },
+    {
+      "name": "view=overseas&agreement=required",
+      "status": 200
+    },
+    {
+      "name": "view=recipients",
+      "status": 200
+    },
+    {
+      "name": "view=recipients&agreement=required",
+      "status": 200
+    },
+    {
+      "name": "view=recipients&recipient=1d541113-b72d-4f44-acff-2c98b1ed97e8",
+      "status": 200
+    },
+    {
+      "name": "view=recipients&recipient=90cc7e11-94ac-43e2-a12b-f989b6731aec",
+      "status": 200
+    },
+    {
+      "name": "view=overseas&country=US",
+      "status": 200
+    },
+    {
+      "name": "view=collection",
+      "status": 200
+    },
+    {
+      "name": "view=resident&domestic=domestic&agreement=required",
+      "status": 200
+    },
+    {
+      "name": "view=overseas&country=JP",
+      "status": 200
+    },
+    {
+      "name": "invalid country",
+      "status": 422,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "public version 1",
+      "status": 410,
+      "code": "DOCUMENT_CLOSED"
+    },
+    {
+      "name": "public PDF 1",
+      "status": 410
+    },
+    {
+      "name": "public version 2",
+      "status": 410,
+      "code": "DOCUMENT_CLOSED"
+    },
+    {
+      "name": "public PDF 2",
+      "status": 410
+    },
+    {
+      "name": "public version 3",
+      "status": 200
+    },
+    {
+      "name": "public PDF 3",
+      "status": 200
+    }
+  ],
+  "pdfs": [
+    {
+      "number": 1,
+      "bytes": 46085,
+      "sha256": "b482f6c41d61f51ef2bb4ecbd0b873474a7dc94a460a7e1d06e5ba08869adebe",
+      "pages": 2
+    },
+    {
+      "number": 2,
+      "bytes": 46819,
+      "sha256": "40c92b2a76e3d5f4639f87f344db04eccec5817c78787a41827ce0fbd20d5dc0",
+      "pages": 2
+    },
+    {
+      "number": 3,
+      "bytes": 46818,
+      "sha256": "380e154a7d9c623d49274ff45d660f49711706e3e45de2a42cae82adaba97c0f",
+      "pages": 2
+    }
+  ],
+  "auditEvents": 10,
+  "snapshotImmutable": true,
+  "stateHash": "e764dc9efc9ca03519a2d553aa0f32df62f3f742ff87a190fb850548957c44a3",
+  "restartVerified": true
+}

@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-10-10T01:50:59.447931+00:00",
+  "review": "read-only independent review from prior_evidence",
+  "findings": [
+    {
+      "id": "policy-fifth-attempt",
+      "status": "fixed",
+      "test": "policy-limit-final.log",
+      "browser": "policy-limit-fixed.json"
+    },
+    {
+      "id": "policy-description-overlap",
+      "status": "fixed",
+      "browser": "policy-browser.json"
+    },
+    {
+      "id": "history-navigation-guard",
+      "status": "pending",
+      "evidence": "Source-only: current common guard covers beforeunload and GuardedLink, not SPA history traversal."
+    },
+    {
+      "id": "freeze-coverage",
+      "status": "expanded",
+      "evidence": "Single RepeatableRead relational snapshot plus mail-file hashes. No claim of DB write lock or external proof."
+    }
+  ]
+}

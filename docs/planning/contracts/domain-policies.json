@@ -2,6 +2,28 @@
   "version": 1,
   "rules": [
     {
+      "id": "org-email-ownership",
+      "prefixes": [
+        "/auth/org/email-register"
+      ],
+      "scope": "PIN으로 확인한 가상 조직 디렉터리의 미등록 이메일. ticket·회사·공급자·디렉터리 version·입력 이메일·challenge·code 결합.",
+      "validation": "현재 회사/IP/SSO정책·공급자 상태와 버전·디렉터리 스냅샷을 잠금 안에서 재검사. 코드 5분/티켓 기한 이내, 오답 5회 영속 제한, 재전송 60초·구성원별 시간당10회. 무효 티켓/쿨다운은 구성원 발급한도를 소모하지 않음.",
+      "response": "발급은 challengeId/expiresAt/retryAt만, 등록은 status/redirect와 session 또는 MFA cookie. ticket/code/이메일/암호문은 감사·응답에 미노출.",
+      "deletion": "재발급은 이전 challenge 폐기와 대기메일 취소. 성공은 디렉터리/JIT/계정/세션/감사와 같은 트랜잭션에서 티켓·challenge 소비. 관리자 수정/삭제로 티켓 제거 시 challenge cascade. worker는 발송 직전 현재 상태 확인.",
+      "forbidden": "이메일 소유 검증 없는 verified 사용자 생성, 다른 티켓/회사/이메일의 번호 재사용, 만료/소비/5회 실패 번호 사용, 취소·만료·관리자변경 뒤 발송, 실패한 JIT의 부분 등록 금지."
+    },
+    {
+      "id": "sso-login-policy-writer",
+      "prefixes": [
+        "/security/sso-policy"
+      ],
+      "scope": "현재 회사 직접 소속 조회 security.read, 변경 owner/security + security.write + 불변 상품 버전의 security.sso_login_policy 기능",
+      "validation": "Company UPDATE 선잠금. 현재 계정/세션/권한/IP/MFA/비밀번호 정책/구독 및 선택 공급자의 최근5분 실제 SSO 근거, challenge 회사/user/session/version/mode/email 결합. 코드5분·5회·분당1회/시간10회·1회소비. 제한 공급자 교체는 NONE 중간 전이 필요.",
+      "response": "정책·권한·구독·최근 인증 시각·연결 영향 건수. 코드/해시/공급자 비밀 제외.",
+      "deletion": "코드 재발급 시 기존 요청 폐기와 대기 메일 취소, 세션 종료 시 challenge cascade. 정책은 NONE 저장으로 제한 해제하며 version/감사 유지.",
+      "forbidden": "Account 연결 유무를 최근 인증으로 추정 금지. 다른 회사/사용자/세션/선택mode/version의 코드 사용, 중복소비, 회수권한/구독만료 후 변경 금지. 구독 만료로 저장된 정책 자동 해제 금지."
+    },
+    {
       "id": "company-mfa",
       "prefixes": [
         "/security/mfa-policy",
@@ -87,7 +109,7 @@
         "/access-requests"
       ],
       "scope": "현재 회사의 Membership·Invitation. ServiceGrant는 같은 tenant 서비스만.",
-      "validation": "역할 상한, 이메일 정규화, 서비스 ID, version·Idempotency-Key·초대 만료를 검사한다. 좌석은 활성 구성원과 유효 대기 초대를 합산하고 재발송·수락은 자기 예약을 제외한다. 기존 구성원은 빈 서비스 범위와 기존 보관 서비스 권한 유지·회수를 허용하고 새 초대는 활성 서비스가 필요하다. 수락과 메일 전달 직전에 계정·세션 또는 초대 세대·초대자 권한을 재검사한다.",
+      "validation": "역할 상한, 이메일 정규화, 서비스 ID, version·Idempotency-Key·초대 만료를 검사한다. 좌석은 활성 구성원과 유효 대기 초대를 합산하고 재발송·수락은 자기 예약을 제외한다. 기존 구성원은 빈 서비스 범위와 기존 보관 서비스 권한 유지·회수를 허용하고 새 초대는 활성 서비스가 필요하다. 수락과 메일 전달 직전에 계정·세션 또는 초대 세대·초대자 권한을 재검사한다. 초대 수락과 성공 캐시 재전송도 대상 회사의 현재 SSO 로그인 정책과 해당 세션의 인증 근거를 검사한다. 확인된 초대 수락 자체는 SSO 연결에 필요한 소속을 부여한다. 대상 정책에 맞는 인증 전에는 activeServiceId=null이며 업무 API는 거부한다. 응답과 재전송에는 현재 ssoLogin 상태를 반환한다.",
       "response": "구성원 역할·허용 서비스·서비스 보관 상태·초대 상태. 초대 token hash/원문 제외.",
       "deletion": "구성원 제외는 권한·세션 회수 후 이력 보존. 초대 DELETE는 취소.",
       "forbidden": "마지막 owner 제거, 자기보다 높은 역할 부여, 초대받지 않은 이메일 수락, 회수한 보관 서비스 권한 재부여, 만료·이전 세대 초대 메일 전달 금지."
@@ -481,7 +503,7 @@
         "/security/sso"
       ],
       "scope": "현재 회사의 직접 소속·security.read로 조회, 변경/검사는 직접 소속 owner만. 삭제는 로그인 후 5분 이내.",
-      "validation": "protocol별 URL/secret/cert 입력, 사전검사 전후 권한·버전 확인. 사용 중 공급자의 수동 비활성화/인증정보 변경·삭제 시 활성 연결 사용자의 대체 로그인 수단과 최신 권한 검사. SERIALIZABLE과 사용자 잠금으로 회사 간 경합 방지. 인증정보 변경은 비활성화/재검사. 실패한 사전검사는 대체 수단 유무와 무관하게 비활성화한다. 수동 비활성화/교체는 기존 세션을 유지하고 대기 인증은 version 재검사로 거부한다.",
+      "validation": "protocol별 URL/secret/cert 입력, 사전검사 전후 권한·버전 확인. 사용 중 공급자의 수동 비활성화/인증정보 변경·삭제 시 활성 연결 사용자의 대체 로그인 수단과 최신 권한 검사. SERIALIZABLE과 사용자 잠금으로 회사 간 경합 방지. 인증정보 변경은 비활성화/재검사. 실패한 사전검사는 대체 수단 유무와 무관하게 비활성화한다. 수동 비활성화/교체는 기존 세션을 유지하고 대기 인증은 version 재검사로 거부한다. 회사 SSO 제한 중 공급자 중지의 대체 로그인은 같은 회사·허용된 제공자의 활성 연결 계정만 인정한다. 다른 회사 계정이나 비밀번호만으로 허용하지 않는다.",
       "response": "items 또는 단일 공급자 안전 DTO; secret/cert는 존재 여부만. 검사 결과와 삭제 건수/signedOut을 반환한다.",
       "deletion": "Account의 공급자 FK는 RESTRICT. 서비스 계층에서 영향 계정/세션/인증/state 및 감사를 원자 처리한 뒤 공급자 삭제. 계정 참조는 DB trigger가 providerId에서 채운다.",
       "forbidden": "다른 회사, 전문가, owner 아닌 변경; 비밀 원문 조회; 사전검사 없는 활성화; 마지막 로그인 수단 제거; 고아 계정 생성 금지."
@@ -491,11 +513,22 @@
       "prefixes": [
         "/auth/sso"
       ],
-      "scope": "해당 공급자의 활성 회사/IP 정책. login은 공개 시작, link는 현재 직접 구성원과 최근 로그인 필요. 초대는 별도 bearer POST 진입.",
-      "validation": "state 일회 소비·10분 기한, providerVersion, OIDC PKCE/nonce/issuer/audience/signature 또는 서명 SAML 응답/Assertion의 요청/대상/시간 확인. 현재 계정·연결세션·초대 hash/version/이메일/역할·정원 재검사.",
+      "scope": "해당 공급자의 활성 회사/IP 정책. login은 공개 시작, link는 현재 직접 구성원과 최근 로그인 필요. 초대는 별도 bearer POST 진입. 제한 회사의 직접 구성원은 계정 복구용 SSO 연결을 시작할 수 있지만 인증 전 업무 권한은 부여하지 않는다.",
+      "validation": "state 일회 소비·10분 기한, providerVersion, OIDC PKCE/nonce/issuer/audience/signature 또는 서명 SAML 응답/Assertion의 요청/대상/시간 확인. 현재 계정·연결세션·초대 hash/version/이메일/역할·정원 재검사. 저장된 회사 SSO 로그인 제한(NONE/AZURE/GOOGLE)을 시작·완료·MFA 완료에서 재검사하며 공식 endpoint 분류를 사용한다. 제한에 맞지 않는 요청은 GOOGLE_OAUTH_POLICY/MS_OAUTH_POLICY 403이다.",
       "response": "정상 302 Location/쿠키. 2FA 사용자는 factor 화면 이동, 확인 전 세션 없음. 문서 실패303 고정 오류코드, API 실패JSON. 공급자 상세 오류 비노출.",
       "deletion": "state는 일회 소비, 회사/공급자/연결 세션 회수 시 인증 불가. 연결·초대·세션·감사는 원자 처리.",
       "forbidden": "초대 UUID만 시작, 자동 이메일 계정 병합, 상태 재사용, 서명/발급자/대상 우회, 삭제 소속의 자동 복구, 2FA 전 세션, 임의 리디렉션 금지."
+    },
+    {
+      "id": "author-assets",
+      "prefixes": [
+        "/author-assets"
+      ],
+      "scope": "업로드 init/content/complete/discard/임시 다운로드와 usage는 현재 발급 구성원·활성 서비스의 form.write가 필요하다. 지정 부모 읽기는 form/template/approval에 form.read, submission에 submission.read가 필요하며, 부모의 현재 회사·서비스·전문가/직접 구성원 권한을 재검사한다.",
+      "validation": "엄격한 판별 query와 UUID·form/template version, FILE+LINK 합계 3개와 0기반 순서, 일반 객관식·체크박스 이미지 20개. PDF/DOCX/AI 5MiB·JPEG/PNG 1MiB, 이름 255 UTF-16, 원본 SHA·한도가 있는 내용 검증·ClamAV. init은 영속 1시간 예약과 공용 용량 한도를 적용하고 멱등 재요청에도 현재 권한을 검사한다.",
+      "response": "안전 메타데이터(id/purpose/name/mime/size/sha256/status/version/expiresAt), upload의 usage, 부모 manifest만 반환한다. storageKey/blobId/암호문/타회사·발급자 정보는 제외한다. 다운로드는 요청마다 부모·현재 권한·기한 및 I/O 후 기한을 확인하며 private, no-store·nosniff·no-referrer를 적용한다. 문서는 attachment, 검사된 이미지는 inline이다.",
+      "deletion": "discard는 명시 version·현재 발급자·form.write 검사 후 미참조 자료만 요청한다(참조 중이면 409). pin과 불변 bytes·과거 버전은 보존하며 영속 worker가 최종 무참조 blob만 정리한다. 암묵 개정은 재사용하고 명시 copy/use는 새 asset 소유권과 용량을 적용한다. system ingest는 서버 전용이며 HTTP 경로가 없다.",
+      "forbidden": "URL/경로/storageKey/blobId/ownerKind/tenantId 입력으로 자산 권한을 대체하지 않는다. 검사 전·만료·회수된 권한의 다운로드, 다른 문항/부모 자산 추측, 기타/드롭다운/행렬 이미지, 응답 FILE/DRAW 파일 혼용, 과거 pin 파괴를 금지한다."
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { formContentSchema } from "./domains";
-import type { Answers, MatrixRows } from "./questions";
+import type { Answers, MatrixRows, OptionDefinition } from "./questions";
 
 export const retentionDesignationInput = z.object({
   version: z.number().int().positive(),
@@ -18,14 +18,14 @@ export type FormRecord = {
   version: number; createdAt: string; updatedAt: string; content: FormContent;
   consentBundle?: import("./form-documents").FormConsentBundle | null;
   draftNumber: number; hasDraft: boolean; published: boolean; favorite: boolean;
-  publication: null | { id: string; responseCount: number; maxResponses: number; expiresAt: string | null; token?: string };
+  publication: null | { id: string; responseCount: number; maxResponses: number; opensAt: string | null; expiresAt: string | null; token?: string };
   actions?: FormActions;
 };
 export type SubmissionRecord = {
   id: string; version: number; formVersionId: string; status: string; created: string;
   retentionUntil: string; legalHold: boolean; contentAvailable: boolean; values: Answers;
   attachments: import("./files").FileInfo[];
-  questions: { id: string; label: string; type: string; rows?: MatrixRows }[];
+  questions: { id: string; label: string; type: string; rows?: MatrixRows; optionDefinitions?: OptionDefinition[] }[];
 };
 export type Paged<T> = { items: T[]; total: number; page: number; pageSize: number };
 export type FormPage = Paged<FormRecord> & { permissions: FormListPermissions };
@@ -39,6 +39,9 @@ export const formStatus: Record<FormRecord["status"], string> = {
 };
 
 export type TemplateActions = { preview: boolean; use: boolean; edit: boolean; remove: boolean };
-export type TemplatePermissions = { canCreate: boolean; targets: { id: string; name: string }[] };
-export type TemplateRecord = { id: string; serviceId: string | null; serviceName: string | null; scope: "company" | "public"; title: string; category: string; content: FormContent; version: number; createdAt: string; updatedAt: string; actions?: TemplateActions };
+export type TemplatePermissions = { canCreate: boolean; subscriptionActive: boolean; targets: { id: string; name: string }[] };
+export type TemplateRecord = { id: string; serviceId: string | null; serviceName: string | null; scope: "company" | "public";
+  title: string; category: string; description: string; thumbnailAssetId: string | null;
+  licenseScope: "SERVICE" | "ACTIVE_SUBSCRIPTION"; licenseAvailable: boolean;
+  content: FormContent; version: number; createdAt: string; updatedAt: string; actions?: TemplateActions };
 export type TemplatePage = Paged<TemplateRecord> & { permissions: TemplatePermissions };

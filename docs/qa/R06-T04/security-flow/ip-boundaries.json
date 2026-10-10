@@ -1,0 +1,101 @@
+{
+  "checkedAt": "2026-10-09T20:44:27.208Z",
+  "realTransport": "Two local custom-server listeners, IPv4 127.0.0.1:3100 and IPv6 [::1]:3110, each signs its actual socket peer; same existing owner session; no trusted proxies",
+  "cases": [
+    {
+      "label": "IPv4 owner existing session allowed",
+      "status": 200
+    },
+    {
+      "label": "Real IPv6 socket with forged IPv4 headers denied /security/policy",
+      "status": 403,
+      "code": "IP_NOT_ALLOWED"
+    },
+    {
+      "label": "Real IPv6 socket with forged IPv4 headers denied /security/ip-rules",
+      "status": 403,
+      "code": "IP_NOT_ALLOWED"
+    },
+    {
+      "label": "Real IPv6 socket with forged IPv4 headers denied /members",
+      "status": 403,
+      "code": "IP_NOT_ALLOWED"
+    },
+    {
+      "label": "Real IPv6 socket with forged IPv4 headers denied /forms",
+      "status": 403,
+      "code": "IP_NOT_ALLOWED"
+    },
+    {
+      "label": "Real IPv6 socket with forged IPv4 headers denied /files?submissionId=3ca6ec8e-d15b-4770-aac1-e29e47484978",
+      "status": 403,
+      "code": "IP_NOT_ALLOWED"
+    },
+    {
+      "label": "Real IPv6 socket with forged IPv4 headers denied /exports",
+      "status": 403,
+      "code": "IP_NOT_ALLOWED"
+    },
+    {
+      "label": "unauthenticated list",
+      "status": 401,
+      "code": "UNAUTHENTICATED"
+    },
+    {
+      "label": "viewer list denied",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "label": "admin cannot create",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "label": "foreign rule hidden",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "label": "invalid CIDR rejected",
+      "status": 422,
+      "code": "INVALID_CIDR"
+    },
+    {
+      "label": "IPv6 normalized create",
+      "status": 201
+    },
+    {
+      "label": "IPv6 update",
+      "status": 200
+    },
+    {
+      "label": "stale update rejected",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "label": "idempotent replay returns current version",
+      "status": 201
+    },
+    {
+      "label": "delete IPv6 rule",
+      "status": 204
+    },
+    {
+      "label": "deleted rule hidden",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "label": "deleted create replay gone",
+      "status": 410,
+      "code": "IDEMPOTENCY_EXPIRED"
+    },
+    {
+      "label": "last allowed rule cannot be deleted",
+      "status": 409,
+      "code": "IP_LOCKOUT"
+    }
+  ]
+}

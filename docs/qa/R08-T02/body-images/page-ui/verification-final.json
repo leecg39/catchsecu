@@ -1,0 +1,149 @@
+{
+  "result": "passed",
+  "checkpoint": "BI-05b/F4c",
+  "recordedAt": "2026-10-10T11:38:18Z",
+  "scope": "다중 페이지 편집, 보기별 분기, 공개 앞뒤 이동과 방문 경로 제출",
+  "implementation": {
+    "pageEditor": [
+      "enable-disable",
+      "add-duplicate-reorder-delete",
+      "stable-page-and-question-id-remap",
+      "title-and-rich-body",
+      "question-placement",
+      "default-destination",
+      "allow-back",
+      "option-destination"
+    ],
+    "publicFlow": [
+      "canonical-server-shared-destination-resolution",
+      "page-specific-question-rendering",
+      "back-navigation",
+      "branch-change-answer-and-upload-pruning",
+      "ineligible-terminal",
+      "visited-page-path-submission"
+    ],
+    "draftSafety": [
+      "autosave-and-reload",
+      "manual-save",
+      "two-tab-409-input-preservation",
+      "explicit-next-button-default-prevention"
+    ]
+  },
+  "defectFoundAndFixed": {
+    "symptom": "마지막 페이지의 다음 버튼이 동의 화면으로 전환되며 같은 click의 기본 submit까지 실행함",
+    "cause": "React가 같은 button DOM을 terminal submit 버튼으로 재사용해 click 기본 동작 시점에 type이 submit으로 바뀜",
+    "fix": "다음 페이지 onClick에서 preventDefault 후 advance 실행",
+    "verified": "동의 화면에서 제출하기 버튼을 별도로 눌러야만 제출됨"
+  },
+  "automatedValidation": [
+    {
+      "command": "npx vitest run tests/server/form-page-state.test.ts tests/server/form-draft-state.test.ts",
+      "files": 2,
+      "tests": 19,
+      "status": "passed"
+    },
+    {
+      "command": "npm test -- tests/server/form-page-branches.test.ts",
+      "files": 1,
+      "tests": 5,
+      "database": "catchsecu_test",
+      "status": "passed"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "passed"
+    },
+    {
+      "command": "npx eslint <BI-05b changed source, tests, QA script>",
+      "status": "passed",
+      "errors": 0
+    },
+    {
+      "command": "ALLOW_LOCAL_MAIL=1 ALLOW_LOCAL_KAKAO=1 ALLOW_LOCAL_PAYMENT=1 ALLOW_LOCAL_SSO=1 npm run build",
+      "status": "passed",
+      "staticPages": 82,
+      "note": "외부 공급자 성공 검증이 아니라 로컬 production 빌드용 명시적 안전장치 해제"
+    },
+    {
+      "command": "BETTER_AUTH_URL=http://localhost:3112 node --env-file=.env.test.local --import tsx scripts/qa-rea-page-flow.ts verify",
+      "status": "passed",
+      "database": "catchsecu_test",
+      "afterServerRestart": true
+    }
+  ],
+  "browserValidation": {
+    "browser": "Ego Lite",
+    "origin": "http://localhost:3112",
+    "formId": "aefbf033-4266-40ff-ada6-1e8d265953d4",
+    "observed": [
+      "다중 페이지 활성화와 3페이지 생성",
+      "페이지 제목과 rich 본문 저장",
+      "질문 3개를 페이지별로 배치",
+      "상세-2페이지, 바로-3페이지, 제외-ineligible 분기 저장과 새로고침 복원",
+      "장기 경로 3페이지 제출",
+      "뒤로 이동 후 분기 변경과 상세 답변 제거",
+      "단축 경로 2페이지 제출",
+      "참여 대상 아님 경로의 제출 차단",
+      "동의 화면 전환과 제출 버튼 분리",
+      "두 탭 409에서 두 번째 탭 입력과 내려받기 기능 보존",
+      "서버 재시작 후 공개 게시본 복원",
+      "390·768·1440px 편집기와 공개 폼 가로 넘침 0"
+    ],
+    "responsive": {
+      "editor": {
+        "390": { "documentOverflowPx": 0 },
+        "768": { "documentOverflowPx": 0 },
+        "1440": { "documentOverflowPx": 0 }
+      },
+      "public": {
+        "390": { "documentOverflowPx": 0 },
+        "768": { "documentOverflowPx": 0 },
+        "1440": { "documentOverflowPx": 0 }
+      }
+    }
+  },
+  "databaseValidation": {
+    "publicationVersion": 2,
+    "submissions": 2,
+    "longPathPages": 3,
+    "shortPathPages": 2,
+    "ineligibleSubmissionCreated": false,
+    "shortPathDetailAnswerCleared": true,
+    "storedAnswers": 6,
+    "terminals": ["consent", "consent"]
+  },
+  "artifacts": {
+    "browserDatabase": "browser-db.json",
+    "publish": "publish.json",
+    "editor390": { "path": "editor-390.png", "sha256": "49163b72b162d9bb4cb7276d61a764182130a46af9fbffabd2768437fe0ff682" },
+    "editor768": { "path": "editor-768.png", "sha256": "be4ed05dd196d81e9af4000152ed20d67c7766936c820cb21bdb3b1ff1a9f649" },
+    "editor1440": { "path": "editor-1440.png", "sha256": "8c7d5b3ce307164f3d6a1a3c743a730e553c01b9f4b8987ad6e4e158060a72ca" },
+    "editorConflict": { "path": "editor-conflict.png", "sha256": "2c2bb2c632e5aba34ac34328ac3d72cfd0e0fbe7dcf72b308d603e4df9b020a8" },
+    "public390": { "path": "public-390.png", "sha256": "49b21a1a26228387799e84f986f91d53d21cb222bd27a4f445c560b1221ec556" },
+    "public768": { "path": "public-768.png", "sha256": "b7729ee6b3eda1948562adc43ac5961d4215aa8b5081a64f13ce60fb32c82895" },
+    "public1440": { "path": "public-1440.png", "sha256": "51f6ea9114e12809c6b8b115c058f806dc535f79cfca8c7c3c6ebd19df411fbf" }
+  },
+  "sourceSha256": {
+    "src/contracts/form-sections.ts": "0b6f2725eed53fcab7d3654236adaaabbacde5d7ae924047a99644db8a4dd2df",
+    "src/components/forms/form-page-state.ts": "8d99232ec340a5441693598a133a31aecf48a8cef81641705c72ae6a0bb01e0a",
+    "src/components/forms/FormPagesEditor.tsx": "6036ba74e3d9bfed2a4cc74590c937da696633aeb9010004277cb892dfc51090",
+    "src/components/forms/OwnedRichDocumentView.tsx": "4a827a69e3ed2e22808c8e38ca147b24b24d2b4bb17bfef98c878d04a0951bc2",
+    "src/components/forms/FormEditor.tsx": "84250a2f870ef61ade3574533edc919aa967d0a04514ba7e438d9e41bb3c0779",
+    "src/components/forms/PublicForm.tsx": "9bb1679c477e34f493ba9f0fd6625acbc592613085b42d90e273e3b238c37a32",
+    "src/components/forms/forms.css": "4cfb177d001f090a0dcbf47544ec2f00087306a9fe9ff7f047bbff3a9fc18d08",
+    "src/components/public.css": "e2b34fdb42fe4de5d604bc223dcd0625c8c5ab3f612ad9cc3ec4f70e4653ff6a",
+    "scripts/qa-rea-page-flow.ts": "b78d5dafab6165fcb1c38c72ef0b201e690036a0d9f3f7d2ff9d18ca9bb9be5c",
+    "tests/server/form-page-state.test.ts": "15cb2a8b4ab8353fbccb3e6b84293199fbde1a27b8c905012f699956d58fab7a"
+  },
+  "externalCredentials": [],
+  "notCompletedHere": [
+    "BI-05c completion and closed page editors and read authorization",
+    "BI-06 evidence v2 and rich PDF",
+    "BI-07 four-slot full acceptance"
+  ],
+  "protectedState": {
+    "productionDatabaseTouched": false,
+    "frozenQuestionImageFixtureTouched": false,
+    "localhost3108Touched": false
+  }
+}

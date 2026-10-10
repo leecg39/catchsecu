@@ -1,3 +1,4 @@
+import { grantSecurityTestTrials } from "../fixtures/security-subscription";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeEach, expect, test } from "vitest";
 import { auth } from "@/server/auth";
@@ -23,6 +24,7 @@ async function owner() {
   const user = await db.user.update({ where: { email }, data: { emailVerified: true } });
   const company = await db.company.create({ data: { name: "보유 기간 회사", publicName: "보유 기간", policy: { create: { retentionDays: 365, allowRetentionDesignation: true } },
     memberships: { create: { userId: user.id, role: "owner" } }, services: { create: { name: "보유 서비스", externalName: "보유" } } }, include: { services: true, policy: true } });
+  await grantSecurityTestTrials();
   const login = await auth.handler(req("/auth/sign-in/email", "", "POST", { email, password })); expect(login.status).toBe(200);
   const cookie = login.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
   return { company, cookie, serviceId: company.services[0].id };

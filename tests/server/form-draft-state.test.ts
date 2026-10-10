@@ -1,6 +1,7 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { FormDraftSession, type FormDraftValue } from "@/lib/form-draft";
 import type { FormRecord } from "@/contracts/forms";
+import { richDocumentText, type RichDocumentV1 } from "@/contracts/rich-content";
 
 const value: FormDraftValue = { serviceId: "service", title: "초안", content: { body: "원본", questions: [{ id: "question", type: "단문형 답변", label: "이름", required: true }],
   consentRequired: false, consentPurpose: "", retentionDays: 30, maxResponses: 50 } };
@@ -58,6 +59,30 @@ test("409는 내 입력을 유지하고 자동 덮어쓰기를 멈춘다; 최신
   s.edit({ ...value, title: "충돌 뒤 추가 입력" }); await vi.advanceTimersByTimeAsync(4000); await s.save(); expect(persist).toHaveBeenCalledTimes(1);
   s.load(record({ ...value,title:"다른 기기" },7)); s.edit({ ...value,title:"최신본에서 변경" }); await s.save();
   expect(persist.mock.calls[1][0].version).toBe(7); expect(s.getSnapshot().record?.version).toBe(8);
+});
+test("409 충돌 뒤에도 리치 본문과 소유 이미지 참조를 정확히 보존한다", async () => {
+  const bodyRich: RichDocumentV1 = {
+    schemaVersion: 1,
+    blocks: [
+      { type: "heading", level: 2, children: [{ type: "text", text: "내 리치 입력", bold: true }] },
+      { type: "image", nodeId: "00000000-0000-4000-8000-000000000001",
+        assetId: "00000000-0000-4000-8000-000000000002", alt: "보존할 이미지", alignment: "right",
+        width: { unit: "percent", value: 75 } },
+    ],
+  };
+  const persist = vi.fn().mockRejectedValueOnce(Object.assign(new Error("다른 기기 변경"), { status: 409 }));
+  const { s } = session(persist);
+  const richValue: FormDraftValue = {
+    ...value,
+    content: { ...value.content, body: richDocumentText(bodyRich), bodyRich },
+  };
+  s.edit(richValue);
+  await s.save();
+
+  expect(s.getSnapshot().phase).toBe("conflict");
+  expect(s.getSnapshot().value.content.body).toBe("내 리치 입력\n");
+  expect(s.getSnapshot().value.content.bodyRich).toEqual(bodyRich);
+  expect(persist.mock.calls[0][1].content.bodyRich).toEqual(bodyRich);
 });
 test("미완성 입력은 보내지 않고 입력을 마치면 자동저장한다", async () => {
   vi.useFakeTimers(); const { s, persist } = session(); s.edit({ ...value,title:"" }); await vi.advanceTimersByTimeAsync(1200);

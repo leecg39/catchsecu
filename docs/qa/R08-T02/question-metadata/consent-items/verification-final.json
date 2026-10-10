@@ -1,0 +1,84 @@
+{
+  "checkedAt": "2026-10-10T13:18:02Z",
+  "result": "passed",
+  "scope": "Manual question classification to version-frozen consent item aggregation, UI presentation, receipt evidence and PDF persistence.",
+  "implementation": {
+    "projectionSchemaVersion": 1,
+    "filtersNonPersonalInformation": true,
+    "preservesQuestionAndItemOrder": true,
+    "preservesDuplicates": true,
+    "publicQuestionMetadataHidden": true,
+    "receiptEvidenceFrozen": true,
+    "receiptPdfIncludesItems": true
+  },
+  "database": {
+    "migrations": 141,
+    "freshSchema": "passed",
+    "strictJsonConstraint": "passed",
+    "deferredProjectionTriggers": 2,
+    "existingVersionsPreserved": 196,
+    "legacyClassifiedVersionsPreservedWithoutBackfill": 2,
+    "legacyClassifiedQuestionsPreservedWithoutBackfill": 4,
+    "unexpectedSchemaDifferences": 0
+  },
+  "tests": {
+    "focusedDuringImplementation": 24,
+    "integrationDuringImplementation": 25,
+    "expandedDuringImplementation": 43,
+    "finalRender": 3,
+    "typecheck": "passed",
+    "changedFileLint": "passed"
+  },
+  "browser": {
+    "name": "Ego Lite",
+    "editor": "passed",
+    "public": "passed",
+    "submission": "passed",
+    "afterProductionRestart": "passed",
+    "visibleItems": [
+      {
+        "type": "SENSITIVE",
+        "name": "건강정보"
+      },
+      {
+        "type": "IDENTIFICATION",
+        "name": "운전면허번호"
+      },
+      {
+        "type": "SENSITIVE",
+        "name": "건강정보"
+      }
+    ]
+  },
+  "receipt": {
+    "evidenceVersion": 1,
+    "pdfBytes": 43713,
+    "pdfPages": 1,
+    "documentHash": "4057fb93d46583c58b3ed291fece90afdcc53dd42d57ead12d774237dcb40bc9",
+    "pdfHash": "6538b0c662a85836a9e78e2ab2e6ed92775dd3ee847dddb26f31ceff3c019670"
+  },
+  "restart": {
+    "databaseFrozenHashBefore": "8a2f82b5c2cccab11ef071663d2b5e8183774c2a8547ca091dc1f30b491d9c64",
+    "databaseFrozenHashAfter": "8a2f82b5c2cccab11ef071663d2b5e8183774c2a8547ca091dc1f30b491d9c64",
+    "publicBrowserReloaded": true
+  },
+  "contracts": {
+    "openapiPaths": 323,
+    "openapiOperations": 458,
+    "missingOperations": 0,
+    "taskCount": 107,
+    "dependencyCycles": 0,
+    "productionPages": 82
+  },
+  "remaining": [
+    "NLP or AI classification suggestions",
+    "Full legal consent document text generation",
+    "R08 complete route and state acceptance"
+  ],
+  "officialTaskStatus": {
+    "completed": 0,
+    "inProgress": 53,
+    "planned": 54,
+    "goal": "active"
+  }
+}

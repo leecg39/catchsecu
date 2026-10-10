@@ -1,0 +1,10 @@
+[
+  {
+    "table": "Company",
+    "name": "Company_closure_requested_by_fkey",
+    "definition": "FOREIGN KEY (id, \"closureRequestedById\") REFERENCES \"Membership\"(\"tenantId\", \"userId\") ON DELETE RESTRICT",
+    "sourceMigration": "20261003180000_company_business_files",
+    "reason": "Prisma 7.10.0의 선택적 복합 관계에 Company.id를 포함하면 중첩 회사 생성에서 PK null 오류가 재현된다. @ignore도 해결하지 못했다. scalar 필드와 실제 SQL FK를 유지하며, 이 FK를 삭제하는 diff는 실행하지 않는다.",
+    "evidence": "docs/qa/R01-T01/schema-alignment/regression-before-repair.json"
+  }
+]

@@ -114,6 +114,8 @@ describe("external sharing with PostgreSQL, local mail and private attachments",
     const first = await ok<ShareRecord>(a, 201), again = await ok<ShareRecord>(b, 201); expect(first.id).toBe(again.id);
     const stored = await db.shareGrant.findUniqueOrThrow({ where: { id: first.id } }); expect(stored.emailCipher).not.toContain(input.email); expect(decrypt(stored.emailCipher)).toBe(input.email);
     expect(stored.emailHash).toBe(tokenHash(input.email)); expect(JSON.stringify(first)).not.toMatch(/codeHash|emailHash|Cipher|invitationCode/);
+    const createdAudit = await db.auditEvent.findFirstOrThrow({ where: { resource: "shareGrant", resourceId: first.id, action: "share.created" } });
+    expect(createdAudit.detail).toMatchObject({ changedFields: ["email", "questionIds", "shareFormBody", "expiresAt"] });
     expect(await db.job.count({ where: { dedupeKey: `mail:share:${first.id}:invite:1` } })).toBe(1);
     expect((await shareCreate(req("/share-grants", "POST", "owner", { ...input, email: "else@viewer.local.test" }, { "idempotency-key": key }))).status).toBe(409);
     for (const patch of [{ questionIds: [] }, { questionIds: [f.name, f.name] }, { questionIds: [randomUUID()] }, { expiresAt: new Date(0).toISOString() }, { expiresAt: new Date(Date.now() + 91 * 86400000).toISOString() }])

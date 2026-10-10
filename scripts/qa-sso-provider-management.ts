@@ -63,7 +63,7 @@ try {
     execFileSync("openssl", ["req", "-x509", "-newkey", "rsa:2048", "-keyout", keyPath, "-out", certPath,
       "-days", "2", "-nodes", "-subj", "/CN=catchsecu-local-management-qa"], { stdio: "pipe" });
     const certificate = readFileSync(certPath, "utf8");
-    const input = { protocol: "saml", name: "사전검사 QA", issuer: "https://qa-idp.example.test",
+    const input = { tenantId: fixture.tenantId, protocol: "saml", name: "사전검사 QA", issuer: "https://qa-idp.example.test",
       clientId: "qa-sp", authorizationUrl: "https://qa-idp.example.test/sso", idpCert: certificate };
     const invalidCertificate = "-----BEGIN CERTIFICATE-----\n" + "QUJD".repeat(40) + "\n-----END CERTIFICATE-----";
     const invalid = (await request("/security/sso", "POST", { ...input, name: "미통과 QA", idpCert: invalidCertificate }, 201)).parsed;

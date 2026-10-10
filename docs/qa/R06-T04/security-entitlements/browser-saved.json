@@ -1,0 +1,134 @@
+{
+  "actualUiActions": [
+    "IP rule create",
+    "IP policy enable with password",
+    "MFA policy enable with password"
+  ],
+  "authenticatedWith": "restored session from real HTTP TOTP verification",
+  "rows": [
+    {
+      "path": "/security/policy",
+      "status": 200,
+      "body": {
+        "tenantId": "d84f1bbd-643b-4531-9c71-826e5bb20a49",
+        "minPassword": 12,
+        "passwordMonths": 0,
+        "passwordReuse": 1,
+        "passwordDeferral": "never",
+        "passwordRevision": 1,
+        "sessionMinutes": 30,
+        "requireMfa": true,
+        "requireApproval": false,
+        "approvalRoles": [
+          "owner"
+        ],
+        "approvalReferenceRequired": false,
+        "approvalRequestTemplate": "",
+        "approvalRevision": 1,
+        "automaticDestruction": false,
+        "allowRetentionAdjustment": false,
+        "allowRetentionDesignation": false,
+        "retentionDays": 365,
+        "activityReviewRetentionDays": null,
+        "version": 2,
+        "updatedAt": "2026-10-09T21:15:26.010Z",
+        "entitlements": {
+          "security.company_policy": {
+            "available": true,
+            "state": "included",
+            "expiresAt": "2026-10-16T21:12:05.639Z"
+          },
+          "security.ip_access": {
+            "available": true,
+            "state": "included",
+            "expiresAt": "2026-10-16T21:12:05.639Z"
+          },
+          "security.mfa_management": {
+            "available": true,
+            "state": "included",
+            "expiresAt": "2026-10-16T21:12:05.639Z"
+          }
+        },
+        "canManage": true
+      }
+    },
+    {
+      "path": "/security/ip-rules",
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "ad00522e-ccbb-41ff-9829-72955ceb01c1",
+            "tenantId": "d84f1bbd-643b-4531-9c71-826e5bb20a49",
+            "cidr": "127.0.0.1/32",
+            "description": "구독 만료 후에도 유지되는 관리자 규칙",
+            "enabled": true,
+            "version": 1,
+            "createdAt": "2026-10-09T21:14:19.798Z",
+            "updatedAt": "2026-10-09T21:14:19.798Z"
+          }
+        ],
+        "total": 1,
+        "page": 1,
+        "pageSize": 20,
+        "policy": {
+          "tenantId": "d84f1bbd-643b-4531-9c71-826e5bb20a49",
+          "enabled": true,
+          "version": 1,
+          "currentIp": "127.0.0.1",
+          "canManage": true,
+          "entitlement": {
+            "available": true,
+            "state": "included",
+            "expiresAt": "2026-10-16T21:12:05.639Z"
+          }
+        }
+      }
+    },
+    {
+      "path": "/security/mfa-policy",
+      "status": 200,
+      "body": {
+        "policy": {
+          "tenantId": "d84f1bbd-643b-4531-9c71-826e5bb20a49",
+          "required": true,
+          "version": 2,
+          "canManage": true,
+          "actorEnrolled": true,
+          "entitlement": {
+            "available": true,
+            "state": "included",
+            "expiresAt": "2026-10-16T21:12:05.639Z"
+          }
+        },
+        "items": [
+          {
+            "id": "6ecb39d4-dc3b-4cb4-a58d-128dd9bdbcae",
+            "name": "REA 기능 권한 owner",
+            "email": "rea-entitlement-owner-efb32eae-daca-4358-b2d5-3453ed94028f@catchsecu.test",
+            "role": "owner",
+            "enrolled": true,
+            "exception": null
+          },
+          {
+            "id": "b5b082fc-e16a-4a65-a559-e91833122b85",
+            "name": "REA 기능 권한 admin",
+            "email": "rea-entitlement-admin-efb32eae-daca-4358-b2d5-3453ed94028f@catchsecu.test",
+            "role": "admin",
+            "enrolled": false,
+            "exception": null
+          }
+        ],
+        "total": 2,
+        "page": 1,
+        "pageSize": 20,
+        "summary": {
+          "members": 2,
+          "enrolled": 1,
+          "exceptions": 0,
+          "missing": 1
+        }
+      }
+    }
+  ]
+}

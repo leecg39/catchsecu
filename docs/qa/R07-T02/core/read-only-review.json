@@ -1,0 +1,24 @@
+{
+  "scope": "SSO provider/directory owner and tenant boundaries, idempotency, version concurrency, pending ticket lifecycle",
+  "readOnly": true,
+  "reviewerRanTests": false,
+  "finding": {
+    "priority": "P2",
+    "path": "src/server/org-auth.ts",
+    "description": "The old public orgLogin could recreate an email ticket after an administrative update/delete because issue and revoke were not serialized. Final email registration still rejected stale identity, so this was not an authentication bypass."
+  },
+  "resolution": {
+    "companyProviderMemberLocks": true,
+    "freshSnapshotValidation": true,
+    "ticketAndAuditAtomic": true,
+    "rereviewAdditionalFindings": []
+  },
+  "reproduction": "ticket-race-before.json",
+  "intermediateVerification": "ticket-race-after.json",
+  "finalRegression": "regression-final.json",
+  "fingerprints": {
+    "src/server/org-auth.ts": "2cbf70f3689c62ff5825cbc743c9f2d7c63a756fb420803e7f3688eba57686a7",
+    "src/server/sso.ts": "f88a1a7cb55f2ca4a72bb2e89342e9bd16ef7d2c5dfa51b32e2670c532ff21c5",
+    "tests/server/sso-management-crud.test.ts": "8f8f73e2f0ed90d918d47056ad87f81c3695df6ab8428b54c572068270e9fae4"
+  }
+}

@@ -1,0 +1,385 @@
+{
+  "schemaVersion": 1,
+  "task": "R08-T02 F3 질문 추가 설명 백엔드 영향 분석",
+  "status": "읽기 전용 분석 완료; 구현 대기",
+  "scope": {
+    "included": "optional additionalExplanation: 평문 문자열 0~3000 UTF-16 단위, nullable DB → null은 DTO에서 생략",
+    "excluded": [
+      "개인정보분류 detectedItems/NLP/동의 항목 집계",
+      "questionImageKey/materialList 이미지·참고자료",
+      "HTML rich text 편집"
+    ],
+    "executed": [
+      "로컬 소스·마이그레이션·기존 시험 읽기",
+      "이 backend-impact.json 작성"
+    ],
+    "notExecuted": [
+      "제품 코드 변경",
+      "DB 접근·변경",
+      "마이그레이션",
+      "시험 실행",
+      "브라우저"
+    ]
+  },
+  "sourceBoundary": {
+    "kind": "원본 정적 분석 담당 bundle_analysis의 중간 근거 전달; 본 agent가 원본을 새로 관측한 것은 아님",
+    "confirmed": [
+      "V3 description → wire additionalExplanation 문자열",
+      "textarea maxLength 3000",
+      "공개 화면은 <pre>{P.additionalExplanation}</pre>로 평문+개행",
+      "이미지와 링크는 별도 questionImageKey/materialList"
+    ],
+    "pending": "source-review.json의 원본 발췌/해시/offset 최종 근거를 결합할 것",
+    "classification": "5개 enum만 축소 구현하면 detectedItems 배열/NLP 출처/확인/행렬 제한/동의집계 계약을 잃음. 별도 후속 유지."
+  },
+  "conclusion": "질문 공통 schema, nullable DB 컬럼, writeQuestions의 data 및 변경 비교, contentDto 투영을 함께 추가해야 한다. 평문이므로 sanitizer를 쓰지 않고 React text node로 출력한다. null DTO 생략과 저장된 게시본 무변경으로 기존 승인 해시/응답/PDF를 보존한다.",
+  "changeMap": [
+    {
+      "priority": "P1",
+      "path": "src/contracts/questions.ts",
+      "lines": [
+        16,
+        21
+      ],
+      "fact": "questionSchema.strict()이며 설명 필드가 없어서 신규 입력은 현재 422이다.",
+      "required": "additionalExplanation:z.string().max(3000).optional(). trim/HTML 변환/개행 정규화 없이 평문 원형 유지. null/number/object 거절. 빈 문자열 허용."
+    },
+    {
+      "priority": "P1",
+      "path": "prisma/schema.prisma",
+      "lines": [
+        1314,
+        1335
+      ],
+      "fact": "Question에는 label/textMaxLength/required/condition/matrixRows/selectionLimits만 있다.",
+      "required": "additionalExplanation String? nullable 추가 및 신규 additive migration. 기존 published Question UPDATE/backfill 금지. DB 길이 CHECK 제안 시 UTF-16 앱 길이와 PostgreSQL char_length의 astral 차이를 명시하고 시험."
+    },
+    {
+      "priority": "P1",
+      "path": "src/server/forms.ts",
+      "lines": [
+        40,
+        57,
+        150,
+        167
+      ],
+      "fact": "contentDto와 writeQuestions data/deepEqual 비교가 모두 필드를 수동 투영한다.",
+      "required": "DTO는 !==null일 때만 새 필드 포함. write data와 prior 비교 양쪽에 추가. 설명만 바꿀 때 기존 질문/옵션 physical ID를 유지하며 UPDATE가 실행되어야 함."
+    },
+    {
+      "priority": "P1",
+      "path": "src/server/forms.ts",
+      "lines": [
+        77,
+        83,
+        225,
+        245,
+        258,
+        273
+      ],
+      "fact": "fingerprint는 contentDto의 JSON.stringify이며, 초안 수정은 기존 승인 pending/approved를 superseded한다.",
+      "required": "null은 기존 DTO에 새 키를 추가하지 않아 예전 지문 유지. 새 설명/명시적 비우기 변경은 지문에 반영. 저장·정규화된 문자열이 승인 snapshot, fingerprint, 공개 DTO에 일관되게 들어가야 함."
+    },
+    {
+      "priority": "P1",
+      "path": "src/server/forms.ts",
+      "lines": [
+        142,
+        148,
+        225,
+        242,
+        387,
+        405
+      ],
+      "fact": "기존 draft writeQuestions뿐 아니라 게시 후 직접 content PATCH는 새 createVersion 경로로 간다.",
+      "required": "구클라이언트 omission 보존 정책을 선택하면 updateFormDraft에서 직전 같은 폼/동일 logical question ID의 설명을 병합해야 함. writeQuestions prior fallback만으로는 새 version 생성 시 설명이 사라진다. 새로운 질문 ID에 이전 설명을 추정 배정하지 않음."
+    },
+    {
+      "priority": "P1",
+      "path": "src/server/templates.ts",
+      "lines": [
+        18,
+        35,
+        87,
+        110,
+        122,
+        129
+      ],
+      "fact": "템플릿 JSON은 formContentSchema로 읽고 쓰며 cloneFormContent → createForm으로 사용한다.",
+      "required": "schema 추가 후 JSON 보존은 가능하나 UPDATE omission 보존은 question ID별 현재 content 병합 필요. create/update/use의 동일 계약·길이 검증. 읽기만으로 기존 JSON에 빈 키를 덧붙여 재저장하지 않음."
+    },
+    {
+      "priority": "P2",
+      "path": "src/contracts/form-copy.ts",
+      "lines": [
+        4,
+        22
+      ],
+      "fact": "structuredClone으로 전체 content를 복사하고 질문/보기/행/조건/마케팅 ID만 다시 배정한다.",
+      "required": "새 설명은 자동 복제 가능. 새 field를 별도 분해/재생성하여 유실하지 않는지 시험. 기존 normalizeQuestionOptions는 {...question}으로 보존(src/contracts/option-identities.ts:18)."
+    },
+    {
+      "priority": "P2",
+      "path": "src/server/submissions.ts",
+      "lines": [
+        38,
+        40
+      ],
+      "fact": "공개 폼은 게시 FormVersion의 contentDto를 그대로 사용한다.",
+      "required": "DTO 연결 후 게시본 설명만 공개된다. 초안 변경이 구 게시 링크 설명에 반영되지 않는지 확인."
+    },
+    {
+      "priority": "P2",
+      "path": "src/server/submission-management.ts",
+      "lines": [
+        53,
+        59,
+        73,
+        81
+      ],
+      "fact": "응답 detail은 응답의 FormVersion contentDto.questions를 사용하고 정정도 그 버전의 questions로 답변을 검증한다.",
+      "required": "detail 설명은 자연 전달. validateAnswers에는 설명이 답변 규칙으로 들어갈 이유가 없음. 최신 개정 설명으로 구 응답 안내를 바꾸거나 정정 payload에 설명을 보내지 않음."
+    },
+    {
+      "priority": "P2",
+      "path": "src/components/forms/PublicForm.tsx",
+      "lines": [
+        129,
+        134
+      ],
+      "fact": "현재 부모 fieldset에서 질문 label과 QuestionInput을 조합하며 설명을 표시하지 않는다.",
+      "required": "같은 보이는 질문 fieldset에 pre 또는 white-space:pre-wrap의 React text node로 출력. 숨겨진 조건 질문의 설명도 함께 숨김. 빈 설명 숨기기. aria-describedby를 사용하면 ID의 유일성 유지."
+    },
+    {
+      "priority": "P2",
+      "path": "src/components/forms/QuestionSummary.tsx",
+      "lines": [
+        4,
+        11
+      ],
+      "fact": "FormLists preview(:126), TemplateGallery(:21), Approvals snapshot(:72)가 이 요약을 공통 사용한다.",
+      "required": "평문 설명 출력을 공통화하면 미리보기/템플릿/승인 누락을 줄일 수 있음. 공개 폼·정정은 별도 consumer이므로 함께 연결."
+    },
+    {
+      "priority": "P2",
+      "path": "src/components/forms/SubmissionDetail.tsx",
+      "lines": [
+        125,
+        150
+      ],
+      "fact": "정정 fieldset과 읽기 dl에서 label만 출력한다.",
+      "required": "공개 수집 시점 설명을 필요 표면에 안전한 text node로 추가. 입력 컴포넌트 변경 없이 안내로만 사용."
+    },
+    {
+      "priority": "P2",
+      "path": "src/lib/form-draft.ts",
+      "lines": [
+        11,
+        12,
+        23,
+        40,
+        61,
+        75
+      ],
+      "fact": "dirty/idempotency는 전체 JSON stamp 및 structuredClone 기반이다. use-form-draft.ts:10-23 공통 schema 검증 후 전체 content 저장.",
+      "required": "일반 dirty 추적은 자동 적용. 설명 입력 중 자동 저장/중복 클릭/409/서버 정규화 응답이 새 입력을 덮어쓰지 않는지 기존 draft 시험 틀로 검증. 새 필드에 trim을 넣지 않아 불필요한 정규화 왕복 방지."
+    }
+  ],
+  "compatibility": {
+    "nullVersusEmpty": "구 DB null은 DTO에서 키 생략. 새 명시적 ''는 유효한 비우기 값으로 정의할 수 있다. 저장 후 null로 바꿀지 ''로 저장할지는 일관되게 정하고 fingerprint 시험으로 고정.",
+    "recommendedOmission": "기존 질문 UPDATE 필드 생략은 현재 설명 보존, 명시적 ''는 비우기; 신규 질문 생략은 null. 부모가 최종 계약 확정해야 하는 제안이다.",
+    "immutable": {
+      "path": "prisma/migrations/20261002094000_forms/migration.sql",
+      "lines": [
+        328,
+        351
+      ],
+      "fact": "published version/question 전체 행의 UPDATE/DELETE 및 published Question INSERT를 이미 거절한다. 새 nullable 컬럼만 추가하면 이 트리거를 완화/변경할 필요가 없다."
+    },
+    "approval": {
+      "path": "src/server/approvals.ts",
+      "lines": [
+        37,
+        49,
+        115,
+        117
+      ],
+      "fact": "승인 snapshot content와 hash가 공통 DTO에서 나오고 승인 결정 시 현재 fingerprint를 재검사한다. 새 설명이 DTO에 포함되면 승인 범위에도 포함되므로 별도 description-only 우회 없음."
+    },
+    "imports": {
+      "path": "src/server/import-worker.ts",
+      "lines": [
+        78,
+        80
+      ],
+      "fact": "CSV 질문은 단문형과 label만 생성한다. nullable 컬럼이면 기존 importer 변경 없이 null로 호환 가능. 설명을 CSV 데이터에서 임의 유추하지 않는다."
+    }
+  },
+  "htmlSafety": {
+    "decision": "재사용 sanitizer 없음. 평문 설명을 React expression/pre로 렌더하면 '<script>'·'<img onerror>'·URL도 실행/자동 로드되지 않는 글자이다.",
+    "existing": [
+      {
+        "path": "src/server/message-content.ts",
+        "lines": [
+          6,
+          25,
+          31,
+          33
+        ],
+        "policy": "sanitize-html 태그 allowlist, HTTPS/mailto 링크, credentials/control URL 거절, rel 추가, 이벤트/style/img/svg 제거. 메시지 변수 {{...}} 속성을 별도 거절하는 이메일 전용 정책.",
+        "reuse": "이번 설명에 적용하면 원문을 삭제/변형하고 업무 전용 오류를 유발하므로 부적합. 향후 rich HTML을 실제 지원할 때 공통 정책 primitive 추출은 별도 검토."
+      },
+      {
+        "path": "src/server/notices.ts",
+        "lines": [
+          12,
+          16
+        ],
+        "policy": "공지 전용 소수 태그/http+https/HTML trim, 100000 길이.",
+        "reuse": "설명과 길이·출력 계약이 달라 직접 사용 금지. 현재 NoticePages.tsx:75만 dangerouslySetInnerHTML로 공지를 출력."
+      }
+    ],
+    "mustNot": "설명 문자열을 dangerouslySetInnerHTML에 넣거나 HTML decode/regex strip 후 표시하지 않는다. title/answer와 별개로 리치 HTML 필드를 발명하지 않는다."
+  },
+  "unchangedPaths": [
+    {
+      "path": "src/server/answer-validation.ts",
+      "lines": [
+        11,
+        25
+      ],
+      "reason": "설명은 제출 답변 형식·필수·조건 규칙이 아니다. 제출/정정 encrypted answers와 subject/marketing binding은 기존대로."
+    },
+    {
+      "path": "src/server/sharing.ts",
+      "lines": [
+        20,
+        25,
+        93,
+        96
+      ],
+      "reason": "외부 공유 질문 DTO는 id/label/type/optionDefinitions/rows만 명시 투영. first increment에서 설명 노출을 자동 확장할 필요 없음. 포함을 요청하면 contracts/sharing.ts·viewer.ts:122 및 공유 UI를 함께 명시 변경/시험."
+    },
+    {
+      "path": "src/server/export-renderer.ts",
+      "lines": [
+        14,
+        31,
+        36,
+        58
+      ],
+      "reason": "CSV는 버전별 질문 label/행/답변만 내보낸다. 설명은 답변도 헤더도 아니므로 기존 CSV/sourceHash 바이트 계약 유지 권장."
+    },
+    {
+      "path": "src/server/consent-receipts.ts",
+      "lines": [
+        20,
+        24,
+        35,
+        49
+      ],
+      "reason": "동의 증거 schema1과 PDF는 폼 title/body/purpose/동의문서이며 질문 label/설명/답변은 현재 포함하지 않는다. 설명 추가를 계기로 receipt evidence/hash/PDF bytes 변경하지 않음."
+    },
+    {
+      "path": "src/server/form-documents.ts",
+      "lines": [
+        12,
+        21
+      ],
+      "reason": "ConsentVersion include는 문서 binding만 관리. 추가 설명은 문서선택/동의집계와 독립."
+    },
+    {
+      "path": "src/server/pdf-renderer.ts",
+      "lines": [
+        23,
+        30
+      ],
+      "reason": "현재 질문 설명은 PDF 입력이 아니므로 방금 검증한 v1/v2 dispatch 및 기존 저장 PDF를 변경할 이유가 없음. 향후 설명 포함 PDF는 별도 증거 버전 요구."
+    }
+  ],
+  "validationPlan": [
+    {
+      "id": "M01",
+      "priority": "P1",
+      "case": "마이그레이션 후 기존 Question 공통 컬럼·게시 row·승인 snapshot/hash·FormTemplate JSON·응답 암호문·PDF bytes 불변, 신규 컬럼 모두 null. 구 DTO에 additionalExplanation 없음.",
+      "reuse": "tests/server/question-identities.test.ts:154, docs/qa/R08-T02/international-contact/quality-final.json 고정 근거"
+    },
+    {
+      "id": "M02",
+      "priority": "P1",
+      "case": "설명 생략/빈 문자열/개행/앞뒤 공백/3000 UTF-16 정상 저장·DTO;3001/null/숫자/object는422 및 version/감사/row 변경 없음. astral 문자 1500개=3000 UTF-16 및1501개 경계 포함.",
+      "reuse": "tests/server/question-text-limits.test.ts:41,86"
+    },
+    {
+      "id": "M03",
+      "priority": "P1",
+      "case": "설명만 수정하면 question/option physical+logical ID 유지, contentHash 변경, 승인 superseded. stale409 및 감사 실패 시 설명/버전 전부 rollback.",
+      "reuse": "tests/server/question-identities.test.ts:44,73,154; form-module-concurrency.test.ts"
+    },
+    {
+      "id": "M04",
+      "priority": "P1",
+      "case": "권장 omission 계약: existing draft와 published→implicit 새 draft 각각 구클라이언트 필드 생략 시 보존, '' 명시 시 비움, 신규 질문 ID는 설명 승계 없음. 템플릿 UPDATE도 동일.",
+      "reuse": "tests/server/form-draft-save.test.ts; question-text-limits.test.ts:62"
+    },
+    {
+      "id": "M05",
+      "priority": "P1",
+      "case": "'<script>', img/onerror, javascript URL, &<> 따옴표를 literal text로 공개·preview·승인·템플릿·정정 표시. 태그 실행/이미지 요청/HTML decode 없음.",
+      "reuse": "새 컴포넌트 SSR/DOM 시험; campaigns.test.ts:584 HTML sanitizer는 비교 배경만"
+    },
+    {
+      "id": "M06",
+      "priority": "P1",
+      "case": "publish v1 explanation A→revise B→구 공개 링크/구 응답 정정/구 승인 snapshot은A, 새 게시만B. 게시 Question 설명 직접 DB UPDATE/INSERT/DELETE 거절.",
+      "reuse": "question-identities.test.ts:61,183; question-rules.test.ts:138"
+    },
+    {
+      "id": "M07",
+      "priority": "P2",
+      "case": "form copy/template create-update-use/revise에서 설명 값 보존; 새 폼에는 질문/보기/조건 새 IDs, 같은폼 revise에는logicalID 유지.",
+      "reuse": "question-identities.test.ts:123,144; form-module-flow.test.ts:47"
+    },
+    {
+      "id": "M08",
+      "priority": "P2",
+      "case": "분기로 숨은 질문과 설명 모두 숨김, 재노출시 원래 설명 유지. 설명만 바뀌어도 답변 검증/숨김 empty/정정 baseline에는 영향 없음.",
+      "reuse": "question-rules.test.ts:82,112"
+    },
+    {
+      "id": "M09",
+      "priority": "P2",
+      "case": "설명 입력 자동 저장·저장 중 추가 입력·동일키 재전송·409 충돌·새로고침 복원; 서버 응답이 후속 입력을 덮어쓰지 않음.",
+      "reuse": "form-draft-state.test.ts:21,28,40,54,80"
+    },
+    {
+      "id": "M10",
+      "priority": "P2",
+      "case": "설명 포함 후 1MB HTTP 본문 상한은 유지. 100질문×3000 최대 입력은 UTF-8 비용 및 기존 label/보기와 합산해 request413 여부를 일관 안내.",
+      "reuse": "src/server/http.ts:16-30; domains.ts:13"
+    },
+    {
+      "id": "M11",
+      "priority": "P2",
+      "case": "동일 답변을 가진 구 게시본 CSV, consent evidence/hash/PDF 및 외부 공유 DTO는 field 미확장 상태에서 그대로 유지.",
+      "reuse": "form-documents.test.ts:151,185,247; sharing.test.ts; question-identities.test.ts:183"
+    }
+  ],
+  "openDecisions": [
+    "구클라이언트 omission 보존/명시적 '' 비우기 의미 최종 확정",
+    "평문 줄바꿈/공백 원문을 그대로 저장하는 계약 확정",
+    "DB CHECK의 Unicode scalar 길이와 UI/Zod UTF-16 길이 차이 처리",
+    "외부 공유/응답 목록에도 추가 설명을 표시할지는 별도 범위 확정; 첫 구현에 자동 확장 불필요"
+  ],
+  "rootFollowUp": {
+    "checkedAt": "2026-10-10T06:29:56.870850+00:00",
+    "status": "Implemented and scoped verified",
+    "report": "explanation/README.md",
+    "resolvedDecisions": [
+      "UTF-16 length and raw text preserved",
+      "same-current-ID omission retains; explicit empty clears",
+      "receipt/PDF unchanged"
+    ],
+    "remainingScope": "See report; historical analysis status above is retained"
+  }
+}

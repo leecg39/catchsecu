@@ -7,7 +7,7 @@ const groups = ["security/sso", "auth/sso", "auth/org", "me/sso-accounts", "invi
 function routes(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap(item => item.isDirectory() ? routes(join(dir, item.name)) : item.name === "route.ts" ? [join(dir, item.name)] : []);
 }
-test("SSO 계약: 실제 Route Handler 17개 작업과 선언된 경로/메서드가 일치", () => {
+test("SSO 계약: 실제 Route Handler 19개 작업과 선언된 경로/메서드가 일치", () => {
   const actual: string[] = [];
   for (const group of groups) for (const file of routes("src/app/api/v1/" + group)) {
     const path = "/" + relative("src/app/api/v1", file).replace(/\/route\.ts$/, "").replace(/\[([^\]]+)\]/g, "{$1}");
@@ -24,7 +24,7 @@ test("SSO 계약: 실제 Route Handler 17개 작업과 선언된 경로/메서�
   for (const [path, item] of Object.entries(spec.paths)) if (groups.some(group => path === "/" + group || path.startsWith("/" + group + "/"))) {
     for (const method of ["get", "post", "patch", "delete", "put"]) if ((item as Record<string, unknown>)[method]) declared.push(method.toUpperCase() + " " + path);
   }
-  expect(actual).toHaveLength(17); expect(declared.sort()).toEqual(actual.sort());
+  expect(actual).toHaveLength(19); expect(declared.sort()).toEqual(actual.sort());
   expect(spec.paths["/identity-providers"]).toBeUndefined();
   expect(spec.paths["/identity-providers/{id}"]).toBeUndefined();
 });
@@ -61,4 +61,15 @@ test("SSO 계약: 관리 응답과 계정 목록은 비밀 필드 미포함", ()
   for (const secret of ["clientSecret", "clientSecretCipher", "idpCert", "tokenHash", "verifierCipher"]) expect(provider.properties[secret]).toBeUndefined();
   const account = spec.paths["/me/sso-accounts"].get.responses["200"].content["application/json"].schema.properties.items.items;
   expect(Object.keys(account.properties).sort()).toEqual(["canUnlink", "createdAt", "id", "providerId", "updatedAt"]);
+});
+
+ test("SSO 계약: 이메일 소유 확인 번호는 필수이며 발급 응답에 비밀이 없다", () => {
+  const request = spec.paths["/auth/org/email-register"].post.requestBody.content["application/json"].schema;
+  expect(request.required.sort()).toEqual(["challengeId", "code", "email", "ticket"]);
+  expect(request.additionalProperties).toBe(false);
+  const issue = spec.paths["/auth/org/email-register/challenge"].post;
+  expect(issue["x-origin-check"]).toBe("exact configured application Origin");
+  const response = issue.responses["200"].content["application/json"].schema;
+  expect(response.required.sort()).toEqual(["challengeId", "expiresAt", "retryAt"]);
+  expect(response.properties.code).toBeUndefined();
 });

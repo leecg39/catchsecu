@@ -23,6 +23,11 @@ export type PdfSource = { title: string; author: string; text: string; contentHa
 export async function renderPdf(source: PdfSource) {
   if (source.text.length > 500000) fail(422, "PDF_TOO_LARGE", "PDF로 만들 수 있는 본문 길이를 초과했습니다. 문서를 나누어 게시해주세요.");
   const font = await koreanFont();
+  // Preserve the exact v1 render path for every previously supported input. New scripts use an
+  // independent renderer/font manifest; stored PDFs and receipt evidence are never regenerated here.
+  const outputText = source.text + source.title + source.author + (source.label ?? "") + source.contentHash;
+  if ([...outputText].some(char => !/\s/u.test(char) && !font.characters.has(char.codePointAt(0)!)))
+    return (await import("./pdf-renderer-v2")).renderPdfV2(source);
   for (const char of new Set(source.text + source.title + source.author)) {
     if (!/\s/u.test(char) && !font.characters.has(char.codePointAt(0)!))
       fail(422, "PDF_UNSUPPORTED_CHARACTER", `PDF 글꼴에 없는 문자(U+${char.codePointAt(0)!.toString(16).toUpperCase()})가 있습니다. 문구를 수정해 새 버전으로 게시해주세요.`);

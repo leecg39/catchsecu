@@ -1,0 +1,28 @@
+[p1 "캐치시큐 데모" | space "캐치시큐 전체 구현 검증"(2): 1 managed, 0 untracked — p1* "캐치시큐 데모"]
+root
+  container
+    anchor "캐치시큐 로그인" [ref=986, loc=css:a[aria-label="캐치시큐 로그인"], url=http://localhost:3100/login]
+      image
+    container
+      heading
+        text "GPKI"
+        text "조직 인증"
+      form
+        paragraph
+          text "가상 인증 — 외부"
+          text "GPKI"
+          text "기관 미연동. 가상 디렉터리에 등록된 계정만 로그인됩니다."
+        container
+          text "조직 식별자"
+          textbox [ref=987, loc=css:input[name="orgCode"]]
+        container
+          text "사번"
+          textbox [ref=988, loc=css:input[name="employeeNo"]]
+        container
+          text "인증번호"
+          textbox [ref=989, loc=css:input[name="pin"]]
+        button [ref=990]
+          text "GPKI 인증 로그인"
+      button [ref=991]
+        text "조직 로그인 다시 시작"
+  alert

@@ -2,6 +2,7 @@ generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
+
 datasource db {
   provider = "postgresql"
 }
@@ -17,6 +18,7 @@ enum Role {
   security
   auditor
 }
+
 enum JobStatus {
   queued
   leased
@@ -27,64 +29,65 @@ enum JobStatus {
 }
 
 model User {
-  id               String    @id @default(dbgenerated("gen_random_uuid()::text"))
-  name             String
-  email            String    @unique
-  emailVerified    Boolean   @default(false)
-  image            String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  twoFactorEnabled Boolean   @default(false)
-  status           String    @default("active")
-  platformAdmin    Boolean   @default(false)
-  phone            String?
-  department       String?
-  jobTitle         String?
-  locale           String    @default("ko")
-  version          Int       @default(1)
-  passwordChangedAt DateTime?
-  passwordHistory PasswordHistory[]
-  sessions         Session[]
-  accounts         Account[]
-  twoFactors       TwoFactor[]
-  memberships      Membership[]
-  auditEvents      AuditEvent[]
-  authoredSupportTickets SupportTicket[] @relation("SupportAuthor")
-  answeredSupportTickets SupportTicket[] @relation("SupportResponder")
-  expertAssignments ExpertAssignment[] @relation("ExpertUser")
+  id                        String             @id @default(dbgenerated("(gen_random_uuid())::text"))
+  name                      String
+  email                     String             @unique
+  emailVerified             Boolean            @default(false)
+  image                     String?
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+  twoFactorEnabled          Boolean            @default(false)
+  status                    String             @default("active")
+  platformAdmin             Boolean            @default(false)
+  phone                     String?
+  department                String?
+  jobTitle                  String?
+  locale                    String             @default("ko")
+  version                   Int                @default(1)
+  passwordChangedAt         DateTime?
+  passwordHistory           PasswordHistory[]
+  sessions                  Session[]
+  accounts                  Account[]
+  twoFactors                TwoFactor[]
+  memberships               Membership[]
+  auditEvents               AuditEvent[]
+  authoredSupportTickets    SupportTicket[]    @relation("SupportAuthor")
+  answeredSupportTickets    SupportTicket[]    @relation("SupportResponder")
+  expertAssignments         ExpertAssignment[] @relation("ExpertUser")
   assignedExpertAssignments ExpertAssignment[] @relation("ExpertAssigner")
-  closure          AccountClosure?
+  closure                   AccountClosure?
 }
 
 model AccountClosure {
-  id          String   @id @default(dbgenerated("gen_random_uuid()::text"))
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)
-  requestedAt DateTime @default(now())
-  completedAt DateTime @default(now())
+  id           String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onUpdate: NoAction)
+  requestedAt  DateTime @default(now())
+  completedAt  DateTime @default(now())
   reasonCipher String?
 }
 
 model Notice {
-  id          String   @id @default(dbgenerated("gen_random_uuid()::text"))
+  id          String             @id @default(dbgenerated("(gen_random_uuid())::text"))
   category    String
   title       String
-  bodyHtml    String   @db.Text
-  status      String   @default("draft")
-  sortOrder   Int      @default(0)
-  authorName  String   @default("운영자")
+  bodyHtml    String             @db.Text
+  status      String             @default("draft")
+  sortOrder   Int                @default(0)
+  authorName  String             @default("운영자")
   publishedAt DateTime?
-  version     Int      @default(1)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  version     Int                @default(1)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @default(now()) @updatedAt
   attachments NoticeAttachment[]
+
   @@index([status, sortOrder, publishedAt, id])
 }
 
 model NoticeAttachment {
   id         String   @id @default(uuid())
   noticeId   String
-  notice     Notice   @relation(fields: [noticeId], references: [id], onDelete: Restrict)
+  notice     Notice   @relation(fields: [noticeId], references: [id], onUpdate: NoAction)
   status     String   @default("active")
   fileName   String?
   mime       String?
@@ -92,80 +95,88 @@ model NoticeAttachment {
   fileSha256 String?
   storageKey String?  @unique
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  @@index([noticeId, status, createdAt, id])
-  @@index([status, createdAt, id])
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@index([noticeId, status, createdAt, id], map: "NoticeAttachment_notice_status_created_idx")
+  @@index([status, createdAt, id], map: "NoticeAttachment_status_created_idx")
 }
 
 model Guide {
-  id            String   @id @default(dbgenerated("gen_random_uuid()::text"))
+  id            String    @id @default(dbgenerated("(gen_random_uuid())::text"))
   category      String
-  categoryOrder Int      @default(0)
+  categoryOrder Int       @default(0)
   title         String
-  sortOrder     Int      @default(0)
-  status        String   @default("draft")
+  sortOrder     Int       @default(0)
+  status        String    @default("draft")
   fileName      String?
   fileSize      Int?
   fileSha256    String?
-  assetKey      String?  @unique
-  storageKey    String?  @unique
+  assetKey      String?   @unique
+  storageKey    String?   @unique
   publishedAt   DateTime?
-  version       Int      @default(1)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  version       Int       @default(1)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+
   @@index([status, categoryOrder, sortOrder, id])
 }
 
 model SupportTicket {
-  id            String   @id @default(dbgenerated("gen_random_uuid()::text"))
+  id            String    @id @default(dbgenerated("(gen_random_uuid())::text"))
   tenantId      String
-  tenant        Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  tenant        Company   @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
   serviceId     String?
-  service       Service? @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  service       Service?  @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction)
   authorId      String
-  author        User     @relation("SupportAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  author        User      @relation("SupportAuthor", fields: [authorId], references: [id], onUpdate: NoAction)
   answeredById  String?
-  answeredBy    User?    @relation("SupportResponder", fields: [answeredById], references: [id], onDelete: Restrict)
+  answeredBy    User?     @relation("SupportResponder", fields: [answeredById], references: [id], onDelete: Restrict, onUpdate: NoAction)
   kind          String
-  status        String   @default("submitted")
-  subjectCipher String?  @db.Text
-  bodyCipher    String?  @db.Text
-  replyCipher   String?  @db.Text
+  status        String    @default("submitted")
+  subjectCipher String?   @db.Text
+  bodyCipher    String?   @db.Text
+  replyCipher   String?   @db.Text
   answeredAt    DateTime?
   closedAt      DateTime?
-  version       Int      @default(1)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  @@index([tenantId, authorId, status, createdAt, id])
-  @@index([status, createdAt, id])
+  version       Int       @default(1)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+
+  @@index([tenantId, authorId, status, createdAt, id], map: "SupportTicket_tenant_author_status_created_idx")
+  @@index([status, createdAt, id], map: "SupportTicket_status_created_idx")
 }
 
 model Session {
-  id              String   @id @default(dbgenerated("gen_random_uuid()::text"))
-  expiresAt       DateTime
-  token           String   @unique
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  ipAddress       String?
-  userAgent       String?
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  activeCompanyId String?
-  activeCompany   Company? @relation(fields: [activeCompanyId], references: [id], onDelete: SetNull)
-  activeServiceId String?
-  ssoLinkStates SsoState[]
+  id                  String               @id @default(dbgenerated("(gen_random_uuid())::text"))
+  expiresAt           DateTime
+  token               String               @unique
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  ipAddress           String?
+  userAgent           String?
+  userId              String
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeCompanyId     String?
+  activeCompany       Company?             @relation(fields: [activeCompanyId], references: [id])
+  activeServiceId     String?
+  ssoLinkStates       SsoState[]
+  ssoProof            SsoSessionProof?
+  ssoPolicyChallenges SsoPolicyChallenge[]
+
   @@unique([userId, id])
   @@index([userId])
 }
+
 model Account {
-  id                    String   @id @default(dbgenerated("gen_random_uuid()::text"))
+  id                    String            @id @default(dbgenerated("(gen_random_uuid())::text"))
   accountId             String
   providerId            String
   // DB trigger derives this reference from the Better Auth providerId (sso:<id>).
   ssoProviderId         String?
-  ssoProvider           SsoProvider? @relation(fields: [ssoProviderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  ssoProvider           SsoProvider?      @relation(fields: [ssoProviderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  sessionProofs         SsoSessionProof[]
   userId                String
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -173,510 +184,560 @@ model Account {
   refreshTokenExpiresAt DateTime?
   scope                 String?
   password              String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  @@index([userId])
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
   @@unique([providerId, accountId])
+  @@unique([ssoProviderId, id, userId])
+  @@index([userId])
   @@index([ssoProviderId])
 }
+
 model Verification {
-  id         String   @id @default(dbgenerated("gen_random_uuid()::text"))
+  id         String   @id @default(dbgenerated("(gen_random_uuid())::text"))
   identifier String
   value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
   @@index([identifier])
 }
+
 model TwoFactor {
-  id                      String   @id @default(dbgenerated("gen_random_uuid()::text"))
+  id                      String    @id @default(dbgenerated("(gen_random_uuid())::text"))
   secret                  String
   backupCodes             String
   userId                  String
-  verified                Boolean  @default(true)
-  failedVerificationCount Int      @default(0)
+  verified                Boolean   @default(true)
+  failedVerificationCount Int       @default(0)
   lockedUntil             DateTime?
-  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([secret])
 }
+
 model RateLimit {
-  id          String @id @default(dbgenerated("gen_random_uuid()::text"))
+  id          String @id @default(dbgenerated("(gen_random_uuid())::text"))
   key         String @unique
   count       Int
   lastRequest BigInt
 }
 
 model Company {
-  id           String   @id @default(uuid())
-  name         String
-  publicName   String
-  address      String   @default("")
-  phone        String   @default("")
-  website      String   @default("")
-  businessNo   String   @default("")
-  billingEmail String   @default("")
-  billingContactName String @default("")
-  billingContactPhone String @default("")
-  closureRequestedAt DateTime?
-  closureReasonCipher String?
+  id                   String                   @id @default(uuid())
+  name                 String
+  publicName           String
+  address              String                   @default("")
+  phone                String                   @default("")
+  website              String                   @default("")
+  businessNo           String                   @default("")
+  billingEmail         String                   @default("")
+  billingContactName   String                   @default("")
+  billingContactPhone  String                   @default("")
+  closureRequestedAt   DateTime?
+  closureReasonCipher  String?
+  // Composite FK with this model's PK remains in SQL; see prisma/sql-only-constraints.json.
   closureRequestedById String?
-  businessFiles CompanyBusinessFile[]
-  status       String   @default("active")
-  version      Int      @default(1)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  memberships  Membership[]
-  services     Service[]
-  complianceCloses ComplianceClose[]
-  sessions     Session[]
-  policy       SecurityPolicy?
-  ssoProviders SsoProvider[]
-  ipRules      IpRule[]
-  ipAccessPolicy IpAccessPolicy?
-  invitations  Invitation[]
-  auditEvents  AuditEvent[]
-  files        FileObject[]
-  jobs         Job[]
-  templates    FormTemplate[]
-  destructions DestructionRequest[]
-  certificates DestructionCertificate[]
-  subscriptions BillingSubscription[]
-  creditAccounts CreditAccount[]
-  ledgerTransactions LedgerTransaction[]
-  paymentMethods PaymentMethod[]
-  monthCloses BillingMonthClose[]
-  supportTickets SupportTicket[]
-  accessRequests AccessRequest[]
-  expertAssignments ExpertAssignment[]
-  retentionRules RetentionRule[]
+  businessFiles        CompanyBusinessFile[]
+  authorAssets         AuthorAsset[]
+  status               String                   @default("active")
+  version              Int                      @default(1)
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  memberships          Membership[]
+  services             Service[]
+  complianceCloses     ComplianceClose[]
+  sessions             Session[]
+  policy               SecurityPolicy?
+  ssoProviders         SsoProvider[]
+  ssoLoginPolicy       SsoLoginPolicy?
+  ssoPolicyChallenges  SsoPolicyChallenge[]
+  ipRules              IpRule[]
+  ipAccessPolicy       IpAccessPolicy?
+  invitations          Invitation[]
+  auditEvents          AuditEvent[]
+  files                FileObject[]
+  jobs                 Job[]
+  templates            FormTemplate[]
+  destructions         DestructionRequest[]
+  certificates         DestructionCertificate[]
+  subscriptions        BillingSubscription[]
+  creditAccounts       CreditAccount[]
+  ledgerTransactions   LedgerTransaction[]
+  paymentMethods       PaymentMethod[]
+  monthCloses          BillingMonthClose[]
+  supportTickets       SupportTicket[]
+  accessRequests       AccessRequest[]
+  expertAssignments    ExpertAssignment[]
+  retentionRules       RetentionRule[]
 }
 
 model CompanyBusinessFile {
-  id String @id @default(uuid())
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  id         String   @id @default(uuid())
+  tenantId   String
+  tenant     Company  @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
   nameCipher String?
-  mime String?
-  size Int
-  sha256 String?
-  storageKey String? @unique
-  status String @default("active")
+  mime       String?
+  size       Int
+  sha256     String?
+  storageKey String?  @unique
+  status     String   @default("active")
   scanEngine String
-  scannedAt DateTime
-  createdAt DateTime @default(now())
+  scannedAt  DateTime
+  createdAt  DateTime @default(now())
+
   @@unique([tenantId, id])
   @@index([status, createdAt])
 }
 
 model BillingPlan {
-  id String @id
-  name String
-  description String @default("")
-  createdAt DateTime @default(now())
-  versions BillingPlanVersion[]
+  id            String                @id
+  name          String
+  description   String                @default("")
+  createdAt     DateTime              @default(now())
+  versions      BillingPlanVersion[]
   subscriptions BillingSubscription[]
 }
 
 model BillingPlanVersion {
-  id String @id @default(uuid())
-  planId String
-  plan BillingPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
-  number Int
-  cycle String
-  priceKrw Int?
-  currency String @default("KRW")
-  serviceLimit Int?
-  memberLimit Int?
-  subjectLimit Int?
-  formLimit Int?
-  features Json
-  orderable Boolean @default(false)
-  effectiveFrom DateTime @default(now())
-  effectiveTo DateTime?
-  createdAt DateTime @default(now())
+  id            String                @id @default(uuid())
+  planId        String
+  plan          BillingPlan           @relation(fields: [planId], references: [id], onUpdate: NoAction)
+  number        Int
+  cycle         String
+  priceKrw      Int?
+  currency      String                @default("KRW")
+  serviceLimit  Int?
+  memberLimit   Int?
+  subjectLimit  Int?
+  formLimit     Int?
+  features      Json
+  capabilities  String[]              @default([])
+  orderable     Boolean               @default(false)
+  effectiveFrom DateTime              @default(now())
+  effectiveTo   DateTime?
+  createdAt     DateTime              @default(now())
   subscriptions BillingSubscription[]
+
   @@unique([planId, number, cycle])
   @@unique([id, planId])
   @@index([planId, cycle, orderable])
 }
 
 model BillingSubscription {
-  id String @id @default(uuid())
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  planId String
-  plan BillingPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
-  planVersionId String
-  planVersion BillingPlanVersion @relation(fields: [planVersionId, planId], references: [id, planId], onDelete: Restrict)
-  status String
-  periodStart DateTime?
-  periodEnd DateTime?
-  cancelAt DateTime?
-  priceKrw Int?
-  currency String @default("KRW")
+  id               String                     @id @default(uuid())
+  tenantId         String
+  tenant           Company                    @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  planId           String
+  plan             BillingPlan                @relation(fields: [planId], references: [id], onUpdate: NoAction)
+  planVersionId    String
+  planVersion      BillingPlanVersion         @relation(fields: [planVersionId, planId], references: [id, planId], onUpdate: NoAction)
+  status           String
+  periodStart      DateTime?
+  periodEnd        DateTime?
+  cancelAt         DateTime?
+  priceKrw         Int?
+  currency         String                     @default("KRW")
   activationSource String?
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  events BillingSubscriptionEvent[]
-  paymentOrders PaymentOrder[]
+  version          Int                        @default(1)
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
+  events           BillingSubscriptionEvent[]
+  paymentOrders    PaymentOrder[]
+
   @@unique([tenantId, id])
   @@index([tenantId, status, periodEnd])
 }
 
 model PaymentMethod {
-  id String @id @default(uuid())
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  tokenHash String @unique
+  id          String         @id @default(uuid())
+  tenantId    String
+  tenant      Company        @relation(fields: [tenantId], references: [id], map: "PaymentMethod_tenant_fkey")
+  tokenHash   String         @unique
   tokenCipher String
-  provider String @default("local")
-  kind String
-  label String
-  isDefault Boolean @default(false)
-  status String @default("active")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  orders PaymentOrder[]
+  provider    String         @default("local")
+  kind        String
+  label       String
+  isDefault   Boolean        @default(false)
+  status      String         @default("active")
+  version     Int            @default(1)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  orders      PaymentOrder[]
+
   @@unique([tenantId, id])
   @@index([tenantId, status])
 }
 
 model PaymentOrder {
-  id String @id @default(uuid())
-  tenantId String
+  id             String              @id @default(uuid())
+  tenantId       String
   subscriptionId String
-  subscription BillingSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
-  methodId String?
-  method PaymentMethod? @relation(fields: [tenantId, methodId], references: [tenantId, id], onDelete: Restrict)
-  amount Int
-  currency String
-  status String @default("pending")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  events PaymentEvent[]
-  refunds PaymentRefund[]
+  subscription   BillingSubscription @relation(fields: [subscriptionId], references: [id], map: "PaymentOrder_subscription_fkey")
+  methodId       String?
+  method         PaymentMethod?      @relation(fields: [tenantId, methodId], references: [tenantId, id], map: "PaymentOrder_method_fkey")
+  amount         Int
+  currency       String
+  status         String              @default("pending")
+  version        Int                 @default(1)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  events         PaymentEvent[]
+  refunds        PaymentRefund[]
+
   @@unique([tenantId, id])
   @@index([tenantId, status, createdAt])
   @@index([tenantId, methodId])
 }
+
 model PaymentEvent {
-  id String @id @default(uuid())
-  orderId String
-  order PaymentOrder @relation(fields: [orderId], references: [id], onDelete: Restrict)
-  providerEventId String @unique
-  outcome String
-  createdAt DateTime @default(now())
+  id              String       @id @default(uuid())
+  orderId         String
+  order           PaymentOrder @relation(fields: [orderId], references: [id], map: "PaymentEvent_order_fkey")
+  providerEventId String       @unique
+  outcome         String
+  createdAt       DateTime     @default(now())
+
   @@index([orderId, createdAt])
 }
+
 model PaymentRefund {
-  id String @id @default(uuid())
-  tenantId String
-  orderId String
-  order PaymentOrder @relation(fields: [tenantId, orderId], references: [tenantId, id], onDelete: Restrict)
-  amount Int
-  currency String @default("KRW")
-  reason String
-  status String @default("requested")
+  id          String       @id @default(dbgenerated("(gen_random_uuid())::text"))
+  tenantId    String
+  orderId     String
+  order       PaymentOrder @relation(fields: [tenantId, orderId], references: [tenantId, id], map: "PaymentRefund_order_fkey")
+  amount      Int
+  currency    String       @default("KRW")
+  reason      String
+  status      String       @default("requested")
   providerRef String?
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@unique([tenantId, id])
-  @@index([tenantId, orderId, status])
+  version     Int          @default(1)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+
+  @@unique([tenantId, id], map: "PaymentRefund_tenant_id")
+  @@index([tenantId, orderId, status], map: "PaymentRefund_order")
 }
+
 model BillingMonthClose {
-  id String @id @default(uuid())
+  id       String   @id @default(dbgenerated("(gen_random_uuid())::text"))
   tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  month String
+  tenant   Company  @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  month    String
   currency String
-  totals Json
+  totals   Json
   closedBy String
   closedAt DateTime @default(now())
-  @@unique([tenantId, month, currency])
+
+  @@unique([tenantId, month, currency], map: "BillingMonthClose_key")
 }
+
 model BillingSubscriptionEvent {
-  id String @id @default(uuid())
+  id             String              @id @default(uuid())
   subscriptionId String
-  subscription BillingSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
-  version Int
-  kind String
-  detail Json
-  createdAt DateTime @default(now())
+  subscription   BillingSubscription @relation(fields: [subscriptionId], references: [id], onUpdate: NoAction)
+  version        Int
+  kind           String
+  detail         Json
+  createdAt      DateTime            @default(now())
+
   @@unique([subscriptionId, version])
 }
 
 model CreditAccount {
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  currency String
-  available BigInt @default(0)
-  held BigInt @default(0)
+  tenantId  String
+  tenant    Company  @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  currency  String
+  available BigInt   @default(0)
+  held      BigInt   @default(0)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
+
   @@id([tenantId, currency])
 }
 
 model LedgerTransaction {
-  id String @id @default(uuid())
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  serviceId String?
-  service Service? @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  currency String
-  kind String
-  amount BigInt
-  sourceKind String
-  sourceId String
+  id            String              @id @default(dbgenerated("(gen_random_uuid())::text"))
+  tenantId      String
+  tenant        Company             @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  serviceId     String?
+  service       Service?            @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction)
+  currency      String
+  kind          String
+  amount        BigInt
+  sourceKind    String
+  sourceId      String
   reservationId String?
-  reservation LedgerTransaction? @relation("LedgerReservation", fields: [reservationId], references: [id], onDelete: Restrict)
-  settlements LedgerTransaction[] @relation("LedgerReservation")
-  createdAt DateTime @default(now())
-  entries LedgerEntry[]
+  reservation   LedgerTransaction?  @relation("LedgerReservation", fields: [reservationId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  settlements   LedgerTransaction[] @relation("LedgerReservation")
+  createdAt     DateTime            @default(now())
+  entries       LedgerEntry[]
+
   @@unique([tenantId, kind, sourceKind, sourceId])
-  @@index([tenantId, currency, createdAt, id])
-  @@index([tenantId, serviceId, createdAt, id])
-  @@index([reservationId])
+  @@index([tenantId, currency, createdAt, id], map: "LedgerTransaction_tenant_currency_created_idx")
+  @@index([tenantId, serviceId, createdAt, id], map: "LedgerTransaction_tenant_service_created_idx")
+  @@index([reservationId], map: "LedgerTransaction_reservation_idx")
 }
 
 model LedgerEntry {
-  id String @id @default(uuid())
+  id            String            @id @default(dbgenerated("(gen_random_uuid())::text"))
   transactionId String
-  transaction LedgerTransaction @relation(fields: [transactionId], references: [id], onDelete: Restrict)
-  currency String
-  account String
-  amount BigInt
-  createdAt DateTime @default(now())
+  transaction   LedgerTransaction @relation(fields: [transactionId], references: [id], onUpdate: NoAction)
+  currency      String
+  account       String
+  amount        BigInt
+  createdAt     DateTime          @default(now())
+
   @@unique([transactionId, account])
 }
+
 model Membership {
-  exports ExportJob[]
-  complianceExports ComplianceExportJob[]
+  authorAssets             AuthorAsset[]             @relation("AuthorAssetCreator")
+  exports                  ExportJob[]
+  complianceExports        ComplianceExportJob[]
   notificationIntegrations NotificationIntegration[]
-  messageTemplates MessageTemplate[]
-  campaigns Campaign[] @relation("CampaignCreator")
-  requestedCampaigns Campaign[] @relation("CampaignRequester")
-  senders Sender[]
-  id          String   @id @default(uuid())
-  tenantId    String
-  tenant      Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)
-  role        Role
-  status      String   @default("active")
-  version     Int      @default(1)
-  accessKind String @default("direct")
-  expertAssignmentId String? @unique
-  expertAssignment ExpertAssignment? @relation(fields: [tenantId, expertAssignmentId, userId], references: [tenantId, id, expertUserId], onDelete: Restrict)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  grants      ServiceGrant[]
-  ownedForms  Form[]
-  favorites   FormFavorite[]
-  subprocessorNotices SubprocessorNotice[]
-  approvalRequests ApprovalRequest[] @relation("ApprovalRequester")
-  approvalDecisions ApprovalRequest[] @relation("ApprovalReviewer")
-  passwordDeferrals PasswordDeferral[]
-  mfaException MfaException? @relation("MfaExceptionMember")
-  issuedMfaExceptions MfaException[] @relation("MfaExceptionCreator")
-  files FileObject[]
-  destructionRequests DestructionRequest[] @relation("DestructionRequester")
-  destructionApprovals DestructionRequest[] @relation("DestructionApprover")
-  createdImports ImportJob[] @relation("ImportCreator")
-  committedImports ImportJob[] @relation("ImportCommitter")
-  purposeRevisions PurposeRevision[]
-  recipientRevisions RecipientRevision[]
-  documents Document[]
-  shareGrants ShareGrant[]
-  requestedAccess AccessRequest[] @relation("AccessRequester")
-  reviewedAccess AccessRequest[] @relation("AccessReviewer")
-  requestedActivityReviews ActivityReview[] @relation("ActivityRequester")
-  receivedActivityReviews ActivityReview[] @relation("ActivityRecipient")
-  destroyedActivityReviews ActivityReview[] @relation("ActivityReviewDestroyer")
-  activityReviewMessages ActivityReviewMessage[]
-  @@unique([tenantId, expertAssignmentId, userId])
+  messageTemplates         MessageTemplate[]
+  campaigns                Campaign[]                @relation("CampaignCreator")
+  requestedCampaigns       Campaign[]                @relation("CampaignRequester")
+  senders                  Sender[]
+  id                       String                    @id @default(uuid())
+  tenantId                 String
+  tenant                   Company                   @relation(fields: [tenantId], references: [id])
+  userId                   String
+  user                     User                      @relation(fields: [userId], references: [id])
+  role                     Role
+  status                   String                    @default("active")
+  version                  Int                       @default(1)
+  accessKind               String                    @default("direct")
+  expertAssignmentId       String?                   @unique
+  expertAssignment         ExpertAssignment?         @relation(fields: [tenantId, expertAssignmentId, userId], references: [tenantId, id, expertUserId], onUpdate: NoAction, map: "Membership_expertAssignment_fkey")
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  grants                   ServiceGrant[]
+  ownedForms               Form[]
+  favorites                FormFavorite[]
+  subprocessorNotices      SubprocessorNotice[]
+  approvalRequests         ApprovalRequest[]         @relation("ApprovalRequester")
+  approvalDecisions        ApprovalRequest[]         @relation("ApprovalReviewer")
+  passwordDeferrals        PasswordDeferral[]
+  mfaException             MfaException?             @relation("MfaExceptionMember")
+  issuedMfaExceptions      MfaException[]            @relation("MfaExceptionCreator")
+  files                    FileObject[]
+  destructionRequests      DestructionRequest[]      @relation("DestructionRequester")
+  destructionApprovals     DestructionRequest[]      @relation("DestructionApprover")
+  createdImports           ImportJob[]               @relation("ImportCreator")
+  committedImports         ImportJob[]               @relation("ImportCommitter")
+  purposeRevisions         PurposeRevision[]
+  recipientRevisions       RecipientRevision[]
+  documents                Document[]
+  shareGrants              ShareGrant[]
+  requestedAccess          AccessRequest[]           @relation("AccessRequester")
+  reviewedAccess           AccessRequest[]           @relation("AccessReviewer")
+  requestedActivityReviews ActivityReview[]          @relation("ActivityRequester")
+  receivedActivityReviews  ActivityReview[]          @relation("ActivityRecipient")
+  destroyedActivityReviews ActivityReview[]          @relation("ActivityReviewDestroyer")
+  activityReviewMessages   ActivityReviewMessage[]
+  messageTemplateRevisions MessageTemplateRevision[] @relation("MessageTemplateRevisionActor")
+
+  @@unique([tenantId, expertAssignmentId, userId], map: "Membership_tenant_assignment_user_key")
   @@unique([tenantId, id, userId])
   @@unique([tenantId, userId])
   @@unique([tenantId, id])
   @@index([userId, status])
 }
+
 model Service {
-  verificationIntegration VerificationIntegration?
-  verificationAttempts VerificationAttempt[]
-  ledgerTransactions LedgerTransaction[]
+  verificationIntegration  VerificationIntegration?
+  verificationAttempts     VerificationAttempt[]
+  ledgerTransactions       LedgerTransaction[]
   notificationIntegrations NotificationIntegration[]
-  notificationEvents NotificationEvent[]
-  emailFeedback EmailFeedback[]
-  messageTemplates MessageTemplate[]
-  campaigns Campaign[]
-  senders Sender[]
-  marketingPreferences MarketingPreference[]
-  id           String   @id @default(uuid())
-  tenantId     String
-  tenant       Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  name         String
-  externalName String
-  description  String   @default("")
-  type         String   @default("website")
-  status       String   @default("active")
-  version      Int      @default(1)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  grants       ServiceGrant[]
-  accessRequests AccessRequest[]
+  notificationEvents       NotificationEvent[]
+  emailFeedback            EmailFeedback[]
+  messageTemplates         MessageTemplate[]
+  campaigns                Campaign[]
+  senders                  Sender[]
+  marketingPreferences     MarketingPreference[]
+  id                       String                    @id @default(uuid())
+  tenantId                 String
+  tenant                   Company                   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  name                     String
+  externalName             String
+  description              String                    @default("")
+  type                     String                    @default("website")
+  status                   String                    @default("active")
+  version                  Int                       @default(1)
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  grants                   ServiceGrant[]
+  accessRequests           AccessRequest[]
   expertAssignmentServices ExpertAssignmentService[]
-  retentionRule RetentionRule?
-  forms        Form[]
-  templates    FormTemplate[]
-  files        FileObject[]
-  destructions DestructionRequest[]
-  certificates DestructionCertificate[]
-  importJobs ImportJob[]
-  processingPurposes ProcessingPurpose[]
-  recipients Recipient[]
-  documents Document[]
-  clauseTemplates ClauseTemplate[]
-  consentDisplays ServiceConsentDisplay[]
-  subprocessors Subprocessor[]
-  activityReviews ActivityReview[]
-  kakaoChannels KakaoChannel[]
-  dataSubjects DataSubject[]
-  suppressions Suppression[]
-  supportTickets SupportTicket[]
+  retentionRule            RetentionRule?
+  forms                    Form[]
+  templates                FormTemplate[]
+  files                    FileObject[]
+  destructions             DestructionRequest[]
+  authorAssets             AuthorAsset[]
+  certificates             DestructionCertificate[]
+  importJobs               ImportJob[]
+  processingPurposes       ProcessingPurpose[]
+  recipients               Recipient[]
+  documents                Document[]
+  clauseTemplates          ClauseTemplate[]
+  consentDisplays          ServiceConsentDisplay[]
+  subprocessors            Subprocessor[]
+  activityReviews          ActivityReview[]
+  kakaoChannels            KakaoChannel[]
+  dataSubjects             DataSubject[]
+  suppressions             Suppression[]
+  supportTickets           SupportTicket[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, name])
   @@index([tenantId, status, createdAt, id])
 }
 
 model ProcessingPurpose {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  name String
-  nameKey String
-  purpose String
-  lawfulBasis String
-  basisReference String @default("")
-  items Json
-  retentionMode String
-  retentionDays Int?
-  retentionReason String @default("")
-  status String @default("active")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  importJobs ImportJob[]
-  recipients PurposeRecipient[]
-  revisions PurposeRevision[]
-  documents DocumentPurpose[]
+  id              String             @id @default(uuid())
+  tenantId        String
+  serviceId       String
+  service         Service            @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  name            String
+  nameKey         String
+  purpose         String
+  lawfulBasis     String
+  basisReference  String             @default("")
+  items           Json
+  retentionMode   String
+  retentionDays   Int?
+  retentionReason String             @default("")
+  status          String             @default("active")
+  version         Int                @default(1)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  importJobs      ImportJob[]
+  recipients      PurposeRecipient[]
+  revisions       PurposeRevision[]
+  documents       DocumentPurpose[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, status, createdAt, id])
 }
+
 model Recipient {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  name String
-  nameKey String
-  kind String
-  countryCode String
-  purpose String
-  items String[]
-  retentionMode String
-  retentionDays Int?
-  retentionReason String @default("")
-  contact String @default("")
-  transferMethod String @default("")
-  transferTiming String @default("")
-  refusalNotice String @default("")
-  status String @default("active")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  importJobs ImportJob[]
-  purposes PurposeRecipient[]
-  revisions RecipientRevision[]
-  documents DocumentRecipient[]
+  id               String                     @id @default(uuid())
+  tenantId         String
+  serviceId        String
+  service          Service                    @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  name             String
+  nameKey          String
+  kind             String
+  countryCode      String
+  purpose          String
+  items            String[]
+  retentionMode    String
+  retentionDays    Int?
+  retentionReason  String                     @default("")
+  contact          String                     @default("")
+  transferMethod   String                     @default("")
+  transferTiming   String                     @default("")
+  refusalNotice    String                     @default("")
+  status           String                     @default("active")
+  version          Int                        @default(1)
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
+  importJobs       ImportJob[]
+  purposes         PurposeRecipient[]
+  revisions        RecipientRevision[]
+  documents        DocumentRecipient[]
+  publishedSources DocumentVersionRecipient[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, status, createdAt, id])
 }
+
 model Subprocessor {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  name String
-  emailCipher String
-  emailHash String
+  id            String               @id @default(uuid())
+  tenantId      String
+  serviceId     String
+  service       Service              @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: "Subprocessor_service_fkey")
+  name          String
+  emailCipher   String
+  emailHash     String
   changeSummary String
-  status String @default("active")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  notices SubprocessorNotice[]
+  status        String               @default("active")
+  version       Int                  @default(1)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  notices       SubprocessorNotice[]
+
   @@unique([tenantId, serviceId, emailHash])
   @@unique([tenantId, id])
   @@index([tenantId, serviceId, status, createdAt, id])
 }
+
 model SubprocessorNotice {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
+  id             String       @id @default(uuid())
+  tenantId       String
+  serviceId      String
   subprocessorId String
-  subprocessor Subprocessor @relation(fields: [tenantId, subprocessorId], references: [tenantId, id], onDelete: Restrict)
-  subject String
-  bodyCipher String
-  contentHash String
-  status String @default("queued")
-  jobId String?
-  actorId String
-  actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onDelete: Restrict)
-  createdAt DateTime @default(now())
+  subprocessor   Subprocessor @relation(fields: [tenantId, subprocessorId], references: [tenantId, id], map: "SubprocessorNotice_subprocessor_fkey")
+  subject        String
+  bodyCipher     String
+  contentHash    String
+  status         String       @default("queued")
+  jobId          String?
+  actorId        String
+  actor          Membership   @relation(fields: [tenantId, actorId], references: [tenantId, userId], map: "SubprocessorNotice_actor_fkey")
+  createdAt      DateTime     @default(now())
+
   @@unique([tenantId, subprocessorId, contentHash])
   @@index([tenantId, serviceId, createdAt, id])
 }
+
 model PurposeRecipient {
-  tenantId String
-  serviceId String
-  purposeId String
-  purpose ProcessingPurpose @relation(fields: [tenantId, serviceId, purposeId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  tenantId    String
+  serviceId   String
+  purposeId   String
+  purpose     ProcessingPurpose @relation(fields: [tenantId, serviceId, purposeId], references: [tenantId, serviceId, id], onDelete: Restrict)
   recipientId String
-  recipient Recipient @relation(fields: [tenantId, serviceId, recipientId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  recipient   Recipient         @relation(fields: [tenantId, serviceId, recipientId], references: [tenantId, serviceId, id], onDelete: Restrict)
+
   @@id([tenantId, purposeId, recipientId])
   @@index([tenantId, recipientId])
 }
+
 model PurposeRevision {
-  id String @id @default(uuid())
-  tenantId String
+  id        String            @id @default(uuid())
+  tenantId  String
   purposeId String
-  purpose ProcessingPurpose @relation(fields: [tenantId, purposeId], references: [tenantId, id], onDelete: Restrict)
-  version Int
-  actorId String
-  actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onDelete: Restrict, map: "PurposeRevision_actor_fkey")
-  snapshot Json
-  createdAt DateTime @default(now())
+  purpose   ProcessingPurpose @relation(fields: [tenantId, purposeId], references: [tenantId, id])
+  version   Int
+  actorId   String
+  actor     Membership        @relation(fields: [tenantId, actorId], references: [tenantId, userId], onUpdate: NoAction, map: "PurposeRevision_actor_fkey")
+  snapshot  Json
+  createdAt DateTime          @default(now())
+
   @@unique([tenantId, purposeId, version])
 }
+
 model RecipientRevision {
-  id String @id @default(uuid())
-  tenantId String
+  id          String     @id @default(uuid())
+  tenantId    String
   recipientId String
-  recipient Recipient @relation(fields: [tenantId, recipientId], references: [tenantId, id], onDelete: Restrict)
-  version Int
-  actorId String
-  actor Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onDelete: Restrict, map: "RecipientRevision_actor_fkey")
-  snapshot Json
-  createdAt DateTime @default(now())
+  recipient   Recipient  @relation(fields: [tenantId, recipientId], references: [tenantId, id])
+  version     Int
+  actorId     String
+  actor       Membership @relation(fields: [tenantId, actorId], references: [tenantId, userId], onUpdate: NoAction, map: "RecipientRevision_actor_fkey")
+  snapshot    Json
+  createdAt   DateTime   @default(now())
+
   @@unique([tenantId, recipientId, version])
 }
+
 model ServiceGrant {
   id           String     @id @default(uuid())
   tenantId     String
@@ -686,197 +747,281 @@ model ServiceGrant {
   service      Service    @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Cascade)
   capabilities String[]
   createdAt    DateTime   @default(now())
+
   @@unique([tenantId, memberId, serviceId])
 }
+
 model AccessRequest {
-  id String @id @default(uuid())
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  requesterId String
-  requester Membership @relation("AccessRequester", fields: [tenantId, requesterId], references: [tenantId, id], onDelete: Restrict)
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  reason String @default("")
-  status String @default("pending")
-  version Int @default(1)
-  reviewerId String?
-  reviewer Membership? @relation("AccessReviewer", fields: [tenantId, reviewerId], references: [tenantId, id], onDelete: Restrict)
-  decisionNote String @default("")
-  resolvedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@unique([tenantId, id])
-  @@index([tenantId, requesterId, createdAt, id])
-  @@index([tenantId, status, createdAt, id])
+  id           String      @id @default(uuid())
+  tenantId     String
+  tenant       Company     @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
+  requesterId  String
+  requester    Membership  @relation("AccessRequester", fields: [tenantId, requesterId], references: [tenantId, id], onUpdate: NoAction, map: "AccessRequest_requester_fkey")
+  serviceId    String
+  service      Service     @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction, map: "AccessRequest_service_fkey")
+  reason       String      @default("")
+  status       String      @default("pending")
+  version      Int         @default(1)
+  reviewerId   String?
+  reviewer     Membership? @relation("AccessReviewer", fields: [tenantId, reviewerId], references: [tenantId, id], onUpdate: NoAction, map: "AccessRequest_reviewer_fkey")
+  decisionNote String      @default("")
+  resolvedAt   DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now()) @updatedAt
+
+  @@unique([tenantId, id], map: "AccessRequest_tenant_id_key")
+  @@index([tenantId, requesterId, createdAt, id], map: "AccessRequest_requester_created_idx")
+  @@index([tenantId, status, createdAt, id], map: "AccessRequest_status_created_idx")
 }
+
 model ExpertAssignment {
-  id String @id @default(uuid())
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  id           String                    @id @default(uuid())
+  tenantId     String
+  tenant       Company                   @relation(fields: [tenantId], references: [id], onUpdate: NoAction)
   expertUserId String
-  expertUser User @relation("ExpertUser", fields: [expertUserId], references: [id], onDelete: Restrict)
+  expertUser   User                      @relation("ExpertUser", fields: [expertUserId], references: [id], onUpdate: NoAction)
   assignedById String
-  assignedBy User @relation("ExpertAssigner", fields: [assignedById], references: [id], onDelete: Restrict)
-  status String @default("active")
-  expiresAt DateTime
-  revokedAt DateTime?
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  services ExpertAssignmentService[]
-  membership Membership?
-  @@unique([tenantId, id])
-  @@unique([tenantId, id, expertUserId])
-  @@unique([tenantId, expertUserId])
-  @@index([expertUserId, status, expiresAt])
+  assignedBy   User                      @relation("ExpertAssigner", fields: [assignedById], references: [id], onUpdate: NoAction)
+  status       String                    @default("active")
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  version      Int                       @default(1)
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @default(now()) @updatedAt
+  services     ExpertAssignmentService[]
+  membership   Membership?
+
+  @@unique([tenantId, id], map: "ExpertAssignment_tenant_id_key")
+  @@unique([tenantId, id, expertUserId], map: "ExpertAssignment_tenant_id_user_key")
+  @@unique([tenantId, expertUserId], map: "ExpertAssignment_tenant_user_key")
+  @@index([expertUserId, status, expiresAt], map: "ExpertAssignment_user_status_expiry_idx")
 }
+
 model ExpertAssignmentService {
-  id String @id @default(uuid())
-  tenantId String
+  id           String           @id @default(uuid())
+  tenantId     String
   assignmentId String
-  assignment ExpertAssignment @relation(fields: [tenantId, assignmentId], references: [tenantId, id], onDelete: Cascade)
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  @@unique([tenantId, assignmentId, serviceId])
-  @@index([tenantId, serviceId])
+  assignment   ExpertAssignment @relation(fields: [tenantId, assignmentId], references: [tenantId, id], onDelete: Cascade, onUpdate: NoAction, map: "ExpertAssignmentService_assignment_fkey")
+  serviceId    String
+  service      Service          @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction, map: "ExpertAssignmentService_service_fkey")
+
+  @@unique([tenantId, assignmentId, serviceId], map: "ExpertAssignmentService_scope_key")
+  @@index([tenantId, serviceId], map: "ExpertAssignmentService_service_idx")
 }
+
 model ComplianceExportJob {
-  id String @id @default(uuid())
-  tenantId String
-  closeId String
-  close ComplianceClose @relation(fields: [tenantId, closeId], references: [tenantId, id], onDelete: Restrict)
-  memberId String
-  requesterId String
-  requester Membership @relation(fields: [tenantId, memberId, requesterId], references: [tenantId, id, userId], onDelete: Restrict)
-  format String
-  sourceHash String
+  id             String          @id @default(uuid())
+  tenantId       String
+  closeId        String
+  close          ComplianceClose @relation(fields: [tenantId, closeId], references: [tenantId, id], map: "ComplianceExportJob_close_fkey")
+  memberId       String
+  requesterId    String
+  requester      Membership      @relation(fields: [tenantId, memberId, requesterId], references: [tenantId, id, userId], map: "ComplianceExportJob_requester_fkey")
+  format         String
+  sourceHash     String
   requestKeyHash String
-  status String @default("queued")
-  version Int @default(1)
-  resultCipher String?
-  resultHash String?
-  byteLength Int @default(0)
-  pageCount Int @default(0)
-  leaseOwner String?
-  leaseUntil DateTime?
-  attempts Int @default(0)
-  lastError String?
-  expiresAt DateTime
-  completedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  status         String          @default("queued")
+  version        Int             @default(1)
+  resultCipher   String?
+  resultHash     String?
+  byteLength     Int             @default(0)
+  pageCount      Int             @default(0)
+  leaseOwner     String?
+  leaseUntil     DateTime?
+  attempts       Int             @default(0)
+  lastError      String?
+  expiresAt      DateTime
+  completedAt    DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
   @@unique([tenantId, memberId, requestKeyHash])
   @@index([tenantId, memberId, closeId, createdAt, id])
   @@index([status, leaseUntil, createdAt])
   @@index([expiresAt])
 }
+
 model ComplianceClose {
-  id String @id @default(uuid())
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  serviceKey String @default("")
-  month String
-  snapshot Json
-  createdBy String
-  createdAt DateTime @default(now())
-  exports ComplianceExportJob[]
+  id         String                @id @default(uuid())
+  tenantId   String
+  tenant     Company               @relation(fields: [tenantId], references: [id], map: "ComplianceClose_tenant_fkey")
+  serviceKey String                @default("")
+  month      String
+  snapshot   Json
+  createdBy  String
+  createdAt  DateTime              @default(now())
+  exports    ComplianceExportJob[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceKey, month])
   @@index([tenantId, createdAt])
 }
+
 model SecurityPolicy {
-  tenantId        String   @id
-  tenant          Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  minPassword     Int      @default(12)
-  passwordMonths  Int      @default(3)
-  passwordReuse   Int      @default(1)
-  passwordDeferral String  @default("never")
-  passwordRevision Int    @default(1)
-  sessionMinutes  Int      @default(30)
-  requireMfa      Boolean  @default(false)
-  requireApproval Boolean  @default(false)
-  approvalRoles Role[] @default([owner])
-  approvalReferenceRequired Boolean @default(false)
-  approvalRequestTemplate String @default("")
-  approvalRevision Int @default(1)
-  retentionDays   Int      @default(365)
-  automaticDestruction Boolean @default(false)
-  allowRetentionAdjustment Boolean @default(false)
-  allowRetentionDesignation Boolean @default(false)
+  tenantId                    String   @id
+  tenant                      Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  minPassword                 Int      @default(12)
+  passwordMonths              Int      @default(3)
+  passwordReuse               Int      @default(1)
+  passwordDeferral            String   @default("never")
+  passwordRevision            Int      @default(1)
+  sessionMinutes              Int      @default(30)
+  requireMfa                  Boolean  @default(false)
+  requireApproval             Boolean  @default(false)
+  approvalRoles               Role[]   @default([owner])
+  approvalReferenceRequired   Boolean  @default(false)
+  approvalRequestTemplate     String   @default("")
+  approvalRevision            Int      @default(1)
+  retentionDays               Int      @default(365)
+  automaticDestruction        Boolean  @default(false)
+  allowRetentionAdjustment    Boolean  @default(false)
+  allowRetentionDesignation   Boolean  @default(false)
   activityReviewRetentionDays Int?
-  version         Int      @default(1)
-  updatedAt       DateTime @updatedAt
+  version                     Int      @default(1)
+  updatedAt                   DateTime @updatedAt
 }
+
 model RetentionRule {
   id            String   @id @default(uuid())
   tenantId      String
-  tenant        Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  tenant        Company  @relation(fields: [tenantId], references: [id], map: "RetentionRule_tenant_fkey")
   serviceId     String
-  service       Service  @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  service       Service  @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: "RetentionRule_service_fkey")
   retentionDays Int
   reason        String   @default("")
   status        String   @default("active")
   version       Int      @default(1)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
   @@unique([tenantId, serviceId])
   @@unique([tenantId, id])
   @@index([tenantId, status, createdAt])
 }
+
 model SsoProvider {
-  id           String   @id @default(uuid())
-  tenantId     String
-  tenant       Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  name         String
-  protocol     String   @default("oidc")
-  issuer       String
-  clientId     String
+  id                 String             @id @default(dbgenerated("(gen_random_uuid())::text"))
+  tenantId           String
+  tenant             Company            @relation(fields: [tenantId], references: [id])
+  name               String
+  protocol           String             @default("oidc")
+  issuer             String
+  clientId           String
   clientSecretCipher String?
-  authorizationUrl String
-  tokenUrl     String?
-  jwksUrl      String?
-  idpCert      String?
-  scopes       String   @default("openid profile email")
-  enabled      Boolean  @default(false)
-  preflightOk  Boolean  @default(false)
-  preflightDetail String @default("")
-  version      Int      @default(1)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  states       SsoState[]
-  accounts     Account[]
-  orgMembers   VirtualOrgMember[]
+  authorizationUrl   String
+  tokenUrl           String?
+  jwksUrl            String?
+  idpCert            String?
+  scopes             String             @default("openid profile email")
+  enabled            Boolean            @default(false)
+  preflightOk        Boolean            @default(false)
+  preflightDetail    String             @default("")
+  version            Int                @default(1)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @default(now()) @updatedAt
+  states             SsoState[]
+  accounts           Account[]
+  orgMembers         VirtualOrgMember[]
+  sessionProofs      SsoSessionProof[]
+
   @@unique([tenantId, id])
   @@index([tenantId, enabled])
 }
 
+// Separate from provider CRUD: the original company login policy.
+model SsoLoginPolicy {
+  tenantId  String   @id
+  tenant    Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  mode      String   @default("NONE")
+  version   Int      @default(1)
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model SsoPolicyChallenge {
+  id            String    @id @default(uuid())
+  tenantId      String
+  tenant        Company   @relation(fields: [tenantId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  userId        String
+  sessionId     String
+  session       Session   @relation(fields: [userId, sessionId], references: [userId, id], onDelete: Cascade, onUpdate: Restrict)
+  policyVersion Int
+  mode          String
+  emailHash     String
+  codeHash      String
+  attempts      Int       @default(0)
+  expiresAt     DateTime
+  consumedAt    DateTime?
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([tenantId, userId, createdAt])
+}
+
+// Written only by successful server-verified SSO, not from linked accounts or client input.
+model SsoSessionProof {
+  sessionId        String      @id
+  userId           String
+  tenantId         String
+  providerId       String
+  accountId        String
+  identityProvider String
+  authenticatedAt  DateTime    @default(now())
+  session          Session     @relation(fields: [userId, sessionId], references: [userId, id], onDelete: Cascade, onUpdate: Restrict)
+  provider         SsoProvider @relation(fields: [tenantId, providerId], references: [tenantId, id], onDelete: Cascade, onUpdate: Restrict)
+  account          Account     @relation(fields: [providerId, accountId, userId], references: [ssoProviderId, id, userId], onDelete: Cascade, onUpdate: Restrict)
+
+  @@unique([userId, sessionId])
+  @@index([tenantId, userId])
+}
+
 model SsoState {
-  id          String   @id @default(uuid())
-  tenantId    String
-  providerId  String
-  provider    SsoProvider @relation(fields: [tenantId, providerId], references: [tenantId, id], onDelete: Cascade)
-  stateHash   String   @unique
-  nonceHash   String
-  verifierCipher String
-  mode        String
-  providerVersion Int @default(0)
-  sessionId   String?
-  linkSession Session? @relation(fields: [userId, sessionId], references: [userId, id], onDelete: Cascade)
-  userId      String?
-  invitationId String?
-  invitationVersion Int?
+  id                  String              @id @default(dbgenerated("(gen_random_uuid())::text"))
+  tenantId            String
+  providerId          String
+  provider            SsoProvider         @relation(fields: [tenantId, providerId], references: [tenantId, id], onDelete: Cascade)
+  stateHash           String              @unique
+  browserHash         String?
+  nonceHash           String
+  verifierCipher      String
+  mode                String
+  providerVersion     Int                 @default(0)
+  sessionId           String?
+  linkSession         Session?            @relation(fields: [userId, sessionId], references: [userId, id], onDelete: Cascade)
+  userId              String?
+  invitationId        String?
+  invitationVersion   Int?
   invitationTokenHash String?
-  orgMemberId String?
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
+  orgMemberId         String?
+  emailChallenges     OrgEmailChallenge[]
+  expiresAt           DateTime
+  createdAt           DateTime            @default(now())
+
+  @@unique([tenantId, id])
   @@index([expiresAt])
+}
+
+// An organization credential authenticates the directory identity, not a new email.
+model OrgEmailChallenge {
+  id          String    @id @default(uuid())
+  tenantId    String
+  stateId     String
+  state       SsoState  @relation(fields: [tenantId, stateId], references: [tenantId, id], onDelete: Cascade, onUpdate: Restrict)
+  emailCipher String
+  emailHash   String
+  codeHash    String
+  attempts    Int       @default(0)
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([tenantId, stateId, createdAt])
 }
 
 // 가상 조직 인증 디렉터리 — GPKI·새올·그룹웨어 외부 기관 미연동 상태에서
 // login/verified/fail/email-register 경로를 실제 DB·세션으로 검증하기 위한
 // mock 디렉터리. protocol이 "gpki"/"saeol"/"groupware"인 SsoProvider에만 속한다.
 model VirtualOrgMember {
-  id          String   @id @default(uuid())
+  id          String      @id @default(uuid())
   tenantId    String
   providerId  String
   provider    SsoProvider @relation(fields: [tenantId, providerId], references: [tenantId, id], onDelete: Cascade)
@@ -885,61 +1030,66 @@ model VirtualOrgMember {
   nameCipher  String
   emailCipher String?
   pinHash     String
-  version     Int      @default(1)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  version     Int         @default(1)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
   @@unique([providerId, orgCode, employeeNo])
   @@unique([orgCode, employeeNo])
 }
 
 model PasswordHistory {
-  id BigInt @id @default(autoincrement())
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           BigInt   @id @default(autoincrement())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   passwordHash String
-  changedAt DateTime @default(now())
+  changedAt    DateTime @default(now())
+
   @@index([userId, id])
 }
+
 model PasswordDeferral {
-  id String @id @default(uuid())
-  tenantId String
-  memberId String
-  userId String
-  member Membership @relation(fields: [tenantId, memberId, userId], references: [tenantId, id, userId], onDelete: Cascade)
+  id                String     @id @default(uuid())
+  tenantId          String
+  memberId          String
+  userId            String
+  member            Membership @relation(fields: [tenantId, memberId, userId], references: [tenantId, id, userId], onDelete: Cascade)
   passwordChangedAt DateTime
-  passwordRevision Int
-  mode String
-  sessionId String?
-  expiresAt DateTime
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  passwordRevision  Int
+  mode              String
+  sessionId         String?
+  expiresAt         DateTime
+  version           Int        @default(1)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
   @@unique([tenantId, memberId])
   @@index([userId])
   @@index([expiresAt])
 }
 
 model MfaException {
-  id String @id @default(uuid())
-  tenantId String
-  memberId String
-  member Membership @relation("MfaExceptionMember", fields: [tenantId, memberId], references: [tenantId, id], onDelete: Cascade)
-  createdById String
-  createdBy Membership @relation("MfaExceptionCreator", fields: [tenantId, createdById], references: [tenantId, id], onDelete: Restrict)
+  id           String     @id @default(uuid())
+  tenantId     String
+  memberId     String
+  member       Membership @relation("MfaExceptionMember", fields: [tenantId, memberId], references: [tenantId, id], onDelete: Cascade, onUpdate: NoAction)
+  createdById  String
+  createdBy    Membership @relation("MfaExceptionCreator", fields: [tenantId, createdById], references: [tenantId, id], onUpdate: NoAction)
   reasonCipher String
-  expiresAt DateTime
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  expiresAt    DateTime
+  version      Int        @default(1)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
   @@unique([tenantId, memberId])
   @@index([tenantId, expiresAt])
 }
 
 model IpAccessPolicy {
-  tenantId String @id
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  enabled Boolean @default(false)
-  version Int @default(1)
+  tenantId  String   @id
+  tenant    Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  enabled   Boolean  @default(false)
+  version   Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -954,183 +1104,205 @@ model IpRule {
   version     Int      @default(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
   @@unique([tenantId, cidr])
 }
+
 model Invitation {
-  id          String   @id @default(uuid())
-  tenantId    String
-  tenant      Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  email       String
-  role        Role
-  serviceIds  String[]
-  tokenHash   String   @unique
-  expiresAt   DateTime
-  status      String   @default("pending")
-  invitedBy   String
-  acceptedBy  String?
-  version     Int      @default(1)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(uuid())
+  tenantId   String
+  tenant     Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  email      String
+  role       Role
+  serviceIds String[]
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  status     String   @default("pending")
+  invitedBy  String
+  acceptedBy String?
+  version    Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
   @@index([tenantId, status, createdAt, id])
 }
+
 model AuditEvent {
-  id          String   @id @default(uuid())
-  tenantId    String?
-  tenant      Company? @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  actorId     String?
-  actor       User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
-  action      String
-  resource    String
-  resourceId  String?
-  serviceId   String?
-  requestId   String
-  detail      Json
-  createdAt   DateTime @default(now())
+  id              String           @id @default(uuid())
+  tenantId        String?
+  tenant          Company?         @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  actorId         String?
+  actor           User?            @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action          String
+  resource        String
+  resourceId      String?
+  serviceId       String?
+  requestId       String
+  detail          Json
+  createdAt       DateTime         @default(now())
   activityReviews ActivityReview[]
+
   @@unique([tenantId, serviceId, id, actorId])
   @@index([tenantId, createdAt, id])
   @@index([actorId, createdAt])
 }
+
 model FileObject {
-  campaignId String?
-  campaign Campaign? @relation(fields: [tenantId, serviceId, campaignId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  senderId String?
-  sender Sender? @relation(fields: [tenantId, serviceId, senderId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  id           String   @id @default(uuid())
-  tenantId     String
-  tenant       Company  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  serviceId    String
-  service      Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  ownerId      String?
-  owner        Membership? @relation(fields: [tenantId, ownerId], references: [tenantId, userId], onDelete: Restrict)
-  ownerKind    String
-  encoding     String @default("utf-8")
-  importJob    ImportJob?
-  nameCipher   String?
-  storageKey   String   @unique
-  mime         String
-  size         Int
-  sha256       String?
-  scanStatus   String   @default("pending")
-  scanEngine   String?
-  scannedAt    DateTime?
-  status       String   @default("pending")
-  publicationId String?
-  publication Publication? @relation(fields: [tenantId, publicationId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)
-  formVersionId String?
-  questionId String?
-  question Question? @relation(fields: [tenantId, formVersionId, questionId], references: [tenantId, formVersionId, id], onDelete: Restrict)
-  submissionId String?
-  submission Submission? @relation(fields: [tenantId, submissionId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)
-  uploadTokenHash String? @unique
-  expiresAt DateTime?
-  version Int @default(1)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  campaignId      String?
+  campaign        Campaign?    @relation(fields: [tenantId, serviceId, campaignId], references: [tenantId, serviceId, id], onUpdate: NoAction, map: "FileObject_campaign_fkey")
+  senderId        String?
+  sender          Sender?      @relation(fields: [tenantId, serviceId, senderId], references: [tenantId, serviceId, id])
+  id              String       @id @default(uuid())
+  tenantId        String
+  tenant          Company      @relation(fields: [tenantId], references: [id])
+  serviceId       String
+  service         Service      @relation(fields: [tenantId, serviceId], references: [tenantId, id])
+  ownerId         String?
+  owner           Membership?  @relation(fields: [tenantId, ownerId], references: [tenantId, userId])
+  ownerKind       String
+  encoding        String       @default("utf-8")
+  importJob       ImportJob?
+  nameCipher      String?
+  storageKey      String       @unique
+  mime            String
+  size            Int
+  sha256          String?
+  scanStatus      String       @default("pending")
+  scanEngine      String?
+  scannedAt       DateTime?
+  status          String       @default("pending")
+  publicationId   String?
+  publication     Publication? @relation(fields: [tenantId, publicationId, formVersionId], references: [tenantId, id, formVersionId])
+  formVersionId   String?
+  questionId      String?
+  question        Question?    @relation(fields: [tenantId, formVersionId, questionId], references: [tenantId, formVersionId, id])
+  submissionId    String?
+  submission      Submission?  @relation(fields: [tenantId, submissionId, formVersionId], references: [tenantId, id, formVersionId])
+  uploadTokenHash String?      @unique
+  expiresAt       DateTime?
+  version         Int          @default(1)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, ownerId])
   @@index([tenantId, serviceId, status])
   @@index([tenantId, submissionId, questionId])
   @@index([status, expiresAt])
+  @@index([campaignId, status], map: "FileObject_campaign")
+  @@index([senderId, status], map: "FileObject_sender")
 }
+
 model Sender {
-  campaigns Campaign[]
-  campaignFallbacks Campaign[] @relation("campaignFallbackSender")
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  creatorId String
-  creator Membership @relation(fields: [tenantId, creatorId], references: [tenantId, userId], onDelete: Restrict)
-  channel String
-  addressHash String
-  addressCipher String?
-  domain String?
-  label String
-  description String @default("")
-  status String @default("pending")
-  isDefault Boolean @default(false)
-  generation Int @default(1)
-  verifiedAt DateTime?
-  expiresAt DateTime?
-  environment String?
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  verifications SenderVerification[]
-  events SenderEvent[]
-  files FileObject[]
-  jobs Job[]
+  campaigns         Campaign[]
+  campaignFallbacks Campaign[]           @relation("campaignFallbackSender")
+  id                String               @id @default(uuid())
+  tenantId          String
+  serviceId         String
+  service           Service              @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  creatorId         String
+  creator           Membership           @relation(fields: [tenantId, creatorId], references: [tenantId, userId], onDelete: Restrict)
+  channel           String
+  addressHash       String
+  addressCipher     String?
+  domain            String?
+  label             String
+  description       String               @default("")
+  status            String               @default("pending")
+  isDefault         Boolean              @default(false)
+  generation        Int                  @default(1)
+  verifiedAt        DateTime?
+  expiresAt         DateTime?
+  environment       String?
+  version           Int                  @default(1)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  verifications     SenderVerification[]
+  events            SenderEvent[]
+  files             FileObject[]
+  jobs              Job[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, channel, status, createdAt, id])
 }
+
 model SenderVerification {
-  id String @id @default(uuid())
-  tenantId String
-  senderId String
-  sender Sender @relation(fields: [tenantId, senderId], references: [tenantId, id], onDelete: Restrict)
-  generation Int
-  method String
-  status String @default("pending")
-  tokenHash String?
-  valueCipher String?
-  attempts Int @default(0)
-  expiresAt DateTime
-  verifiedAt DateTime?
-  validUntil DateTime?
-  environment String
-  resultCode String?
+  id              String    @id @default(uuid())
+  tenantId        String
+  senderId        String
+  sender          Sender    @relation(fields: [tenantId, senderId], references: [tenantId, id], onDelete: Restrict)
+  generation      Int
+  method          String
+  status          String    @default("pending")
+  tokenHash       String?
+  valueCipher     String?
+  attempts        Int       @default(0)
+  expiresAt       DateTime
+  verifiedAt      DateTime?
+  validUntil      DateTime?
+  environment     String
+  resultCode      String?
   providerRefHash String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
   @@unique([tenantId, id])
   @@index([senderId, generation, method, createdAt])
 }
+
 model SenderEvent {
-  id String @id @default(uuid())
-  tenantId String
-  senderId String
-  sender Sender @relation(fields: [tenantId, senderId], references: [tenantId, id], onDelete: Restrict)
-  version Int
-  kind String
-  actorId String?
+  id        String   @id @default(uuid())
+  tenantId  String
+  senderId  String
+  sender    Sender   @relation(fields: [tenantId, senderId], references: [tenantId, id], onDelete: Restrict)
+  version   Int
+  kind      String
+  actorId   String?
   createdAt DateTime @default(now())
+
   @@unique([senderId, version])
 }
+
 model Job {
-  emailFeedback EmailFeedback[]
-  campaignDeliveryId String?
-  campaignDelivery CampaignDelivery? @relation(fields: [tenantId, campaignDeliveryId], references: [tenantId, id], onDelete: Restrict)
-  senderId String?
-  sender Sender? @relation(fields: [tenantId, senderId], references: [tenantId, id], onDelete: Restrict)
+  emailFeedback         EmailFeedback[]
+  campaignDeliveryId    String?
+  campaignDelivery      CampaignDelivery?    @relation(fields: [tenantId, campaignDeliveryId], references: [tenantId, id], onDelete: Restrict)
+  senderId              String?
+  sender                Sender?              @relation(fields: [tenantId, senderId], references: [tenantId, id], onDelete: Restrict)
   marketingPreferenceId String?
-  marketingPreference MarketingPreference? @relation(fields: [tenantId, marketingPreferenceId], references: [tenantId, id], onDelete: Restrict)
+  marketingPreference   MarketingPreference? @relation(fields: [tenantId, marketingPreferenceId], references: [tenantId, id], onDelete: Restrict)
   marketingSubmissionId String?
-  marketingSubmission Submission? @relation(fields: [tenantId, marketingSubmissionId], references: [tenantId, id], onDelete: Restrict)
-  payloadErasedAt DateTime?
-  localCopyErasedAt DateTime?
-  id            String    @id @default(uuid())
-  tenantId      String?
-  tenant        Company?  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  type          String
-  payloadCipher String
-  status        JobStatus @default(queued)
-  dedupeKey     String    @unique
-  dueAt         DateTime  @default(now())
-  leaseUntil    DateTime?
-  leaseOwner    String?
-  attempts      Int       @default(0)
-  maxAttempts   Int       @default(5)
-  lastError     String?
-  completedAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  attemptsLog   JobAttempt[]
+  marketingSubmission   Submission?          @relation(fields: [tenantId, marketingSubmissionId], references: [tenantId, id], onDelete: Restrict)
+  payloadErasedAt       DateTime?
+  localCopyErasedAt     DateTime?
+  id                    String               @id @default(uuid())
+  tenantId              String?
+  tenant                Company?             @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  type                  String
+  payloadCipher         String
+  status                JobStatus            @default(queued)
+  dedupeKey             String               @unique
+  dueAt                 DateTime             @default(now())
+  leaseUntil            DateTime?
+  leaseOwner            String?
+  attempts              Int                  @default(0)
+  maxAttempts           Int                  @default(5)
+  lastError             String?
+  completedAt           DateTime?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  attemptsLog           JobAttempt[]
+
   @@index([status, dueAt])
   @@index([payloadErasedAt, localCopyErasedAt])
+  @@index([campaignDeliveryId], map: "Job_campaign_delivery")
+  @@index([marketingPreferenceId], map: "Job_marketing_preference")
+  @@index([marketingSubmissionId], map: "Job_marketing_source")
+  @@index([senderId, status], map: "Job_sender")
 }
+
 model JobAttempt {
   id         String    @id @default(uuid())
   jobId      String
@@ -1141,10 +1313,12 @@ model JobAttempt {
   errorCode  String?
   createdAt  DateTime  @default(now())
   finishedAt DateTime?
+
   @@index([jobId, createdAt])
 }
+
 model IdempotencyRecord {
-  id             String   @id @default(uuid())
+  id             String    @id @default(uuid())
   scope          String
   key            String
   requestHash    String?
@@ -1155,237 +1329,426 @@ model IdempotencyRecord {
   tenantId       String?
   invalidatedAt  DateTime?
   expiresAt      DateTime
-  createdAt      DateTime @default(now())
+  createdAt      DateTime  @default(now())
+
   @@unique([scope, key])
   @@index([expiresAt])
   @@index([tenantId, resourceType, resourceId])
 }
+
 model ApiRateLimit {
-  key       String   @id
-  count     Int
-  resetAt   DateTime
+  key     String   @id
+  count   Int
+  resetAt DateTime
 }
 
 model Form {
-  verificationAttempts VerificationAttempt[]
-  exports ExportJob[]
-  id                 String   @id @default(uuid())
-  tenantId           String
-  serviceId          String
-  service            Service  @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  ownerId            String
-  owner              Membership @relation(fields: [tenantId, ownerId], references: [tenantId, userId], onDelete: Restrict)
-  title              String
-  status             String   @default("draft")
-  sourceType         String   @default("form")
-  publishedVersionId String?
-  publishedVersion   FormVersion? @relation("PublishedVersion", fields: [tenantId, id, publishedVersionId], references: [tenantId, formId, id], onDelete: Restrict)
-  version            Int      @default(1)
+  verificationAttempts    VerificationAttempt[]
+  exports                 ExportJob[]
+  id                      String                   @id @default(uuid())
+  tenantId                String
+  serviceId               String
+  service                 Service                  @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  ownerId                 String
+  owner                   Membership               @relation(fields: [tenantId, ownerId], references: [tenantId, userId], onDelete: Restrict)
+  title                   String
+  status                  String                   @default("draft")
+  sourceType              String                   @default("form")
+  publishedVersionId      String?
+  publishedVersion        FormVersion?             @relation("PublishedVersion", fields: [tenantId, id, publishedVersionId], references: [tenantId, formId, id], onDelete: Restrict)
+  version                 Int                      @default(1)
   designatedRetentionDays Int?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  versions           FormVersion[] @relation("FormVersions")
-  publications       Publication[]
-  favorites          FormFavorite[]
-  approvals          ApprovalRequest[]
-  shareGrants        ShareGrant[]
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  versions                FormVersion[]            @relation("FormVersions")
+  publications            Publication[]
+  favorites               FormFavorite[]
+  approvals               ApprovalRequest[]
+  shareGrants             ShareGrant[]
+  accessTargetBatches     FormAccessTargetBatch[]
+  accessTargets           FormAccessTarget[]
+  participants            PublicationParticipant[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, status, createdAt, id])
 }
+
 model FormVersion {
-  verificationAttempts VerificationAttempt[]
-  id               String   @id @default(uuid())
-  tenantId         String
-  formId           String
-  form             Form     @relation("FormVersions", fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict)
-  number           Int
-  title            String
-  status           String   @default("draft")
-  body             String   @default("")
-  verify           Boolean  @default(false)
-  font             String   @default("14px")
-  bold             Boolean  @default(false)
-  consentRequired  Boolean  @default(true)
-  consentPurpose   String   @default("")
-  consentDisplay   Json?
-  marketing        Json?
-  receiptEvidenceVersion Int @default(0)
-  retentionDays    Int?
-  maxResponses     Int      @default(100)
-  showSubmitNotice Boolean  @default(true)
-  publishedAt      DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  questions        Question[]
-  publications     Publication[]
-  submissions      Submission[]
-  importJobs       ImportJob[]
-  publishedFor     Form[] @relation("PublishedVersion")
-  approvals        ApprovalRequest[]
-  documentBindings FormDocumentBinding[]
-  shareGrants ShareGrant[]
+  authorAssetReferences            AuthorAssetReference[]
+  verificationAttempts             VerificationAttempt[]
+  id                               String                 @id @default(uuid())
+  tenantId                         String
+  formId                           String
+  form                             Form                   @relation("FormVersions", fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict)
+  number                           Int
+  title                            String
+  status                           String                 @default("draft")
+  body                             String                 @default("")
+  bodyRich                         Json?
+  formLanguage                     String?
+  verify                           Boolean                @default(false)
+  font                             String                 @default("14px")
+  bold                             Boolean                @default(false)
+  consentRequired                  Boolean                @default(true)
+  consentPurpose                   String                 @default("")
+  consentDisplay                   Json?
+  consentItemSchemaVersion         Int                    @default(0)
+  consentItems                     Json?
+  marketing                        Json?
+  receiptEvidenceVersion           Int                    @default(0)
+  optionSchemaVersion              Int                    @default(0)
+  sectionSchemaVersion             Int                    @default(0)
+  completionPageMode               String?
+  completionPageBody               String?
+  completionPageBodyRich           Json?
+  closedPageMode                   String?
+  closedPageBody                   String?
+  closedPageBodyRich               Json?
+  retentionDays                    Int?
+  maxResponses                     Int                    @default(100)
+  collectionWindowSchemaVersion    Int                    @default(0)
+  collectionOpenAt                 DateTime?
+  collectionCloseAt                DateTime?
+  participationAccessSchemaVersion Int                    @default(0)
+  useParticipationAccess           Boolean                @default(false)
+  participationAccessMethod        String                 @default("EMAIL")
+  participationTargetScope         String                 @default("ALL")
+  participationUseOtp              Boolean                @default(false)
+  participationSocialProvider      String                 @default("KAKAO")
+  restrictDuplicateReplies         Boolean                @default(false)
+  showSubmitNotice                 Boolean                @default(true)
+  publishedAt                      DateTime?
+  createdAt                        DateTime               @default(now())
+  updatedAt                        DateTime               @updatedAt
+  questions                        Question[]
+  sections                         FormSection[]
+  publications                     Publication[]
+  submissions                      Submission[]
+  importJobs                       ImportJob[]
+  publishedFor                     Form[]                 @relation("PublishedVersion")
+  approvals                        ApprovalRequest[]
+  documentBindings                 FormDocumentBinding[]
+  shareGrants                      ShareGrant[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, formId, id])
   @@unique([formId, number])
 }
+
+model FormSection {
+  id                       String           @id @default(uuid())
+  tenantId                 String
+  formVersionId            String
+  formVersion              FormVersion      @relation(fields: [tenantId, formVersionId], references: [tenantId, id], onDelete: Restrict, onUpdate: NoAction)
+  pageKey                  String
+  order                    Int
+  title                    String           @default("")
+  body                     String           @default("")
+  bodyRich                 Json?
+  destinationKind          String
+  destinationSectionId     String?
+  destinationSection       FormSection?     @relation("FormSectionDestination", fields: [tenantId, formVersionId, destinationSectionId], references: [tenantId, formVersionId, id], onDelete: Restrict, onUpdate: NoAction)
+  destinationSources       FormSection[]    @relation("FormSectionDestination")
+  allowBack                Boolean          @default(true)
+  questions                Question[]
+  branchDestinationOptions QuestionOption[] @relation("OptionBranchDestination")
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @default(now()) @updatedAt
+
+  @@unique([tenantId, formVersionId, id])
+  @@unique([tenantId, formVersionId, pageKey])
+  @@unique([tenantId, formVersionId, order])
+}
+
 model Question {
-  id            String      @id @default(uuid())
-  tenantId      String
-  formVersionId String
-  formVersion   FormVersion @relation(fields: [tenantId, formVersionId], references: [tenantId, id], onDelete: Restrict)
-  stableKey     String
-  subjectRole   String?
-  type          String
-  label         String
-  required      Boolean
-  condition     Json?
-  matrixRows    Json?
-  selectionLimits Json?
-  order         Int
-  options       QuestionOption[]
-  answers       Answer[]
-  files         FileObject[]
-  shareFields   ShareField[]
+  authorAssetReferences                AuthorAssetReference[]
+  id                                   String                 @id @default(uuid())
+  tenantId                             String
+  formVersionId                        String
+  formVersion                          FormVersion            @relation(fields: [tenantId, formVersionId], references: [tenantId, id], onDelete: Restrict)
+  sectionId                            String?
+  section                              FormSection?           @relation(fields: [tenantId, formVersionId, sectionId], references: [tenantId, formVersionId, id], onDelete: Restrict, onUpdate: NoAction)
+  stableKey                            String
+  subjectRole                          String?
+  type                                 String
+  label                                String
+  infoPatternId                        Int?
+  textMaxLength                        Int?
+  additionalExplanation                String?
+  questionImageKey                     String?
+  questionImage                        AuthorAsset?           @relation("QuestionAuthorAsset", fields: [questionImageKey], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  materialList                         Json?
+  catchFormPersonalInformationRequests Json?
+  required                             Boolean
+  condition                            Json?
+  matrixRows                           Json?
+  selectionLimits                      Json?
+  order                                Int
+  options                              QuestionOption[]
+  answers                              Answer[]
+  files                                FileObject[]
+  shareFields                          ShareField[]
+
   @@unique([tenantId, formVersionId, id])
   @@unique([tenantId, formVersionId, stableKey])
+  @@index([questionImageKey])
 }
+
 model QuestionOption {
-  id         String   @id @default(uuid())
-  questionId String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  value      String
-  order      Int
+  id                         String       @id @default(uuid())
+  questionId                 String
+  question                   Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  value                      String
+  stableKey                  String?
+  label                      String?
+  isCustomValue              Boolean?
+  optionImageKey             String?
+  optionImage                AuthorAsset? @relation("OptionAuthorAsset", fields: [optionImageKey], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  branchDestinationKind      String?
+  branchDestinationSectionId String?
+  branchDestinationSection   FormSection? @relation("OptionBranchDestination", fields: [branchDestinationSectionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  order                      Int
+
   @@unique([questionId, value])
+  @@unique([questionId, stableKey])
+  @@index([stableKey])
+  @@index([optionImageKey])
+  @@index([branchDestinationSectionId])
 }
+
+model AuthorAssetBlob {
+  id                String        @id @default(uuid())
+  storageKey        String        @unique
+  mime              String
+  size              Int
+  sha256            String
+  validationVersion Int           @default(1)
+  status            String        @default("pending")
+  scanStatus        String        @default("pending")
+  scanEngine        String?
+  scannedAt         DateTime?
+  expiresAt         DateTime?     @default(dbgenerated("(CURRENT_TIMESTAMP + '01:00:00'::interval)"))
+  leaseUntil        DateTime?
+  version           Int           @default(1)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  assets            AuthorAsset[]
+
+  @@index([status, expiresAt])
+}
+
+model AuthorAsset {
+  id          String                 @id @default(uuid())
+  blobId      String
+  blob        AuthorAssetBlob        @relation(fields: [blobId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  ownerKind   String                 @default("company")
+  tenantId    String?
+  tenant      Company?               @relation(fields: [tenantId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  serviceId   String?
+  service     Service?               @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict, onUpdate: NoAction)
+  createdById String?
+  creator     Membership?            @relation("AuthorAssetCreator", fields: [tenantId, createdById], references: [tenantId, id], onDelete: Restrict, onUpdate: NoAction)
+  purpose     String
+  nameCipher  String?
+  size        Int
+  status      String                 @default("pending")
+  expiresAt   DateTime?              @default(dbgenerated("(CURRENT_TIMESTAMP + '01:00:00'::interval)"))
+  version     Int                    @default(1)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  references  AuthorAssetReference[]
+  options     QuestionOption[]       @relation("OptionAuthorAsset")
+  questions   Question[]             @relation("QuestionAuthorAsset")
+  templateThumbnails FormTemplate[]  @relation("FormTemplateThumbnail")
+
+  @@index([tenantId, serviceId, status])
+  @@index([blobId, status])
+  @@index([status, expiresAt])
+}
+
+model AuthorAssetReference {
+  id            String           @id @default(uuid())
+  assetId       String
+  asset         AuthorAsset      @relation(fields: [assetId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  tenantId      String?
+  serviceId     String?
+  formVersionId String?
+  formVersion   FormVersion?     @relation(fields: [formVersionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  questionId    String?
+  question      Question?        @relation(fields: [tenantId, formVersionId, questionId], references: [tenantId, formVersionId, id], onDelete: Restrict, onUpdate: NoAction)
+  templateId    String?
+  template      FormTemplate?    @relation(fields: [templateId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  approvalId    String?
+  approval      ApprovalRequest? @relation(fields: [approvalId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  questionKey   String?
+  documentKey   String?
+  nodeKey       String?
+  slot          String
+  orderNumber   Int?
+  optionKey     String?
+  createdAt     DateTime         @default(now())
+
+  @@index([assetId])
+  @@index([formVersionId])
+  @@index([templateId])
+  @@index([approvalId])
+  @@index([tenantId, formVersionId, questionId])
+}
+
 model FormFavorite {
   tenantId String
   memberId String
   member   Membership @relation(fields: [tenantId, memberId], references: [tenantId, id], onDelete: Cascade)
   formId   String
   form     Form       @relation(fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict)
+
   @@id([tenantId, memberId, formId])
 }
+
 model ApprovalRequest {
-  id String @id @default(uuid())
-  tenantId String
-  formId String
-  form Form @relation(fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict)
-  formVersionId String
-  formVersion FormVersion @relation(fields: [tenantId, formId, formVersionId], references: [tenantId, formId, id], onDelete: Restrict)
-  formRevision Int
-  policyRevision Int
-  contentHash String
-  snapshot Json
-  requestCipher String
-  requestedBy String
-  requester Membership @relation("ApprovalRequester", fields: [tenantId, requestedBy], references: [tenantId, id], onDelete: Restrict)
-  decidedBy String?
-  reviewer Membership? @relation("ApprovalReviewer", fields: [tenantId, decidedBy], references: [tenantId, id], onDelete: Restrict)
-  decisionCipher String?
-  decidedAt DateTime?
-  status String @default("pending")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  publication Publication?
+  authorAssetReferences AuthorAssetReference[]
+  id                    String                 @id @default(uuid())
+  tenantId              String
+  formId                String
+  form                  Form                   @relation(fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict)
+  formVersionId         String
+  formVersion           FormVersion            @relation(fields: [tenantId, formId, formVersionId], references: [tenantId, formId, id], onDelete: Restrict)
+  formRevision          Int
+  policyRevision        Int
+  contentHash           String
+  snapshot              Json
+  requestCipher         String
+  requestedBy           String
+  requester             Membership             @relation("ApprovalRequester", fields: [tenantId, requestedBy], references: [tenantId, id], onDelete: Restrict)
+  decidedBy             String?
+  reviewer              Membership?            @relation("ApprovalReviewer", fields: [tenantId, decidedBy], references: [tenantId, id], onDelete: Restrict)
+  decisionCipher        String?
+  decidedAt             DateTime?
+  status                String                 @default("pending")
+  version               Int                    @default(1)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  publication           Publication?
+
   @@unique([tenantId, formId, formVersionId, id])
   @@index([tenantId, status, createdAt, id])
   @@index([formId, createdAt])
 }
 
 model FormTemplate {
-  id        String   @id @default(uuid())
-  tenantId  String?
-  tenant    Company? @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  serviceId String?
-  service   Service? @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  title     String
-  category  String
-  content   Json
-  status    String   @default("active")
-  version   Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([tenantId, status])
+  authorAssetReferences AuthorAssetReference[]
+  id                    String                 @id @default(uuid())
+  tenantId              String?
+  tenant                Company?               @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  serviceId             String?
+  service               Service?               @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  title                 String
+  category              String
+  description           String                 @default("")
+  thumbnailAssetId      String?
+  thumbnailAsset        AuthorAsset?           @relation("FormTemplateThumbnail", fields: [thumbnailAssetId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  licenseScope          String                 @default("SERVICE")
+  content               Json
+  status                String                 @default("active")
+  version               Int                    @default(1)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
   @@unique([tenantId, serviceId, title])
+  @@index([tenantId, status])
+  @@index([thumbnailAssetId])
 }
+
 model Publication {
-  verificationAttempts VerificationAttempt[]
-  id            String   @id @default(uuid())
-  tenantId      String
-  formId        String
-  form          Form     @relation(fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict)
-  formVersionId String
-  formVersion   FormVersion @relation(fields: [tenantId, formId, formVersionId], references: [tenantId, formId, id], onDelete: Restrict)
-  approvalId    String? @unique
-  approval      ApprovalRequest? @relation(fields: [tenantId, formId, formVersionId, approvalId], references: [tenantId, formId, formVersionId, id], onDelete: Restrict)
-  tokenHash     String   @unique
-  tokenCipher   String
-  status        String   @default("active")
-  expiresAt     DateTime?
-  maxResponses  Int
-  responseCount Int      @default(0)
-  version       Int      @default(1)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  submissions   Submission[]
-  fixedUrls     FixedUrl[]
-  files         FileObject[]
+  verificationAttempts    VerificationAttempt[]
+  id                      String                   @id @default(uuid())
+  tenantId                String
+  formId                  String
+  form                    Form                     @relation(fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict)
+  formVersionId           String
+  formVersion             FormVersion              @relation(fields: [tenantId, formId, formVersionId], references: [tenantId, formId, id], onDelete: Restrict)
+  approvalId              String?                  @unique
+  approval                ApprovalRequest?         @relation(fields: [tenantId, formId, formVersionId, approvalId], references: [tenantId, formId, formVersionId, id], onDelete: Restrict)
+  tokenHash               String                   @unique
+  tokenCipher             String
+  status                  String                   @default("active")
+  opensAt                 DateTime?
+  expiresAt               DateTime?
+  maxResponses            Int
+  responseCount           Int                      @default(0)
+  version                 Int                      @default(1)
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  submissions             Submission[]
+  fixedUrls               FixedUrl[]
+  files                   FileObject[]
+  participationChallenges ParticipationChallenge[]
+  participationSessions   ParticipationSession[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, id, formVersionId])
   @@unique([tenantId, formId, formVersionId, approvalId])
   @@unique([tenantId, formId, id, formVersionId])
 }
+
 model FixedUrl {
-  id            String   @id @default(uuid())
+  id            String      @id @default(uuid())
   tenantId      String
   publicationId String
   publication   Publication @relation(fields: [tenantId, publicationId], references: [tenantId, id], onDelete: Restrict)
-  slug          String   @unique
+  slug          String      @unique
   name          String
-  status        String   @default("active")
-  version       Int      @default(1)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        String      @default("active")
+  version       Int         @default(1)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
   @@index([tenantId, status])
 }
+
 model Submission {
-  verificationReceipts VerificationReceipt[]
-  exportReferences ExportSource[]
-  campaignDeliveries CampaignDelivery[]
-  marketingJobs Job[]
-  marketingPreferences MarketingPreference[]
-  subjectWithdrawals SubjectWithdrawal[]
-  suppressions Suppression[]
-  subjectId      String?
-  subject        DataSubject? @relation(fields: [tenantId, subjectId], references: [tenantId, id], onDelete: Restrict)
-  id             String   @id @default(uuid())
-  tenantId       String
-  formVersionId  String
-  formVersion    FormVersion @relation(fields: [tenantId, formVersionId], references: [tenantId, id], onDelete: Restrict)
-  publicationId  String?
-  publication    Publication? @relation(fields: [tenantId, publicationId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)
-  importJobId    String?
-  importRowNo    Int?
-  importJob      ImportJob? @relation(fields: [tenantId, importJobId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)
-  importRows     ImportRow[]
-  importEvidence ImportEvidence?
-  status         String   @default("submitted")
-  version        Int      @default(1)
-  retentionUntil DateTime
+  verificationReceipts   VerificationReceipt[]
+  exportReferences       ExportSource[]
+  campaignDeliveries     CampaignDelivery[]
+  marketingJobs          Job[]
+  marketingPreferences   MarketingPreference[]
+  subjectWithdrawals     SubjectWithdrawal[]
+  suppressions           Suppression[]
+  subjectId              String?
+  subject                DataSubject?            @relation(fields: [tenantId, subjectId], references: [tenantId, id], onDelete: Restrict)
+  participantId          String?
+  id                     String                  @id @default(uuid())
+  tenantId               String
+  formVersionId          String
+  formVersion            FormVersion             @relation(fields: [tenantId, formVersionId], references: [tenantId, id], onDelete: Restrict)
+  publicationId          String?
+  publication            Publication?            @relation(fields: [tenantId, publicationId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)
+  participant            PublicationParticipant? @relation(fields: [participantId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  importJobId            String?
+  importRowNo            Int?
+  importJob              ImportJob?              @relation(fields: [tenantId, importJobId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)
+  importRows             ImportRow[]
+  importEvidence         ImportEvidence?
+  status                 String                  @default("submitted")
+  version                Int                     @default(1)
+  retentionUntil         DateTime
   originalRetentionUntil DateTime
-  retentionVersion Int @default(1)
-  legalHold      Boolean  @default(false)
-  submittedAt    DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  answers        Answer[]
-  receipts       ConsentReceipt[]
-  corrections    Correction[]
-  notes          SubmissionNote[]
-  files          FileObject[]
-  destructions DestructionRequest[]
-  certificate DestructionCertificate?
+  retentionVersion       Int                     @default(1)
+  legalHold              Boolean                 @default(false)
+  pagePathVersion        Int                     @default(0)
+  visitedPageKeys        Json?
+  terminationKind        String?
+  submittedAt            DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  answers                Answer[]
+  receipts               ConsentReceipt[]
+  corrections            Correction[]
+  notes                  SubmissionNote[]
+  files                  FileObject[]
+  destructions           DestructionRequest[]
+  certificate            DestructionCertificate?
+
   @@unique([tenantId, importJobId, importRowNo])
   @@unique([tenantId, id])
   @@unique([tenantId, id, formVersionId])
@@ -1393,9 +1756,102 @@ model Submission {
   @@index([tenantId, submittedAt])
   @@index([status, retentionUntil])
   @@index([tenantId, subjectId])
+  @@index([participantId])
 }
+
+model FormAccessTargetBatch {
+  id            String             @id @default(uuid())
+  tenantId      String
+  formId        String
+  form          Form               @relation(fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict, onUpdate: NoAction)
+  nameCipher    String
+  sourceHash    String
+  acceptedCount Int
+  rejectedCount Int
+  version       Int                @default(1)
+  createdBy     String
+  createdAt     DateTime           @default(now())
+  targets       FormAccessTarget[]
+
+  @@unique([tenantId, formId, id])
+  @@index([tenantId, formId, createdAt, id])
+}
+
+model FormAccessTarget {
+  id          String                @id @default(uuid())
+  tenantId    String
+  formId      String
+  form        Form                  @relation(fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict, onUpdate: NoAction)
+  batchId     String
+  batch       FormAccessTargetBatch @relation(fields: [tenantId, formId, batchId], references: [tenantId, formId, id], onDelete: Restrict, onUpdate: NoAction)
+  emailHash   String
+  emailCipher String
+  createdAt   DateTime              @default(now())
+
+  @@unique([tenantId, formId, emailHash])
+  @@index([batchId])
+}
+
+model ParticipationChallenge {
+  id            String                @id
+  tenantId      String
+  publicationId String
+  publication   Publication           @relation(fields: [tenantId, publicationId], references: [tenantId, id], onDelete: Restrict, onUpdate: NoAction)
+  emailHash     String
+  emailCipher   String
+  clientHash    String
+  codeHash      String?
+  attempts      Int                   @default(0)
+  expiresAt     DateTime
+  consumedAt    DateTime?
+  createdAt     DateTime              @default(now())
+  session       ParticipationSession?
+
+  @@unique([tenantId, publicationId, id])
+  @@index([publicationId, emailHash, createdAt])
+}
+
+model PublicationParticipant {
+  id              String                 @id @default(uuid())
+  tenantId        String
+  formId          String
+  form            Form                   @relation(fields: [tenantId, formId], references: [tenantId, id], onDelete: Restrict, onUpdate: NoAction)
+  identityHash    String
+  identityCipher  String
+  method          String
+  provider        String?
+  submissionCount Int                    @default(0)
+  lastSubmittedAt DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  sessions        ParticipationSession[]
+  submissions     Submission[]
+
+  @@unique([tenantId, formId, id])
+  @@unique([tenantId, formId, identityHash])
+  @@index([formId, lastSubmittedAt])
+}
+
+model ParticipationSession {
+  id            String                 @id @default(uuid())
+  tenantId      String
+  publicationId String
+  publication   Publication            @relation(fields: [tenantId, publicationId], references: [tenantId, id], onDelete: Restrict, onUpdate: NoAction)
+  participantId String
+  participant   PublicationParticipant @relation(fields: [participantId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  challengeId   String                 @unique
+  challenge     ParticipationChallenge @relation(fields: [tenantId, publicationId, challengeId], references: [tenantId, publicationId, id], onDelete: Restrict, onUpdate: NoAction)
+  tokenHash     String                 @unique
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  createdAt     DateTime               @default(now())
+
+  @@unique([tenantId, publicationId, challengeId])
+  @@index([participantId, expiresAt])
+}
+
 model Answer {
-  id            String   @id @default(uuid())
+  id            String     @id @default(uuid())
   tenantId      String
   submissionId  String
   formVersionId String
@@ -1404,24 +1860,28 @@ model Answer {
   question      Question   @relation(fields: [tenantId, formVersionId, questionId], references: [tenantId, formVersionId, id], onDelete: Restrict)
   valueCipher   String
   valueType     String
+
   @@unique([submissionId, questionId])
 }
+
 model ConsentReceipt {
-  id             String     @id @default(uuid())
-  tenantId       String
-  submissionId   String
-  submission     Submission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
-  purpose        String
-  documentHash   String
-  retentionDays  Int
-  evidenceVersion Int @default(0)
-  evidenceCipher String?
-  pdfCipher String?
-  pdfHash String?
-  grantedAt      DateTime   @default(now())
-  events         ConsentEvent[]
+  id              String         @id @default(uuid())
+  tenantId        String
+  submissionId    String
+  submission      Submission     @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
+  purpose         String
+  documentHash    String
+  retentionDays   Int
+  evidenceVersion Int            @default(0)
+  evidenceCipher  String?
+  pdfCipher       String?
+  pdfHash         String?
+  grantedAt       DateTime       @default(now())
+  events          ConsentEvent[]
+
   @@unique([tenantId, id])
 }
+
 model ConsentEvent {
   id        String         @id @default(uuid())
   tenantId  String
@@ -1429,21 +1889,24 @@ model ConsentEvent {
   receipt   ConsentReceipt @relation(fields: [tenantId, receiptId], references: [tenantId, id], onDelete: Restrict)
   type      String
   reason    String
-  createdAt DateTime @default(now())
+  createdAt DateTime       @default(now())
 }
+
 model Correction {
-  id             String     @id @default(uuid())
-  tenantId       String
-  submissionId   String
-  submission     Submission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
-  actorId        String
-  reason         String
-  changedFields  String[]
-  beforeHash     String
-  payload        CorrectionPayload?
-  createdAt      DateTime @default(now())
+  id            String             @id @default(uuid())
+  tenantId      String
+  submissionId  String
+  submission    Submission         @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
+  actorId       String
+  reason        String
+  changedFields String[]
+  beforeHash    String
+  payload       CorrectionPayload?
+  createdAt     DateTime           @default(now())
+
   @@unique([tenantId, id])
 }
+
 model CorrectionPayload {
   id           String     @id @default(uuid())
   tenantId     String
@@ -1451,9 +1914,11 @@ model CorrectionPayload {
   correction   Correction @relation(fields: [tenantId, correctionId], references: [tenantId, id], onDelete: Restrict)
   beforeCipher String
   afterCipher  String
+
   @@unique([tenantId, correctionId])
   @@index([tenantId])
 }
+
 model SubmissionNote {
   id           String     @id @default(uuid())
   tenantId     String
@@ -1465,112 +1930,117 @@ model SubmissionNote {
   version      Int        @default(1)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+
   @@unique([tenantId, id])
   @@index([tenantId, submissionId, createdAt, id])
 }
 
 model DestructionRequest {
-  id String @id @default(uuid())
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  submissionId String
-  submission Submission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
-  source String
-  retentionKey String? @unique
+  id             String                  @id @default(uuid())
+  tenantId       String
+  tenant         Company                 @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  serviceId      String
+  service        Service                 @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  submissionId   String
+  submission     Submission              @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
+  source         String
+  retentionKey   String?                 @unique
   previousStatus String
-  status String @default("pending")
-  dueAt DateTime
-  requesterId String?
-  requester Membership? @relation("DestructionRequester", fields: [tenantId, requesterId], references: [tenantId, userId], onDelete: Restrict)
-  approverId String?
-  approver Membership? @relation("DestructionApprover", fields: [tenantId, approverId], references: [tenantId, userId], onDelete: Restrict)
-  approvedAt DateTime?
-  reasonCipher String?
+  status         String                  @default("pending")
+  dueAt          DateTime
+  requesterId    String?
+  requester      Membership?             @relation("DestructionRequester", fields: [tenantId, requesterId], references: [tenantId, userId], onDelete: Restrict)
+  approverId     String?
+  approver       Membership?             @relation("DestructionApprover", fields: [tenantId, approverId], references: [tenantId, userId], onDelete: Restrict)
+  approvedAt     DateTime?
+  reasonCipher   String?
   decisionCipher String?
-  startedAt DateTime?
-  completedAt DateTime?
-  attempts Int @default(0)
-  maxAttempts Int @default(5)
-  nextAttemptAt DateTime?
-  leaseOwner String?
-  leaseUntil DateTime?
-  lastError String?
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  certificate DestructionCertificate?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  attempts       Int                     @default(0)
+  maxAttempts    Int                     @default(5)
+  nextAttemptAt  DateTime?
+  leaseOwner     String?
+  leaseUntil     DateTime?
+  lastError      String?
+  version        Int                     @default(1)
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+  certificate    DestructionCertificate?
+
   @@unique([tenantId, id, submissionId, serviceId])
   @@index([tenantId, serviceId, createdAt, id])
   @@index([status, dueAt, nextAttemptAt])
   @@index([tenantId, submissionId])
 }
+
 model DestructionCertificate {
-  id String @id @default(uuid())
-  tenantId String
-  tenant Company @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  submissionId String @unique
-  submission Submission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
-  requestId String @unique
-  request DestructionRequest @relation(fields: [tenantId, requestId, submissionId, serviceId], references: [tenantId, id, submissionId, serviceId], onDelete: Restrict)
-  scope String @default("active-database-and-private-storage")
-  method String @default("database-delete-and-encrypted-object-unlink")
-  counts Json
-  digest String
-  version Int @default(1)
-  completedAt DateTime
+  id           String             @id @default(uuid())
+  tenantId     String
+  tenant       Company            @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  serviceId    String
+  service      Service            @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  submissionId String             @unique
+  submission   Submission         @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
+  requestId    String             @unique
+  request      DestructionRequest @relation(fields: [tenantId, requestId, submissionId, serviceId], references: [tenantId, id, submissionId, serviceId], onDelete: Restrict)
+  scope        String             @default("active-database-and-private-storage")
+  method       String             @default("database-delete-and-encrypted-object-unlink")
+  counts       Json
+  digest       String
+  version      Int                @default(1)
+  completedAt  DateTime
+
   @@unique([tenantId, submissionId])
   @@unique([tenantId, requestId, submissionId, serviceId])
   @@index([tenantId, serviceId, completedAt, id])
 }
 
 model ImportJob {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  creatorId String
-  creator Membership @relation("ImportCreator", fields: [tenantId, creatorId], references: [tenantId, userId], onDelete: Restrict)
-  committerId String?
-  committer Membership? @relation("ImportCommitter", fields: [tenantId, committerId], references: [tenantId, userId], onDelete: Restrict)
-  title String
-  fileId String @unique
-  file FileObject @relation(fields: [tenantId, serviceId, fileId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  purposeId String?
-  purpose ProcessingPurpose? @relation(fields: [tenantId, serviceId, purposeId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  sourceRecipientId String?
-  sourceRecipient Recipient? @relation(fields: [tenantId, serviceId, sourceRecipientId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  headersCipher String?
-  mappingCipher String?
-  snapshotCipher String?
-  purposeVersion Int?
+  id                     String             @id @default(uuid())
+  tenantId               String
+  serviceId              String
+  service                Service            @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  creatorId              String
+  creator                Membership         @relation("ImportCreator", fields: [tenantId, creatorId], references: [tenantId, userId], onDelete: Restrict)
+  committerId            String?
+  committer              Membership?        @relation("ImportCommitter", fields: [tenantId, committerId], references: [tenantId, userId], onDelete: Restrict)
+  title                  String
+  fileId                 String             @unique
+  file                   FileObject         @relation(fields: [tenantId, serviceId, fileId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  purposeId              String?
+  purpose                ProcessingPurpose? @relation(fields: [tenantId, serviceId, purposeId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  sourceRecipientId      String?
+  sourceRecipient        Recipient?         @relation(fields: [tenantId, serviceId, sourceRecipientId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  headersCipher          String?
+  mappingCipher          String?
+  snapshotCipher         String?
+  purposeVersion         Int?
   sourceRecipientVersion Int?
-  status String @default("uploading")
-  version Int @default(1)
-  totalRows Int @default(0)
-  validRows Int @default(0)
-  invalidRows Int @default(0)
-  skippedRows Int @default(0)
-  importedRows Int @default(0)
-  formVersionId String?
-  formVersion FormVersion? @relation(fields: [tenantId, formVersionId], references: [tenantId, id], onDelete: Restrict)
-  expiresAt DateTime
-  startedAt DateTime?
-  completedAt DateTime?
-  leaseOwner String?
-  leaseUntil DateTime?
-  nextAttemptAt DateTime?
-  attempts Int @default(0)
-  lastError String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  rows ImportRow[]
-  leaseGeneration Int @default(0)
-  submissions Submission[]
-  evidence ImportEvidence[]
+  status                 String             @default("uploading")
+  version                Int                @default(1)
+  totalRows              Int                @default(0)
+  validRows              Int                @default(0)
+  invalidRows            Int                @default(0)
+  skippedRows            Int                @default(0)
+  importedRows           Int                @default(0)
+  formVersionId          String?
+  formVersion            FormVersion?       @relation(fields: [tenantId, formVersionId], references: [tenantId, id], onDelete: Restrict)
+  expiresAt              DateTime
+  startedAt              DateTime?
+  completedAt            DateTime?
+  leaseOwner             String?
+  leaseUntil             DateTime?
+  nextAttemptAt          DateTime?
+  attempts               Int                @default(0)
+  lastError              String?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  rows                   ImportRow[]
+  leaseGeneration        Int                @default(0)
+  submissions            Submission[]
+  evidence               ImportEvidence[]
+
   @@unique([tenantId, serviceId, fileId])
   @@unique([tenantId, id])
   @@unique([tenantId, id, formVersionId])
@@ -1578,355 +2048,420 @@ model ImportJob {
   @@index([status, leaseUntil, nextAttemptAt])
   @@index([expiresAt])
 }
+
 model ImportRow {
-  id String @id @default(uuid())
-  tenantId String
-  jobId String
-  job ImportJob @relation(fields: [tenantId, jobId], references: [tenantId, id], onDelete: Restrict)
-  rowNo Int
-  lineNo Int
-  status String
+  id            String      @id @default(uuid())
+  tenantId      String
+  jobId         String
+  job           ImportJob   @relation(fields: [tenantId, jobId], references: [tenantId, id], onDelete: Restrict)
+  rowNo         Int
+  lineNo        Int
+  status        String
   payloadCipher String?
-  digest String?
-  errors Json
-  duplicateOf Int?
-  original ImportRow? @relation("ImportDuplicate", fields: [tenantId, jobId, duplicateOf], references: [tenantId, jobId, rowNo], onDelete: Cascade)
-  duplicates ImportRow[] @relation("ImportDuplicate")
-  submissionId String?
-  submission Submission? @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
-  createdAt DateTime @default(now())
+  digest        String?
+  errors        Json
+  duplicateOf   Int?
+  original      ImportRow?  @relation("ImportDuplicate", fields: [tenantId, jobId, duplicateOf], references: [tenantId, jobId, rowNo], onDelete: Cascade)
+  duplicates    ImportRow[] @relation("ImportDuplicate")
+  submissionId  String?
+  submission    Submission? @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
+  createdAt     DateTime    @default(now())
+
   @@unique([tenantId, jobId, rowNo])
   @@index([tenantId, jobId, status, rowNo])
   @@index([submissionId])
 }
+
 model ImportEvidence {
-  submissionId String @id
-  tenantId String
-  submission Submission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
-  jobId String
-  job ImportJob @relation(fields: [tenantId, jobId], references: [tenantId, id], onDelete: Restrict)
+  submissionId  String     @id
+  tenantId      String
+  submission    Submission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
+  jobId         String
+  job           ImportJob  @relation(fields: [tenantId, jobId], references: [tenantId, id], onDelete: Restrict)
   payloadCipher String
-  createdAt DateTime @default(now())
+  createdAt     DateTime   @default(now())
+
   @@unique([tenantId, submissionId])
 }
 
 model Document {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  createdBy String
-  creator Membership @relation(fields: [tenantId, createdBy], references: [tenantId, userId], onDelete: Restrict)
-  type String
-  title String
-  body String @default("")
-  refusalNotice String @default("")
-  rightsContact String @default("")
+  id            String                @id @default(uuid())
+  tenantId      String
+  serviceId     String
+  service       Service               @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  createdBy     String
+  creator       Membership            @relation(fields: [tenantId, createdBy], references: [tenantId, userId], onDelete: Restrict)
+  type          String
+  title         String
+  body          String                @default("")
+  refusalNotice String                @default("")
+  rightsContact String                @default("")
   effectiveDate String
-  status String @default("draft")
-  version Int @default(1)
-  draftRevision Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  purposes DocumentPurpose[]
-  recipients DocumentRecipient[]
-  versions DocumentVersion[]
-  publications DocumentPublication[]
+  status        String                @default("draft")
+  version       Int                   @default(1)
+  draftRevision Int                   @default(1)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  purposes      DocumentPurpose[]
+  recipients    DocumentRecipient[]
+  policyDraft   DocumentPolicyDraft?
+  versions      DocumentVersion[]
+  publications  DocumentPublication[]
+
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, status, createdAt, id])
 }
+
+model DocumentPolicyDraft {
+  documentId    String   @id
+  tenantId      String
+  serviceId     String
+  schemaVersion Int      @default(1)
+  payload       Json
+  document      Document @relation(fields: [tenantId, serviceId, documentId], references: [tenantId, serviceId, id], onDelete: Restrict)
+
+  @@unique([tenantId, serviceId, documentId])
+}
+
 model DocumentPurpose {
-  tenantId String
-  serviceId String
+  tenantId   String
+  serviceId  String
   documentId String
-  document Document @relation(fields: [tenantId, serviceId, documentId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  purposeId String
-  purpose ProcessingPurpose @relation(fields: [tenantId, serviceId, purposeId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  document   Document          @relation(fields: [tenantId, serviceId, documentId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  purposeId  String
+  purpose    ProcessingPurpose @relation(fields: [tenantId, serviceId, purposeId], references: [tenantId, serviceId, id], onDelete: Restrict)
+
   @@id([tenantId, documentId, purposeId])
 }
+
 model DocumentRecipient {
-  tenantId String
-  serviceId String
-  documentId String
-  document Document @relation(fields: [tenantId, serviceId, documentId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  tenantId    String
+  serviceId   String
+  documentId  String
+  document    Document  @relation(fields: [tenantId, serviceId, documentId], references: [tenantId, serviceId, id], onDelete: Restrict)
   recipientId String
-  recipient Recipient @relation(fields: [tenantId, serviceId, recipientId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  recipient   Recipient @relation(fields: [tenantId, serviceId, recipientId], references: [tenantId, serviceId, id], onDelete: Restrict)
+
   @@id([tenantId, documentId, recipientId])
 }
+
 model DocumentVersion {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  documentId String
-  document Document @relation(fields: [tenantId, serviceId, documentId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  number Int
-  draftRevision Int
-  snapshot Json
-  renderedText String
-  contentHash String
-  createdAt DateTime @default(now())
-  publications DocumentPublication[]
-  pdf DocumentPdf?
-  formBindings FormDocumentBinding[]
+  id               String                     @id @default(uuid())
+  tenantId         String
+  serviceId        String
+  documentId       String
+  document         Document                   @relation(fields: [tenantId, serviceId, documentId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  number           Int
+  draftRevision    Int
+  snapshot         Json
+  renderedText     String
+  contentHash      String
+  createdAt        DateTime                   @default(now())
+  publications     DocumentPublication[]
+  pdf              DocumentPdf?
+  formBindings     FormDocumentBinding[]
+  recipientSources DocumentVersionRecipient[]
+
   @@unique([tenantId, serviceId, documentId, id])
   @@unique([documentId, number])
 }
+
+model DocumentVersionRecipient {
+  tenantId          String
+  serviceId         String
+  documentId        String
+  documentVersionId String
+  recipientId       String
+  documentVersion   DocumentVersion @relation(fields: [tenantId, serviceId, documentId, documentVersionId], references: [tenantId, serviceId, documentId, id], onDelete: Restrict, map: "DocumentVersionRecipient_version_fkey")
+  recipient         Recipient       @relation(fields: [tenantId, serviceId, recipientId], references: [tenantId, serviceId, id], onDelete: Restrict, map: "DocumentVersionRecipient_recipient_fkey")
+
+  @@id([tenantId, documentVersionId, recipientId], map: "DocumentVersionRecipient_pkey")
+  @@index([tenantId, serviceId, recipientId], map: "DocumentVersionRecipient_recipient_idx")
+}
+
 model DocumentPdf {
-  documentVersionId String @id
-  tenantId String
-  serviceId String
-  documentId String
-  documentVersion DocumentVersion @relation(fields: [tenantId, serviceId, documentId, documentVersionId], references: [tenantId, serviceId, documentId, id], onDelete: Restrict, map: "DocumentPdf_version_fkey")
-  rendererVersion Int
-  fontHash String
-  contentHash String
-  pdfHash String
-  bytes Bytes
-  pageCount Int
-  createdAt DateTime @default(now())
+  documentVersionId String          @id
+  tenantId          String
+  serviceId         String
+  documentId        String
+  documentVersion   DocumentVersion @relation(fields: [tenantId, serviceId, documentId, documentVersionId], references: [tenantId, serviceId, documentId, id], onDelete: Restrict, map: "DocumentPdf_version_fkey")
+  rendererVersion   Int
+  fontHash          String
+  contentHash       String
+  pdfHash           String
+  bytes             Bytes
+  pageCount         Int
+  createdAt         DateTime        @default(now())
+
   @@unique([tenantId, serviceId, documentId, documentVersionId])
   @@index([tenantId, serviceId, documentId])
 }
+
 model DocumentPublication {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  documentId String
-  document Document @relation(fields: [tenantId, serviceId, documentId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  id                String                  @id @default(uuid())
+  tenantId          String
+  serviceId         String
+  documentId        String
+  document          Document                @relation(fields: [tenantId, serviceId, documentId], references: [tenantId, serviceId, id], onDelete: Restrict)
   documentVersionId String
-  documentVersion DocumentVersion @relation(fields: [tenantId, serviceId, documentId, documentVersionId], references: [tenantId, serviceId, documentId, id], onDelete: Restrict)
-  tokenHash String @unique
-  tokenCipher String
-  expiresAt DateTime?
-  revokedAt DateTime?
-  status String @default("active")
-  createdAt DateTime @default(now())
-  displays ServiceConsentDisplay[]
+  documentVersion   DocumentVersion         @relation(fields: [tenantId, serviceId, documentId, documentVersionId], references: [tenantId, serviceId, documentId, id], onDelete: Restrict)
+  tokenHash         String                  @unique
+  tokenCipher       String
+  expiresAt         DateTime?
+  revokedAt         DateTime?
+  status            String                  @default("active")
+  createdAt         DateTime                @default(now())
+  displays          ServiceConsentDisplay[]
+
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, documentId, status])
 }
+
 model ClauseTemplate {
-  id String @id @default(uuid())
-  tenantId String
+  id        String   @id @default(uuid())
+  tenantId  String
   serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  type String
-  title String
-  body String
-  status String @default("active")
-  version Int @default(1)
+  service   Service  @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  type      String
+  title     String
+  body      String
+  status    String   @default("active")
+  version   Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@index([tenantId, serviceId, status, createdAt, id])
 }
+
 model ServiceConsentDisplay {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  kind String
-  nameMode String
-  startText String @default("")
-  processorText String @default("")
-  policyText String @default("")
-  requiredText String @default("")
-  optionalText String @default("")
-  policyMode String @default("none")
-  externalUrl String @default("")
+  id            String               @id @default(uuid())
+  tenantId      String
+  serviceId     String
+  service       Service              @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  kind          String
+  nameMode      String
+  startText     String               @default("")
+  processorText String               @default("")
+  policyText    String               @default("")
+  requiredText  String               @default("")
+  optionalText  String               @default("")
+  policyMode    String               @default("none")
+  externalUrl   String               @default("")
   publicationId String?
-  publication DocumentPublication? @relation(fields: [tenantId, serviceId, publicationId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  publication   DocumentPublication? @relation(fields: [tenantId, serviceId, publicationId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  version       Int                  @default(1)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
   @@unique([tenantId, serviceId, kind])
 }
 
 model FormDocumentBinding {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  formVersionId String
-  formVersion FormVersion @relation(fields: [tenantId, formVersionId], references: [tenantId, id], onDelete: Restrict)
-  documentId String
+  id                String          @id @default(uuid())
+  tenantId          String
+  serviceId         String
+  formVersionId     String
+  formVersion       FormVersion     @relation(fields: [tenantId, formVersionId], references: [tenantId, id], onDelete: Restrict)
+  documentId        String
   documentVersionId String
-  documentVersion DocumentVersion @relation(fields: [tenantId, serviceId, documentId, documentVersionId], references: [tenantId, serviceId, documentId, id], onDelete: Restrict)
-  required Boolean
-  kind String
-  order Int
-  displaySnapshot Json
+  documentVersion   DocumentVersion @relation(fields: [tenantId, serviceId, documentId, documentVersionId], references: [tenantId, serviceId, documentId, id], onDelete: Restrict)
+  required          Boolean
+  kind              String
+  order             Int
+  displaySnapshot   Json
+
   @@unique([formVersionId, documentId])
   @@unique([formVersionId, order])
   @@index([tenantId, serviceId, documentVersionId])
 }
 
 model ShareGrant {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  formId String
-  form Form @relation(fields: [tenantId, serviceId, formId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  id            String            @id @default(uuid())
+  tenantId      String
+  serviceId     String
+  formId        String
+  form          Form              @relation(fields: [tenantId, serviceId, formId], references: [tenantId, serviceId, id], onDelete: Restrict)
   formVersionId String
-  formVersion FormVersion @relation(fields: [tenantId, formId, formVersionId], references: [tenantId, formId, id], onDelete: Restrict)
-  createdBy String
-  creator Membership @relation(fields: [tenantId, createdBy], references: [tenantId, id], onDelete: Restrict)
-  emailCipher String
-  emailHash String
-  codeHash String @unique
-  expiresAt DateTime
-  revokedAt DateTime?
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  fields ShareField[]
-  challenges ViewerChallenge[]
-  sessions ViewerSession[]
+  formVersion   FormVersion       @relation(fields: [tenantId, formId, formVersionId], references: [tenantId, formId, id], onDelete: Restrict)
+  createdBy     String
+  creator       Membership        @relation(fields: [tenantId, createdBy], references: [tenantId, id], onDelete: Restrict)
+  emailCipher   String
+  emailHash     String
+  codeHash      String            @unique
+  expiresAt     DateTime
+  shareFormBody Boolean           @default(false)
+  revokedAt     DateTime?
+  version       Int               @default(1)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  fields        ShareField[]
+  challenges    ViewerChallenge[]
+  sessions      ViewerSession[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, id, formVersionId])
   @@index([tenantId, formId, createdAt, id])
   @@index([expiresAt])
 }
+
 model ShareField {
-  tenantId String
-  grantId String
+  tenantId      String
+  grantId       String
   formVersionId String
-  questionId String
-  grant ShareGrant @relation(fields: [tenantId, grantId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Cascade)
-  question Question @relation(fields: [tenantId, formVersionId, questionId], references: [tenantId, formVersionId, id], onDelete: Restrict)
+  questionId    String
+  grant         ShareGrant @relation(fields: [tenantId, grantId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Cascade)
+  question      Question   @relation(fields: [tenantId, formVersionId, questionId], references: [tenantId, formVersionId, id], onDelete: Restrict)
+
   @@id([grantId, questionId])
 }
+
 model ViewerChallenge {
-  id String @id
-  tenantId String
-  grantId String
-  grant ShareGrant @relation(fields: [tenantId, grantId], references: [tenantId, id], onDelete: Restrict)
+  id           String         @id
+  tenantId     String
+  grantId      String
+  grant        ShareGrant     @relation(fields: [tenantId, grantId], references: [tenantId, id], onDelete: Restrict)
   grantVersion Int
-  clientHash String
-  codeHash String
-  attempts Int @default(0)
-  expiresAt DateTime
-  consumedAt DateTime?
-  createdAt DateTime @default(now())
-  session ViewerSession?
+  clientHash   String
+  codeHash     String
+  attempts     Int            @default(0)
+  expiresAt    DateTime
+  consumedAt   DateTime?
+  createdAt    DateTime       @default(now())
+  session      ViewerSession?
+
   @@unique([tenantId, grantId, id])
   @@index([grantId, createdAt])
 }
+
 model ViewerSession {
-  id String @id @default(uuid())
-  tenantId String
-  grantId String
-  grant ShareGrant @relation(fields: [tenantId, grantId], references: [tenantId, id], onDelete: Restrict)
+  id           String          @id @default(uuid())
+  tenantId     String
+  grantId      String
+  grant        ShareGrant      @relation(fields: [tenantId, grantId], references: [tenantId, id], onDelete: Restrict)
   grantVersion Int
-  challengeId String @unique
-  challenge ViewerChallenge @relation(fields: [tenantId, grantId, challengeId], references: [tenantId, grantId, id], onDelete: Restrict)
-  tokenHash String @unique
-  expiresAt DateTime
-  revokedAt DateTime?
-  createdAt DateTime @default(now())
-  @@index([grantId, expiresAt])
+  challengeId  String          @unique
+  challenge    ViewerChallenge @relation(fields: [tenantId, grantId, challengeId], references: [tenantId, grantId, id], onDelete: Restrict)
+  tokenHash    String          @unique
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  createdAt    DateTime        @default(now())
+
   @@unique([tenantId, grantId, challengeId])
+  @@index([grantId, expiresAt])
 }
 
 model DataSubject {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  identityHash String
-  nameHash String
-  emailHash String
+  id            String               @id @default(uuid())
+  tenantId      String
+  serviceId     String
+  service       Service              @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  identityHash  String
+  nameHash      String
+  emailHash     String
   contactCipher String
-  accessScopes SubjectAccessScope[]
-  createdAt DateTime @default(now())
-  submissions Submission[]
+  accessScopes  SubjectAccessScope[]
+  createdAt     DateTime             @default(now())
+  submissions   Submission[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, identityHash])
   @@index([nameHash, emailHash])
 }
 
 model SubjectAccessRequest {
-  id String @id @default(uuid())
-  tokenHash String @unique
+  id          String               @id @default(uuid())
+  tokenHash   String               @unique
   browserHash String
-  expiresAt DateTime
-  consumedAt DateTime?
-  createdAt DateTime @default(now())
-  scopes SubjectAccessScope[]
-  session SubjectSession?
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime             @default(now())
+  scopes      SubjectAccessScope[]
+  session     SubjectSession?
+
   @@index([expiresAt])
 }
+
 model SubjectAccessScope {
   requestId String
-  request SubjectAccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  tenantId String
+  request   SubjectAccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  tenantId  String
   subjectId String
-  subject DataSubject @relation(fields: [tenantId, subjectId], references: [tenantId, id], onDelete: Cascade)
+  subject   DataSubject          @relation(fields: [tenantId, subjectId], references: [tenantId, id], onDelete: Cascade)
+
   @@id([requestId, subjectId])
   @@index([tenantId, subjectId])
 }
+
 model SubjectSession {
-  id String @id @default(uuid())
-  requestId String @unique
-  request SubjectAccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  tokenHash String @unique
-  expiresAt DateTime
-  revokedAt DateTime?
-  createdAt DateTime @default(now())
+  id          String               @id @default(uuid())
+  requestId   String               @unique
+  request     SubjectAccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  tokenHash   String               @unique
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime             @default(now())
   withdrawals SubjectWithdrawal[]
+
   @@index([expiresAt])
 }
+
 model SubjectWithdrawal {
-  id String @id @default(uuid())
-  tenantId String
-  submissionId String
-  submission Submission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
-  sessionId String
-  session SubjectSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id                String         @id @default(uuid())
+  tenantId          String
+  submissionId      String
+  submission        Submission     @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Restrict)
+  sessionId         String
+  session           SubjectSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   submissionVersion Int
-  status String @default("requested")
-  createdAt DateTime @default(now())
-  finishedAt DateTime?
+  status            String         @default("requested")
+  createdAt         DateTime       @default(now())
+  finishedAt        DateTime?
+
   @@index([sessionId, submissionId])
 }
+
 model Suppression {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  emailHash String
-  channel String @default("email")
-  reason String
+  id                 String     @id @default(uuid())
+  tenantId           String
+  serviceId          String
+  service            Service    @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  emailHash          String
+  channel            String     @default("email")
+  reason             String
   sourceSubmissionId String
-  sourceSubmission Submission @relation(fields: [tenantId, sourceSubmissionId], references: [tenantId, id], onDelete: Restrict)
-  createdAt DateTime @default(now())
+  sourceSubmission   Submission @relation(fields: [tenantId, sourceSubmissionId], references: [tenantId, id], onDelete: Restrict)
+  createdAt          DateTime   @default(now())
+
   @@unique([tenantId, serviceId, emailHash, channel])
 }
 
 model MarketingPreference {
   campaignDeliveries CampaignDelivery[]
-  jobs Job[]
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  jobs               Job[]
+  id                 String             @id @default(uuid())
+  tenantId           String
+  serviceId          String
+  service            Service            @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
   sourceSubmissionId String
-  sourceSubmission Submission @relation(fields: [tenantId, sourceSubmissionId], references: [tenantId, id], onDelete: Restrict)
-  nameQuestionId String
-  contactQuestionId String
-  channel String
-  contactHash String
-  nameHash String?
-  contactCipher String?
-  evidenceCipher String?
-  evidenceHash String
-  sourceKind String
-  grantedAt DateTime
-  withdrawnAt DateTime?
-  excluded Boolean @default(false)
-  status String @default("granted")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  events MarketingEvent[]
+  sourceSubmission   Submission         @relation(fields: [tenantId, sourceSubmissionId], references: [tenantId, id], onDelete: Restrict)
+  nameQuestionId     String
+  contactQuestionId  String
+  channel            String
+  contactHash        String
+  nameHash           String?
+  contactCipher      String?
+  evidenceCipher     String?
+  evidenceHash       String
+  sourceKind         String
+  grantedAt          DateTime
+  withdrawnAt        DateTime?
+  excluded           Boolean            @default(false)
+  status             String             @default("granted")
+  version            Int                @default(1)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  events             MarketingEvent[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, channel, contactHash])
   @@unique([tenantId, serviceId, id])
@@ -1934,387 +2469,422 @@ model MarketingPreference {
   @@index([sourceSubmissionId])
   @@index([tenantId, serviceId, nameHash])
 }
+
 model MarketingEvent {
-  id String @id @default(uuid())
-  tenantId String
+  id           String              @id @default(uuid())
+  tenantId     String
   preferenceId String
-  preference MarketingPreference @relation(fields: [tenantId, preferenceId], references: [tenantId, id], onDelete: Restrict)
-  kind String
-  actorId String?
-  version Int
+  preference   MarketingPreference @relation(fields: [tenantId, preferenceId], references: [tenantId, id], onDelete: Restrict)
+  kind         String
+  actorId      String?
+  version      Int
   evidenceHash String?
-  createdAt DateTime @default(now())
+  createdAt    DateTime            @default(now())
+
   @@unique([preferenceId, version])
 }
 
 model KakaoChannel {
-  id String @id @default(uuid())
-  tenantId String
+  id        String          @id @default(uuid())
+  tenantId  String
   serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  name String
-  searchId String
-  status String @default("pending")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  service   Service         @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: "KakaoChannel_service_fkey")
+  name      String
+  searchId  String
+  status    String          @default("pending")
+  version   Int             @default(1)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
   templates KakaoTemplate[]
+
   @@unique([tenantId, serviceId, searchId])
   @@unique([tenantId, id])
   @@index([tenantId, serviceId, status, createdAt])
 }
+
 model KakaoTemplate {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  channelId String
-  channel KakaoChannel @relation(fields: [tenantId, channelId], references: [tenantId, id], onDelete: Restrict)
-  campaigns Campaign[]
+  id           String             @id @default(uuid())
+  tenantId     String
+  serviceId    String
+  channelId    String
+  channel      KakaoChannel       @relation(fields: [tenantId, channelId], references: [tenantId, id], map: "KakaoTemplate_channel_fkey")
+  campaigns    Campaign[]
   mockReceipts KakaoMockReceipt[]
-  name String
-  body String
-  buttons Json
-  status String @default("draft")
-  reviewNote String @default("")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  name         String
+  body         String
+  buttons      Json
+  status       String             @default("draft")
+  reviewNote   String             @default("")
+  version      Int                @default(1)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
   @@unique([tenantId, serviceId, name])
   @@unique([tenantId, id])
   @@index([tenantId, channelId, status])
 }
+
 model KakaoMockReceipt {
-  id String @id @default(uuid())
-  tenantId String
-  templateId String
-  template KakaoTemplate @relation(fields: [tenantId, templateId], references: [tenantId, id], onDelete: Restrict)
-  serviceId String
-  channelId String
+  id              String        @id @default(uuid())
+  tenantId        String
+  templateId      String
+  template        KakaoTemplate @relation(fields: [tenantId, templateId], references: [tenantId, id], onDelete: Restrict)
+  serviceId       String
+  channelId       String
   templateVersion Int
-  channelVersion Int
-  contentHash String
-  requestId String @unique
-  status String @default("local_delivered")
-  createdAt DateTime @default(now())
+  channelVersion  Int
+  contentHash     String
+  requestId       String        @unique
+  status          String        @default("local_delivered")
+  createdAt       DateTime      @default(now())
+
   @@index([tenantId, templateId, createdAt])
 }
+
 model SmsReceipt {
-  id String @id @default(uuid())
-  tenantId String
+  id         String           @id @default(uuid())
+  tenantId   String
   deliveryId String
-  delivery CampaignDelivery @relation(fields: [tenantId, deliveryId], references: [tenantId, id], onDelete: Restrict)
-  attempt Int @default(1)
-  receiptId String @unique
-  status String
-  createdAt DateTime @default(now())
+  delivery   CampaignDelivery @relation(fields: [tenantId, deliveryId], references: [tenantId, id], onDelete: Restrict)
+  attempt    Int              @default(1)
+  receiptId  String           @unique
+  status     String
+  createdAt  DateTime         @default(now())
+
   @@unique([deliveryId, attempt])
   @@index([tenantId, createdAt])
 }
+
 model Campaign {
-  files FileObject[]
-  attachmentSnapshot Json @default("[]")
-  mailProtocol String @default("mail.campaign.v3")
-  messageTemplateId String?
-  messageTemplateVersion Int?
+  files                   FileObject[]
+  attachmentSnapshot      Json                     @default("[]")
+  mailProtocol            String                   @default("mail.campaign.v3")
+  messageTemplateId       String?
+  messageTemplateVersion  Int?
   messageTemplateRevision MessageTemplateRevision? @relation(fields: [tenantId, serviceId, messageTemplateId, messageTemplateVersion], references: [tenantId, serviceId, templateId, version], onDelete: Restrict)
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  creatorId String
-  creator Membership @relation("CampaignCreator", fields: [tenantId, creatorId], references: [tenantId, userId], onDelete: Restrict)
-  requesterId String?
-  requester Membership? @relation("CampaignRequester", fields: [tenantId, requesterId], references: [tenantId, userId], onDelete: Restrict)
-  channel String
-  source String
-  title String
-  contentCipher String?
-  senderId String?
-  sender Sender? @relation(fields: [tenantId, serviceId, senderId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  senderVersion Int?
-  kakaoTemplateId String?
-  kakaoTemplateVersion Int?
-  kakaoTemplate KakaoTemplate? @relation(fields: [tenantId, kakaoTemplateId], references: [tenantId, id], onDelete: Restrict)
-  fallbackSenderId String?
-  fallbackSenderVersion Int?
-  fallbackSender Sender? @relation("campaignFallbackSender", fields: [tenantId, fallbackSenderId], references: [tenantId, id], onDelete: Restrict)
-  status String @default("draft")
-  scheduledAt DateTime?
-  requestedAt DateTime?
-  completedAt DateTime?
-  archivedAt DateTime?
-  expiresAt DateTime
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  recipients CampaignDelivery[]
-  events CampaignEvent[]
+  id                      String                   @id @default(uuid())
+  tenantId                String
+  serviceId               String
+  service                 Service                  @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  creatorId               String
+  creator                 Membership               @relation("CampaignCreator", fields: [tenantId, creatorId], references: [tenantId, userId], onDelete: Restrict)
+  requesterId             String?
+  requester               Membership?              @relation("CampaignRequester", fields: [tenantId, requesterId], references: [tenantId, userId], onDelete: Restrict)
+  channel                 String
+  source                  String
+  title                   String
+  contentCipher           String?
+  senderId                String?
+  sender                  Sender?                  @relation(fields: [tenantId, serviceId, senderId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  senderVersion           Int?
+  kakaoTemplateId         String?
+  kakaoTemplateVersion    Int?
+  kakaoTemplate           KakaoTemplate?           @relation(fields: [tenantId, kakaoTemplateId], references: [tenantId, id], onDelete: Restrict)
+  fallbackSenderId        String?
+  fallbackSenderVersion   Int?
+  fallbackSender          Sender?                  @relation("campaignFallbackSender", fields: [tenantId, fallbackSenderId], references: [tenantId, id], onDelete: Restrict)
+  status                  String                   @default("draft")
+  scheduledAt             DateTime?
+  requestedAt             DateTime?
+  completedAt             DateTime?
+  archivedAt              DateTime?
+  expiresAt               DateTime
+  version                 Int                      @default(1)
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  recipients              CampaignDelivery[]
+  events                  CampaignEvent[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, channel, status, createdAt, id])
   @@index([expiresAt, status])
 }
+
 model CampaignDelivery {
-  emailFeedback EmailFeedback[]
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  campaignId String
-  campaign Campaign @relation(fields: [tenantId, serviceId, campaignId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  position Int
-  contactHash String
-  contactCipher String?
-  preferenceId String?
-  preference MarketingPreference? @relation(fields: [tenantId, serviceId, preferenceId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  emailFeedback      EmailFeedback[]
+  id                 String               @id @default(uuid())
+  tenantId           String
+  serviceId          String
+  campaignId         String
+  campaign           Campaign             @relation(fields: [tenantId, serviceId, campaignId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  position           Int
+  contactHash        String
+  contactCipher      String?
+  preferenceId       String?
+  preference         MarketingPreference? @relation(fields: [tenantId, serviceId, preferenceId], references: [tenantId, serviceId, id], onDelete: Restrict)
   sourceSubmissionId String?
-  sourceSubmission Submission? @relation(fields: [tenantId, sourceSubmissionId], references: [tenantId, id], onDelete: Restrict)
-  preferenceVersion Int?
-  status String @default("draft")
-  reason String?
-  attempt Int @default(0)
-  acceptedAt DateTime?
-  erasedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  jobs Job[]
-  smsReceipts SmsReceipt[]
+  sourceSubmission   Submission?          @relation(fields: [tenantId, sourceSubmissionId], references: [tenantId, id], onDelete: Restrict)
+  preferenceVersion  Int?
+  status             String               @default("draft")
+  reason             String?
+  attempt            Int                  @default(0)
+  acceptedAt         DateTime?
+  erasedAt           DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  jobs               Job[]
+  smsReceipts        SmsReceipt[]
+
   @@unique([tenantId, id])
   @@unique([campaignId, contactHash])
   @@index([campaignId, status, position, id])
   @@index([sourceSubmissionId])
   @@index([preferenceId])
 }
+
 model CampaignEvent {
-  id String @id @default(uuid())
-  tenantId String
+  id         String   @id @default(uuid())
+  tenantId   String
   campaignId String
-  campaign Campaign @relation(fields: [tenantId, campaignId], references: [tenantId, id], onDelete: Restrict)
-  version Int
-  kind String
-  actorId String?
-  createdAt DateTime @default(now())
+  campaign   Campaign @relation(fields: [tenantId, campaignId], references: [tenantId, id], onDelete: Restrict)
+  version    Int
+  kind       String
+  actorId    String?
+  createdAt  DateTime @default(now())
+
   @@unique([campaignId, version])
 }
 
 model MessageTemplate {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  creatorId String
-  creator Membership @relation(fields: [tenantId, creatorId], references: [tenantId, userId], onDelete: Restrict)
-  channel String
-  name String
+  id            String                    @id @default(uuid())
+  tenantId      String
+  serviceId     String
+  service       Service                   @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  creatorId     String
+  creator       Membership                @relation(fields: [tenantId, creatorId], references: [tenantId, userId], onDelete: Restrict)
+  channel       String
+  name          String
   contentCipher String?
-  contentHash String?
-  status String @default("active")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  revisions MessageTemplateRevision[]
+  contentHash   String?
+  status        String                    @default("active")
+  version       Int                       @default(1)
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+  revisions     MessageTemplateRevision[]
+
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, channel, status, createdAt, id])
 }
+
 model MessageTemplateRevision {
-  templateId String
-  tenantId String
-  serviceId String
-  template MessageTemplate @relation(fields: [tenantId, serviceId, templateId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  version Int
-  name String
+  templateId    String
+  tenantId      String
+  serviceId     String
+  template      MessageTemplate @relation(fields: [tenantId, serviceId, templateId], references: [tenantId, serviceId, id])
+  version       Int
+  name          String
   contentCipher String?
-  contentHash String?
-  kind String
-  actorId String
-  createdAt DateTime @default(now())
-  campaigns Campaign[]
+  contentHash   String?
+  kind          String
+  actorId       String
+  createdAt     DateTime        @default(now())
+  campaigns     Campaign[]
+  actor         Membership      @relation("MessageTemplateRevisionActor", fields: [tenantId, actorId], references: [tenantId, userId], onDelete: Restrict, onUpdate: NoAction, map: "MessageTemplateRevision_actor")
+
   @@id([templateId, version])
   @@unique([tenantId, serviceId, templateId, version])
 }
 
 model EmailFeedback {
-  id String @id @default(uuid())
-  eventKey String @unique
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  jobId String
-  job Job @relation(fields: [jobId], references: [id], onDelete: Restrict)
-  deliveryId String
-  delivery CampaignDelivery @relation(fields: [tenantId, deliveryId], references: [tenantId, id], onDelete: Restrict)
-  contactHash String
-  kind String
-  source String
-  occurredAt DateTime
-  bodyHash String
-  createdAt DateTime @default(now())
+  id           String             @id @default(uuid())
+  eventKey     String             @unique
+  tenantId     String
+  serviceId    String
+  service      Service            @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction, map: "EmailFeedback_service_fkey")
+  jobId        String
+  job          Job                @relation(fields: [jobId], references: [id], onUpdate: NoAction)
+  deliveryId   String
+  delivery     CampaignDelivery   @relation(fields: [tenantId, deliveryId], references: [tenantId, id], onUpdate: NoAction, map: "EmailFeedback_delivery_fkey")
+  contactHash  String
+  kind         String
+  source       String
+  occurredAt   DateTime
+  bodyHash     String
+  createdAt    DateTime           @default(now())
   suppressions EmailSuppression[]
-  @@unique([tenantId, serviceId, contactHash, id])
-  @@index([tenantId, serviceId, contactHash, kind, occurredAt])
-  @@index([jobId, kind])
-  @@index([deliveryId, createdAt, id])
+
+  @@unique([tenantId, serviceId, contactHash, id], map: "EmailFeedback_scope_key")
+  @@index([tenantId, serviceId, contactHash, kind, occurredAt], map: "EmailFeedback_contact_kind_time")
+  @@index([jobId, kind], map: "EmailFeedback_job_kind")
+  @@index([deliveryId, createdAt, id], map: "EmailFeedback_delivery_time")
 }
 
 model NotificationIntegration {
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  creator Membership @relation(fields: [tenantId, creatorId], references: [tenantId, id], onDelete: Restrict)
-  subscriptions NotificationSubscription[]
-  deliveries NotificationDelivery[]
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  creatorId String
-  name String
-  provider String
-  transport String
+  service        Service                    @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction)
+  creator        Membership                 @relation(fields: [tenantId, creatorId], references: [tenantId, id], onUpdate: NoAction)
+  subscriptions  NotificationSubscription[]
+  deliveries     NotificationDelivery[]
+  id             String                     @id @default(uuid())
+  tenantId       String
+  serviceId      String
+  creatorId      String
+  name           String
+  provider       String
+  transport      String
   endpointCipher String?
-  endpointHost String?
-  enabled Boolean @default(true)
-  generation Int @default(1)
-  version Int @default(1)
-  deletedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  endpointHost   String?
+  enabled        Boolean                    @default(true)
+  generation     Int                        @default(1)
+  version        Int                        @default(1)
+  deletedAt      DateTime?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, createdAt, id])
 }
+
 model NotificationSubscription {
-  integration NotificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
+  integration   NotificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onUpdate: NoAction)
+  id            String                  @id @default(uuid())
+  tenantId      String
+  serviceId     String
   integrationId String
-  kind String
-  targetId String?
+  kind          String
+  targetId      String?
+
   @@unique([integrationId, kind])
   @@index([tenantId, serviceId, kind])
 }
+
 model NotificationEvent {
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  deliveries NotificationDelivery[]
-  id String @id @default(uuid())
-  eventKey String @unique
-  tenantId String
-  serviceId String
-  kind String
-  sourceId String
+  service       Service                @relation(fields: [tenantId, serviceId], references: [tenantId, id], onUpdate: NoAction)
+  deliveries    NotificationDelivery[]
+  id            String                 @id @default(uuid())
+  eventKey      String                 @unique
+  tenantId      String
+  serviceId     String
+  kind          String
+  sourceId      String
   sourceVersion Int
-  targetId String
-  importedRows Int @default(0)
-  failedRows Int @default(0)
-  occurredAt DateTime @default(now())
+  targetId      String
+  importedRows  Int                    @default(0)
+  failedRows    Int                    @default(0)
+  occurredAt    DateTime               @default(now())
+
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, occurredAt, id])
 }
+
 model NotificationDelivery {
-  integration NotificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  event NotificationEvent @relation(fields: [tenantId, serviceId, eventId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  history NotificationAttempt[]
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
+  integration   NotificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onUpdate: NoAction)
+  event         NotificationEvent       @relation(fields: [tenantId, serviceId, eventId], references: [tenantId, serviceId, id], onUpdate: NoAction)
+  history       NotificationAttempt[]
+  id            String                  @id @default(uuid())
+  tenantId      String
+  serviceId     String
   integrationId String
-  eventId String
-  generation Int
-  transport String
-  status String @default("queued")
-  outcome String?
-  lastError String?
-  version Int @default(1)
-  attempts Int @default(0)
-  maxAttempts Int @default(3)
-  nextAttemptAt DateTime @default(now())
-  leaseOwner String?
-  leaseUntil DateTime?
-  startedAt DateTime?
-  completedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  eventId       String
+  generation    Int
+  transport     String
+  status        String                  @default("queued")
+  outcome       String?
+  lastError     String?
+  version       Int                     @default(1)
+  attempts      Int                     @default(0)
+  maxAttempts   Int                     @default(3)
+  nextAttemptAt DateTime                @default(now())
+  leaseOwner    String?
+  leaseUntil    DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+
   @@unique([integrationId, eventId])
   @@unique([tenantId, serviceId, id])
   @@index([status, nextAttemptAt, leaseUntil])
   @@index([integrationId, createdAt, id])
 }
+
 model NotificationAttempt {
-  delivery NotificationDelivery @relation(fields: [deliveryId], references: [id], onDelete: Restrict)
-  id String @id @default(uuid())
+  delivery   NotificationDelivery @relation(fields: [deliveryId], references: [id], onUpdate: NoAction)
+  id         String               @id @default(uuid())
   deliveryId String
-  number Int
-  outcome String
-  code String?
+  number     Int
+  outcome    String
+  code       String?
   httpStatus Int?
-  startedAt DateTime
-  finishedAt DateTime @default(now())
+  startedAt  DateTime
+  finishedAt DateTime             @default(now())
+
   @@unique([deliveryId, number])
 }
 
 model EmailSuppression {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  contactHash String
-  reason String
+  id            String        @id @default(uuid())
+  tenantId      String
+  serviceId     String
+  contactHash   String
+  reason        String
   sourceEventId String
-  sourceEvent EmailFeedback @relation(fields: [tenantId, serviceId, contactHash, sourceEventId], references: [tenantId, serviceId, contactHash, id], onDelete: Restrict)
-  createdAt DateTime @default(now())
-  @@unique([tenantId, serviceId, contactHash, reason])
-  @@index([tenantId, serviceId, createdAt, id])
+  sourceEvent   EmailFeedback @relation(fields: [tenantId, serviceId, contactHash, sourceEventId], references: [tenantId, serviceId, contactHash, id], onUpdate: NoAction, map: "EmailSuppression_scope_event_fkey")
+  createdAt     DateTime      @default(now())
+
+  @@unique([tenantId, serviceId, contactHash, reason], map: "EmailSuppression_identity_key")
+  @@index([tenantId, serviceId, createdAt, id], map: "EmailSuppression_service_time")
 }
 
 model ExportJob {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  formId String
-  form Form @relation(fields: [tenantId, serviceId, formId], references: [tenantId, serviceId, id], onDelete: Cascade)
-  requesterId String
-  requester Membership @relation(fields: [tenantId, requesterId], references: [tenantId, userId], onDelete: Restrict)
+  id             String         @id @default(uuid())
+  tenantId       String
+  serviceId      String
+  formId         String
+  form           Form           @relation(fields: [tenantId, serviceId, formId], references: [tenantId, serviceId, id], onDelete: Cascade)
+  requesterId    String
+  requester      Membership     @relation(fields: [tenantId, requesterId], references: [tenantId, userId], onDelete: Restrict)
   requestKeyHash String
-  requestHash String?
-  filtersCipher String?
-  layoutCipher String?
-  readFiles Boolean @default(false)
-  status String @default("queued")
-  version Int @default(1)
-  totalRows Int @default(0)
-  processedRows Int @default(0)
-  byteLength Int @default(0)
-  resultHash String?
-  leaseOwner String?
-  leaseUntil DateTime?
-  attempts Int @default(0)
-  lastError String?
-  expiresAt DateTime
-  completedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  chunks ExportChunk[]
-  sources ExportSource[]
+  requestHash    String?
+  filtersCipher  String?
+  layoutCipher   String?
+  readFiles      Boolean        @default(false)
+  status         String         @default("queued")
+  version        Int            @default(1)
+  totalRows      Int            @default(0)
+  processedRows  Int            @default(0)
+  byteLength     Int            @default(0)
+  resultHash     String?
+  leaseOwner     String?
+  leaseUntil     DateTime?
+  attempts       Int            @default(0)
+  lastError      String?
+  expiresAt      DateTime
+  completedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  chunks         ExportChunk[]
+  sources        ExportSource[]
+
   @@unique([tenantId, id])
   @@unique([tenantId, requesterId, requestKeyHash])
   @@index([tenantId, requesterId, formId, createdAt, id])
   @@index([status, leaseUntil, createdAt])
   @@index([expiresAt])
 }
+
 model ExportChunk {
-  id String @id @default(uuid())
-  tenantId String
-  jobId String
-  job ExportJob @relation(fields: [tenantId, jobId], references: [tenantId, id], onDelete: Cascade)
-  number Int
+  id            String    @id @default(uuid())
+  tenantId      String
+  jobId         String
+  job           ExportJob @relation(fields: [tenantId, jobId], references: [tenantId, id], onDelete: Cascade)
+  number        Int
   contentCipher String
-  byteLength Int
+  byteLength    Int
+
   @@unique([jobId, number])
 }
+
 model ExportSource {
-  id String @id @default(uuid())
-  tenantId String
-  jobId String
-  job ExportJob @relation(fields: [tenantId, jobId], references: [tenantId, id], onDelete: Cascade)
+  id           String     @id @default(uuid())
+  tenantId     String
+  jobId        String
+  job          ExportJob  @relation(fields: [tenantId, jobId], references: [tenantId, id], onDelete: Cascade)
   submissionId String
-  submission Submission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Cascade)
-  rowNo Int
-  sourceHash String?
+  submission   Submission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Cascade)
+  rowNo        Int
+  sourceHash   String?
+
   @@unique([jobId, rowNo])
   @@unique([jobId, submissionId])
   @@index([tenantId, submissionId, jobId])
@@ -2322,149 +2892,160 @@ model ExportSource {
 
 // No adapter currently issues these records. Configuration never grants verified status.
 model VerificationIntegration {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  identityProvider String?
+  id                String                            @id @default(uuid())
+  tenantId          String
+  serviceId         String
+  service           Service                           @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  identityProvider  String?
   signatureProvider String?
-  environment String @default("sandbox")
-  status String @default("pending")
-  version Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  revisions VerificationIntegrationRevision[]
+  environment       String                            @default("sandbox")
+  status            String                            @default("pending")
+  version           Int                               @default(1)
+  createdAt         DateTime                          @default(now())
+  updatedAt         DateTime                          @updatedAt
+  revisions         VerificationIntegrationRevision[]
+
   @@unique([tenantId, serviceId])
   @@unique([tenantId, serviceId, id])
 }
+
 model VerificationIntegrationRevision {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  integrationId String
-  integration VerificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  version Int
-  identityProvider String?
+  id                String                  @id @default(uuid())
+  tenantId          String
+  serviceId         String
+  integrationId     String
+  integration       VerificationIntegration @relation(fields: [tenantId, serviceId, integrationId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  version           Int
+  identityProvider  String?
   signatureProvider String?
-  environment String
-  status String
-  createdAt DateTime @default(now())
-  attempts VerificationAttempt[]
+  environment       String
+  status            String
+  createdAt         DateTime                @default(now())
+  attempts          VerificationAttempt[]
+
   @@unique([tenantId, serviceId, integrationId, version])
 }
+
 model VerificationAttempt {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  integrationId String
-  integrationVersion Int
-  integrationRevision VerificationIntegrationRevision @relation(fields: [tenantId, serviceId, integrationId, integrationVersion], references: [tenantId, serviceId, integrationId, version], onDelete: Restrict)
-  formId String
-  form Form @relation(fields: [tenantId, serviceId, formId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  formVersionId String
-  formVersion FormVersion @relation(fields: [tenantId, formId, formVersionId], references: [tenantId, formId, id], onDelete: Restrict)
-  publicationId String
-  publication Publication @relation(fields: [tenantId, formId, publicationId, formVersionId], references: [tenantId, formId, id, formVersionId], onDelete: Restrict)
-  kind String
-  environment String
-  browserNonceHash String
-  requestHash String
-  documentHash String
-  providerRequestHash String?
+  id                    String                          @id @default(uuid())
+  tenantId              String
+  serviceId             String
+  service               Service                         @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
+  integrationId         String
+  integrationVersion    Int
+  integrationRevision   VerificationIntegrationRevision @relation(fields: [tenantId, serviceId, integrationId, integrationVersion], references: [tenantId, serviceId, integrationId, version], onDelete: Restrict)
+  formId                String
+  form                  Form                            @relation(fields: [tenantId, serviceId, formId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  formVersionId         String
+  formVersion           FormVersion                     @relation(fields: [tenantId, formId, formVersionId], references: [tenantId, formId, id], onDelete: Restrict)
+  publicationId         String
+  publication           Publication                     @relation(fields: [tenantId, formId, publicationId, formVersionId], references: [tenantId, formId, id, formVersionId], onDelete: Restrict)
+  kind                  String
+  environment           String
+  browserNonceHash      String
+  requestHash           String
+  documentHash          String
+  providerRequestHash   String?
   providerRequestCipher String?
-  status String @default("pending")
-  version Int @default(1)
-  verifiedAt DateTime?
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  events VerificationEvent[]
-  receipt VerificationReceipt?
+  status                String                          @default("pending")
+  version               Int                             @default(1)
+  verifiedAt            DateTime?
+  expiresAt             DateTime
+  createdAt             DateTime                        @default(now())
+  updatedAt             DateTime                        @updatedAt
+  events                VerificationEvent[]
+  receipt               VerificationReceipt?
+
   @@unique([tenantId, serviceId, id])
   @@index([tenantId, serviceId, status, expiresAt])
 }
+
 model VerificationEvent {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  attemptId String
-  attempt VerificationAttempt @relation(fields: [tenantId, serviceId, attemptId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  providerEventHash String
-  bodyHash String
-  signatureValid Boolean
+  id                 String                @id @default(uuid())
+  tenantId           String
+  serviceId          String
+  attemptId          String
+  attempt            VerificationAttempt   @relation(fields: [tenantId, serviceId, attemptId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  providerEventHash  String
+  bodyHash           String
+  signatureValid     Boolean
   verificationStatus String
-  createdAt DateTime @default(now())
-  receipts VerificationReceipt[]
+  createdAt          DateTime              @default(now())
+  receipts           VerificationReceipt[]
+
   @@unique([tenantId, serviceId, attemptId, id])
   @@unique([attemptId, providerEventHash])
 }
+
 model VerificationReceipt {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  attemptId String @unique
-  attempt VerificationAttempt @relation(fields: [tenantId, serviceId, attemptId], references: [tenantId, serviceId, id], onDelete: Restrict)
-  eventId String
-  event VerificationEvent @relation(fields: [tenantId, serviceId, attemptId, eventId], references: [tenantId, serviceId, attemptId, id], onDelete: Restrict)
-  formVersionId String
-  publicationId String
-  submissionId String?
-  submission Submission? @relation(fields: [tenantId, submissionId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)
-  provider String
-  kind String
-  environment String
-  documentHash String
-  proofHash String
-  verifiedAt DateTime
+  id             String              @id @default(uuid())
+  tenantId       String
+  serviceId      String
+  attemptId      String              @unique
+  attempt        VerificationAttempt @relation(fields: [tenantId, serviceId, attemptId], references: [tenantId, serviceId, id], onDelete: Restrict)
+  eventId        String
+  event          VerificationEvent   @relation(fields: [tenantId, serviceId, attemptId, eventId], references: [tenantId, serviceId, attemptId, id], onDelete: Restrict)
+  formVersionId  String
+  publicationId  String
+  submissionId   String?
+  submission     Submission?         @relation(fields: [tenantId, submissionId, formVersionId], references: [tenantId, id, formVersionId], onDelete: Restrict)
+  provider       String
+  kind           String
+  environment    String
+  documentHash   String
+  proofHash      String
+  verifiedAt     DateTime
   retentionUntil DateTime
-  createdAt DateTime @default(now())
+  createdAt      DateTime            @default(now())
+
   @@unique([tenantId, id])
   @@unique([tenantId, serviceId, attemptId])
   @@unique([tenantId, submissionId, kind])
 }
 
-
 model ActivityReview {
-  id String @id @default(uuid())
-  tenantId String
-  serviceId String
-  service Service @relation(fields: [tenantId, serviceId], references: [tenantId, id], onDelete: Restrict)
-  auditEventId String
-  recipientUserId String
-  auditEvent AuditEvent @relation(fields: [tenantId, serviceId, auditEventId, recipientUserId], references: [tenantId, serviceId, id, actorId], onDelete: Restrict)
-  requesterId String
-  requester Membership @relation("ActivityRequester", fields: [tenantId, requesterId], references: [tenantId, id], onDelete: Restrict)
-  recipientId String
-  recipient Membership @relation("ActivityRecipient", fields: [tenantId, recipientId, recipientUserId], references: [tenantId, id, userId], onDelete: Restrict)
-  title String
-  status String @default("requested")
-  version Int @default(1)
-  retentionUntil DateTime?
-  destructionStatus String @default("none")
-  destroyedAt DateTime?
+  id                String                  @id @default(uuid())
+  tenantId          String
+  serviceId         String
+  service           Service                 @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: "ActivityReview_service_fkey")
+  auditEventId      String
+  recipientUserId   String
+  auditEvent        AuditEvent              @relation(fields: [tenantId, serviceId, auditEventId, recipientUserId], references: [tenantId, serviceId, id, actorId], map: "ActivityReview_auditEvent_fkey")
+  requesterId       String
+  requester         Membership              @relation("ActivityRequester", fields: [tenantId, requesterId], references: [tenantId, id], map: "ActivityReview_requester_fkey")
+  recipientId       String
+  recipient         Membership              @relation("ActivityRecipient", fields: [tenantId, recipientId, recipientUserId], references: [tenantId, id, userId], map: "ActivityReview_recipient_fkey")
+  title             String
+  status            String                  @default("requested")
+  version           Int                     @default(1)
+  retentionUntil    DateTime?
+  destructionStatus String                  @default("none")
+  destroyedAt       DateTime?
   destroyApproverId String?
-  destroyApprover Membership? @relation("ActivityReviewDestroyer", fields: [tenantId, destroyApproverId], references: [tenantId, id], onDelete: Restrict)
-  respondedAt DateTime?
-  closedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  messages ActivityReviewMessage[]
+  destroyApprover   Membership?             @relation("ActivityReviewDestroyer", fields: [tenantId, destroyApproverId], references: [tenantId, id], map: "ActivityReview_destroyApprover_fkey")
+  respondedAt       DateTime?
+  closedAt          DateTime?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  messages          ActivityReviewMessage[]
+
   @@unique([tenantId, id])
   @@index([tenantId, recipientId, status, createdAt, id])
   @@index([tenantId, requesterId, status, createdAt, id])
   @@index([tenantId, serviceId, status, createdAt, id])
   @@index([destructionStatus, retentionUntil])
 }
+
 model ActivityReviewMessage {
-  id String @id @default(uuid())
-  tenantId String
-  reviewId String
-  review ActivityReview @relation(fields: [tenantId, reviewId], references: [tenantId, id], onDelete: Restrict)
-  authorId String
-  author Membership @relation(fields: [tenantId, authorId], references: [tenantId, id], onDelete: Restrict)
-  kind String
+  id         String         @id @default(uuid())
+  tenantId   String
+  reviewId   String
+  review     ActivityReview @relation(fields: [tenantId, reviewId], references: [tenantId, id], map: "ActivityReviewMessage_review_fkey")
+  authorId   String
+  author     Membership     @relation(fields: [tenantId, authorId], references: [tenantId, id], map: "ActivityReviewMessage_author_fkey")
+  kind       String
   bodyCipher String
-  createdAt DateTime @default(now())
+  createdAt  DateTime       @default(now())
+
   @@index([tenantId, reviewId, createdAt, id])
 }

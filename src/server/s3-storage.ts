@@ -1,5 +1,5 @@
 import { createHash, createHmac } from "node:crypto";
-import { MAX_FILE_BYTES } from "@/contracts/files";
+import { MAX_ENCRYPTED_OBJECT_BYTES, MAX_PRIVATE_OBJECT_BYTES } from "@/contracts/storage-limits";
 import { type PrivateFileStorage, decryptStoredObject, encryptStoredObject, storageObjectName } from "./file-storage";
 
 export interface S3StorageConfig {
@@ -43,11 +43,19 @@ export function createS3FileStorage(config: S3StorageConfig): PrivateFileStorage
       ...(method === "PUT" ? { "content-type": "application/octet-stream", "content-length": String(payload.length) } : {}),
     } });
     if (!response.ok) throw Object.assign(new Error("S3 " + method + " failed: " + response.status), { status: response.status });
-    return Buffer.from(await response.arrayBuffer());
+    if (method === "GET") {
+      const declared = response.headers.get("content-length");
+      if (declared !== null && (!/^\d+$/.test(declared) || Number(declared) > MAX_ENCRYPTED_OBJECT_BYTES)) {
+        await response.body?.cancel(); throw new Error("Invalid encrypted file");
+      }
+    }
+    const received = Buffer.from(await response.arrayBuffer());
+    if (method === "GET" && received.length > MAX_ENCRYPTED_OBJECT_BYTES) throw new Error("Invalid encrypted file");
+    return received;
   }
   return {
     async write(name, bytes) {
-      if (!bytes.length || bytes.length > MAX_FILE_BYTES) throw new Error("Invalid file size");
+      if (!bytes.length || bytes.length > MAX_PRIVATE_OBJECT_BYTES) throw new Error("Invalid file size");
       await call("PUT", name, encryptStoredObject(name, bytes));
     },
     async read(name) { return decryptStoredObject(name, await call("GET", name)); },

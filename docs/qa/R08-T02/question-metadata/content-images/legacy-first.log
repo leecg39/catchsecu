@@ -1,0 +1,15 @@
+node:internal/fs/promises:697
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open 'docs/qa/R08-T02/question-metadata/question-images/legacy-preservation.json'
+    at async open (node:internal/fs/promises:697:25)
+    at async writeFile (node:internal/fs/promises:1317:14)
+    at async <anonymous> (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/scripts/qa-rea-question-images-legacy.ts:32:1) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'docs/qa/R08-T02/question-metadata/question-images/legacy-preservation.json'
+}
+
+Node.js v24.19.0

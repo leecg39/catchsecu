@@ -1,0 +1,91 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:80884) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/question-international-contact.test.ts (14 tests) 13744ms
+   ✓ language and international helpers preserve incomplete candidates and never guess shared-code country ISO 1160ms
+   ✓ all sixteen language codes round trip and invalid or null API values fail 2490ms
+   ✓ legacy null language is omitted and retains the exact pre-language approval fingerprint and domestic answer contract 741ms
+   ✓ old-client content updates preserve the current explicit language in drafts, implicit revisions and templates 661ms
+   ✓ non-Korean verification is rejected by create/update/template API and direct DB writes 434ms
+   ✓ international contacts store encrypted original strings at both six and fifteen national-digit boundaries 1131ms
+   ✓ international invalid codes, incomplete pairs, lengths, non-ASCII digits and object/scalar injections fail atomically 1134ms
+   ✓ Korean explicit language preserves domestic numbers and international display language never changes email or birth validation 764ms
+   ✓ corrections always use their published version language and retain legacy answers after the new draft changes language 914ms
+   ✓ failed mixed correction retains scalar, version, ciphertext, correction payload and audit atomically 985ms
+   ✓ copy and template use retain language, while explicit change affects the approval fingerprint 545ms
+   ✓ hidden international contacts reject supplied values and clear prior answers during correction 703ms
+   ✓ CSV retains exact international scalar including shared dial codes and values beyond complete E164 length 750ms
+   ✓ marketing retains stronger complete-E164 policy: unsuitable consent rolls back everything but no-consent storage succeeds 1329ms
+(node:81173) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/billing-settlement.test.ts (17 tests) 22293ms
+   ✓ 문자 발송은 예약·확정으로 정산되고 재실행해도 이중 차감되지 않는다 2360ms
+   ✓ 잔액 부족은 INSUFFICIENT_CREDIT 실패로 기록되고 원장을 오염시키지 않는다 2761ms
+   ✓ 동의 철회로 취소된 발송은 예약 크레딧을 반환한다 2841ms
+   ✓ 예약된 문자 캠페인 취소는 미발송분을 취소하고 발송분만 정산한다 1227ms
+   ✓ 공급자 수신 결과는 미정산 발송 예약을 접수는 청구·거부와 미확인은 환불로 정산한다 1585ms
+   ✓ solapi 영수증 부재 복구는 재전송하지 않고 webhook 대사가 정산한다 911ms
+   ✓ 끊긴 발송 잡의 수리는 영수증으로 정산하고 미전송분은 환불한다 1118ms
+   ✓ 월별 사용량은 서비스별로 집계되고 마감 스냅샷에 보존된다 927ms
+   ✓ 수동 재요청 문자 webhook accepted는 새 attempt 예약만 정산한다 894ms
+   ✓ 수동 재요청 문자 webhook failed는 새 attempt 예약만 정산한다 886ms
+   ✓ 수동 재요청 문자 webhook timeout는 새 attempt 예약만 정산한다 891ms
+   ✓ 이전 빌드가 예약한 수동 attempt의 기존 원장은 worker에서도 중복 예약 없이 복구한다 965ms
+   ✓ 이전 빌드가 예약한 수동 attempt의 기존 원장은 cleanup에서도 중복 예약 없이 복구한다 1050ms
+   ✓ 문자 공급자 network 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 809ms
+   ✓ 문자 공급자 malformed 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 840ms
+   ✓ 문자 공급자 server 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 831ms
+   ✓ 공급자 실패가 기록된 문자의 수동 재요청은 새 영수증으로 청구하고 이전 결과 재전송은 무시한다 1391ms
+ ✓ tests/server/pdf-renderer-v2.test.ts (19 tests) 11978ms
+   ✓ PDF renderer v2 without database (19)
+     ✓ preserves exact v1 bytes against a frozen pre-change source on the same Node runtime 747ms
+     ✓ generates deterministic multiple pages with all source paragraphs in order 314ms
+     ✓ wraps long tokens and rejects oversized or adversarial combining input in bounded time 3665ms
+     ✓ bounds actual v2 resource work for single-arabic-500k 3741ms
+     ✓ bounds actual v2 resource work for single-thai-500k 1299ms
+     ✓ bounds actual v2 resource work for zero-width-breaks-500k 625ms
+     ✓ stops excessive page rendering before persisting any result 509ms
+(node:81781) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/form-documents.test.ts (18 tests) 10737ms
+   ✓ versioned form documents and consent receipt PDFs (18)
+     ✓ publishes ar consent text and preserves its encrypted v2 receipt on every read 818ms
+     ✓ publishes th consent text and preserves its encrypted v2 receipt on every read 502ms
+     ✓ publishes tr consent text and preserves its encrypted v2 receipt on every read 728ms
+     ✓ publishes frozen display and policy text without leaking internal scope identifiers 1415ms
+     ✓ validates published same-service selections, kind, duplicate documents and retention limit 452ms
+     ✓ rejects missing, unknown and duplicate acknowledgments before creating any response 306ms
+     ✓ stores one encrypted immutable receipt for retry and parses its actual Korean PDF bytes 588ms
+     ✓ optional refusals never become granted documents and an all-refused response has no receipt 499ms
+     ✓ source edits, display changes and public-link revocation preserve published forms and receipt bytes 793ms
+     ✓ approval freezes document display and saving refreshed settings requires approval again 516ms
+     ✓ database rejects published binding edits and cross-service draft references 428ms
+     ✓ current grants, tenant and retention control PDF access even with a previously loaded context 424ms
+     ✓ approved destruction removes encrypted evidence, PDF and events then blocks downloads 676ms
+     ✓ paginated options and templates enforce the same document boundaries 512ms
+(node:82023) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/compliance-exports.test.ts (31 tests) 6123ms
+   ✓ PDF는 한글·미판정·고정 합계와 원천 해시를 포함하며 활성 콘텐츠가 없다 402ms
+   ✓ 0·1·11·100건 목록은 서버 페이지와 끝 페이지를 정확히 반환한다 330ms
+(node:82162) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/document-pdf.test.ts (13 tests) 4491ms
+   ✓ stored document PDF with real PostgreSQL (13)
+     ✓ stores multilingual document PDF v2 without rewriting bytes: مرحبا بالعالم 707ms
+     ✓ stores multilingual document PDF v2 without rewriting bytes: ข้อมูลส่วนบุคคล 447ms
+     ✓ stores multilingual document PDF v2 without rewriting bytes: İstanbul kişisel şıİŞğ 427ms
+     ✓ older version stays byte-identical after revision and public revocation 381ms
+(node:82276) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/consent-display-authority.test.ts (8 tests) 1364ms
+ ✓ tests/server/form-system-copy.test.ts (6 tests) 36ms
+
+ Test Files  8 passed (8)
+      Tests  126 passed (126)
+   Start at  15:05:59
+   Duration  78.08s (tests 92%, import 6%, transform 2%)
+
+JSON report written to /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/international-contact/pdf-integration.json

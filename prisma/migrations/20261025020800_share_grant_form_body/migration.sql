@@ -1,0 +1,1 @@
+ALTER TABLE "ShareGrant" ADD COLUMN "shareFormBody" BOOLEAN NOT NULL DEFAULT false;

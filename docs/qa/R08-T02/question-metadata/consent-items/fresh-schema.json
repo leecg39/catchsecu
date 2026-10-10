@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-10-10T13:09:09.540Z",
+  "result": "passed",
+  "migrations": 141,
+  "expectedMigrations": 141,
+  "columns": [
+    {
+      "column_name": "consentItemSchemaVersion",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "column_name": "consentItems",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": null
+    }
+  ],
+  "constraints": [
+    {
+      "conname": "FormVersion_consent_items_check",
+      "definition": "CHECK ((((\"consentItemSchemaVersion\" = 0) AND (\"consentItems\" IS NULL)) OR ((\"consentItemSchemaVersion\" = 1) AND (\"consentItems\" IS NOT NULL) AND qa_consent_items_5a18525384114f30ab82c10148b262cd.valid_form_consent_items(\"consentItems\"))))"
+    }
+  ],
+  "triggers": [
+    {
+      "tgname": "FormVersion_consent_items_projection",
+      "definition": "CREATE CONSTRAINT TRIGGER \"FormVersion_consent_items_projection\" AFTER INSERT OR UPDATE ON qa_consent_items_5a18525384114f30ab82c10148b262cd.\"FormVersion\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION qa_consent_items_5a18525384114f30ab82c10148b262cd.check_form_consent_items_projection()"
+    },
+    {
+      "tgname": "Question_consent_items_projection",
+      "definition": "CREATE CONSTRAINT TRIGGER \"Question_consent_items_projection\" AFTER INSERT OR DELETE OR UPDATE ON qa_consent_items_5a18525384114f30ab82c10148b262cd.\"Question\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION qa_consent_items_5a18525384114f30ab82c10148b262cd.check_form_consent_items_projection()"
+    }
+  ],
+  "schemaWasDropped": true,
+  "scope": "Fresh isolated PostgreSQL schema; all migrations applied; additive columns, strict JSON check and both deferred projection triggers inspected."
+}

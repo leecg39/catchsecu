@@ -3,6 +3,7 @@ import { db, type Transaction } from "./db";
 import type { Context } from "./context";
 import { fail } from "./http";
 import { auditAccess } from "./audit";
+import { authorAssetAuditFormId, authorAssetAuditBinding } from "./audit-resources";
 import { assertFileDeadlines } from "./file-access";
 import { safeCsvCell } from "./import-csv";
 import { actionPrefixes, accessDetail, auditActor, auditWhere, auditSelect, auditTransaction,
@@ -27,6 +28,7 @@ async function formWhere(tx: Transaction, ctx: Context, formId: string, input: A
       (a.resource='file' AND EXISTS (SELECT 1 FROM "FileObject" f JOIN "FormVersion" v
         ON v.id=f."formVersionId" AND v."tenantId"=f."tenantId"
         WHERE f.id=a."resourceId" AND f."tenantId"=a."tenantId" AND v."formId"=${formId})) OR
+      (a.resource='author-asset' AND ${authorAssetAuditBinding} AND ${authorAssetAuditFormId}=${formId}) OR
       (a.resource='export' AND EXISTS (SELECT 1 FROM "ExportJob" e
         WHERE e.id=a."resourceId" AND e."tenantId"=a."tenantId" AND e."formId"=${formId}))
     )`];
@@ -58,8 +60,8 @@ export async function formAuditEvents(ctx: Context, formId: string, input: Audit
     await auditAccess(tx, current, requestId, csv ? "audit.exported" : "audit.viewed", accessDetail(input, rows.length), serviceId);
     assertFileDeadlines(deadlines);
     if (!csv) return { items, total, page, pageSize: input.pageSize };
-    return "\uFEFF" + [["이벤트 ID", "처리일시", "서비스명", "처리자명", "처리내용", "처리대상", "대상 ID"],
-      ...items.map(row => [row.id, row.createdAt.toISOString(), row.serviceName ?? "", row.actorName ?? "비공개", row.action, row.resource, row.resourceId ?? ""])]
+    return "\uFEFF" + [["이벤트 ID", "처리일시", "서비스명", "처리자명", "처리내용", "처리대상", "대상 ID", "캐치폼·개인정보 업로드명", "응답 ID"],
+      ...items.map(row => [row.id, row.createdAt.toISOString(), row.serviceName ?? "", row.actorName ?? "비공개", row.action, row.resource, row.resourceId ?? "", row.formName ?? "", row.submissionId ?? ""])]
       .map(row => row.map(safeCsvCell).join(",")).join("\r\n") + "\r\n";
   }, auditTransaction);
 }

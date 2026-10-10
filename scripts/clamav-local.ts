@@ -15,7 +15,7 @@ async function configure() {
     "Foreground yes", "ConnectTimeout 15", "ReceiveTimeout 60", "MaxAttempts 2", "Checks 12", "LogTime yes"];
   const clamd = [...common, "LocalSocket " + socket, "LocalSocketMode 600", "FixStaleSocket yes", "Foreground yes",
     "TemporaryDirectory " + temp, "LogTime yes", "OfficialDatabaseOnly yes", "MaxThreads 4", "MaxQueue 20",
-    "StreamMaxLength 11M", "MaxFileSize 11M", "MaxScanSize 20M", "AlertExceedsMax yes", "AlertEncrypted yes",
+    "StreamMaxLength 15M", "MaxFileSize 15M", "MaxScanSize 32M", "AlertExceedsMax yes", "AlertEncrypted yes",
     "SelfCheck 60", "ExitOnOOM yes"];
   await writeFile(join(state, "freshclam.conf"), fresh.join("\n") + "\n", { mode: 0o600 });
   await writeFile(join(state, "clamd.conf"), clamd.join("\n") + "\n", { mode: 0o600 });

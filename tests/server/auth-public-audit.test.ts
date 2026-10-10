@@ -86,7 +86,34 @@ test("email confirmation audit failure rolls back its flag and a retry of the sa
 test("concurrent email confirmation records one actual flag transition", async () => {
   const u = await user(), link = (await proof()).url;
   const results = await Promise.all([auth.handler(new Request(link)), auth.handler(new Request(link))]); expect(results.map(r => r.status)).toEqual([302, 302]);
+  expect(results.map(r => new URL(r.headers.get("location")!, origin).searchParams.get("error")).sort()).toEqual(["EMAIL_ALREADY_VERIFIED", null].sort());
   expect(await db.auditEvent.count({ where: { action: "auth.email_verified", resourceId: u.id } })).toBe(1);
+});
+test("a used signed verification link rejects replay while retaining the safe return page", async () => {
+  const u = await user(), link = (await proof()).url;
+  const first = await auth.handler(new Request(link)); expect(first.status).toBe(302);
+  expect(new URL(first.headers.get("location")!, origin).searchParams.has("error")).toBe(false);
+  const replay = await auth.handler(new Request(link)); expect(replay.status).toBe(302);
+  const location = new URL(replay.headers.get("location")!, origin);
+  expect(location.pathname).toBe("/login"); expect(location.searchParams.get("returnTo")).toBe("/my-page/info");
+  expect(location.searchParams.get("error")).toBe("EMAIL_ALREADY_VERIFIED");
+  expect(await db.auditEvent.count({ where: { action: "auth.email_verified", resourceId: u.id } })).toBe(1);
+  expect((await requestEvents(replay)).map(row => row.action)).toContain("auth.email_verification_rejected");
+  expect(replay.headers.getSetCookie()).toHaveLength(0);
+});
+test("verification replay without callback returns an error and cannot mint a session", async () => {
+  await user(); const link = new URL((await proof()).url); link.searchParams.delete("callbackURL");
+  expect((await auth.handler(new Request(link))).status).toBe(200);
+  const replay = await auth.handler(new Request(link)); expect(replay.status).toBe(400);
+  expect(await replay.json()).toMatchObject({ code: "EMAIL_ALREADY_VERIFIED" });
+  expect(replay.headers.getSetCookie()).toHaveLength(0);
+});
+test("used verification proofs still reject unsafe callbacks before redirecting", async () => {
+  await user(); const link = new URL((await proof()).url);
+  expect((await auth.handler(new Request(link))).status).toBe(302);
+  link.searchParams.set("callbackURL", "https://evil.example/");
+  const replay = await auth.handler(new Request(link)); expect(replay.status).toBeGreaterThanOrEqual(400);
+  expect(replay.headers.get("location")).toBeNull();
 });
 test("a signed email proof expiring after its audit cannot publish confirmation", async () => {
   const u = await user(), link = (await proof()).url; fault.action = "auth.email_verified"; fault.expire = true;

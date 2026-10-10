@@ -1,0 +1,1765 @@
+{
+  "format": 1,
+  "recordedAt": "2026-10-10T09:36:47.338Z",
+  "reviewer": "bundle_analysis",
+  "scope": "BI-01 계획용 원본 main/page/end/private rich HTML 및 이미지 정적 분석. 제품 구현 없음.",
+  "method": {
+    "retainedOnly": true,
+    "executedSource": false,
+    "network": false,
+    "database": false,
+    "browser": false,
+    "tests": false,
+    "staticTools": [
+      "Node fs/crypto string slices",
+      "acorn.parseExpressionAt: nUt literal only"
+    ],
+    "reaReuse": "기존 REA 분석 Evidence와 동일 SHA 번들 재사용; 동일 대형 분석 재실행 없음"
+  },
+  "source": {
+    "file": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+    "sha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "bytes": 15337385,
+    "utf16Length": 15329557,
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152"
+  },
+  "reusedEvidence": {
+    "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json",
+    "sha256": "dbc1a8dabe0b5d6343fd6c53ccd978f03e9a15f102328046166792ad56c3ddab",
+    "verifiedPriorExcerpts": 61,
+    "reusedExcerptCount": 31
+  },
+  "wireLocations": [
+    {
+      "location": "FORM",
+      "editorState": "formModelV3.description",
+      "writePath": "mainText",
+      "assetType": "FORM_CONTENT_IMAGE",
+      "scope": "catchformId",
+      "editorMount": "pageIndex=0",
+      "readPath": "basic response.mainText; public response.content",
+      "empty": "<p></p>",
+      "evidence": [
+        "body-v3-write",
+        "body-form-page-editors",
+        "body-origin-load-usage",
+        "body-public-html-render"
+      ]
+    },
+    {
+      "location": "PAGE",
+      "editorState": "formModelV3.pageList[i].pageContent",
+      "writePath": "pageList[i].pageContent",
+      "assetType": "PAGE_CONTENT_IMAGE",
+      "scope": "catchformId (upload does not contain pageId)",
+      "editorMount": "i>0",
+      "readPath": "basic response.pages[i].pageContent",
+      "empty": "<p></p> editor; first page write is empty string",
+      "evidence": [
+        "body-v3-write",
+        "body-form-page-editors",
+        "body-upload-adapter"
+      ]
+    },
+    {
+      "location": "END",
+      "editorState": "settingData.endPageContent / live ref",
+      "writePath": "endPageSetting.endPageContent",
+      "assetType": "END_PAGE_CONTENT_IMAGE",
+      "scope": "catchformId",
+      "editorMount": "END tab and paid pricing",
+      "readPath": "managements response.endPageSetting.endPageContent",
+      "empty": "aUt(language) default literal",
+      "evidence": [
+        "management-v3-write",
+        "management-v3-read",
+        "end-private-asset-scope"
+      ]
+    },
+    {
+      "location": "PRIVATE",
+      "editorState": "settingData.privatePageContent",
+      "writePath": "privatePageSetting.privatePageContent + privatePageType",
+      "assetType": "PRIVATE_PAGE_CONTENT_IMAGE",
+      "scope": "catchformId",
+      "editorMount": "PRIVATE tab + DIRECT mode + paid pricing",
+      "readPath": "managements response.privatePageSetting; public privatePageContent/privatePageType",
+      "empty": "<p>jH(language)</p>",
+      "evidence": [
+        "management-v3-write",
+        "management-v3-read",
+        "management-v3-mode",
+        "private-screen-render"
+      ]
+    }
+  ],
+  "toolbar": {
+    "configured": [
+      "heading",
+      "bold",
+      "italic",
+      "link",
+      "bulletedList",
+      "numberedList",
+      "outdent",
+      "indent",
+      "imageUpload (imageUpload prop)",
+      "blockQuote",
+      "mediaEmbed",
+      "insertTable",
+      "undo",
+      "redo"
+    ],
+    "custom": [
+      "fontSize",
+      "fontColor",
+      "rtlToggle"
+    ],
+    "fontSizesPx": [
+      12,
+      14,
+      15,
+      16,
+      20,
+      24,
+      32
+    ],
+    "imageToolbar": [
+      "imageStyle:alignLeft",
+      "imageStyle:full",
+      "imageStyle:alignRight",
+      "imageTextAlternative",
+      "resizeImage:50"
+    ],
+    "resizeOptions": [
+      {
+        "name": "resizeImage:original",
+        "value": null
+      },
+      {
+        "name": "resizeImage:50",
+        "value": "50"
+      },
+      {
+        "name": "resizeImage:75",
+        "value": "75"
+      }
+    ],
+    "tableContentToolbar": [
+      "tableColumn",
+      "tableRow",
+      "mergeTableCells"
+    ],
+    "boundary": "설정/변환 코드 관측 목록. 동작하는 command 전체·붙여넣기 허용 요소 전체·보안 allowlist를 입증하지 않음."
+  },
+  "htmlShapes": [
+    {
+      "shape": "<p>…</p>; <h2>…</h2>; <h3>…</h3>; <h4>…</h4>",
+      "basis": "converter/defaults",
+      "evidence": [
+        "converter-paragraph-heading",
+        "converter-heading-defaults"
+      ]
+    },
+    {
+      "shape": "<strong>…</strong>; <i>…</i>; <blockquote>…</blockquote>; <ol|ul><li>…</li></ol|ul>",
+      "basis": "converter",
+      "evidence": [
+        "converter-bold",
+        "converter-italic",
+        "converter-blockquote",
+        "converter-list"
+      ]
+    },
+    {
+      "shape": "<figure class=\"image image-style-align-left\" style=\"width:50.0%\"><img src=\"[returned imgUrl]\" alt=\"…\"><figcaption>…</figcaption></figure>",
+      "basis": "converter를 합친 설명용 형태; 실제 저장 응답 문자열이 아니며 style/attr 순서·빈 caption 생성은 미확인",
+      "evidence": [
+        "converter-image-attributes",
+        "converter-image-figure",
+        "converter-image-caption",
+        "converter-image-styles",
+        "editor-width-serialization",
+        "editor-resize-interaction"
+      ]
+    },
+    {
+      "shape": "<span style=\"font-size:20px;\">…</span>; <span style=\"color:#ab4642;\">…</span>",
+      "basis": "custom downcast template; 두 attribute 결합 시 wrapper nesting/순서 미관측",
+      "evidence": [
+        "editor-font-converters"
+      ]
+    },
+    {
+      "shape": "<figure class=\"table\"><table>…</table></figure>",
+      "basis": "table downcast",
+      "evidence": [
+        "converter-table-figure",
+        "converter-table-schema"
+      ]
+    },
+    {
+      "shape": "<figure class=\"media media-align-center\" style=\"width:…\"><div data-oembed-url=\"…\">…iframe…</div></figure> / oembed",
+      "basis": "media provider/CY + width/alignment converters; provider별 결과·serialization 전체는 미관측",
+      "evidence": [
+        "converter-media-figure",
+        "editor-config-without-license",
+        "html-render-transform",
+        "editor-width-serialization"
+      ]
+    }
+  ],
+  "defaultEndHtml": [
+    {
+      "language": "ko",
+      "html": "<h4>응답 작성에 감사드립니다.</h4><p>&nbsp;</p><p>수집된 모든 정보는<br>개인정보보호 솔루션 캐치시큐를 통해 안전하게 처리됩니다.</p>",
+      "start": 13175312,
+      "endExclusive": 13175622,
+      "rawSha256": "09f1fc0f54e538da523f3ca51fc9061e3f88545db8834caf56334a4ed909061a"
+    },
+    {
+      "language": "en",
+      "html": "<h4>Thank you for submitting your response.</h4><p>&nbsp;</p><p>All collected information is securely processed<br>through the personal data protection solution, CATCHSECU.</p>",
+      "start": 13175626,
+      "endExclusive": 13175804,
+      "rawSha256": "f7035b8dfb8f2d34655067ffc927499ee8168be6997e7b8afafb4b2aa13cdea4"
+    },
+    {
+      "language": "ja",
+      "html": "<h4>ご回答いただき、ありがとうございます。</h4><p>&nbsp;</p><p>収集されたすべての情報は、<br>個人情報保護ソリューション「CATCHSECU」を通じて安全に処理されます。</p>",
+      "start": 13175808,
+      "endExclusive": 13176218,
+      "rawSha256": "1ec42795a18d700c13955bf46baabd6240aa3eb97a69b48211f49704209c827c"
+    },
+    {
+      "language": "zh-CN",
+      "html": "<h4>感谢您填写此答复。</h4><p>&nbsp;</p><p>所有收集到的信息都将<br>通过个人信息保护解决方案 CATCHSECU 进行安全处理。</p>",
+      "start": 13176227,
+      "endExclusive": 13176501,
+      "rawSha256": "f6b448b3d33ba76f6d6d195d4e85c9a33e84ed624ca478c872920b783622505d"
+    },
+    {
+      "language": "zh-TW",
+      "html": "<h4>感謝您填寫此答覆。</h4><p>&nbsp;</p><p>所有收集到的資訊都將<br>通過個人資料保護解決方案 CATCHSECU 進行安全處理。</p>",
+      "start": 13176510,
+      "endExclusive": 13176784,
+      "rawSha256": "f46669507dd13291926f04869ba3e851a00916c7c75218d69c9d3d0aa8a2cffc"
+    },
+    {
+      "language": "de",
+      "html": "<h4>Vielen Dank für Ihre Antwort.</h4><p>&nbsp;</p><p>Alle gesammelten Informationen werden sicher<br>durch die Datenschutzlösung CATCHSECU verarbeitet.</p>",
+      "start": 13176788,
+      "endExclusive": 13176952,
+      "rawSha256": "d47b1eb76ef2189613dd01cd2cf380676008bc6aabdc847a2a4d5128b742bc90"
+    },
+    {
+      "language": "fr",
+      "html": "<h4>Nous vous remercions d'avoir répondu.</h4><p>&nbsp;</p><p>Toutes les informations collectées sont traitées en toute sécurité<br>via la solution de protection des données personnelles, CATCHSECU.</p>",
+      "start": 13176956,
+      "endExclusive": 13177178,
+      "rawSha256": "f6310685877f5a60dd4370fc9e279db653efd1569ec8e3e62b067748b8d16e64"
+    },
+    {
+      "language": "ru",
+      "html": "<h4>Благодарим Вас за заполнение ответа.</h4><p>&nbsp;</p><p>Вся собранная информация безопасно обрабатывается<br>с помощью решения для защиты персональных данных CATCHSECU.</p>",
+      "start": 13177182,
+      "endExclusive": 13177951,
+      "rawSha256": "4caac8f3b058201c0b176f357bbd56675ea3684d2e1a463b808fdb1dea0a045b"
+    },
+    {
+      "language": "es",
+      "html": "<h4>Gracias por completar su respuesta.</h4><p>&nbsp;</p><p>Toda la información recopilada se procesa de forma segura<br>a través de la solución de protección de datos personales, CATCHSECU.</p>",
+      "start": 13177955,
+      "endExclusive": 13178163,
+      "rawSha256": "ff5c5715b67a39f0a6640657307de253de4fea3a599cde251e788198fd142d51"
+    },
+    {
+      "language": "pt",
+      "html": "<h4>Obrigado por enviar sua resposta.</h4><p>&nbsp;</p><p>Todas as informações coletadas são processadas com segurança<br>através da solução de proteção de dados pessoais, CATCHSECU.</p>",
+      "start": 13178167,
+      "endExclusive": 13178382,
+      "rawSha256": "5d928fef0d47b782e0b0541ac1b3cd1c9b79e2292b981babd2812bb726a2c230"
+    },
+    {
+      "language": "id",
+      "html": "<h4>Terima kasih atas tanggapan Anda.</h4><p>&nbsp;</p><p>Semua informasi yang dikumpulkan akan diproses dengan aman<br>melalui solusi perlindungan data pribadi, CATCHSECU.</p>",
+      "start": 13178386,
+      "endExclusive": 13178564,
+      "rawSha256": "82638394365548dee95d074bbce54e51abf52b8a785a717d5b903b0efab41fe7"
+    },
+    {
+      "language": "th",
+      "html": "<h4>ขอขอบคุณสำหรับการตอบกลับ</h4><p>&nbsp;</p><p>ข้อมูลทั้งหมดที่รวบรวมจะได้รับการประมวลผลอย่างปลอดภัย<br>ผ่านโซลูชันการปกป้องข้อมูลส่วนบุคคล CATCHSECU</p>",
+      "start": 13178568,
+      "endExclusive": 13179285,
+      "rawSha256": "64b6306f102971906869a7925013b0c4d1bfd094d94f69f33dd1489f8753948f"
+    },
+    {
+      "language": "vi",
+      "html": "<h4>Cảm ơn bạn đã hoàn thành phản hồi.</h4><p>&nbsp;</p><p>Tất cả thông tin thu thập được sẽ được xử lý an toàn<br>thông qua giải pháp bảo vệ dữ liệu cá nhân, CATCHSECU.</p>",
+      "start": 13179289,
+      "endExclusive": 13179604,
+      "rawSha256": "d16b1518d9f0c407d200c45a4b6bc24cfdbac5f023be5b8c9651bc2906b7af6b"
+    },
+    {
+      "language": "tr",
+      "html": "<h4>Yanıtınızı doldurduğunuz için teşekkür ederiz.</h4><p>&nbsp;</p><p>Toplanan tüm bilgiler güvenli bir şekilde<br>kişisel veri koruma çözümü CATCHSECU aracılığıyla işlenmektedir.</p>",
+      "start": 13179608,
+      "endExclusive": 13179883,
+      "rawSha256": "d41d68ab5331c6b5a19f8d3fb3ded4b0eb1514e2f5c7912d3cc4c84b2007c765"
+    },
+    {
+      "language": "it",
+      "html": "<h4>Grazie per aver inviato la sua risposta.</h4><p>&nbsp;</p><p>Tutte le informazioni raccolte vengono elaborate in modo sicuro<br>tramite la soluzione di protezione dei dati personali, CATCHSECU.</p>",
+      "start": 13179887,
+      "endExclusive": 13180090,
+      "rawSha256": "49549df82f64140a0f8f38709aeea55e13d0b3ce148e0fcf148f9c660f88ebb6"
+    },
+    {
+      "language": "ar",
+      "html": "<h4>شكراً لتقديم ردك.</h4><p>&nbsp;</p><p>تتم معالجة جميع المعلومات التي تم جمعها بأمان<br>من خلال حل حماية البيانات الشخصية، كاتش سيكيو (CATCHSECU).</p>",
+      "start": 13180094,
+      "endExclusive": 13180699,
+      "rawSha256": "99f248427118100bd695213caf26fcf04697d92d276953e5081ae5c9b64ddcc5"
+    }
+  ],
+  "facts": [
+    {
+      "id": "BI01",
+      "classification": "observed-static",
+      "title": "네 위치는 서로 다른 저장 위치",
+      "evidence": [
+        "body-v3-write",
+        "body-v3-api",
+        "body-final-save",
+        "management-v3-write",
+        "management-v3-read",
+        "body-form-page-editors",
+        "end-private-asset-scope"
+      ],
+      "detail": "mainText는 formModelV3.description HTML, 일반 페이지는 pageList[].pageContent HTML이다. C_t는 첫 페이지 title/content를 빈 문자열로 강제한다. end/private는 endPageSetting.endPageContent 및 privatePageSetting.privatePageContent/privatePageType의 별도 managements API다. 하나의 image key 필드로 평탄화할 근거는 없다."
+    },
+    {
+      "id": "BI02",
+      "classification": "observed-static",
+      "title": "페이지 식별·순서",
+      "evidence": [
+        "body-v3-write",
+        "page-initial-shape",
+        "page-read-and-numbering",
+        "page-create-limit",
+        "page-order-drag",
+        "page-identity-reducer",
+        "page-runtime-response-id"
+      ],
+      "detail": "쓰기 pageList의 page/pageTitle/pageContent/pageOffset/questionList에는 pageId/pageIndex/_dragKey가 없다. 초기 page=1, 신규 page=r+2, UI pageIndex와 랜덤 _dragKey가 별도다. A_t는 _dragKey 및 전역 questionNumber를 만든다. 로드 pages는 spread하므로 추가 서버 필드를 보존할 수 있으나 write는 명시 투영한다. 응답 제출은 pageId/pageIndex를 사용한다. 첫 페이지는 드래그 목록에서 제외한다. 일부 add/reorder 경로는 배열 순서/pageIndex만 바꾸므로 모든 경로에서 page 숫자가 항상 재번호화된다고 일반화할 수 없다. 서버 순서/ID canonicalization은 미관측."
+    },
+    {
+      "id": "BI03",
+      "classification": "observed-static",
+      "title": "페이지 분기는 rich 본문과 별도지만 구조 의존",
+      "evidence": [
+        "page-branch-capability",
+        "page-branch-enumeration",
+        "page-branch-sentinels",
+        "page-path-kill",
+        "page-preview-path",
+        "page-one-branch-validation",
+        "page-order-drag",
+        "page-delete-assets",
+        "page-copy-pipeline"
+      ],
+      "detail": "RADIO/SELECTBOX에 usePageOffset, 선택지 pageOffset이 있다. pageOffset=-2는 기본 다음으로 정규화(1), 양수는 상대 이동, 99는 수집·이용 동의로 이동, UB=99999는 참여 대상 제외 PATH_KILL이다. 같은 페이지의 분기 질문 2개 이상은 저장 진행에서 거절한다. 질문 분기 존재 시 페이지 분기 UI를 비활성화하고 -2로 돌린다. 페이지 삭제/복제/이동은 경로 비교와 분기 초기화 확인에 연결된다. pageType literal은 번들 검색에서 0회이며 END/PRIVATE는 pageList enum으로 확인되지 않았다."
+    },
+    {
+      "id": "BI04",
+      "classification": "observed-static",
+      "title": "페이지 개수와 본문 입력 제한의 경계",
+      "evidence": [
+        "page-create-limit",
+        "body-form-page-editors",
+        "editor-config-without-license",
+        "body-upload-adapter",
+        "limits-quota",
+        "form-title-limit"
+      ],
+      "detail": "신규 페이지 추가 handler는 50개 이상을 막는다. 페이지 제목 input maxLength=200, 폼 제목은 기존 100이다. 추적한 mkt 및 네 본문 call site에는 HTML 전체 길이/이미지 개수 상한이 명시되지 않는다. 이는 서버에서 무제한임을 뜻하지 않는다."
+    },
+    {
+      "id": "BI05",
+      "classification": "observed-static",
+      "title": "rich toolbar와 HTML model",
+      "evidence": [
+        "editor-config-without-license",
+        "editor-font-presets",
+        "editor-font-converters",
+        "editor-extra-toolbar",
+        "editor-rtl-plugin",
+        "converter-paragraph-heading",
+        "converter-heading-defaults",
+        "converter-bold",
+        "converter-italic",
+        "converter-blockquote",
+        "converter-list",
+        "converter-table-schema",
+        "converter-table-figure",
+        "editor-default-table-toolbar"
+      ],
+      "detail": "기본 toolbar는 heading,bold,italic,link,bulletedList,numberedList,outdent,indent,imageUpload(조건부),blockQuote,mediaEmbed,insertTable,undo,redo다. 추가 DOM toolbar는 fontSize(12/14/15/16/20/24/32px), fontColor, RTL/LTR다. converter로 p,h2/h3/h4,strong,i,blockquote,ol/ul/li,figure.table/table 계열과 span의 font-size/color가 확인된다. 이 목록은 관측된 생성/변환 기능이며 안전한 HTML allowlist의 증명이 아니다."
+    },
+    {
+      "id": "BI06",
+      "classification": "observed-static",
+      "title": "이미지 HTML·너비·정렬·alt·caption",
+      "evidence": [
+        "converter-image-attributes",
+        "converter-image-figure",
+        "converter-image-caption",
+        "converter-image-styles",
+        "editor-config-without-license",
+        "editor-custom-model-width",
+        "editor-width-serialization",
+        "editor-resize-interaction",
+        "editor-responsive-css"
+      ],
+      "detail": "image model에 src/alt/srcset, figure.image 안 img, 선택 caption의 figcaption이 있다. 스타일 full 기본, alignLeft/alignRight는 image-style-align-left/right class로 변환한다. tkt는 image/media width를 figure style width로 upcast/downcast한다. mouse 드래그는 부모 폭의 10~100%를 1자리 소수 %로 저장한다. config resizeUnit:px와 50/75/original options도 있으나 모듈42394 내 resizeImage/ImageResize 문자열은 없어 해당 기본 command의 실동작은 확인되지 않았다. 실제 캡처가 아닌 정적 변환 근거다."
+    },
+    {
+      "id": "BI07",
+      "classification": "observed-static",
+      "title": "media·링크 변환은 이미지 소유 URL 치환과 다름",
+      "evidence": [
+        "editor-config-without-license",
+        "converter-media-figure",
+        "html-render-transform",
+        "editor-width-serialization",
+        "editor-align-interaction"
+      ],
+      "detail": "mediaEmbed previewsInData=true, YouTube Shorts provider가 iframe HTML을 생성한다. figure.media에 width 및 media-align-left/center/right가 사용된다. CY는 oembed/YouTube를 변환하고 무스킴 a.href에 https://와 target/rel을 보완한다. 이는 img src를 새로운 소유 자산 URL로 바꾸는 함수가 아니다."
+    },
+    {
+      "id": "BI08",
+      "classification": "observed-static",
+      "title": "sanitize 경계",
+      "evidence": [
+        "html-image-extraction",
+        "editor-change-readonly-complete",
+        "html-parser-import",
+        "html-parser-module",
+        "body-public-html-render",
+        "body-admin-preview-raw-html",
+        "body-admin-reply-raw-html",
+        "end-screen-render",
+        "private-screen-render",
+        "consent-cleaner-start",
+        "consent-editor-html"
+      ],
+      "detail": "mkt의 Ppt는 src가 없거나 공백인 img 태그만 제거한다. 일반 본문 저장에는 이 Ppt와 editor.getData가 연결된다. QO module53908은 parseFragment 결과를 React element로 만들고 script에 dangerouslySetInnerHTML을 지정하는 분기도 있다. 공개 main/page는 CY 후 QO, 일부 admin/end/private는 QO 직행이다. 동의용 Mpt의 script/iframe/on*/위험 스킴 제거는 별도 call path다. 본문 경로의 완전한 sanitizer/서버 무해화는 입증되지 않았으며 이 정적 사실만으로 브라우저 실행 가능 취약점을 확정하지 않는다."
+    },
+    {
+      "id": "BI09",
+      "classification": "observed-static",
+      "title": "14 MiB 업로드 계약",
+      "evidence": [
+        "limits-quota",
+        "body-upload-adapter",
+        "body-upload-scope",
+        "body-form-page-editors",
+        "end-private-asset-scope"
+      ],
+      "detail": "SNt는 file.size>14,680,064를 거절하고 MIME image/jpeg,image/jpg,image/png만 받는다. multipart POST /company-operated-service/formImage/upload의 file field는 files다. 유효 catchformId가 있는 scope에만 catchformId와 assetType을 추가한다. 반환 data.imgUrl/fileSize/usedBytes/limitBytes를 읽고 CKEditor에 {default:imgUrl}를 준다. question 업로드와 달리 이 handler에는 확장자·magic·0 bytes·pixel 완전 decode 확인이 없다. 서버 검사는 미관측이며 오류 메시지 매핑만 보인다."
+    },
+    {
+      "id": "BI10",
+      "classification": "observed-static",
+      "title": "네 assetType 및 구버전/동의 무scope 경로",
+      "evidence": [
+        "body-form-page-editors",
+        "end-private-asset-scope",
+        "management-v2-editor",
+        "consent-editor-upload",
+        "body-upload-adapter"
+      ],
+      "detail": "V3 main/page/end/private의 scope는 각각 FORM_CONTENT_IMAGE/PAGE_CONTENT_IMAGE/END_PAGE_CONTENT_IMAGE/PRIVATE_PAGE_CONTENT_IMAGE다. 인접 v2 end/private 및 비한국어 동의 편집기도 같은 imageUpload=true mkt를 쓰지만 해당 call site에는 assetScope가 없다. 따라서 전체 rich editor 업로드가 항상 form 소유/quota/temp 관리로 연결된다고 단정하면 안 된다."
+    },
+    {
+      "id": "BI11",
+      "classification": "observed-static",
+      "title": "quota·진행 중 저장",
+      "evidence": [
+        "limits-quota",
+        "upload-queue-errors",
+        "body-upload-scope",
+        "body-upload-pending-save",
+        "management-v3-write",
+        "body-asset-gauge",
+        "body-origin-load-usage"
+      ],
+      "detail": "유효 scope의 업로드는 pending Set에 들어가며 공통 Promise queue를 통한다. bNt=true이면 기본 저장/설정 저장/페이지 복제 진입을 막는다. assetUsage는 질문·보기·참고파일과 본문이 공유한다. quotaApplied=false 또는 limitBytes<=0이면 프런트 사전검사를 통과한다. createAt 2026-09-22 06:30:00 경계도 클라이언트 quotaApplied에 사용한다. gauge 100 MiB fallback은 서버 보편 한도가 아니다. 명시 abort adapter는 해당 SNt 반환 객체에서 확인되지 않는다."
+    },
+    {
+      "id": "BI12",
+      "classification": "observed-static",
+      "title": "편집 상태의 저장·blur·실시간 변경",
+      "evidence": [
+        "editor-change-readonly-complete",
+        "body-form-page-editors",
+        "management-v3-binding-gates",
+        "end-private-asset-scope"
+      ],
+      "detail": "일반 본문은 focus/blur에서 parent 변경, 이미지 URL 집합 변경 때 onContentImageChange가 발생한다. end/private는 immediate=true와 onLiveChangeEditor refs도 연결한다. page title/content는 300ms debounce 및 flush registry에 연결된다. disabled는 CKEditor readOnlyMode를 적용한다. source에는 custom overlay와 adapter 취소/모든 교체 race의 포괄 보장은 확인되지 않는다."
+    },
+    {
+      "id": "BI13",
+      "classification": "observed-static",
+      "title": "HTML URL 추출·삭제/복구 bookkeeping",
+      "evidence": [
+        "html-image-extraction",
+        "body-owned-url-filter",
+        "content-url-set-helpers",
+        "body-status-delete",
+        "body-origin-load-usage",
+        "body-origin-reducer",
+        "page-delete-assets",
+        "management-v3-binding-gates"
+      ],
+      "detail": "DOMParser로 img src를 추출한다. kNt는 data:를 제외하고 query/hash를 뗀 마지막 경로가 UUID.확장자인 URL만 자산 관리 대상으로 취급한다. 호스트 allowlist 검사가 아니므로 원본 호스트 소유를 증명하지 않는다. O_t는 catchformId/saveData[]/deleteData[] URL 목록을 formImage/temp/status에 보내며 초기 폼은 deleteData를 억제한다. 다른 본문에 남은 URL과 origin/삭제 집합을 대조해 중복 차감 및 undo 재증가를 처리한다. 실패는 catch에서 무시한다. 서버의 영구 삭제/복구/게시본 보존은 미관측."
+    },
+    {
+      "id": "BI14",
+      "classification": "observed-static-with-gap",
+      "title": "END/PRIVATE와 기본 편집기의 다른 URL 비교 범위",
+      "evidence": [
+        "content-url-set-helpers",
+        "body-form-page-editors",
+        "management-v3-binding-gates",
+        "end-private-asset-scope"
+      ],
+      "detail": "FNt는 description+pageList만 수집한다. main/page handler는 FNt 기반이고 END/PRIVATE handler는 BNt로 description+pageList+반대 설정 본문까지 비교한다. 전체 네 위치의 관리가 대칭이라고 주장하지 않는다. 특히 main/page 화면이 이전 end/private HTML을 같은 집합으로 받는 근거는 추적 경로에서 미확인."
+    },
+    {
+      "id": "BI15",
+      "classification": "observed-static-with-gap",
+      "title": "페이지 복제의 URL remap·quota 갭",
+      "evidence": [
+        "page-copy-collect",
+        "asset-copy-api",
+        "copy-response-question-map",
+        "page-copy-pipeline",
+        "page-read-and-numbering"
+      ],
+      "detail": "MNt는 질문 자산과 PAGE_CONTENT_IMAGE URL을 중복 제거해 {assetType,originS3Key,targetAssetType} 배열로 /catch-form/asset/copy에 보낸다. originS3Key 값이 본문에서는 URL 전체임을 확인했다. 반환 assets의 originKey/newKey/fileUrl/fileSize는 LNt로 질문 자산에만 매핑한다. 추적된 page clone의 {...u,questionList:...}는 pageContent 치환을 하지 않는다. totalBytes는 질문 자산 합계, contentImageBytes는 별도인데 복제 사전 quota는 totalBytes만 검사한다. 파일 제외 복제도 DNt로 질문만 비우며 본문 HTML을 남긴다. 서버의 동작/최종 URL 교체 결과는 미관측; 로컬 계획에서 이 갭을 복제하지 않아야 한다."
+    },
+    {
+      "id": "BI16",
+      "classification": "observed-static",
+      "title": "END/PRIVATE UI·gate·mode",
+      "evidence": [
+        "management-v3-binding-gates",
+        "management-v3-write",
+        "management-v3-read",
+        "management-v3-mode",
+        "end-private-asset-scope",
+        "end-default-literals",
+        "management-default-helper",
+        "private-screen-status",
+        "private-screen-render"
+      ],
+      "detail": "END와 PRIVATE 탭, PRIVATE BASIC/DIRECT 라디오가 있다. servicePricingType가 없거나 F/None이면 rich 편집은 숨김/disabled이다. 일부 parent 반영·mode/reset handler는 저장 중 T에서 alert하지만 editor.disabled는 pricing V이고 live ref 콜백에는 T 검사가 없으므로 전체 조작 잠금을 보장한다고 볼 수 없다. DIRECT 최초 선택은 <p>언어별 상태 메시지</p>로 초기화하며 BASIC 전환은 custom HTML 삭제를 수행하지 않는다. end reset은 aUt(language) 16언어 HTML literal을 넣는다. private API는 content||기본p를 전송하고 type으로 표시를 결정한다. PRIVATE는 단순 시간 마감만이 아니라 activeYn=N 및 비활성 사유 경로에 연결된다."
+    },
+    {
+      "id": "BI17",
+      "classification": "observed-static",
+      "title": "다국어와 RTL은 작성자 HTML 자동 번역이 아님",
+      "evidence": [
+        "language-change-preserves-fields",
+        "editor-config-without-license",
+        "editor-rtl-plugin",
+        "editor-extra-toolbar",
+        "end-default-literals",
+        "management-default-helper",
+        "management-step-language",
+        "end-private-asset-scope"
+      ],
+      "detail": "main/page/end는 language prop, private v3 call site는 language prop 없음으로 mkt의 en fallback이다. 편집기 UI는 en, content는 ar/he/fa/ur/ps/ku/sd/yi이면 ar 아니면 en이다. RTL 토글은 editing view root dir만 변경하며 HTML model의 dir 저장 converter는 이 plugin에서 보이지 않는다. 기존 작성자 HTML은 언어 변경으로 번역하지 않으며 기본 완료 HTML만 언어별 literal로 복원한다. 비한국어는 설정 wizard 단계가 3, ko는 4인 branch도 있다."
+    },
+    {
+      "id": "BI18",
+      "classification": "observed-static-with-gap",
+      "title": "출력·PDF·수명 주기의 경계",
+      "evidence": [
+        "body-public-html-render",
+        "body-preview-html-render",
+        "body-admin-preview-raw-html",
+        "body-admin-reply-raw-html",
+        "end-screen-render",
+        "private-screen-render",
+        "pdf-async-request",
+        "pdf-direct-request",
+        "edit-rejection-temp-cleanup"
+      ],
+      "detail": "main/page/end/private는 ck-content HTML 렌더이며 렌더 전에 LF를 제거하는 call site가 있다. PDF 요청은 customerIds/pageIds/includeConsent 등의 서버 생성 인자이므로 본문 이미지 포함/레이아웃/bytes/receipt hash를 입증하지 않는다. 활성/응답 존재시 수정 불가 오류와 temp cleanup API는 보이지만 immutable 버전/pin/승인/공유/영구삭제 수명은 원본 서버 미관측."
+    }
+  ],
+  "unknowns": [
+    {
+      "question": "서버 HTML schema/sanitizer·URL 소유권·업로드 decode/백신/14 MiB 서버 한도",
+      "status": "unobserved-server",
+      "detail": "프런트 handler 및 오류 문자열만 관측. 안전한 allowlist 또는 보안 보장을 역으로 확정하지 않음."
+    },
+    {
+      "question": "페이지의 서버 ID/type/order 모델",
+      "status": "partial",
+      "detail": "쓰기 page 및 응답 pageId는 확인. 모든 페이지 수정/재정렬의 서버 canonicalization과 DB key 타입은 미관측."
+    },
+    {
+      "question": "기본 resizeImage:50/75/original command 실제 작동",
+      "status": "unobserved-runtime",
+      "detail": "config에 있음. module42394 resizeImage/ImageResize 문자열 0회; custom mouse resize는 별도 코드로 확인."
+    },
+    {
+      "question": "모바일 touch/키보드 resize, 업로드 cancel/선택교체 race, 모든 readOnly custom control",
+      "status": "unobserved-runtime",
+      "detail": "실행하지 않았으며 mouse handler와 readOnly mode 코드만 확인."
+    },
+    {
+      "question": "페이지 복제 후 본문 URL remap, 파일 제외 복제의 본문 정리, quota 서버 보정",
+      "status": "static-gap",
+      "detail": "프런트 요청/응답 적용 경로에는 위 갭 존재. 실제 서버 응답 및 최종 저장 결과는 미관측."
+    },
+    {
+      "question": "폼 전체 복제·템플릿의 body URL 재소유",
+      "status": "unobserved",
+      "detail": "이번 조사는 페이지 복제 및 본문 관리 helper까지 추적. 원본 서버 전체 폼/템플릿 내부 동작을 추정하지 않음."
+    },
+    {
+      "question": "원본 게시본·승인·정정·공유·PDF·영수증 장기 불변과 GC",
+      "status": "unobserved-server",
+      "detail": "catchformId/temp 관리만으로 immutable version/pin을 입증할 수 없음."
+    }
+  ],
+  "localPlanningDecisions": [
+    {
+      "id": "D1",
+      "classification": "local-design-recommendation",
+      "detail": "기존 plain body를 자동 HTML로 해석하지 않는다. 별도 versioned rich-content 계약/필드 또는 명시 모드가 필요하고 구형 DTO·영수증 evidence/bytes/hash를 보존한다. 명시 전환이 있다면 평문 <,>,& 및 개행을 text로 처리하는 정책을 별도 수용 시험한다."
+    },
+    {
+      "id": "D2",
+      "classification": "local-design-recommendation",
+      "detail": "관측 converter 요소와 로컬 보안 allowlist를 분리한다. script/iframe/oembed/URL schemes/style/class 허용 범위는 별도 결정하며 QO/Ppt를 sanitizer로 재사용하지 않는다."
+    },
+    {
+      "id": "D3",
+      "classification": "local-design-recommendation",
+      "detail": "root/page/end/private 자산 슬롯·버전 참조·공통 용량을 소유 ID 기반으로 설계하고 URL은 읽기 시 인가된 값으로 만든다. 원본처럼 HTML URL 마지막 UUID 파일명만으로 소유를 판정하지 않는다."
+    },
+    {
+      "id": "D4",
+      "classification": "local-design-recommendation",
+      "detail": "페이지 배열·안정 ID·순서·분기 및 first-page mainText를 별도 모델로 먼저 고정한다. 폼 본문 한 필드 구현으로 페이지/완료/마감까지 완료 처리하지 않는다."
+    },
+    {
+      "id": "D5",
+      "classification": "local-design-recommendation",
+      "detail": "본문 이미지 복제의 HTML/asset remap, 본문 포함 quota, undo/삭제/다른 슬롯 참조, snapshot 보존을 독립 검증한다. 원본 정적 갭은 동등 기능으로 복제하지 않는다."
+    },
+    {
+      "id": "D6",
+      "classification": "local-design-recommendation",
+      "detail": "14 MiB는 기존 1/5/10 MiB 경계를 전역 확장하지 않고 해당 목적의 upload/decode/scan/storage/read/PDF 경로에서 별도 resource limit과 함께 설계한다."
+    }
+  ],
+  "boundedSearch": {
+    "wholeBundle": {
+      "pageTypeOccurrences": 0,
+      "formImageOccurrences": 2
+    },
+    "editorModule": {
+      "start": 2455460,
+      "endExclusive": 3136450,
+      "resizeImageOccurrences": 0,
+      "ImageResizeOccurrences": 0
+    },
+    "sanitizeBoundary": "DOMPurify는 번들 다른 위치(7128827+)에 존재하나 추적 본문 mkt/CY/QO에서 호출되지 않음. 전체 앱 sanitizer 부재를 주장하지 않음.",
+    "copyBoundary": "MNt/LNt/DNt 및 pOt W/H page clone 경로를 추적. 서버 clone 구현·완료 응답은 미관측."
+  },
+  "excerpts": [
+    {
+      "id": "limits-quota",
+      "symbol": "Jc/Zc/od/ad/nd",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 6912700,
+      "endExclusive": 6914080,
+      "excerptUtf8Sha256": "b0a1d9ff848187fb0748163ca57125a22ce3dc4aeb3c5abc7ca9a098cde29a7a",
+      "raw": ")=>{e.error=t.payload}}}),{actions:Kc}=Qc,Xc=(Qc.reducer,{usedBytes:0,limitBytes:0,enforced:!0,quotaApplied:!0,contentImageSizes:{}}),Jc={contentImage:14680064,questionImage:1048576,optionImage:1048576,material:5242880},Zc=[\"image/jpeg\",\"image/jpg\",\"image/png\"],ed=[\"pdf\",\"docx\",\"ai\"],td=[\"jpg\",\"jpeg\",\"png\"],rd=/^(\\d{4}-\\d{2}-\\d{2})[T ](\\d{2}:\\d{2}:\\d{2})/;function nd(e){if(!e)return!0;const t=rd.exec(e.trim());return!t||`${t[1]} ${t[2]}`>=\"2026-09-22 06:30:00\"}function ad(e,t){const r=(e=>Math.max(0,e.limitBytes-e.usedBytes))(t);return!1===t.quotaApplied||t.limitBytes<=0?{allowed:!0,remainBytes:r}:t.usedBytes+e>t.limitBytes?{allowed:!1,reason:\"total\",remainBytes:r}:{allowed:!0,remainBytes:r}}function od(e,t){var r;if(!e)return{allowed:!1,reason:\"type\"};return(\"material\"===t?ed.includes((e=>{const t=e.lastIndexOf(\".\");return t<0||t===e.length-1?\"\":e.slice(t+1).toLowerCase()})(null!==(r=e.name)&&void 0!==r?r:\"\")):Zc.includes(e.type))?e.size>Jc[t]?{allowed:!1,reason:\"size\"}:{allowed:!0}:{allowed:!1,reason:\"type\"}}function id(e){return!Number.isFinite(e)||e<=0?\"0KB\":e<1048576?`${Math.max(1,Math.round(e/1024))}KB`:`${(e/1048576).toFixed(1).replace(/\\.0$/,\"\")}MB`}function sd(e,t){return{...e,usedBytes:Math.max(0,e.usedBytes+t)}}const ld={listLoading:!1,actionsLoading:!1,entities:null,templates:null,lastError:null,elementList:null,replyCount:0,formMarketing:null,fo",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "upload-queue-errors",
+      "symbol": "hNt/fNt/ANt/yNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12341014,
+      "endExclusive": 12342900,
+      "excerptUtf8Sha256": "088371473ee9caf3d1b3ac67dd52ead7e80621158c012d9d937265c3cc070d97",
+      "raw": "const hNt={OVER_LIMIT_QUESTION_IMAGE_SIZE:\"questionImageSize\",OVER_LIMIT_OPTION_IMAGE_SIZE:\"optionImageSize\",OVER_LIMIT_MATERIAL_FILE_SIZE:\"materialSize\",OVER_LIMIT_MATERIAL_COUNT:\"materialCount\",INVALID_MATERIAL_URL_SCHEME:\"materialUrlScheme\",OPTION_IMAGE_NOT_ALLOWED_TYPE:\"optionImageNotAllowedType\",OPTION_IMAGE_NOT_ALLOWED_CUSTOM:\"optionImageNotAllowedCustom\",OVER_LIMIT_OPTION_IMAGE_COUNT:\"optionImageCount\",OVER_LIMIT_CATCHFORM_ASSET_SIZE:\"formTotal\",INVALID_CATCHFORM_ASSET_TYPE:\"assetTypeInvalid\",NOT_FOUND_CATCHFORM_ASSET:\"assetNotFound\",OVER_LIMIT_MATERIAL_LINK_COUNT:\"materialLinkCount\",INVALID_MATERIAL_PAYLOAD:\"materialPayload\",OVER_LIMIT_MATERIAL_LINK_LABEL:\"materialLinkLabel\",NOT_FOUND_FORM:\"notFoundForm\",FORBIDDEN:\"forbidden\"},pNt={331:\"emptyFile\",332:\"assetTypeNotAllowed\"},mNt=new Set([\"OVER_LIMIT_CATCHFORM_ASSET_SIZE\"]);function fNt(e){const t=(e=>{var t,r,n,a;return null!==(t=null!==(r=null!==(n=null===e||void 0===e||null===(a=e.response)||void 0===a?void 0:a.data)&&void 0!==n?n:null===e||void 0===e?void 0:e.data)&&void 0!==r?r:e)&&void 0!==t?t:{}})(e),r=\"string\"===typeof t.category?t.category:\"\",n=\"string\"===typeof t.message&&\"\"!==t.message.trim()?t.message:null;if(!r||!(r in hNt)){const e=\"number\"===typeof t.code?t.code:null,n=null!==e?pNt[e]:void 0;return n?{category:r||`code_${e}`,messageKey:n,serverMessage:null}:null}return mNt.has(r)&&n?{category:r,messageKey:null,serverMessage:n}:{category:r,messageKey:hNt[r],serverMessage:null}}function gNt(e){var t;return 415===(null===e||void 0===e||null===(t=e.response)||void 0===t?void 0:t.status)}const vNt=new Set;function bNt(){return vNt.size>0}let xNt=Promise.resolve();function ANt(e){const t=xNt.then(e,e);return xNt=t.catch((()=>{})),t}async function yNt(e,t){return ANt((async()=>{const r=e();return null!==r&&void 0!==r?{ok:!1,reason:r}:{ok:!0,result:await t()}}))}const wNt=e=>null!==(null===e",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-upload-adapter",
+      "symbol": "SNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12342997,
+      "endExclusive": 12344854,
+      "excerptUtf8Sha256": "500296bd166102d0ad0a7e84d9ba65acb2c541ace280d18c72792e133465253d",
+      "raw": "atchformId&&\"\"!==e.catchformId,CNt=[\"image/jpeg\",\"image/jpg\",\"image/png\"];function SNt(e,t){const r=e=>{throw void(wNt(t)?$u.dispatch(ic({show:!0,type:\"fail\",text:e})):alert(e))};return{upload:async()=>{const n=wNt(t)?function(){const e=Symbol(\"contentImageUpload\");return vNt.add(e),()=>{vNt.delete(e)}}():()=>{};return ANt((async()=>{try{const n=await e.file;if(n.size>Jc.contentImage&&r(QN(\"uploadAdapter.alert.phrase1\")+(n.size/1048576).toFixed(2)+QN(\"uploadAdapter.alert.phrase2\")),CNt.includes(n.type)||r(QN(\"uploadAdapter.alert.phrase6\")),wNt(t)){const{allowed:e,remainBytes:t}=ad(n.size,$u.getState().form.assetUsage);e||r(QN(\"uploadAdapter.alert.quotaExceeded1\")+id(t)+QN(\"uploadAdapter.alert.quotaExceeded2\"))}const c=new FormData;c.append(\"files\",n),wNt(t)&&(c.append(\"catchformId\",String(t.catchformId)),c.append(\"assetType\",t.assetType));try{var a,o;const e=await At.post(`${PE}/company-operated-service/formImage/upload`,c,{headers:{\"Check-Multipart\":!0}}),{imgUrl:r,fileSize:i,usedBytes:s,limitBytes:l}=null!==(a=e.data)&&void 0!==a?a:{};return null===t||void 0===t||null===(o=t.onUploaded)||void 0===o||o.call(t,{url:r,fileSize:\"number\"===typeof i?i:n.size,usedBytes:s,limitBytes:l}),{default:r}}catch(l){var i,s;const e=((e,t)=>{var r,n;const a=fNt(e);return a?null!==(r=a.serverMessage)&&void 0!==r?r:t(null!==(n=a.messageKey)&&void 0!==n?n:\"\"):null})(l,(e=>QN(`aiQuestions.assetError.${e}`)));e&&r(e);const t=null!==(i=null===l||void 0===l||null===(s=l.response)||void 0===s?void 0:s.data)&&void 0!==i?i:{},n=\"string\"===typeof t.message?t.message:\"\",a=gNt(l)||n.startsWith(\"not allowed format\")?QN(\"uploadAdapter.alert.phrase3\"):QN(\"size too big\"===n?\"uploadAdapter.alert.phrase4\":\"can not read file\"===n?\"uploadAdapter.alert.phrase5\":\"uploadAdapter.alert.uploadFailed\");r(a)}}finally{n()}}))}}}const TNt=e=>\"string\"===typeof e&&\"\"!==e.tr",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "html-image-extraction",
+      "symbol": "jpt/Ipt/Rpt/Ppt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 11578370,
+      "endExclusive": 11579460,
+      "excerptUtf8Sha256": "d51c52802de7a947fd22e7e261cb9fb560f03195bf3ce7903725254547c2169e",
+      "raw": "function jpt(e){if(\"string\"!==typeof e||\"\"===e.trim())return[];const t=(new DOMParser).parseFromString(e,\"text/html\");return Array.from(t.querySelectorAll(\"img\")).map((e=>{var t;return null!==(t=e.getAttribute(\"src\"))&&void 0!==t?t:\"\"})).filter((e=>\"\"!==e.trim()))}function Ipt(e,t,r){const n=new Set(jpt(t)),a=new Set(r);return Array.from(new Set(jpt(e).filter((e=>!n.has(e)&&!a.has(e)))))}function _pt(e,t){return e.reduce(((e,r)=>{const n=null===t||void 0===t?void 0:t[r];return\"number\"===typeof n&&Number.isFinite(n)?e+n:e}),0)}function Rpt(e){return Array.isArray(e)?e.reduce(((e,t)=>(\"string\"===typeof(null===t||void 0===t?void 0:t.url)&&\"number\"===typeof(null===t||void 0===t?void 0:t.fileSize)&&Number.isFinite(t.fileSize)&&(e[t.url]=t.fileSize),e)),{}):{}}function Ppt(e){return\"string\"!==typeof e?\"\":e.replace(/<img\\b[^>]*>/gi,(e=>function(e){var t;const r=null===(t=(new DOMParser).parseFromString(e,\"text/html\").querySelector(\"img\"))||void 0===t?void 0:t.getAttribute(\"src\");return\"string\"===typeof r&&\"\"!==r.trim()}(e)?e:\"\"))}const Opt=e=>{if(null===e||void 0===e)return!1;retu",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "page-copy-collect",
+      "symbol": "MNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12346308,
+      "endExclusive": 12347376,
+      "excerptUtf8Sha256": "c6379d51c0216b1de611a625cb124d3dd8062144b07fd46c011cd655e46dde1f",
+      "raw": "n=t[r.originS3Key])&&void 0!==n?n:0)}),0);return{assets:r,totalBytes:i,contentImageBytes:0}}function RNt(e){return Object.keys(INt(e))}function PNt(e,t){const r=INt(e),n=new Set(Object.keys(INt(t)));return Object.entries(r).reduce(((e,t)=>{let[r,a]=t;return n.has(r)?e:e+a}),0)}function ONt(e,t){const r=new Set(Object.keys(INt(t)));return Object.keys(INt(e)).filter((e=>!r.has(e)))}function MNt(e,t){var r;let n=arguments.length>2&&void 0!==arguments[2]?arguments[2]:[];const a=null!==(r=null===e||void 0===e?void 0:e.questionList)&&void 0!==r?r:[],o=[],i=new Set;for(const h of a)for(const e of _Nt(h).assets)i.has(e.originS3Key)||(i.add(e.originS3Key),o.push(e));const s=a.reduce(((e,t)=>({...e,...INt(t)})),{}),l=o.reduce(((e,t)=>{var r;return e+(null!==(r=s[t.originS3Key])&&void 0!==r?r:0)}),0),c=Array.from(new Set(jpt(null===e||void 0===e?void 0:e.pageContent))).filter(kNt),d=new Set(n),u=c.reduce(((e,r)=>d.has(r)?e:e+ENt(null===t||void 0===t?void 0:t[r])),0);return{assets:[...o,...c.map((e=>jNt(\"PAGE_CONTENT_IMAGE\",e)))],totalBytes:l,contentImageBytes:u}}",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "copy-response-question-map",
+      "symbol": "LNt/DNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12347376,
+      "endExclusive": 12348517,
+      "excerptUtf8Sha256": "80fa81bf953d6d24b0b6b80214e410d2bec7fcd43db9d757cd4d4896ebd8baa5",
+      "raw": "function LNt(e,t){var r,n;const a=new Map((null!==(r=null===t||void 0===t?void 0:t.assets)&&void 0!==r?r:[]).map((e=>[e.originKey,e]))),o=a.get(null===e||void 0===e?void 0:e.questionImageKey),i=sQ(e).map((e=>{const t=\"file\"===e.type?a.get(e.fileKey):void 0;return t?{...e,fileKey:t.newKey,url:t.fileUrl,size:t.fileSize}:{...e}}));return{...e,...o?{questionImageKey:o.newKey,questionImageUrl:o.fileUrl,questionImageFileSize:o.fileSize}:{},questionOptionList:(null!==(n=null===e||void 0===e?void 0:e.questionOptionList)&&void 0!==n?n:[]).map((e=>{const t=a.get(null===e||void 0===e?void 0:e.optionImageKey);return t?{...e,optionImageKey:t.newKey,optionImageUrl:t.fileUrl,optionImageFileSize:t.fileSize}:{...e}})),materials:i,materialList:void 0}}function DNt(e){var t;const r=sQ(e).filter((e=>\"file\"!==e.type)).map(((e,t)=>({...e,sequence:t})));return{...e,questionImageKey:null,questionImageUrl:null,questionImageFileSize:null,questionOptionList:(null!==(t=null===e||void 0===e?void 0:e.questionOptionList)&&void 0!==t?t:[]).map((e=>({...e,optionImageKey:null,optionImageUrl:null,optionImageFileSize:null}))),materials:r,materialList:void 0}}",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "content-url-set-helpers",
+      "symbol": "FNt/BNt/UNt/zNt/VNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12348517,
+      "endExclusive": 12349707,
+      "excerptUtf8Sha256": "f390a8d33c8c76b2dd326da67f4aeedb989e22799907edf605c095d6478c9575",
+      "raw": "function FNt(e,t){const r=[];null!==t&&void 0!==t&&t.excludeDescription||\"string\"!==typeof(null===e||void 0===e?void 0:e.description)||r.push(e.description);return(Array.isArray(null===e||void 0===e?void 0:e.pageList)?e.pageList:[]).forEach(((e,n)=>{(null===t||void 0===t?void 0:t.excludePageIndex)!==n&&\"string\"===typeof(null===e||void 0===e?void 0:e.pageContent)&&r.push(e.pageContent)})),r}function BNt(e,t,r){const n=\"END\"===r?null===t||void 0===t?void 0:t.privatePageContent:null===t||void 0===t?void 0:t.endPageContent,a=FNt(e);return\"string\"===typeof n&&\"\"!==n.trim()?[...a,n]:a}function UNt(e,t){let r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:[];const n=new Set([...jpt(t),...r.flatMap((e=>jpt(e)))]),a=jpt(e).filter((e=>!n.has(e)));return Array.from(new Set(a)).filter(kNt)}function zNt(e){const t=[e,...arguments.length>1&&void 0!==arguments[1]?arguments[1]:[]].flatMap((e=>jpt(e)));return Array.from(new Set(t)).filter(kNt)}function VNt(e,t){const r=zNt(e),n=zNt(t);if(r.length!==n.length)return!0;const a=new Set(n);return r.some((e=>!a.has(e)))}const $Nt=new Set([\"ar\",\"he\",\"fa\",\"ur\",\"ps\",\"ku\",\"sd\",\"yi\"]);function HNt(e){return function(t){t.ui.componentFactory.",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "editor-width-serialization",
+      "symbol": "tkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12351300,
+      "endExclusive": 12353520,
+      "excerptUtf8Sha256": "4530b5140360ef635f0efb5313dcacf5a56e25181c2320f1260d1bd6fe4b2942",
+      "raw": "ibutes:\"width\"})})),t.isRegistered(\"media\")&&t.extend(\"media\",{allowAttributes:\"alignment\"}),XNt.forEach((t=>{e.conversion.for(\"downcast\").add((e=>{e.on(`attribute:width:${t}`,((e,t,r)=>{if(!r.consumable.consume(t.item,e.name))return;const n=r.mapper.toViewElement(t.item);if(!n)return;const a=r.writer;null!==t.attributeNewValue&&void 0!==t.attributeNewValue?a.setStyle(\"width\",t.attributeNewValue,n):a.removeStyle(\"width\",n)}))}))})),e.conversion.for(\"downcast\").add((e=>{e.on(\"attribute:alignment:media\",((e,t,r)=>{if(!r.consumable.consume(t.item,e.name))return;const n=r.mapper.toViewElement(t.item);if(!n)return;const a=r.writer;a.removeClass([\"media-align-left\",\"media-align-center\",\"media-align-right\"],n);const o=t.attributeNewValue;\"left\"!==o&&\"center\"!==o&&\"right\"!==o||a.addClass(`media-align-${o}`,n)}))})),e.conversion.for(\"upcast\").add((e=>{e.on(\"element:figure\",((e,t,r)=>{var n;const a=t.viewItem;if(!a||null===(n=a.hasStyle)||void 0===n||!n.call(a,\"width\"))return;const o=a.getStyle(\"width\");if(t.modelRange)for(const s of t.modelRange.getItems())if(s.is&&s.is(\"element\",\"image\"))return void r.writer.setAttribute(\"width\",o,s);const i=t.modelCursor;if(i){const e=i.parent;if(e&&e.getChildren){const t=Array.from(e.getChildren());for(let e=t.length-1;e>=0;e--){const n=t[e];if(n.is&&n.is(\"element\",\"media\"))return void r.writer.setAttribute(\"width\",o,n)}}}}),{priority:\"lowest\"})})),e.conversion.for(\"upcast\").add((e=>{e.on(\"element:figure\",((e,t,r)=>{const n=t.viewItem;if(!n||!n.hasClass)return;let a=null;if(n.hasClass(\"media-align-left\")?a=\"left\":n.hasClass(\"media-align-right\")?a=\"right\":n.hasClass(\"media-align-center\")&&(a=\"center\"),!a)return;const o=t.modelCursor;if(!o)return;const i=o.parent;if(i&&i.getChildren){const e=Array.from(i.getChildren());for(let t=e.length-1;t>=0;t--){const n=e[t];if(n.is&&n.is(\"element\",\"media\"))return void r.writer.setAttribute(\"alignment\",a,n)}}}),{priority:\"lowest\"})}));const{container:r,handles:n,alignToolbar:a,alignButtons:o}=function(){let e=document.getElementById(\"cs-ck-resize-overlay\");const t=new Map,r=new Map;if(e){ZNt.forEach((r=>{const n=e.querySelector(`[data-handle=\"${r.position}\"]`);n&&t.set(r.position,n)}));const n=document.getElementById(\"",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "editor-resize-interaction",
+      "symbol": "tkt mouse handlers",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12357580,
+      "endExclusive": 12358783,
+      "excerptUtf8Sha256": "c1211da56af7d55500165507ceee9d9e61a3605eaac84abad6633f8191adbdae",
+      "raw": "er(\"mousedown\",(t=>{if(!i||!s)return;t.preventDefault(),t.stopPropagation(),l=!0;const n=t.clientX,a=i.offsetWidth,o=i.parentElement,d=o?o.offsetWidth:a,u=\"tl\"===r||\"bl\"===r,h=e=>{if(!i)return;let t=e.clientX-n;u&&(t=-t);const r=a+t,o=Math.max(10,Math.min(100,r/d*100));i.style.width=`${o.toFixed(1)}%`,c()},p=()=>{if(window.removeEventListener(\"mousemove\",h),window.removeEventListener(\"mouseup\",p),l=!1,!i||!s)return;const t=i.style.width;t&&e.model.change((e=>{e.setAttribute(\"width\",t,s)})),c()};window.addEventListener(\"mousemove\",h),window.addEventListener(\"mouseup\",p)}))})),e.on(\"destroy\",(()=>{window.removeEventListener(\"scroll\",c,{capture:!0}),window.removeEventListener(\"resize\",c),i=null,s=null,l=!1,JNt=Math.max(0,JNt-1),0===JNt&&(r.remove(),a.remove())}))}const rkt=new Set([\"image\",\"media\"]);function nkt(e){var t,r;const n=null===(t=(r=e.model.document.selection).getSelectedElement)||void 0===t?void 0:t.call(r);return n&&rkt.has(n.name)?n:null}function akt(e){setTimeout((()=>function(e){let t;try{t=e.commands.get(\"imageUpload\")}catch{return}if(!t)return;let r=!1;t.on(\"change:isEnabled\",((n,a,o)=>{r||!o&&nkt(e)&&(r=!0,t.isEnabled=!0,r=!1)}));const n=setInterval((()=>{!t.isEnabled&",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "editor-responsive-css",
+      "symbol": "pkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12370100,
+      "endExclusive": 12371027,
+      "excerptUtf8Sha256": "d89b4a007128b4f6ff48546eb558b401a188675b83973478f5be0ae6b6b6c36d",
+      "raw": "ej};\n  }\n\n  ${e=>{if(e.$minHeight)return`\\n        .ck-editor__editable_inline {\\n          min-height: ${e.$minHeight}px;\\n        }\\n      `}};\n\n  /*\n   * 이미지 반응형 보장:\n   * - CKEditor 5 v23의 ImageResize 플러그인은 드래그 핸들을 기본 제공하지만,\n   *   이미지가 에디터 폭을 넘어가면 핸들 동작이 어색해진다.\n   *   ck-content img 의 max-width:100% 로 폭을 강제해 핸들 사용성을 보장.\n   */\n  .ck-content img {\n    max-width: 100%;\n    height: auto;\n  }\n\n  /*\n   * 미디어 임베드(YouTube 등) 16:9 비율 보존 + 드래그 리사이즈 지원 CSS:\n   * - figure.media 자체는 너비 가변 (drag-resize 시 inline style width 부여됨), aspect-ratio로 16:9 비율 자동 유지\n   * - 기본 너비 100% — drag 시 % 단위로 축소 가능\n   * - iframe은 figure를 꽉 채워서 비율 유지\n   */\n  .ck-content .media,\n  .ck-content figure.media {\n    width: 100%;\n    aspect-ratio: 16 / 9;\n    margin: 1em 0;\n    max-width: 100%;\n    position: relative; /* resize handle 절대 좌표 기준 */\n  }\n  .ck-content .media iframe,\n  .ck-content figure.media iframe,\n  .ck-content .media .ck-media__wrapper",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-form-page-editors",
+      "symbol": "mkt call sites",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12779400,
+      "endExclusive": 12782328,
+      "excerptUtf8Sha256": "936129dd2fc792f086ce497097c75dfde385f965a9be06f87436e0f81d21a243",
+      "raw": ":()=>{k_t(t,!1),l(!0)},children:[s||o?(0,nI.jsxs)(nI.Fragment,{children:[0===t&&(0,nI.jsxs)(\"div\",{children:[(0,nI.jsx)(dOt,{}),(0,nI.jsxs)(hOt,{className:\"mt-6 min-w-[540px]\",children:[(0,nI.jsxs)(\"div\",{className:\"flex flex-col mb-6\",id:\"catchform-description\",children:[(0,nI.jsx)(iI,{className:\"subtitle-1 mb-2\",color:tj,children:\"\\uce90\\uce58\\ud3fc \\ubcf8\\ubb38\"}),(0,nI.jsx)(iI,{className:\"body-2\",color:ej,children:\"\\uc751\\ub2f5\\uc744 \\uc2dc\\uc791\\ud558\\uae30 \\uc804, \\uce90\\uce58\\ud3fc\\uc5d0 \\ub300\\ud55c \\uc0c1\\uc138\\ud55c \\uc548\\ub0b4\\ub97c \\uc790\\uc720\\ub86d\\uac8c \\uc791\\uc131\\ud574 \\uc8fc\\uc138\\uc694. (\\uc608: \\uc124\\ubb38 \\ubaa9\\uc801, \\ucc38\\uc5ec\\uae30\\uac04, \\uc774\\ubca4\\ud2b8 \\uacbd\\ud488 \\uc548\\ub0b4 \\ub4f1)\"})]}),(0,nI.jsx)(\"div\",{dir:u,children:(0,nI.jsx)(mkt,{language:null===c||void 0===c?void 0:c.formLanguage,data:(null===c||void 0===c?void 0:c.description)||\"<p></p>\",onChangeEditor:e=>{a(QG({...$u.getState().form.formModelV3,description:e}))},imageUpload:!0,onContentImageChange:E,onBlurEditor:C,assetScope:{catchformId:d,assetType:\"FORM_CONTENT_IMAGE\",onUploaded:e=>{let{url:t,fileSize:r,usedBytes:n,limitBytes:o}=e;a(KG(n,r,o)),a(JG(t,r))}}},`form-description-${null===c||void 0===c?void 0:c.formLanguage}`)})]})]}),t>0&&(0,nI.jsxs)(uOt,{className:\"drag-border mt-6 p-6 border-radius-10 bg-white\",children:[(0,nI.jsxs)(\"div\",{className:\"flex row-line-center justify-between mb-5\",children:[(0,nI.jsx)(iI,{className:\"subtitle-3\",color:aj,children:`${t+1} ${r(\"page\")}`}),(0,nI.jsxs)(\"div\",{className:\"flex row-line-center gap-x-2\",children:[(0,nI.jsx)(BL,{className:\"center p-2\",content:r(\"pageCopy\"),placement:\"bottom\",theme:\"light\",children:(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(DXe,{onClick:()=>q(t),type:\"secondary\",size:\"md\",disabled:P,icon:\"/img/google-icons-v2/document/file-copy.svg\",className:\" !bg-transparent\"})})}),(0,nI.jsx)(BL,{className:\"center p-2\",content:r(\"pageDelete\"),placement:\"bottom\",theme:\"light\",children:(0,nI.jsx)(\"div\",{children:(0,nI.jsx)(DXe,{onClick:()=>V(t),type:\"secondary\",size:\"md\",disabled:!1,icon:\"/img/google-icons-v2/system/delete.svg\",className:\" !bg-transparent\"})})})]})]}),(0,nI.jsx)(\"div\",{dir:u,children:(0,nI.jsx)(fD,{value:null===A||void 0===A?void 0:A.pageTitle,maxLength:200,onChange:e=>{F({...A,pageTitle:e.target.value})}})}),(0,nI.jsx)(\"div\",{className:\"mt-5\",dir:u,children:(0,nI.jsx)(mkt,{language:null===c||void 0===c?void 0:c.formLanguage,data:(null===A||void 0===A?void 0:A.pageContent)||\"<p></p>\",onChangeEditor:e=>{F({...A,pageContent:e})},imageUpload:!0,onContentImageChange:N,onBlurEditor:S,assetScope:{catchformId:d,assetType:\"PAGE_CONTENT_IMAGE\",onUploaded:e=>{let{url:t,fileSize:r,usedBytes:n,limitBytes:o}=e;a(KG(n,r,o)),a(JG(t,r))}}},`page-content-${t}-${null===c||void 0===c?void 0:c.formLanguage}`)})]}),(0,nI.jsx)(oOt,{isDefaultQuestionDetectLoading:!1,pageIndex:t})]}):(0,nI.jsx)(\"div\",{className:\"mt-6\",children:(0,nI.jsx)(l",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-public-html-render",
+      "symbol": "b.content/V[k].pageContent",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8518700,
+      "endExclusive": 8520710,
+      "excerptUtf8Sha256": "a0c1f2840dbb0359966a30374149a98f10378f97ac0892cb0a1243fc3facf521",
+      "raw": "ull===b||void 0===b?void 0:b.subject}),0===k&&((null===(n=b.catchformConstraintResponse)||void 0===n?void 0:n.collectOpenTime)||(null===(a=b.catchformConstraintResponse)||void 0===a?void 0:a.collectEndTime))&&(0,nI.jsx)(\"div\",{style:{background:wj},className:\"px-[12px] py-[6px] rounded-[8px] inline-flex self-start\",children:(0,nI.jsx)(iI,{className:\"body-1\",color:ej,children:Se})}),0===k?b.content&&\"<p></p>\"!==b.content&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base\",style:{color:ej},children:b.content&&\"<p></p>\"!==b.content&&QO()(CY(b.content.replace(/\\n/g,\"\")))}):((null===(o=V[k])||void 0===o?void 0:o.pageTitle)||(null===(i=V[k])||void 0===i?void 0:i.pageContent)&&\"<p></p>\"!==(null===(s=V[k])||void 0===s?void 0:s.pageContent))&&(0,nI.jsxs)(\"div\",{children:[((null===(l=V[k])||void 0===l?void 0:l.pageTitle)||(null===(c=V[k])||void 0===c?void 0:c.pageContent)&&\"<p></p>\"!==(null===(d=V[k])||void 0===d?void 0:d.pageContent))&&(0,nI.jsx)(\"div\",{style:{background:uj},className:(Te=ae,Te?\"mb-6\":\"mb-4\")+\" w-full h-[1px]\"}),(0,nI.jsx)(iI,{className:\"subtitle-2 !break-normal\",color:tj,children:null===(u=V[k])||void 0===u?void 0:u.pageTitle}),(null===(h=V[k])||void 0===h?void 0:h.pageContent)&&\"<p></p>\"!==(null===(p=V[k])||void 0===p?void 0:p.pageContent)&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base\",style:{color:ej},children:(null===(m=V[k])||void 0===m?void 0:m.pageContent)&&\"<p></p>\"!==(null===(f=V[k])||void 0===f?void 0:f.pageContent)&&QO()(CY(null===(g=V[k])||void 0===g?void 0:g.pageContent.replace(/\\n/g,\"\")))})]})]})}),(0,nI.jsxs)(\"div\",{className:\"flex flex-col gap-[10px] mt-6\",children:[(0,nI.jsx)(iI,{className:\"body-2\",color:\"#F24E4E\",children:K(\"phrase.phrase78\")}),(()=>{let e=!1;return x&&(null===x||void 0===x?void 0:x.map(((t,r)=>{var n,a,o;let i=!1;return\"IDV\"!==(null===t||void 0===t?void 0:t.questionSubType)||e||(i=!0,e=!0),(0,nI.jsx)(s1,{questionIndex:r,item:t,onUpdate:ye,onUpdateObject:\"INFO_OWNER\"===W?we:Ce,onUpdateList:Ae,authCompleted:J,",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-preview-html-render",
+      "symbol": "CLt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12881180,
+      "endExclusive": 12882104,
+      "excerptUtf8Sha256": "5a0694f55724bcce4c325c44dcb486b92912a461a53b8987511908fac3285cf8",
+      "raw": ".jsx)(iI,{className:\"body-1\",color:ej,children:H})}),0===f&&p&&\"<p></p>\"!==p&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base body-1  \"+(u?\"mt-6\":\"\"),style:{color:ej},children:p&&\"<p></p>\"!==p&&QO()(CY(p.replace(/\\n/g,\"\")))}),f>0&&(E||k)&&(0,nI.jsxs)(\"div\",{className:\"mt-6\",children:[(0,nI.jsx)(bLt,{className:\"mb-6\"}),(0,nI.jsx)(iI,{className:\"subtitle-2\",color:tj,children:E}),k&&\"<p></p>\"!==k&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base body-1  \"+(E?\"mt-4\":\"\"),style:{color:ej},children:QO()(CY(k.replace(/\\n/g,\"\")))})]})]}),(0,nI.jsx)(iI,{className:\"body-2 mb-2\",color:\"#F24E4E\",children:U(\"requiredQuestionNotice\")}),(0,nI.jsx)(fLt,{children:(0,nI.jsx)(sLt,{pageIndex:f,device:v,errorFocus:R,onPendingInput:M},L)}),(0,nI.jsxs)(\"div\",{className:\"mt-10 center gap-3\",children:[f>0&&(z||a.allowPageBack)&&(0,nI.jsx)(DY,{text:U(\"prevPage\"),className:\"min-w-[144px]\",onClick:()=>{if(f>0){P(!1),",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "html-render-transform",
+      "symbol": "CY",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 8182533,
+      "endExclusive": 8183626,
+      "excerptUtf8Sha256": "c07c2e1e9379f46a86b2b6ad4489777aecfac29538a6540eb05d575e2f587fea",
+      "raw": "function CY(e){if(!e)return\"\";let t=e.replace(/<figure[^>]*\\bclass=\"[^\"]*\\bmedia\\b[^\"]*\"[^>]*>\\s*<div[^>]*\\bdata-oembed-url=[\"']([^\"']+)[\"'][^>]*>[\\s\\S]*?<\\/figure>/gi,((e,t)=>{const r=AY(t);return r?`<figure class=\"media\">${yY(r)}</figure>`:e}));return t=t.replace(/<oembed\\b([^>]*?)\\/?>(?:\\s*<\\/oembed>)?/gi,((e,t)=>{const r=/url\\s*=\\s*[\"']([^\"']+)[\"']/i.exec(t||\"\");if(!r)return e;const n=AY(r[1]);return n?yY(n):e})),function(e){return e.replace(/<a\\b[^>]*>/gi,(e=>{const t=/\\bhref\\s*=\\s*(\"[^\"]*\"|'[^']*')/i.exec(e);if(!t)return e;const r=t[1],n=r[0],a=r.slice(1,-1);if(!a||wY.test(a))return e;const o=t.index+t[0].length-r.length;let i=e.slice(0,o)+`${n}https://${a}${n}`+e.slice(o+r.length),s=\"\";return/\\btarget\\s*=/i.test(i)||(s+=' target=\"_blank\"'),/\\brel\\s*=/i.test(i)||(s+=' rel=\"noopener noreferrer\"'),s&&(i=`${i.slice(0,-1)}${s}>`),i}))}(t)}const SY=as(BU)`\n  position: absolute;\n  inset-inline-end: 10px;\n  top: 50%;\n  width: 20px;\n  height: 20px;\n  pointer-events: none;\n  transform: translateY(-50%);\n`,TY=as.div`\n  position: relative;\n  width: 100%;\n  cursor: ${e=>e.readOnly||",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-status-delete",
+      "symbol": "O_t/M_t/L_t/D_t",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12629197,
+      "endExclusive": 12631588,
+      "excerptUtf8Sha256": "cecc67eda5dc06259fb3570b4ef945162eb1d72e3343603f3ef54bf58c6f251c",
+      "raw": "(e,t){let{removed:r,present:n,origin:a=[],sendDelete:o=!0}=t;if(!__t(e))return;const i=e=>Array.from(new Set(e.filter((e=>\"string\"===typeof e&&\"\"!==e.trim())))),s=new Set(qG(e)),l=i(r).filter((e=>!s.has(e))),c=i(n),d=c.filter((e=>s.has(e))),u=new Set(GG(e)),h=c.filter((e=>u.has(e)));if(0===l.length&&0===d.length&&0===h.length)return;const p=new Set(i(a)),m=c.filter((e=>!p.has(e))),f=new Set(c),g=i(a).filter((e=>!f.has(e)));l.length>0&&function(e,t){var r;const n=HG(e);if(!n)return;const a=WG(t);if(0===a.length)return;const o=null!==(r=VG.get(n))&&void 0!==r?r:new Set;a.forEach((e=>o.add(e))),VG.set(n,o)}(e,l),d.length>0&&function(e,t){const r=HG(e);if(!r)return;const n=VG.get(r);n&&(WG(t).forEach((e=>n.delete(e))),0===n.size&&VG.delete(r))}(e,d),h.length>0&&function(e,t){const r=HG(e);if(!r)return;const n=$G.get(r);n&&(WG(t).forEach((e=>n.delete(e))),0===n.size&&$G.delete(r))}(e,h);try{!function(e,t){const r=String(e),n=R_t.get(r),a=n?n.then(t,t):t(),o=Promise.resolve(a).catch((()=>{})).then((()=>{R_t.get(r)===o&&R_t.delete(r)}));R_t.set(r,o)}(e,(()=>{return Promise.resolve((t={catchformId:e,...m.length>0?{saveData:m}:{},...o&&g.length>0?{deleteData:g}:{}},At.post(`${PE}/company-operated-service/formImage/temp/status`,t))).catch((()=>{}));var t}))}catch{}}function M_t(e,t){let{isInitCatchform:r,getOrigin:n}=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};return a=>{var o;let{prevHtml:i,nextHtml:s}=a;if(!VNt(i,s)&&!function(e){var t,r,n,a;const o=HG(e);return!!o&&((null!==(t=null===(r=VG.get(o))||void 0===r?void 0:r.size)&&void 0!==t?t:0)>0||(null!==(n=null===(a=$G.get(o))||void 0===a?void 0:a.size)&&void 0!==n?n:0)>0)}(e))return;const l=t();O_t(e,{removed:UNt(i,s,l),present:zNt(s,l),origin:null!==(o=null===n||void 0===n?void 0:n())&&void 0!==o?o:[],sendDelete:!(null!==r&&void 0!==r&&r())})}}function L_t(e,t,r){let{getSizeMap:n,patchUsedBytes:a}=r;return r=>{let{prevHtml:o,nextHtml:i}=r;const s=zNt(null,t()),l=n(),c=[...qG(e),...GG(e)],d=function(e,t,r){return _pt(Ipt(e,t,arguments.length>3&&void 0!==arguments[3]?arguments[3]:[]),r)}(o,i,l,s),u=function(e,t,r){let n=arguments.length>3&&void 0!==arguments[3]?arguments[3]:[];const a=new Set(arguments.length>4&&void 0!==arguments[4]?arguments[4]:[]);return 0===a.size?0:_pt(Ipt(t,e,n).filter((e=>a.has(e))),r)}(o,i,l,s,c),h=u-d;0!==h&&a(h)}}function D_t(e,t){return r=>{e(r),t(r)}}const F_t={page",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "page-delete-assets",
+      "symbol": "z",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12769308,
+      "endExclusive": 12769985,
+      "excerptUtf8Sha256": "dba7ade3b255ad334f3f9e642c0cb1524b0893c92686a07949cd3229ab50afc3",
+      "raw": "ntent:r}))}),300),[]);(0,yt.useEffect)((()=>U_t(\"page\",(()=>U.flush()))),[U]);const z=e=>{var t;const r=$u.getState(),n=r.form.formModelV3.pageList[e],o=zNt(null,FNt(r.form.formModelV3,{excludePageIndex:e})),i=MNt(n,r.form.assetUsage.contentImageSizes,o),s=i.totalBytes+i.contentImageBytes;s>0&&a(XG(-s)),P_t(r.form.formModelV3.catchformId,function(e){var t;const r=null!==(t=null===e||void 0===e?void 0:e.questionList)&&void 0!==t?t:[];return Array.from(new Set(r.flatMap((e=>RNt(e)))))}(n));M_t(r.form.formModelV3.catchformId,(()=>FNt($u.getState().form.formModelV3,{excludePageIndex:e})),w)({prevHtml:null!==(t=null===n||void 0===n?void 0:n.pageContent)&&void 0!==t?t:\"\",nex",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "page-copy-pipeline",
+      "symbol": "H/W",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12771440,
+      "endExclusive": 12774721,
+      "excerptUtf8Sha256": "0e40a60c4c52f72583934ccc0d24de54d908bcf157d62cb1229c3012a9f7dd16",
+      "raw": "()}finally{O(!1)}},n=500-(Date.now()-e);n>0?setTimeout(r,n):r()},H=(e,t,n,o)=>{var i;const s=$u.getState().form.formModelV3,l=e=>n?{...e,pageOffset:-2,questionList:e.questionList.map((e=>{var t;return{...e,usePageOffset:!1,questionOptionList:null===(t=e.questionOptionList)||void 0===t?void 0:t.map((e=>({...e,pageOffset:-2})))}}))}:e,c=(null!==(i=null===e||void 0===e?void 0:e.questionList)&&void 0!==i?i:[]).map((e=>W_t(e))),d=[...s.pageList.slice(0,t+1).map(((e,t)=>({...l(e),page:t+1,pageIndex:t+1}))),{...e,questionList:c,page:t+2,pageIndex:t+2},...s.pageList.slice(t+1).map(((e,r)=>({...l(e),page:t+3+r,pageIndex:t+3+r})))];a(QG({...s,pageList:A_t(d)})),requestAnimationFrame((()=>requestAnimationFrame((()=>{$(o,(()=>{k_t(t+1),a(ic({show:!0,type:\"success\",text:r(\"pageCopied\")}))}))}))))},W=async function(e,t){let o=arguments.length>2&&void 0!==arguments[2]&&arguments[2];if(!o){z_t();const n=$u.getState().form.assetUsage,a=MNt($u.getState().form.formModelV3.pageList[e],n.contentImageSizes);if(a.assets.length>0&&!ad(a.totalBytes,n).allowed)return void((e,t,n,a)=>{L({show:!0,data:{title:r(\"assetQuota.copyExcludeFilesTitle\"),body:(0,nI.jsx)(cD,{type:\"warning\",icon:\"exclamation\",className:\"w-full\",secondText:r(\"assetQuota.copyExcludeFilesKeptPage\"),thirdText:r(\"assetQuota.copyExcludeFilesReason\",{limit:id(a.limitBytes),used:id(a.usedBytes),after:id(a.usedBytes+n)})}),cancelButtonText:r(\"assetQuota.copyExcludeFilesCancel\"),confirmButtonText:r(\"assetQuota.copyExcludeFilesConfirm\"),handleConfirm:()=>W(e,t,!0),isShowCancelButton:!0,confirmButtonType:\"primary\"}})})(e,t,a.totalBytes,n)}O(!0);const i=Date.now();let s=!1;try{z_t();const l=$u.getState().form.formModelV3.pageList[e],c=l._dragKey,d=o?function(e){var t;return{...e,questionList:(null!==(t=null===e||void 0===e?void 0:e.questionList)&&void 0!==t?t:[]).map(DNt)}}(l):l,u=(e=>{const{_dragKey:t,...r}=(0,tK.cloneDeep)(e);return{...r,pageOffset:-2,questionList:r.questionList.map((e=>{var t;return{...e,usePageOffset:!1,nlpFeedbackId:null,detectedItems:[],questionOptionList:null===(t=e.questionOptionList)||void 0===t?void 0:t.map((e=>({...e,pageOffset:-2})))}}))}})(d),h=MNt(d,$u.getState().form.assetUsage.contentImageSizes);if(($u.getState().form.formModelV3.formLanguage||SV)!==SV)u.questionList=u.questionList.map((e=>({...e,currentTitle:e.title})));else{(await Promise.all(u.questionList.map((e=>e.title?Dkt(u.catchformId,e.title,JN([\"EXPERT\"],I)?_:I.companyIdx,I.userIdx).catch((()=>null)):Promise.resolve(null))))).forEach(((e,t)=>{Array.isArray(e)&&e.length>0&&(u.questionList[t].currentTitle=u.questionList[t].title,u.questionList[t].nlpFeedbackId=e[0].nlpFeedbackId,u.questionList[t].detectedItems=e)}))}const p=$u.getState().form.formModelV3,m=p.pageList.findIndex((e=>c?e._dragKey===c:e===l));if(m<0)return;if(0===h.assets.length)return H(u,m,t,i),void(s=!0);U$({catchformId:p.catchformId,assets:h.assets}).then((e=>{var r,n;a(KG(null===(r=e.data)||void 0===r?void 0:r.usedBytes,void 0,null===(n=e.data)||void 0===n?void 0:n.limitBytes));const o={...u,questionList:u.questionList.map((t=>LNt(t,e.data)))};H(o,m,t,i)})).catch((e=>{var t;const o=fNt(e);a(ic({show:!0,type:\"fail\",text:o?null!==(t=o.serverMessage)&&void 0!==t?t:n(o.messageKey):r(\"assetQuota.copyFailed\")})),$(i)})),s=!0}finally{s||O",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-upload-pending-save",
+      "symbol": "I",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12789934,
+      "endExclusive": 12790300,
+      "excerptUtf8Sha256": "3e100cc7a7179d8ff78b5e701e753df63f0e5eb382835da47cf7e60406a32d64",
+      "raw": "allback)((()=>{if(bNt())return void t(ic({show:!0,type:\"fail\",text:k(\"aiQuestions.assetQuota.saveUploadPending\")}));z_t();const e=$u.getState().form.formModelV3;g$(S_t(e,u)).then((r=>{t(aY(e.catchformId,zNt(null,FNt(e)))),alert(E(\"phrase.phrase69\"))})).catch((t=>{var r,n;const a=fNt(t);var o;if(a)alert(null!==(o=a.serverMessage)&&void 0!==o?o:N(String(a.messageKey",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-origin-load-usage",
+      "symbol": "RLt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12889340,
+      "endExclusive": 12890200,
+      "excerptUtf8Sha256": "40d25ccef13de2657fb7b86187abe49f6b7a2014a2c1ea672d660a858f37ca3c",
+      "raw": "atchformId:e.catchFormId,catchFormProgress:e.catchFormProgress,pageList:A_t(e.pages),serviceId:null!==(o=a.state)&&void 0!==o&&o.serviceId?null===(l=a.state)||void 0===l?void 0:l.serviceId:e.serviceId,title:e.title,description:e.mainText,formLanguage:null!==(d=e.formLanguage)&&void 0!==d?d:\"ko\",detectedPurposeSuccess:null,detectedPurpose:\"\",systemSetQuestion:{useSignature:e.useSignature,useAuthentication:e.useAuthentication,systemSetQuestionList:e.systemSetQuestionResponses}})),i((f=zNt(e.mainText,(null!==(u=e.pages)&&void 0!==u?u:[]).map((e=>null===e||void 0===e?void 0:e.pageContent))),e=>e(YG.contentImageOriginLoadedV3({urls:f})))),i((g={...null!==(h=e.assetUsage)&&void 0!==h?h:{},contentImageSizes:Rpt(null===(p=e.assetUsage)||void 0===p?void 0:p.contentImages),quotaApplied:nd(e.createAt)},e=>e(YG.assetUsageLoadedV3({assetUsage:g}))))})).catch((e",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-origin-reducer",
+      "symbol": "contentImageOriginLoadedV3",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 6926830,
+      "endExclusive": 6927470,
+      "excerptUtf8Sha256": "9b0adb1f149a6592a77a78a819712da9965d2b7b380e83fd38c76ab9dd7f22eb",
+      "raw": "questionList[r].matrixOptionData=n},fetchPrevCollectItemsV3:(e,t)=>{const{collectItems:r}=t.payload;e.prevCollectItems=r},fetchFormTitleV3:(e,t)=>{const{formTitle:r}=t.payload;e.formTitle=r},contentImageOriginLoadedV3:(e,t)=>{const{urls:r}=t.payload;e.originContentImageUrls=Array.isArray(r)?r:[]},catchformSavedV3:(e,t)=>{e.isInitCatchform=!1},fetchInitFormModelV3:(e,t)=>{var r;e.formModelV3=(r=e.initFormModelV3,JSON.parse(JSON.stringify(r))),e.isInitCatchform=!0,e.originContentImageUrls=[],e.assetUsage={...Xc,contentImageSizes:{}}},fetchFormOpenSettingV3:(e,t)=>{const{formOpenSetting:r}=t.payload;e.constraint=r},fetchStep1PreviewDat",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "language-change-preserves-fields",
+      "symbol": "setFormLanguageV3",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 6925225,
+      "endExclusive": 6925689,
+      "excerptUtf8Sha256": "c3ff77184b0ecc05170084b69a7eb8c810e22e4034f6e67054b0a2bff8b38aec",
+      "raw": "setFormLanguageV3:(e,t)=>{var r;const{formLanguage:n}=t.payload;e.formModelV3.formLanguage=n;const a=\"ko\"===n?\"ADDRESS\":\"FOREIGN_ADDRESS\";null===(r=e.formModelV3.pageList)||void 0===r||r.forEach((e=>{var t;null===e||void 0===e||null===(t=e.questionList)||void 0===t||t.forEach((e=>{\"ADDRESS\"!==(null===e||void 0===e?void 0:e.elementType)&&\"FOREIGN_ADDRESS\"!==(null===e||void 0===e?void 0:e.elementType)||(e.elementType=a)}))}))},formAnswerUploadResultFetchedV3:(e,",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-asset-gauge",
+      "symbol": "GOt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12815200,
+      "endExclusive": 12817640,
+      "excerptUtf8Sha256": "6be331772c12a5facfcc9c30bfe28c9f670e3debe30e82c0173f8eaf01269747",
+      "raw": "a(\"translate\",{keyPrefix:\"aiQuestions.assetGauge\"}),[n,a]=(0,yt.useState)(!1),o=(0,yt.useRef)(null),i=(0,yt.useRef)(null),s=Ut((e=>e.form.assetUsage)),l=(0,yt.useMemo)((()=>function(e){const t=Number.isFinite(e.limitBytes)&&e.limitBytes>0?e.limitBytes:104857600,r=Number.isFinite(e.usedBytes)?Math.max(0,e.usedBytes):0,n=r/t,a=(e=>e>=1?\"full\":e>=.9?\"near\":e>=.7?\"caution\":\"default\")(n);return{level:a,percent:Math.min(100,Math.max(0,100*n)),usedText:id(r),limitText:id(t),remainText:id(Math.max(0,t-r)),showNote:\"near\"===a||\"full\"===a}}(null!==s&&void 0!==s?s:Xc)),[s]),c=!1===(null===s||void 0===s?void 0:s.quotaApplied);return(0,yt.useEffect)((()=>{a(!1)}),[t]),(0,yt.useEffect)((()=>{if(!n)return;const e=e=>{var t;\"Escape\"===e.key&&(a(!1),null===(t=o.current)||void 0===t||t.focus())},t=e=>{var t,r;const n=e.target;null!==(t=o.current)&&void 0!==t&&t.contains(n)||null!==(r=i.current)&&void 0!==r&&r.contains(n)||a(!1)};return document.addEventListener(\"keydown\",e),document.addEventListener(\"mousedown\",t),()=>{document.removeEventListener(\"keydown\",e),document.removeEventListener(\"mousedown\",t)}}),[n]),c?null:(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(LOt,{\"data-testid\":\"form-asset-gauge\",children:[(0,nI.jsxs)(DOt,{children:[(0,nI.jsx)(FOt,{className:\"caption-strong\",children:r(\"label\")}),(0,nI.jsx)(BOt,{className:\"body-2-medium\",$emphasized:l.showNote,children:`${l.usedText} / ${l.limitText}`}),(0,nI.jsx)($Ot,{ref:o,type:\"button\",\"aria-expanded\":n,\"aria-controls\":\"form-asset-gauge-tip\",\"aria-label\":r(\"tooltipToggle\"),onClick:()=>a((e=>!e)),children:(0,nI.jsx)(cP,{width:16,src:\"/media/google-icons/question_v2.svg\",color:ij})})]}),(0,nI.jsx)(UOt,{children:(0,nI.jsx)(zOt,{$percent:l.percent,$color:qOt[l.level]})}),l.showNote&&(0,nI.jsxs)(VOt,{className:\"body-2\",children:[(0,nI.jsx)(cP,{width:16,src:\"/media/google-icons/warning.svg\",color:Uj}),(0,nI.jsx)(\"span\",{children:\"full\"===l.level?r(\"fullNote\"):r(\"nearNote\",{remain:l.remainText})})]})]}),n&&(0,nI.jsxs)(HOt,{ref:i,id:\"form-asset-gauge-tip\",className:\"body-2\",\"data-testid\":\"form-asset-gauge-tip\",children:[(0,nI.jsx)(\"p\",{children:r(\"tooltipIntro\",{limit:l.limitText})}),(0,nI.jsxs)(\"div\",{children:[(0,nI.jsx)(\"p\",{children:r(\"tooltipItemContentImage\")}),(0,nI.jsx)(\"p\",{children:r(\"tooltipItemQuestionImage\")}),(0,nI.jsx)(\"p\",{children:r(\"tooltipItemMaterial\")}),(0,nI.jsx)(\"p\",{children:r(\"tooltipItemOptionImage\")})]}),(0,nI.jsx)(WOt,{children:r(\"toolti",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "end-private-asset-scope",
+      "symbol": "END/PRIVATE mkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 13190430,
+      "endExclusive": 13193100,
+      "excerptUtf8Sha256": "32c778edc0ca7423777c9fd3a74b25be52cbf92b38406c43d13e756ebbed1f4d",
+      "raw": "3\",children:[(0,nI.jsx)(iI,{className:\"label-1\",color:tj,style:{display:\"flex\",alignItems:\"end\"},children:l(\"endScreenBody\")}),(0,nI.jsx)(M_,{size:\"sm\",type:\"secondary\",text:l(\"resetEndScreenBody\"),disabled:T,onClick:()=>{if(T)return void alert(l(\"phrase.phrase44\"));const e=aUt(m.formLanguage);g.current=e,z(e),f({...m,endPageContent:e})}})]}),(0,nI.jsx)(mkt,{language:m.formLanguage,data:m.endPageContent,immediate:!0,onChangeEditor:e=>{T?alert(l(\"phrase.phrase44\")):(g.current=e,z(e),f({...m,endPageContent:e}))},onLiveChangeEditor:e=>{g.current=e,z(e)},imageUpload:!0,disabled:V,onContentImageChange:C,onBlurEditor:A,assetScope:{catchformId:m.catchformId,assetType:\"END_PAGE_CONTENT_IMAGE\",onUploaded:e=>{let{url:t,fileSize:r,usedBytes:n,limitBytes:a}=e;d(KG(n,r,a)),d(JG(t,r))}}},`end-page-content-${m.formLanguage}`)]}),(0,nI.jsx)(\"div\",{className:\"END\"===N?\"mt-4\":\"mt-6\",children:D&&(0,nI.jsx)(ga,{i18n:M,children:(0,nI.jsx)(\"div\",{dir:F,children:(0,nI.jsx)(_V,{width:40,height:480,title:m.title,content:U,logoFlag:m.activateLogoView,servicePricingType:h.servicePricingType,formLanguage:m.formLanguage,type:\"PREVIEW\"})})})})]}):(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(\"div\",{className:\"mt-6\",children:[(0,nI.jsx)(\"div\",{className:\"mb-2\",children:(0,nI.jsxs)(iI,{className:\"label-1\",color:tj,children:[l(\"privateMessageLabel\"),\" \",(0,nI.jsx)(iI,{span:!0,className:\"label-1-strong\",color:Uj,children:\"*\"})]})}),(0,nI.jsx)(jXe,{value:j,row:!0,size:\"md\",fontStyle:\"label-1-weak\",disabled:V,labelList:[{value:\"BASIC\",label:l(\"useDefaultMessage\")},{value:\"DIRECT\",label:l(\"editCustomMessage\")}],onChange:e=>{if(T)return void alert(l(\"phrase.phrase44\"));const t=e.target.value;I(t);const r={};\"DIRECT\"!==t||_.current||(r.privatePageContent=P,v.current=P,_.current=!0),f({...m,...r}),d(ic({show:!0,type:\"success\",text:l(\"BASIC\"===t?\"defaultPrivateToastOn\":\"defaultPrivateToastOff\"),duration:2500}))}})]}),\"DIRECT\"===j&&(0,nI.jsx)(\"div\",{className:\"mt-4 ai-form-content flex flex-col\",id:\"ck-editor-private\",children:(0,nI.jsx)(mkt,{data:null!==(i=m.privatePageContent)&&void 0!==i?i:\"\",placeholder:R,minHeight:104,immediate:!0,onChangeEditor:e=>{T?alert(l(\"phrase.phrase44\")):(v.current=e,f((t=>({...t,privatePageContent:e}))))},onLiveChangeEditor:e=>{v.current=e},imageUpload:!0,disabled:V,onContentImageChange:S,onBlurEditor:y,assetScope:{catchformId:m.catchformId,assetType:\"PRIVATE_PAGE_CONTENT_IMAGE\",onUploaded:e=>{let{url:t,fileSize:r,usedBytes:n,limitBytes:a}=e;d(KG(n,r,a)),d(JG(t,r))}}})}),(0,nI.jsx)(\"div\",{className:\"mt-6\",children:D&&(0,nI.jsx)(ga,{i18n:M,children:(0,nI.jsx)(\"div\",{dir:F,children:(0,nI.jsx)(UV,{width:40,height:480,title:m.title,useD",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "consent-editor-html",
+      "symbol": "S/mkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 13041900,
+      "endExclusive": 13042400,
+      "excerptUtf8Sha256": "7cded5cf63f829aefc520dc1d42f8ff7373fdf47fd8f0dd47c2119a7b0596a03",
+      "raw": "egory||n.agreementCategory||\"\",x=\"CLOSE\"!==n.agreementViewType,A=n.title||n.agreementTitle||\"\",[y,w]=(0,yt.useState)(A);(0,yt.useEffect)((()=>{w(A)}),[A]);const C=(0,yt.useCallback)((()=>{y!==A&&l(t,r,{title:y,agreementTitle:y})}),[y,A,l,t,r]),S=(0,yt.useCallback)((e=>{const n=Mpt(e);l(t,r,{content:n,agreementContent:n,mainPurpose:n.replace(/<[^>]*>/g,\"\").replace(/&nbsp;/g,\" \").slice(0,300)})}),[l,t,r]),T=(0,yt.useCallback)((e=>{const n=e.target.value,a={consentCategory:n,agreementCategory:n,...",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "consent-editor-upload",
+      "symbol": "mkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 13045000,
+      "endExclusive": 13046155,
+      "excerptUtf8Sha256": "329090ccb83b83fff755b6aac90cd2c4f1a64e9e2e53e7065e41baac4f72a6bc",
+      "raw": "r:()=>d(v),onFocus:()=>d(v),onClick:j,children:(0,nI.jsx)(cP,{src:\"/img/google-icons-v2/marks/help_black.svg\",width:16,color:sj})})]}),o&&(0,nI.jsxs)($Ft,{children:[(0,nI.jsx)(iI,{className:\"body-2-strong\",color:ej,children:g(\"content.guideTitle\")}),(0,nI.jsx)(HFt,{children:m.map((e=>(0,nI.jsx)(\"li\",{children:(0,nI.jsx)(iI,{className:\"body-2\",color:ej,children:e})},e)))}),(0,nI.jsx)(iI,{className:\"body-2-strong\",color:ej,children:g(\"content.guideExampleLabel\")}),(0,nI.jsx)(WFt,{children:f.map(((e,t)=>(0,nI.jsx)(qFt,{children:e.map((e=>(0,nI.jsx)(iI,{className:\"body-2\",color:ej,children:e},e)))},t)))})]}),(0,nI.jsx)(\"div\",{dir:i,children:(0,nI.jsx)(mkt,{height:200,minHeight:200,imageUpload:!0,language:s,data:n.content||n.agreementContent||\"\",onChangeEditor:S,onContentImageChange:e=>{let{nextHtml:t}=e;return S(t)}},`${t}-${r}-${s}`)})]})]}),(0,nI.jsxs)(iI,{className:\"label-1 cursor-pointer flex items-center gap-2\",color:sj,onClick:N,children:[(0,nI.jsx)(BU,{src:x?\"/img/google-icons-v2/arrows/caret-up.svg\":\"/img/google-icons-v2/arrows/caret-down.svg\",width:24,color:sj}),g(x?\"collapse\":\"expand\")]})]})})]})})),dBt=(0,yt.memo)((function(e){let",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "consent-html-cleaning",
+      "symbol": "Mpt/Fpt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 11579615,
+      "endExclusive": 11580790,
+      "excerptUtf8Sha256": "064455974842db7bf40cf5a24530525ba4ca9158766b242e8b50ed595424df9b",
+      "raw": "e(/<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>/gi,\"\").replace(/<iframe\\b[^<]*(?:(?!<\\/iframe>)<[^<]*)*<\\/iframe>/gi,\"\").replace(/<\\/?iframe\\b[^>]*>/gi,\"\").replace(/\\son\\w+\\s*=\\s*\"[^\"]*\"/gi,\"\").replace(/\\son\\w+\\s*=\\s*'[^']*'/gi,\"\").replace(/\\son\\w+\\s*=\\s*[^\\s>]+/gi,\"\");do{t=r,r=r.replace(/javascript:/gi,\"\").replace(/vbscript:/gi,\"\").replace(/data\\s*:\\s*text\\/html/gi,\"\")}while(r!==t);return r},Lpt=e=>\"string\"===typeof e&&\"ko\"!==e&&mH.includes(e),Dpt=e=>\"NOTICE\"===(null===e||void 0===e?void 0:e.consentCategory)||\"NOTICE\"===(null===e||void 0===e?void 0:e.agreementCategory),Fpt=e=>{const t=(null===e||void 0===e?void 0:e.consentCategory)||(null===e||void 0===e?void 0:e.agreementCategory),r=(null===e||void 0===e?void 0:e.title)||(null===e||void 0===e?void 0:e.agreementTitle)||(null===e||void 0===e?void 0:e.name),n=(null===e||void 0===e?void 0:e.content)||(null===e||void 0===e?void 0:e.agreementContent)||(null===e||void 0===e?void 0:e.contents)||(null===e||void 0===e?void 0:e.body);return!!t&&(!!(Dpt(e)||null!==e&&void 0!==e&&e.consentType)&&(!!Opt(r)&&!!(Opt(a=n)||\"string\"===typeof a&&jpt(a).length>0)));var a},Bpt=e=>{var t,r,n,a,o,i;const s=Lpt(e.formLangua",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "pdf-async-request",
+      "symbol": "Re",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12198805,
+      "endExclusive": 12199428,
+      "excerptUtf8Sha256": "eb569a68704d9154595da4bcc027cbf910dd8e35623fd0d711f2e249341a8b1b",
+      "raw": "0),function(e,t,r,n,a){return At.post(`${PE}/company-operated-service/form/${e}/compress/replies/pdf`,{customerIds:[t],rrnMaskingOption:r,pdfFormat:MAe,pageIds:Array.isArray(n)?n:[],includeConsent:!!a})}(null===Le||void 0===Le||null===(r=Le.formBasicInfo)||void 0===r?void 0:r.formId,q,t,null===e||void 0===e?void 0:e.pageIds,null===e||void 0===e?void 0:e.includeConsent).then((()=>(Ce({show:!1}),Te({show:!1}),Ne({show:!0}),!0))).catch((e=>{const t=Agt(e);return\"importantIp\"===t.kind?(Ce({show:!1}),Te({show:!1}),ae({show:!0,data:{firstText:L(\"phrase.phrase1\"),secondText:L(\"phrase.phrase2\"),title:L(\"phrase.phrase3\")}}),",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "pdf-direct-request",
+      "symbol": "HAt onConfirm",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12208640,
+      "endExclusive": 12209210,
+      "excerptUtf8Sha256": "7a899ac04d6cb5283c1ff0f0681b09e7e31ecbc3c2709957a2527572678f22b2",
+      "raw": "==Le||void 0===Le||null===(y=Le.formBasicInfo)||void 0===y?void 0:y.formId},onConfirm:e=>{var t;let{reason:r,rrnMaskingOption:n}=e;return function(e,t,r,n){return At.post(`${PE}/company-operated-service/form/${e}/compress/reply/pdf/${t}`,{reason:r,rrnMaskingOption:n},{responseType:\"blob\"})}(null===Le||void 0===Le||null===(t=Le.formBasicInfo)||void 0===t?void 0:t.formId,q,r,n).then((e=>{var t,r,n;const a=null!==(t=null===(r=e.headers)||void 0===r?void 0:r[\"content-disposition\"])&&void 0!==t?t:\"\",o=/filename\\*?=(?:UTF-8'')?[\"']?([^;\"'\\n]+)/i.exec(a),i=o?decodeURICom",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "edit-rejection-temp-cleanup",
+      "symbol": "v$/k",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units, zero-based start, end exclusive",
+      "start": 12893358,
+      "endExclusive": 12894220,
+      "excerptUtf8Sha256": "45fcb5abdcf9b6982ba0b49515c93c8f26abe839520866f4f4acfc5d57b9e0fc",
+      "raw": ",N(t,n)})).finally((()=>{b(!0)}))}})),tk(\"isEnterprise\")&&r(qM()),()=>{r(nY())};v$(C.state.catchformId).then((e=>{const{catchFormProgress:t,catchFormId:r}=e.data;b(!0),N(t,r)})).catch((e=>{let r=400!==e.response.status&&t(\"alert.phrase4\");const n=e.response.data.message;\"not exists required question\"===n?r=t(\"alert.phrase5\"):\"active form cannot update\"===n?(r=t(\"alert.phrase6\"),o(\"/form/manage\")):\"reply exist form cannot update\"===n&&(r=t(\"alert.phrase7\"),o(\"/form/manage\")),alert(r)}))}),[]);const k=()=>{var e;h(!1),function(e){return At.delete(`${PE}/company-operated-service/catch-form/asset/temp`,{params:{catchformId:e}})}(f).catch((()=>{}));const t=null===(e=C.state)||void 0===e?void 0:e.isEdit;switch(x){case\"V3_BASIC_SAVE\":case\"V3_AGREEMENT_TEMP\":o(\"/form/ai/agreement\",{state:{catchformId:f,version:\"v3\",isEdit:t}});break;case\"V3_AGREEMENT_SAVE\":L",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-admin-preview-raw-html",
+      "symbol": "PREVIEW pageContent QO renderer",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; end exclusive",
+      "start": 8457040,
+      "endExclusive": 8458400,
+      "excerptUtf8Sha256": "38fde13c930b7ab71e4212f9f368e2d40d6ac75ae4532e9cb67a2f596fa6e1f5",
+      "raw": ",nI.jsxs)(iI,{className:\"body-2\",color:Ij,children:[\"\\u203b \",_(\"phrase.phrase22\")]}),(0,nI.jsxs)(iI,{className:\"body-2\",color:Ij,children:[\"\\u203b \",_(\"phrase.phrase23\")]})]}),\"PREVIEW\"===b?N&&M&&Array.isArray(null===p||void 0===p?void 0:p.pages)&&p.pages.length>0?(()=>{const e=p.pages.reduce(((e,t)=>{var r;return e+((null===t||void 0===t||null===(r=t.questions)||void 0===r?void 0:r.length)||0)}),0);let t=0,r=Math.max(0,((null===M||void 0===M?void 0:M.length)||0)-e);return p.pages.map(((e,n)=>{const a=!(null===e||void 0===e||!e.pageTitle),o=(null===e||void 0===e?void 0:e.pageContent)&&\"<p></p>\"!==e.pageContent,i=n>0&&(a||o);return(0,nI.jsxs)(yt.Fragment,{children:[n>0&&(0,nI.jsx)(iI,{className:\"body-2-strong\",color:sj,style:{marginTop:14},children:_(\"pageLabel\",{number:te(e,n)})}),i&&(0,nI.jsxs)(n5,{children:[a&&(0,nI.jsx)(iI,{className:\"subtitle-1 !break-normal\",color:tj,children:e.pageTitle}),a&&o&&(0,nI.jsx)(\"div\",{style:{background:uj,height:1,width:\"100%\",marginTop:24,marginBottom:24}}),o&&(0,nI.jsx)(\"div\",{className:\"ck-content no-tailwindcss-base\",style:{color:ej,marginTop:0},children:QO()(e.pageContent.replace(/\\n/g,\"\"))})]}),((null===e||void 0===e?void 0:e.questions)||[]).map((e=>{var a;const o=null!==(a=null===M||void 0===M?void 0:M[r])&&void 0!==a?a:e;if(r++,\"SIGNATURE\"===e.questionType)return null;const i=t++;return(0,nI.jsx)",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-admin-reply-raw-html",
+      "symbol": "admin reply content/pageContent useMemo",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; end exclusive",
+      "start": 8484140,
+      "endExclusive": 8485000,
+      "excerptUtf8Sha256": "1fb1fbd73df0f4737871772128e0b022f5d23918e7784c55c7ee715b98474bb2",
+      "raw": ",yt.useMemo)((()=>{const e={};return null===A||void 0===A||A.forEach(((t,r)=>{var n;const a=null===t||void 0===t||null===(n=t[0])||void 0===n?void 0:n.questionId;void 0!==a&&null!==a&&(e[String(a)]=r)})),e}),[A]),Z=(0,yt.useMemo)((()=>{const e=null===r||void 0===r?void 0:r.content;return e&&\"<p></p>\"!==e?QO()(CY(e.replace(/\\n/g,\"\"))):null}),[null===r||void 0===r?void 0:r.content]),ee=(0,yt.useMemo)((()=>Y.map((e=>{var t;const r=null!==(t=null===e||void 0===e?void 0:e.pageContent)&&void 0!==t?t:null===e||void 0===e?void 0:e.content;return r&&\"<p></p>\"!==r?QO()(r.replace(/\\n/g,\"\")):null}))),[Y]),te=e=>{const{mode:t,count:r}=dG(e),n=pG(oG(e),t);return n?(0,nI.jsx)(iI,{className:\"body-2 mb-2\",color:aj,children:B(n,{count:r})}):null},re=(e,t)=>{var r,n,a,o,i;switch(e.questionType){case\"FOREIGN_ADDRESS\":return(0,nI.jsx)(v5,{variant:\"input\",reply:null!==(",
+      "reusedFrom": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/question-metadata/content-images/source-review.json"
+    },
+    {
+      "id": "body-v3-write",
+      "symbol": "C_t / S_t",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12625323,
+      "endExclusive": 12626800,
+      "excerptUtf8Sha256": "99c5c80a8c810404268f8599712a1e0e57d6c0c6056c6652fc503bca46dc1e6f",
+      "raw": "C_t=e=>{const t=[];return e.pageList.forEach(((e,r)=>{t.push({page:e.page,pageTitle:0===r?\"\":e.pageTitle,pageContent:0===r?\"\":e.pageContent,pageOffset:e.pageOffset,questionList:e.questionList.map((e=>{return{nlpFeedbackId:e.nlpFeedbackId,title:e.title,additionalExplanation:e.description,catchFormQuestionType:e.elementType,questionOptionList:(t=kG(e.elementType,e.questionOptionList),Array.isArray(t)?t.map((e=>{const{optionImageUrl:t,imageUrl:r,optionImageFileSize:n,optionImageUploadToken:a,...o}=null!==e&&void 0!==e?e:{};return{...o,optionImageKey:SG(e)}})):[]),matrixOptionData:e.matrixOptionData,usePageOffset:e.usePageOffset,required:e.isRequired,useSecureKeyStroke:!1,...hG(e),...qY(e),materialList:lQ(e),...h_t(e),catchFormPersonalInformationRequests:w_t(e.detectedItems)};var t}))})})),t},S_t=(e,t)=>{var r;const n=$u.getState().form.constraint;let a={};return a={constraint:{chooseCollectLimitAmount:n.chooseCollectLimitAmount,collectLimitAmount:n.collectLimitAmount,chooseCollectOpenTime:n.chooseCollectOpenTime,collectOpenTime:n.collectOpenTime,collectOpenHour:\"none\"==n.collectOpenHour?null:n.collectOpenHour,chooseCollectEndTime:n.chooseCollectEndTime,collectEndTime:n.collectEndTime,collectEndHour:\"none\"==n.collectEndHour?null:n.collectEndHour,allowPageBack:n.allowPageBack},accessControl:Gvt(n),catchformId:e.catchformId,serviceId:t,title:e.title,mainText:e.description||\"<p></p>\",formLanguage:null!==(r=e.formLanguage)&&void 0!==r?r:\"ko\",pageList:C_t(e)},a}"
+    },
+    {
+      "id": "body-v3-api",
+      "symbol": "f$ / g$ / v$",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 7916120,
+      "endExclusive": 7916430,
+      "excerptUtf8Sha256": "a6675c3182c625240450cbd3d79bd49d3cb9f974fdb6a68c081c773fa7d8d9e6",
+      "raw": "pany-operated-service/v3/catch-form/basic/paths?catchformId=${e}`)}function g$(e){return At.post(`${PE}/company-operated-service/v3/catch-form/basic/temp`,e)}function v$(e){return At.get(`${PE}/company-operated-service/v3/catch-form/basic`,{params:{catchformId:e}})}function b$(e){return At.get(`${PE}/company-"
+    },
+    {
+      "id": "body-final-save",
+      "symbol": "POST v3/catch-form/basic",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12806689,
+      "endExclusive": 12807100,
+      "excerptUtf8Sha256": "5f94b035742257c5b2699c429963d73fa624a60935921c6fd3f9ede64c2f0956",
+      "raw": "onst L=S_t(e,u),D=((e,t)=>{const r=e=>e.map((e=>JSON.stringify([e.type,e.name]))).sort(),n=r(T_t(e)),a=r(t);return n.length!==a.length||n.some(((e,t)=>e!==a[t]))})(L.pageList,h);var F;(F=L,At.post(`${PE}/company-operated-service/v3/catch-form/basic`,F)).then((r=>{t(aY(e.catchformId,zNt(null,FNt(e)))),A$(e.catchformId).then((e=>{var t,r,n,i;((null===(t=e.data)||void 0===t||null===(r=t.paths)||void 0===r||null"
+    },
+    {
+      "id": "page-initial-shape",
+      "symbol": "formModelV3.pageList",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 6914751,
+      "endExclusive": 6915275,
+      "excerptUtf8Sha256": "e7777823319421fea660728681a35fdd60f9967998c3eccc735a4e1c2b3b5ed7",
+      "raw": "tQuestionList:[]}},formModelV3:{formLanguage:\"ko\",title:\"\",content:\"\",catchformId:0,catchFormProgress:\"\",useSecureKeyStroke:!1,pageList:[{page:1,pageTitle:\"\",pageContent:\"\",pageOffset:-2,questionList:[{nlpFeedbackId:null,isRequired:!0,usePageOffset:!1,currentTitle:\"\",title:\"\",description:\"\",elementType:\"TEXTBOX\",questionOptionList:[],matrixOptionData:null,detectedItems:[]}]}],constraint:{chooseCollectLimitAmount:!1,collectLimitAmount:null,chooseCollectOpenTime:!1,collectOpenTime:null,collectOpenHour:null,chooseCollectE"
+    },
+    {
+      "id": "page-read-and-numbering",
+      "symbol": "A_t / y_t",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12624715,
+      "endExclusive": 12625104,
+      "excerptUtf8Sha256": "c2f456b51f04d92efebdc033d640c3f81624eaf424d2e8109db1aafb3515f0a3",
+      "raw": "A_t=e=>{let t=1;return e.map((e=>({...e,_dragKey:e._dragKey||Math.random().toString(36).substring(2,11),questionList:e.questionList.map((e=>{const r=t;return\"IDV\"===e.elementType?t+=e.questionOptionList.length:t++,{...e,questionNumber:r}}))})))},y_t=(e,t)=>{let r=null;return e.pageList.forEach(((e,n)=>{e.questionList.forEach(((e,a)=>{e.questionNumber===t&&(r={pageIndex:n,questionIndex:a"
+    },
+    {
+      "id": "page-create-limit",
+      "symbol": "add-page handler",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12758943,
+      "endExclusive": 12759666,
+      "excerptUtf8Sha256": "61ab514a0e552bed6b62a877b8b8f429ae752d6ad82c108bbb67b3d9dcc8dd2c",
+      "raw": "}),[r,a]),b=(0,yt.useCallback)((()=>{const e=$u.getState().form.formModelV3;if(e.pageList.length>=50)return void h({...u,show:!0});const t=[...e.pageList.slice(0,r+1).map(((e,t)=>({...e,pageIndex:t+1}))),{page:r+2,pageTitle:\"\",pageContent:\"\",pageOffset:-2,pageIndex:r+2,questionList:[{nlpFeedbackId:null,isRequired:!0,usePageOffset:!1,currentTitle:\"\",title:\"\",description:\"\",elementType:\"TEXTBOX\",questionOptionList:[],matrixOptionData:null,detectedItems:[]}]},...e.pageList.slice(r+1).map(((e,t)=>({...e,pageIndex:r+2+t+1})))],n=A_t(t);a(QG({...e,pageList:n})),setTimeout((()=>{k_t(r+1)}),0)}),[r,u,a]);return(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsx)(G_t,{dragClass:\"opacity-ghost drag-border\",nonDragAreaSelector:\".no"
+    },
+    {
+      "id": "page-order-drag",
+      "symbol": "page drag onDrop",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12832135,
+      "endExclusive": 12833200,
+      "excerptUtf8Sha256": "2ddaa7dfca9dd8232cb9b9320141bfcce095543e8e4b1b3d432b3bf379058507",
+      "raw": "function(e){let{removedIndex:t,addedIndex:r}=e;if(null===t||null===r)return;if(t===r)return;if(t+=1,r+=1,0===t)return;let n=!1;const s=(0,tK.cloneDeep)(o.pageList),[c]=s.splice(t,1);s.splice(r,0,c);const d=f_t(o.pageList),p=f_t(s),m=N_t(d,p),f=(0,tK.cloneDeep)(o.pageList);if((!m||d.findIndex((e=>e.includes(r)))>-1||d.findIndex((e=>e.includes(t)))>-1)&&(f.map(((e,t)=>{e.pageOffset>=1?(e.pageOffset=-2,n=!0):e.questionList.map(((e,t)=>{e.usePageOffset&&(e.usePageOffset=!1,\"RADIO\"!==e.elementType&&\"SELECTBOX\"!==e.elementType||e.questionOptionList.map(((e,t)=>{e.pageOffset=-2})),n=!0)}))})),n)){l((e=>e+1));const[e]=f.splice(t,1);return f.splice(r,0,e),i.current=null,void h({show:!0,data:{...u.data,handleConfirm:async()=>{const e=A_t(f);a(QG({...o,pageList:e})),requestAnimationFrame((()=>{setTimeout((()=>k_t(r)),50)}))}}})}const[g]=f.splice(t,1);f.splice(r,0,g);const v=A_t(f);a(QG({...o,pageList:v})),requestAnimationFrame((()=>{setTimeout((()=>k_t(r)),50)}))}(e)},dragHandleSelector:\".cursor-grab\",children:o.pageList.slice(1).map(((e,t)=>{const n=t+1;retur"
+    },
+    {
+      "id": "page-identity-reducer",
+      "symbol": "formModelFetchedV3",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 6924095,
+      "endExclusive": 6924207,
+      "excerptUtf8Sha256": "99d0180abeea4304bca7a82a0d4614c26867148c17fb66d005c27fafa90c57eb",
+      "raw": "formModelFetchedV3:(e,t)=>{const{formModel:r}=t.payload;e.listLoading=!1,e.formModelV3={...e.formModelV3,...r}},"
+    },
+    {
+      "id": "page-branch-capability",
+      "symbol": "r_t / n_t",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12618853,
+      "endExclusive": 12619430,
+      "excerptUtf8Sha256": "0b51afe6e5a51f38168a20f1da91e83b428d2b9b7ff262d6d6ac0682fc6036b3",
+      "raw": "e\"],r_t=e=>{var t,r;return null!==(t=null!==(r=null===e||void 0===e?void 0:e.elementType)&&void 0!==r?r:null===e||void 0===e?void 0:e.catchFormQuestionType)&&void 0!==t?t:null===e||void 0===e?void 0:e.questionType};function n_t(e){return\"string\"!==typeof e||\"\"===e||\"IDV\"===e?[]:\"RADIO\"===e?[\"questionImage\",\"questionMaterial\",\"optionImage\",\"pageOffset\"]:\"CHECKBOX\"===e?[\"questionImage\",\"questionMaterial\",\"optionImage\"]:\"SELECTBOX\"===e?[\"questionImage\",\"questionMaterial\",\"pageOffset\"]:[\"questionImage\",\"questionMaterial\"]}const a_t=e=>n_t(e).length>0,o_t=(e,t)=>n_t(e).includ"
+    },
+    {
+      "id": "page-branch-enumeration",
+      "symbol": "m_t / f_t",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12621041,
+      "endExclusive": 12621688,
+      "excerptUtf8Sha256": "30ab7a05257c474d2c9232d38909197d57004363c6adda359a8450e111694f06",
+      "raw": "const m_t=e=>null==e||e<1?1:e,f_t=e=>{if(!e||0===e.length)return[];const t=[],r=new Array(e.length).fill(!1);!function n(a,o){if(a>=e.length)return void t.push([...o]);o.push(a),r[a]=!0;const i=e[a],s=new Set;let l=!1;for(let e=(null===(c=i.questionList)||void 0===c?void 0:c.length)-1;e>=0;e--){var c;const t=i.questionList[e];if(t.usePageOffset){var d;l=!0,null===(d=t.questionOptionList)||void 0===d||d.forEach((e=>{const t=m_t(e.pageOffset);t!==UB&&s.add(t)})),t.isRequired||s.add(1);break}}l||s.add(m_t(i.pageOffset));const u=Array.from(s).sort(((e,t)=>e-t));for(const e of u)n(a+e,o);o.pop()}(0,[]);for(let n=0;n<r.length;n++)r[n];return t};"
+    },
+    {
+      "id": "page-branch-sentinels",
+      "symbol": "pageOffset selector / question branch disables page branch",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12777721,
+      "endExclusive": 12778426,
+      "excerptUtf8Sha256": "0a93d42c4ef979dc2f2de0eedb221b44699a0dcb6765dd316fb8e2f867a58ef6",
+      "raw": "!0}}):W(e,!1)};(0,yt.useEffect)((()=>{if(p-t>0){const e=[];e.push({value:-2,text:\"\\ub2e4\\uc74c \\ud398\\uc774\\uc9c0\\ub85c \\uc774\\ub3d9\"});for(let r=t+1;r<p;r++)e.push({value:r-t,text:r+1+\"\\ud398\\uc774\\uc9c0\\ub85c \\uc774\\ub3d9\"});e.push({value:99,text:\"\\uc218\\uc9d1\\xb7\\uc774\\uc6a9 \\ub3d9\\uc758 \\ud398\\uc774\\uc9c0\\ub85c \\uc774\\ub3d9\"}),v(e)}x(h.pageOffset)}),[p]),(0,yt.useEffect)((()=>{x(h.pageOffset)}),[h.pageOffset]),(0,yt.useEffect)((()=>{h.questionList.findIndex((e=>!0===e.usePageOffset))>-1?(x(-2),f(!0),-2!==h.pageOffset&&(e=>{const r=(0,tK.cloneDeep)($u.getState().form.formModelV3.pageList);r[t]={...h,pageOffset:e},a(QG({...$u.getState().form.formModelV3,pageList:r}))})(-2)):f(!1)}),[h.questionL"
+    },
+    {
+      "id": "page-path-kill",
+      "symbol": "UB",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 7824732,
+      "endExclusive": 7824740,
+      "excerptUtf8Sha256": "dd078cb0f33058161b012c01dff96ac0fc04d0b63ff836f68a3ad4871baedb1b",
+      "raw": "UB=99999"
+    },
+    {
+      "id": "page-preview-path",
+      "symbol": "preview page offset",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12878500,
+      "endExclusive": 12879430,
+      "excerptUtf8Sha256": "3c071b4592aee82e854ed9142982f500e1788ea20661f09df19ffb56791a0466",
+      "raw": ";const a=null===e||void 0===e||null===(t=e.pageList)||void 0===t?void 0:t[f],o=null===a||void 0===a?void 0:a.pageOffset,i=null===c||void 0===c||null===(r=c[f])||void 0===r?void 0:r.pageOffset;let s=yLt(o&&-2!==o?o:i);const l=null===a||void 0===a||null===(n=a.questionList)||void 0===n?void 0:n.find((e=>(\"RADIO\"===e.elementType||\"SELECTBOX\"===e.elementType)&&e.usePageOffset));if(null!==l&&void 0!==l&&l.value){var d;const e=null===(d=l.questionOptionList)||void 0===d?void 0:d.find((e=>String(e.value)===String(l.value)));null!==e&&void 0!==e&&e.pageOffset&&(s=yLt(e.pageOffset))}return s})(t);if(o===UB)return void _({show:!0,message:U(\"phrase.phrase80\"),type:\"PATH_KILL\",data:{},onClick:null});const i=f+o;99===o||i>c.length-1?_({show:!0,message:U(\"previewModal.unavailableNextAlert\"),type:\"\",data:{},onClick:null}):(S(!0),g(i),w([...y,i]))},H=(0,yt.useMemo)((()=>{if(!a)return null;const e=a.chooseCollectOpenTime?Uq(a.collect"
+    },
+    {
+      "id": "page-runtime-response-id",
+      "symbol": "reply pages serializer",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 10058517,
+      "endExclusive": 10058825,
+      "excerptUtf8Sha256": "bff58c345f549d8ed2eae9d31293103c64d0aa3818358b0e3b7cd6866df5b68e",
+      "raw": "return{questionId:e.questionId,questionType:e.questionType,\"@type\":e.questionType,subType:e.questionSubType,questionIndex:e.orderNumber,required:e.questionElementType,value:y}}));return{pageId:e.pageId,pageIndex:t,replies:r}}));return{formId:t.formId,passedPath:m,requestUser:l,userMTxId:c||null,pages:g,agre"
+    },
+    {
+      "id": "page-one-branch-validation",
+      "symbol": "question usePageOffset count guard",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12805413,
+      "endExclusive": 12806094,
+      "excerptUtf8Sha256": "90c0b7e0d1305bab2a28b215529274bff4f7b770cb920ac66ff815e5429f5f4a",
+      "raw": "th\",block:\"start\"})}),0),T({show:!1})},isShowCancelButton:!1}}),!1;const M=function(e){const t=[];return e.pageList.forEach(((e,r)=>{const n=e.questionList.filter((e=>!0===e.usePageOffset)).length;return n>=2?t.push({pageIndex:r,count:n}):null})),(null===t||void 0===t?void 0:t.length)>0?t[0]:null}(e);if(M)return T({show:!0,data:{title:E(\"phrase.phrase114\"),body:(0,nI.jsxs)(Z_t,{children:[(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:E(\"phrase.phrase115\",{page:M.pageIndex+1})}),(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:E(\"phrase.phrase116\")}),(0,nI.jsx)(iI,{className:\"body-1-strong\",color:ej,children:E(\"phrase.phrase117\")})]}),cancelButtonText:"
+    },
+    {
+      "id": "body-upload-scope",
+      "symbol": "vNt / bNt / ANt / wNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12342645,
+      "endExclusive": 12343077,
+      "excerptUtf8Sha256": "02ebbf64d451d6a5ff410a0a131f97c1511112aa550e7f04222eaeae0519f165",
+      "raw": "let xNt=Promise.resolve();function ANt(e){const t=xNt.then(e,e);return xNt=t.catch((()=>{})),t}async function yNt(e,t){return ANt((async()=>{const r=e();return null!==r&&void 0!==r?{ok:!1,reason:r}:{ok:!0,result:await t()}}))}const wNt=e=>null!==(null===e||void 0===e?void 0:e.catchformId)&&void 0!==(null===e||void 0===e?void 0:e.catchformId)&&0!==e.catchformId&&\"\"!==e.catchformId,CNt=[\"image/jpeg\",\"image/jpg\",\"image/png\"];functi"
+    },
+    {
+      "id": "body-owned-url-filter",
+      "symbol": "TNt / kNt / jNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12344814,
+      "endExclusive": 12345246,
+      "excerptUtf8Sha256": "aa0797f3f0acf2be6a9baf088aead6522e1a0245840fc13d7aeaf71400fd9e61",
+      "raw": "st TNt=e=>\"string\"===typeof e&&\"\"!==e.trim()?e:null,ENt=e=>\"number\"===typeof e&&Number.isFinite(e)?e:0,NNt=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.[a-z0-9]+$/i;function kNt(e){if(\"string\"!==typeof e||\"\"===e.trim())return!1;if(/^data:/i.test(e.trim()))return!1;const t=e.split(/[?#]/)[0];return NNt.test(t.slice(t.lastIndexOf(\"/\")+1))}const jNt=(e,t)=>({assetType:e,originS3Key:t,targetAssetType:e});function "
+    },
+    {
+      "id": "asset-copy-api",
+      "symbol": "U$",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 7918976,
+      "endExclusive": 7919081,
+      "excerptUtf8Sha256": "6f1ee404b8768dbcf0c96627763f7cc2e61d07ea3e3a584665169553776ae7f5",
+      "raw": "function U$(e){return At.post(`${PE}/company-operated-service/catch-form/asset/copy`,e)}const z$={regDtm:"
+    },
+    {
+      "id": "editor-import",
+      "symbol": "dNt module42394 / uNt module59589",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12340948,
+      "endExclusive": 12341014,
+      "excerptUtf8Sha256": "7122d7c47fb3f1b99b0cc61a7abca0c4550d7e01ecc736cf17d6f8363a20b325",
+      "raw": "var dNt=__webpack_require__(42394),uNt=__webpack_require__(59589);"
+    },
+    {
+      "id": "editor-custom-model-width",
+      "symbol": "tkt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12351178,
+      "endExclusive": 12353520,
+      "excerptUtf8Sha256": "0f0de77c1e59a42d295ff542cb3dfc22b35176e15bf6956d98b14519757a9f9f",
+      "raw": "3 3v2h18V3H3z\"/></svg>'}];function tkt(e){const t=e.model.schema;XNt.forEach((e=>{t.isRegistered(e)&&t.extend(e,{allowAttributes:\"width\"})})),t.isRegistered(\"media\")&&t.extend(\"media\",{allowAttributes:\"alignment\"}),XNt.forEach((t=>{e.conversion.for(\"downcast\").add((e=>{e.on(`attribute:width:${t}`,((e,t,r)=>{if(!r.consumable.consume(t.item,e.name))return;const n=r.mapper.toViewElement(t.item);if(!n)return;const a=r.writer;null!==t.attributeNewValue&&void 0!==t.attributeNewValue?a.setStyle(\"width\",t.attributeNewValue,n):a.removeStyle(\"width\",n)}))}))})),e.conversion.for(\"downcast\").add((e=>{e.on(\"attribute:alignment:media\",((e,t,r)=>{if(!r.consumable.consume(t.item,e.name))return;const n=r.mapper.toViewElement(t.item);if(!n)return;const a=r.writer;a.removeClass([\"media-align-left\",\"media-align-center\",\"media-align-right\"],n);const o=t.attributeNewValue;\"left\"!==o&&\"center\"!==o&&\"right\"!==o||a.addClass(`media-align-${o}`,n)}))})),e.conversion.for(\"upcast\").add((e=>{e.on(\"element:figure\",((e,t,r)=>{var n;const a=t.viewItem;if(!a||null===(n=a.hasStyle)||void 0===n||!n.call(a,\"width\"))return;const o=a.getStyle(\"width\");if(t.modelRange)for(const s of t.modelRange.getItems())if(s.is&&s.is(\"element\",\"image\"))return void r.writer.setAttribute(\"width\",o,s);const i=t.modelCursor;if(i){const e=i.parent;if(e&&e.getChildren){const t=Array.from(e.getChildren());for(let e=t.length-1;e>=0;e--){const n=t[e];if(n.is&&n.is(\"element\",\"media\"))return void r.writer.setAttribute(\"width\",o,n)}}}}),{priority:\"lowest\"})})),e.conversion.for(\"upcast\").add((e=>{e.on(\"element:figure\",((e,t,r)=>{const n=t.viewItem;if(!n||!n.hasClass)return;let a=null;if(n.hasClass(\"media-align-left\")?a=\"left\":n.hasClass(\"media-align-right\")?a=\"right\":n.hasClass(\"media-align-center\")&&(a=\"center\"),!a)return;const o=t.modelCursor;if(!o)return;const i=o.parent;if(i&&i.getChildren){const e=Array.from(i.getChildren());for(let t=e.length-1;t>=0;t--){const n=e[t];if(n.is&&n.is(\"element\",\"media\"))return void r.writer.setAttribute(\"alignment\",a,n)}}}),{priority:\"lowest\"})}));const{container:r,handles:n,alignToolbar:a,alignButtons:o}=function(){let e=document.getElementById(\"cs-ck-resize-overlay\");const t=new Map,r=new Map;if(e){ZNt.forEach((r=>{const n=e.querySelector(`[data-handle=\"${r.position}\"]`);n&&t.set(r.position,n)}));const n=document.getElementById(\""
+    },
+    {
+      "id": "editor-align-interaction",
+      "symbol": "media alignment click",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12356709,
+      "endExclusive": 12356900,
+      "excerptUtf8Sha256": "37b7d3c4e5907faa3dbcaef0a4db9afefe980c6375207e28d6624899252f4b5f",
+      "raw": "t=>{t.preventDefault(),t.stopPropagation(),s&&\"media\"===s.name&&e.model.change((e=>{e.setAttribute(\"alignment\",r,s)}))}))})),e.model.document.selection.on(\"change:range\",(()=>{Promise.resolve"
+    },
+    {
+      "id": "editor-font-presets",
+      "symbol": "okt / skt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12359032,
+      "endExclusive": 12359277,
+      "excerptUtf8Sha256": "3923031f3f79ec2d78fa8fd6906f09377e5b59b54c1066fb6127fd11d97c2302",
+      "raw": "const okt=[12,14,15,16,20,24,32],ikt=\"\\ud3f0\\ud2b8 \\ud06c\\uae30\",skt=[\"#181818\",\"#282828\",\"#383838\",\"#585858\",\"#b8b8b8\",\"#d8d8d8\",\"#e8e8e8\",\"#f8f8f8\",\"#ab4642\",\"#dc9656\",\"#f7ca88\",\"#a1b56c\",\"#86c1b9\",\"#7cafc2\",\"#ba8baf\",\"#a16946\"],lkt=\"#ab4642\";"
+    },
+    {
+      "id": "editor-font-converters",
+      "symbol": "ukt fontSize / fontColor",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12359930,
+      "endExclusive": 12361251,
+      "excerptUtf8Sha256": "ead5999d3ee58cf28d5f2f7a4cdaaea04750ce8df3dc094a3cc7d4e9959ea502",
+      "raw": "!function(e){const t=e.model.schema;t.extend(\"$text\",{allowAttributes:[\"fontSize\",\"fontColor\"]}),e.conversion.for(\"downcast\").attributeToElement({model:\"fontSize\",view:(e,t)=>{let{writer:r}=t;return e?r.createAttributeElement(\"span\",{style:`font-size:${e}px;`},{priority:7}):null}}),e.conversion.for(\"upcast\").elementToAttribute({view:{name:\"span\",styles:{\"font-size\":/^(\\d+)px$/}},model:{key:\"fontSize\",value:e=>{const t=e.getStyle(\"font-size\"),r=/^(\\d+)px$/.exec(t||\"\");return r?parseInt(r[1],10):null}}}),e.conversion.for(\"downcast\").attributeToElement({model:\"fontColor\",view:(e,t)=>{let{writer:r}=t;return e?r.createAttributeElement(\"span\",{style:`color:${e};`},{priority:7}):null}}),e.conversion.for(\"upcast\").elementToAttribute({view:{name:\"span\",styles:{color:/.+/}},model:{key:\"fontColor\",value:e=>e.getStyle(\"color\")||null}})}(e),setTimeout((()=>function(e){var t,r,n;const a=(null===(t=e.ui.view)||void 0===t||null===(r=t.toolbar)||void 0===r?void 0:r.element)||document.querySelector(\".ck-toolbar\");if(!a)return;if(a.querySelector(\".cs-font-controls\"))return;const o=document.createElement(\"span\");o.className=\"cs-font-controls\",o.style.cssText=\"display:inline-flex;gap:4px;flex-basis:100%;align-items:center;\";const i=document.createElement(\"select\");i.className=\"cs-font-size-select\",i.style.cssText=\"height"
+    },
+    {
+      "id": "editor-extra-toolbar",
+      "symbol": "fontSize / fontColor / rtlToggle controls",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12367947,
+      "endExclusive": 12368285,
+      "excerptUtf8Sha256": "39ab5feffb3e51d2d25e72d6187ba80f94d479b53aff7e083d267bcd0dc533d0",
+      "raw": "cus()}i.addEventListener(\"change\",(e=>{const t=e.target.value;c(\"fontSize\",\"\"===t?null:parseInt(t,10))}));let d=null;try{d=e.ui.componentFactory.create(\"rtlToggle\"),d.render()}catch{d=null}o.appendChild(i),o.appendChild(l.element),null!==(n=d)&&void 0!==n&&n.element&&o.appendChild(d.element);function u(){const t=e.model.document.selecti"
+    },
+    {
+      "id": "editor-rtl-plugin",
+      "symbol": "HNt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12349604,
+      "endExclusive": 12350333,
+      "excerptUtf8Sha256": "056c8b7bb7cfd5798ad2c6569824860a33668fb9cf88a4819c600f418ef90dd9",
+      "raw": "et([\"ar\",\"he\",\"fa\",\"ur\",\"ps\",\"ku\",\"sd\",\"yi\"]);function HNt(e){return function(t){t.ui.componentFactory.add(\"rtlToggle\",(r=>{const n=t.ui.componentFactory.create(\"bold\"),a=n.constructor;n.destroy();const o=new a(r);return o.set({label:\"Toggle text direction (RTL/LTR)\",tooltip:!0,icon:'<svg viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 10v5h2V4h2v11h2V4h2V2h-8C7.79 2 6 3.79 6 6s1.79 4 4 4zm-2 7v-3l-4 4 4 4v-3h12v-2H8z\"/></svg>',isToggleable:!0}),o.set(\"isOn\",e),o.on(\"execute\",(()=>{const e=!o.isOn;o.set(\"isOn\",e),t.editing.view.change((r=>{const n=t.editing.view.document.getRoot();r.setAttribute(\"dir\",e?\"rtl\":\"ltr\",n)}))})),o}))}}const WNt=Ak,qNt=$k,GNt=Gk,YNt=zk,QNt=mk,KNt=yk,XNt=[\"image\",\"media\"];l"
+    },
+    {
+      "id": "editor-change-readonly-complete",
+      "symbol": "mkt state and event handlers",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12375506,
+      "endExclusive": 12377370,
+      "excerptUtf8Sha256": "2fb3e2097daa778b9c7b2dd71253bd77cc6a57701d7778d154e10a38a93c73b6",
+      "raw": "const[u,h]=(0,yt.useState)(e.data),[p,m]=(0,yt.useState)(null),f=(0,yt.useRef)(null!==(t=e.data)&&void 0!==t?t:\"\"),g=(0,yt.useRef)(Ppt(null!==(r=e.data)&&void 0!==r?r:\"\"));return(0,yt.useEffect)((()=>{e.onChangeEditor(Ppt(u))}),[u]),(0,yt.useEffect)((()=>{var t,r,n;Ppt(null!==(t=null===p||void 0===p||null===(r=p.getData)||void 0===r?void 0:r.call(p))&&void 0!==t?t:u)!==Ppt(e.data)&&(g.current=Ppt(null!==(n=e.data)&&void 0!==n?n:\"\"),h(e.data))}),[e.data]),(0,yt.useEffect)((()=>{if(p)try{\"function\"===typeof p.enableReadOnlyMode?e.disabled?p.enableReadOnlyMode(\"disabled-prop\"):p.disableReadOnlyMode(\"disabled-prop\"):p.isReadOnly=!!e.disabled}catch(Ovr){p.isReadOnly=!!e.disabled}}),[e.disabled,p]),(0,nI.jsx)(nI.Fragment,{children:(0,nI.jsx)(pkt,{className:\"no-tailwindcss-base\",$minHeight:e.minHeight,$disabled:e.disabled,children:(0,nI.jsx)(uNt,{editor:dNt,config:{...c,height:`${n}px`},data:u,onReady:t=>{if(t.setData(u||\"<p></p>\"),t.editing.view.focus(),f.current=u||\"<p></p>\",t.editing.view.change((e=>{const r=t.editing.view.document.getRoot();e.setStyle(\"height\",`${n}px`,r),s&&e.setAttribute(\"dir\",\"rtl\",r)})),e.disabled)try{\"function\"===typeof t.enableReadOnlyMode?t.enableReadOnlyMode(\"disabled-prop\"):t.isReadOnly=!0}catch(Ovr){t.isReadOnly=!0}m(t)},onChange:(t,r)=>{var n;const a=r.getData();null===(n=e.onLiveChangeEditor)||void 0===n||n.call(e,Ppt(a));const o=Ppt(a);if(VNt(g.current,o)){var i;const t=g.current;g.current=o,null===(i=e.onContentImageChange)||void 0===i||i.call(e,{prevHtml:t,nextHtml:o})}a.includes(\"<img>\")||r.editing.view.focus(),e.immediate&&h(a)},onFocus:(e,t)=>{f.current=t.getData(),h(t.getData()||\"<p></p>\")},onBlur:(t,r)=>{var n;const a=r.getData();e.onChangeEditor(Ppt(a)),null===(n=e.onBlurEditor)||void 0===n||n.call(e,{prevHtml:f.current,nextHtml:Ppt(a)}),f.current=a,h(a)}})})})}),\"widget:ck-editor\",{minHeight:300})"
+    },
+    {
+      "id": "html-parser-import",
+      "symbol": "YO / QO",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 7702940,
+      "endExclusive": 7703023,
+      "excerptUtf8Sha256": "e65fe8ea72fa718e8d3f0a58f6e01b6e5689066154e8fd2618f8e40972c29308",
+      "raw": "var YO=__webpack_require__(53908),QO=__webpack_require__.n(YO);const KO=yt.forwardR"
+    },
+    {
+      "id": "html-parser-module",
+      "symbol": "module53908 parseFragment / createElement",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3293649,
+      "endExclusive": 3294314,
+      "excerptUtf8Sha256": "f8f94b9bef5b08605457bba9f9263a597e57497572146067b9d95606959b5324",
+      "raw": "53908:(e,t,r)=>{\"use strict\";var n=r(35461),a=r(4662),o=r(85583),i=r(95153);function s(e,t){if(\"#text\"===e.nodeName)return e.value;if(\"#comment\"===e.nodeName)return e.value;var r=e.attrs.reduce((function(e,t){var r=o(t.name);return e[r]=\"style\"===r?i(t.value):t.value,e}),{key:t});if(0===e.childNodes.length)return a.createElement(e.tagName,r);if(\"script\"===e.nodeName)return r.dangerouslySetInnerHTML={__html:e.childNodes[0].value},a.createElement(\"script\",r);var n=e.childNodes.map(s);return a.createElement(e.tagName,r,n)}e.exports=function(e){var t=n.parseFragment(e);if(0===t.childNodes.length)return null;var r=t.childNodes.map(s);return 1===r.length?r[0]:r}}"
+    },
+    {
+      "id": "converter-paragraph-heading",
+      "symbol": "Paragraph model -> p",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3006876,
+      "endExclusive": 3007182,
+      "excerptUtf8Sha256": "0a450fe5afd507705cb75a58c67ad353a153e005c2d7caa5af0121bc3275413c",
+      "raw": "schema.register(\"paragraph\",{inheritAllFrom:\"$block\"}),e.conversion.elementToElement({model:\"paragraph\",view:\"p\"}),e.conversion.for(\"upcast\").elementToElement({model:(e,t)=>{let{writer:r}=t;return Jp.paragraphLikeElements.has(e.name)?e.isEmpty?null:r.createElement(\"paragraph\"):null},view:/.+/,converterPri"
+    },
+    {
+      "id": "converter-heading-defaults",
+      "symbol": "HeadingEditing defaults",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3007880,
+      "endExclusive": 3008490,
+      "excerptUtf8Sha256": "7e526ea155036bb328094cb3847fd36558554c590831238dc7503c88d17eca92",
+      "raw": "ss tm extends id{static get pluginName(){return\"HeadingEditing\"}constructor(e){super(e),e.config.define(\"heading\",{options:[{model:\"paragraph\",title:\"Paragraph\",class:\"ck-heading_paragraph\"},{model:\"heading1\",view:\"h2\",title:\"Heading 1\",class:\"ck-heading_heading1\"},{model:\"heading2\",view:\"h3\",title:\"Heading 2\",class:\"ck-heading_heading2\"},{model:\"heading3\",view:\"h4\",title:\"Heading 3\",class:\"ck-heading_heading3\"}]})}static get requires(){return[Jp]}init(){const e=this.editor,t=e.config.get(\"heading.options\"),r=[];for(const n of t)\"paragraph\"!==n.model&&(e.model.schema.register(n.model,{inheritAllFrom:\"$b"
+    },
+    {
+      "id": "converter-bold",
+      "symbol": "bold -> strong",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 2927656,
+      "endExclusive": 2927897,
+      "excerptUtf8Sha256": "df00f4a9a32d010c2dc7d2f2ff1e001ec5439f4a883d59cd75b51dd2a8e118f3",
+      "raw": "Formatting:!0,copyOnEnter:!0}),e.conversion.attributeToElement({model:\"bold\",view:\"strong\",upcastAlso:[\"b\",e=>{const t=e.getStyle(\"font-weight\");return t?\"bold\"==t||Number(t)>=600?{name:!0,styles:[\"font-weight\"]}:void 0:null}]}),e.commands.a"
+    },
+    {
+      "id": "converter-italic",
+      "symbol": "italic -> i",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 2929255,
+      "endExclusive": 2929455,
+      "excerptUtf8Sha256": "fd3df673bd01f734e1521d225e63ded832122aa0878a90ebf31601ba1cf5fa68",
+      "raw": "Formatting:!0,copyOnEnter:!0}),e.conversion.attributeToElement({model:\"italic\",view:\"i\",upcastAlso:[\"em\",{styles:{\"font-style\":\"italic\"}}]}),e.commands.add(\"italic\",new Su(e,\"italic\")),e.keystrokes.se"
+    },
+    {
+      "id": "converter-blockquote",
+      "symbol": "blockQuote -> blockquote",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 2932039,
+      "endExclusive": 2932282,
+      "excerptUtf8Sha256": "2416f370d692bc67cd35ad46f39aef7a907e3bf01afd6ea64c1ad54310e6806c",
+      "raw": "register(\"blockQuote\",{allowWhere:\"$block\",allowContentOf:\"$root\"}),t.addChildCheck(((e,t)=>{if(e.endsWith(\"blockQuote\")&&\"blockQuote\"==t.name)return!1})),e.conversion.elementToElement({model:\"blockQuote\",view:\"blockquote\"}),e.model.document.r"
+    },
+    {
+      "id": "converter-list",
+      "symbol": "listType -> ol/ul/li",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3041917,
+      "endExclusive": 3042300,
+      "excerptUtf8Sha256": "ed416bc8be6f2575c9232a10b7f76baabe1a179a4ce26b86f86bc63d7f59a164",
+      "raw": "=t)return n.getAttribute(\"listType\")==r;n=n.previousSibling}return!1}return!0}}function Ym(e,t){const r=t.mapper,n=t.writer,a=\"numbered\"==e.getAttribute(\"listType\")?\"ol\":\"ul\",o=function(e){const t=e.createContainerElement(\"li\");return t.getFillerOffset=ef,t}(n),i=n.createContainerElement(a,null);return n.insert(n.createPositionAt(i,0),o),r.bindElements(e,o),o}function Qm(e,t,r,n){"
+    },
+    {
+      "id": "converter-image-attributes",
+      "symbol": "ImageEditing attributes / conversions",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 2945630,
+      "endExclusive": 2946640,
+      "excerptUtf8Sha256": "c5cd9dafbf98ca47c86349d3e06be8c8cb1947a6b6ee0368e96c331b4dbae4d3",
+      "raw": "diting\"}init(){const e=this.editor,t=e.model.schema,r=e.t,n=e.conversion;e.editing.view.addObserver(Lu),t.register(\"image\",{isObject:!0,isBlock:!0,allowWhere:\"$block\",allowAttributes:[\"alt\",\"src\",\"srcset\"]}),n.for(\"dataDowncast\").elementToElement({model:\"image\",view:(e,t)=>{let{writer:r}=t;return uh(r)}}),n.for(\"editingDowncast\").elementToElement({model:\"image\",view:(e,t)=>{let{writer:n}=t;return function(e,t,r){return t.setCustomProperty(\"image\",!0,e),Ku(e,t,{label:function(){const t=sh(e).getAttribute(\"alt\");return t?`${t} ${r}`:r}})}(uh(n),n,r(\"image widget\"))}}),n.for(\"downcast\").add(lh(\"src\")).add(lh(\"alt\")).add(function(){return t=>{t.on(\"attribute:srcset:image\",e)};function e(e,t,r){if(!r.consumable.consume(t.item,e.name))return;const n=r.writer,a=sh(r.mapper.toViewElement(t.item));if(null===t.attributeNewValue){const e=t.attributeOldValue;e.data&&(n.removeAttribute(\"srcset\",a),n.removeAttribute(\"sizes\",a),e.width&&n.removeAttribute(\"width\",a))}else{const e=t.attributeNewValue;e.data&&(n."
+    },
+    {
+      "id": "converter-image-figure",
+      "symbol": "uh image figure",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 2947588,
+      "endExclusive": 2947774,
+      "excerptUtf8Sha256": "1537b4d49c10b0393015ccb2e75b165d2e77ad0656cc82e05054f3080bf9be60",
+      "raw": "function uh(e){const t=e.createEmptyElement(\"img\"),r=e.createContainerElement(\"figure\",{class:\"image\"});return e.insert(e.createPositionAt(r,0),t),r}class hh extends Do{constructor(e){su"
+    },
+    {
+      "id": "converter-image-caption",
+      "symbol": "ImageCaptionEditing",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3010670,
+      "endExclusive": 3011385,
+      "excerptUtf8Sha256": "f5d875b37c90b7e83cd4bb49229cebc77d4b6a7d798a6a4706e00ba549784553",
+      "raw": "return null}function om(e){const t=e.parent;return\"figcaption\"==e.name&&t&&\"figure\"==t.name&&t.hasClass(\"image\")?{name:!0}:null}class im extends id{static get pluginName(){return\"ImageCaptionEditing\"}init(){const e=this.editor,t=e.editing.view,r=e.model.schema,n=e.data,a=e.editing,o=e.t;r.register(\"caption\",{allowIn:\"image\",allowContentOf:\"$block\",isLimit:!0}),e.model.document.registerPostFixer((e=>this._insertMissingModelCaptionElement(e))),e.conversion.for(\"upcast\").elementToElement({view:om,model:\"caption\"}),n.downcastDispatcher.on(\"insert:caption\",sm((e=>e.createContainerElement(\"figcaption\")),!1));const i=function(e,t){return r=>{const n=r.createEditableElement(\"figcaption\");return r.setCustomProperty"
+    },
+    {
+      "id": "converter-image-styles",
+      "symbol": "vm styles",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3015582,
+      "endExclusive": 3016106,
+      "excerptUtf8Sha256": "b94662b58fc6ae2abee03c4ab0d7021a7fbd54dd7085767b0ccbdd303e1cef60",
+      "raw": "onst vm={full:{name:\"full\",title:\"Full size image\",icon:pm,isDefault:!0},side:{name:\"side\",title:\"Side image\",icon:gm,className:\"image-style-side\"},alignLeft:{name:\"alignLeft\",title:\"Left aligned image\",icon:mm,className:\"image-style-align-left\"},alignCenter:{name:\"alignCenter\",title:\"Centered image\",icon:fm,className:\"image-style-align-center\"},alignRight:{name:\"alignRight\",title:\"Right aligned image\",icon:gm,className:\"image-style-align-right\"}},bm={full:pm,left:mm,right:gm,center:fm};function xm(){return(arguments.l"
+    },
+    {
+      "id": "converter-table-schema",
+      "symbol": "table/tableRow/tableCell schema",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3104431,
+      "endExclusive": 3104970,
+      "excerptUtf8Sha256": "bc504a1e118beced8cda3f71a6737788f9882dc63f438557f9ad58d905c61b14",
+      "raw": "(){const e=this.editor,t=e.model,r=t.schema,n=e.conversion;r.register(\"table\",{allowWhere:\"$block\",allowAttributes:[\"headingRows\",\"headingColumns\"],isObject:!0,isBlock:!0}),r.register(\"tableRow\",{allowIn:\"table\",isLimit:!0}),r.register(\"tableCell\",{allowIn:\"tableRow\",allowAttributes:[\"colspan\",\"rowspan\"],isLimit:!0,isSelectable:!0}),r.extend(\"$block\",{allowIn:\"tableCell\"}),r.addChildCheck(((e,t)=>{if(\"table\"==t.name&&Array.from(e.getNames()).includes(\"table\"))return!1})),n.for(\"upcast\").add(Hf()),n.for(\"editingDowncast\").add(Qf({asWi"
+    },
+    {
+      "id": "converter-table-figure",
+      "symbol": "table figure downcast",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3080030,
+      "endExclusive": 3080390,
+      "excerptUtf8Sha256": "fd81300ff13dc06a38b15a9dd96a5fe7008be1173dd58f20a74f0ed1491d31b3",
+      "raw": ":headingColumns:table\");const o=e&&e.asWidget,i=n.writer.createContainerElement(\"figure\",{class:\"table\"}),s=n.writer.createContainerElement(\"table\");let l;var c,d;n.writer.insert(n.writer.createPositionAt(i,0),s),o&&(c=i,(d=n.writer).setCustomProperty(\"table\",!0,c),l=Ku(c,d,{hasSelectionHandle:!0}));const u=new Gf(a),h={headingRows:a.getAttribute(\"headingRow"
+    },
+    {
+      "id": "converter-media-figure",
+      "symbol": "xf media figure",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3056210,
+      "endExclusive": 3056490,
+      "excerptUtf8Sha256": "505ae44c9bf4ffb40aad02de4f6af1b72111908beda44232d38e9aa7d4c02000",
+      "raw": "e.getMediaViewElement(i,o,t);i.insert(i.createPositionAt(s,0),c)}}function xf(e,t,r,n){const a=e.createContainerElement(\"figure\",{class:\"media\"});return e.insert(e.createPositionAt(a,0),t.getMediaViewElement(e,r,n)),a}function Af(e){const t=e.getSelectedElement();return t&&t.is(\""
+    },
+    {
+      "id": "editor-default-table-toolbar",
+      "symbol": "Iv.defaultConfig",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 3136020,
+      "endExclusive": 3136440,
+      "excerptUtf8Sha256": "6e5c4480a9e04dd22d7a11263aa5d6f80fe5fa88b46a0d95e08cdcf664f2512c",
+      "raw": "defaultConfig={toolbar:{items:[\"heading\",\"|\",\"bold\",\"italic\",\"link\",\"bulletedList\",\"numberedList\",\"|\",\"indent\",\"outdent\",\"|\",\"imageUpload\",\"blockQuote\",\"insertTable\",\"mediaEmbed\",\"undo\",\"redo\"]},image:{toolbar:[\"imageStyle:full\",\"imageStyle:side\",\"|\",\"imageTextAlternative\"]},table:{contentToolbar:[\"tableColumn\",\"tableRow\",\"mergeTableCells\"]},language:\"en\"}}]).default},42485:(e,t)=>{\"use strict\";Object.defineProperty("
+    },
+    {
+      "id": "management-v3-binding-gates",
+      "symbol": "sUt state / refs / image scope / pricing",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 13181000,
+      "endExclusive": 13183377,
+      "excerptUtf8Sha256": "91a11c4154f1eabc2e082360f6a70758c49bae2cc710977d4c98475e32b75535",
+      "raw": "(\"translate\",{keyPrefix:\"formSetting\"}),{t:c}=fa(\"translate\"),d=Wu(),u=Qr(),{purchaseInfo:h}=(null===(t=u.state)||void 0===t||t.formId,Ut((e=>e.pay),Jt)),p=Xr(),[m,f]=(0,yt.useState)(e.settingData),g=(0,yt.useRef)(e.settingData.endPageContent),v=(0,yt.useRef)(null!==(r=null===(n=e.settingData)||void 0===n?void 0:n.privatePageContent)&&void 0!==r?r:\"\"),[b]=(0,yt.useState)((()=>{var t,r;return zNt(null,[null===(t=e.settingData)||void 0===t?void 0:t.endPageContent,null===(r=e.settingData)||void 0===r?void 0:r.privatePageContent])})),x={isInitCatchform:()=>$u.getState().form.isInitCatchform,getOrigin:()=>[...$u.getState().form.originContentImageUrls,...b]},A=M_t(m.catchformId,(()=>BNt($u.getState().form.formModelV3,{endPageContent:g.current,privatePageContent:v.current},\"END\")),x),y=M_t(m.catchformId,(()=>BNt($u.getState().form.formModelV3,{endPageContent:g.current,privatePageContent:v.current},\"PRIVATE\")),x),w={getSizeMap:()=>$u.getState().form.assetUsage.contentImageSizes,patchUsedBytes:e=>d(XG(e))},C=D_t(L_t(m.catchformId,(()=>BNt($u.getState().form.formModelV3,{endPageContent:g.current,privatePageContent:v.current},\"END\")),w),A),S=D_t(L_t(m.catchformId,(()=>BNt($u.getState().form.formModelV3,{endPageContent:g.current,privatePageContent:v.current},\"PRIVATE\")),w),y),[T,E]=(0,yt.useState)(!1),[N,k]=(0,yt.useState)(\"END\"),[j,I]=(0,yt.useState)(\"DIRECT\"===(null===(a=e.settingData)||void 0===a?void 0:a.privatePageType)?\"DIRECT\":\"BASIC\"),_=(0,yt.useRef)(\"DIRECT\"===(null===(o=e.settingData)||void 0===o?void 0:o.privatePageType)),R=jH(m.formLanguage),P=`<p>${R}</p>`,O=Lpt(m.formLanguage),{scopedI18n:M,langReady:L}=MH(m.formLanguage),D=!DH(m.formLanguage)||L,F=EV(m.formLanguage),B=!h.servicePricingType||\"F\"===h.servicePricingType||\"None\"===h.servicePricingType,[U,z]=(0,yt.useState)(e.settingData.endPageContent),V=((0,nP.useMediaQuery)({maxWidth:767}),(0,nP.useMediaQuery)({maxWidth:1023}),!h.servicePricingType||\"F\"===h.servicePricingType||\"None\"===h.servicePricingType),$=[{value:\"SLIDE\",label:l(\"phrase.phrase6\")},{value:\"CLICK\",label:l(\"phrase.phrase5\")}],H=[{value:\"CLOSE\",label:l(\"phrase.phrase7\")},{value:\"OPEN\",label:l(\"phrase.phrase8\")}],W=[{value:\"EXPOSE\",label:l(\"phrase.phrase40\")},{value:\"UNEXPOSE\",label:l(\"phrase.phrase41\")}],q=(e,t)=>{f({...m,[e]:t})},G=()=>{if(bNt())return d(ic({show:!0,type:\"fail\",text:c(\"aiQuestions.assetQuota.saveUplo"
+    },
+    {
+      "id": "management-v3-write",
+      "symbol": "sUt G / managements POST",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 13182980,
+      "endExclusive": 13185297,
+      "excerptUtf8Sha256": "307d00d6d09706cac6bf7569dd22d9ccb2d8fded3f927ff068dc425e70c0f1a0",
+      "raw": "PricingType),$=[{value:\"SLIDE\",label:l(\"phrase.phrase6\")},{value:\"CLICK\",label:l(\"phrase.phrase5\")}],H=[{value:\"CLOSE\",label:l(\"phrase.phrase7\")},{value:\"OPEN\",label:l(\"phrase.phrase8\")}],W=[{value:\"EXPOSE\",label:l(\"phrase.phrase40\")},{value:\"UNEXPOSE\",label:l(\"phrase.phrase41\")}],q=(e,t)=>{f({...m,[e]:t})},G=()=>{if(bNt())return d(ic({show:!0,type:\"fail\",text:c(\"aiQuestions.assetQuota.saveUploadPending\")})),!1;if(h.servicePricingType&&\"F\"!==h.servicePricingType&&!m.catchformManagementRequest.agreementDisplay)return alert(l(\"phrase.phrase16\")),!1;if(h.servicePricingType&&\"F\"!==h.servicePricingType&&\"SLIDE\"===m.catchformManagementRequest.agreementDisplay&&!m.catchformManagementRequest.agreementOpenType)return alert(l(\"phrase.phrase17\")),!1;const e={catchformId:m.catchformId,displaySetting:{agreementDisplay:m.catchformManagementRequest.agreementDisplay,agreementOpenType:m.catchformManagementRequest.agreementOpenType,agreementExposeType:m.catchformManagementRequest.agreementExposeType},endPageSetting:{endPageContent:g.current,activateLogoView:m.activateLogoView},privatePageSetting:{privatePageContent:m.privatePageContent||P,privatePageType:j}};var t;E(!0),(t=e,At.post(`${PE}/company-operated-service/v3/catch-form/managements`,t)).then((e=>{var t,r,n;E(!1),QT(l(\"formSettings\")),p(\"/form/ai/share\",{state:{formId:m.catchformId,serviceFormId:e.data.formId,isEdit:null===(t=u.state)||void 0===t?void 0:t.isEdit,reapprovalSummary:null!==(r=null===(n=e.data)||void 0===n?void 0:n.reapprovalSummary)&&void 0!==r?r:null}})})).catch((e=>{var t,r;E(!1);const n=e.response.data.message;\"active form cannot update\"===n?(alert(l(\"phrase.phrase18\")),p(\"/form/manage\")):\"reply exist form cannot update\"===n?(alert(l(\"phrase.phrase19\")),p(\"/form/manage\")):400===(null===e||void 0===e||null===(t=e.response)||void 0===t?void 0:t.status)&&\"REQUIRED_APPROVE_CATCHFORM_PERIOD\"===(null===e||void 0===e||null===(r=e.response)||void 0===r?void 0:r.data.category)&&(alert(l(\"phrase.phrase43\")),d(qM()))}))},[Y,Q]=(0,yt.useState)({show:!1}),[K,X]=(0,yt.useState)({show:!1});return(0,yt.useEffect)((()=>{const e={};m.privatePageContent||(e.privatePageContent=P,v.current=P),m.endPageContent||(e.endPageContent=`<h4>${l(\"phrase.phrase1\")}</h4><p>&nbsp;</p><p>${l(\"phrase.phrase2\")}<br>${l(\"phrase.phrase3\")}</p>`,g.current=e.e"
+    },
+    {
+      "id": "management-v3-read",
+      "symbol": "cUt / managements GET",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 13194616,
+      "endExclusive": 13195740,
+      "excerptUtf8Sha256": "096f9b820f1f1f9a205caf689b1aad48d9b39360aa1a2457a5b85c6d8a40f99d",
+      "raw": "At.get(`${PE}/company-operated-service/v3/catch-form/managements`,{params:{catchformId:e}})).then((e=>{var r;const a=e.data.formLanguage||\"ko\",o=e.data.endPageSetting.endPageContent,i=null!==(r=e.data.privatePageSetting)&&void 0!==r?r:{};s({catchformId:e.data.catchformId,title:e.data.title,allAgreement:e.data.allAgreeType,activateLogoView:!(!t.servicePricingType||\"F\"!==t.servicePricingType)||!1!==e.data.endPageSetting.activateLogoView,endPageContent:o||aUt(a),privatePageContent:i.privatePageContent||`<p>${jH(a)}</p>`,privatePageType:\"DIRECT\"===i.privatePageType?\"DIRECT\":\"BASIC\",formLanguage:a,catchformManagementRequest:{agreementDisplay:e.data.displaySetting.agreementDisplay,agreementOpenType:e.data.displaySetting.agreementOpenType,agreementExposeType:!1===e.data.allAgreeType?\"EXPOSE\":e.data.displaySetting.agreementExposeType?e.data.displaySetting.agreementExposeType:\"EXPOSE\"}});const l=e.data.assetUsage;var c;l&&(n(KG(l.usedBytes,void 0,l.limitBytes)),n((c=Rpt(l.contentImages),e=>e(YG.contentImageSizesRegisteredV3({contentImageSizes:c})))))})).finally((()=>{o(!1)}))}),[]);const l=Lpt(i.formLanguage)?3:4;re"
+    },
+    {
+      "id": "management-v3-mode",
+      "symbol": "PRIVATE BASIC/DIRECT editor",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 13191933,
+      "endExclusive": 13193191,
+      "excerptUtf8Sha256": "1cd783524552585bdd983ffcc0552797d8acbdf6f93cd731eaabe06ab9dab66b",
+      "raw": "elList:[{value:\"BASIC\",label:l(\"useDefaultMessage\")},{value:\"DIRECT\",label:l(\"editCustomMessage\")}],onChange:e=>{if(T)return void alert(l(\"phrase.phrase44\"));const t=e.target.value;I(t);const r={};\"DIRECT\"!==t||_.current||(r.privatePageContent=P,v.current=P,_.current=!0),f({...m,...r}),d(ic({show:!0,type:\"success\",text:l(\"BASIC\"===t?\"defaultPrivateToastOn\":\"defaultPrivateToastOff\"),duration:2500}))}})]}),\"DIRECT\"===j&&(0,nI.jsx)(\"div\",{className:\"mt-4 ai-form-content flex flex-col\",id:\"ck-editor-private\",children:(0,nI.jsx)(mkt,{data:null!==(i=m.privatePageContent)&&void 0!==i?i:\"\",placeholder:R,minHeight:104,immediate:!0,onChangeEditor:e=>{T?alert(l(\"phrase.phrase44\")):(v.current=e,f((t=>({...t,privatePageContent:e}))))},onLiveChangeEditor:e=>{v.current=e},imageUpload:!0,disabled:V,onContentImageChange:S,onBlurEditor:y,assetScope:{catchformId:m.catchformId,assetType:\"PRIVATE_PAGE_CONTENT_IMAGE\",onUploaded:e=>{let{url:t,fileSize:r,usedBytes:n,limitBytes:a}=e;d(KG(n,r,a)),d(JG(t,r))}}})}),(0,nI.jsx)(\"div\",{className:\"mt-6\",children:D&&(0,nI.jsx)(ga,{i18n:M,children:(0,nI.jsx)(\"div\",{dir:F,children:(0,nI.jsx)(UV,{width:40,height:480,title:m.title,useDefault:\"BASIC\"===j,content:m.privatePageContent,statusMessage:R,logoFlag:m.activateLogoView"
+    },
+    {
+      "id": "management-default-helper",
+      "symbol": "aUt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 13180701,
+      "endExclusive": 13180772,
+      "excerptUtf8Sha256": "50920e544229e1e0e0444762858d26f0f458bf258b3d8a028e2c8c27db97f859",
+      "raw": "function aUt(e){return e&&e in nUt?nUt[e]:nUt.ko}const oUt=as.div`\n  wi"
+    },
+    {
+      "id": "management-step-language",
+      "symbol": "cUt step number",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 13195742,
+      "endExclusive": 13196000,
+      "excerptUtf8Sha256": "1a15da5e14e399154e231d9102509db3d477b0c8b2e8101f02e9339b513f8322",
+      "raw": "rn!a&&(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(lUt,{children:[(0,nI.jsx)(iI,{color:tj,className:\"headline-2 mb-3\",children:`\\uce90\\uce58\\ud3fc \\uc0dd\\uc131 - ${l}\\ub2e8\\uacc4 '\\uc751\\ub2f5 \\ud654\\uba74 \\uc124\\uc815'`}),(0,nI.jsx)(iI,{className:\"body-1\""
+    },
+    {
+      "id": "management-v2-wire",
+      "symbol": "v2 endPageSetting/privatePageSetting",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 13164817,
+      "endExclusive": 13165510,
+      "excerptUtf8Sha256": "6f16b63d5a863394cb7a5c5ca4569f3bb550f0b2cb0b711a09bb6d0144df507a",
+      "raw": "nagementRequest.agreementDisplay,agreementOpenType:u.catchformManagementRequest.agreementOpenType,agreementExposeType:u.catchformManagementRequest.agreementExposeType},endPageSetting:{endPageContent:u.endPageContent,activateLogoView:u.activateLogoView},privatePageSetting:{privatePageContent:u.privatePageContent||y,privatePageType:v}};m(!0),E$(e).then((e=>{var t,r,n;m(!1),QT(i(\"formSettings\")),d(\"/form/ai/share\",{state:{formId:u.catchformId,serviceFormId:e.data.formId,isEdit:null===(t=l.state)||void 0===t?void 0:t.isEdit,reapprovalSummary:null!==(r=null===(n=e.data)||void 0===n?void 0:n.reapprovalSummary)&&void 0!==r?r:null}})})).catch((e=>{m(!1);const t=e.response.data.message;\"active"
+    },
+    {
+      "id": "management-v2-editor",
+      "symbol": "unscoped v2 mkt end/private",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 13171033,
+      "endExclusive": 13173190,
+      "excerptUtf8Sha256": "059a11387c40eeeb902da774471027b2364bb2c07222ca938597332c74e35104",
+      "raw": "ssName:\"mt-4 ai-form-content flex flex-col\",id:\"ck-editor\",children:(0,nI.jsx)(mkt,{language:u.formLanguage,data:u.endPageContent,immediate:!0,onChangeEditor:e=>{p?alert(i(\"phrase.phrase44\")):h((t=>({...t,endPageContent:e})))},imageUpload:!0,disabled:N},`end-page-content-${u.formLanguage}`)}),(0,nI.jsx)(\"div\",{className:\"mt-6\",children:S&&(0,nI.jsx)(ga,{i18n:w,children:(0,nI.jsx)(\"div\",{dir:T,children:(0,nI.jsx)(_V,{width:40,height:480,title:u.title,content:u.endPageContent,logoFlag:u.activateLogoView,servicePricingType:c.servicePricingType,formLanguage:u.formLanguage,type:\"PREVIEW\"})})})})]}):(0,nI.jsxs)(nI.Fragment,{children:[(0,nI.jsxs)(\"div\",{className:\"mt-6\",children:[(0,nI.jsx)(\"div\",{className:\"mb-2\",children:(0,nI.jsxs)(iI,{className:\"label-1\",color:tj,children:[i(\"privateMessageLabel\"),\" \",(0,nI.jsx)(iI,{span:!0,className:\"label-1-strong\",color:Uj,children:\"*\"})]})}),(0,nI.jsx)(jXe,{value:v,row:!0,size:\"md\",fontStyle:\"label-1-weak\",disabled:N,labelList:[{value:\"BASIC\",label:i(\"useDefaultMessage\")},{value:\"DIRECT\",label:i(\"editCustomMessage\")}],onChange:e=>{if(p)return void alert(i(\"phrase.phrase44\"));const t=e.target.value;b(t);const r={};\"DIRECT\"!==t||x.current||(r.privatePageContent=y,x.current=!0),h({...u,...r}),s(ic({show:!0,type:\"success\",text:i(\"BASIC\"===t?\"defaultPrivateToastOn\":\"defaultPrivateToastOff\"),duration:2500}))}})]}),\"DIRECT\"===v&&(0,nI.jsx)(\"div\",{className:\"mt-4 ai-form-content flex flex-col\",id:\"ck-editor-private\",children:(0,nI.jsx)(mkt,{data:null!==(a=u.privatePageContent)&&void 0!==a?a:\"\",placeholder:A,minHeight:104,immediate:!0,onChangeEditor:e=>{p?alert(i(\"phrase.phrase44\")):h((t=>({...t,privatePageContent:e})))},imageUpload:!0,disabled:N})}),(0,nI.jsx)(\"div\",{className:\"mt-6\",children:S&&(0,nI.jsx)(ga,{i18n:w,children:(0,nI.jsx)(\"div\",{dir:T,children:(0,nI.jsx)(UV,{width:40,height:480,title:u.title,useDefault:\"BASIC\"===v,content:u.privatePageContent,statusMessage:A,logoFlag:u.activateLogoView,viewerType:\"PREVIEW\",servicePricingType:c.servicePricingType,type:\"PREVIEW\"})})})})]})]}),(0,nI.jsxs)(ZBt,{children:[(0,nI.jsx)(M_,{width:\"225px\",style:{backgroundColor:\"white\"},size:\"lg\",type:\"se"
+    },
+    {
+      "id": "management-v2-api",
+      "symbol": "E$",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 7917386,
+      "endExclusive": 7917494,
+      "excerptUtf8Sha256": "cf1087b9ea94c586d6146910324e029052d50e6d40b26172fe5aca8d62eebab9",
+      "raw": "function E$(e){return At.post(`${PE}/company-operated-service/catch-form/v2/management`,e)}function N$(e,t){"
+    },
+    {
+      "id": "end-screen-render",
+      "symbol": "_V",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 7906731,
+      "endExclusive": 7908277,
+      "excerptUtf8Sha256": "5d8ef4c92a83a5509cd595acc998daac763d23ceb32d8f3f12f3a68806411131",
+      "raw": "function _V(e){let{title:t,content:r,logoFlag:n,width:a,side:o=!1,height:i=530,servicePricingType:s,viewerType:l,submittedAt:c,formLanguage:d,minHeight:u,maxHeight:h,type:p=\"INFO_OWNER\"}=e;const{t:m}=fa(\"translate\",{keyPrefix:\"formEndPageContent\"}),f=(0,nP.useMediaQuery)({maxWidth:839}),g=EV(d),v=l?{maxWidth:\"420px\"}:{maxWidth:\"420px\",width:\"auto\"};return(0,nI.jsxs)(NV,{height:i,minHeight:u,maxHeight:h,children:[o?(0,nI.jsx)(kV,{style:v,dir:g,children:(0,nI.jsx)(\"div\",{className:\"ck-content p-6\",children:(0,nI.jsxs)(\"div\",{className:\"flex flex-col gap-8\",children:[(0,nI.jsx)(iI,{className:(\"INFO_OWNER\"!==p||f?\"subtitle-1\":\"headline-2\")+\" !break-normal\",color:tj,children:t}),r&&\"<p></p>\"!==r&&(0,nI.jsx)(jV,{className:\"ck-content no-tailwindcss-base\",children:r&&\"<p></p>\"!==r&&QO()(r.replace(/\\n/g,\"\"))}),n&&(0,nI.jsx)(IV,{className:\"inline-block flex-grow-0 self-start\",children:(0,nI.jsx)(iI,{className:\"body-2-medium\",span:!0,color:ej,children:\"powered by CATCHSECU\"})})]})})}):(0,nI.jsx)(kV,{className:\"m-auto\",width:a,style:v,dir:g,children:(0,nI.jsx)(\"div\",{className:\"ck-content p-6\",children:(0,nI.jsxs)(\"div\",{className:\"flex flex-col gap-8\",children:[(0,nI.jsx)(iI,{className:(\"INFO_OWNER\"!==p||f?\"subtitle-1\":\"headline-2\")+\" !break-normal\",color:tj,children:t}),r&&\"<p></p>\"!==r&&(0,nI.jsx)(jV,{className:\"ck-content no-tailwindcss-base\",children:r&&\"<p></p>\"!==r&&QO()(r.replace(/\\n/g,\"\"))}),n&&(0,nI.jsx)(IV,{className:\"inline-block flex-grow-0 self-start\",children:(0,nI.jsx)(iI,{className:\"body-2-medium\",color:ej,children"
+    },
+    {
+      "id": "private-screen-render",
+      "symbol": "UV",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 7909963,
+      "endExclusive": 7911040,
+      "excerptUtf8Sha256": "15271659c12e9b8dde080454b58c40fc39ae04a81b4a9ec15873cd4e9e83d831",
+      "raw": "UV=e=>{let{title:t,useDefault:r=!0,content:n,statusMessage:a,logoFlag:o=!0,width:i,height:s,minHeight:l,maxHeight:c,viewerType:d,servicePricingType:u,type:h=\"INFO_OWNER\"}=e;const{t:p}=fa(\"translate\",{keyPrefix:\"formNotice\"}),{t:m}=fa(\"translate\",{keyPrefix:\"infoOwnerForm\"}),f=(0,nP.useMediaQuery)({maxWidth:839}),g=d?{maxWidth:\"420px\"}:{maxWidth:\"420px\",width:\"auto\"},v=a||m(\"phrase.phrase10\");return(0,nI.jsxs)(RV,{height:s,minHeight:l,maxHeight:c,children:[(0,nI.jsxs)(PV,{style:g,width:i,children:[t&&(0,nI.jsx)(OV,{children:(0,nI.jsx)(iI,{className:(\"INFO_OWNER\"!==h||f?\"subtitle-1\":\"headline-2\")+\" !break-normal\",color:tj,children:t})}),(0,nI.jsxs)(MV,{children:[!1!==r?(0,nI.jsx)(cD,{type:\"secondary\",icon:\"exclamation\",secondText:v}):(0,nI.jsx)(DV,{className:\"ck-content no-tailwindcss-base\",children:n&&\"<p></p>\"!==n?QO()(n.replace(/\\n/g,\"\")):null}),(0,nI.jsx)(LV,{children:(0,nI.jsx)(iI,{className:\"body-1\",color:ej,children:(0,nI.jsx)(pa,{i18nKey:\"formNotice.phrase.phrase1\",components:[(0,nI.jsx)(iI,{span:!0,className:\"body-1-strong\",color:ej}),(0,nI.jsx)(\"br\",{})"
+    },
+    {
+      "id": "private-screen-status",
+      "symbol": "H_e",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 10008405,
+      "endExclusive": 10008749,
+      "excerptUtf8Sha256": "4ea21c5906afefefcc8b2be718314d474de52e494fb7fda596edec4a50451a84",
+      "raw": "function H_e(e,t){var r,n;if(!e)return null;if(\"N\"!==e.activeYn)return null;const a=null===(r=e.catchformConstraintResponse)||void 0===r?void 0:r.catchformDeActivateType;if(!a)return $_e;const o=null===t||void 0===t?void 0:t.identityBalance;return\"IDENTITY_NOT_ENOUGH\"===a&&\"number\"===typeof o&&o>0?$_e:null!==(n=V_e[a])&&void 0!==n?n:$_e}const"
+    },
+    {
+      "id": "preview-end-private",
+      "symbol": "preview screen selector",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 8585660,
+      "endExclusive": 8586440,
+      "excerptUtf8Sha256": "fa4143f628ba013e3e376d5da336034601ae90aa3647895cc818105a2e4f2c1c",
+      "raw": "d 0:_.subject,useDefault:\"DIRECT\"!==(null===_||void 0===_?void 0:_.privatePageType),content:null===_||void 0===_?void 0:_.privatePageContent,statusMessage:jH(null===_||void 0===_?void 0:_.formLanguage),logoFlag:null===_||void 0===_?void 0:_.activateLogoView,servicePricingType:z.servicePricingType,viewerType:a3(N),type:\"PREVIEW\"}):(0,nI.jsx)(_V,{title:null===_||void 0===_?void 0:_.subject,content:null===_||void 0===_?void 0:_.endPageContent,logoFlag:null===_||void 0===_?void 0:_.activateLogoView,servicePricingType:z.servicePricingType,viewerType:a3(N),formLanguage:null===_||void 0===_?void 0:_.formLanguage,type:\"PREVIEW\"})})})})})]}),\"SECURITY\"!==f&&\"PREVIEW\"!==f&&\"FEEDBACK\"!==f&&(0,nI.jsxs)(\"div\",{className:`w-full flex ${\"COLLECTIVE\"!==(null===_||void 0===_?void 0:_.fo"
+    },
+    {
+      "id": "consent-cleaner-start",
+      "symbol": "Mpt / Lpt",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 11579532,
+      "endExclusive": 11580331,
+      "excerptUtf8Sha256": "694defdec80895279faeae2e6e2c954cc248b6513ea3c9e691d8ca53fb517617",
+      "raw": "p;/g,\" \").trim().length>0},Mpt=e=>{if(\"string\"!==typeof e)return\"\";let t,r=e.replace(/<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>/gi,\"\").replace(/<iframe\\b[^<]*(?:(?!<\\/iframe>)<[^<]*)*<\\/iframe>/gi,\"\").replace(/<\\/?iframe\\b[^>]*>/gi,\"\").replace(/\\son\\w+\\s*=\\s*\"[^\"]*\"/gi,\"\").replace(/\\son\\w+\\s*=\\s*'[^']*'/gi,\"\").replace(/\\son\\w+\\s*=\\s*[^\\s>]+/gi,\"\");do{t=r,r=r.replace(/javascript:/gi,\"\").replace(/vbscript:/gi,\"\").replace(/data\\s*:\\s*text\\/html/gi,\"\")}while(r!==t);return r},Lpt=e=>\"string\"===typeof e&&\"ko\"!==e&&mH.includes(e),Dpt=e=>\"NOTICE\"===(null===e||void 0===e?void 0:e.consentCategory)||\"NOTICE\"===(null===e||void 0===e?void 0:e.agreementCategory),Fpt=e=>{const t=(null===e||void 0===e?void 0:e.consentCategory)||(null===e||void 0===e?void 0:e.agreementCategory),r=(null===e||void 0"
+    },
+    {
+      "id": "editor-config-without-license",
+      "symbol": "mkt config (ends before unrelated license field)",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12373386,
+      "endExclusive": 12375384,
+      "excerptUtf8Sha256": "45a24ed004a7c0944b8ebbcbe89c697671ac899a125d9cd93bedf8b39892b66b",
+      "raw": "const mkt=hve((function(e){var t,r;const n=e.height||300,a=(0,yt.useRef)(e.assetScope);a.current=e.assetScope;const o=(0,yt.useRef)(void 0);var i;e.assetScope&&!o.current&&(o.current=(i=()=>a.current,{get catchformId(){var e;return null===(e=i())||void 0===e?void 0:e.catchformId},get assetType(){var e;return null===(e=i())||void 0===e?void 0:e.assetType},onUploaded:e=>{var t,r;return null===(t=i())||void 0===t||null===(r=t.onUploaded)||void 0===r?void 0:r.call(t,e)}}));const s=function(e){const t=(e||\"\").toLowerCase().split(\"-\")[0];return $Nt.has(t)}(e.language||\"en\"),l=s?\"ar\":\"en\",c={extraPlugins:[(d=o.current,function(e){e.plugins.get(\"FileRepository\").createUploadAdapter=e=>SNt(e,d)}),HNt(s),tkt,akt,ukt],placeholder:e.placeholder,toolbar:{items:[\"heading\",\"|\",\"bold\",\"italic\",\"link\",\"bulletedList\",\"numberedList\",\"|\",\"outdent\",\"indent\",\"|\",e.imageUpload&&\"imageUpload\",\"blockQuote\",\"mediaEmbed\",\"insertTable\",\"undo\",\"redo\"]},mediaEmbed:{previewsInData:!0,extraProviders:[{name:\"youtubeShorts\",url:/^(?:www\\.|m\\.)?youtube\\.com\\/shorts\\/([\\w-]+)/,html:e=>{let[,t]=e;return`<div style=\"position:relative;padding-bottom:56.2493%;height:0;\"><iframe src=\"https://www.youtube.com/embed/${t}\" style=\"position:absolute;width:100%;height:100%;top:0;left:0;border:0;\" frameborder=\"0\" allow=\"accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture\" allowfullscreen></iframe></div>`}}]},image:{resizeUnit:\"px\",toolbar:[\"imageStyle:alignLeft\",\"imageStyle:full\",\"imageStyle:alignRight\",\"|\",\"imageTextAlternative\",\"resizeImage:50\"],styles:[\"full\",\"alignLeft\",\"alignRight\",\"resizeImage:50\",\"alignBlockLeft\"],type:[\"jpeg\",\"png\",\"jpg\"],resizeOptions:[{name:\"resizeImage:original\",value:null},{name:\"resizeImage:50\",value:\"50\"},{name:\"resizeImage:75\",value:\"75\"}]},language:{ui:\"en\",content:l},link:{defaultProtocol:\"https://\",decorators:{addTargetToExternalLinks:{mode:\"automatic\",callback:e=>/^(https?:)?\\/\\//.test(e),attributes:{target:\"_blank\",rel:\"noopener noreferrer\"}}}}"
+    },
+    {
+      "id": "end-default-literals",
+      "symbol": "nUt literal; static AST parsing only",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 13175308,
+      "endExclusive": 13180700,
+      "excerptUtf8Sha256": "5733a3380bb4a086fe8cd01329e291a214b0d4675eb3d2736f41176324602354",
+      "raw": "{ko:\"<h4>\\uc751\\ub2f5 \\uc791\\uc131\\uc5d0 \\uac10\\uc0ac\\ub4dc\\ub9bd\\ub2c8\\ub2e4.</h4><p>&nbsp;</p><p>\\uc218\\uc9d1\\ub41c \\ubaa8\\ub4e0 \\uc815\\ubcf4\\ub294<br>\\uac1c\\uc778\\uc815\\ubcf4\\ubcf4\\ud638 \\uc194\\ub8e8\\uc158 \\uce90\\uce58\\uc2dc\\ud050\\ub97c \\ud1b5\\ud574 \\uc548\\uc804\\ud558\\uac8c \\ucc98\\ub9ac\\ub429\\ub2c8\\ub2e4.</p>\",en:\"<h4>Thank you for submitting your response.</h4><p>&nbsp;</p><p>All collected information is securely processed<br>through the personal data protection solution, CATCHSECU.</p>\",ja:\"<h4>\\u3054\\u56de\\u7b54\\u3044\\u305f\\u3060\\u304d\\u3001\\u3042\\u308a\\u304c\\u3068\\u3046\\u3054\\u3056\\u3044\\u307e\\u3059\\u3002</h4><p>&nbsp;</p><p>\\u53ce\\u96c6\\u3055\\u308c\\u305f\\u3059\\u3079\\u3066\\u306e\\u60c5\\u5831\\u306f\\u3001<br>\\u500b\\u4eba\\u60c5\\u5831\\u4fdd\\u8b77\\u30bd\\u30ea\\u30e5\\u30fc\\u30b7\\u30e7\\u30f3\\u300cCATCHSECU\\u300d\\u3092\\u901a\\u3058\\u3066\\u5b89\\u5168\\u306b\\u51e6\\u7406\\u3055\\u308c\\u307e\\u3059\\u3002</p>\",\"zh-CN\":\"<h4>\\u611f\\u8c22\\u60a8\\u586b\\u5199\\u6b64\\u7b54\\u590d\\u3002</h4><p>&nbsp;</p><p>\\u6240\\u6709\\u6536\\u96c6\\u5230\\u7684\\u4fe1\\u606f\\u90fd\\u5c06<br>\\u901a\\u8fc7\\u4e2a\\u4eba\\u4fe1\\u606f\\u4fdd\\u62a4\\u89e3\\u51b3\\u65b9\\u6848 CATCHSECU \\u8fdb\\u884c\\u5b89\\u5168\\u5904\\u7406\\u3002</p>\",\"zh-TW\":\"<h4>\\u611f\\u8b1d\\u60a8\\u586b\\u5beb\\u6b64\\u7b54\\u8986\\u3002</h4><p>&nbsp;</p><p>\\u6240\\u6709\\u6536\\u96c6\\u5230\\u7684\\u8cc7\\u8a0a\\u90fd\\u5c07<br>\\u901a\\u904e\\u500b\\u4eba\\u8cc7\\u6599\\u4fdd\\u8b77\\u89e3\\u6c7a\\u65b9\\u6848 CATCHSECU \\u9032\\u884c\\u5b89\\u5168\\u8655\\u7406\\u3002</p>\",de:\"<h4>Vielen Dank f\\xfcr Ihre Antwort.</h4><p>&nbsp;</p><p>Alle gesammelten Informationen werden sicher<br>durch die Datenschutzl\\xf6sung CATCHSECU verarbeitet.</p>\",fr:\"<h4>Nous vous remercions d'avoir r\\xe9pondu.</h4><p>&nbsp;</p><p>Toutes les informations collect\\xe9es sont trait\\xe9es en toute s\\xe9curit\\xe9<br>via la solution de protection des donn\\xe9es personnelles, CATCHSECU.</p>\",ru:\"<h4>\\u0411\\u043b\\u0430\\u0433\\u043e\\u0434\\u0430\\u0440\\u0438\\u043c \\u0412\\u0430\\u0441 \\u0437\\u0430 \\u0437\\u0430\\u043f\\u043e\\u043b\\u043d\\u0435\\u043d\\u0438\\u0435 \\u043e\\u0442\\u0432\\u0435\\u0442\\u0430.</h4><p>&nbsp;</p><p>\\u0412\\u0441\\u044f \\u0441\\u043e\\u0431\\u0440\\u0430\\u043d\\u043d\\u0430\\u044f \\u0438\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0446\\u0438\\u044f \\u0431\\u0435\\u0437\\u043e\\u043f\\u0430\\u0441\\u043d\\u043e \\u043e\\u0431\\u0440\\u0430\\u0431\\u0430\\u0442\\u044b\\u0432\\u0430\\u0435\\u0442\\u0441\\u044f<br>\\u0441 \\u043f\\u043e\\u043c\\u043e\\u0449\\u044c\\u044e \\u0440\\u0435\\u0448\\u0435\\u043d\\u0438\\u044f \\u0434\\u043b\\u044f \\u0437\\u0430\\u0449\\u0438\\u0442\\u044b \\u043f\\u0435\\u0440\\u0441\\u043e\\u043d\\u0430\\u043b\\u044c\\u043d\\u044b\\u0445 \\u0434\\u0430\\u043d\\u043d\\u044b\\u0445 CATCHSECU.</p>\",es:\"<h4>Gracias por completar su respuesta.</h4><p>&nbsp;</p><p>Toda la informaci\\xf3n recopilada se procesa de forma segura<br>a trav\\xe9s de la soluci\\xf3n de protecci\\xf3n de datos personales, CATCHSECU.</p>\",pt:\"<h4>Obrigado por enviar sua resposta.</h4><p>&nbsp;</p><p>Todas as informa\\xe7\\xf5es coletadas s\\xe3o processadas com seguran\\xe7a<br>atrav\\xe9s da solu\\xe7\\xe3o de prote\\xe7\\xe3o de dados pessoais, CATCHSECU.</p>\",id:\"<h4>Terima kasih atas tanggapan Anda.</h4><p>&nbsp;</p><p>Semua informasi yang dikumpulkan akan diproses dengan aman<br>melalui solusi perlindungan data pribadi, CATCHSECU.</p>\",th:\"<h4>\\u0e02\\u0e2d\\u0e02\\u0e2d\\u0e1a\\u0e04\\u0e38\\u0e13\\u0e2a\\u0e33\\u0e2b\\u0e23\\u0e31\\u0e1a\\u0e01\\u0e32\\u0e23\\u0e15\\u0e2d\\u0e1a\\u0e01\\u0e25\\u0e31\\u0e1a</h4><p>&nbsp;</p><p>\\u0e02\\u0e49\\u0e2d\\u0e21\\u0e39\\u0e25\\u0e17\\u0e31\\u0e49\\u0e07\\u0e2b\\u0e21\\u0e14\\u0e17\\u0e35\\u0e48\\u0e23\\u0e27\\u0e1a\\u0e23\\u0e27\\u0e21\\u0e08\\u0e30\\u0e44\\u0e14\\u0e49\\u0e23\\u0e31\\u0e1a\\u0e01\\u0e32\\u0e23\\u0e1b\\u0e23\\u0e30\\u0e21\\u0e27\\u0e25\\u0e1c\\u0e25\\u0e2d\\u0e22\\u0e48\\u0e32\\u0e07\\u0e1b\\u0e25\\u0e2d\\u0e14\\u0e20\\u0e31\\u0e22<br>\\u0e1c\\u0e48\\u0e32\\u0e19\\u0e42\\u0e0b\\u0e25\\u0e39\\u0e0a\\u0e31\\u0e19\\u0e01\\u0e32\\u0e23\\u0e1b\\u0e01\\u0e1b\\u0e49\\u0e2d\\u0e07\\u0e02\\u0e49\\u0e2d\\u0e21\\u0e39\\u0e25\\u0e2a\\u0e48\\u0e27\\u0e19\\u0e1a\\u0e38\\u0e04\\u0e04\\u0e25 CATCHSECU</p>\",vi:\"<h4>C\\u1ea3m \\u01a1n b\\u1ea1n \\u0111\\xe3 ho\\xe0n th\\xe0nh ph\\u1ea3n h\\u1ed3i.</h4><p>&nbsp;</p><p>T\\u1ea5t c\\u1ea3 th\\xf4ng tin thu th\\u1eadp \\u0111\\u01b0\\u1ee3c s\\u1ebd \\u0111\\u01b0\\u1ee3c x\\u1eed l\\xfd an to\\xe0n<br>th\\xf4ng qua gi\\u1ea3i ph\\xe1p b\\u1ea3o v\\u1ec7 d\\u1eef li\\u1ec7u c\\xe1 nh\\xe2n, CATCHSECU.</p>\",tr:\"<h4>Yan\\u0131t\\u0131n\\u0131z\\u0131 doldurdu\\u011funuz i\\xe7in te\\u015fekk\\xfcr ederiz.</h4><p>&nbsp;</p><p>Toplanan t\\xfcm bilgiler g\\xfcvenli bir \\u015fekilde<br>ki\\u015fisel veri koruma \\xe7\\xf6z\\xfcm\\xfc CATCHSECU arac\\u0131l\\u0131\\u011f\\u0131yla i\\u015flenmektedir.</p>\",it:\"<h4>Grazie per aver inviato la sua risposta.</h4><p>&nbsp;</p><p>Tutte le informazioni raccolte vengono elaborate in modo sicuro<br>tramite la soluzione di protezione dei dati personali, CATCHSECU.</p>\",ar:\"<h4>\\u0634\\u0643\\u0631\\u0627\\u064b \\u0644\\u062a\\u0642\\u062f\\u064a\\u0645 \\u0631\\u062f\\u0643.</h4><p>&nbsp;</p><p>\\u062a\\u062a\\u0645 \\u0645\\u0639\\u0627\\u0644\\u062c\\u0629 \\u062c\\u0645\\u064a\\u0639 \\u0627\\u0644\\u0645\\u0639\\u0644\\u0648\\u0645\\u0627\\u062a \\u0627\\u0644\\u062a\\u064a \\u062a\\u0645 \\u062c\\u0645\\u0639\\u0647\\u0627 \\u0628\\u0623\\u0645\\u0627\\u0646<br>\\u0645\\u0646 \\u062e\\u0644\\u0627\\u0644 \\u062d\\u0644 \\u062d\\u0645\\u0627\\u064a\\u0629 \\u0627\\u0644\\u0628\\u064a\\u0627\\u0646\\u0627\\u062a \\u0627\\u0644\\u0634\\u062e\\u0635\\u064a\\u0629\\u060c \\u0643\\u0627\\u062a\\u0634 \\u0633\\u064a\\u0643\\u064a\\u0648 (CATCHSECU).</p>\"}"
+    },
+    {
+      "id": "form-title-limit",
+      "symbol": "dOt title field",
+      "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+      "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+      "coordinate": "JavaScript UTF-16 code units; zero-based start, end exclusive",
+      "start": 12766508,
+      "endExclusive": 12766878,
+      "excerptUtf8Sha256": "5ccc3d2e4f4c27a19408d4d3534698650f07c53799bb27cda63bf51fb416b813",
+      "raw": "me:\"mt-6\",dir:s,children:(0,nI.jsx)(fD,{maxLength:100,value:c,onChange:e=>{d(e.target.value),m({...n,title:e.target.value})},inputSize:\"lg\",placeholder:i,onBlur:p,error:u.catchformTitle})})]})),[r,c,l,n.title,i,p,u.catchformTitle,s]),\" \"]})}const uOt=as.div`\n  border-radius: 12px;\n  width: 100%;\n  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.15), 0px 0px 2px 0px rgba(0"
+    }
+  ],
+  "verification": {
+    "bundleSHAConfirmed": true,
+    "utf16SlicesAndUtf8HashesVerified": 90,
+    "prior61Verified": 61,
+    "duplicateEvidenceIds": 0,
+    "defaultLiteralLanguages": 16,
+    "allEvidenceReferencesExist": true,
+    "sourceExecution": false,
+    "finalStaticCheck": {
+      "at": "2026-10-10T09:38:05.585Z",
+      "excerptCount": 90,
+      "allReferencesExist": true,
+      "markdownLinksChecked": 6,
+      "issues": []
+    }
+  },
+  "planComparison": {
+    "path": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/body-images/PLAN.md",
+    "sha256": "0bfe7a296d5a917f11b3c839f2930314e3414621343f3c0d54bebec374a9248f",
+    "result": "원본/로컬 결정 분리에 blocker 없음. 계약 고정 전 아래 관측 보완.",
+    "points": [
+      {
+        "id": "P1",
+        "classification": "source-precision",
+        "evidence": [
+          "editor-config-without-license",
+          "editor-resize-interaction"
+        ],
+        "detail": "50/75 options는 resizeUnit:px와 value 문자열이다. custom drag는 10~100%로 저장한다. 원본 50/75% 프리셋으로 단정하지 말고 로컬 width 단위/정규화 정책을 명시한다."
+      },
+      {
+        "id": "P2",
+        "classification": "contract-completeness-decision",
+        "evidence": [
+          "editor-font-presets",
+          "editor-font-converters",
+          "editor-extra-toolbar",
+          "converter-image-caption",
+          "converter-table-schema"
+        ],
+        "detail": "fontSize/fontColor/RTL, caption, table colspan/rowspan을 계약에 보존하거나 명시 후속으로 구분한다. 관측된 converter를 완전한 paste allowlist로 취급하지 않는다."
+      },
+      {
+        "id": "P3",
+        "classification": "future-F4-source-precision",
+        "evidence": [
+          "page-path-kill",
+          "page-preview-path"
+        ],
+        "detail": "99999 PATH_KILL은 참여 대상 제외이며 정상 동의/제출 endpoint와 구별한다."
+      }
+    ],
+    "legacyPlainCompatibility": "기존 평문 body 무백필·bodyRich 생략/null 규칙·v1 증거/bytes 보존은 원본 관측이 아니라 명시된 로컬 설계로 타당하게 구분됨.",
+    "sanitization": "원본 안전성을 미입증으로 남기고 로컬 allowlist를 독립적으로 정의하는 구분에 동의."
+  }
+}

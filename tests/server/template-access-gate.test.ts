@@ -9,7 +9,7 @@ import { formContentSchema } from "@/contracts/domains";
 import { POST as contextSelect } from "@/app/api/v1/context/route";
 import { GET as templateList } from "@/app/api/v1/templates/route";
 import { POST as templateCreate } from "@/app/api/v1/templates/route";
-import { DELETE as templateDelete } from "@/app/api/v1/templates/[...segments]/route";
+import { DELETE as templateDelete, GET as templateGet, PATCH as templateUpdate, POST as templateUse } from "@/app/api/v1/templates/[...segments]/route";
 import { encrypt, tokenHash } from "@/server/crypto";
 
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
@@ -35,7 +35,8 @@ async function fixture() {
   const content = formContentSchema.parse({ body: "합성 템플릿 본문", questions: [{ id: randomUUID(), type: "단문형 답변", label: "합성 질문", required: true }], consentRequired: false, consentPurpose: "", retentionDays: 30, maxResponses: 5 });
   const first = await db.$transaction(tx => createTemplate(ownerCtx, { serviceId: firstId, title: "A 회사 양식", category: "검증", content }, randomUUID(), tx));
   const second = await db.$transaction(tx => createTemplate(ownerCtx, { serviceId: secondId, title: "B 다른 양식", category: "다른", content }, randomUUID(), tx));
-  const publicTemplate = await db.formTemplate.create({ data: { title: "C 공용 양식", category: "공용", content } });
+  const publicTemplate = await db.formTemplate.create({ data: { title: "C 공용 양식", category: "공용", description: "유료 공용 설명",
+    licenseScope: "ACTIVE_SUBSCRIPTION", content } });
   return { company, owner, editor, member, grant, ctx, ownerCtx, firstId, secondId, first, second, publicTemplate, content };
 }
 const query = { page: 1, pageSize: 10, search: "", scope: "all" as const };
@@ -80,7 +81,9 @@ test("조회·작성 grant와 선택 서비스 상태를 GET 작업 및 생성 �
   expect(selected.permissions.canCreate).toBe(false); expect(selected.permissions.targets.map(row => row.id)).toEqual([f.secondId]);
   expect(selected.items.find(row => row.id === f.first.id)?.actions).toEqual({ preview: true, use: true, edit: false, remove: false });
   expect((await getTemplate(f.ctx, f.second.id)).actions).toEqual({ preview: true, use: true, edit: true, remove: true });
-  expect((await getTemplate(f.ctx, f.publicTemplate.id)).actions?.edit).toBe(false);
+  const publicTemplate = await getTemplate(f.ctx, f.publicTemplate.id);
+  expect(publicTemplate.actions).toEqual({ preview: true, use: false, edit: false, remove: false });
+  expect(publicTemplate).toMatchObject({ description: "유료 공용 설명", licenseScope: "ACTIVE_SUBSCRIPTION", licenseAvailable: false });
   await db.service.update({ where: { id: f.secondId }, data: { status: "archived" } });
   const archived = await listTemplates(f.ctx, query); expect(archived.permissions.targets).toEqual([]); expect(archived.permissions.canCreate).toBe(false);
   expect((await getTemplate(f.ctx, f.second.id)).actions).toEqual({ preview: true, use: false, edit: false, remove: false });
@@ -113,6 +116,81 @@ test("목록 입력은 알 수 없는 키를 거부하고 이름 정렬을 처�
   expect((await templateList(req("/templates?unknown=true", f.owner.cookie))).status).toBe(422);
   const response = await templateList(req("/templates?sort=name&direction=asc", f.owner.cookie)); expect(response.status).toBe(200);
   expect((await response.json()).items.map((row: { title: string }) => row.title)).toEqual(["A 회사 양식", "B 다른 양식", "C 공용 양식"]);
+});
+test("설명은 생성·검색·수정되고 라이선스 범위는 회사와 공용 경계에서 서버가 고정한다", async () => {
+  const f = await fixture(), key = randomUUID();
+  const createdResponse = await templateCreate(req("/templates", f.editor.cookie, "POST", {
+    serviceId: f.firstId, title: "설명 검색 양식", category: "QA", description: "찾을 수 있는 고유 설명", content: f.content,
+  }, { "idempotency-key": key }));
+  expect(createdResponse.status).toBe(201);
+  const created = await createdResponse.json();
+  expect(created).toMatchObject({ description: "찾을 수 있는 고유 설명", thumbnailAssetId: null, licenseScope: "SERVICE", licenseAvailable: true });
+
+  const searched = await templateList(req("/templates?search=" + encodeURIComponent("고유 설명"), f.editor.cookie));
+  expect(searched.status).toBe(200);
+  expect((await searched.json()).items.map((row: { id: string }) => row.id)).toContain(created.id);
+
+  const updatedResponse = await templateUpdate(req("/templates/" + created.id, f.editor.cookie, "PATCH", {
+    version: created.version, description: "수정된 설명",
+  }));
+  expect(updatedResponse.status).toBe(200);
+  expect(await updatedResponse.json()).toMatchObject({ description: "수정된 설명", version: 2, licenseScope: "SERVICE" });
+  expect((await templateUpdate(req("/templates/" + created.id, f.editor.cookie, "PATCH", {
+    version: 2, licenseScope: "ACTIVE_SUBSCRIPTION",
+  }))).status).toBe(422);
+
+  await expect(db.formTemplate.create({ data: { tenantId: f.company.id, serviceId: f.firstId, title: "잘못된 회사 라이선스",
+    category: "QA", licenseScope: "ACTIVE_SUBSCRIPTION", content: f.content } })).rejects.toThrow();
+  await expect(db.formTemplate.create({ data: { title: "잘못된 공용 라이선스", category: "QA", licenseScope: "SERVICE",
+    content: f.content } })).rejects.toThrow();
+});
+test("동시 편집의 오래된 버전은 409이고 먼저 저장된 설명과 제목을 덮어쓰지 않는다", async () => {
+  const f = await fixture();
+  const first = await templateUpdate(req("/templates/" + f.first.id, f.owner.cookie, "PATCH", {
+    version: 1, title: "먼저 저장된 제목", description: "먼저 저장된 설명",
+  }));
+  expect(first.status).toBe(200);
+  const stale = await templateUpdate(req("/templates/" + f.first.id, f.owner.cookie, "PATCH", {
+    version: 1, title: "오래된 화면 제목", description: "오래된 화면 설명",
+  }));
+  expect(stale.status).toBe(409);
+  expect(await stale.json()).toMatchObject({ error: { code: "VERSION_CONFLICT" } });
+  expect(await db.formTemplate.findUniqueOrThrow({ where: { id: f.first.id } })).toMatchObject({
+    title: "먼저 저장된 제목", description: "먼저 저장된 설명", version: 2,
+  });
+});
+test("공용 템플릿 사용은 유효한 구독에서만 열리고 원본 공용 템플릿 수정·삭제는 거부된다", async () => {
+  const f = await fixture(), useInput = { version: f.publicTemplate.version, serviceId: f.firstId, title: "공용 복제본" };
+  const noLicense = await templateUse(req("/templates/" + f.publicTemplate.id + "/use", f.owner.cookie, "POST", useInput,
+    { "idempotency-key": randomUUID() }));
+  expect(noLicense.status).toBe(402);
+  expect(await noLicense.json()).toMatchObject({ error: { code: "SUBSCRIPTION_REQUIRED" } });
+  expect(await db.form.count()).toBe(0);
+
+  await db.billingPlan.upsert({ where: { id: "trial" }, create: { id: "trial", name: "체험" }, update: {} });
+  const version = await db.billingPlanVersion.create({ data: { planId: "trial", number: Math.floor(Math.random() * 1000000000) + 100,
+    cycle: "trial", priceKrw: 0, features: {} } });
+  const trialStart = new Date(Date.now() - 1000);
+  await db.billingSubscription.create({ data: { tenantId: f.company.id, planId: "trial", planVersionId: version.id,
+    status: "trialing", activationSource: "trial", priceKrw: 0,
+    periodStart: trialStart, periodEnd: new Date(trialStart.getTime() + 7 * 86400000) } });
+
+  const detailResponse = await templateGet(req("/templates/" + f.publicTemplate.id, f.owner.cookie));
+  expect(detailResponse.status).toBe(200);
+  expect(await detailResponse.json()).toMatchObject({ licenseAvailable: true,
+    actions: { preview: true, use: true, edit: false, remove: false } });
+  const used = await templateUse(req("/templates/" + f.publicTemplate.id + "/use", f.owner.cookie, "POST", useInput,
+    { "idempotency-key": randomUUID() }));
+  expect(used.status).toBe(201);
+  expect(await used.json()).toMatchObject({ title: "공용 복제본", serviceId: f.firstId });
+  expect(await db.form.count()).toBe(1);
+
+  expect((await templateUpdate(req("/templates/" + f.publicTemplate.id, f.owner.cookie, "PATCH", {
+    version: 1, description: "수정 시도",
+  }))).status).toBe(403);
+  expect((await templateDelete(req("/templates/" + f.publicTemplate.id, f.owner.cookie, "DELETE", undefined,
+    { "if-match": "1" }))).status).toBe(403);
+  expect((await db.formTemplate.findUniqueOrThrow({ where: { id: f.publicTemplate.id } })).description).toBe("유료 공용 설명");
 });
 test("삭제한 템플릿의 생성 캐시는 내용·해시를 지우고 새/이전 형식의 재전송을 410으로 막는다", async () => {
   const f = await fixture(), key = randomUUID(), input = { serviceId: f.firstId, title: "삭제할 양식", category: "QA", content: f.content };

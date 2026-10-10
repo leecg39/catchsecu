@@ -8,7 +8,7 @@ const extras: NavEntry[] = [
   { path: "/log/destruction_certificate", label: "개인정보 파기 증명서", group: "개인정보 모니터링", keywords: "파기 증명" },
   { path: "/security", label: "회사 보안 현황", group: "관리", keywords: "보안 점검" },
   { path: "/security/ip", label: "IP 접근 관리", group: "관리", keywords: "아이피 접속 제한" },
-  { path: "/security/sso", label: "SSO 연결 관리", group: "관리", keywords: "통합 로그인 싱글사인온" },
+  { path: "/security/sso", label: "SSO 로그인 정책", group: "관리", keywords: "통합 로그인 싱글사인온" },
   { path: "/security/two-factor", label: "2단계 인증 강제 정책", group: "관리", keywords: "otp mfa 이중 인증" },
   { path: "/shared-privacy/view", label: "공유받은 외부 개인정보 열람", group: "공유", keywords: "외부 열람" },
   { path: "/notice", label: "캐치시큐 업데이트 노트", group: "도움말", keywords: "공지" },

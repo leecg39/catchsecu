@@ -1,18 +1,22 @@
+import { SsoTestBrowser } from "../helpers/sso-browser";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { inflateRawSync } from "node:zlib";
-import { afterAll, beforeEach, expect, test } from "vitest";
+import { afterAll, beforeEach, expect, test, vi } from "vitest";
 import { SignedXml } from "xml-crypto";
 import { auth } from "@/server/auth";
 import { opaqueToken, tokenHash } from "@/server/crypto";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
 
+vi.hoisted(() => { process.env.BETTER_AUTH_URL = process.env.BETTER_AUTH_URL!.replace(/^http:/, "https:"); });
+
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
+const browser = new SsoTestBrowser();
 const password = "Saml-owner!12345";
 const acs = origin + "/api/v1/auth/sso/saml";
 const IDP_ENTITY = "http://127.0.0.1:3999/idp";
@@ -53,8 +57,11 @@ function sign(xml: string, key = idpKey) {
   return Buffer.from(sig.getSignedXml()).toString("base64");
 }
 
+// Capture the company selected by each fixture; never infer it from a later shared-session change.
+const fixtureCompanies = new Map<string, string>();
 function req(path: string, cookie = "", method = "GET", input?: unknown, key?: string) {
-  return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie,
+  if (path === "/security/sso" && method === "POST" && input && typeof input === "object") input = { tenantId: fixtureCompanies.get(cookie), ...input };
+  return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie: browser.cookie(cookie),
     ...(input === undefined ? {} : { "content-type": "application/json" }), ...(key ? { "idempotency-key": key } : {}) },
     ...(input === undefined ? {} : { body: JSON.stringify(input) }) });
 }
@@ -65,9 +72,12 @@ async function ownerCookie() {
   const company = await db.company.create({ data: { name: "SAML 회사", publicName: "SAML", policy: { create: {} },
     memberships: { create: { userId: user.id, role: "owner" } } } });
   const login = await auth.handler(req("/auth/sign-in/email", "", "POST", { email, password }));
-  return { cookie: login.headers.getSetCookie().map(v => v.split(";")[0]).join("; "), company, user };
+  const cookie = login.headers.getSetCookie().map(v => v.split(";")[0]).join("; ");
+  fixtureCompanies.set(cookie, company.id);
+  return { cookie, company, user };
 }
 beforeEach(async () => {
+  browser.reset(); fixtureCompanies.clear();
   await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "Job", "SsoProvider" CASCADE');
 });
 afterAll(async () => { await db.$disconnect(); });
@@ -77,7 +87,7 @@ async function routes() {
   const { POST: samlRoute } = await import("@/app/api/v1/auth/sso/saml/route");
   const { POST: createProvider } = await import("@/app/api/v1/security/sso/route");
   const { PATCH: patchProvider } = await import("@/app/api/v1/security/sso/[id]/route");
-  return { startRoute, samlRoute, createProvider, patchProvider };
+  return { startRoute: browser.wrap(startRoute), samlRoute: browser.wrap(samlRoute), createProvider, patchProvider };
 }
 async function makeProvider(cookie: string) {
   const { createProvider, patchProvider } = await routes();
@@ -91,7 +101,7 @@ async function begin(cookie: string, providerId: string, invitationToken?: strin
   const { startRoute } = await routes();
   const { POST: inviteStart } = await import("@/app/api/v1/invitations/sso/start/route");
   const started = invitationToken
-    ? await inviteStart(req("/invitations/sso/start", cookie, "POST", { token: invitationToken, providerId }))
+    ? await browser.wrap(inviteStart)(req("/invitations/sso/start", cookie, "POST", { token: invitationToken, providerId }))
     : await startRoute(req(`/auth/sso/${providerId}?mode=login`, cookie));
   expect(started.status).toBe(invitationToken ? 200 : 302);
   const url = new URL(invitationToken ? (await started.json()).redirect : started.headers.get("location")!);
@@ -156,6 +166,7 @@ test("실제 SAML 로그인: AuthnRequest→서명검증→세션발급→JIT �
   expect(member.role).toBe("viewer");
   const account = await db.account.findFirstOrThrow({ where: { providerId: "sso:" + provider.id } });
   expect(account.accountId).toBe(`${IDP_ENTITY}|saml-sub-1`);
+  expect(await db.ssoSessionProof.findFirst({ where: { userId: user.id } })).toMatchObject({ tenantId: company.id, providerId: provider.id, accountId: account.id, identityProvider: "OTHER" });
   // 같은 RelayState 재전송 → 401 (일회성 소비)
   const replay = await routes().then(r => r.samlRoute(postSaml(sign(samlResponse({ inResponseTo: requestId })), relayState)));
   expect(replay.status).toBe(401);
@@ -346,4 +357,24 @@ test("SAML 인증서 교체: 마지막 로그인 수단을 비활성화하는 �
   const changed = await patchProvider(req(`/security/sso/${provider.id}`, cookie, "PATCH", { version: 2, idpCert: readFileSync(join(otherDir, "cert.pem"), "utf8") }));
   expect(changed.status).toBe(409); expect((await changed.json()).error.code).toBe("SSO_PROVIDER_LAST_LOGIN");
   expect(await db.ssoProvider.findUniqueOrThrow({ where: { id: provider.id } })).toMatchObject({ enabled: true, version: 2, idpCert: idpCert.trim() });
+});
+
+test.each(["missing", "other", "legacy", "http"])("E1 SAML %s 브라우저 결합/전송 거절은 서명된 상태도 소비하지 않는다", async variant => {
+  const { cookie } = await ownerCookie(), { provider } = await makeProvider(cookie);
+  await db.ssoProvider.update({ where: { id: provider.id }, data: { enabled: true } });
+  const { requestId, relayState } = await begin(cookie, provider.id);
+  const state = await db.ssoState.findFirstOrThrow();
+  if (variant === "legacy") await db.ssoState.update({ where: { id: state.id }, data: { browserHash: null } });
+  const { POST: rawSaml } = await import("@/app/api/v1/auth/sso/saml/route");
+  const request = postSaml(sign(samlResponse({ inResponseTo: requestId })), relayState);
+  request.headers.set("cookie", variant === "missing" ? "" : variant === "other" ? browser.cookie().split("=", 1)[0] + "=" + "x".repeat(43) : browser.cookie());
+  const previous = env.BETTER_AUTH_URL;
+  if (variant === "http") env.BETTER_AUTH_URL = previous.replace(/^https:/, "http:");
+  try {
+    const response = await rawSaml(request);
+    expect(response.status).toBe(variant === "http" ? 503 : 401);
+    expect((await response.json()).error.code).toBe(variant === "http" ? "SSO_HTTPS_REQUIRED" : "SSO_BROWSER_MISMATCH");
+  } finally { env.BETTER_AUTH_URL = previous; }
+  expect(await db.ssoState.count({ where: { id: state.id } })).toBe(1);
+  expect(await db.account.count({ where: { providerId: "sso:" + provider.id } })).toBe(0);
 });

@@ -1,0 +1,1100 @@
+{
+  "checkedAt": "2026-10-09T20:57:31.286Z",
+  "checks": [
+    {
+      "label": "owner policy",
+      "status": 200
+    },
+    {
+      "label": "owner IP",
+      "status": 200
+    },
+    {
+      "label": "owner MFA",
+      "status": 200
+    },
+    {
+      "label": "security overview",
+      "status": 200
+    },
+    {
+      "label": "reset opens member",
+      "status": 200
+    },
+    {
+      "label": "idle old admin stays revoked",
+      "status": 401,
+      "errorCode": "UNAUTHENTICATED"
+    },
+    {
+      "label": "viewer cannot read",
+      "status": 403,
+      "errorCode": "FORBIDDEN"
+    },
+    {
+      "label": "foreign rule hidden",
+      "status": 404,
+      "errorCode": "NOT_FOUND"
+    }
+  ],
+  "state": {
+    "policy": {
+      "tenantId": "775d221d-6051-4948-bfae-18a4211a8926",
+      "minPassword": 12,
+      "passwordMonths": 3,
+      "passwordReuse": 1,
+      "passwordDeferral": "never",
+      "passwordRevision": 3,
+      "sessionMinutes": 30,
+      "requireMfa": false,
+      "requireApproval": false,
+      "approvalRoles": [
+        "owner"
+      ],
+      "approvalReferenceRequired": false,
+      "approvalRequestTemplate": "",
+      "approvalRevision": 3,
+      "retentionDays": 365,
+      "automaticDestruction": false,
+      "allowRetentionAdjustment": false,
+      "allowRetentionDesignation": false,
+      "activityReviewRetentionDays": null,
+      "version": 5,
+      "updatedAt": "2026-10-09T20:49:12.877Z"
+    },
+    "ipPolicy": {
+      "tenantId": "775d221d-6051-4948-bfae-18a4211a8926",
+      "enabled": true,
+      "version": 1,
+      "createdAt": "2026-10-09T20:43:39.918Z",
+      "updatedAt": "2026-10-09T20:43:39.918Z"
+    },
+    "rules": [
+      {
+        "id": "20364f9f-2ae1-4e6a-8375-ac20abf2e209",
+        "tenantId": "775d221d-6051-4948-bfae-18a4211a8926",
+        "cidr": "127.0.0.1/32",
+        "description": "REA 검증된 관리자 허용",
+        "enabled": true,
+        "version": 3,
+        "createdAt": "2026-10-09T20:43:12.003Z",
+        "updatedAt": "2026-10-09T20:43:37.828Z"
+      }
+    ],
+    "exceptions": 0,
+    "users": [
+      {
+        "id": "4467979c-9913-49da-8b05-175e87cfbd0b",
+        "status": "active",
+        "twoFactorEnabled": false
+      },
+      {
+        "id": "5479acf6-eb80-4053-9a23-1654769a6fab",
+        "status": "active",
+        "twoFactorEnabled": false
+      },
+      {
+        "id": "7fa45aab-5ea0-46ac-95c3-a2a70f014ee8",
+        "status": "active",
+        "twoFactorEnabled": false
+      },
+      {
+        "id": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "status": "active",
+        "twoFactorEnabled": true
+      },
+      {
+        "id": "fb8a64ae-0db1-4045-b510-79ba3cc2168a",
+        "status": "active",
+        "twoFactorEnabled": false
+      }
+    ],
+    "expiredSessionIds": [
+      "a9081c17-d34c-4c17-860e-e18718461dbd"
+    ],
+    "idempotency": [
+      {
+        "resourceId": "08edf83c-ce66-485c-a61b-7ca53cd9bc47",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.518Z"
+      },
+      {
+        "resourceId": "0b7b3f94-ecf5-49e1-ae35-959ea1b58a49",
+        "resourceType": "mfa-exception",
+        "invalidatedAt": "2026-10-09T20:48:46.970Z"
+      },
+      {
+        "resourceId": "12432465-4595-4244-9dff-2e7659f700e7",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:18.100Z"
+      },
+      {
+        "resourceId": "20364f9f-2ae1-4e6a-8375-ac20abf2e209",
+        "resourceType": "ip-rule",
+        "invalidatedAt": null
+      },
+      {
+        "resourceId": "22cc702a-4e49-44fb-94f5-e5abfdc8a574",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:25.280Z"
+      },
+      {
+        "resourceId": "23c5701e-fb34-418e-8ef0-973519ffc0db",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.412Z"
+      },
+      {
+        "resourceId": "2c8f2a1a-3268-4090-94ac-0d0ee12ee412",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:27.426Z"
+      },
+      {
+        "resourceId": "35e17234-db56-4c1d-9312-d415dc25f06a",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:44:27.029Z"
+      },
+      {
+        "resourceId": "3f5fcc22-4881-4195-9a8b-5da7b5b3dcf2",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:18.276Z"
+      },
+      {
+        "resourceId": "3f7ded88-f23c-4823-8c83-9b8ba6d9b7dc",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:25.791Z"
+      },
+      {
+        "resourceId": "494776a9-ad90-4952-afc6-ed364a59bd9c",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:28.289Z"
+      },
+      {
+        "resourceId": "4c74a7f6-4048-4923-a923-0c0be90546af",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:52:34.195Z"
+      },
+      {
+        "resourceId": "50019629-aefb-42c1-ad9f-13ec80d65702",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:18.327Z"
+      },
+      {
+        "resourceId": "6406741e-2171-4387-807c-9972ac0dc306",
+        "resourceType": "mfa-exception",
+        "invalidatedAt": "2026-10-09T20:48:44.994Z"
+      },
+      {
+        "resourceId": "6d6b7543-c571-48e4-9a60-131331976dec",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.559Z"
+      },
+      {
+        "resourceId": "6dca59f5-5879-48ca-b7c3-ca454d710d25",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.227Z"
+      },
+      {
+        "resourceId": "79405433-4a75-47cb-9100-9b638fba4732",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:18.127Z"
+      },
+      {
+        "resourceId": "7b9a0678-f33b-4674-b1fb-51b65c72c68a",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.910Z"
+      },
+      {
+        "resourceId": "806ea660-0c3d-4f15-8ac1-6bfcfa2151d4",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.626Z"
+      },
+      {
+        "resourceId": "80beb46e-32f2-468c-8e7f-137e86b75254",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:26.053Z"
+      },
+      {
+        "resourceId": "8405062a-f27d-43f8-bb5f-6ce0a3c4eaf6",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:18.016Z"
+      },
+      {
+        "resourceId": "87d755c6-3521-47ce-96dc-d5b395b78844",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.289Z"
+      },
+      {
+        "resourceId": "96760d10-d8b7-4ade-b0c0-111af525759e",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:25.132Z"
+      },
+      {
+        "resourceId": "9aa79a9f-7189-4e62-91f0-30b19cb1ac56",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:25.677Z"
+      },
+      {
+        "resourceId": "9c9d3058-22a5-41ca-aac2-a6685e7cba49",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.770Z"
+      },
+      {
+        "resourceId": "9cdfdc64-5b4c-49c0-9ae1-1c4ff048a547",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:18.302Z"
+      },
+      {
+        "resourceId": "9da232ad-85cc-4063-a181-902ea4a5a140",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:28.085Z"
+      },
+      {
+        "resourceId": "b1d97077-dceb-48c6-831a-906659eedc5e",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:25.514Z"
+      },
+      {
+        "resourceId": "b6228a63-b7fc-44ee-8aa8-6bd5f2b96ce9",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:27.583Z"
+      },
+      {
+        "resourceId": "b73f9e23-032a-4e1a-aeac-1af018406329",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:25.948Z"
+      },
+      {
+        "resourceId": "b9013e40-084c-496e-b93d-b76d655b5473",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:27.852Z"
+      },
+      {
+        "resourceId": "b995cca6-fd23-4d18-992a-c81e41500f96",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:26.148Z"
+      },
+      {
+        "resourceId": "bca50efb-2070-4f9d-bc7b-1dacccedd5d3",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:27.067Z"
+      },
+      {
+        "resourceId": "bccffdcb-41c9-4cb2-ab00-d1cb7a7fe78e",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:25.391Z"
+      },
+      {
+        "resourceId": "c4b7307d-e8c2-49df-817d-78404d4f8b70",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:18.070Z"
+      },
+      {
+        "resourceId": "c7992f0b-9d6c-4dcf-bd69-272dd71c3e85",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:26.691Z"
+      },
+      {
+        "resourceId": "c997adae-e5cb-46a8-965e-3851eedbc29c",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:27.724Z"
+      },
+      {
+        "resourceId": "cde1eb68-97a3-421d-acef-7336a90c21a2",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:28.967Z"
+      },
+      {
+        "resourceId": "ce9af488-7ad6-4d3c-b4e9-52c8b3781189",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.473Z"
+      },
+      {
+        "resourceId": "da3ebccf-5107-4af5-a9e1-3cad496e3fbb",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:28.608Z"
+      },
+      {
+        "resourceId": "e5e518a2-43f3-48f8-8fe2-28c8caaff416",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:50:28.882Z"
+      },
+      {
+        "resourceId": "eb186cae-e55d-4994-a73b-00ef8e825515",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:18.157Z"
+      },
+      {
+        "resourceId": "f1d5acc0-c08d-4e1c-b584-5467d6721124",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.592Z"
+      },
+      {
+        "resourceId": "fe7ff06c-500d-43cb-b3a5-08c86bd9110d",
+        "resourceType": "ip-rule",
+        "invalidatedAt": "2026-10-09T20:53:17.678Z"
+      }
+    ],
+    "audits": [
+      {
+        "id": "2fa1f968-ebcf-4f4e-8aa7-e75ce52692cd",
+        "action": "company.created",
+        "resourceId": "775d221d-6051-4948-bfae-18a4211a8926",
+        "createdAt": "2026-10-09T20:38:20.558Z"
+      },
+      {
+        "id": "9255baad-fecb-4448-9e09-be8c23e83dfe",
+        "action": "session.created",
+        "resourceId": "b0d8974d-66f5-46b5-b7e7-b655a551698c",
+        "createdAt": "2026-10-09T20:38:34.031Z"
+      },
+      {
+        "id": "45a5e7d0-7b11-471b-94bb-c389a90f9d90",
+        "action": "analytics.dashboard_viewed",
+        "resourceId": null,
+        "createdAt": "2026-10-09T20:38:34.297Z"
+      },
+      {
+        "id": "6508a9b0-f830-485e-a54c-f8620c33bc67",
+        "action": "marketing.summary_viewed",
+        "resourceId": null,
+        "createdAt": "2026-10-09T20:38:34.369Z"
+      },
+      {
+        "id": "59305bab-75c6-4783-9ac8-aa16132657aa",
+        "action": "auth.factor_setup",
+        "resourceId": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "createdAt": "2026-10-09T20:41:44.918Z"
+      },
+      {
+        "id": "f6a6ef0d-0c79-4d15-be0d-b95566339b77",
+        "action": "session.ended",
+        "resourceId": "9f06e6ea-b46a-46eb-997e-1655d9436417",
+        "createdAt": "2026-10-09T20:42:13.260Z"
+      },
+      {
+        "id": "8119a08d-0548-4d34-9dae-07b113b4c04b",
+        "action": "auth.sessions_revoked_for_mfa",
+        "resourceId": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "createdAt": "2026-10-09T20:42:13.263Z"
+      },
+      {
+        "id": "bf60b348-beb7-4267-a479-b940788d1a56",
+        "action": "auth.mfa_enabled",
+        "resourceId": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "createdAt": "2026-10-09T20:42:13.275Z"
+      },
+      {
+        "id": "578cb471-4787-4c19-a8ed-e2d7dc839226",
+        "action": "session.created",
+        "resourceId": "f4df5ce3-712b-4b82-8caa-dac438808497",
+        "createdAt": "2026-10-09T20:42:13.294Z"
+      },
+      {
+        "id": "780ab1fd-62d2-486f-ad44-fb6c325cff18",
+        "action": "session.ended",
+        "resourceId": "b0d8974d-66f5-46b5-b7e7-b655a551698c",
+        "createdAt": "2026-10-09T20:42:13.309Z"
+      },
+      {
+        "id": "22fd9323-d9bf-4a22-889c-015ca35f7306",
+        "action": "auth.factor_verified",
+        "resourceId": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "createdAt": "2026-10-09T20:42:13.313Z"
+      },
+      {
+        "id": "32ac84e4-9064-4754-9649-e2f8f9a5c0ca",
+        "action": "session.created",
+        "resourceId": "fed4acbb-1da0-496b-80b0-8be9770af66f",
+        "createdAt": "2026-10-09T20:43:10.062Z"
+      },
+      {
+        "id": "6465fc0c-cadd-4f73-b55e-cb7aa0f6ecd2",
+        "action": "session.ended",
+        "resourceId": "fed4acbb-1da0-496b-80b0-8be9770af66f",
+        "createdAt": "2026-10-09T20:43:10.070Z"
+      },
+      {
+        "id": "983b37da-2350-4467-b86a-c766fef0addd",
+        "action": "auth.factor_challenged",
+        "resourceId": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "createdAt": "2026-10-09T20:43:10.079Z"
+      },
+      {
+        "id": "374cbe4d-a3a8-41d6-a6b1-40b9b3bf0120",
+        "action": "session.created",
+        "resourceId": "59687d16-c0ea-4fd6-b67c-96757d3fe91f",
+        "createdAt": "2026-10-09T20:43:10.116Z"
+      },
+      {
+        "id": "409707bc-6403-4e15-badd-3b2e0f57e98f",
+        "action": "auth.factor_verified",
+        "resourceId": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "createdAt": "2026-10-09T20:43:10.117Z"
+      },
+      {
+        "id": "e1a678b2-c33a-4bf1-925d-1837fa0e70bf",
+        "action": "ip_rule.created",
+        "resourceId": "20364f9f-2ae1-4e6a-8375-ac20abf2e209",
+        "createdAt": "2026-10-09T20:43:12.008Z"
+      },
+      {
+        "id": "59e9a807-b666-4c90-b778-03affb1347c6",
+        "action": "ip_rule.updated",
+        "resourceId": "20364f9f-2ae1-4e6a-8375-ac20abf2e209",
+        "createdAt": "2026-10-09T20:43:17.684Z"
+      },
+      {
+        "id": "994635d9-9082-4179-b89f-946cb84c5aeb",
+        "action": "ip_rule.updated",
+        "resourceId": "20364f9f-2ae1-4e6a-8375-ac20abf2e209",
+        "createdAt": "2026-10-09T20:43:37.833Z"
+      },
+      {
+        "id": "7f0f8b3a-93a2-4b0a-9d66-e5cb701b8c47",
+        "action": "ip_access.updated",
+        "resourceId": "775d221d-6051-4948-bfae-18a4211a8926",
+        "createdAt": "2026-10-09T20:43:39.921Z"
+      },
+      {
+        "id": "7c32d37b-989a-4a9d-94e5-3d9fea0b38d9",
+        "action": "ip_rule.created",
+        "resourceId": "35e17234-db56-4c1d-9312-d415dc25f06a",
+        "createdAt": "2026-10-09T20:44:26.839Z"
+      },
+      {
+        "id": "2baad81c-d7dd-450a-aa4e-d3ecdf125d7e",
+        "action": "ip_rule.updated",
+        "resourceId": "35e17234-db56-4c1d-9312-d415dc25f06a",
+        "createdAt": "2026-10-09T20:44:26.878Z"
+      },
+      {
+        "id": "2d98a385-88df-497d-84e9-ff4f84ebbef7",
+        "action": "ip_rule.deleted",
+        "resourceId": "35e17234-db56-4c1d-9312-d415dc25f06a",
+        "createdAt": "2026-10-09T20:44:27.032Z"
+      },
+      {
+        "id": "40b31ec6-fbe0-4c0a-a0b4-21c694c1f82a",
+        "action": "mfa_exception.created",
+        "resourceId": "6406741e-2171-4387-807c-9972ac0dc306",
+        "createdAt": "2026-10-09T20:44:47.210Z"
+      },
+      {
+        "id": "738ac8df-23f2-43fb-933c-f9b5a3cf4498",
+        "action": "mfa_policy.updated",
+        "resourceId": "775d221d-6051-4948-bfae-18a4211a8926",
+        "createdAt": "2026-10-09T20:44:49.162Z"
+      },
+      {
+        "id": "15801986-0424-4f43-9bc5-a9d83cb4baff",
+        "action": "mfa_exception.updated",
+        "resourceId": "6406741e-2171-4387-807c-9972ac0dc306",
+        "createdAt": "2026-10-09T20:44:58.595Z"
+      },
+      {
+        "id": "c6708235-503c-4913-be9d-d04c3a47e85d",
+        "action": "mfa_exception.updated",
+        "resourceId": "6406741e-2171-4387-807c-9972ac0dc306",
+        "createdAt": "2026-10-09T20:45:20.185Z"
+      },
+      {
+        "id": "702e095f-5d1b-48e4-8936-d92d91e85eaa",
+        "action": "policy.updated",
+        "resourceId": "775d221d-6051-4948-bfae-18a4211a8926",
+        "createdAt": "2026-10-09T20:46:09.693Z"
+      },
+      {
+        "id": "72c6c7af-9ac8-4d0e-8520-ca3bd643c1a0",
+        "action": "mfa_exception.created",
+        "resourceId": "0b7b3f94-ecf5-49e1-ae35-959ea1b58a49",
+        "createdAt": "2026-10-09T20:47:32.772Z"
+      },
+      {
+        "id": "7507d389-aca1-4f70-8d97-34c9c78e62a4",
+        "action": "auth.factor_rejected",
+        "resourceId": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "createdAt": "2026-10-09T20:47:41.021Z"
+      },
+      {
+        "id": "9ccadaa1-706e-4301-ba47-ac03c319e44c",
+        "action": "policy.updated",
+        "resourceId": "775d221d-6051-4948-bfae-18a4211a8926",
+        "createdAt": "2026-10-09T20:47:59.058Z"
+      },
+      {
+        "id": "61458056-af42-4791-8c65-ce3762bf7270",
+        "action": "mfa_exception.deleted",
+        "resourceId": "6406741e-2171-4387-807c-9972ac0dc306",
+        "createdAt": "2026-10-09T20:48:44.996Z"
+      },
+      {
+        "id": "05ff251b-9c64-42dc-b839-b75ef020ee18",
+        "action": "mfa_exception.deleted",
+        "resourceId": "0b7b3f94-ecf5-49e1-ae35-959ea1b58a49",
+        "createdAt": "2026-10-09T20:48:46.970Z"
+      },
+      {
+        "id": "480ebfa9-0802-4041-be7e-3dce3ab388f3",
+        "action": "policy.reset",
+        "resourceId": "775d221d-6051-4948-bfae-18a4211a8926",
+        "createdAt": "2026-10-09T20:49:12.882Z"
+      },
+      {
+        "id": "4da60baa-d801-4225-8f52-05ad666e96ab",
+        "action": "ip_rule.created",
+        "resourceId": "96760d10-d8b7-4ade-b0c0-111af525759e",
+        "createdAt": "2026-10-09T20:49:13.878Z"
+      },
+      {
+        "id": "a5605239-8caa-41e1-9797-fb5515951602",
+        "action": "ip_rule.created",
+        "resourceId": "22cc702a-4e49-44fb-94f5-e5abfdc8a574",
+        "createdAt": "2026-10-09T20:49:13.914Z"
+      },
+      {
+        "id": "a76953ec-3006-4873-863b-71f95950518b",
+        "action": "ip_rule.created",
+        "resourceId": "bccffdcb-41c9-4cb2-ab00-d1cb7a7fe78e",
+        "createdAt": "2026-10-09T20:49:13.948Z"
+      },
+      {
+        "id": "5b5c9c53-576a-49fb-8889-f2d0f6b757db",
+        "action": "ip_rule.created",
+        "resourceId": "b1d97077-dceb-48c6-831a-906659eedc5e",
+        "createdAt": "2026-10-09T20:49:13.976Z"
+      },
+      {
+        "id": "2a6f59ae-dd69-47d2-b22c-6bbec42cf757",
+        "action": "ip_rule.created",
+        "resourceId": "9aa79a9f-7189-4e62-91f0-30b19cb1ac56",
+        "createdAt": "2026-10-09T20:49:14.003Z"
+      },
+      {
+        "id": "2a891e1e-612c-4515-9b92-3e4f1df6af39",
+        "action": "ip_rule.created",
+        "resourceId": "3f7ded88-f23c-4823-8c83-9b8ba6d9b7dc",
+        "createdAt": "2026-10-09T20:49:14.029Z"
+      },
+      {
+        "id": "7caf9de1-a8d0-42c7-a1a5-1e9e46a299aa",
+        "action": "ip_rule.created",
+        "resourceId": "b73f9e23-032a-4e1a-aeac-1af018406329",
+        "createdAt": "2026-10-09T20:49:14.055Z"
+      },
+      {
+        "id": "3f0b6db0-68db-47e3-889a-561ae287fb55",
+        "action": "ip_rule.created",
+        "resourceId": "80beb46e-32f2-468c-8e7f-137e86b75254",
+        "createdAt": "2026-10-09T20:49:14.097Z"
+      },
+      {
+        "id": "711fb0d8-96a7-417f-9d4d-f5c7c5014493",
+        "action": "ip_rule.created",
+        "resourceId": "b995cca6-fd23-4d18-992a-c81e41500f96",
+        "createdAt": "2026-10-09T20:49:14.120Z"
+      },
+      {
+        "id": "94c4e835-fc90-4c52-adfb-4acf44362cf1",
+        "action": "ip_rule.created",
+        "resourceId": "c7992f0b-9d6c-4dcf-bd69-272dd71c3e85",
+        "createdAt": "2026-10-09T20:49:14.151Z"
+      },
+      {
+        "id": "7c11061c-79a6-4db6-a6d1-6b2e7352cf5a",
+        "action": "ip_rule.created",
+        "resourceId": "bca50efb-2070-4f9d-bc7b-1dacccedd5d3",
+        "createdAt": "2026-10-09T20:49:14.179Z"
+      },
+      {
+        "id": "cd765d93-2d34-410f-a90c-e1399e2c1cf4",
+        "action": "ip_rule.created",
+        "resourceId": "2c8f2a1a-3268-4090-94ac-0d0ee12ee412",
+        "createdAt": "2026-10-09T20:49:14.209Z"
+      },
+      {
+        "id": "f3c3a9f5-f86a-4ae3-816a-8db3e989337d",
+        "action": "ip_rule.created",
+        "resourceId": "b6228a63-b7fc-44ee-8aa8-6bd5f2b96ce9",
+        "createdAt": "2026-10-09T20:49:14.236Z"
+      },
+      {
+        "id": "635f680e-47e7-4050-b2e9-4eee1ef354f7",
+        "action": "ip_rule.created",
+        "resourceId": "c997adae-e5cb-46a8-965e-3851eedbc29c",
+        "createdAt": "2026-10-09T20:49:14.266Z"
+      },
+      {
+        "id": "74f81727-f76e-4b18-98d5-0e02ac510245",
+        "action": "ip_rule.created",
+        "resourceId": "b9013e40-084c-496e-b93d-b76d655b5473",
+        "createdAt": "2026-10-09T20:49:14.291Z"
+      },
+      {
+        "id": "aff27cb0-2da7-4682-9993-337af438b589",
+        "action": "ip_rule.created",
+        "resourceId": "9da232ad-85cc-4063-a181-902ea4a5a140",
+        "createdAt": "2026-10-09T20:49:14.319Z"
+      },
+      {
+        "id": "58bd2f5c-09e7-4335-8319-a9b9b91dd79d",
+        "action": "ip_rule.created",
+        "resourceId": "494776a9-ad90-4952-afc6-ed364a59bd9c",
+        "createdAt": "2026-10-09T20:49:14.350Z"
+      },
+      {
+        "id": "279476e7-8582-4c55-92d2-9bf1d3d360ba",
+        "action": "ip_rule.created",
+        "resourceId": "da3ebccf-5107-4af5-a9e1-3cad496e3fbb",
+        "createdAt": "2026-10-09T20:49:14.377Z"
+      },
+      {
+        "id": "b9586698-ba67-4956-affd-0735cb991f3d",
+        "action": "ip_rule.created",
+        "resourceId": "e5e518a2-43f3-48f8-8fe2-28c8caaff416",
+        "createdAt": "2026-10-09T20:49:14.406Z"
+      },
+      {
+        "id": "bfed66a3-b450-4b6c-aa38-2b4a1485d5fc",
+        "action": "ip_rule.created",
+        "resourceId": "cde1eb68-97a3-421d-acef-7336a90c21a2",
+        "createdAt": "2026-10-09T20:49:14.436Z"
+      },
+      {
+        "id": "b46393be-b68c-4ad7-ad5e-576f8597f58f",
+        "action": "session.created",
+        "resourceId": "6dbadfde-e55e-46eb-a820-34b00c8323bb",
+        "createdAt": "2026-10-09T20:49:14.663Z"
+      },
+      {
+        "id": "626acf30-dd85-4b65-a2a2-b8fad654b711",
+        "action": "analytics.dashboard_viewed",
+        "resourceId": null,
+        "createdAt": "2026-10-09T20:49:14.870Z"
+      },
+      {
+        "id": "3da2c064-de65-42bd-a269-03b34ccdea2d",
+        "action": "marketing.summary_viewed",
+        "resourceId": null,
+        "createdAt": "2026-10-09T20:49:14.874Z"
+      },
+      {
+        "id": "a7fda38f-4c19-4f77-9ebd-c51a06f2955b",
+        "action": "session.created",
+        "resourceId": "64a0c039-ae28-415c-9884-36e55e3e24ff",
+        "createdAt": "2026-10-09T20:49:28.844Z"
+      },
+      {
+        "id": "37e31f6f-1573-4b9c-80e9-c6f8dd48ff70",
+        "action": "analytics.dashboard_viewed",
+        "resourceId": null,
+        "createdAt": "2026-10-09T20:49:29.020Z"
+      },
+      {
+        "id": "f5eb53f7-7051-4495-b55b-243f2998b50e",
+        "action": "session.created",
+        "resourceId": "98769447-67e8-41c9-aa06-c6aba8d9c978",
+        "createdAt": "2026-10-09T20:49:30.938Z"
+      },
+      {
+        "id": "c800f34c-3174-44d1-b57e-c578e04bdbc8",
+        "action": "session.ended",
+        "resourceId": "98769447-67e8-41c9-aa06-c6aba8d9c978",
+        "createdAt": "2026-10-09T20:49:30.942Z"
+      },
+      {
+        "id": "494ad887-5408-448a-8f31-0b3e7d4d8f29",
+        "action": "auth.factor_challenged",
+        "resourceId": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "createdAt": "2026-10-09T20:49:30.946Z"
+      },
+      {
+        "id": "68490cce-9625-4100-960d-acbaf0b13a45",
+        "action": "session.created",
+        "resourceId": "92e33b91-88fb-4278-af9e-ea0264848fd3",
+        "createdAt": "2026-10-09T20:50:04.179Z"
+      },
+      {
+        "id": "b11a42d8-4239-402b-b374-11596e8afcae",
+        "action": "auth.factor_verified",
+        "resourceId": "b319eaa1-3241-4e2c-80a4-99cbb2bfaabf",
+        "createdAt": "2026-10-09T20:50:04.182Z"
+      },
+      {
+        "id": "b6550448-d9df-4ce5-896f-3e79ea94dc4c",
+        "action": "analytics.dashboard_viewed",
+        "resourceId": null,
+        "createdAt": "2026-10-09T20:50:04.469Z"
+      },
+      {
+        "id": "9e2d9aa6-95af-4440-99fd-1dfd573252fe",
+        "action": "marketing.summary_viewed",
+        "resourceId": null,
+        "createdAt": "2026-10-09T20:50:04.530Z"
+      },
+      {
+        "id": "2de46c82-a784-46a7-af29-9c5c816d953c",
+        "action": "ip_rule.deleted",
+        "resourceId": "96760d10-d8b7-4ade-b0c0-111af525759e",
+        "createdAt": "2026-10-09T20:50:25.140Z"
+      },
+      {
+        "id": "60f93e8c-f21d-4c62-8370-b2468a02d27d",
+        "action": "ip_rule.deleted",
+        "resourceId": "22cc702a-4e49-44fb-94f5-e5abfdc8a574",
+        "createdAt": "2026-10-09T20:50:25.284Z"
+      },
+      {
+        "id": "2e3678fa-9c51-4556-9e07-e02c46073b34",
+        "action": "ip_rule.deleted",
+        "resourceId": "bccffdcb-41c9-4cb2-ab00-d1cb7a7fe78e",
+        "createdAt": "2026-10-09T20:50:25.397Z"
+      },
+      {
+        "id": "69c2ca06-ac6c-4739-9efd-25875962b6cb",
+        "action": "ip_rule.deleted",
+        "resourceId": "b1d97077-dceb-48c6-831a-906659eedc5e",
+        "createdAt": "2026-10-09T20:50:25.517Z"
+      },
+      {
+        "id": "f782dcae-0965-4826-b2c8-f0b60e1e2bfd",
+        "action": "ip_rule.deleted",
+        "resourceId": "9aa79a9f-7189-4e62-91f0-30b19cb1ac56",
+        "createdAt": "2026-10-09T20:50:25.681Z"
+      },
+      {
+        "id": "decff3ff-3022-4a65-9f69-39dcb17e484c",
+        "action": "ip_rule.deleted",
+        "resourceId": "3f7ded88-f23c-4823-8c83-9b8ba6d9b7dc",
+        "createdAt": "2026-10-09T20:50:25.793Z"
+      },
+      {
+        "id": "cbca167d-44cf-405f-aca9-347c0e2fb90f",
+        "action": "ip_rule.deleted",
+        "resourceId": "b73f9e23-032a-4e1a-aeac-1af018406329",
+        "createdAt": "2026-10-09T20:50:25.950Z"
+      },
+      {
+        "id": "4c7efc5b-aac2-4e8b-92cb-ac9645a7dd58",
+        "action": "ip_rule.deleted",
+        "resourceId": "80beb46e-32f2-468c-8e7f-137e86b75254",
+        "createdAt": "2026-10-09T20:50:26.055Z"
+      },
+      {
+        "id": "b088af55-7b1d-41d0-a2cd-eb6baa073f13",
+        "action": "ip_rule.deleted",
+        "resourceId": "b995cca6-fd23-4d18-992a-c81e41500f96",
+        "createdAt": "2026-10-09T20:50:26.150Z"
+      },
+      {
+        "id": "2683cdc4-b4be-45f7-b301-91041136c6d3",
+        "action": "ip_rule.deleted",
+        "resourceId": "c7992f0b-9d6c-4dcf-bd69-272dd71c3e85",
+        "createdAt": "2026-10-09T20:50:26.693Z"
+      },
+      {
+        "id": "75ee11e3-ec68-49ae-b6e1-a33347951693",
+        "action": "ip_rule.deleted",
+        "resourceId": "bca50efb-2070-4f9d-bc7b-1dacccedd5d3",
+        "createdAt": "2026-10-09T20:50:27.123Z"
+      },
+      {
+        "id": "ae2e787f-c894-4097-916c-2f49113968e1",
+        "action": "ip_rule.deleted",
+        "resourceId": "2c8f2a1a-3268-4090-94ac-0d0ee12ee412",
+        "createdAt": "2026-10-09T20:50:27.427Z"
+      },
+      {
+        "id": "3c634fab-6ec1-4bd3-8b90-6cd195355e1b",
+        "action": "ip_rule.deleted",
+        "resourceId": "b6228a63-b7fc-44ee-8aa8-6bd5f2b96ce9",
+        "createdAt": "2026-10-09T20:50:27.584Z"
+      },
+      {
+        "id": "5b5c9764-fc22-4b15-a658-a0b1c97275cd",
+        "action": "ip_rule.deleted",
+        "resourceId": "c997adae-e5cb-46a8-965e-3851eedbc29c",
+        "createdAt": "2026-10-09T20:50:27.727Z"
+      },
+      {
+        "id": "fa625676-c8f0-40c5-9f4f-b01de60ce4b9",
+        "action": "ip_rule.deleted",
+        "resourceId": "b9013e40-084c-496e-b93d-b76d655b5473",
+        "createdAt": "2026-10-09T20:50:27.854Z"
+      },
+      {
+        "id": "aea97ded-ecf7-4d8f-8bd2-e678b4d8c7e2",
+        "action": "ip_rule.deleted",
+        "resourceId": "9da232ad-85cc-4063-a181-902ea4a5a140",
+        "createdAt": "2026-10-09T20:50:28.092Z"
+      },
+      {
+        "id": "7a68e646-7269-4e24-bfcf-f1a1da52c55c",
+        "action": "ip_rule.deleted",
+        "resourceId": "494776a9-ad90-4952-afc6-ed364a59bd9c",
+        "createdAt": "2026-10-09T20:50:28.290Z"
+      },
+      {
+        "id": "91b65b67-6750-403a-9af0-0171e38c1947",
+        "action": "ip_rule.deleted",
+        "resourceId": "da3ebccf-5107-4af5-a9e1-3cad496e3fbb",
+        "createdAt": "2026-10-09T20:50:28.614Z"
+      },
+      {
+        "id": "99d316ea-40a1-41d0-a9bc-6951b35a4a84",
+        "action": "ip_rule.deleted",
+        "resourceId": "e5e518a2-43f3-48f8-8fe2-28c8caaff416",
+        "createdAt": "2026-10-09T20:50:28.882Z"
+      },
+      {
+        "id": "17884761-cd44-4cf3-adb6-b0b16417aecf",
+        "action": "ip_rule.deleted",
+        "resourceId": "cde1eb68-97a3-421d-acef-7336a90c21a2",
+        "createdAt": "2026-10-09T20:50:28.968Z"
+      },
+      {
+        "id": "defc832a-cfe1-40c6-b4a1-75bbcca6c6a0",
+        "action": "ip_rule.created",
+        "resourceId": "6dca59f5-5879-48ca-b7c3-ca454d710d25",
+        "createdAt": "2026-10-09T20:51:36.960Z"
+      },
+      {
+        "id": "7456463e-9541-4435-9764-527f1f31d435",
+        "action": "ip_rule.created",
+        "resourceId": "87d755c6-3521-47ce-96dc-d5b395b78844",
+        "createdAt": "2026-10-09T20:51:37.071Z"
+      },
+      {
+        "id": "f682458e-d980-4f69-b50f-d57687c1d8f5",
+        "action": "ip_rule.created",
+        "resourceId": "23c5701e-fb34-418e-8ef0-973519ffc0db",
+        "createdAt": "2026-10-09T20:51:37.187Z"
+      },
+      {
+        "id": "07a430af-484b-43d7-8531-c26433f66417",
+        "action": "ip_rule.created",
+        "resourceId": "ce9af488-7ad6-4d3c-b4e9-52c8b3781189",
+        "createdAt": "2026-10-09T20:51:37.224Z"
+      },
+      {
+        "id": "4adff3ed-07b8-4ea3-960c-8cd1fdccee18",
+        "action": "ip_rule.created",
+        "resourceId": "08edf83c-ce66-485c-a61b-7ca53cd9bc47",
+        "createdAt": "2026-10-09T20:51:37.322Z"
+      },
+      {
+        "id": "9fd2640a-7de0-4dd0-8ae5-0bab9f8505c5",
+        "action": "ip_rule.created",
+        "resourceId": "6d6b7543-c571-48e4-9a60-131331976dec",
+        "createdAt": "2026-10-09T20:51:37.510Z"
+      },
+      {
+        "id": "02516873-43a4-47ea-93d3-a7ac9bfdc663",
+        "action": "ip_rule.created",
+        "resourceId": "f1d5acc0-c08d-4e1c-b584-5467d6721124",
+        "createdAt": "2026-10-09T20:51:37.755Z"
+      },
+      {
+        "id": "ad356d8a-f0fb-402d-a71e-aa8f9fb1c0cb",
+        "action": "ip_rule.created",
+        "resourceId": "806ea660-0c3d-4f15-8ac1-6bfcfa2151d4",
+        "createdAt": "2026-10-09T20:51:37.906Z"
+      },
+      {
+        "id": "a5119f85-a537-45af-b588-c64eb0e78b14",
+        "action": "ip_rule.created",
+        "resourceId": "fe7ff06c-500d-43cb-b3a5-08c86bd9110d",
+        "createdAt": "2026-10-09T20:51:38.036Z"
+      },
+      {
+        "id": "626488a4-10fd-477e-8322-223363dc8494",
+        "action": "ip_rule.created",
+        "resourceId": "9c9d3058-22a5-41ca-aac2-a6685e7cba49",
+        "createdAt": "2026-10-09T20:51:38.176Z"
+      },
+      {
+        "id": "23f6cfb2-d48a-4629-a1d7-bfedbed9c9ca",
+        "action": "ip_rule.created",
+        "resourceId": "7b9a0678-f33b-4674-b1fb-51b65c72c68a",
+        "createdAt": "2026-10-09T20:51:38.222Z"
+      },
+      {
+        "id": "3c4694ef-4b22-4998-997b-3cd690bc5e29",
+        "action": "ip_rule.created",
+        "resourceId": "8405062a-f27d-43f8-bb5f-6ce0a3c4eaf6",
+        "createdAt": "2026-10-09T20:51:38.255Z"
+      },
+      {
+        "id": "fdc51d56-9c14-43b5-9f3b-be083d3c4ae1",
+        "action": "ip_rule.created",
+        "resourceId": "c4b7307d-e8c2-49df-817d-78404d4f8b70",
+        "createdAt": "2026-10-09T20:51:38.332Z"
+      },
+      {
+        "id": "8c817b92-4c3d-4f4e-ab7e-7320c9daec80",
+        "action": "ip_rule.created",
+        "resourceId": "12432465-4595-4244-9dff-2e7659f700e7",
+        "createdAt": "2026-10-09T20:51:38.449Z"
+      },
+      {
+        "id": "d9d37f55-6b9f-4815-8fd6-406f6b190cdb",
+        "action": "ip_rule.created",
+        "resourceId": "79405433-4a75-47cb-9100-9b638fba4732",
+        "createdAt": "2026-10-09T20:51:38.598Z"
+      },
+      {
+        "id": "fc80aeb8-e966-4958-956a-d310f8172c87",
+        "action": "ip_rule.created",
+        "resourceId": "eb186cae-e55d-4994-a73b-00ef8e825515",
+        "createdAt": "2026-10-09T20:51:38.670Z"
+      },
+      {
+        "id": "5c7bb914-dd8d-43f5-875c-587e01b807a5",
+        "action": "ip_rule.created",
+        "resourceId": "3f5fcc22-4881-4195-9a8b-5da7b5b3dcf2",
+        "createdAt": "2026-10-09T20:51:38.727Z"
+      },
+      {
+        "id": "56b559da-18eb-461e-bd7f-c25742fee5d0",
+        "action": "ip_rule.created",
+        "resourceId": "9cdfdc64-5b4c-49c0-9ae1-1c4ff048a547",
+        "createdAt": "2026-10-09T20:51:38.829Z"
+      },
+      {
+        "id": "46d59609-926a-49c5-af53-c26d4ec61b3b",
+        "action": "ip_rule.created",
+        "resourceId": "50019629-aefb-42c1-ad9f-13ec80d65702",
+        "createdAt": "2026-10-09T20:51:38.915Z"
+      },
+      {
+        "id": "1b53ce53-c3a9-4992-91c1-8f20aa618839",
+        "action": "ip_rule.created",
+        "resourceId": "4c74a7f6-4048-4923-a923-0c0be90546af",
+        "createdAt": "2026-10-09T20:51:39.038Z"
+      },
+      {
+        "id": "ca61c004-a180-47db-a906-d9b10cf9b614",
+        "action": "ip_rule.deleted",
+        "resourceId": "4c74a7f6-4048-4923-a923-0c0be90546af",
+        "createdAt": "2026-10-09T20:52:34.305Z"
+      },
+      {
+        "id": "6c2caf7f-a1a2-41ad-a8ff-0d29a164978d",
+        "action": "ip_rule.deleted",
+        "resourceId": "6dca59f5-5879-48ca-b7c3-ca454d710d25",
+        "createdAt": "2026-10-09T20:53:17.232Z"
+      },
+      {
+        "id": "f8db6fef-766d-43af-9f8d-c8fbb80de9cd",
+        "action": "ip_rule.deleted",
+        "resourceId": "87d755c6-3521-47ce-96dc-d5b395b78844",
+        "createdAt": "2026-10-09T20:53:17.291Z"
+      },
+      {
+        "id": "d6afa58f-5822-42ef-b12a-8038671725ec",
+        "action": "ip_rule.deleted",
+        "resourceId": "23c5701e-fb34-418e-8ef0-973519ffc0db",
+        "createdAt": "2026-10-09T20:53:17.421Z"
+      },
+      {
+        "id": "1aa5ff3e-f2ad-433c-9367-dc6d570d17a8",
+        "action": "ip_rule.deleted",
+        "resourceId": "ce9af488-7ad6-4d3c-b4e9-52c8b3781189",
+        "createdAt": "2026-10-09T20:53:17.475Z"
+      },
+      {
+        "id": "35c91b09-ca20-40f5-9066-272db5c4be01",
+        "action": "ip_rule.deleted",
+        "resourceId": "08edf83c-ce66-485c-a61b-7ca53cd9bc47",
+        "createdAt": "2026-10-09T20:53:17.519Z"
+      },
+      {
+        "id": "c86289de-cbd6-4659-8a57-462991074cbd",
+        "action": "ip_rule.deleted",
+        "resourceId": "6d6b7543-c571-48e4-9a60-131331976dec",
+        "createdAt": "2026-10-09T20:53:17.560Z"
+      },
+      {
+        "id": "8f00b2f0-29ca-49be-8769-aa13ae6b24a3",
+        "action": "ip_rule.deleted",
+        "resourceId": "f1d5acc0-c08d-4e1c-b584-5467d6721124",
+        "createdAt": "2026-10-09T20:53:17.592Z"
+      },
+      {
+        "id": "4a68c515-d6e7-4686-96f7-8da0b94662ba",
+        "action": "ip_rule.deleted",
+        "resourceId": "806ea660-0c3d-4f15-8ac1-6bfcfa2151d4",
+        "createdAt": "2026-10-09T20:53:17.627Z"
+      },
+      {
+        "id": "4b4fa5d5-b79a-4c7d-adcf-a1e32ac986c4",
+        "action": "ip_rule.deleted",
+        "resourceId": "fe7ff06c-500d-43cb-b3a5-08c86bd9110d",
+        "createdAt": "2026-10-09T20:53:17.679Z"
+      },
+      {
+        "id": "6b381f75-8022-4bde-abaf-0e683f7eaca3",
+        "action": "ip_rule.deleted",
+        "resourceId": "9c9d3058-22a5-41ca-aac2-a6685e7cba49",
+        "createdAt": "2026-10-09T20:53:17.772Z"
+      },
+      {
+        "id": "77b7e64d-a492-4a8f-abaa-afe7788df502",
+        "action": "ip_rule.deleted",
+        "resourceId": "7b9a0678-f33b-4674-b1fb-51b65c72c68a",
+        "createdAt": "2026-10-09T20:53:17.911Z"
+      },
+      {
+        "id": "0fe2f68a-fde1-4b46-abf4-6a0a66c3d15f",
+        "action": "ip_rule.deleted",
+        "resourceId": "8405062a-f27d-43f8-bb5f-6ce0a3c4eaf6",
+        "createdAt": "2026-10-09T20:53:18.017Z"
+      },
+      {
+        "id": "587687c8-311f-46cd-a581-9dfefd9f6069",
+        "action": "ip_rule.deleted",
+        "resourceId": "c4b7307d-e8c2-49df-817d-78404d4f8b70",
+        "createdAt": "2026-10-09T20:53:18.071Z"
+      },
+      {
+        "id": "8a337ea3-f0e9-4858-86be-a565a851117c",
+        "action": "ip_rule.deleted",
+        "resourceId": "12432465-4595-4244-9dff-2e7659f700e7",
+        "createdAt": "2026-10-09T20:53:18.101Z"
+      },
+      {
+        "id": "9c39ad7c-b3fa-4795-b231-bca18efad4f4",
+        "action": "ip_rule.deleted",
+        "resourceId": "79405433-4a75-47cb-9100-9b638fba4732",
+        "createdAt": "2026-10-09T20:53:18.127Z"
+      },
+      {
+        "id": "a900690a-39b8-48bf-aa51-f1e5b57f6289",
+        "action": "ip_rule.deleted",
+        "resourceId": "eb186cae-e55d-4994-a73b-00ef8e825515",
+        "createdAt": "2026-10-09T20:53:18.157Z"
+      },
+      {
+        "id": "68a17797-59ec-4f92-a4c8-c0115975be0c",
+        "action": "ip_rule.deleted",
+        "resourceId": "3f5fcc22-4881-4195-9a8b-5da7b5b3dcf2",
+        "createdAt": "2026-10-09T20:53:18.277Z"
+      },
+      {
+        "id": "17d74669-df42-4c36-98d3-75d5f2fa7018",
+        "action": "ip_rule.deleted",
+        "resourceId": "9cdfdc64-5b4c-49c0-9ae1-1c4ff048a547",
+        "createdAt": "2026-10-09T20:53:18.302Z"
+      },
+      {
+        "id": "fd2fbb5e-a91a-4fa6-b4e9-3dfe8f9044c8",
+        "action": "ip_rule.deleted",
+        "resourceId": "50019629-aefb-42c1-ad9f-13ec80d65702",
+        "createdAt": "2026-10-09T20:53:18.327Z"
+      }
+    ]
+  },
+  "stateHash": "cef31de2e955306df2870a5612210634923503080b2d12c289892a82a720e7ed",
+  "sourceFidelity": "partial",
+  "entitlementMatrixVerified": false,
+  "externalProviderVerified": false
+}

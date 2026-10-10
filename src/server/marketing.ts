@@ -1,8 +1,8 @@
 import { cleanupMarketingLocalCopies, eraseMarketingJobs } from "./marketing-jobs";
 import { z } from "zod";
 import { Prisma, type MarketingPreference } from "@/generated/prisma/client";
-import { marketingConfig, marketingCreate, marketingList, normalizeMarketingContact, normalizeMarketingName,
-  type MarketingChannel, type MarketingConfig, type MarketingRecord, type MarketingSummaryQuery, type MarketingSummary } from "@/contracts/marketing";
+import { marketingConfig, marketingCreate, marketingList, marketingQuestionTypeAllowed, normalizeMarketingContact, normalizeMarketingName,
+  type MarketingChannel, type MarketingConfig, type MarketingQuestionKind, type MarketingRecord, type MarketingSummaryQuery, type MarketingSummary } from "@/contracts/marketing";
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
 import { decrypt, encrypt, tokenHash } from "./crypto";
@@ -128,7 +128,8 @@ export async function marketingSources(ctx: Context, serviceId: string, page: nu
     const rows = await tx.submission.findMany({ where: { ...where, id: { in: picked.map(s => s.id) } }, include: { formVersion: true, answers: { include: { question: true } } }, orderBy: [{ submittedAt: "desc" }, { id: "asc" }] });
     await audit(tx, ctx, requestId, "marketing.sources_viewed", "marketing", undefined, [], serviceId);
     const items = rows.filter(r => r.retentionUntil > new Date()).map(r => ({ id: r.id, title: r.formVersion.title, createdAt: r.submittedAt, retentionUntil: r.retentionUntil,
-      questions: r.answers.filter(a => ["단문형 답변", "장문형 답변"].includes(a.question.type)).map(a => ({ id: a.question.stableKey, label: a.question.label, value: decrypt<string>(a.valueCipher) })) }));
+      questions: r.answers.filter(a => (["name", "email", "sms", "kakao"] as const).some(kind => marketingQuestionTypeAllowed(kind, a.question.type)))
+        .map(a => ({ id: a.question.stableKey, type: a.question.type, label: a.question.label, value: decrypt<string>(a.valueCipher) })) }));
     assertFileDeadlines(access.deadlines);
     return { items, total, page, pageSize: 20 };
   });
@@ -141,10 +142,10 @@ export async function grantMarketing(tx: Transaction, input: GrantInput) {
   if (!source) fail(404, "NOT_FOUND", "동의 출처를 찾을 수 없습니다.");
   if (!["submitted", "corrected"].includes(source.status) || source.retentionUntil <= new Date()) fail(409, "SOURCE_UNAVAILABLE", "유효한 원본 응답이 필요합니다.");
   if (input.grantedAt > new Date() || input.grantedAt < new Date("2000-01-01")) fail(422, "CONSENT_TIME", "동의 시각을 확인해주세요. 미래 시각은 사용할 수 없습니다.");
-  const value = (id: string) => { const a = source.answers.find(a => a.question.stableKey === id && ["단문형 답변", "장문형 답변"].includes(a.question.type));
-    if (!a) fail(422, "CONTACT_QUESTION", "원본 응답의 텍스트 질문을 선택해주세요."); return decrypt<string>(a.valueCipher); };
+  const value = (id: string, kind: MarketingQuestionKind) => { const a = source.answers.find(a => a.question.stableKey === id && marketingQuestionTypeAllowed(kind, a.question.type));
+    if (!a) fail(422, "CONTACT_QUESTION", "이름 또는 선택한 채널에 맞는 원본 응답 질문을 선택해주세요."); return decrypt<string>(a.valueCipher); };
   if (input.nameQuestionId === input.contactQuestionId) fail(422, "CONTACT_QUESTION", "이름과 연락처 질문을 각각 선택해주세요.");
-  const contact = normalizeMarketingContact(input.channel, value(input.contactQuestionId)), name = normalizeMarketingName(value(input.nameQuestionId));
+  const contact = normalizeMarketingContact(input.channel, value(input.contactQuestionId, input.channel)), name = normalizeMarketingName(value(input.nameQuestionId, "name"));
   const scope = { tenantId: input.tenantId, serviceId: input.serviceId, channel: input.channel, contactHash: marketingContactHash(input.channel, contact) };
   const old = await tx.marketingPreference.findUnique({ where: { tenantId_serviceId_channel_contactHash: scope } });
   if (old) await lockSources(tx, [old.sourceSubmissionId]);

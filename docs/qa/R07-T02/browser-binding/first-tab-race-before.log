@@ -1,0 +1,33 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/sso-browser.test.ts (16 tests | 1 failed | 15 skipped) 33ms
+   × 최초 두 탭의 응답이 어느 순서로 도착해도 양쪽 브라우저 결합이 유지된다 31ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/sso-browser.test.ts > 최초 두 탭의 응답이 어느 순서로 도착해도 양쪽 브라우저 결합이 유지된다
+AssertionError: expected [Function] to not throw an error but 'Error: 로그인을 시작한 브라우저를 확인할 수 없습니다. 현재 …' was thrown
+
+- Expected:
+undefined
+
++ Received:
+"Error: 로그인을 시작한 브라우저를 확인할 수 없습니다. 현재 브라우저에서 다시 시작해주세요."
+
+ ❯ tests/server/sso-browser.test.ts:20:64
+     18|     }
+     19|     const cookie = [...jar.values()].join("; ");
+     20|     expect(() => assertSsoBrowser(first, headers(cookie))).not.toThrow…
+       |                                                                ^
+     21|     expect(() => assertSsoBrowser(second, headers(cookie))).not.toThro…
+     22|     const next = startSsoBrowser(headers(cookie));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 15 skipped (16)
+   Start at  11:00:38
+   Duration  884ms (transform 52%, import 43%, tests 5%, worker 1%)
+

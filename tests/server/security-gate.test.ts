@@ -1,3 +1,5 @@
+import { beforeEach as beforeSecurityCase } from "vitest";
+import { grantSecurityTestTrials } from "../fixtures/security-subscription";
 import { randomBytes, randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { createOTP } from "@better-auth/utils/otp";
@@ -165,7 +167,7 @@ describe("P11-T05 보안 모듈 통합 체인", () => {
 
     // 1) owner가 가상 GPKI 공급자를 등록·활성화하고 디렉터리 구성원을 추가한다.
     const created = await ssoCreate(request("/security/sso", "POST", gateCookie,
-      { protocol: "gpki", name: "게이트 가상 GPKI" }, "10.8.0.5", { "idempotency-key": randomUUID() }));
+      { tenantId: tenant, protocol: "gpki", name: "게이트 가상 GPKI" }, "10.8.0.5", { "idempotency-key": randomUUID() }));
     expect(created.status).toBe(201);
     const provider = await created.json();
     const enabled = await ssoPatch(request(`/security/sso/${provider.id}`, "PATCH", gateCookie, { version: provider.version, enabled: true }));
@@ -202,3 +204,5 @@ describe("P11-T05 보안 모듈 통합 체인", () => {
     expect(audit.map(a => a.action)).toContain("sso.account_linked");
   });
 });
+
+beforeSecurityCase(grantSecurityTestTrials);

@@ -1,0 +1,40 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:23680) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/question-drawing-types.test.ts (15 tests | 1 failed) 14309ms
+   × response destruction erases current and old drawing bytes plus encrypted answers, corrections and receipt payloads 912ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/question-drawing-types.test.ts > response destruction erases current and old drawing bytes plus encrypted answers, corrections and receipt payloads
+PrismaClientKnownRequestError: 
+Invalid `db.consentReceipt.findFirstOrThrow()` invocation in
+/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/question-drawing-types.test.ts:338:35
+
+  335   expect(await db.fileObject.findUniqueOrThrow({ where: { id: file.id } })).toMatchObject({ status: "deleted", size: 0, sha256: null, nameCipher: null });
+  336   await expect(privateFiles.read(file.storageKey)).rejects.toThrow();
+  337 }
+→ 338 expect((await db.consentReceipt.findFirstOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+ ❯ vn.handleRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:238:13
+ ❯ vn.handleAndLogRequestError node_modules/@prisma/client/src/runtime/RequestHandler.ts:184:12
+ ❯ vn.request node_modules/@prisma/client/src/runtime/RequestHandler.ts:153:12
+ ❯ a node_modules/@prisma/client/src/runtime/getPrismaClient.ts:1014:24
+ ❯ tests/server/question-drawing-types.test.ts:338:11
+    336|     await expect(privateFiles.read(file.storageKey)).rejects.toThrow();
+    337|   }
+    338|   expect((await db.consentReceipt.findFirstOrThrow({ where: { submissi…
+       |           ^
+    339|   expect((await getSubmission(ctx, a.id, randomUUID())).values).toEqua…
+    340|   expect(answersSchema.safeParse({ [f.questions[0].id]: null }).succes…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 14 passed (15)
+   Start at  14:15:27
+   Duration  15.88s (tests 91%, transform 5%, import 4%)
+

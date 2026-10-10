@@ -1,0 +1,557 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-10-10T05:15:40.376Z",
+  "author": "bundle_analysis",
+  "purpose": "R08-T02 DRAW 직접 그리기 구현의 UI 영향 및 상태·권한 경계 독립 정적 검토",
+  "repository": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone",
+  "method": {
+    "sourceReadOnly": true,
+    "implementationChanged": false,
+    "databaseAccessed": false,
+    "browserUsed": false,
+    "serverStarted": false,
+    "testsExecuted": false,
+    "networkRequested": false,
+    "onlyWrittenArtifact": "docs/qa/R08-T02/drawing-questions/ui-review.json",
+    "evidenceType": "현재 소스 제어·데이터 흐름 및 보존 원본 REA 증거 대조. 실제 브라우저 동작이나 서버 실행을 관측한 결과가 아니다."
+  },
+  "summary": {
+    "confirmedStaticFindings": 2,
+    "resolvedByParentAndSourceRechecked": 2,
+    "remainingConfirmedFindings": 0,
+    "prioritiesOriginallyFound": {
+      "P2": 2
+    },
+    "result": "발견한 두 결함은 부모 수정 후 현재 소스에서 해결을 확인했다. 아래 적용 전 획의 폐기 경계와 실제 브라우저 검증은 별도로 남긴다.",
+    "runtimeVerification": "이 검토에서는 미실행. 부모의 실제 Ego QA와 서버 작업은 별도 증거로 판정해야 한다."
+  },
+  "originalProvenance": {
+    "sourceReport": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/drawing-questions/source-review.json",
+    "source": "/Users/user01/Desktop/캐쳐시큐/outputs/catchsecu-reverse-2026-10-09/bundle/main.183e9d2c.js",
+    "sourceSha256": "3538d47856c6ba1b4207059dc09434066c7ca692a5907ed792dd9e27c7dba78f",
+    "evidenceId": "ev_87493e79c4f053718022b23e1e5d42acf1af245f8c7838a89cd7ebc3918df152",
+    "offsetConvention": "0-based Node.js String UTF-16 code unit, end exclusive. 파일 byte offset이 아님."
+  },
+  "findings": [
+    {
+      "id": "DRAW-UI-01",
+      "priority": "P2",
+      "status": "resolved_by_parent_source_rechecked",
+      "title": "응답 목록이 DRAW 객체를 파일 ID 문자열과 직접 비교하여 다운로드 링크를 누락",
+      "originalLocation": {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/Workflow.tsx",
+        "line": 89,
+        "end": 89
+      },
+      "originalExpression": "row.attachments.find(item => item.id === row.values[question.id])",
+      "reproduction": [
+        "file.read 권한으로 DRAW 응답이 있는 폼의 응답 목록을 연다.",
+        "row.values[question.id]가 {s3Key,fileName,fileSize}이고 row.attachments가 해당 FileInfo를 포함한다.",
+        "수정 전에는 문자열 item.id와 객체의 === 비교가 항상 false여서 첨부파일 문구만 표시한다."
+      ],
+      "impact": "권한이 있고 서버가 파일을 반환해도 목록에서 파일명과 다운로드 링크를 사용할 수 없다.",
+      "fixedEvidence": {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/Workflow.tsx",
+        "line": 89,
+        "end": 91,
+        "text": "            const file = row.attachments.find(item => item.id === fileAnswerId(row.values[question.id]));\n            return file ? <a className=\"cs-link\" href={fileDownloadUrl(file.id, row.id, question.id)}>{file.name}</a> :\n              isFileQuestion(question.type) && row.values[question.id] ? \"첨부파일\" : formatAnswer(row.values[question.id], question.rows, question.optionDefinitions, question.type);"
+      },
+      "contractEvidence": {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/drawing-questions.ts",
+        "line": 15,
+        "end": 20,
+        "text": "export function fileAnswerId(value: unknown): string | undefined {\n  if (typeof value === \"string\") return z.uuid().safeParse(value).success ? value : undefined;\n  return isDrawingAnswer(value) ? value.s3Key : undefined;\n}\nexport function drawingAnswerFromFile(file: { id: string; name: string; size: number }): DrawingAnswer {\n  return drawingAnswerSchema.parse({ s3Key: file.id, fileName: file.name, fileSize: file.size });"
+      },
+      "resolution": "fileAnswerId가 DRAW 객체의 s3Key와 기존 FILE 문자열을 모두 정규화한다. 현 소스에서 이 함수를 이용한 조회를 확인했다.",
+      "remainingValidation": "권한 있는 목록의 실제 링크·다운로드 브라우저 확인은 부모 QA 범위."
+    },
+    {
+      "id": "DRAW-UI-02",
+      "priority": "P2",
+      "status": "resolved_by_parent_source_rechecked",
+      "title": "재입력 중 지우기가 기존 적용값을 제거하지 않음",
+      "originalLocation": {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+        "line": 63,
+        "end": 63
+      },
+      "originalExpression": "function clear() { if (locked()) return; strokes.current = []; pointer.current = null; setError(\"\"); paint(); }",
+      "reproduction": [
+        "그림 A를 적용하거나 저장된 그림 A의 응답 정정을 연다.",
+        "다시 입력하기 후 지우기를 누른다.",
+        "수정 전 clear는 strokes만 초기화하여 기존 file/hasSaved는 남고 A를 계속 제출할 수 있었다."
+      ],
+      "impact": "원본의 지우기 의미와 다르게 적용값이 유지되며 사용자가 비웠다고 생각한 그림이 제출/정정에 남는다.",
+      "sourceEvidence": {
+        "sourceReport": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/drawing-questions/source-review.json",
+        "observation": "DRAW-05",
+        "evidence": "E09",
+        "start": 8277141,
+        "end": 8279975,
+        "exactFragment": "a(!1),i(!1),l(null),r.current&&r.current.clear(),e.handleChange(null,null)"
+      },
+      "fixedEvidence": {
+        "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+        "line": 63,
+        "end": 63,
+        "text": "  function clear() { if (locked()) return; strokes.current = []; pointer.current = null; onFileChange(); setError(\"\"); paint(); }"
+      },
+      "parentEvidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "line": 130,
+          "end": 132,
+          "text": "          onFileChange={file => { if (busy || session.current!.hasPending) return;\n            setFiles(current => { const next = { ...current }; if (file) next[question.id] = file; else delete next[question.id]; return next; });\n            uploadCache.current.delete(question.id);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 129,
+          "end": 132,
+          "text": "            onChange={value => change(question.id, value)} onFileChange={file => {\n              if (busy || conflict || row.legalHold || !app.data?.capabilities.includes(\"file.read\")) return;\n              const next = { ...files }; if (file) next[question.id] = file; else delete next[question.id];\n              setFiles(next); if (!file) setValues(current => ({ ...current, [question.id]: null })); uploads.current.delete(question.id);"
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 46,
+          "end": 57,
+          "text": "  useEffect(() => {\n    const form = root.current?.closest(\"form\");\n    const validate = (event: SubmitEvent) => {\n      if (disabled || root.current?.closest(\"fieldset:disabled\")) return;\n      if (applied || !question.required && !strokes.current.length) return;\n      event.preventDefault(); event.stopImmediatePropagation();\n      setError(strokes.current.length ? \"그림을 적용한 뒤 제출해주세요.\" : \"그림을 입력하고 적용해주세요.\");\n      applyButton.current?.focus();\n    };\n    form?.addEventListener(\"submit\", validate, true);\n    return () => form?.removeEventListener(\"submit\", validate, true);\n  }, [applied, disabled, question.required]);"
+        }
+      ],
+      "resolution": "clear가 onFileChange()를 호출한다. 공개 부모는 File을 삭제하고 정정 부모는 File 삭제와 답변 null을 저장한다. 필수 질문은 적용값이 사라진 뒤 submit 검증에서 차단한다. 선택 질문은 null 제출이 가능하다.",
+      "remainingValidation": "지우기→필수 제출 차단 및 선택 비우기→정정 취소/저장의 실제 브라우저 확인은 부모 QA 범위."
+    }
+  ],
+  "coverage": [
+    {
+      "topic": "resize·PNG·점 허용",
+      "status": "정적 대조 완료",
+      "conclusion": "정규화된 좌표 배열을 보관하고 ResizeObserver에서 재그린다. 폭과 DPR에 맞는 backing canvas, 고정 CSS 높이 120, 검은 선과 흰 배경, image/png File 생성이 연결돼 있다. 첫 점을 즉시 배열에 넣고 원형으로 그리므로 한 점도 빈 그림으로 취급하지 않는다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 25,
+          "end": 45
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 64,
+          "end": 72
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 80,
+          "end": 87
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/forms.css",
+          "line": 14,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "topic": "포인터·터치·잠금",
+      "status": "정적 대조 완료",
+      "conclusion": "첫 primary-button pointer만 캡처하고 활성 pointer ID가 맞는 이동만 기록한다. up/cancel/lost capture는 활성 상태를 해제한다. canvas touch-action:none이며 canvas 조작과 clear/apply/재입력/이전 모두 locked 검사를 수행한다. disabled prop 및 상위 disabled fieldset을 검사한다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 58,
+          "end": 63
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 80,
+          "end": 97
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/forms.css",
+          "line": 14,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "topic": "필수 누락·미적용·선택 빈값",
+      "status": "정적 대조 완료",
+      "conclusion": "form의 submit capture listener가 필수 미적용 값을 막고 적용 버튼으로 초점을 보낸다. 선택 빈 캔버스는 허용하되 선택 질문에도 미적용 획이 있으면 적용을 요구한다. 서버 DRAW 분기는 undefined/null의 필수 여부 및 strict metadata를 별도로 검증한다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 46,
+          "end": 57
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+          "line": 28,
+          "end": 36
+        }
+      ]
+    },
+    {
+      "topic": "재입력·이전·명시적 지우기",
+      "status": "정적 대조 완료",
+      "conclusion": "재입력은 현재 적용된 File/저장값을 보존하면서 빈 편집 캔버스를 연다. 이전은 새 획을 버리고 기존 적용 미리보기로 돌아간다. 지우기는 수정 후 적용값까지 해제한다. 새 적용은 부모 File을 교체한다. blob URL은 file 또는 editing 변경 시 정리하고 재생성한다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 18,
+          "end": 24
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 63,
+          "end": 73
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 91,
+          "end": 97
+        }
+      ]
+    },
+    {
+      "topic": "공개 제출·검사·동시 조작 잠금",
+      "status": "정적 대조 완료",
+      "conclusion": "public submit은 보이는 질문의 File을 기존 업로드 경로로 전송한 뒤 DRAW metadata와 attachment proof를 구성한다. busy/pending을 disabled로 전달하고 부모 파일 변경도 busy/hasPending일 때 거절한다. 동기 PNG 변환으로 늦은 toBlob callback은 없다. 불확실 제출 재시도는 PublicSubmissionSession의 같은 payload/key를 재사용한다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "line": 92,
+          "end": 120
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "line": 127,
+          "end": 133
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/public-submission.ts",
+          "line": 10,
+          "end": 36
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/file-upload.ts",
+          "line": 7,
+          "end": 41
+        }
+      ]
+    },
+    {
+      "topic": "조건부 숨김·재등장",
+      "status": "정적 대조 완료",
+      "conclusion": "공개 및 정정 change는 숨겨진 질문의 값·File·업로드 캐시를 제거한다. 질문 컴포넌트가 필터링되어 unmount되므로 내부 획도 남지 않는다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "line": 85,
+          "end": 90
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+          "line": 127,
+          "end": 129
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 65,
+          "end": 73
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 124,
+          "end": 126
+        }
+      ]
+    },
+    {
+      "topic": "정정 비우기·재입력·취소·이력",
+      "status": "정적 대조 완료",
+      "conclusion": "정정에서 clear는 답변 null을 기록하며 새 그림 적용은 files에 남겨 upload/metadata 교체를 수행한다. File·답변 null·사유는 dirty 판정에 포함되어 취소 확인 대상이다. 취소하면 원래 row.values와 빈 files/cache로 복원하고 컴포넌트가 unmount된다. 이력/현재값 링크는 authorized attachments에서 찾는다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 49,
+          "end": 63
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 75,
+          "end": 96
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 124,
+          "end": 146
+        }
+      ]
+    },
+    {
+      "topic": "파일 권한·메타데이터 마스킹",
+      "status": "정적 대조 완료",
+      "conclusion": "DRAW 파일명은 raw metadata가 아니라 권한 검증된 FileInfo에서 렌더한다. file.read가 없는 read projection은 s3Key만 반환하고 UI는 정정 그림을 비활성화한다. 정정 저장 시 파일 질문 키를 아예 생략하여 서버 baseline을 보존한다. 공유 선택/뷰어에는 isFileQuestion 및 fileAnswerId가 연결되어 있다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 94,
+          "end": 100
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-access.ts",
+          "line": 36,
+          "end": 46
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 80,
+          "end": 94
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 125,
+          "end": 132
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/Workflow.tsx",
+          "line": 89,
+          "end": 91
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SharedPrivacy.tsx",
+          "line": 69,
+          "end": 72
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/ShareGrants.tsx",
+          "line": 68,
+          "end": 70
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/ShareGrants.tsx",
+          "line": 88,
+          "end": 90
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/viewer.ts",
+          "line": 145,
+          "end": 158
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-download.ts",
+          "line": 17,
+          "end": 35
+        }
+      ]
+    },
+    {
+      "topic": "matrix union 영향",
+      "status": "정적 대조 완료",
+      "conclusion": "QuestionInput은 질문 type으로 matrix와 DRAW를 분리한다. emptyAnswer가 DRAW에서만 null을 반환하며 isEmptyAnswer 및 formatAnswer는 DRAW metadata를 먼저 인식한다. 서버는 DRAW 이외 null을 거절한 뒤 matrix 검증으로 진행한다. 이번 UI 검토 범위에서 새 확정 오류는 찾지 못했다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+          "line": 16,
+          "end": 31
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+          "line": 43,
+          "end": 44
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 79,
+          "end": 85
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+          "line": 94,
+          "end": 104
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+          "line": 28,
+          "end": 50
+        }
+      ]
+    }
+  ],
+  "sourceContractBoundary": {
+    "observedOriginal": [
+      "한국어 라벨 직접 그리기, 검은 펜/흰 배경/높이120, PNG userSignImage.png.",
+      "지우기는 원본에서도 handleChange(null,null)로 기존 적용값을 제거한다. source-review DRAW-05/E09는 이미 이 동작을 정확히 기록하고 있다.",
+      "재입력·이전은 기존 적용 그림을 보존하며 새 적용 전에는 상위 응답을 새 획으로 교체하지 않는다."
+    ],
+    "independentLocalChoices": [
+      "보존 좌표 재그리기를 통한 resize 보존 및 disabled에서 모든 조작 차단은 로컬 강화이다.",
+      "로컬 strict metadata의 s3Key는 FileObject UUID이며 원본 저장소 경로를 의미하지 않는다.",
+      "선택 질문에 그린 미적용 획이 있으면 제출을 막는 것은 로컬 입력 보호이며 원본 필수 판정 aK가 보장한 동작으로 주장하지 않는다."
+    ],
+    "notClaimed": [
+      "원본 펜 보간/폭 알고리즘의 픽셀 동일성",
+      "원본 서버의 PNG 검사·필수 강제·파일 권한 구현",
+      "SIGNATURE/IDV_SIGNATURE 인증 계열의 구현 완료"
+    ]
+  },
+  "behaviorBoundaries": [
+    {
+      "id": "DRAW-UI-B01",
+      "classification": "확정 결함으로 분류하지 않은 현재 적용 경계",
+      "title": "적용 전 획은 정정 dirty 판정에 포함되지 않음",
+      "observation": "사유/다른 변경 없이 새 획만 그린 뒤 정정 취소 또는 상세 닫기를 누르면 modeDirty는 false이므로 별도 폐기 확인이 없다. 적용된 File 또는 clear가 만든 null은 dirty에 포함된다.",
+      "evidence": [
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 17,
+          "end": 17
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+          "line": 80,
+          "end": 86
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 53,
+          "end": 63
+        },
+        {
+          "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+          "line": 117,
+          "end": 117
+        }
+      ],
+      "rationale": "원본도 적용 전에는 상위 응답을 변경하지 않는다. 현재 계획의 적용을 커밋 경계로 해석하여 원본 불일치나 확정 버그로 보고하지 않았다. 부모에게 상태 경계를 전달했다.",
+      "parentDecision": "부모가 적용 전 획을 원본과 같은 임시 입력으로 유지한다고 명시했다. 별도 dirty 경고 추가 없이 현재 동작을 수용한다."
+    }
+  ],
+  "runtimeChecksRemaining": [
+    "마우스·터치·펜 실제 입력, 한 점의 PNG, 창/컨테이너 크기 변경 후 획과 미리보기 보존.",
+    "필수 빈값/미적용의 실제 submit capture 및 초점, 여러 DRAW 질문 중 첫 오류 표시.",
+    "A 적용→재입력→새 획→이전은 A 보존; A→재입력→지우기는 A 제거; 필수 제출 차단/선택 null 저장.",
+    "PNG 업로드·검사·제출 지연 중 모든 canvas/버튼/이탈 및 pending 재시도의 실제 타이밍.",
+    "정정 clear→취소 복원, 재적용→취소 복원, 정정 저장 후 이전 이미지 이력 다운로드.",
+    "file.read 유무별 목록/상세/정정/공유 파일명·미리보기·다운로드 및 권한 철회 후 응답."
+  ],
+  "sourceSnapshots": [
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/DrawingQuestionInput.tsx",
+      "sha256": "016eda13162eb1304a25d147e23d150c5e8705b82db042172080588efef24d93",
+      "bytes": 6735,
+      "lines": 102
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/QuestionInput.tsx",
+      "sha256": "f255c6b215fae5fe6a024bbd2ee64d198915c86258195f6dbfec1fbdf310fc80",
+      "bytes": 7136,
+      "lines": 62
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/PublicForm.tsx",
+      "sha256": "6aa3911f7509b47b2c1880a3963ece14b504380fa6520f483f211ebaa7b5091d",
+      "bytes": 13633,
+      "lines": 156
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SubmissionDetail.tsx",
+      "sha256": "4e617eeb8c9bf071f7a866ff7999e7f7a2d51ccc7df6058edba1c8478b30a059",
+      "bytes": 20101,
+      "lines": 193
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/Workflow.tsx",
+      "sha256": "23c7c3ba329cb4c9d5c0b3bf5b448aaf35f9fbba93eaace4a4b32ce0e1fa91b5",
+      "bytes": 19306,
+      "lines": 202
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/SharedPrivacy.tsx",
+      "sha256": "c0cb5ec4fda800d82c52e4f8b383e48a5f62afdadc5661495e86491c7cef728c",
+      "bytes": 8044,
+      "lines": 79
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/ShareGrants.tsx",
+      "sha256": "e2d9c1b59e2145afc0a6d958ec4fdd54f5e41373fb2fc51bf8caa3f271ed52ba",
+      "bytes": 12142,
+      "lines": 107
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/components/forms/forms.css",
+      "sha256": "114e037a7b161216dc3419e89864f350c95385d4606bf2b174fcc8cd89c9f861",
+      "bytes": 6667,
+      "lines": 15
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/drawing-questions.ts",
+      "sha256": "ba369d68fac74272770414bd8d83a35dfa1192a3bc9a5eaef1186bbef7cb8c65",
+      "bytes": 1274,
+      "lines": 22
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/contracts/questions.ts",
+      "sha256": "c563b932a3ea3503439024d00298e244d585925d6eace0f993f49ce30030a21b",
+      "bytes": 10472,
+      "lines": 118
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/file-upload.ts",
+      "sha256": "d3f1dd3c41f4d54dfbb5c78666bd8b45258db73df8dc999d4d5983ede58fd2d3",
+      "bytes": 3135,
+      "lines": 50
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/lib/public-submission.ts",
+      "sha256": "3770b82d568facfba1dcceb8201cdbbe21d2612a586304f3bafb93530e065730",
+      "bytes": 2100,
+      "lines": 40
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/answer-validation.ts",
+      "sha256": "6b719d8e185f5aeda9cbe121bd798dd22158e73ac029840a7377666904a930e6",
+      "bytes": 8784,
+      "lines": 97
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-access.ts",
+      "sha256": "5d69c3b1ec143b709fb32a829cd5e97d6c5d36e6701536660d798286bc992feb",
+      "bytes": 12927,
+      "lines": 150
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/file-download.ts",
+      "sha256": "10e0d63516de97899cda7b6752407715fc53109546d251023e0fec1cb9000945",
+      "bytes": 5953,
+      "lines": 74
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submissions.ts",
+      "sha256": "1c2a4cac4f902ad47608a3561145d932961c32744e672f9ead1ea0b1a98eda0b",
+      "bytes": 10465,
+      "lines": 140
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/submission-management.ts",
+      "sha256": "b92364d3ea6d9427522b515c8753e3b111084fb2446cee6829c204ca137495ca",
+      "bytes": 13683,
+      "lines": 154
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/viewer.ts",
+      "sha256": "6d023a948d4bfabc6caebfa3a9add9e53d8324a0ba06a53ff963cc05533aa69d",
+      "bytes": 17579,
+      "lines": 210
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/sharing.ts",
+      "sha256": "805a534fd54426c26fdad6dd9ae033ee560b3d7301c372bb3e5ecfb42be49383",
+      "bytes": 15680,
+      "lines": 194
+    },
+    {
+      "file": "/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/docs/qa/R08-T02/drawing-questions/PLAN.md",
+      "sha256": "bf40e355e591eca48b4c5a8cb042d5b701356059df9eb5b508f3ef52331d3e26",
+      "bytes": 2661,
+      "lines": 13
+    }
+  ]
+}

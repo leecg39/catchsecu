@@ -1,9 +1,10 @@
+import { authorAssetScope, assertAuthorAssetReferences, withAuthorAssetReferences } from "./author-asset-references";
 import { consentBundle, validateFormDocuments } from "./form-documents";
 import { preflightConsentReceipt } from "./consent-receipts";
 import { z } from "zod";
 import { db, type Transaction } from "./db";
 import { type Context } from "./context";
-import { formScope, lockFormService } from "./form-access";
+import { formScope, lockFormService, formTransaction, withFormAccess } from "./form-access";
 import { companyRetentionDays, lockPolicy } from "./security-policy";
 import { roleCan } from "./permissions";
 import { fail, listQuery } from "./http";
@@ -27,30 +28,34 @@ export function approvalDto(row: StoredApproval, detail = false) {
     ...(detail ? { ...request, reason: row.decisionCipher ? decrypt<string>(row.decisionCipher) : null, snapshot: row.snapshot } : {}) };
 }
 export async function requestApproval(tx: Transaction, ctx: Context, id: string, input: z.infer<typeof approvalRequestInput>, requestId: string) {
-  const { form, policy } = await lockCurrentForm(tx, ctx, id, "form.write");
-  if (!policy.requireApproval) fail(409, "APPROVAL_NOT_REQUIRED", "현재 정책에서는 게시 승인이 필요하지 않습니다.");
-  if (form.version !== input.version) fail(409, "VERSION_CONFLICT", "폼이 수정되었습니다. 최신 내용을 불러와주세요.");
-  if (policy.approvalReferenceRequired && !input.reference) fail(422, "REFERENCE_REQUIRED", "사내 승인번호 등 증빙 번호를 입력해주세요.");
-  const draft = form.versions.find(version => version.status === "draft");
-  if (!draft) fail(409, "NO_DRAFT", "승인을 요청할 초안이 없습니다.");
-  const content = contentDto(draft);
-  try { validateFormForPublish(content); } catch (error) { fail(422, "INVALID_FORM", error instanceof Error ? error.message : "폼 내용을 확인해주세요."); }
-  const defaultDays = await companyRetentionDays(tx, ctx.tenantId, form.serviceId);
-  await validateFormDocuments(tx, ctx, form.serviceId, draft);
-  await preflightConsentReceipt(draft, defaultDays);
-  if (await tx.approvalRequest.count({ where: { formId: id, status: { in: ["pending", "approved"] } } })) fail(409, "APPROVAL_EXISTS", "진행 중이거나 승인된 요청이 있습니다.");
-  const changed = await tx.form.update({ where: { id }, data: {
-    status: form.status === "draft" ? "pendingApproval" : form.status, version: { increment: 1 },
-  } });
-  const row = await tx.approvalRequest.create({ data: { tenantId: ctx.tenantId, formId: id, formVersionId: draft.id,
-    formRevision: changed.version, policyRevision: policy.approvalRevision, contentHash: fingerprint(draft, defaultDays),
-    snapshot: { title: draft.title, content, consentBundle: consentBundle(draft) } as Prisma.InputJsonValue, requestedBy: ctx.member.id,
-    requestCipher: encrypt({ message: input.message, reference: input.reference }) }, include: approvalInclude });
-  await audit(tx, ctx, requestId, "approval.requested", "approval", row.id, ["status"], form.serviceId);
-  return approvalDto(row, true);
+  return withFormAccess(tx, ctx, "form.write", async () => {
+    const { form, policy } = await lockCurrentForm(tx, ctx, id, "form.write");
+    if (!policy.requireApproval) fail(409, "APPROVAL_NOT_REQUIRED", "현재 정책에서는 게시 승인이 필요하지 않습니다.");
+    if (form.version !== input.version) fail(409, "VERSION_CONFLICT", "폼이 수정되었습니다. 최신 내용을 불러와주세요.");
+    if (policy.approvalReferenceRequired && !input.reference) fail(422, "REFERENCE_REQUIRED", "사내 승인번호 등 증빙 번호를 입력해주세요.");
+    const draft = form.versions.find(version => version.status === "draft");
+    if (!draft) fail(409, "NO_DRAFT", "승인을 요청할 초안이 없습니다.");
+    const content = contentDto(draft);
+    try { validateFormForPublish(content); } catch (error) { fail(422, "INVALID_FORM", error instanceof Error ? error.message : "폼 내용을 확인해주세요."); }
+    const defaultDays = await companyRetentionDays(tx, ctx.tenantId, form.serviceId);
+    await validateFormDocuments(tx, ctx, form.serviceId, draft);
+    await preflightConsentReceipt(tx, draft, defaultDays);
+    await assertAuthorAssetReferences(tx, authorAssetScope(ctx, form.serviceId), { kind: "version", id: draft.id }, content);
+    if (await tx.approvalRequest.count({ where: { formId: id, status: { in: ["pending", "approved"] } } })) fail(409, "APPROVAL_EXISTS", "진행 중이거나 승인된 요청이 있습니다.");
+    const changed = await tx.form.update({ where: { id }, data: {
+      status: form.status === "draft" ? "pendingApproval" : form.status, version: { increment: 1 },
+    } });
+    const row = await tx.approvalRequest.create({ data: { tenantId: ctx.tenantId, formId: id, formVersionId: draft.id,
+      formRevision: changed.version, policyRevision: policy.approvalRevision, contentHash: fingerprint(draft, defaultDays),
+      snapshot: { title: draft.title, content, consentBundle: consentBundle(draft) } as Prisma.InputJsonValue, requestedBy: ctx.member.id,
+      requestCipher: encrypt({ message: input.message, reference: input.reference }) }, include: approvalInclude });
+    await withAuthorAssetReferences(tx, authorAssetScope(ctx, form.serviceId), { kind: "approval", id: row.id }, content, requestId, async () => undefined);
+    await audit(tx, ctx, requestId, "approval.requested", "approval", row.id, ["status"], form.serviceId);
+    return approvalDto(row, true);
+  });
 }
 export async function approvalForForm(ctx: Context, formId: string, page: number, pageSize: number) {
-  return db.$transaction(async tx => {
+  return formTransaction(ctx, "form.read", async tx => {
   const form=await readableForm(tx,ctx,formId),policy=await lockPolicy(tx,ctx.tenantId);
   const member=await tx.membership.findUniqueOrThrow({ where:{ id:ctx.member.id },include:{ grants:true } });
   const where={ tenantId:ctx.tenantId,formId },total=await tx.approvalRequest.count({ where });
@@ -75,7 +80,7 @@ async function readableForm(tx: Transaction,ctx: Context,id: string) {
   return form;
 }
 export async function getApproval(ctx: Context, id: string) {
-  return db.$transaction(async tx => {
+  return formTransaction(ctx, "form.read", async tx => {
   await formScope(tx,ctx,"form.read");
   const row = await tx.approvalRequest.findFirst({ where: { id, tenantId: ctx.tenantId }, include: approvalInclude });
   if (!row) fail(404, "NOT_FOUND", "승인 요청을 찾을 수 없습니다.");
@@ -87,7 +92,7 @@ export const approvalQuery = listQuery.extend({
   formId: z.uuid().optional(), serviceId: z.uuid().optional(), status: z.enum(["all", ...approvalStatuses]).default("all"),
 }).strict();
 export async function listApprovals(ctx: Context, query: z.infer<typeof approvalQuery>) {
-  return db.$transaction(async tx => {
+  return formTransaction(ctx, "form.read", async tx => {
   const scope=await formScope(tx,ctx,"form.read");
   if (query.serviceId) await lockFormService(tx,ctx,query.serviceId,"form.read",false);
   const services = await tx.service.findMany({ where:scope, select: { id: true } });
@@ -103,7 +108,7 @@ export async function listApprovals(ctx: Context, query: z.infer<typeof approval
 export async function decideApproval(ctx: Context, id: string, input: z.infer<typeof approvalDecisionInput> | { version: number; decision: "cancelled" }, requestId: string) {
   const initial = await db.approvalRequest.findFirst({ where: { id, tenantId: ctx.tenantId }, select: { formId: true } });
   if (!initial) fail(404, "NOT_FOUND", "승인 요청을 찾을 수 없습니다.");
-  return db.$transaction(async tx => {
+  return formTransaction(ctx, input.decision === "cancelled" ? "form.write" : "form.approve", async tx => {
     const cancel = input.decision === "cancelled";
     const { form, policy, member } = await lockCurrentForm(tx, ctx, initial.formId, cancel ? "form.write" : "form.approve");
     if (!cancel && !policy.approvalRoles.includes(member.role)) fail(403, "REVIEWER_FORBIDDEN", "회사 정책에 지정된 승인 담당자만 처리할 수 있습니다.");
