@@ -1,0 +1,88 @@
+{
+  "checkedAt": "2026-10-10T22:44:33.645483Z",
+  "result": "internal_pass_external_pending",
+  "task": "R02-T04",
+  "status": "in_progress",
+  "tests": {
+    "files": 15,
+    "suites": 28,
+    "total": 249,
+    "passed": 249,
+    "failed": 0,
+    "pending": 0
+  },
+  "restart": {
+    "checkedAt": "2026-10-10T22:44:33.645483Z",
+    "result": "passed",
+    "buildId": "PeToU2pCg3V8reSmiyOYj",
+    "processStarts": 2,
+    "before": {
+      "health": {
+        "status": "ok",
+        "database": "ready"
+      },
+      "page": {
+        "status": 200,
+        "bytes": 11078,
+        "sha256": "47edb48c77cade24e9cc005526692df89ca2b2e42318e891317c8af3d71a5585",
+        "containsLogin": true
+      },
+      "database": {
+        "userId": "4faf340a-5e6f-4896-b16e-2f25d0c69160",
+        "emailVerified": true,
+        "twoFactorEnabled": false,
+        "sessions": 1,
+        "audits": 67
+      }
+    },
+    "after": {
+      "health": {
+        "status": "ok",
+        "database": "ready"
+      },
+      "page": {
+        "status": 200,
+        "bytes": 11078,
+        "sha256": "47edb48c77cade24e9cc005526692df89ca2b2e42318e891317c8af3d71a5585",
+        "containsLogin": true
+      },
+      "database": {
+        "userId": "4faf340a-5e6f-4896-b16e-2f25d0c69160",
+        "emailVerified": true,
+        "twoFactorEnabled": false,
+        "sessions": 1,
+        "audits": 67
+      }
+    },
+    "equal": {
+      "health": true,
+      "page": true,
+      "database": true
+    }
+  },
+  "surfaces": {
+    "database": "verified",
+    "api": "verified",
+    "ui": "verified",
+    "external": "external_pending"
+  },
+  "acceptance": {
+    "companyRoleTenantIsolation": "verified",
+    "crudFailureDuplicateRace": "verified",
+    "browserRefreshAndRelogin": "verified",
+    "serverRestart": "verified",
+    "workerAndLocalMail": "verified",
+    "secondIndependentSessionRevocation": "verified",
+    "officialProviderReceipt": "external_pending"
+  },
+  "evidence": [
+    "README.md",
+    "full-acceptance-regression.json",
+    "restart-verification.json",
+    "external-dependency.json",
+    "../authentication/README.md",
+    "../authentication/verified-after-restart.json",
+    "../authentication/revoked-second-session.json",
+    "../../R02-T03/current/retry-countdown-browser-db.json"
+  ]
+}

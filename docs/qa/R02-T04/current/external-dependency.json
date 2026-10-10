@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-10-10T22:44:33.645483Z",
+  "task": "R02-T04",
+  "status": "external_pending",
+  "integration": "official email provider receipt",
+  "implementedAndLocallyVerified": [
+    "encrypted mail outbox",
+    "local mail transport",
+    "SMTP transport contract",
+    "worker retry and receipt",
+    "authentication links and OTP"
+  ],
+  "notExecuted": [
+    "official SMTP/API provider delivery",
+    "test-domain SPF/DKIM/DMARC confirmation",
+    "external mailbox receipt and header inspection",
+    "provider bounce/complaint callback"
+  ],
+  "requiredInputs": [
+    "dedicated provider test account or SMTP credentials",
+    "verified test domain and DNS access",
+    "test mailbox",
+    "provider webhook secret and callback URL when applicable"
+  ],
+  "reason": "No external provider credentials or verified test domain are stored for this project. Local acceptance passed, but external receipt is not claimed.",
+  "nextAction": "Run only with dedicated test credentials; preserve provider message ID, redacted headers, DNS result and callback receipt."
+}

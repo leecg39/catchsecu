@@ -1,5 +1,7 @@
 # 2026-10-10 활성 구현 계획
 
+R02-T04 내부 수용검증 통과·외부 대기: 현재 소스의 인증 모델·API·UI·권한 15파일249시험과 production 두 차례 기동을 확인했다. 재시작 전후 health, 로그인 HTML, 보존 계정의 인증/MFA/세션/감사 지문이 동일하다. 공식 SMTP·DNS·외부 수신함은 자격증명 미확보로 external_pending이므로 작업은 진행 중이며, 활성 계획은 완료12/진행43/계획52다. [검증](docs/qa/R02-T04/current/README.md).
+
 R02-T03 인증 화면 연결 완료: 15개 인증 경로의 정상·로딩·빈 상태·401/403·만료·충돌·재시도·새로고침 상태와 안전한 returnTo를 대조했다. 서버 Retry-After 기반 인증메일·OTP 재전송 대기 표시를 구현하고 Ego Lite에서 59→55초 감소와 재활성화, PostgreSQL 사용자·감사·mail job을 확인했다. UI/API 4파일56시험·타입·린트·production build와 3폭45화면 가로넘침0이 통과했다. 활성 계획은 완료12/진행43/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R02-T03/current/README.md).
 
 R02-T02 인증 서버 API 완료: 가입·로컬 시험메일 인증·로그인·로그아웃·암호 재설정·OTP/TOTP·복구코드·다중 세션 폐기·정책 변경 집행을 실제 PostgreSQL에서 확인했다. tenant/role/license 거부와 DB·감사·outbox 원자성을 포함해 13파일233시험·타입·린트·production build가 통과했다. 활성 계획은 완료11/진행44/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R02-T02/current/README.md).
