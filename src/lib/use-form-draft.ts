@@ -14,7 +14,7 @@ function validate(value: FormDraftValue) {
   validateQuestionDefinitions(content.questions, false, content.marketing ? [content.marketing.nameQuestionId, content.marketing.emailQuestionId, content.marketing.smsQuestionId, content.marketing.kakaoQuestionId].filter((id): id is string => !!id) : []);
   return result.data;
 }
-export function useFormDraft(initial: FormRecord | undefined, seed: FormDraftValue, enabled = true) {
+export function useFormDraft(initial: FormRecord | undefined, seed: FormDraftValue, enabled = true, confirmNavigation?: () => Promise<boolean>) {
   const router = useRouter();
   const [session] = useState(() => new FormDraftSession({ initial, seed, validate,
     persist: (record, value, key) => api<FormRecord>(record ? "/forms/" + record.id + "/draft" : "/forms", {
@@ -37,11 +37,14 @@ export function useFormDraft(initial: FormRecord | undefined, seed: FormDraftVal
       if (url.origin !== window.location.origin || !["http:", "https:"].includes(url.protocol)) return;
       const target = url.pathname + url.search + url.hash;
       event.preventDefault(); event.stopPropagation(); setNavigationTarget(target);
-      void session.save().then(record => { if (record && !session.getSnapshot().dirty) router.push(target); });
+      void session.save().then(async record => {
+        if (!record || session.getSnapshot().dirty || confirmNavigation && !await confirmNavigation()) return;
+        router.push(target);
+      });
     };
     window.addEventListener("beforeunload", unload); document.addEventListener("click", navigate, true);
     return () => { window.removeEventListener("beforeunload", unload); document.removeEventListener("click", navigate, true); };
-  }, [enabled, router, session]);
+  }, [confirmNavigation, enabled, router, session]);
   return { ...snapshot, getSnapshot: session.getSnapshot, pauseSaving: session.pauseSaving, creationPending: session.hasPendingCreation(), saving: snapshot.phase === "saving", edit: (value: FormDraftValue | ((current: FormDraftValue) => FormDraftValue)) => session.edit(typeof value === "function" ? value(session.getSnapshot().value) : value),
     save: (force = false) => session.save(force), navigationTarget,
     discardNavigation: () => { session.stop(); router.push(navigationTarget); },

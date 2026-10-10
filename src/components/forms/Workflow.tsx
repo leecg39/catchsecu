@@ -4,7 +4,7 @@ import { AuditLogs } from "../management/AuditLogs";
 import { z } from "zod";
 import { ExportJobs } from "./ExportJobs";
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { GuardedLink as Link, useNavigationGuard } from "../ux/navigation-guard";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeading, Panel, ActionButton } from "../shared";
 import { RemoteTable } from "../RemoteTable";
@@ -117,7 +117,13 @@ function Settings({ initial, path }: { initial: FormRecord; path: string }) {
   }, []);
   const canWrite = !!permissions?.edit;
   const router = useRouter(), share = path.endsWith("/share"), setting = path.endsWith("/set") || path.endsWith("/setting"), recipient = path.endsWith("/recipient");
-  const draft = useFormDraft(initial, draftValue(initial), !share && !!canWrite && initial.status !== "archived");
+  const navigationGuard = useNavigationGuard();
+  const confirmNavigation = useCallback(async () => {
+    const leave = await navigationGuard.confirmLeave();
+    if (leave) navigationGuard.discardConfirmedChanges();
+    return leave;
+  }, [navigationGuard]);
+  const draft = useFormDraft(initial, draftValue(initial), !share && !!canWrite && initial.status !== "archived", confirmNavigation);
   const form = draft.record ?? initial, content = draft.value.content;
   const [message, setMessage] = useState(""), [error, setError] = useState(""), [transitioning, setTransitioning] = useState(false);
   const toast = useToast();
@@ -140,10 +146,11 @@ function Settings({ initial, path }: { initial: FormRecord; path: string }) {
       if (!saved) return;
       if (setting && next) {
         await publicationSession.publish(saved); await readCurrent(saved.id);
+        if (!await confirmNavigation()) return;
         router.push("/form/ai/share?formId=" + saved.id);
       } else {
         await readCurrent(saved.id);
-        if (next) router.push((recipient ? "/form/ai/agreement" : "/form/ai/setting") + "?formId=" + saved.id);
+        if (next && await confirmNavigation()) router.push((recipient ? "/form/ai/agreement" : "/form/ai/setting") + "?formId=" + saved.id);
         else setMessage("서버에 저장했습니다.");
       }
     } catch (cause) { setError(errorText(cause)); void readCurrent(form.id).catch(() => undefined); } finally { setTransitioning(false); }
@@ -154,7 +161,7 @@ function Settings({ initial, path }: { initial: FormRecord; path: string }) {
     setTransitioning(true);
     try {
       const saved = await draft.save();
-      if (saved) router.push(setting ? "/form/ai/agreement?formId=" + saved.id : recipient ? "/form/ai/create?edit=" + saved.id : "/form/ai/recipient?formId=" + saved.id);
+      if (saved && await confirmNavigation()) router.push(setting ? "/form/ai/agreement?formId=" + saved.id : recipient ? "/form/ai/create?edit=" + saved.id : "/form/ai/recipient?formId=" + saved.id);
     } catch (cause) { setError(errorText(cause)); } finally { setTransitioning(false); }
   }
   const publicPath = permissions?.share && form.publication?.token ? "/projects/" + form.publication.token + "/form" : "";

@@ -57,6 +57,7 @@ export function GuardedLink({ onNavigate, ...props }: ComponentProps<typeof Link
     event.preventDefault();
     void guard.confirmLeave().then(leave => {
       if (!leave) return;
+      guard.discardConfirmedChanges();
       const target = hrefText(props.href);
       if (props.replace) router.replace(target); else router.push(target);
     });
