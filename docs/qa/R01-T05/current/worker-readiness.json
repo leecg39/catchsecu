@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-10T22:14:39.537806+00:00",
+  "database": "catchsecu_test",
+  "localProviders": {
+    "mail": true,
+    "kakao": true,
+    "payment": true
+  },
+  "productionOrOriginalDatabaseUsed": false,
+  "externalDeliveryOrPaymentUsed": false,
+  "runs": [
+    {
+      "name": "main-worker",
+      "command": "--env-file=.env.test.local --import tsx scripts/worker.ts --once",
+      "exitCode": 0,
+      "readyLogObserved": true,
+      "output": "작업 처리기 시작 { workerId: '9b756228-ede0-4b78-a242-51fd61d33fe2' }"
+    },
+    {
+      "name": "export-worker",
+      "command": "--env-file=.env.test.local --import tsx scripts/export-worker.ts --once",
+      "exitCode": 0,
+      "readyLogObserved": true,
+      "output": "응답·월마감 출력 처리기 시작 { workerId: 'e7b792a0-1978-49fd-87cb-45d920d6a6af' }"
+    }
+  ],
+  "success": true
+}

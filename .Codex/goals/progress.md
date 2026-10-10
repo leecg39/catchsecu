@@ -1,4 +1,8 @@
-## 최신 작업: R01-T04 Outbox·worker·플랫폼 인증메일·감사 기반 완료
+## 최신 작업: R01-T05 자동 검증·관측·통합환경 완료
+
+2026-10-11 dev/test PostgreSQL·ClamAV·migration148/148 preflight, production 서버 health/ready 200와 보호 API requestId 401, main/export worker 실제 기동, 오류 비밀 마스킹, 운영 로컬 공급자 차단과 CI 실패·scanner blocked 비성공 집계를 확인했다. 3파일36시험·typecheck·lint·production build가 통과했다. 계획 상태 완료9/진행46/계획52, 전체 goal active. [증거](../../docs/qa/R01-T05/current/README.md).
+
+## 이전 작업: R01-T04 Outbox·worker·플랫폼 인증메일·감사 기반 완료
 
 2026-10-11 실제 PostgreSQL과 일회성 shadow DB에서 두 worker claim 경쟁, 강제 종료 뒤 lease 회수, expired→delivered 시도이력, 마지막 lease exhaustion, 완료·취소 중복 실행 방지를 확인했다. 로컬 파일과 격리 SMTP 인증메일, job/attempt/audit 원자성, 가입·비밀번호 재설정·MFA proof/job/audit rollback, 회사·마케팅 데이터0 상태의 인증메일 전달을 5파일64시험으로 검증했다. 공식 SMTP 수신은 후속 외부 task에 남겼다. 계획 상태 완료8/진행47/계획52, 전체 goal active. [증거](../../docs/qa/R01-T04/current/README.md).
 

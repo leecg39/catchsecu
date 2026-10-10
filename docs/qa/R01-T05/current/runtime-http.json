@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-10-10T22:14:43.435725+00:00",
+  "baseUrl": "http://127.0.0.1:3198",
+  "runtime": "production-build",
+  "database": "catchsecu_test",
+  "localProviders": true,
+  "checks": [
+    {
+      "path": "/api/v1/health",
+      "status": 200,
+      "contentType": "application/json",
+      "requestId": "cb1e01b1-f36e-45f6-828e-38fd9d9cd1c5",
+      "body": {
+        "status": "ok",
+        "database": "ready"
+      }
+    },
+    {
+      "path": "/api/v1/ready",
+      "status": 200,
+      "contentType": "application/json",
+      "requestId": "eb054695-9067-4a35-a812-6f2d4e8c428c",
+      "body": {
+        "status": "ready"
+      }
+    },
+    {
+      "path": "/api/v1/forms",
+      "status": 401,
+      "contentType": "application/json",
+      "requestId": "0ee1a243-cc1c-4156-8cc2-a7a223dac899",
+      "body": {
+        "error": {
+          "code": "UNAUTHENTICATED",
+          "message": "로그인이 필요합니다.",
+          "requestId": "0ee1a243-cc1c-4156-8cc2-a7a223dac899"
+        }
+      }
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "requestId": null,
+      "htmlDocument": true
+    }
+  ],
+  "success": true
+}

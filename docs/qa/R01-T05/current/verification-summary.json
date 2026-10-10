@@ -1,0 +1,48 @@
+{
+  "task": "R01-T05",
+  "checkedAt": "2026-10-11",
+  "result": "passed",
+  "sourceFingerprint": "base b66199f plus the R01-T05 working tree",
+  "environment": {
+    "node": "24.18.0",
+    "database": ["local catchsecu_dev", "isolated local catchsecu_test"],
+    "scanner": "ClamAV 1.5.4",
+    "server": "production build on 127.0.0.1:3198",
+    "browser": "not applicable",
+    "externalProvider": "not applicable"
+  },
+  "tests": {
+    "platform": { "tests": 2, "passed": 2, "failed": 0 },
+    "productionEnvironment": { "tests": 31, "passed": 31, "failed": 0 },
+    "ciEvidenceGate": { "tests": 3, "passed": 3, "failed": 0 },
+    "total": { "files": 3, "tests": 36, "passed": 36, "failed": 0 }
+  },
+  "runtime": {
+    "developmentPreflight": "passed",
+    "testPreflight": "passed",
+    "httpChecks": 4,
+    "httpPassed": 4,
+    "mainWorker": "ready and exit 0",
+    "exportWorker": "ready and exit 0"
+  },
+  "quality": {
+    "typecheck": "passed",
+    "eslint": "passed",
+    "productionBuild": "passed"
+  },
+  "acceptance": {
+    "failedChecksDoNotCountAsSuccess": "passed",
+    "scannerUnavailableReportedBlocked": "passed",
+    "serverReadyObserved": "passed",
+    "workersReadyObserved": "passed",
+    "localDatabaseGuard": "passed",
+    "requestIdAndSecretMasking": "passed",
+    "fixtureCleanupScopeRecorded": "passed",
+    "httpDatabaseAndEvidenceContractTraceable": "passed"
+  },
+  "limitations": [
+    "The scanner-dependent suites are explicitly blocked on GitHub runners without ClamAV and do not count as passed there.",
+    "No production or source database, official provider delivery, OAuth acceptance, or payment was exercised.",
+    "This cross-cutting server and CI task owns no browser UI surface; downstream page tasks retain browser evidence requirements."
+  ]
+}

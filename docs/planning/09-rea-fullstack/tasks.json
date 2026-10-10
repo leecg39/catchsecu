@@ -463,27 +463,47 @@
     "legacy_tasks": [
       "P01-T05"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "cross-cutting",
     "evidence_directory": "catchsecu-clone/docs/qa/R01-T05/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R01-T05/current/README.md",
+      "docs/qa/R01-T05/current/verification-summary.json",
+      "docs/qa/R01-T05/current/platform.json",
+      "docs/qa/R01-T05/current/env-production.json",
+      "docs/qa/R01-T05/current/ci-evidence-gate.json",
+      "docs/qa/R01-T05/current/runtime-http.json",
+      "docs/qa/R01-T05/current/worker-readiness.json",
+      "docs/qa/R01-T05/current/quality-gates.json",
+      "docs/qa/R01-T05/preflight/catchsecu_dev.json",
+      "docs/qa/R01-T05/preflight/catchsecu_test.json"
+    ],
     "dependency_gates": {
       "R01-T03": "task_complete",
       "R01-T04": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "Node/DB/검사 서비스/마이그레이션 사전점검 명령. ClamAV 복구 후 dev 런타임 검사 통과. 운영 외부연동 수용과 구분.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "verified",
+    "progress_note": "dev/test PostgreSQL·ClamAV·migration preflight, production 서버 HTTP readiness와 requestId, main/export worker 실제 기동, 비밀 마스킹, CI 실패·scanner blocked 집계 계약을 36시험과 품질 게이트로 검증했다.",
     "progress_evidence": [
-      "docs/qa/R01-T05/preflight/catchsecu_dev.json"
+      "docs/qa/R01-T05/current/README.md",
+      "docs/qa/R01-T05/current/verification-summary.json",
+      "docs/qa/R01-T05/current/platform.json",
+      "docs/qa/R01-T05/current/env-production.json",
+      "docs/qa/R01-T05/current/ci-evidence-gate.json",
+      "docs/qa/R01-T05/current/runtime-http.json",
+      "docs/qa/R01-T05/current/worker-readiness.json",
+      "docs/qa/R01-T05/current/quality-gates.json",
+      "docs/qa/R01-T05/preflight/catchsecu_dev.json",
+      "docs/qa/R01-T05/preflight/catchsecu_test.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
-      "ui": "partial_verified",
-      "external": "not_assessed"
+      "database": "verified",
+      "api": "verified",
+      "ui": "not_applicable",
+      "external": "not_applicable"
     }
   },
   {

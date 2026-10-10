@@ -2,7 +2,7 @@
 
 2026-10-10 · **사용자 승인 후 구현·검증 진행 중**
 
-R01-T04 Outbox·worker·플랫폼 인증메일·감사 기반이 완료됐다. 실제 PostgreSQL과 shadow DB에서 lease 복구·중복방지·시도이력, job/감사 원자성, 인증 트랜잭션 rollback, 로컬·SMTP와 마케팅 비의존성을 확인했다. 전체107개 작업 상태는 완료8·진행47·계획52이며 다음 의존 작업은 R01-T05 실행·관측·CI·복구다. [현재 증거](../../qa/R01-T04/current/README.md).
+R01-T05 자동 검증·관측·통합환경이 완료됐다. dev/test PostgreSQL·ClamAV·migration preflight, production 서버 HTTP readiness와 requestId, main/export worker 기동, 비밀 마스킹, CI 실패 집계 계약을 확인했다. 전체107개 작업 상태는 완료9·진행46·계획52이며 다음 의존 작업은 R02-T01 계정 인증·세션·복구다. [현재 증거](../../qa/R01-T05/current/README.md).
 
 원본 계획은 outputs에 보존했다. 이 복사본과 tasks.json이 활성 실행 기준선이다. 증거는 저장소 docs/qa/Rxx-Tyy에 기록한다.
 

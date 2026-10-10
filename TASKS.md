@@ -1,5 +1,7 @@
 # 2026-10-10 활성 구현 계획
 
+R01-T05 자동 검증·관측·통합환경 완료: dev/test PostgreSQL·ClamAV·migration 148개 preflight, production 서버 health/ready와 보호 API requestId, main/export worker 실제 기동, 비밀 마스킹과 CI 실패·scanner blocked 집계 계약을 확인했다. 3파일36시험·typecheck·lint·production build가 통과했다. 활성 계획은 완료9/진행46/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R01-T05/current/README.md).
+
 R01-T04 outbox·인증메일·감사 기반 완료: 실제 PostgreSQL과 shadow DB에서 worker lease 강제종료·회수·시도이력·중복방지, job/감사 원자성, 인증 proof/job/audit rollback, 로컬·SMTP 인증메일과 마케팅 비의존성을 확인했다. 5파일64시험·shadow 재현·타입·린트가 통과했다. 활성 계획은 완료8/진행47/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R01-T04/current/README.md).
 
 R01-T03 파일 공통 경계 완료: 실제 PostgreSQL·ClamAV와 독립 S3 SigV4 서버에서 검사 전 열람 차단, EICAR 격리, tenant 결합 거부, 최신 권한·보유기한 재검사, 저장 실패 재시도·삭제 정리, hash/바이트 왕복과 다국어 PDF를 확인했다. 4파일77시험·S3 9요청·타입·린트가 통과했다. 당시 활성 계획은 완료7/진행47/계획53이었다. [검증](docs/qa/R01-T03/current/README.md).

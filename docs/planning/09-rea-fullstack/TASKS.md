@@ -146,7 +146,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
   - 비즈니스 실패 rollback이면 감사/외부job 성공기록도 없음; 인증메일은 마케팅동의 기능에 의존하지 않음
 - 완료 증거: [현재 보고서](../../qa/R01-T04/current/README.md), [검증 집계](../../qa/R01-T04/current/verification-summary.json), [shadow lease 복구](../../qa/R01-T04/current/outbox-shadow.json), [job·시도·감사](../../qa/R01-T04/current/mail-job-audit.json), [공개 인증 트랜잭션](../../qa/R01-T04/current/auth-public-audit.json), [세션·MFA 감사](../../qa/R01-T04/current/auth-mutations-audit.json), [로그인 원자성](../../qa/R01-T04/current/audit-auth-atomicity.json), [마케팅 비의존 SMTP](../../qa/R01-T04/current/r01-outbox-boundaries.json). 5파일64시험과 shadow 강제종료 재현, 타입·린트가 통과했다.
 
-### [~] R01-T05 자동 검증·관측·통합환경
+### [x] R01-T05 자동 검증·관측·통합환경
 
 전용dev/test/shadow DB 가드, request/job 상관ID·secret마스킹, type/lint/build/DB통합/브라우저 증거 디렉터리를 정비한다.
 
@@ -157,6 +157,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
 - 완료 조건:
   - 실패한검사를 성공처럼집계하지않는검증명령; 서버기동/workerready확인
   - 기존fixture정리 범위명확; 운영·원본DB/발송/결제 사용안함; screenshot/HTTP/DB 증거상호추적
+- 완료 증거: [현재 보고서](../../qa/R01-T05/current/README.md), [검증 집계](../../qa/R01-T05/current/verification-summary.json), [HTTP readiness](../../qa/R01-T05/current/runtime-http.json), [worker readiness](../../qa/R01-T05/current/worker-readiness.json), [CI 집계 계약](../../qa/R01-T05/current/ci-evidence-gate.json). dev/test preflight, 3파일36시험, typecheck·lint·production build가 통과했다.
 
 
 ## R02 계정 인증·세션·복구
