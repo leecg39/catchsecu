@@ -15,16 +15,28 @@ function Password({ name = "password", label = "비밀번호", current = false, 
     minLength={current ? 1 : minimum} maxLength={128} type={visible ? "text" : "password"} autoComplete={current ? "current-password" : "new-password"} />
     <button type="button" aria-label="비밀번호 표시 전환" onClick={() => setVisible(!visible)}>◉</button></div>;
 }
-function useAction() {
+function useAction(initialRetrySeconds = 0) {
   const [error, setError] = useState(""), [pending, setPending] = useState(false), [notice, setNotice] = useState("");
-  const [errorCode, setErrorCode] = useState(""), running = useRef(false);
+  const [errorCode, setErrorCode] = useState(""), [retryUntil, setRetryUntil] = useState(() => initialRetrySeconds ? Date.now() + initialRetrySeconds * 1000 : 0);
+  const [clock, setClock] = useState(() => Date.now()), running = useRef(false);
+  const retrySeconds = Math.max(0, Math.ceil((retryUntil - clock) / 1000));
+  useEffect(() => {
+    if (!retryUntil) return;
+    const tick = () => { const value = Date.now(); setClock(value); if (value >= retryUntil) setRetryUntil(0); }; tick();
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [retryUntil]);
+  function startRetry(seconds: number) { setRetryUntil(Date.now() + seconds * 1000); setClock(Date.now()); }
   async function run(action: () => Promise<void>) {
-    if (running.current) return;
+    if (running.current || retrySeconds > 0) return;
     running.current = true; setPending(true); setError(""); setErrorCode(""); setNotice("");
-    try { await action(); } catch (error) { setError(errorText(error)); setErrorCode(error instanceof ApiError ? error.code : ""); }
+    try { await action(); } catch (error) {
+      setError(errorText(error)); setErrorCode(error instanceof ApiError ? error.code : "");
+      if (error instanceof ApiError && error.status === 429) startRetry(error.retryAfterSeconds ?? 60);
+    }
     finally { running.current = false; setPending(false); }
   }
-  return { error, errorCode, pending, notice, setNotice, run };
+  return { error, errorCode, pending, notice, retrySeconds, startRetry, setNotice, run };
 }
 function Status({ action }: { action: ReturnType<typeof useAction> }) {
   return <>{action.error && <p role="alert" className="auth-error">{action.error}</p>}
@@ -37,11 +49,11 @@ export function AuthCallbackError() {
   return error ? <p role="alert" className="auth-error">{authErrorMessage(error) ?? "인증을 완료하지 못했습니다. 다시 요청해주세요."}</p> : null;
 }
 function VerificationResend({ email, returnTo }: { email: string; returnTo: string }) {
-  const action = useAction();
-  return <><button type="button" disabled={action.pending} className="auth-text-button" onClick={() => action.run(async () => {
+  const action = useAction(60);
+  return <><button type="button" disabled={action.pending || action.retrySeconds > 0} className="auth-text-button" onClick={() => action.run(async () => {
     await post("/send-verification-email", { email, callbackURL: authPath("/login", returnTo) });
-    action.setNotice("인증이 필요한 계정이면 인증 메일 전송을 요청했습니다. 메일함을 확인해주세요.");
-  })}>{action.pending ? "요청 중…" : "인증 메일 다시 받기"}</button><Status action={action} />
+    action.startRetry(60); action.setNotice("인증이 필요한 계정이면 인증 메일 전송을 요청했습니다. 메일함을 확인해주세요.");
+  })}>{action.pending ? "요청 중…" : action.retrySeconds ? `${action.retrySeconds}초 후 다시 요청` : "인증 메일 다시 받기"}</button><Status action={action} />
     {action.errorCode === "EMAIL_MISMATCH" && <Link className="auth-back" href="/logout">로그아웃하기</Link>}</>;
 }
 export function LoginForm() {
@@ -146,9 +158,9 @@ export function VerificationForm({ email }: { email: boolean }) {
   }
   return <><p className="auth-description">{backup ? "일회용 복구코드를 입력해주세요." : email ? "코드를 요청한 뒤 메일을 확인해주세요." : "인증 앱의 6자리 인증코드를 입력해주세요."}</p>
     <form className="auth-code-row" onSubmit={submit}><input key={backup ? "backup" : "otp"} className="cs-input" name="code" aria-label="인증코드" autoComplete="one-time-code" required minLength={6} maxLength={backup ? 30 : 6} pattern={backup ? undefined : "[0-9]{6}"} inputMode={backup ? "text" : "numeric"} /><button disabled={action.pending} className="auth-primary">확인</button></form>
-    <Status action={action} />{email && <button disabled={action.pending} className="auth-text-button" onClick={() => action.run(async () => {
-      await post("/two-factor/send-otp", {}); action.setNotice("이메일 인증코드 전송을 요청했습니다.");
-    })}>인증코드 요청</button>}
+    <Status action={action} />{email && <button disabled={action.pending || action.retrySeconds > 0} className="auth-text-button" onClick={() => action.run(async () => {
+      await post("/two-factor/send-otp", {}); action.startRetry(60); action.setNotice("이메일 인증코드 전송을 요청했습니다.");
+    })}>{action.pending ? "요청 중…" : action.retrySeconds ? `${action.retrySeconds}초 후 다시 요청` : "인증코드 요청"}</button>}
     <div className="auth-back"><Link href={authPath(email ? "/login-otp" : "/login-email", returnTo)}>{email ? "OTP 인증" : "이메일 인증"}</Link> · <button type="button" onClick={() => setBackup(!backup)}>{backup ? "인증코드 사용" : "복구코드 사용"}</button></div>
     <Link className="auth-back" href={authPath("/login", returnTo)}>로그인부터 다시 시작</Link></>;
 }

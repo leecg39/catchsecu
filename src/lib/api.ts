@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { authErrorMessage } from "./auth-errors";
 
 export class ApiError extends Error {
-  constructor(message: string, public status: number, public code: string, public requestId?: string) { super(message); }
+  constructor(message: string, public status: number, public code: string, public requestId?: string, public retryAfterSeconds?: number) { super(message); }
 }
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   let response: Response;
@@ -19,8 +19,10 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (response.status === 204) return undefined as T;
   const value = await response.json().catch(() => ({ error: { code: "INVALID_RESPONSE", message: "서버가 올바르게 응답하지 않았습니다. 잠시 후 다시 시도해주세요." } }));
   const code = response.status === 429 ? "TOO_MANY_REQUESTS" : value.error?.code ?? value.code ?? "REQUEST_FAILED";
+  const retryHeader = response.status === 429 ? Number(response.headers.get("Retry-After")) : NaN;
+  const retryAfterSeconds = Number.isFinite(retryHeader) && retryHeader > 0 ? Math.min(3600, Math.ceil(retryHeader)) : response.status === 429 ? 60 : undefined;
   if (!response.ok) throw new ApiError(authErrorMessage(code) ?? value.error?.message ?? value.message ?? "요청을 처리하지 못했습니다.",
-    response.status, code, value.error?.requestId);
+    response.status, code, value.error?.requestId, retryAfterSeconds);
   return value as T;
 }
 export function useResource<T>(path: string | null) {

@@ -1,4 +1,8 @@
-## 최신 작업: R02-T02 계정 인증·세션·복구 서버 API 완료
+## 최신 작업: R02-T03 계정 인증·세션·복구 화면 연결 완료
+
+2026-10-11 인증메일·이메일OTP 재전송을 서버 Retry-After 기반 60초 대기와 중복차단에 연결했다. 15개 경로의 상태 매트릭스, 안전한 returnTo, 로딩/빈/401/실패재시도/IP검색·페이지를 4파일56시험으로 확인하고, 기존 3폭45화면 넘침0·키보드·실제 인증 여정 증거를 재대조했다. Ego Lite 합성 가입에서 처리중→59초→55초→재활성화와 PostgreSQL 사용자·감사·mail job을 확인했고 typecheck·lint·production build가 통과했다. 계획 상태 완료12/진행43/계획52, 전체 goal active. [증거](../../docs/qa/R02-T03/current/README.md).
+
+## 이전 작업: R02-T02 계정 인증·세션·복구 서버 API 완료
 
 2026-10-11 가입·인증링크 단일소비·로그인/로그아웃·암호 재설정·OTP/TOTP·복구코드·다중세션 폐기·정책 변경 집행을 실제 PostgreSQL에서 재검증했다. tenant/role/license 거부와 DB·감사·outbox 원자성을 포함한 13파일233시험, 보존된 재시작 상태 재검증, typecheck·lint·production build가 통과했다. 계획 상태 완료11/진행44/계획52, 전체 goal active. 공식 SMTP 수신은 R02-T04의 external_pending으로 유지한다. [증거](../../docs/qa/R02-T02/current/README.md).
 

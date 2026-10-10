@@ -655,29 +655,43 @@
       "P02-T04",
       "P02-T05"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "frontend",
     "evidence_directory": "catchsecu-clone/docs/qa/R02-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R02-T03/current/README.md",
+      "docs/qa/R02-T03/current/verification-summary.json",
+      "docs/qa/R02-T03/current/state-matrix.json",
+      "docs/qa/R02-T03/current/auth-ui-regression.json",
+      "docs/qa/R02-T03/current/retry-countdown-browser-db.json",
+      "docs/qa/R02-T03/current/quality-gates.json",
+      "docs/qa/R02-T03/authentication/routes-responsive.json",
+      "docs/qa/R02-T03/authentication/signup-final-check.json"
+    ],
     "dependency_gates": {
       "R02-T02": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "external_pending",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "실제UI 가입/링크인증/암호재설정/OTP·TOTP·복구코드/해제/암호변경 확인. 영문 복구오류·3화면 재시도·정책 미확인 폼·모바일 약관 줄바꿈 보완. 인증15경로45폭관측·키보드 확인. 모든 정책/원본 조합은 후속.",
+    "progress_note": "15개 인증 경로의 정상/로딩/빈/검증오류/401·403/만료/충돌/재시도/새로고침 상태와 returnTo를 대조했다. 서버 Retry-After 기반 인증메일·OTP 재전송 대기 표시를 구현하고 Ego Lite에서 59→55초 감소·재활성화와 PostgreSQL 사용자/감사/mail job을 확인했다. UI/API 4파일56시험, 기존 3폭45화면 넘침0, typecheck/lint/production build가 통과했다.",
     "progress_evidence": [
+      "docs/qa/R02-T03/current/README.md",
+      "docs/qa/R02-T03/current/verification-summary.json",
+      "docs/qa/R02-T03/current/state-matrix.json",
+      "docs/qa/R02-T03/current/auth-ui-regression.json",
+      "docs/qa/R02-T03/current/retry-countdown-browser-db.json",
+      "docs/qa/R02-T03/current/quality-gates.json",
       "docs/qa/R02-T03/authentication/README.md",
       "docs/qa/R02-T03/authentication/routes-responsive.json",
-      "docs/qa/R02-T03/authentication/resource-failure-after.json",
       "docs/qa/R02-T03/authentication/signup-final-check.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "not_applicable",
-      "api": "not_applicable",
-      "ui": "partial_verified",
-      "external": "external_pending"
+      "database": "verified",
+      "api": "verified",
+      "ui": "verified",
+      "external": "not_applicable"
     }
   },
   {

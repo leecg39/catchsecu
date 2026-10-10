@@ -188,7 +188,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 - 완료 증거: [현재 보고서](../../qa/R02-T02/current/README.md), [검증 집계](../../qa/R02-T02/current/verification-summary.json), [인증 API 206시험](../../qa/R02-T02/current/auth-api-regression.json), [구독·권한 27시험](../../qa/R02-T02/current/security-entitlements.json), [재시작 영속 상태 재검증](../../qa/R02-T02/current/restart-persistence-verification.json). 총13파일233시험과 typecheck·lint·production build가 통과했다.
 
-### [~] R02-T03 계정 인증·세션·복구 — 전체 화면·모달 연결
+### [x] R02-T03 계정 인증·세션·복구 — 전체 화면·모달 연결
 
 로그인/가입/이메일·OTP/복구/암호변경/2단계/만료 경로 각각 서버 상태에 연결한다. 전송 중·잘못된 코드·만료·재전송 대기·로그아웃 완료를 표시한다.
 
@@ -199,6 +199,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
 - 완료 조건:
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
+- 완료 증거: [현재 보고서](../../qa/R02-T03/current/README.md), [상태 매트릭스](../../qa/R02-T03/current/state-matrix.json), [56개 UI·API 회귀](../../qa/R02-T03/current/auth-ui-regression.json), [Ego Lite 재전송·DB 증거](../../qa/R02-T03/current/retry-countdown-browser-db.json), [15경로·3폭 기존 증거](../../qa/R02-T03/authentication/routes-responsive.json). 15개 경로45개 화면의 가로넘침0과 재전송 대기·재활성화를 확인했다.
 
 ### [~] R02-T04 계정 인증·세션·복구 — DB·브라우저·재시작 수용검증
 

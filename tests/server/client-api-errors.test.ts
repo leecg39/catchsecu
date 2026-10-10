@@ -18,3 +18,10 @@ test("서버의 권한 거부와 충돌 오류는 상태·코드·요청 식별�
     await expect(api("/documents/example")).rejects.toMatchObject({ status, code: "SYNTHETIC_ERROR", requestId: "request-example", message: "합성 서버 오류" });
   }
 });
+test.each([["17", 17], ["0", 60], ["invalid", 60], ["7200", 3600]])("429 응답의 Retry-After %s를 안전한 재요청 대기시간으로 보존한다", async (header, expected) => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: { message: "too many", requestId: "rate-request" } }),
+    { status: 429, headers: { "Retry-After": header } })));
+  await expect(api("/auth/two-factor/send-otp", { method: "POST", body: "{}" })).rejects.toMatchObject({
+    status: 429, code: "TOO_MANY_REQUESTS", requestId: "rate-request", retryAfterSeconds: expected,
+  });
+});

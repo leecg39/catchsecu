@@ -1,0 +1,253 @@
+{
+  "checkedAt": "2026-10-10T22:35:25.935074Z",
+  "result": "passed",
+  "task": "R02-T03",
+  "paths": [
+    {
+      "path": "/auth-code",
+      "states": [
+        "normal",
+        "validation_error",
+        "expired_code",
+        "recovery_code",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/expire/code",
+      "states": [
+        "expired",
+        "restart_link",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/login",
+      "states": [
+        "normal",
+        "loading",
+        "validation_error",
+        "401_403",
+        "unverified_resend",
+        "safe_returnTo",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/login-email",
+      "states": [
+        "normal",
+        "loading",
+        "invalid_or_expired_code",
+        "rate_limit_wait",
+        "recovery_code",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/login-failed",
+      "states": [
+        "failure",
+        "restart_link",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/login-otp",
+      "states": [
+        "normal",
+        "loading",
+        "invalid_or_expired_code",
+        "recovery_code",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/logout",
+      "states": [
+        "normal",
+        "loading",
+        "failure_retry",
+        "completed_redirect"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/not-allow-ip",
+      "states": [
+        "loading",
+        "empty",
+        "failure_retry",
+        "search",
+        "pagination",
+        "company_selection",
+        "403"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/password-change-email",
+      "states": [
+        "normal",
+        "loading",
+        "validation_error",
+        "generic_non_disclosure",
+        "safe_returnTo",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/password-change-email/complete",
+      "states": [
+        "generic_non_disclosure",
+        "safe_returnTo",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/password-change-rule",
+      "states": [
+        "loading",
+        "normal",
+        "validation_error",
+        "401",
+        "403",
+        "409_conflict",
+        "failure_retry",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/passwordChange",
+      "states": [
+        "loading",
+        "normal",
+        "expired_token",
+        "invalid_token",
+        "validation_error",
+        "409_conflict",
+        "failure_retry",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/signup",
+      "states": [
+        "normal",
+        "loading",
+        "validation_error",
+        "duplicate",
+        "mail_resend_wait",
+        "safe_returnTo",
+        "keyboard",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/two-step",
+      "states": [
+        "loading",
+        "normal",
+        "validation_error",
+        "401_403",
+        "409_conflict",
+        "failure_retry",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    },
+    {
+      "path": "/two-step-setting",
+      "states": [
+        "loading",
+        "normal",
+        "validation_error",
+        "401_403",
+        "409_conflict",
+        "failure_retry",
+        "refresh"
+      ],
+      "evidence": [
+        "auth-ui-regression.json",
+        "../authentication/routes-responsive.json",
+        "../authentication/README.md"
+      ]
+    }
+  ],
+  "controls": {
+    "search": "/not-allow-ip",
+    "pagination": "/not-allow-ip",
+    "selection": "/not-allow-ip company selection",
+    "sort": "not_applicable_no_sort_control",
+    "urlAndQuery": "all paths preserve safe returnTo where supported",
+    "keyboard": "signup-final-check.json",
+    "responsive": "15 paths x 390/768/1440; overflow 0"
+  }
+}
