@@ -1,6 +1,6 @@
 # 2026-10-10 활성 구현 계획
 
-R00-T02 현재 소스 감사 진행: 관리자 CRUD15개에 이어 보유기간·피드백 CRUD와 개인정보·마케팅·준수 집계13개 operation을 격리 PostgreSQL에서 검증했다. 이번 대상3파일17시험이 통과했고 API466개·handler158개·handler/정책누락0, 직접시험연결444·미연결22, 작업소유자 미연결0, catch-all 분기 미검증285다. 지원 Node24 전체2865/2867의 SSO DB초기화 hook timeout2건과 같은 파일 독립 재실행131/131은 단일 전체 성공으로 집계하지 않는다. [검증](docs/qa/R00-T02/internal-alias-routes/README.md). R00-T02와 전체 목표는 진행 중이다.
+R00-T02 현재 소스 감사 진행: 가입·로그인·비밀번호·세션·MFA의 공통 인증13개 operation을 실제 Next.js route와 격리 PostgreSQL에서 검증해 대상3파일71시험을 통과했다. API466개·handler158개·handler/정책누락0, 직접시험연결457·미연결9, 작업소유자 미연결0, catch-all 분기 미검증285다. 지원 Node24 전체2865/2867의 SSO DB초기화 hook timeout2건과 같은 파일 독립 재실행131/131은 단일 전체 성공으로 집계하지 않는다. [검증](docs/qa/R00-T02/auth-route-adapter/README.md). R00-T02와 전체 목표는 진행 중이다.
 
 R00-T01 경로·메뉴 기준선 완료: 활성 경로186개 고유·기존181개 전부 포함·구체184개/fallback2개·별도 부가21개를 자동 검증한다. 메뉴35개 중 production 렌더34개와 세션 보존 때문에 미실행한 `/logout`을 구분하고, 관측 동작463개를 API링크36·경로링크58·버튼216·입력153으로 추적했다. 모든 미실행 동작과 렌더/redirect/403은 CRUD 성공으로 집계하지 않는다. [검증](docs/qa/R00-T01/README.md). 활성 계획은 완료1/진행52/계획54다.
 

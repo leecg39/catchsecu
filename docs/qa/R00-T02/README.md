@@ -6,7 +6,8 @@
 - 지원 Node 24.18.0 전체 실행은 261파일 중260파일, 2,867개 중2,865개가 통과했다. 실패2개는 `tests/server/sso.test.ts`의 `beforeEach` DB 초기화 hook timeout이며 제품 assertion 실패는 없었다. 같은 현재 소스의 해당 파일 독립 재실행은 131/131 통과했다. 이 둘은 결합 증거이며 단일 전체 회귀 성공으로 기록하지 않는다.
 - 관리자 요금제·공지·가이드의 목록·생성·상세·수정·삭제 15개 operation을 실제 route handler와 격리 PostgreSQL로 실행했다. 대상3파일24시험, 타입 검사와 변경 파일 lint가 통과했다. [관리자 CRUD route 수용](admin-crud-routes/README.md)
 - 보유기간 규칙·피드백 CRUD와 개인정보·마케팅·준수 집계 13개 operation을 실제 route handler와 격리 PostgreSQL로 실행했다. 대상3파일17시험, 타입 검사와 변경 파일 lint가 통과했다. [내부 별칭·집계 route 수용](internal-alias-routes/README.md)
-- 현재 API 감사는 466 operation·158 handler, handler/메서드 누락0·정책 누락0이다. handler 직접 import가 연결된 operation은444개, 미연결22개이며 작업 소유자 미연결은0개다. catch-all 285개는 분기별 실행 증거가 필요하다.
+- 가입·로그인·비밀번호·세션·MFA의 공통 인증 route 13개 operation을 격리 PostgreSQL로 실행했다. 대상3파일71시험, 타입 검사와 변경 파일 lint가 통과했다. [공통 인증 route 수용](auth-route-adapter/README.md)
+- 현재 API 감사는 466 operation·158 handler, handler/메서드 누락0·정책 누락0이다. handler 직접 import가 연결된 operation은457개, 미연결9개이며 작업 소유자 미연결은0개다. catch-all 285개는 분기별 실행 증거가 필요하다.
 - [현재 감사 요약](current-audit-summary.json), [API operation 감사](api-audit/README.md), [지원 Node 전체 실행](full-tests-current.json), [SSO 재실행](sso-node24-retry.json)
 
 R00-T02는 위 누락과 단일 지원 Node 전체 실행 실패 때문에 진행 상태를 유지한다.

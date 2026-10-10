@@ -12,6 +12,7 @@ import { GET as statusGet, POST as defer } from "@/app/api/v1/me/password-policy
 import { GET as services } from "@/app/api/v1/services/route";
 import { GET as context, POST as switchCompany } from "@/app/api/v1/context/route";
 import { GET as policyGet, PATCH as policyPatch, DELETE as policyReset } from "@/app/api/v1/security/policy/route";
+import { GET as authRouteGet, POST as authRoutePost } from "@/app/api/v1/auth/[...all]/route";
 
 const database = new URL(env.DATABASE_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Only isolated test database is allowed.");
@@ -23,8 +24,9 @@ function req(path: string, method = "GET", cookie = person?.cookie ?? "", value?
   return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie, ...(value === undefined ? {} : { "content-type": "application/json" }), ...headers },
     ...(value === undefined ? {} : { body: JSON.stringify(value) }) });
 }
+const authRoute = (request: Request) => request.method === "GET" ? authRouteGet(request) : authRoutePost(request);
 const cookieOf = (response: Response) => response.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
-const authCall = (path: string, data: unknown, cookie = "") => auth.handler(req("/auth" + path, "POST", cookie, data));
+const authCall = (path: string, data: unknown, cookie = "") => authRoute(req("/auth" + path, "POST", cookie, data));
 async function login(user: Person, next = password) {
   const response = await authCall("/sign-in/email", { email: user.email, password: next });
   expect(response.status).toBe(200); return cookieOf(response);
@@ -53,7 +55,7 @@ async function proof() {
   expect((await authCall("/request-password-reset", { email: person.email, redirectTo: "/passwordChange" })).status).toBe(200);
   const jobs = await db.job.findMany({ where: { type: "mail" }, orderBy: [{ createdAt: "desc" }, { id: "desc" }] });
   const mail = jobs.map(job => decrypt<{ to: string; text: string; subject: string }>(job.payloadCipher)).find(mail => mail.to === person.email && mail.subject === "비밀번호 재설정")!;
-  const response = await auth.handler(new Request(mail.text.match(/https?:\/\/\S+/)![0]));
+  const response = await authRoute(new Request(mail.text.match(/https?:\/\/\S+/)![0]));
   return new URL(response.headers.get("location")!, origin).searchParams.get("token")!;
 }
 const reset = (token: string, next = replacement) => authCall("/reset-password", { token, newPassword: next });
@@ -99,7 +101,7 @@ describe("password policy, expiry and credential transactions", () => {
   });
   test("change rejects missing authentication, wrong origin, unknown fields and incorrect current password", async () => {
     expect((await change(replacement, password, "")).status).toBe(401);
-    expect((await auth.handler(req("/auth/change-password", "POST", person.cookie, { currentPassword: password, newPassword: replacement }, { origin: "https://invalid.example" }))).status).toBe(403);
+    expect((await authRoute(req("/auth/change-password", "POST", person.cookie, { currentPassword: password, newPassword: replacement }, { origin: "https://invalid.example" }))).status).toBe(403);
     expect((await authCall("/change-password", { currentPassword: password, newPassword: replacement, userId: owner.id }, person.cookie)).status).toBe(422);
     const wrong = await change(password, "incorrect");
     expect(wrong.status).toBe(400); expect(await wrong.json()).toMatchObject({ code: "INVALID_PASSWORD" });

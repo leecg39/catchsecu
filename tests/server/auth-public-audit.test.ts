@@ -6,6 +6,7 @@ import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
 import { decrypt } from "@/server/crypto";
+import { GET as authRouteGet, POST as authRoutePost } from "@/app/api/v1/auth/[...all]/route";
 
 const fault = vi.hoisted(() => ({ action: "", expire: false }));
 vi.mock("@/server/audit", async importOriginal => {
@@ -26,8 +27,9 @@ const cookies = (r: Response) => r.headers.getSetCookie().map(c => c.split(";")[
 function req(path: string, input?: unknown, cookie = "", requestOrigin = origin) {
   return new Request(origin + "/api/v1/auth" + path, { method: input ? "POST" : "GET", headers: { origin: requestOrigin, cookie, ...(input ? { "content-type": "application/json" } : {}) }, ...(input ? { body: JSON.stringify(input) } : {}) });
 }
-const signup = () => auth.handler(req("/sign-up/email", { email, password, name: "가입 감사", callbackURL: callback }));
-const reset = (address = email, cookie = "") => auth.handler(req("/request-password-reset", { email: address, redirectTo: "/passwordChange" }, cookie));
+const authRoute = (request: Request) => request.method === "GET" ? authRouteGet(request) : authRoutePost(request);
+const signup = () => authRoute(req("/sign-up/email", { email, password, name: "가입 감사", callbackURL: callback }));
+const reset = (address = email, cookie = "") => authRoute(req("/request-password-reset", { email: address, redirectTo: "/passwordChange" }, cookie));
 async function user(verified = false) {
   expect((await signup()).status).toBe(200);
   return db.user.update({ where: { email }, data: { emailVerified: verified } });
@@ -41,11 +43,11 @@ async function proof() { const m = await mail("이메일 인증"); return new Re
 async function requestEvents(r: Response) { return db.auditEvent.findMany({ where: { requestId: r.headers.get("x-request-id") ?? "missing" } }); }
 async function counts() { return { users: await db.user.count(), accounts: await db.account.count(), jobs: await db.job.count(), proofs: await db.verification.count(), sessions: await db.session.count() }; }
 async function pendingMfa() {
-  const u = await user(true), login = await auth.handler(req("/sign-in/email", { email, password })), cookie = cookies(login);
-  const enable = await auth.handler(req("/two-factor/enable", { password }, cookie)), data = await enable.json();
+  const u = await user(true), login = await authRoute(req("/sign-in/email", { email, password })), cookie = cookies(login);
+  const enable = await authRoute(req("/two-factor/enable", { password }, cookie)), data = await enable.json();
   const secret = new TextDecoder().decode(base32.decode(new URL(data.totpURI).searchParams.get("secret")!));
-  expect((await auth.handler(req("/two-factor/verify-totp", { code: await createOTP(secret, { digits: 6, period: 30 }).totp() }, cookie))).status).toBe(200);
-  const pending = await auth.handler(req("/sign-in/email", { email, password })); expect(pending.status).toBe(200);
+  expect((await authRoute(req("/two-factor/verify-totp", { code: await createOTP(secret, { digits: 6, period: 30 }).totp() }, cookie))).status).toBe(200);
+  const pending = await authRoute(req("/sign-in/email", { email, password })); expect(pending.status).toBe(200);
   // Factor behavior is separate from the already tested three-request throttle.
   await db.rateLimit.deleteMany(); return { userId: u.id, cookie: cookies(pending) };
 }
@@ -72,28 +74,28 @@ test("duplicate signup preserves the generic response without another account or
   expect((await requestEvents(r)).filter(e => e.action === "auth.account_registered")).toHaveLength(0);
 });
 test("signed email confirmation commits its flag and safe event despite the successful 302 callback", async () => {
-  const u = await user(); const r = await auth.handler(await proof()); expect(r.status).toBe(302);
+  const u = await user(); const r = await authRoute(await proof()); expect(r.status).toBe(302);
   expect(new URL(r.headers.get("location")!, origin).searchParams.get("returnTo")).toBe("/my-page/info");
   expect(await db.user.findUnique({ where: { id: u.id } })).toMatchObject({ emailVerified: true });
   const events = await requestEvents(r); expect(events.find(e => e.action === "auth.email_verified")).toMatchObject({ actorId: u.id, resourceId: u.id, detail: { changedFields: ["emailVerified"] } }); safe(events, [email, (await mail("이메일 인증")).url]);
 });
 test("email confirmation audit failure rolls back its flag and a retry of the same signed link succeeds", async () => {
   const u = await user(), link = (await proof()).url; fault.action = "auth.email_verified";
-  const r = await auth.handler(new Request(link)); fault.action = ""; expect(r.status).toBe(500); expect(r.headers.get("location")).toBeNull();
+  const r = await authRoute(new Request(link)); fault.action = ""; expect(r.status).toBe(500); expect(r.headers.get("location")).toBeNull();
   expect(await db.user.findUnique({ where: { id: u.id } })).toMatchObject({ emailVerified: false }); expect(await requestEvents(r)).toHaveLength(0);
-  expect((await auth.handler(new Request(link))).status).toBe(302);
+  expect((await authRoute(new Request(link))).status).toBe(302);
 });
 test("concurrent email confirmation records one actual flag transition", async () => {
   const u = await user(), link = (await proof()).url;
-  const results = await Promise.all([auth.handler(new Request(link)), auth.handler(new Request(link))]); expect(results.map(r => r.status)).toEqual([302, 302]);
+  const results = await Promise.all([authRoute(new Request(link)), authRoute(new Request(link))]); expect(results.map(r => r.status)).toEqual([302, 302]);
   expect(results.map(r => new URL(r.headers.get("location")!, origin).searchParams.get("error")).sort()).toEqual(["EMAIL_ALREADY_VERIFIED", null].sort());
   expect(await db.auditEvent.count({ where: { action: "auth.email_verified", resourceId: u.id } })).toBe(1);
 });
 test("a used signed verification link rejects replay while retaining the safe return page", async () => {
   const u = await user(), link = (await proof()).url;
-  const first = await auth.handler(new Request(link)); expect(first.status).toBe(302);
+  const first = await authRoute(new Request(link)); expect(first.status).toBe(302);
   expect(new URL(first.headers.get("location")!, origin).searchParams.has("error")).toBe(false);
-  const replay = await auth.handler(new Request(link)); expect(replay.status).toBe(302);
+  const replay = await authRoute(new Request(link)); expect(replay.status).toBe(302);
   const location = new URL(replay.headers.get("location")!, origin);
   expect(location.pathname).toBe("/login"); expect(location.searchParams.get("returnTo")).toBe("/my-page/info");
   expect(location.searchParams.get("error")).toBe("EMAIL_ALREADY_VERIFIED");
@@ -103,25 +105,25 @@ test("a used signed verification link rejects replay while retaining the safe re
 });
 test("verification replay without callback returns an error and cannot mint a session", async () => {
   await user(); const link = new URL((await proof()).url); link.searchParams.delete("callbackURL");
-  expect((await auth.handler(new Request(link))).status).toBe(200);
-  const replay = await auth.handler(new Request(link)); expect(replay.status).toBe(400);
+  expect((await authRoute(new Request(link))).status).toBe(200);
+  const replay = await authRoute(new Request(link)); expect(replay.status).toBe(400);
   expect(await replay.json()).toMatchObject({ code: "EMAIL_ALREADY_VERIFIED" });
   expect(replay.headers.getSetCookie()).toHaveLength(0);
 });
 test("used verification proofs still reject unsafe callbacks before redirecting", async () => {
   await user(); const link = new URL((await proof()).url);
-  expect((await auth.handler(new Request(link))).status).toBe(302);
+  expect((await authRoute(new Request(link))).status).toBe(302);
   link.searchParams.set("callbackURL", "https://evil.example/");
-  const replay = await auth.handler(new Request(link)); expect(replay.status).toBeGreaterThanOrEqual(400);
+  const replay = await authRoute(new Request(link)); expect(replay.status).toBeGreaterThanOrEqual(400);
   expect(replay.headers.get("location")).toBeNull();
 });
 test("a signed email proof expiring after its audit cannot publish confirmation", async () => {
   const u = await user(), link = (await proof()).url; fault.action = "auth.email_verified"; fault.expire = true;
-  const r = await auth.handler(new Request(link)); fault.action = ""; fault.expire = false; vi.useRealTimers();
+  const r = await authRoute(new Request(link)); fault.action = ""; fault.expire = false; vi.useRealTimers();
   expect(r.status).toBe(401); expect(r.headers.get("location")).toBeNull(); expect(await db.user.findUnique({ where: { id: u.id } })).toMatchObject({ emailVerified: false }); expect(await requestEvents(r)).toHaveLength(0);
 });
 test("invalid signed email links keep the callback error and cannot produce a verified event", async () => {
-  const r = await auth.handler(req("/verify-email?" + new URLSearchParams({ token: "invalid", callbackURL: callback })));
+  const r = await authRoute(req("/verify-email?" + new URLSearchParams({ token: "invalid", callbackURL: callback })));
   expect(r.status).toBe(302); expect(new URL(r.headers.get("location")!, origin).searchParams.get("error")).toBe("INVALID_TOKEN");
   expect((await requestEvents(r)).filter(e => e.action === "auth.email_verified")).toHaveLength(0);
 });
@@ -143,15 +145,15 @@ test("unknown and inactive reset requests retain the generic reply and create no
 });
 test("verification resend and its audit roll back on storage failure", async () => {
   await user(); const before = await counts(); fault.action = "auth.verification_queued";
-  const r = await auth.handler(req("/send-verification-email", { email, callbackURL: callback })); fault.action = "";
+  const r = await authRoute(req("/send-verification-email", { email, callbackURL: callback })); fault.action = "";
   expect(r.status).toBe(500); expect(await counts()).toEqual(before); expect(await requestEvents(r)).toHaveLength(0);
 });
 test("an unverified sign-in retains its intended verification mail alongside the rejected-login audit", async () => {
-  await user(); const before = await db.job.count(); const r = await auth.handler(req("/sign-in/email", { email, password })); expect(r.status).toBe(403);
+  await user(); const before = await db.job.count(); const r = await authRoute(req("/sign-in/email", { email, password })); expect(r.status).toBe(403);
   expect(await db.job.count()).toBe(before + 1); const events = await requestEvents(r); expect(events.map(e => e.action)).toEqual(expect.arrayContaining(["auth.verification_queued", "auth.login_rejected"])); expect(events.every(e => e.actorId === null)).toBe(true);
 });
 test("wrong passwords produce only an anonymous rejected-login event without credentials or a successful session", async () => {
-  await user(true); const r = await auth.handler(req("/sign-in/email", { email, password: "incorrect" })); expect(r.status).toBe(401);
+  await user(true); const r = await authRoute(req("/sign-in/email", { email, password: "incorrect" })); expect(r.status).toBe(401);
   const events = await requestEvents(r); expect(events).toHaveLength(1); expect(events[0]).toMatchObject({ actorId: null, tenantId: null, action: "auth.login_rejected", resource: "authentication", resourceId: null }); safe(events, [email, password, "incorrect"]);
 });
 test("signup failures remain rate limited outside the rolled-back account transaction", async () => {
@@ -161,65 +163,65 @@ test("signup failures remain rate limited outside the rolled-back account transa
 });
 test("MFA challenge audit failure rolls back the transient session and challenge cookie/proof", async () => {
   const u = await user(true);
-  const login = await auth.handler(req("/sign-in/email", { email, password })); expect(login.status).toBe(200); let cookie = cookies(login);
-  const enable = await auth.handler(req("/two-factor/enable", { password }, cookie)), data = await enable.json();
+  const login = await authRoute(req("/sign-in/email", { email, password })); expect(login.status).toBe(200); let cookie = cookies(login);
+  const enable = await authRoute(req("/two-factor/enable", { password }, cookie)), data = await enable.json();
   const secret = new TextDecoder().decode(base32.decode(new URL(data.totpURI).searchParams.get("secret")!));
-  const confirm = await auth.handler(req("/two-factor/verify-totp", { code: await createOTP(secret, { digits: 6, period: 30 }).totp() }, cookie)); expect(confirm.status).toBe(200); cookie = cookies(confirm);
+  const confirm = await authRoute(req("/two-factor/verify-totp", { code: await createOTP(secret, { digits: 6, period: 30 }).totp() }, cookie)); expect(confirm.status).toBe(200); cookie = cookies(confirm);
   const before = await counts(); fault.action = "auth.factor_challenged";
-  const r = await auth.handler(req("/sign-in/email", { email, password })); fault.action = ""; expect(r.status).toBe(500); expect(r.headers.getSetCookie()).toHaveLength(0); expect(await counts()).toEqual(before); expect(await requestEvents(r)).toHaveLength(0);
+  const r = await authRoute(req("/sign-in/email", { email, password })); fault.action = ""; expect(r.status).toBe(500); expect(r.headers.getSetCookie()).toHaveLength(0); expect(await counts()).toEqual(before); expect(await requestEvents(r)).toHaveLength(0);
   expect(await auth.api.getSession({ headers: new Headers({ cookie }), query: { disableRefresh: true } })).toMatchObject({ user: { id: u.id } });
 });
 test("a pending MFA proof expiring after backup-code audit restores the code and withholds the new session", async () => {
   const u = await user(true);
-  const login = await auth.handler(req("/sign-in/email", { email, password })); const cookie = cookies(login);
-  const enable = await auth.handler(req("/two-factor/enable", { password }, cookie)), data = await enable.json();
+  const login = await authRoute(req("/sign-in/email", { email, password })); const cookie = cookies(login);
+  const enable = await authRoute(req("/two-factor/enable", { password }, cookie)), data = await enable.json();
   const secret = new TextDecoder().decode(base32.decode(new URL(data.totpURI).searchParams.get("secret")!));
-  expect((await auth.handler(req("/two-factor/verify-totp", { code: await createOTP(secret, { digits: 6, period: 30 }).totp() }, cookie))).status).toBe(200);
-  const pending = await auth.handler(req("/sign-in/email", { email, password })); expect(pending.status).toBe(200);
+  expect((await authRoute(req("/two-factor/verify-totp", { code: await createOTP(secret, { digits: 6, period: 30 }).totp() }, cookie))).status).toBe(200);
+  const pending = await authRoute(req("/sign-in/email", { email, password })); expect(pending.status).toBe(200);
   const factor = await db.twoFactor.findFirstOrThrow({ where: { userId: u.id } }), before = await counts();
   const hash = (value: string) => createHash("sha256").update(value).digest("hex");
   fault.action = "auth.backup_code_verified"; fault.expire = true;
-  const r = await auth.handler(req("/two-factor/verify-backup-code", { code: data.backupCodes[0] }, cookies(pending)));
+  const r = await authRoute(req("/two-factor/verify-backup-code", { code: data.backupCodes[0] }, cookies(pending)));
   fault.action = ""; fault.expire = false; vi.useRealTimers(); expect(r.status).toBe(401); expect(r.headers.getSetCookie()).toHaveLength(0); expect(await counts()).toEqual(before);
   expect(hash((await db.twoFactor.findUniqueOrThrow({ where: { id: factor.id } })).backupCodes)).toBe(hash(factor.backupCodes));
 });
 test("a closed account cannot confirm a formerly valid signed email link", async () => {
   const u = await user(), link = (await proof()).url; await db.user.update({ where: { id: u.id }, data: { status: "closed" } });
-  const r = await auth.handler(new Request(link)); expect(r.status).toBe(401);
+  const r = await authRoute(new Request(link)); expect(r.status).toBe(401);
   expect(await db.user.findUnique({ where: { id: u.id } })).toMatchObject({ emailVerified: false }); expect((await requestEvents(r)).some(e => e.action === "auth.email_verified")).toBe(false);
 });
 test("an unsafe callback cannot turn a valid signed email link into a committed confirmation", async () => {
   const u = await user(), link = new URL((await proof()).url); link.searchParams.set("callbackURL", "https://untrusted.example");
-  const r = await auth.handler(new Request(link)); expect(r.status).toBe(400); expect(r.headers.get("location")).toBeNull();
+  const r = await authRoute(new Request(link)); expect(r.status).toBe(400); expect(r.headers.get("location")).toBeNull();
   expect(await db.user.findUnique({ where: { id: u.id } })).toMatchObject({ emailVerified: false });
 });
 test("signup ignores an unrelated valid session cookie when binding its registration actor", async () => {
-  const other = await user(true), login = await auth.handler(req("/sign-in/email", { email, password })); expect(login.status).toBe(200);
+  const other = await user(true), login = await authRoute(req("/sign-in/email", { email, password })); expect(login.status).toBe(200);
   email = randomUUID() + "@public-auth.example.test";
-  const r = await auth.handler(req("/sign-up/email", { email, password, name: "별도 가입" }, cookies(login))); expect(r.status).toBe(200);
+  const r = await authRoute(req("/sign-up/email", { email, password, name: "별도 가입" }, cookies(login))); expect(r.status).toBe(200);
   const target = await db.user.findUniqueOrThrow({ where: { email } }), events = await requestEvents(r);
   expect(events.find(e => e.action === "auth.account_registered")).toMatchObject({ actorId: target.id }); expect(events.every(e => e.actorId !== other.id)).toBe(true);
 });
 test("password recovery remains available with an expired browser session cookie", async () => {
-  const u = await user(true), login = await auth.handler(req("/sign-in/email", { email, password })); expect(login.status).toBe(200);
+  const u = await user(true), login = await authRoute(req("/sign-in/email", { email, password })); expect(login.status).toBe(200);
   await db.session.updateMany({ where: { userId: u.id }, data: { expiresAt: new Date(Date.now() - 60000) } });
   const r = await reset(email, cookies(login)); expect(r.status).toBe(200); expect(await db.verification.count({ where: { value: u.id } })).toBe(1);
   expect((await requestEvents(r)).every(e => e.actorId === null && e.tenantId === null)).toBe(true);
 });
 test("pending MFA email-code queue and confirmation record the signed challenge actor without the code", async () => {
-  const p = await pendingMfa(), sent = await auth.handler(req("/two-factor/send-otp", {}, p.cookie)); expect(sent.status).toBe(200);
+  const p = await pendingMfa(), sent = await authRoute(req("/two-factor/send-otp", {}, p.cookie)); expect(sent.status).toBe(200);
   const events = await requestEvents(sent); expect(events.map(e => e.action)).toEqual(expect.arrayContaining(["auth.factor_code_requested", "auth.factor_code_queued"])); expect(events.every(e => e.actorId === p.userId)).toBe(true);
   const jobs = await db.job.findMany({ where: { type: "mail" }, orderBy: { createdAt: "desc" } });
   const payload = jobs.map(job => decrypt<{ to: string; subject: string; text: string }>(job.payloadCipher)).find(row => row.to === email && row.subject === "로그인 인증코드")!;
   const code = payload.text.match(/인증코드: ([0-9]{6})/)![1]; safe(events.map(e => e.detail), [code]);
-  const confirmed = await auth.handler(req("/two-factor/verify-otp", { code }, p.cookie)); expect(confirmed.status).toBe(200);
+  const confirmed = await authRoute(req("/two-factor/verify-otp", { code }, p.cookie)); expect(confirmed.status).toBe(200);
   expect((await requestEvents(confirmed)).some(e => e.action === "auth.factor_verified" && e.actorId === p.userId)).toBe(true);
 });
 test("email-code queue audit failure restores the OTP proof and job even when sendOTP catches it", async () => {
   const p = await pendingMfa(), before = await counts(); fault.action = "auth.factor_code_queued";
-  const r = await auth.handler(req("/two-factor/send-otp", {}, p.cookie)); fault.action = "";
+  const r = await authRoute(req("/two-factor/send-otp", {}, p.cookie)); fault.action = "";
   expect(r.status).toBe(500); expect(await counts()).toEqual(before); expect(await requestEvents(r)).toHaveLength(0);
 });
 test("cross-origin signup produces no registration, mail or success audit", async () => {
-  const before = await counts(); const r = await auth.handler(req("/sign-up/email", { email, password, name: "차단" }, "", "https://untrusted.example")); expect(r.status).toBe(403); expect(await counts()).toEqual(before); expect(await requestEvents(r)).toHaveLength(0);
+  const before = await counts(); const r = await authRoute(req("/sign-up/email", { email, password, name: "차단" }, "", "https://untrusted.example")); expect(r.status).toBe(403); expect(await counts()).toEqual(before); expect(await requestEvents(r)).toHaveLength(0);
 });
