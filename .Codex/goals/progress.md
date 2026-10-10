@@ -1,3 +1,7 @@
+## 최신 작업: F7 목록 장애·별도 세션 수용
+
+2026-10-11 분리 브라우저에서 같은 게시 폼 초안을 재개했고 최근 활성 세션2개와 폼 updatedAt 불변을 PostgreSQL로 대조했다. `/form/manage`에서 정상24개→검색 빈0→production 중단 조회 실패→동일 빌드 재기동 로딩→검색6개 복구를 한 세션에서 확인했다. 쿠키·토큰·비밀번호는 증거에 기록하지 않았다. [검증](../../docs/qa/R08-T04/final-acceptance/README.md). 권한·검증·409·저장 실패·완료를 묶은 폼 변경 흐름과 외부 공급자 수용은 남아 goal active·공식0/53/54를 유지한다.
+
 ## 최신 작업: F7 회사 격리 결함 수정·실측
 
 2026-10-11 Ego Lite에서 A→B 회사 전환 후 같은 `/dashboard` 경로의 자식 resource가 A 집계를 유지하는 결함을 재현했다. `AppShell`의 회사 선택 후 이동을 `window.location.replace('/dashboard')`로 바꾸어 모든 테넌트 resource를 새 문서에서 다시 생성했다. B의 서비스·폼·문서·응답0, A 폼 직접 접근 `NOT_FOUND`, A 복귀를 확인했다. QA 회사는 `closed`, 멤버십은 `revoked`로 정리하고 불변 감사를 보존했다. 집중4파일47개·타입·production82페이지 통과. [검증](../../docs/qa/R08-T04/final-acceptance/README.md). 폼 변경 결합 전체 상태·별도 세션과 외부 공급자 수용은 남아 goal active·공식0/53/54를 유지한다.

@@ -1,5 +1,7 @@
 # 2026-10-10 활성 구현 계획
 
+R08 F7 목록 장애·별도 세션 후속: Ego Lite와 분리 브라우저의 최근 활성 세션 2개에서 같은 회사·게시 폼 초안을 재개했고 폼 `updatedAt`가 유지됐다. `/form/manage`의 정상24개→검색 빈0→production 중단 조회 실패→동일 빌드 재기동 로딩→검색6개 복구를 한 세션에서 확인했다. 세션 원문·쿠키·비밀번호는 증거에 기록하지 않았다. [검증](docs/qa/R08-T04/final-acceptance/README.md). 폼 변경 결합 전체 상태와 외부 공급자는 남아 공식0/53/54를 유지한다.
+
 R08 F7 회사 격리 후속: Ego Lite 9개 폼 경로·3폭과 선택 폼 7단계·3폭, 뒤로·앞으로·키보드를 확인했다. A→B 회사 전환 후 같은 `/dashboard` 경로에 A 집계가 남던 실결함을 `AppShell` 전체 탐색으로 수정했다. B의 서비스·폼·문서·응답0, A 폼 직접 접근404, A 복귀와 QA fixture `closed`/`revoked`·불변 감사 보존을 PostgreSQL로 대조했다. 집중4파일47개·타입·production82페이지 통과. [검증](docs/qa/R08-T04/final-acceptance/README.md). F7 폼 변경 결합 전체 상태·별도 세션과 외부 공급자는 남아 공식0/53/54를 유지한다.
 
 R08 F5 승인·게시·고정 URL 내부 결합 수용 완료: 실제 Ego Lite에서 첫 승인·게시→고정 URL 생성→v2 초안 격리→두 번째 승인·재게시→같은 주소의 v2 자동 전환→중지·재개→production 재시작→사용 종료·보관을 확인했다. 일시 중지에도 응답 한도 초과 문구가 표시되던 결함을 재현하고 `closedReason`을 중지·기간 만료·응답 한도로 분리해 기존 다국어 안내와 연결했다. PostgreSQL 재시작 지문 일치와 승인2·게시본2 보존, 활성 합성 폼0을 확인했다. [검증](docs/qa/R08-T02/combined-publication-fixed-url/README.md). F5 외부 OAuth·SMTP·본인확인·전자서명은 `external_pending`이며 F7 전수 수용이 남아 공식0/53/54를 유지한다.
