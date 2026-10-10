@@ -556,20 +556,23 @@ const templateUpdateSchema = (paths["/templates/{id}"].patch as Operation).reque
 templateUpdateSchema.content["application/json"].schema.anyOf = ["title", "category", "description", "thumbnailAssetId", "content"].map(name => ({ required: [name] }));
 add("/templates/{id}", "delete", "form.write + service grant; public read-only", "템플릿 물리 삭제; 기존 복제 폼 유지", undefined, "implemented", "204");
 add("/templates/{id}/use", "post", "form.write + target service grant", "전체 내용 복제와 새 질문 ID 생성", version.extend({ serviceId: z.uuid(), title: z.string().trim().min(1).max(200).optional() }), "implemented", "201");
+add("/templates/{id}/archive", "post", "form.write + service grant; public read-only", "서비스 템플릿 보관; 편집·새 사용 차단, 기존 복제 폼 유지", version, "implemented");
+add("/templates/{id}/restore", "post", "form.write + service grant; public read-only", "보관된 서비스 템플릿 복원", version, "implemented");
 (paths["/templates"].post as Operation).description += "; 생성 캐시는 회사·템플릿에 연결; 삭제 후 기존 생성 키는410";
 (paths["/templates/{id}"].delete as Operation).description += "; 캐시 내용·요청 해시를 같은 transaction에서 삭제; 이전 형식은 회사 구성원 범위에서 검사; 독립 생성 폼은 유지";
 {
   const querySchema = z.toJSONSchema(templateListQuery);
   (paths["/templates"].get as Operation).parameters = Object.entries(querySchema.properties ?? {}).map(([name, schema]) => ({ in: "query", name, required: false, schema }));
-  schemas.TemplateReadActions = { type: "object", additionalProperties: false, required: ["preview", "use", "edit", "remove"], properties: Object.fromEntries(["preview", "use", "edit", "remove"].map(name => [name, { type: "boolean" }])) };
+  schemas.TemplateReadActions = { type: "object", additionalProperties: false, required: ["preview", "use", "edit", "archive", "restore", "remove"], properties: Object.fromEntries(["preview", "use", "edit", "archive", "restore", "remove"].map(name => [name, { type: "boolean" }])) };
   schemas.TemplatePermissions = { type: "object", additionalProperties: false, required: ["canCreate", "subscriptionActive", "targets"], properties: {
     canCreate: { type: "boolean" }, subscriptionActive: { type: "boolean" }, targets: { type: "array", items: { type: "object", additionalProperties: false, required: ["id", "name"], properties: { id: { type: "string", format: "uuid" }, name: { type: "string" } } } },
   } };
-  schemas.TemplateRead = { type: "object", required: ["id", "serviceId", "serviceName", "scope", "title", "category", "description", "thumbnailAssetId", "licenseScope", "licenseAvailable", "content", "version", "createdAt", "updatedAt", "actions"], properties: {
+  schemas.TemplateRead = { type: "object", required: ["id", "serviceId", "serviceName", "scope", "title", "category", "description", "thumbnailAssetId", "licenseScope", "licenseAvailable", "status", "content", "version", "createdAt", "updatedAt", "actions"], properties: {
     id: { type: "string", format: "uuid" }, serviceId: { anyOf: [{ type: "string", format: "uuid" }, { type: "null" }] }, serviceName: { type: ["string", "null"] }, scope: { enum: ["company", "public"] },
     title: { type: "string" }, category: { type: "string" }, description: { type: "string", maxLength: 2000 },
     thumbnailAssetId: { anyOf: [{ type: "string", format: "uuid" }, { type: "null" }] },
     licenseScope: { enum: ["SERVICE", "ACTIVE_SUBSCRIPTION"] }, licenseAvailable: { type: "boolean" },
+    status: { enum: ["active", "archived"] },
     content: openApiSchema(formContentSchema), version: { type: "integer", minimum: 1 }, createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" }, actions: { $ref: "#/components/schemas/TemplateReadActions" },
   } };
   schemas.TemplatePage = { type: "object", required: ["items", "total", "page", "pageSize", "permissions"], properties: {

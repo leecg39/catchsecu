@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-10-10T15:08:41.252Z",
+  "result": "passed",
+  "migration": "20261025029000_form_template_archive_state",
+  "checksum": "f4363bbe973291d9afb70e70218d779f9a367359b01ff73d180ef8d069191bb6",
+  "existingDatabases": [
+    {
+      "database": "catchsecu_dev",
+      "migrationApplied": true,
+      "constraint": {
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'archived'::text])))",
+        "validated": true
+      },
+      "statuses": [
+        {
+          "status": "active",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "database": "catchsecu_test",
+      "migrationApplied": true,
+      "constraint": {
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'archived'::text])))",
+        "validated": true
+      },
+      "statuses": [
+        {
+          "status": "active",
+          "count": 4
+        }
+      ]
+    }
+  ],
+  "freshInstall": {
+    "database": "catchsecu_shadow",
+    "migrationApplied": true,
+    "constraint": {
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'archived'::text])))",
+      "validated": true
+    },
+    "statuses": [],
+    "invalidStatusSqlState": "23514"
+  }
+}

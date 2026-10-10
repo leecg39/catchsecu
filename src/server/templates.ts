@@ -30,7 +30,8 @@ export const templateInput = z.object({
 export const templatePatch = templateInput.omit({ serviceId: true }).partial().extend({ version: z.number().int().positive() }).strict()
   .refine(input => input.title !== undefined || input.category !== undefined || input.description !== undefined
     || input.thumbnailAssetId !== undefined || input.content !== undefined, "변경할 제목·분류·설명·대표 이미지 또는 내용을 입력해주세요.");
-export const templateListQuery = listQuery.extend({ scope: z.enum(["all", "company", "public"]).default("all"), serviceId: z.uuid().optional() }).strict();
+export const templateListQuery = listQuery.extend({ scope: z.enum(["all", "company", "public"]).default("all"),
+  status: z.enum(["active", "archived"]).default("active"), serviceId: z.uuid().optional() }).strict();
 const include = { service: { select: { name: true } } };
 function dto(row: Prisma.FormTemplateGetPayload<{ include: typeof include }>) {
   const content = formContentSchema.parse(row.content);
@@ -43,6 +44,7 @@ function dto(row: Prisma.FormTemplateGetPayload<{ include: typeof include }>) {
   return { id: row.id, serviceId: row.serviceId, serviceName: row.service?.name ?? null, scope: row.tenantId ? "company" : "public",
     title: row.title, category: row.category, description: row.description, thumbnailAssetId: row.thumbnailAssetId,
     licenseScope: row.licenseScope as "SERVICE" | "ACTIVE_SUBSCRIPTION", licenseAvailable: row.licenseScope === "SERVICE",
+    status: row.status as "active" | "archived",
     content, version: row.version, createdAt: row.createdAt, updatedAt: row.updatedAt };
 }
 function validContent(content: z.infer<typeof formContentSchema>) {
@@ -67,9 +69,10 @@ async function readPermissions(tx: Transaction, ctx: Context, selectedServiceId?
 }
 function readDto(row: Prisma.FormTemplateGetPayload<{ include: typeof include }>, permissions: TemplatePermissions) {
   const writable = !!row.tenantId && permissions.targets.some(service => service.id === row.serviceId);
-  const licenseAvailable = row.licenseScope === "SERVICE" || permissions.subscriptionActive;
+  const active = row.status === "active", licenseAvailable = row.licenseScope === "SERVICE" || permissions.subscriptionActive;
   return { ...dto(row), licenseAvailable,
-    actions: { preview: true, use: permissions.targets.length > 0 && licenseAvailable, edit: writable, remove: writable } };
+    actions: { preview: true, use: active && permissions.targets.length > 0 && licenseAvailable, edit: active && writable,
+      archive: active && writable, restore: !active && writable, remove: writable } };
 }
 async function assertTemplateLicense(tx: Transaction, ctx: Context, licenseScope: string) {
   if (licenseScope === "SERVICE") return;
@@ -83,7 +86,8 @@ async function locateTemplate(tx: Transaction, ctx: Context, id: string, write: 
   if (write) await tx.$queryRaw`SELECT id FROM "FormTemplate" WHERE id=${id} AND ("tenantId"=${ctx.tenantId} OR "tenantId" IS NULL) FOR UPDATE`;
   else await tx.$queryRaw`SELECT id FROM "FormTemplate" WHERE id=${id} AND ("tenantId"=${ctx.tenantId} OR "tenantId" IS NULL) FOR SHARE`;
   const row = await tx.formTemplate.findFirst({ where: { id, OR: [{ tenantId: ctx.tenantId }, { tenantId: null }] }, include });
-  if (!row || row.status !== "active") fail(404, "NOT_FOUND", "템플릿을 찾을 수 없습니다.");
+  if (!row || !["active", "archived"].includes(row.status) || (!row.tenantId && row.status !== "active"))
+    fail(404, "NOT_FOUND", "템플릿을 찾을 수 없습니다.");
   if (!row.tenantId) {
     if (write) fail(403, "PUBLIC_TEMPLATE_READ_ONLY", "공용 템플릿은 서비스 템플릿으로 복제한 뒤 수정해주세요.");
   } else {
@@ -98,7 +102,8 @@ export async function getTemplate(ctx: Context, id: string, write = false, tx?: 
   return tx ? withFormAccess(tx, ctx, write ? "form.write" : "form.read", () => locateTemplate(tx, ctx, id, write))
     : formTransaction(ctx, write ? "form.write" : "form.read", client => locateTemplate(client, ctx, id, write));
 }
-export async function listTemplates(ctx: Context, query: { page: number; pageSize: number; search: string; scope: "all" | "company" | "public"; serviceId?: string; sort?: "createdAt" | "name"; direction?: "asc" | "desc" }) {
+export async function listTemplates(ctx: Context, query: { page: number; pageSize: number; search: string; scope: "all" | "company" | "public";
+  status?: "active" | "archived"; serviceId?: string; sort?: "createdAt" | "name"; direction?: "asc" | "desc" }) {
   return formTransaction(ctx, "form.read", async tx => {
     const allowed = await formScope(tx, ctx, "form.read");
     const member = await tx.membership.findUniqueOrThrow({ where: { id: ctx.member.id }, select: { accessKind: true } });
@@ -108,8 +113,11 @@ export async function listTemplates(ctx: Context, query: { page: number; pageSiz
     }
     const services = await tx.service.findMany({ where: { ...allowed, ...(member.accessKind === "expert" ? { status: "active" } : {}) }, select: { id: true } });
     const permissions = await readPermissions(tx, ctx, query.serviceId);
-    const company = { tenantId: ctx.tenantId, serviceId: query.serviceId ?? { in: services.map(service => service.id) } };
-    const where = { status: "active", OR: query.scope === "public" ? [{ tenantId: null }] : query.scope === "company" ? [company] : [{ tenantId: null }, company],
+    const status = query.status ?? "active";
+    const company = { tenantId: ctx.tenantId, serviceId: query.serviceId ?? { in: services.map(service => service.id) }, status };
+    const publicTemplate = { tenantId: null, status: "active" };
+    const where = { OR: query.scope === "public" ? status === "active" ? [publicTemplate] : [] : query.scope === "company" ? [company]
+      : status === "active" ? [publicTemplate, company] : [company],
       AND: [{ OR: [{ title: { contains: query.search, mode: "insensitive" as const } }, { category: { contains: query.search, mode: "insensitive" as const } },
         { description: { contains: query.search, mode: "insensitive" as const } }] }] };
     const total = await tx.formTemplate.count({ where }), page = Math.min(query.page, Math.max(1, Math.ceil(total / query.pageSize)));
@@ -136,6 +144,7 @@ export async function createTemplate(ctx: Context, input: z.infer<typeof templat
 export async function updateTemplate(ctx: Context, id: string, input: z.infer<typeof templatePatch>, requestId: string) {
   return formTransaction(ctx, "form.write", async tx => {
     const current = await locateTemplate(tx, ctx, id, true);
+    if (current.status === "archived") fail(409, "TEMPLATE_ARCHIVED", "보관된 템플릿은 복원한 뒤 변경해주세요.");
     if (current.version !== input.version) fail(409, "VERSION_CONFLICT", "템플릿이 변경되었습니다. 다시 불러와주세요.");
     let content = input.content ? { ...input.content, questions: checkedQuestionOptions(
       normalizeQuestionImages(normalizeQuestionPersonalInformation(normalizeQuestionMaterials(normalizeQuestionExplanations(input.content.questions, current.content.questions), current.content.questions), current.content.questions), current.content.questions), current.content.questions) } : current.content;
@@ -165,10 +174,25 @@ export async function deleteTemplate(ctx: Context, id: string, version: number, 
     await audit(tx, ctx, requestId, "template.deleted", "template", id, [], current.serviceId ?? undefined);
   });
 }
+export async function changeTemplateStatus(ctx: Context, id: string, version: number, action: "archive" | "restore", requestId: string) {
+  return formTransaction(ctx, "form.write", async tx => {
+    const current = await locateTemplate(tx, ctx, id, true), expected = action === "archive" ? "active" : "archived";
+    if (current.version !== version) fail(409, "VERSION_CONFLICT", "템플릿이 변경되었습니다. 최신 내용을 확인해주세요.");
+    if (current.status !== expected) fail(409, action === "archive" ? "TEMPLATE_ARCHIVED" : "TEMPLATE_NOT_ARCHIVED",
+      action === "archive" ? "이미 보관된 템플릿입니다." : "보관된 템플릿만 복원할 수 있습니다.");
+    const changed = await tx.formTemplate.updateMany({ where: { id, tenantId: ctx.tenantId, version, status: expected },
+      data: { status: action === "archive" ? "archived" : "active", version: { increment: 1 } } });
+    if (!changed.count) fail(409, "VERSION_CONFLICT", "템플릿 상태가 변경되었습니다. 최신 내용을 확인해주세요.");
+    if (action === "archive") await invalidateTemplateCache(tx, ctx.tenantId, id);
+    await audit(tx, ctx, requestId, action === "archive" ? "template.archived" : "template.restored", "template", id, ["status"], current.serviceId ?? undefined);
+    return readDto(await tx.formTemplate.findUniqueOrThrow({ where: { id }, include }), await readPermissions(tx, ctx));
+  });
+}
 export async function useTemplate(ctx: Context, id: string, input: { version: number; serviceId: string; title?: string }, requestId: string, tx: Transaction) {
   await lockFileQuota(tx, ctx.tenantId); // Before actor SHARE; reserve logical copy bytes atomically.
   return withFormAccess(tx, ctx, "form.write", async () => {
     const template = await getTemplate(ctx, id, false, tx);
+    if (template.status === "archived") fail(409, "TEMPLATE_ARCHIVED", "보관된 템플릿은 복원한 뒤 사용할 수 있습니다.");
     if (template.version !== input.version) fail(409, "VERSION_CONFLICT", "템플릿이 변경되었습니다. 최신 내용을 확인해주세요.");
     await assertTemplateLicense(tx, ctx, template.licenseScope);
     // Snapshot the full schema and allocate new question identities for the independent form.

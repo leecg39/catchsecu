@@ -35,30 +35,39 @@ function Preview({ id }: { id: string }) {
 export function TemplateGallery() {
   const app = useApplication(), router = useRouter(), searchParams = useSearchParams();
   const [company, setCompany] = useState(searchParams.get("scope") === "company"), [sourcePreview, setSourcePreview] = useState<number | null>(null);
+  const [archived, setArchived] = useState(searchParams.get("status") === "archived");
   const [preview, setPreview] = useState<TemplateRecord>(), [use, setUse] = useState<TemplateRecord>(), [remove, setRemove] = useState<TemplateRecord>();
+  const [transition, setTransition] = useState<{ row: TemplateRecord; action: "archive" | "restore" }>();
   const [target, setTarget] = useState(""), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20);
   const [query, setQuery] = useState(""), [search, setSearch] = useState(""), [busy, setBusy] = useState(false), [error, setError] = useState("");
   const keys = useRef(new Map<string, string>());
-  const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), scope: company ? "company" : "public", search });
+  const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), scope: company ? "company" : "public",
+    status: company && archived ? "archived" : "active", search });
   if (company && app.data?.serviceId) params.set("serviceId", app.data.serviceId);
   const result = useResource<TemplatePage>(app.data ? "/templates?" + params : null);
   const targets = result.data?.permissions.targets ?? [];
   return <><PageHeading title="캐치폼 템플릿"><p>목적에 맞는 템플릿을 저장하고 질문·동의·응답 설정을 새 캐치폼으로 복제하세요.</p>
     {result.data?.permissions.canCreate && <Link className="cs-button" href="/form/ai/create?templateEdit=new">템플릿 생성</Link>}</PageHeading>
     <div className="forms-tabs" role="tablist">{["캐치폼 템플릿", "서비스 템플릿"].map((label, index) => <button role="tab" aria-selected={company === (index === 1)}
-      className={company === (index === 1) ? "active" : ""} key={label} onClick={() => { setCompany(index === 1); setPage(1); setError(""); }}>{label}</button>)}</div>
+      className={company === (index === 1) ? "active" : ""} key={label} onClick={() => { setCompany(index === 1); if (index === 0) setArchived(false); setPage(1); setError(""); }}>{label}</button>)}</div>
     {(company || !!result.data?.items.length || !!result.error) && <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); setSearch(query); setPage(1); }}>
-      <input className="cs-input" aria-label="템플릿 검색" placeholder="제목·분류·설명" value={query} onChange={event => setQuery(event.target.value)} /><ActionButton secondary>검색</ActionButton></form>
+      <input className="cs-input" aria-label="템플릿 검색" placeholder="제목·분류·설명" value={query} onChange={event => setQuery(event.target.value)} />
+      {company && <select className="cs-input" aria-label="템플릿 상태" value={archived ? "archived" : "active"} onChange={event => { setArchived(event.target.value === "archived"); setPage(1); setError(""); }}>
+        <option value="active">사용 중</option><option value="archived">보관됨</option></select>}
+      <ActionButton secondary>검색</ActionButton></form>
       {result.error && <div><p role="alert">{result.error.message}</p><ActionButton secondary disabled={result.loading} onClick={result.reload}>템플릿 목록 다시 불러오기</ActionButton></div>}
-      {!use && !remove && error && <p role="alert">{error}</p>}
-      <RemoteTable columns={["제목", "설명", "분류", "서비스", "이용 범위", "질문 수", "수정일", "관리"]} rows={(result.data?.items ?? []).map(row => ({ id: row.id, cells: [
+      {!use && !remove && !transition && error && <p role="alert">{error}</p>}
+      <RemoteTable columns={["제목", "설명", "분류", "서비스", "상태", "이용 범위", "질문 수", "수정일", "관리"]} rows={(result.data?.items ?? []).map(row => ({ id: row.id, cells: [
         row.title, row.description || "설명 없음", row.category, row.serviceName ?? "공용",
+        row.status === "archived" ? "보관됨" : "사용 중",
         row.licenseScope === "ACTIVE_SUBSCRIPTION" ? row.licenseAvailable ? "유효 구독" : "유료 구독 필요" : "서비스 구성원",
         row.content.questions.length, new Date(row.updatedAt).toLocaleDateString("ko-KR"),
         <div className="forms-row-actions" key="actions"><button onClick={() => setPreview(row)}>미리보기</button>
           {row.actions?.use && <button onClick={() => { setUse(row); setTarget(targets.find(service => service.id === app.data?.serviceId)?.id ?? targets[0]?.id ?? ""); setError(""); }}>사용하기</button>}
           {!row.actions?.use && row.licenseScope === "ACTIVE_SUBSCRIPTION" && !row.licenseAvailable && <span className="cs-muted">구독 필요</span>}
           {row.actions?.edit && <Link href={"/form/ai/create?templateEdit=" + row.id}>편집</Link>}
+          {row.actions?.archive && <button onClick={() => { setTransition({ row, action: "archive" }); setError(""); }}>보관</button>}
+          {row.actions?.restore && <button onClick={() => { setTransition({ row, action: "restore" }); setError(""); }}>복원</button>}
           {row.actions?.remove && <button onClick={() => { setRemove(row); setError(""); }}>삭제</button>}</div>] }))}
         total={result.data?.total ?? 0} page={result.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={result.loading} error={result.error?.message} empty="등록된 템플릿이 없습니다." />
     </Panel>}
@@ -81,6 +90,15 @@ export function TemplateGallery() {
       <label className="cs-label">생성할 서비스<select className="cs-input" aria-label="생성할 서비스" value={target} required onChange={event => setTarget(event.target.value)}>
         <option value="">서비스 선택</option>{targets.map(service => <option key={service.id} value={service.id}>{service.name}</option>)}</select></label>
       {error && <p role="alert">{error}</p>}<ActionButton disabled={busy}>{busy ? "생성 중…" : "캐치폼 생성"}</ActionButton></form></Modal>}
+    {transition && <Modal title={transition.action === "archive" ? "템플릿 보관" : "템플릿 복원"} onClose={() => { if (!busy) setTransition(undefined); }}>
+      <p>“{transition.row.title}” 템플릿을 {transition.action === "archive" ? "보관합니다. 보관 중에는 편집하거나 새 캐치폼을 만들 수 없습니다." : "다시 사용 가능한 상태로 복원합니다."}</p>
+      {error && <p role="alert">{error}</p>}<ActionButton disabled={busy} onClick={async () => {
+        setBusy(true); setError("");
+        try { await api("/templates/" + transition.row.id + "/" + transition.action, { method: "POST",
+          body: JSON.stringify({ version: transition.row.version }) }); setTransition(undefined); result.reload(); }
+        catch (error) { setError(errorText(error)); if (error instanceof ApiError && [403, 404, 409, 410].includes(error.status)) result.reload(); }
+        finally { setBusy(false); }
+      }}>{busy ? "처리 중…" : transition.action === "archive" ? "템플릿 보관" : "템플릿 복원"}</ActionButton></Modal>}
     {remove && <Modal title="템플릿 삭제" onClose={() => { if (!busy) setRemove(undefined); }}><p>“{remove.title}” 템플릿을 삭제합니다. 이미 생성한 캐치폼은 유지됩니다.</p>
       {error && <p role="alert">{error}</p>}<ActionButton disabled={busy} onClick={async () => {
         setBusy(true); setError("");

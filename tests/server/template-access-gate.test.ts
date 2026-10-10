@@ -79,14 +79,14 @@ test("조회·작성 grant와 선택 서비스 상태를 GET 작업 및 생성 �
   await db.serviceGrant.create({ data: { tenantId: f.company.id, memberId: f.member.id, serviceId: f.secondId, capabilities: ["service.read", "form.read", "form.write"] } });
   const selected = await listTemplates(f.ctx, { ...query, serviceId: f.firstId });
   expect(selected.permissions.canCreate).toBe(false); expect(selected.permissions.targets.map(row => row.id)).toEqual([f.secondId]);
-  expect(selected.items.find(row => row.id === f.first.id)?.actions).toEqual({ preview: true, use: true, edit: false, remove: false });
-  expect((await getTemplate(f.ctx, f.second.id)).actions).toEqual({ preview: true, use: true, edit: true, remove: true });
+  expect(selected.items.find(row => row.id === f.first.id)?.actions).toEqual({ preview: true, use: true, edit: false, archive: false, restore: false, remove: false });
+  expect((await getTemplate(f.ctx, f.second.id)).actions).toEqual({ preview: true, use: true, edit: true, archive: true, restore: false, remove: true });
   const publicTemplate = await getTemplate(f.ctx, f.publicTemplate.id);
-  expect(publicTemplate.actions).toEqual({ preview: true, use: false, edit: false, remove: false });
+  expect(publicTemplate.actions).toEqual({ preview: true, use: false, edit: false, archive: false, restore: false, remove: false });
   expect(publicTemplate).toMatchObject({ description: "유료 공용 설명", licenseScope: "ACTIVE_SUBSCRIPTION", licenseAvailable: false });
   await db.service.update({ where: { id: f.secondId }, data: { status: "archived" } });
   const archived = await listTemplates(f.ctx, query); expect(archived.permissions.targets).toEqual([]); expect(archived.permissions.canCreate).toBe(false);
-  expect((await getTemplate(f.ctx, f.second.id)).actions).toEqual({ preview: true, use: false, edit: false, remove: false });
+  expect((await getTemplate(f.ctx, f.second.id)).actions).toEqual({ preview: true, use: false, edit: false, archive: false, restore: false, remove: false });
 });
 async function expert(f: Awaited<ReturnType<typeof fixture>>) {
   const user = await person(), assignment = await db.expertAssignment.create({ data: { tenantId: f.company.id, expertUserId: user.user.id, assignedById: f.owner.user.id, expiresAt: new Date(Date.now() + 86400000) } });
@@ -159,6 +159,48 @@ test("동시 편집의 오래된 버전은 409이고 먼저 저장된 설명과 
     title: "먼저 저장된 제목", description: "먼저 저장된 설명", version: 2,
   });
 });
+test("서비스 템플릿은 보관·복원되고 보관 중 편집·새 사용을 차단한다", async () => {
+  const f = await fixture();
+  const stale = await templateUse(req("/templates/" + f.first.id + "/archive", f.editor.cookie, "POST", { version: 2 }));
+  expect(stale.status).toBe(409);
+  expect(await db.formTemplate.findUniqueOrThrow({ where: { id: f.first.id } })).toMatchObject({ status: "active", version: 1 });
+
+  const archivedResponse = await templateUse(req("/templates/" + f.first.id + "/archive", f.editor.cookie, "POST", { version: 1 }));
+  expect(archivedResponse.status).toBe(200);
+  expect(await archivedResponse.json()).toMatchObject({ id: f.first.id, status: "archived", version: 2,
+    actions: { preview: true, use: false, edit: false, archive: false, restore: true, remove: true } });
+  expect((await templateList(req("/templates?scope=company&status=active", f.editor.cookie))).status).toBe(200);
+  const active = await (await templateList(req("/templates?scope=company&status=active", f.editor.cookie))).json();
+  const archived = await (await templateList(req("/templates?scope=company&status=archived", f.editor.cookie))).json();
+  const publicArchived = await (await templateList(req("/templates?scope=public&status=archived", f.editor.cookie))).json();
+  expect(active.items.map((row: { id: string }) => row.id)).not.toContain(f.first.id);
+  expect(archived.items.map((row: { id: string }) => row.id)).toContain(f.first.id);
+  expect(publicArchived).toMatchObject({ total: 0, items: [] });
+  expect((await templateUpdate(req("/templates/" + f.first.id, f.editor.cookie, "PATCH", { version: 2, title: "보관 중 변경" }))).status).toBe(409);
+  expect((await templateUse(req("/templates/" + f.first.id + "/use", f.editor.cookie, "POST",
+    { version: 2, serviceId: f.firstId }, { "idempotency-key": randomUUID() }))).status).toBe(409);
+  expect((await templateUse(req("/templates/" + f.first.id + "/archive", f.editor.cookie, "POST", { version: 2 }))).status).toBe(409);
+
+  const restoredResponse = await templateUse(req("/templates/" + f.first.id + "/restore", f.editor.cookie, "POST", { version: 2 }));
+  expect(restoredResponse.status).toBe(200);
+  expect(await restoredResponse.json()).toMatchObject({ id: f.first.id, status: "active", version: 3,
+    actions: { preview: true, use: true, edit: true, archive: true, restore: false, remove: true } });
+  expect((await templateUse(req("/templates/" + f.first.id + "/restore", f.editor.cookie, "POST", { version: 3 }))).status).toBe(409);
+  expect(await db.auditEvent.count({ where: { resourceId: f.first.id, action: { in: ["template.archived", "template.restored"] } } })).toBe(2);
+});
+test("공용 템플릿과 권한이 회수된 서비스 템플릿은 보관·복원할 수 없다", async () => {
+  const f = await fixture();
+  expect((await templateUse(req("/templates/" + f.publicTemplate.id + "/archive", f.owner.cookie, "POST", { version: 1 }))).status).toBe(403);
+  await db.serviceGrant.delete({ where: { id: f.grant.id } });
+  expect((await templateUse(req("/templates/" + f.first.id + "/archive", f.editor.cookie, "POST", { version: 1 }))).status).toBe(403);
+  expect(await db.auditEvent.count({ where: { resourceId: { in: [f.publicTemplate.id, f.first.id] },
+    action: { in: ["template.archived", "template.restored"] } } })).toBe(0);
+});
+test("PostgreSQL은 템플릿의 허용되지 않은 상태를 직접 거부한다", async () => {
+  const f = await fixture();
+  await expect(db.formTemplate.update({ where: { id: f.first.id }, data: { status: "deleted" } })).rejects.toThrow();
+  expect(await db.formTemplate.findUniqueOrThrow({ where: { id: f.first.id } })).toMatchObject({ status: "active", version: 1 });
+});
 test("공용 템플릿 사용은 유효한 구독에서만 열리고 원본 공용 템플릿 수정·삭제는 거부된다", async () => {
   const f = await fixture(), useInput = { version: f.publicTemplate.version, serviceId: f.firstId, title: "공용 복제본" };
   const noLicense = await templateUse(req("/templates/" + f.publicTemplate.id + "/use", f.owner.cookie, "POST", useInput,
@@ -178,7 +220,7 @@ test("공용 템플릿 사용은 유효한 구독에서만 열리고 원본 공�
   const detailResponse = await templateGet(req("/templates/" + f.publicTemplate.id, f.owner.cookie));
   expect(detailResponse.status).toBe(200);
   expect(await detailResponse.json()).toMatchObject({ licenseAvailable: true,
-    actions: { preview: true, use: true, edit: false, remove: false } });
+    actions: { preview: true, use: true, edit: false, archive: false, restore: false, remove: false } });
   const used = await templateUse(req("/templates/" + f.publicTemplate.id + "/use", f.owner.cookie, "POST", useInput,
     { "idempotency-key": randomUUID() }));
   expect(used.status).toBe(201);

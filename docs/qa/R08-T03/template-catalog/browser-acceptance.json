@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-10T15:01:23Z",
+  "checkedAt": "2026-10-10T15:12:57.390Z",
   "status": "partial_verified",
   "environment": {
     "browser": "Ego Lite",
@@ -127,13 +127,23 @@
         "auditor·billing·sender 계정은 회사·서비스 문맥 로드 뒤 템플릿 목록 API에서 ‘이 작업을 수행할 권한이 없습니다’와 재시도 버튼을 받았다.",
         "admin은 Ego Lite 생성·편집·사용·삭제 동작 노출, owner는 B사 목록·직접 URL 격리 시나리오에서 확인했다."
       ]
+    },
+    {
+      "id": "template-archive-restore",
+      "status": "passed",
+      "evidence": [
+        "회사 템플릿을 보관하자 활성 목록에서 사라지고 보관됨 목록에 미리보기·복원·삭제만 표시됐다.",
+        "보관 상태의 직접 편집 URL은 권한 오류로 차단됐고 복원 뒤에는 편집 화면이 열렸다.",
+        "production 서버를 재시작한 뒤에도 템플릿은 active와 version 7을 유지했다.",
+        "DB에서 template.archived와 template.restored 감사 이벤트를 각각 확인했다."
+      ]
     }
   ],
   "databaseSnapshot": {
     "template": {
       "id": "3c625a37-a5ac-4e6b-a44c-b6dd7ac42a64",
       "title": "서버 최신본 20261010",
-      "version": 5,
+      "version": 7,
       "licenseScope": "SERVICE",
       "status": "active",
       "thumbnailAssetId": null
@@ -156,8 +166,7 @@
     "최신본 적용 확인창에서 ‘입력 폐기하고 적용’을 누르는 실제 UI 단계는 로컬 미저장 입력 삭제 확인이 필요해 실행하지 않았다.",
     "템플릿 삭제 확정의 실제 UI 단계는 데이터 삭제 확인이 필요해 실행하지 않았다.",
     "대표 이미지 업로드·교체·제거의 브라우저 수용",
-    "실제 외부 결제 또는 운영 구독 계정의 라이선스 허용·만료 검증",
-    "템플릿 보관 상태 모델과 보관·복원 화면"
+    "실제 외부 결제 또는 운영 구독 계정의 라이선스 허용·만료 검증"
   ],
   "taskCompletionClaimed": false
 }

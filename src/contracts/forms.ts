@@ -38,10 +38,10 @@ export const formStatus: Record<FormRecord["status"], string> = {
   draft: "초안", pendingApproval: "승인 대기", published: "공개 중", paused: "일시 중지", archived: "보관",
 };
 
-export type TemplateActions = { preview: boolean; use: boolean; edit: boolean; remove: boolean };
+export type TemplateActions = { preview: boolean; use: boolean; edit: boolean; archive: boolean; restore: boolean; remove: boolean };
 export type TemplatePermissions = { canCreate: boolean; subscriptionActive: boolean; targets: { id: string; name: string }[] };
 export type TemplateRecord = { id: string; serviceId: string | null; serviceName: string | null; scope: "company" | "public";
   title: string; category: string; description: string; thumbnailAssetId: string | null;
   licenseScope: "SERVICE" | "ACTIVE_SUBSCRIPTION"; licenseAvailable: boolean;
-  content: FormContent; version: number; createdAt: string; updatedAt: string; actions?: TemplateActions };
+  status: "active" | "archived"; content: FormContent; version: number; createdAt: string; updatedAt: string; actions?: TemplateActions };
 export type TemplatePage = Paged<TemplateRecord> & { permissions: TemplatePermissions };

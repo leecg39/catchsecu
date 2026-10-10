@@ -2,7 +2,7 @@ import { z } from "zod";
 import { requireContext } from "@/server/context";
 import { body, fail, json, route } from "@/server/http";
 import { idempotent } from "@/server/idempotency";
-import { deleteTemplate, getTemplate, templatePatch, updateTemplate, useTemplate } from "@/server/templates";
+import { changeTemplateStatus, deleteTemplate, getTemplate, templatePatch, updateTemplate, useTemplate } from "@/server/templates";
 import { lockFormService, recheckFormAccess } from "@/server/form-access";
 function parts(request: Request) {
   const [rawId, action, ...rest] = new URL(request.url).pathname.split("/").slice(4);
@@ -23,8 +23,13 @@ export const DELETE = route(async (request, requestId) => {
   return new Response(null, { status: 204 });
 });
 export const POST = route(async (request, requestId) => {
-  const { id, action } = parts(request); if (action !== "use") fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
+  const { id, action } = parts(request);
+  if (!action || !["use", "archive", "restore"].includes(action)) fail(404, "NOT_FOUND", "경로를 찾을 수 없습니다.");
   const ctx = await requireContext(request.headers, "form.write");
+  if (action === "archive" || action === "restore") {
+    const input = await body(request, z.object({ version: z.number().int().positive() }).strict());
+    return json(await changeTemplateStatus(ctx, id, input.version, action, requestId));
+  }
   const input = await body(request, z.object({ version: z.number().int().positive(), serviceId: z.uuid(), title: z.string().trim().min(1).max(200).optional() }).strict());
   const result = await idempotent("template:use:" + ctx.member.id + ":" + id, request.headers.get("idempotency-key"), input,
     async tx => {
