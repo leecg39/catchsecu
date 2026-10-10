@@ -31,7 +31,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
 
 ## R00 기준선·계약
 
-### [~] R00-T01 186 경로·메뉴·모달 근거 기준선 확정
+### [x] R00-T01 186 경로·메뉴·모달 근거 기준선 확정
 
 현 계획의 source evidence와 10월2일 181경로를 대조하고, 3개 새 구체경로+2개 wildcard를 구분한다. 메뉴 밖 생성/편집/인증/공개/결과와 부가 운영경로를 별도 register에 넣는다.
 
@@ -42,6 +42,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
 - 완료 조건:
   - 186 source entries 고유·누락0; 기존181 모두포함; wildcard2를 업무화면 수에 합산하지 않음
   - 메뉴 action→route/API/모달 trace와 미확인상태 목록; 리디렉션·403을 정상 CRUD 성공으로 집계하지 않음
+- 완료 증거: [경로·메뉴·동작 기준선](../../qa/R00-T01/README.md), `action-trace.json`, `route-contract-check.json`, `menu-runtime/inventory.json`
 
 ### [~] R00-T02 현재 구현·계약·증거 유효성 감사
 

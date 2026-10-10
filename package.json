@@ -15,6 +15,7 @@
     "test": "node --env-file=.env.test.local node_modules/vitest/vitest.mjs run",
     "typecheck": "tsc --noEmit",
     "verify:plan": "python3 scripts/verify-plan.py",
+    "verify:route-baseline": "python3 scripts/verify-route-baseline.py",
     "verify:preflight": "node --env-file=.env.local --import tsx scripts/qa-preflight.ts",
     "verify:schema": "node --env-file=.env.local --import tsx scripts/verify-schema-contract.ts",
     "verify:api-audit": "node --import tsx scripts/audit-rea-api.ts",
