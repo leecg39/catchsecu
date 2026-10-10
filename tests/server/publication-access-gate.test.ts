@@ -161,12 +161,14 @@ test("새 게시본은 같은 고정 주소로 연결되고 기존 응답은 기
   expect((await db.submission.findUniqueOrThrow({ where:{ id:old.id } })).formVersionId).toBe(oldVersion);
   expect((await publicGet(req("/public/forms/" + second.result.token))).status).toBe(200);
 });
-test("마지막 한 자리의 동시 공개 응답은 한 건만 저장하고 만료된 공개본은 거부한다",async () => {
+test("마지막 한 자리의 동시 공개 응답은 한 건만 저장하고 만료 뒤 마감 화면만 제공한다",async () => {
   const f=await fixture(), p=await publish(f), answer={ answers:{ [f.input.content.questions[0].id]:"경합 응답" },consent:true };
   const responses=await Promise.all([0,1].map(() => publicSubmit(req("/public/forms/" + p.result.token + "/submissions","","POST",answer,randomUUID()))));
   expect(responses.map(r => r.status).sort()).toEqual([201,409]); expect(await db.submission.count()).toBe(1);
   await db.publication.update({ where:{ id:p.result.id },data:{ expiresAt:new Date(Date.now()-1000) } });
-  expect((await publicGet(req("/public/forms/" + p.result.token))).status).toBe(410);
+  const closed=await publicGet(req("/public/forms/" + p.result.token)); expect(closed.status).toBe(200);
+  const closedBody=await closed.json(); expect(closedBody.closed).toBe(true); expect(closedBody).not.toHaveProperty("content");
+  expect((await publicSubmit(req("/public/forms/" + p.result.token + "/submissions","","POST",answer,randomUUID()))).status).toBe(410);
 });
 test("승인 화면의 작성 버튼 권한은 현재 grant를 반영한다",async () => {
   const f=await fixture(); await approval(f);

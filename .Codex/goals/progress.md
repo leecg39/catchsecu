@@ -1,4 +1,8 @@
-## 최신 작업: 질문 부가 필드 F3 하위 범위 완료
+## 최신 작업: F3 외부 인증·전자서명 준비 상태 완료
+
+2026-10-11 로컬 `sandbox` 인증과 외부 공급자 공식 인증을 설정·공개 화면에서 구분했다. 제출에서 영수증을 소비한 뒤에도 준비 상태를 유지하고, 인증 전·완료 후 모두 비공식 테스트 안내를 노출한다. 집중3파일37개·관련7파일118개, 타입·변경 린트·production82페이지, 실제 브라우저 제출과 PostgreSQL 소비 영수증 연결을 확인했다. 외부 공급자 자격증명·공식 sandbox·production은 `external_pending`이며 R08-T01~T04와 전체 목표는 `in_progress`·공식0/53/54를 유지한다. [검증](../../docs/qa/R08-T02/verification-readiness/README.md).
+
+## 이전 작업: 질문 부가 필드 F3 하위 범위 완료
 
 2026-10-11 질문 설명·문항/보기 이미지·참고 LINK/FILE·기타 직접입력·수동 개인정보 분류를 하나의 F3 부가 필드 범위로 재검증했다. 현재 소스의 PostgreSQL·통합 7파일132개와 계약·화면 렌더 5파일36개, 총12파일168개가 통과했고 기존 Ego Lite·DB·production 재시작 증거를 다시 연결했다. 특수 질문 전체, 외부 본인확인/전자서명, NLP/AI 분류, F4~F7이 남아 R08-T01~T04 및 전체 목표는 `in_progress`·공식0/53/54를 유지한다. [검증](../../docs/qa/R08-T02/question-metadata/integrated-acceptance/README.md).
 

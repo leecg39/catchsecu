@@ -1,5 +1,7 @@
 # 2026-10-10 최신 전체 계획 구현 중
 
+R08 F3 외부 인증·전자서명 준비 상태 하위 범위를 완료했다. 로컬 `sandbox` 성공과 외부 공급자 공식 인증을 설정·공개 화면에서 분리하고, 영수증 소비 뒤 준비 상태와 완료 뒤 테스트 안내를 유지한다. 집중3파일37개·관련7파일118개, 타입·변경 린트·production82페이지, 실제 브라우저 제출과 PostgreSQL `consumed` 영수증 연결을 확인했다. [검증](qa/R08-T02/verification-readiness/README.md). 외부 공급자 자격증명·공식 sandbox·production은 `external_pending`이며 공식 완료0/진행53/계획54를 유지한다.
+
 R08 F3 질문 부가 필드 하위 범위를 완료했다. 질문 설명·문항/보기 이미지·참고 LINK/FILE·기타 직접입력·수동 개인정보 분류를 현재 소스의 PostgreSQL·통합 7파일132개와 계약·화면 렌더 5파일36개, 총12파일168개로 재검증하고 기존 Ego Lite·DB·production 재시작 증거를 연결했다. [검증](qa/R08-T02/question-metadata/integrated-acceptance/README.md). 특수 질문 전체, 외부 본인확인/전자서명, NLP/AI 분류와 F4~F7이 남아 R08-T01~T04 및 공식 완료0/진행53/계획54는 유지한다.
 
 R08 F2 질문·보기 식별자 하위 범위를 완료했다. 기존 문자열 보기, ID/label/value 분리, 기타 직접입력 optionId, 보기별 페이지 이동과 잘못된 참조·순환 차단, 복제/템플릿 remap, 게시본 응답 불변을 현재 소스 10파일82개로 재검증했다. [검증](qa/R08-T02/identities/README.md). R08-T01/T02 전체와 공식 완료0/진행53/계획54는 유지한다.

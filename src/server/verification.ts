@@ -34,7 +34,7 @@ async function state(tx: Transaction, ctx: Context, serviceId: string, row: Veri
   const reason = !row || row.status === "deleted" ? "NOT_CONFIGURED" : row.status === "disabled" ? "DISABLED" :
     row.status === "enabled" && adaptersReady ? "READY" : "PROVIDER_ADAPTER_REQUIRED";
   const sandboxVerified = !!row && !!await tx.verificationAttempt.count({ where: { tenantId: ctx.tenantId, serviceId,
-    integrationId: row.id, integrationVersion: row.version, environment: "sandbox", status: "verified" } });
+    integrationId: row.id, integrationVersion: row.version, environment: "sandbox", status: { in: ["verified", "consumed"] } } });
   const messages = { READY: "local sandbox 공급자가 사용 중입니다. 본인인증 폼을 게시할 수 있습니다.",
     NOT_CONFIGURED: "공급자 설정을 등록해주세요.", DISABLED: "본인인증·전자서명 연동을 사용 중지했습니다.",
     PROVIDER_ADAPTER_REQUIRED: "외부 공급자는 아직 연결할 수 없습니다. sandbox의 local 공급자만 사용으로 전환할 수 있습니다." };

@@ -12,12 +12,15 @@ export function VerificationSettings({ serviceId }: { serviceId: string }) {
   if (resource.loading || !resource.data) return <p role="status">본인인증·전자서명 연동 설정을 불러오는 중입니다.</p>;
   return <section aria-label="서비스 본인인증·전자서명 연동">
     <p role="status">{resource.data.readiness.message}</p>
+    {resource.data.readiness.ready && <p className="forms-muted">{resource.data.readiness.sandboxVerified
+      ? "local sandbox 테스트 인증 흐름을 확인했습니다. 외부 공급자 공식 검증과 운영 환경 연동은 별도로 필요합니다."
+      : "local sandbox 설정은 사용 중이지만 성공한 테스트 인증 흐름은 아직 없습니다."}</p>}
     <p className="forms-muted">이 설정은 선택한 서비스의 모든 캐치폼에 적용됩니다. 공급자 이름을 저장해도 인증이 활성화되지는 않습니다.</p>
     {message && <p role="status">{message}</p>}
     <Configuration key={`${serviceId}:${resource.data.integration?.version ?? 0}`} serviceId={serviceId} state={resource.data}
       done={text => { setMessage(text); resource.reload(); }} />
     {!!resource.data.history.length && <details><summary>설정 변경 이력 (최근 20개)</summary><ul>
-      {resource.data.history.map(item => <li key={item.version}>v{item.version} · {item.status === "deleted" ? "삭제" : item.status === "disabled" ? "사용 중지" : "연결 대기"}
+      {resource.data.history.map(item => <li key={item.version}>v{item.version} · {item.status === "deleted" ? "삭제" : item.status === "disabled" ? "사용 중지" : item.status === "enabled" ? "사용" : "연결 대기"}
         {` · ${item.environment === "sandbox" ? "테스트" : "운영"} · ${item.identityProvider ?? "본인인증 미설정"} / ${item.signatureProvider ?? "전자서명 미설정"} · ${new Date(item.createdAt).toLocaleString("ko-KR")}`}</li>)}
     </ul></details>}
   </section>;
@@ -39,9 +42,11 @@ function Configuration({ serviceId, state, done }: { serviceId: string; state: V
       if (!result.success) { setError(result.error.issues.map(issue => issue.message).join(" ")); return; }
       const body = JSON.stringify(exists ? { ...result.data, version: row!.version } : result.data);
       if (!exists && pending.current?.body !== body) pending.current = { body, key: crypto.randomUUID() };
-      await api<VerificationState>(path, { method: exists ? "PATCH" : "POST", body,
+      const saved = await api<VerificationState>(path, { method: exists ? "PATCH" : "POST", body,
         ...(!exists ? { headers: { "Idempotency-Key": pending.current!.key } } : {}) });
-      pending.current = null; done("연동 설정을 저장했습니다. 실제 공급자 연결과 검증은 대기 중입니다.");
+      pending.current = null; done(saved.readiness.ready
+        ? "local sandbox 설정을 사용으로 전환했습니다. 공개 테스트 인증 흐름으로 동작을 확인해주세요."
+        : "연동 설정을 저장했습니다. 외부 공급자 연결과 공식 검증은 대기 중입니다.");
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 410) pending.current = null;
       setError(errorText(cause));

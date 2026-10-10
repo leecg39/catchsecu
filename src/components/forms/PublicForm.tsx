@@ -120,9 +120,10 @@ function ClosedForm({ data }: { data: ClosedPublicFormData }) {
 }
 type VerificationProof = { attemptId: string; receipt: string; name: string; kind: VerificationKind };
 const verificationLabels: Record<VerificationKind, { title: string; hint: string; action: string; busy: string; done: string }> = {
-  identity: { title: "본인인증", hint: "이 캐치폼은 본인인증이 필요합니다. 이름과 생년월일을 입력해 테스트 공급자 인증을 완료해주세요.", action: "인증하기", busy: "인증 중…", done: "본인인증을 완료했습니다." },
-  signature: { title: "전자서명", hint: "이 캐치폼은 전자서명이 필요합니다. 이름과 생년월일을 입력하면 서명자를 확인하고 문서 내용에 서명합니다.", action: "서명하기", busy: "서명 중…", done: "전자서명을 완료했습니다." },
+  identity: { title: "본인인증", hint: "이 캐치폼은 본인인증이 필요합니다. 이름과 생년월일을 입력해 테스트 공급자 인증을 완료해주세요.", action: "인증하기", busy: "인증 중…", done: "local sandbox 테스트 본인인증을 완료했습니다." },
+  signature: { title: "전자서명", hint: "이 캐치폼은 전자서명이 필요합니다. 이름과 생년월일을 입력하면 서명자를 확인하고 문서 내용에 서명합니다.", action: "서명하기", busy: "서명 중…", done: "local sandbox 테스트 전자서명을 완료했습니다." },
 };
+const localSandboxDisclosure = "local sandbox 테스트 환경입니다. 이 결과는 외부 공급자의 공식 본인확인·전자서명으로 처리되지 않습니다.";
 function IdentityVerification({ token, kinds, onDone }: { token: string; kinds: VerificationKind[]; onDone: (proof: VerificationProof) => void }) {
   const [kind, setKind] = useState<VerificationKind>(kinds[0] ?? "identity");
   return <VerificationStep key={kind} token={token} kind={kind} kinds={kinds} onKind={setKind} onDone={onDone} />;
@@ -152,6 +153,7 @@ function VerificationStep({ token, kind, kinds, onKind, onDone }: { token: strin
   }
   const labels = verificationLabels[kind];
   return <section className="public-consent"><h2>{labels.title}</h2>
+    <p className="forms-muted">{localSandboxDisclosure}</p>
     <p>{labels.hint}</p>
     {kinds.length > 1 && <div className="cs-row" role="group" aria-label="검증 방법 선택">
       {kinds.map(option => <button key={option} type="button" className={"cs-button" + (option === kind ? " cs-button-primary" : "")} disabled={busy} onClick={() => onKind(option)}>{verificationLabels[option].title}</button>)}
@@ -301,7 +303,7 @@ function ResponseForm({ data, token, participationProof }: { data: ActivePublicF
         {content.marketing.kakaoQuestionId && <label className="cs-row"><input name="marketingChannels" type="checkbox" value="kakao" />[{formRequiredLabel(locale, false)}] 알림톡 광고성 정보 수신에 동의합니다.</label>}
       </section>}
     {content.verify && <fieldset className="public-response-fields" disabled={busy || pending}>
-      {verification ? <section className="public-consent"><h2>{verificationLabels[verification.kind].title}</h2><p role="status">{verificationLabels[verification.kind].done} ({verification.name})</p></section>
+      {verification ? <section className="public-consent"><h2>{verificationLabels[verification.kind].title}</h2><p role="status">{verificationLabels[verification.kind].done} ({verification.name})</p><p className="forms-muted">{localSandboxDisclosure}</p></section>
         : <IdentityVerification key={token} token={token} kinds={data.verification?.kinds?.length ? data.verification.kinds : ["identity"]} onDone={proof => setVerification(proof)} />}
     </fieldset>}</>}
     {uploadStatus && <p role="status">{uploadStatus}</p>}

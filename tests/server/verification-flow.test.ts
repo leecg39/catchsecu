@@ -7,7 +7,7 @@ import { POST as createForm } from "@/app/api/v1/forms/route";
 import { POST as formAction } from "@/app/api/v1/forms/[...segments]/route";
 import { GET as publicGet, POST as publicPost } from "@/app/api/v1/public/forms/[...segments]/route";
 import { POST as localProvider } from "@/app/api/v1/public/verify/local/route";
-import { POST as integrationPost, PATCH as integrationPatch } from "@/app/api/v1/services/[id]/verification/route";
+import { GET as integrationGet, POST as integrationPost, PATCH as integrationPatch } from "@/app/api/v1/services/[id]/verification/route";
 import { cleanupVerification } from "@/server/verification-flow";
 import { tokenHash } from "@/server/crypto";
 import type { FormContent } from "@/contracts/forms";
@@ -86,6 +86,9 @@ test("local sandbox 연동 사용 → challenge→provider→callback→영수�
   expect(receipt.provider).toBe("local");
   expect(receipt.proofHash).toMatch(/^[a-f0-9]{64}$/);
   expect(await db.verificationEvent.count({ where: { attemptId: proof.attemptId, signatureValid: true, verificationStatus: "verified" } })).toBe(1);
+  const readinessResponse = await integrationGet(req(`/services/${f.serviceId}/verification`, "GET", undefined, f.cookie));
+  expect(readinessResponse.status).toBe(200);
+  expect((await readinessResponse.json()).readiness).toMatchObject({ ready: true, reason: "READY", sandboxVerified: true });
 });
 
 test("위조 서명·재생·만료·타테넌트·재사용 영수증을 모두 거부한다", async () => {
