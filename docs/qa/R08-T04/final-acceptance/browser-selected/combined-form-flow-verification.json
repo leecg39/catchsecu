@@ -1,0 +1,126 @@
+{
+  "checkedAt": "2026-10-11T03:00:00+09:00",
+  "origin": "http://localhost:3120",
+  "formId": "5b2f06a6-545f-45a9-9e9b-3177999349ab",
+  "submissionId": "a1fe335d-ff6e-41a7-a671-dc217fd4e232",
+  "sessions": [
+    "Ego Lite",
+    "Codex in-app browser"
+  ],
+  "browserFlow": {
+    "blankValidation": "제목·질문·선택 항목과 설정 범위를 확인해주세요.",
+    "draft": {
+      "title": "F7 결합 검증 20261011-0256",
+      "body": "F7 결합 흐름 본문",
+      "questions": [
+        {
+          "type": "단문형 답변",
+          "label": "이름을 입력해주세요"
+        },
+        {
+          "type": "객관식 답변",
+          "label": "선호 채널을 선택해주세요",
+          "options": [
+            "이메일",
+            "문자"
+          ]
+        },
+        {
+          "type": "날짜",
+          "label": "희망 날짜를 선택해주세요"
+        }
+      ],
+      "verificationProvider": "local",
+      "verificationEnvironment": "sandbox",
+      "consentPurpose": "F7 결합 흐름 기능 검증",
+      "retentionDays": 30,
+      "maxResponses": 5,
+      "sameTenantDocumentVersionId": "47100000-0000-4000-8000-000000000001"
+    },
+    "refresh": {
+      "valuesRestored": true,
+      "readOnlyReloadDidNotChangeVersion": true,
+      "readOnlyReloadDidNotAddAudit": true
+    },
+    "approval": {
+      "requestCreated": true,
+      "decision": "approved",
+      "consumedByPublication": true,
+      "evidenceNumber": "F7-20261011-0256"
+    },
+    "publication": {
+      "publishedVersionNumber": 1,
+      "publicPathTokenRecorded": false,
+      "publicFormDisplayedOriginalTitle": true,
+      "publicFormDisplayedOriginalBody": true,
+      "publicFormDisplayedThreeQuestions": true,
+      "publicFormDisplayedConsentDocument": true,
+      "publicFormDisplayedLocalSandboxNotice": true
+    },
+    "submission": {
+      "completed": true,
+      "answerCount": 3,
+      "consentReceiptCount": 1,
+      "identityVerificationStatus": "consumed",
+      "retentionDays": 30
+    },
+    "publishedVersionImmutability": {
+      "publishedVersion": 1,
+      "draftVersion": 2,
+      "draftTitle": "F7 결합 검증 20261011-0256 · 개정 초안 · 서버중단 보존",
+      "publicTitleAfterDraftSave": "F7 결합 검증 20261011-0256",
+      "draftTitleNotVisibleOnPublicForm": true
+    },
+    "staleSessionConflict": {
+      "session": "Ego Lite",
+      "status": 409,
+      "message": "다른 곳에서 수정되었습니다. 이 화면의 수정 내용은 유지했습니다.",
+      "inputPreserved": "F7 결합 검증 20261011-0256 · Ego 충돌 입력",
+      "latestApplyDeferred": "최신본 적용은 현재 화면의 미저장 입력을 폐기하므로 UI 삭제 확인 전에는 실행하지 않음"
+    },
+    "saveFailureRetry": {
+      "serverStopped": true,
+      "failureMessage": "서버에 연결하지 못했습니다. 네트워크 연결을 확인한 뒤 다시 시도해주세요.",
+      "preservedMessage": "수정 내용이 이 화면에 남아 있습니다. 저장을 다시 시도해주세요.",
+      "inputPreserved": true,
+      "serverRestarted": true,
+      "retryMessage": "서버에 저장했습니다.",
+      "retryPersisted": true
+    }
+  },
+  "database": {
+    "formStatus": "published",
+    "publishedVersionNumber": 1,
+    "draftVersionNumber": 2,
+    "publicationStatus": "active",
+    "publicationResponseCount": 1,
+    "approvalStatus": "consumed",
+    "submissionStatus": "submitted",
+    "encryptedAnswerTypes": [
+      "단문형 답변",
+      "객관식 답변",
+      "날짜"
+    ],
+    "consentEvidenceVersion": 2,
+    "identityVerificationEnvironment": "sandbox",
+    "identityVerificationStatus": "consumed",
+    "requiredAudits": [
+      "form.created",
+      "form.draft_updated",
+      "form.published",
+      "submission.created"
+    ]
+  },
+  "qaTooling": {
+    "dateInput": "Codex 인앱 브라우저의 fill이 React 제어형 date 입력을 잘못 직렬화해 CDP로 네이티브 value setter와 input/change 이벤트를 재현했다. 저장된 응답은 서버의 날짜 검증을 통과했다.",
+    "productionCodeChanged": false
+  },
+  "remaining": [
+    "Ego Lite 충돌 화면에서 최신본 적용은 미저장 입력 폐기 확인이 필요함",
+    "회사 A 문서를 회사 B 폼에 연결하는 서버 거절의 이번 결합 fixture 증거",
+    "로그아웃 후 재로그인 복원",
+    "게시본 v1의 PDF 문구·질문·보기 불변 대조",
+    "외부 공식 본인확인·전자서명 provider 수신 증거"
+  ],
+  "externalStatus": "external_pending"
+}
