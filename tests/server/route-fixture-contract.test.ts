@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildRouteFixture, type FixtureRoute } from "../../src/server/fixtures/routes";
+import { externalScenarios } from "../../src/server/fixtures/catalog";
 const route = (path: string): FixtureRoute => ({ id: "RR-test", path, domain: "R00", page_acceptance: "save/read", actors: "owner", api_operations: [] });
 const value = (value: string, model: string) => ({ value, model, verified: true });
 describe("route fixture evidence boundaries", () => {
@@ -31,5 +32,13 @@ describe("route fixture evidence boundaries", () => {
     expect(buildRouteFixture(route("/security/*"), {}).path).toBe("/security/__rea_unknown_route__");
     expect(buildRouteFixture(route("/security/*"), {}).scenarios[0].expected).toContain("404");
     expect(() => buildRouteFixture(route("/unknown/:otherId"), {})).toThrow("unknown route parameter");
+  });
+  it("keeps every external staging run on an explicit dedicated test target", () => {
+    const staging = externalScenarios.filter(item => item.grade === "staging");
+    expect(staging.length).toBeGreaterThan(0);
+    for (const scenario of staging) {
+      expect(scenario.releasePass).toBe(false);
+      expect(scenario.testTargetPolicy).toMatch(/시험|sandbox/);
+    }
   });
 });

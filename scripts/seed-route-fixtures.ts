@@ -11,6 +11,8 @@ const retention = new Date("2030-01-01T00:00:00.000Z");
 const subjectAccessExpiry = new Date("2030-01-01T00:00:00.000Z");
 const fileBytes = Buffer.from("catchsecu route fixture\n", "utf8");
 const fileHash = createHash("sha256").update(fileBytes).digest("hex");
+const importBytes = Buffer.from("name,email\nFixture,fixture@example.test\n", "utf8");
+const importHash = createHash("sha256").update(importBytes).digest("hex");
 
 async function once<T>(find: () => Promise<T | null>, create: () => Promise<T>) {
   return await find() ?? await create();
@@ -29,7 +31,7 @@ export async function seedRouteFixtures() {
   const owner = await db.user.findUnique({ where: { id: users.ownerA } });
   if (!company || !owner) throw new Error("회사 A와 역할 계정이 없습니다. npm run db:seed를 먼저 실행하세요.");
   const hashes = subjectHashes(subjectContact.name, subjectContact.email);
-  let fileCreated = false;
+  const storageWrites = new Map<string, Buffer>();
   await db.$transaction(async tx => {
     const formExisted = !!await tx.form.findUnique({ where: { id: records.form }, select: { id: true } });
     await tx.form.upsert({ where: { id: records.form }, update: {}, create: {
@@ -110,12 +112,65 @@ export async function seedRouteFixtures() {
       where: { requestId_subjectId: { requestId: records.subjectAccess, subjectId: subject.id } },
       update: {}, create: { requestId: records.subjectAccess, tenantId: companies.a, subjectId: subject.id },
     });
-    await once(() => tx.fileObject.findUnique({ where: { id: records.file } }), () => { fileCreated = true; return tx.fileObject.create({ data: {
+    await once(() => tx.fileObject.findUnique({ where: { id: records.file } }), () => { storageWrites.set(records.file, fileBytes); return tx.fileObject.create({ data: {
       id: records.file, tenantId: companies.a, serviceId: services.a, ownerKind: "public", storageKey: records.file,
       mime: "text/plain", size: fileBytes.length, sha256: fileHash, nameCipher: encrypt("fixture.txt"),
       publicationId: records.publication, formVersionId: records.formVersion, questionId: records.questionFile,
       uploadTokenHash: tokenHash(tokens.fileUpload), expiresAt: retention, status: "pending", scanStatus: "pending",
     } }); });
+    await once(() => tx.fileObject.findUnique({ where: { id: records.fileView } }), async () => { storageWrites.set(records.fileView, fileBytes); await tx.fileObject.create({ data: {
+      id: records.fileView, tenantId: companies.a, serviceId: services.a, ownerKind: "public", storageKey: records.fileView,
+      mime: "text/plain", size: fileBytes.length, sha256: fileHash, nameCipher: encrypt("fixture-view.txt"),
+      publicationId: records.publication, formVersionId: records.formVersion, questionId: records.questionFile,
+      uploadTokenHash: tokenHash(tokens.fileViewUpload), expiresAt: retention, status: "pending", scanStatus: "pending",
+    } }); await tx.fileObject.update({ where: { id: records.fileView }, data: { status: "uploaded", version: { increment: 1 } } });
+      await tx.fileObject.update({ where: { id: records.fileView }, data: { status: "ready", scanStatus: "clean", scanEngine: "fixture",
+        scannedAt: new Date("2026-10-03T00:00:00.000Z"), version: { increment: 1 } } });
+      return tx.fileObject.update({ where: { id: records.fileView }, data: { status: "attached", submissionId: records.submission,
+        uploadTokenHash: null, expiresAt: null, version: { increment: 1 } } }); });
+    const existingImportJob = await tx.importJob.findUnique({ where: { id: records.importJob } });
+    if (!existingImportJob) {
+      const existingImportFile = await tx.fileObject.findUnique({ where: { id: records.importFile } });
+      if (existingImportFile && existingImportFile.status !== "pending")
+        throw new Error("고정 import fixture 파일이 job 없이 pending 상태가 아닙니다.");
+      if (!existingImportFile) {
+        storageWrites.set(records.importFile, importBytes);
+        await tx.fileObject.create({ data: {
+          id: records.importFile, tenantId: companies.a, serviceId: services.a, ownerId: users.ownerA, ownerKind: "import", storageKey: records.importFile,
+          mime: "text/csv", size: importBytes.length, sha256: importHash, nameCipher: encrypt("fixture-import.csv"),
+          expiresAt: retention, status: "pending", scanStatus: "pending",
+        } });
+      }
+      await tx.importJob.create({ data: {
+        id: records.importJob, tenantId: companies.a, serviceId: services.a, creatorId: users.ownerA, title: "라우트 fixture 가져오기",
+        fileId: records.importFile, status: "uploading", expiresAt: retention,
+      } });
+      await tx.fileObject.update({ where: { id: records.importFile }, data: { status: "uploaded", version: { increment: 1 } } });
+      await tx.fileObject.update({ where: { id: records.importFile }, data: { status: "ready", scanStatus: "clean", scanEngine: "fixture",
+        scannedAt: new Date("2026-10-03T00:00:00.000Z"), version: { increment: 1 } } });
+      await tx.importJob.update({ where: { id: records.importJob }, data: {
+        status: "draft", headersCipher: encrypt(["name", "email"]), totalRows: 1, version: { increment: 1 },
+      } });
+    }
+    await once(() => tx.kakaoChannel.findUnique({ where: { id: records.kakaoChannel } }), () => tx.kakaoChannel.create({ data: {
+      id: records.kakaoChannel, tenantId: companies.a, serviceId: services.a, name: "라우트 fixture 채널", searchId: "@route_fixture", status: "pending",
+    } }));
+    await once(() => tx.kakaoTemplate.findUnique({ where: { id: records.kakaoTemplate } }), () => tx.kakaoTemplate.create({ data: {
+      id: records.kakaoTemplate, tenantId: companies.a, serviceId: services.a, channelId: records.kakaoChannel,
+      name: "라우트 fixture 템플릿", body: "#{name}님 안내", buttons: [], status: "draft",
+    } }));
+    await tx.billingPlan.upsert({ where: { id: "route-fixture" }, update: {}, create: { id: "route-fixture", name: "라우트 fixture 요금제" } });
+    await once(() => tx.billingPlanVersion.findUnique({ where: { id: records.billingPlanVersion } }), () => tx.billingPlanVersion.create({ data: {
+      id: records.billingPlanVersion, planId: "route-fixture", number: 1, cycle: "month", priceKrw: 1000,
+      features: { fixture: true }, capabilities: [], orderable: true, effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+    } }));
+    await once(() => tx.billingSubscription.findUnique({ where: { id: records.subscription } }), () => tx.billingSubscription.create({ data: {
+      id: records.subscription, tenantId: companies.a, planId: "route-fixture", planVersionId: records.billingPlanVersion,
+      status: "pending", priceKrw: 1000, currency: "KRW",
+    } }));
+    await once(() => tx.paymentOrder.findUnique({ where: { id: records.purchase } }), () => tx.paymentOrder.create({ data: {
+      id: records.purchase, tenantId: companies.a, subscriptionId: records.subscription, amount: 1000, currency: "KRW", status: "pending",
+    } }));
     const documents = [
       ["consent", records.consentDocument, records.consentVersion, records.consentPublication, tokens.documentConsent, "수집 동의 fixture"],
       ["privacy_policy", records.policyDocument, records.policyVersion, records.policyPublication, tokens.documentPolicy, "처리방침 fixture"],
@@ -153,12 +208,12 @@ export async function seedRouteFixtures() {
       return row;
     });
   }, { timeout: 30000 });
-  if (fileCreated) await privateFiles.write(records.file, fileBytes);
+  for (const [key, bytes] of storageWrites) await privateFiles.write(key, bytes);
   const emptyCompanyForms = await db.form.count({ where: { tenantId: companies.b } });
   const restrictedServiceForms = await db.form.count({ where: { serviceId: services.aRestricted } });
   const roleCount = await db.user.count({ where: { id: { in: actors.map(actor => actor.userId) } } });
   const notice = await db.notice.findUnique({ where: { id: noticeId }, select: { status: true } });
   if (emptyCompanyForms !== 0 || restrictedServiceForms !== 0 || roleCount !== actors.length || notice?.status !== "published")
     throw new Error("역할·빈 회사·공지 fixture 상태가 기대와 다릅니다.");
-  return { actors: actors.length, scenarios: externalScenarios.length, noticeId, fileBytes: fileBytes.length, fileSha256: fileHash };
+  return { actors: actors.length, scenarios: externalScenarios.length, noticeId, files: 3, fileBytes: fileBytes.length, fileSha256: fileHash };
 }

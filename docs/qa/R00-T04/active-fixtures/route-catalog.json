@@ -864,17 +864,20 @@
     {
       "routeId": "RR010",
       "template": "/alimtalk/templates/:templateId",
-      "path": null,
+      "path": "/alimtalk/templates/4d000000-0000-4000-8000-000000000001",
       "domain": "R19",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "kakaoTemplate"
+      "bindings": [
+        {
+          "parameter": "templateId",
+          "binding": "kakaoTemplate",
+          "model": "KakaoTemplate",
+          "limitation": "로컬 draft 템플릿; 카카오 승인 상태를 주장하지 않음"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 kakaoTemplate fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -943,17 +946,20 @@
     {
       "routeId": "RR011",
       "template": "/alimtalk/templates/:templateId/edit",
-      "path": null,
+      "path": "/alimtalk/templates/4d000000-0000-4000-8000-000000000001/edit",
       "domain": "R19",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "kakaoTemplate"
+      "bindings": [
+        {
+          "parameter": "templateId",
+          "binding": "kakaoTemplate",
+          "model": "KakaoTemplate",
+          "limitation": "로컬 draft 템플릿; 카카오 승인 상태를 주장하지 않음"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 kakaoTemplate fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -2073,17 +2079,20 @@
     {
       "routeId": "RR021",
       "template": "/bill/:id",
-      "path": null,
+      "path": "/bill/4e000000-0000-4000-8000-000000000001",
       "domain": "R21",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "paymentOrder"
+      "bindings": [
+        {
+          "parameter": "id",
+          "binding": "paymentOrder",
+          "model": "PaymentOrder",
+          "limitation": "로컬 pending 주문; 성공 URL만으로 paid 처리하지 않으며 실제 PG 승인 수용과 별개"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -2144,17 +2153,20 @@
     {
       "routeId": "RR022",
       "template": "/bill/:id/refund",
-      "path": null,
+      "path": "/bill/4e000000-0000-4000-8000-000000000001/refund",
       "domain": "R21",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "paymentOrder"
+      "bindings": [
+        {
+          "parameter": "id",
+          "binding": "paymentOrder",
+          "model": "PaymentOrder",
+          "limitation": "로컬 pending 주문; 성공 URL만으로 paid 처리하지 않으며 실제 PG 승인 수용과 별개"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -2341,17 +2353,20 @@
     {
       "routeId": "RR025",
       "template": "/creditBill/:id",
-      "path": null,
+      "path": "/creditBill/4e000000-0000-4000-8000-000000000001",
       "domain": "R21",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "paymentOrder"
+      "bindings": [
+        {
+          "parameter": "id",
+          "binding": "paymentOrder",
+          "model": "PaymentOrder",
+          "limitation": "로컬 pending 주문; 성공 URL만으로 paid 처리하지 않으며 실제 PG 승인 수용과 별개"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -3002,7 +3017,7 @@
     {
       "routeId": "RR035",
       "template": "/file-view/:customerId/:questionId/:fileId",
-      "path": null,
+      "path": "/file-view/44000000-0000-4000-8000-000000000001/42000000-0000-4000-8000-000000000003/45000000-0000-4000-8000-000000000002",
       "domain": "R11",
       "fallback": false,
       "bindings": [
@@ -3015,15 +3030,17 @@
           "parameter": "questionId",
           "binding": "question",
           "model": "Question"
+        },
+        {
+          "parameter": "fileId",
+          "binding": "file",
+          "model": "FileObject",
+          "limitation": "제출에 연결된 검사 clean 파일; 다운로드 때 현재 권한을 별도 검사"
         }
       ],
-      "missingBindings": [
-        "file"
-      ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 file fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -3076,7 +3093,7 @@
     {
       "routeId": "RR036",
       "template": "/file-view/:customerId/:questionId/:fileId/shared",
-      "path": null,
+      "path": "/file-view/44000000-0000-4000-8000-000000000001/42000000-0000-4000-8000-000000000003/45000000-0000-4000-8000-000000000002/shared",
       "domain": "R11",
       "fallback": false,
       "bindings": [
@@ -3089,14 +3106,17 @@
           "parameter": "questionId",
           "binding": "question",
           "model": "Question"
+        },
+        {
+          "parameter": "fileId",
+          "binding": "file",
+          "model": "FileObject",
+          "limitation": "제출에 연결된 검사 clean 파일; 다운로드 때 현재 권한을 별도 검사"
         }
       ],
-      "missingBindings": [
-        "file"
-      ],
+      "missingBindings": [],
       "preparation": "required",
       "prerequisites": [
-        "실제 DB/API에서 file fixture 생성·유효 상태 확인",
         "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
       ],
       "externalRequired": false,
@@ -4497,17 +4517,19 @@
     {
       "routeId": "RR049",
       "template": "/form/info-upload/agreement",
-      "path": null,
+      "path": "/form/info-upload/agreement?jobId=45100000-0000-4000-8000-000000000001",
       "domain": "R14",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "importJob"
+      "bindings": [
+        {
+          "parameter": "jobId query",
+          "binding": "importJob",
+          "model": "ImportJob"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 importJob fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -4608,17 +4630,19 @@
     {
       "routeId": "RR050",
       "template": "/form/info-upload/recipient",
-      "path": null,
+      "path": "/form/info-upload/recipient?jobId=45100000-0000-4000-8000-000000000001",
       "domain": "R14",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "importJob"
+      "bindings": [
+        {
+          "parameter": "jobId query",
+          "binding": "importJob",
+          "model": "ImportJob"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 importJob fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -5242,72 +5266,16 @@
       ],
       "apiCandidates": [
         {
-          "method": "GET",
-          "path": "/me/sso-accounts"
-        },
-        {
-          "method": "DELETE",
-          "path": "/me/sso-accounts/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/invitations/sso/options"
-        },
-        {
-          "method": "POST",
-          "path": "/invitations/sso/start"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso"
-        },
-        {
-          "method": "PATCH",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/preflight"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}/directory/{memberId}"
-        },
-        {
           "method": "POST",
           "path": "/auth/org/login"
         },
         {
           "method": "POST",
-          "path": "/auth/org/email-register"
-        },
-        {
-          "method": "GET",
-          "path": "/auth/sso/{providerId}"
-        },
-        {
-          "method": "GET",
-          "path": "/auth/sso/callback"
+          "path": "/auth/org/email-register/challenge"
         },
         {
           "method": "POST",
-          "path": "/auth/sso/saml"
+          "path": "/auth/org/email-register"
         }
       ],
       "limitation": "계약/fixture 준비 상태만 검사한다. HTTP 200, 파일 존재, 선언된 시나리오는 CRUD 실행 통과 증거가 아니다."
@@ -5460,72 +5428,16 @@
       ],
       "apiCandidates": [
         {
-          "method": "GET",
-          "path": "/me/sso-accounts"
-        },
-        {
-          "method": "DELETE",
-          "path": "/me/sso-accounts/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/invitations/sso/options"
-        },
-        {
-          "method": "POST",
-          "path": "/invitations/sso/start"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso"
-        },
-        {
-          "method": "PATCH",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/preflight"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}/directory/{memberId}"
-        },
-        {
           "method": "POST",
           "path": "/auth/org/login"
         },
         {
           "method": "POST",
-          "path": "/auth/org/email-register"
-        },
-        {
-          "method": "GET",
-          "path": "/auth/sso/{providerId}"
-        },
-        {
-          "method": "GET",
-          "path": "/auth/sso/callback"
+          "path": "/auth/org/email-register/challenge"
         },
         {
           "method": "POST",
-          "path": "/auth/sso/saml"
+          "path": "/auth/org/email-register"
         }
       ],
       "limitation": "계약/fixture 준비 상태만 검사한다. HTTP 200, 파일 존재, 선언된 시나리오는 CRUD 실행 통과 증거가 아니다."
@@ -7965,72 +7877,16 @@
       ],
       "apiCandidates": [
         {
-          "method": "GET",
-          "path": "/me/sso-accounts"
-        },
-        {
-          "method": "DELETE",
-          "path": "/me/sso-accounts/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/invitations/sso/options"
-        },
-        {
-          "method": "POST",
-          "path": "/invitations/sso/start"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso"
-        },
-        {
-          "method": "PATCH",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/preflight"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}/directory/{memberId}"
-        },
-        {
           "method": "POST",
           "path": "/auth/org/login"
         },
         {
           "method": "POST",
-          "path": "/auth/org/email-register"
-        },
-        {
-          "method": "GET",
-          "path": "/auth/sso/{providerId}"
-        },
-        {
-          "method": "GET",
-          "path": "/auth/sso/callback"
+          "path": "/auth/org/email-register/challenge"
         },
         {
           "method": "POST",
-          "path": "/auth/sso/saml"
+          "path": "/auth/org/email-register"
         }
       ],
       "limitation": "계약/fixture 준비 상태만 검사한다. HTTP 200, 파일 존재, 선언된 시나리오는 CRUD 실행 통과 증거가 아니다."
@@ -8403,72 +8259,16 @@
       ],
       "apiCandidates": [
         {
-          "method": "GET",
-          "path": "/me/sso-accounts"
-        },
-        {
-          "method": "DELETE",
-          "path": "/me/sso-accounts/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/invitations/sso/options"
-        },
-        {
-          "method": "POST",
-          "path": "/invitations/sso/start"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso"
-        },
-        {
-          "method": "PATCH",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/preflight"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}/directory/{memberId}"
-        },
-        {
           "method": "POST",
           "path": "/auth/org/login"
         },
         {
           "method": "POST",
-          "path": "/auth/org/email-register"
-        },
-        {
-          "method": "GET",
-          "path": "/auth/sso/{providerId}"
-        },
-        {
-          "method": "GET",
-          "path": "/auth/sso/callback"
+          "path": "/auth/org/email-register/challenge"
         },
         {
           "method": "POST",
-          "path": "/auth/sso/saml"
+          "path": "/auth/org/email-register"
         }
       ],
       "limitation": "계약/fixture 준비 상태만 검사한다. HTTP 200, 파일 존재, 선언된 시나리오는 CRUD 실행 통과 증거가 아니다."
@@ -11391,17 +11191,20 @@
     {
       "routeId": "RR129",
       "template": "/pay/credit/success/:purchaseId",
-      "path": null,
+      "path": "/pay/credit/success/4e000000-0000-4000-8000-000000000001",
       "domain": "R21",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "paymentOrder"
+      "bindings": [
+        {
+          "parameter": "purchaseId",
+          "binding": "paymentOrder",
+          "model": "PaymentOrder",
+          "limitation": "로컬 pending 주문; 성공 URL만으로 paid 처리하지 않으며 실제 PG 승인 수용과 별개"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -11761,17 +11564,20 @@
     {
       "routeId": "RR135",
       "template": "/pay/plus/success/:purchaseId",
-      "path": null,
+      "path": "/pay/plus/success/4e000000-0000-4000-8000-000000000001",
       "domain": "R21",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "paymentOrder"
+      "bindings": [
+        {
+          "parameter": "purchaseId",
+          "binding": "paymentOrder",
+          "model": "PaymentOrder",
+          "limitation": "로컬 pending 주문; 성공 URL만으로 paid 처리하지 않으며 실제 PG 승인 수용과 별개"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -11808,17 +11614,20 @@
     {
       "routeId": "RR136",
       "template": "/pay/plus/success/:purchasedId/:type",
-      "path": null,
+      "path": "/pay/plus/success/4e000000-0000-4000-8000-000000000001/license",
       "domain": "R21",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "paymentOrder"
+      "bindings": [
+        {
+          "parameter": "purchasedId",
+          "binding": "paymentOrder",
+          "model": "PaymentOrder",
+          "limitation": "로컬 pending 주문; 성공 URL만으로 paid 처리하지 않으며 실제 PG 승인 수용과 별개"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -11898,17 +11707,20 @@
     {
       "routeId": "RR138",
       "template": "/pay/result/success/:purchaseId",
-      "path": null,
+      "path": "/pay/result/success/4e000000-0000-4000-8000-000000000001",
       "domain": "R21",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "paymentOrder"
+      "bindings": [
+        {
+          "parameter": "purchaseId",
+          "binding": "paymentOrder",
+          "model": "PaymentOrder",
+          "limitation": "로컬 pending 주문; 성공 URL만으로 paid 처리하지 않으며 실제 PG 승인 수용과 별개"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -12669,8 +12481,8 @@
         {
           "id": "RR151-normal",
           "kind": "normal",
-          "actor": "관리 security.write; 익명 callback의 일회성 state; 자기 계정연결",
-          "expected": "잘못된issuer/metadata·인증서거부; test성공후활성; 마지막로그인수단 보호",
+          "actor": "직접 소속 security.read; 변경 owner/security + security.write + 기능 구독",
+          "expected": "최근 SSO 인증·이메일 코드·회사/사용자/세션/mode/version 일치, 오답5회·만료·재사용·권한/구독 회수 거절, 여러 탭 회사 전환 보호",
           "execution": "not_run"
         },
         {
@@ -12691,35 +12503,15 @@
       "apiCandidates": [
         {
           "method": "GET",
-          "path": "/security/sso"
+          "path": "/security/sso-policy"
         },
         {
           "method": "POST",
-          "path": "/security/sso"
+          "path": "/security/sso-policy/challenge"
         },
         {
-          "method": "PATCH",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/preflight"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}/directory/{memberId}"
+          "method": "PUT",
+          "path": "/security/sso-policy"
         }
       ],
       "limitation": "계약/fixture 준비 상태만 검사한다. HTTP 200, 파일 존재, 선언된 시나리오는 CRUD 실행 통과 증거가 아니다."
@@ -12740,8 +12532,8 @@
         {
           "id": "RR152-normal",
           "kind": "normal",
-          "actor": "관리 security.write; 익명 callback의 일회성 state; 자기 계정연결",
-          "expected": "잘못된issuer/metadata·인증서거부; test성공후활성; 마지막로그인수단 보호",
+          "actor": "직접 소속 security.read; 변경 owner/security + security.write + 기능 구독",
+          "expected": "최근 SSO 인증·이메일 코드·회사/사용자/세션/mode/version 일치, 오답5회·만료·재사용·권한/구독 회수 거절, 여러 탭 회사 전환 보호",
           "execution": "not_run"
         },
         {
@@ -12762,35 +12554,15 @@
       "apiCandidates": [
         {
           "method": "GET",
-          "path": "/security/sso"
+          "path": "/security/sso-policy"
         },
         {
           "method": "POST",
-          "path": "/security/sso"
+          "path": "/security/sso-policy/challenge"
         },
         {
-          "method": "PATCH",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/preflight"
-        },
-        {
-          "method": "GET",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "POST",
-          "path": "/security/sso/{id}/directory"
-        },
-        {
-          "method": "DELETE",
-          "path": "/security/sso/{id}/directory/{memberId}"
+          "method": "PUT",
+          "path": "/security/sso-policy"
         }
       ],
       "limitation": "계약/fixture 준비 상태만 검사한다. HTTP 200, 파일 존재, 선언된 시나리오는 CRUD 실행 통과 증거가 아니다."
@@ -16529,17 +16301,20 @@
     {
       "routeId": "AR020",
       "template": "/email/unsubscribe/:token",
-      "path": null,
+      "path": "/email/unsubscribe/96c0f846-f806-404c-bb01-947c7d0e4a3d.78ca49beabdee58e951c9eedde931309860d91a1e2260c43fa1c2732cf3676a5",
       "domain": "R18",
       "fallback": false,
-      "bindings": [],
-      "missingBindings": [
-        "unsubscribeToken"
+      "bindings": [
+        {
+          "parameter": "token",
+          "binding": "unsubscribeToken",
+          "model": "Job+CampaignDelivery",
+          "limitation": "실제 local_delivered/accepted 전달 원장에 바인딩된 90일 수신거부 토큰; 임의 job ID 사용 금지"
+        }
       ],
-      "preparation": "required",
-      "prerequisites": [
-        "실제 DB/API에서 unsubscribeToken fixture 생성·유효 상태 확인"
-      ],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
       "externalRequired": false,
       "execution": "not_run",
       "scenarios": [
@@ -16559,6 +16334,44 @@
         },
         {
           "id": "AR020-failure",
+          "kind": "failure",
+          "actor": "정상 시나리오와 동일",
+          "expected": "잘못된 ID/버전 충돌/서버 실패를 오류로 표시; 입력 보존; 재시도 후 DB 중복 변경 없음",
+          "execution": "not_run"
+        }
+      ],
+      "apiCandidates": [],
+      "limitation": "계약/fixture 준비 상태만 검사한다. HTTP 200, 파일 존재, 선언된 시나리오는 CRUD 실행 통과 증거가 아니다."
+    },
+    {
+      "routeId": "AR021",
+      "template": "/security/sso/providers",
+      "path": "/security/sso/providers",
+      "domain": "R07",
+      "fallback": false,
+      "bindings": [],
+      "missingBindings": [],
+      "preparation": "ready_for_execution",
+      "prerequisites": [],
+      "externalRequired": false,
+      "execution": "not_run",
+      "scenarios": [
+        {
+          "id": "AR021-normal",
+          "kind": "normal",
+          "actor": "현재 회사의 해당 기능 권한 계정",
+          "expected": "회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증; 브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과; 외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지.",
+          "execution": "not_run"
+        },
+        {
+          "id": "AR021-denied",
+          "kind": "denied",
+          "actor": "미로그인·권한 없는 역할·다른 회사/서비스",
+          "expected": "401/403/404/410 또는 명시적인 권한 화면; 데이터와 성공 알림 없음",
+          "execution": "not_run"
+        },
+        {
+          "id": "AR021-failure",
           "kind": "failure",
           "actor": "정상 시나리오와 동일",
           "expected": "잘못된 ID/버전 충돌/서버 실패를 오류로 표시; 입력 보존; 재시도 후 DB 중복 변경 없음",

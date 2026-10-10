@@ -1,6 +1,6 @@
 # 2026-10-10 활성 구현 계획
 
-R00-T03 계획·계약 통합 완료: 활성107개 Task와 기존72개 Task를 전부 연결하고 기존 상태의 자동 승격을 금지했다. 원본186개와 독립 제품 부가21개 경로를 분리하고, 모든 활성 Task의 DB/API/UI/외부 검증 상태를 나눴다. 역할9종·capability32개, Prisma143모델의 구형명3개 매핑, OpenAPI329path·466operation/정책466행을 자동 검사한다. 활성 계획은 완료3/진행50/계획54이며 전체 목표는 진행 중이다. [검증](docs/qa/R00-T03/README.md).
+R00-T04 fixture·QA 재현계약 완료: 실제 PostgreSQL 시드에서 원본186개와 부가21개 경로를 모두 구체화하고 정상·권한거부·실패 시나리오621개를 고정했다. callback은 실제 state/challenge, wildcard는 알 수 없는 URL, 외부비용 시험은 전용 allowlist/sandbox 계정만 요구한다. 브라우저 선행상태와 외부 공급자 검증은 준비조건이며 CRUD 실행 성공으로 집계하지 않는다. 활성 계획은 완료4/진행49/계획54이며 전체 목표는 진행 중이다. [검증](docs/qa/R00-T04/active-fixtures/README.md).
 
 R00-T02 현재 소스 감사 완료: API466개·handler158개의 진입점/메서드/정책/작업소유자 누락0, 직접 handler 시험466/466을 확인했다. 실제 route wrapper 25,374요청 중24,948건을 계약에 연결해 성공 operation466/466과 catch-all 분기285/285를 확인했다. 지원 Node24 단일 전체 회귀196파일·261suite·2,877시험 전부 통과했다. 활성 계획은 완료2/진행51/계획54이며 전체 목표는 진행 중이다. [검증](docs/qa/R00-T02/runtime-route-trace/README.md).
 

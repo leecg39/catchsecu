@@ -1,6 +1,6 @@
 # 상세 TASKS — 캐치시큐 전 페이지 풀스택 완성 계획
 
-R00-T03 계획·계약 통합 완료: 활성107개 Task와 기존72개 이력을 전부 연결하고 원본186+부가21경로, DB/API/UI/외부 검증 상태를 분리했다. 역할9종·capability32개, Prisma143모델의 구형명3개 매핑, OpenAPI329path·466operation/정책466행을 자동 검사한다. 현재 공식 상태는 완료3·진행50·계획54다. [검증](../../qa/R00-T03/README.md).
+R00-T04 fixture·QA 재현계약 완료: 실제 PostgreSQL 시드에서 원본186개와 부가21개 경로를 모두 구체화하고 정상·권한거부·실패 시나리오621개를 고정했다. callback은 실제 state/challenge, wildcard는 알 수 없는 URL, 외부비용 시험은 전용 allowlist/sandbox 계정만 요구한다. 브라우저 선행상태와 외부 공급자 검증은 준비조건이며 CRUD 실행 성공으로 집계하지 않는다. 현재 공식 상태는 완료4·진행49·계획54다. [검증](../../qa/R00-T04/active-fixtures/README.md).
 
 F3 입력 패턴 체크포인트: 원본 확인 ID 1·2·3·4·7·8의 nullable 모델·DB 조합 제약, 폼 CRUD/복제/템플릿/게시/정정과 편집/공개 화면을 구현했다. 임의 정규식은 strict 계약에서 거부하며 고정 길이 검증만 실행한다. 집중6·관련27·frozen fixture20/20, migration140 빈 설치·기존 질문415개 보존, Ego 잘못된 값 거부/정상 제출·production 재시작 hash, 82페이지 build를 통과했다. [검증](../../qa/R08-T02/question-patterns/README.md). R08-T02와 공식 완료0/진행53/계획54는 유지한다.
 
@@ -72,7 +72,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
   - API/DB/UI/외부검증 상태 분리; 존재하지 않는 구형 Delivery/MonthlyClose 등 모델명 정정
 - 완료 증거: [통합 보고서](../../qa/R00-T03/README.md), [기계 검사](../../qa/R00-T03/integration-check.json), [기존 작업 연결표](legacy-task-map.json), [표면별 상태 계약](status-contract.json), [역할 계약](../contracts/roles.json), [모델명 매핑](../contracts/model-name-map.json). 활성107↔기존72 전부 연결, 원본186+부가21 분리, DB/API/UI/외부 상태 분리, 역할9·capability32·Prisma143모델·OpenAPI466정책을 검사했다.
 
-### [~] R00-T04 fixture·페이지별 행동표·QA 재현계약 확정
+### [x] R00-T04 fixture·페이지별 행동표·QA 재현계약 확정
 
 회사A/B, 역할9종, 전문가/외부열람자/정보주체, license/토큰/상태/파일·외부실패 fixture를 선언하고 RR별 실제 URL을 생성한다.
 
@@ -83,6 +83,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
 - 완료 조건:
   - 각 RR 경로의 구체fixture와 정상/권한거부/실패 최소 시나리오 존재
   - 동적경로 demo 치환 금지; callback은 사전state; wildcard는 알수없는URL fixture; 외부비용 발생 시험은 전용시험수신자/계정
+- 완료 증거: [fixture 계약 보고서](../../qa/R00-T04/active-fixtures/README.md), [검증 결과](../../qa/R00-T04/active-fixtures/result.json), [전체 경로 카탈로그](../../qa/R00-T04/active-fixtures/route-catalog.json), [실제 DB 시드 결과](../../qa/R00-T04/active-fixtures/seed-result.json), [단위시험](../../qa/R00-T04/active-fixtures/tests-current.json). 원본186+부가21 경로와 시나리오621개를 구체화했으며 실행 상태는 별도 `not_run`으로 유지한다.
 
 
 ## R01 공통 서버 기반

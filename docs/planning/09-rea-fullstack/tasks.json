@@ -182,27 +182,36 @@
     "legacy_tasks": [
       "P00-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "cross-cutting",
     "evidence_directory": "catchsecu-clone/docs/qa/R00-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R00-T04/active-fixtures/README.md",
+      "docs/qa/R00-T04/active-fixtures/result.json",
+      "docs/qa/R00-T04/active-fixtures/route-catalog.json",
+      "docs/qa/R00-T04/active-fixtures/seed-result.json",
+      "docs/qa/R00-T04/active-fixtures/tests-current.json"
+    ],
     "dependency_gates": {
       "R00-T03": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "보유기간·채널·월마감용 독립 dev회사A/B와 허용/거부 사용자 fixture 생성.",
-    "updatedOn": "2026-10-10",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "verified",
+    "progress_note": "실제 PostgreSQL의 결정적 fixture로 원본186+부가21 경로를 모두 구체화하고 정상·권한거부·실패 시나리오621개, callback 선행상태, 음성 wildcard, 전용 외부시험 대상 정책을 검증했다. 실행 결과는 not_run으로 분리한다.",
+    "updatedOn": "2026-10-11",
     "progress_evidence": [
       "docs/qa/R00-T04/active-fixtures/README.md",
-      "docs/qa/R00-T04/active-fixtures/result.json"
+      "docs/qa/R00-T04/active-fixtures/result.json",
+      "docs/qa/R00-T04/active-fixtures/route-catalog.json",
+      "docs/qa/R00-T04/active-fixtures/seed-result.json",
+      "docs/qa/R00-T04/active-fixtures/tests-current.json"
     ],
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
-      "ui": "partial_verified",
-      "external": "not_assessed"
+      "database": "verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_applicable"
     }
   },
   {

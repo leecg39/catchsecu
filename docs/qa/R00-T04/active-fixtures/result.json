@@ -1,32 +1,43 @@
 {
-  "checkedAt": "2026-10-09T16:26:03.684Z",
+  "checkedAt": "2026-10-10T21:50:19.661Z",
   "database": "catchsecu_dev",
   "readOnly": true,
   "contractResult": "passed",
+  "contractComplete": true,
   "runtimeResult": "not_run",
   "allCrudVerified": false,
   "sourceRoutes": 186,
   "concreteRoutes": 184,
   "fallbackRoutes": 2,
-  "additionalRoutes": 20,
-  "scenarioContracts": 618,
-  "pathsWithRealBindings": 192,
+  "additionalRoutes": 21,
+  "scenarioContracts": 621,
+  "pathsWithRealBindings": 207,
+  "sourcePathsConcrete": true,
+  "additionalPathsConcrete": true,
+  "stagingExternalTestPolicies": [
+    {
+      "id": "EXT-04",
+      "policy": "전용 allowlist 시험 수신함과 공급자 시험 계정만 사용"
+    },
+    {
+      "id": "EXT-05",
+      "policy": "전용 allowlist 시험 전화번호·카카오 채널과 공급자 시험 계정만 사용"
+    },
+    {
+      "id": "EXT-06",
+      "policy": "PG sandbox 상점·시험 결제수단만 사용하고 실제 과금 금지"
+    },
+    {
+      "id": "EXT-07",
+      "policy": "본인인증 sandbox 전용 시험 사용자와 callback allowlist만 사용"
+    },
+    {
+      "id": "EXT-08",
+      "policy": "전용 시험 IdP tenant·기관 계정과 callback allowlist만 사용"
+    }
+  ],
   "missingActors": [],
   "preparationRequired": [
-    {
-      "routeId": "RR010",
-      "template": "/alimtalk/templates/:templateId",
-      "prerequisites": [
-        "실제 DB/API에서 kakaoTemplate fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
-      "routeId": "RR011",
-      "template": "/alimtalk/templates/:templateId/edit",
-      "prerequisites": [
-        "실제 DB/API에서 kakaoTemplate fixture 생성·유효 상태 확인"
-      ]
-    },
     {
       "routeId": "RR013",
       "template": "/auth-code",
@@ -35,38 +46,9 @@
       ]
     },
     {
-      "routeId": "RR021",
-      "template": "/bill/:id",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
-      "routeId": "RR022",
-      "template": "/bill/:id/refund",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
-      "routeId": "RR025",
-      "template": "/creditBill/:id",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
-      "routeId": "RR035",
-      "template": "/file-view/:customerId/:questionId/:fileId",
-      "prerequisites": [
-        "실제 DB/API에서 file fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
       "routeId": "RR036",
       "template": "/file-view/:customerId/:questionId/:fileId/shared",
       "prerequisites": [
-        "실제 DB/API에서 file fixture 생성·유효 상태 확인",
         "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
       ]
     },
@@ -75,20 +57,6 @@
       "template": "/file-view/:customerId/shared",
       "prerequisites": [
         "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
-      ]
-    },
-    {
-      "routeId": "RR049",
-      "template": "/form/info-upload/agreement",
-      "prerequisites": [
-        "실제 DB/API에서 importJob fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
-      "routeId": "RR050",
-      "template": "/form/info-upload/recipient",
-      "prerequisites": [
-        "실제 DB/API에서 importJob fixture 생성·유효 상태 확인"
       ]
     },
     {
@@ -259,34 +227,6 @@
       ]
     },
     {
-      "routeId": "RR129",
-      "template": "/pay/credit/success/:purchaseId",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
-      "routeId": "RR135",
-      "template": "/pay/plus/success/:purchaseId",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
-      "routeId": "RR136",
-      "template": "/pay/plus/success/:purchasedId/:type",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
-      "routeId": "RR138",
-      "template": "/pay/result/success/:purchaseId",
-      "prerequisites": [
-        "실제 DB/API에서 paymentOrder fixture 생성·유효 상태 확인"
-      ]
-    },
-    {
       "routeId": "RR145",
       "template": "/saeol/fail/:org",
       "prerequisites": [
@@ -326,13 +266,6 @@
       "template": "/two-step-setting",
       "prerequisites": [
         "선행 요청으로 발급한 state/challenge/OTP 또는 해당 토큰에 바인딩된 브라우저 세션 준비. URL 방문만으로 성공 처리 금지"
-      ]
-    },
-    {
-      "routeId": "AR020",
-      "template": "/email/unsubscribe/:token",
-      "prerequisites": [
-        "실제 DB/API에서 unsubscribeToken fixture 생성·유효 상태 확인"
       ]
     }
   ],
