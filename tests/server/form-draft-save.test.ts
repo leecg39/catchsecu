@@ -5,6 +5,7 @@ import { db } from "@/server/db";
 import { env } from "@/server/env";
 import { POST as create } from "@/app/api/v1/forms/route";
 import { PATCH, GET, POST as action } from "@/app/api/v1/forms/[...segments]/route";
+import { POST as selectContext } from "@/app/api/v1/context/route";
 import { encrypt } from "@/server/crypto";
 
 const database = new URL(env.DATABASE_URL);
@@ -67,6 +68,28 @@ test("다른 기기의 같은 version 저장은 하나만 반영되고 최신본
   const current = await GET(req("/forms/" + f.form.id, "GET", f.cookie)); expect(current.status).toBe(200);
   expect((await current.json()).version).toBe(2);
   expect(await db.auditEvent.count({ where: { resourceId: f.form.id, action: "form.draft_updated" } })).toBe(1);
+});
+test("회사 전환 뒤 이전 회사의 여러 페이지 저장과 성공 캐시를 다시 사용할 수 없다", async () => {
+  const f = await setup(), first = randomUUID(), second = randomUUID(), key = randomUUID();
+  const content = { ...f.form.content, sections: [
+    { id: first, title: "", body: "", defaultDestination: { kind: "page", pageId: second }, allowBack: false },
+    { id: second, title: "확인", body: "회사 A 둘째 페이지", defaultDestination: { kind: "submit" }, allowBack: true },
+  ], questions: f.form.content.questions.map((question: { id: string }) => ({ ...question, pageId: first })) };
+  const saved = await PATCH(req("/forms/" + f.form.id + "/draft", "PATCH", f.cookie, { version: 1, title: "회사 A 다중 페이지", content }, key));
+  expect(saved.status, saved.status >= 400 ? JSON.stringify(await saved.clone().json()) : "").toBe(200);
+  expect((await saved.json()).content.sections).toHaveLength(2);
+
+  const other = await db.company.create({ data: { name: "전환 대상 회사", publicName: "회사 B", policy: { create: {} },
+    services: { create: { name: "회사 B 서비스", externalName: "회사 B 서비스" } } } });
+  await db.membership.create({ data: { tenantId: other.id, userId: f.user.id, role: "editor" } });
+  const selected = await selectContext(req("/context", "POST", f.cookie, { companyId: other.id }));
+  expect(selected.status).toBe(200); expect((await selected.json()).company.id).toBe(other.id);
+
+  const replay = await PATCH(req("/forms/" + f.form.id + "/draft", "PATCH", f.cookie, { version: 1, title: "회사 A 다중 페이지", content }, key));
+  expect(replay.status).toBe(404); expect((await replay.json()).error.code).toBe("NOT_FOUND");
+  expect(await db.auditEvent.count({ where: { tenantId: f.company.id, resourceId: f.form.id, action: "form.draft_updated" } })).toBe(1);
+  const stored = await db.form.findUniqueOrThrow({ where: { id: f.form.id }, include: { versions: { orderBy: { number: "desc" }, take: 1, include: { sections: true } } } });
+  expect(stored.version).toBe(2); expect(stored.versions[0].sections).toHaveLength(2);
 });
 test("로그아웃 후 저장 재전송은 이전 결과를 열람할 수 없다", async () => {
   const f = await setup(), key = randomUUID(), value = { version: 1, title: "회수 전 저장" };

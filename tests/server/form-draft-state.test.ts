@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { FormDraftSession, type FormDraftValue } from "@/lib/form-draft";
+import { draftLeaveProtection, FormDraftSession, type FormDraftValue } from "@/lib/form-draft";
 import type { FormRecord } from "@/contracts/forms";
 import { richDocumentText, type RichDocumentV1 } from "@/contracts/rich-content";
 
@@ -51,6 +51,29 @@ test("응답 유실은 동일 키/본문/version을 재전송한 뒤 추가 입�
   await s.save(); expect(persist).toHaveBeenCalledTimes(3); expect(persist.mock.calls[0]).toEqual(persist.mock.calls[1]);
   expect(persist.mock.calls[2][0]?.version).toBe(2); expect(persist.mock.calls[2][2]).not.toBe(persist.mock.calls[1][2]);
   expect(s.getSnapshot().record?.title).toBe("추가 입력");
+});
+test("여러 페이지 저장 실패는 회사 전환을 막고 입력 보존 재시도 뒤 보호를 해제한다", async () => {
+  let committed!: FormRecord;
+  const persist = vi.fn(async (saved: FormRecord | undefined, next: FormDraftValue, _key: string) => {
+    void _key;
+    if (persist.mock.calls.length === 1) { committed = record(next, (saved?.version ?? 1) + 1); throw new TypeError("저장 응답 유실"); }
+    return committed;
+  });
+  const { s } = session(persist);
+  const first = "00000000-0000-4000-8000-000000000101", second = "00000000-0000-4000-8000-000000000102";
+  const paged: FormDraftValue = { ...value, title: "회사 전환 보호 폼", content: { ...value.content,
+    sections: [
+      { id: first, title: "시작", body: "첫 페이지 입력", defaultDestination: { kind: "page", pageId: second }, allowBack: false },
+      { id: second, title: "확인", body: "둘째 페이지 입력", defaultDestination: { kind: "submit" }, allowBack: true },
+    ], questions: value.content.questions.map(question => ({ ...question, pageId: first })) } };
+  s.edit(paged); expect(await s.save()).toBeUndefined();
+  expect(s.getSnapshot()).toMatchObject({ phase: "error", dirty: true, value: paged });
+  expect(draftLeaveProtection(s.getSnapshot())).toEqual({ blocked: true,
+    message: "캐치폼 변경 사항을 저장하지 못했습니다. 저장 재시도 후 이동하거나, 입력을 버리려면 나가기를 선택하세요." });
+  expect(await s.save()).toMatchObject({ title: paged.title, content: paged.content });
+  expect(persist.mock.calls[1]).toEqual(persist.mock.calls[0]);
+  expect(s.getSnapshot()).toMatchObject({ phase: "saved", dirty: false, value: paged });
+  expect(draftLeaveProtection(s.getSnapshot())).toEqual({ blocked: false, message: "" });
 });
 test("409는 내 입력을 유지하고 자동 덮어쓰기를 멈춘다; 최신본을 불러온 뒤 새 version을 쓴다", async () => {
   vi.useFakeTimers(); const persist = vi.fn().mockRejectedValueOnce(Object.assign(new Error("다른 기기 변경"),{ status:409 })).mockImplementation(async (saved, next) => record(next,saved.version+1));

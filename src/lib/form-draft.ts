@@ -3,6 +3,7 @@ import type { FormContent, FormRecord } from "@/contracts/forms";
 export type FormDraftValue = { serviceId: string; title: string; content: FormContent };
 export type DraftPhase = "idle" | "dirty" | "saving" | "saved" | "invalid" | "error" | "conflict";
 export type DraftSnapshot = { record?: FormRecord; value: FormDraftValue; phase: DraftPhase; dirty: boolean; message: string; error: string };
+export type DraftLeaveProtection = { blocked: boolean; message: string };
 type Pending = { record?: FormRecord; value: FormDraftValue; key: string; inputStamp: string };
 type Options = { initial?: FormRecord; seed: FormDraftValue;
   validate: (value: FormDraftValue) => FormDraftValue;
@@ -10,6 +11,15 @@ type Options = { initial?: FormRecord; seed: FormDraftValue;
   makeKey?: () => string; delay?: number };
 export const draftValue = (record: FormRecord): FormDraftValue => ({ serviceId: record.serviceId, title: record.title, content: record.content });
 const stamp = (value: FormDraftValue) => JSON.stringify(value);
+
+export function draftLeaveProtection(snapshot: Pick<DraftSnapshot, "dirty" | "phase">): DraftLeaveProtection {
+  if (!snapshot.dirty) return { blocked: false, message: "" };
+  if (snapshot.phase === "saving") return { blocked: true, message: "캐치폼 저장 결과를 확인하는 중입니다. 저장이 끝난 뒤 다시 시도해주세요." };
+  if (snapshot.phase === "error") return { blocked: true, message: "캐치폼 변경 사항을 저장하지 못했습니다. 저장 재시도 후 이동하거나, 입력을 버리려면 나가기를 선택하세요." };
+  if (snapshot.phase === "conflict") return { blocked: true, message: "다른 화면의 변경과 충돌해 현재 입력을 유지하고 있습니다. 최신본을 확인한 뒤 이동해주세요." };
+  if (snapshot.phase === "invalid") return { blocked: true, message: "완성되지 않아 저장하지 못한 캐치폼 입력이 있습니다. 입력을 확인한 뒤 이동해주세요." };
+  return { blocked: true, message: "저장하지 않은 캐치폼 변경 사항이 있습니다. 이 화면을 나가면 입력한 내용이 사라집니다." };
+}
 
 // This state owns request ordering; React renders its immutable snapshots.
 export class FormDraftSession {

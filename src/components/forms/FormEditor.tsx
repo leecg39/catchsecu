@@ -36,6 +36,7 @@ import { FormNoticesEditor } from "./FormNoticesEditor";
 import { datetimeLocalIso, datetimeLocalValue } from "@/contracts/form-collection-window";
 import { defaultParticipationAccessPolicy } from "@/contracts/form-participation-access";
 import { ParticipationPolicyFields } from "./ParticipationAccessSettings";
+import { draftLeaveProtection } from "@/lib/form-draft";
 
 const newQuestion = (pageId?: string): Question => ({ id: crypto.randomUUID(), ...(pageId ? { pageId } : {}), type: "단문형 답변", label: "", required: true, infoPatternId: 1, textMaxLength: 100 });
 function newContent(): FormContent {
@@ -119,10 +120,13 @@ function Editor({ initial, initialTemplate, templateMode, path, services }: { in
   const currentTemplateStamp = templateEditorStamp({ serviceId, title, category, description: templateDescription,
     thumbnailAssetId: templateThumbnailAssetId, content });
   const templateDirty = templateMode && currentTemplateStamp !== templateBaseStamp;
-  useUnsavedChanges(uploadCount > 0 || templateDirty || templateBusy, uploadCount > 0
+  const draftLeave = draftLeaveProtection(draft);
+  const leaveBlocked = uploadCount > 0 || (templateMode ? templateDirty || templateBusy : draftLeave.blocked);
+  useUnsavedChanges(leaveBlocked, uploadCount > 0
     ? "파일 업로드가 진행 중입니다. 완료 전에 나가면 문항에 연결되지 않을 수 있습니다."
-    : templateBusy ? "템플릿 저장 결과를 확인하는 중입니다. 잠시 후 다시 시도해주세요."
-      : "저장하지 않은 템플릿 변경 사항이 있습니다. 이 화면을 나가면 입력한 내용이 사라집니다.");
+    : templateMode ? templateBusy ? "템플릿 저장 결과를 확인하는 중입니다. 잠시 후 다시 시도해주세요."
+      : "저장하지 않은 템플릿 변경 사항이 있습니다. 이 화면을 나가면 입력한 내용이 사라집니다."
+      : draftLeave.message);
   useEffect(() => {
     editorMounted.current = true;
     const currentUploads = uploadsRef.current;
