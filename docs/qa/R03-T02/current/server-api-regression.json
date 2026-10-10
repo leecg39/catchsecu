@@ -1,0 +1,30 @@
+{
+  "result": "passed",
+  "database": "catchsecu_test",
+  "files": 12,
+  "tests": 257,
+  "failed": 0,
+  "durationSeconds": 278.74,
+  "filesRun": [
+    "tests/server/company-management.test.ts",
+    "tests/server/management-authority.test.ts",
+    "tests/server/access-requests.test.ts",
+    "tests/server/access-request-authority.test.ts",
+    "tests/server/context-audit.test.ts",
+    "tests/server/foundation.test.ts",
+    "tests/server/subscriptions.test.ts",
+    "tests/server/form-current-authority.test.ts",
+    "tests/server/publication-access-gate.test.ts",
+    "tests/server/share-management-gate.test.ts",
+    "tests/server/public-submission-gate.test.ts",
+    "tests/server/mail-job-audit.test.ts"
+  ],
+  "boundaries": [
+    "tenant, role, origin, active membership, session and MFA",
+    "optimistic version and concurrent duplicate service creation",
+    "subscription required and service quota",
+    "archived service blocks writes, publication, sharing, public submission and mail jobs",
+    "access request state, grant, member version and audit atomicity",
+    "business file storage failure cleanup and retry"
+  ]
+}

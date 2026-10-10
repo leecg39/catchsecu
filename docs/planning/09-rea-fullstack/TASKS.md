@@ -230,7 +230,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 - 완료 증거: [현재 보고서](../../qa/R03-T01/current/README.md), [검증 집계](../../qa/R03-T01/current/verification-summary.json), [158개 모델·업무 회귀](../../qa/R03-T01/current/model-regression.json), [dev 모델 감사](../../qa/R03-T01/model-audit/catchsecu_dev.json), [test 모델 감사](../../qa/R03-T01/model-audit/catchsecu_test.json). 신규 migration 없이 6모델66열·29제약·24인덱스를 확인했다.
 
-### [~] R03-T02 회사·서비스·초기 설정 — 서버 API·업무 처리
+### [x] R03-T02 회사·서비스·초기 설정 — 서버 API·업무 처리
 
 회사·서비스 CRUD, 사업자 파일, 컨텍스트 전환 및 서비스 접근 요청 API에 tenant·활성 상태·version·권한 재검사를 적용한다. 서비스 폐기 시 게시·예약·공유 접근과의 일관성을 확인한다.
 
@@ -241,6 +241,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
 - 완료 조건:
   - 회사 A 생성→서비스2개→수정→보관→재로그인; B 회사 serviceId를 본문/URL에 주입해 거부; 같은 이름 동시생성 하나409; 사용 중 서비스 삭제 의존성 안내.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
+- 완료 증거: [현재 보고서](../../qa/R03-T02/current/README.md), [검증 집계](../../qa/R03-T02/current/verification-summary.json), [257개 서버 회귀](../../qa/R03-T02/current/server-api-regression.json), [OpenAPI 20작업](../../qa/R03-T02/current/api-contract.json). tenant/role/session/MFA/version/구독한도와 보관 서비스 후속 차단까지 확인했다.
 
 ### [~] R03-T03 회사·서비스·초기 설정 — 전체 화면·모달 연결
 

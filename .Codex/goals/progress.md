@@ -1,4 +1,8 @@
-## 최신 작업: R03-T01 회사·서비스·초기 설정 모델·규칙 완료
+## 최신 작업: R03-T02 회사·서비스·초기 설정 서버 API 완료
+
+2026-10-11 회사·서비스·사업자파일·컨텍스트·접근요청 OpenAPI 9경로20작업을 현재 handler와 대조했다. 실제 PostgreSQL에서 tenant/role/session/MFA/version/구독한도, 동시 경합, 파일정리, 요청·권한·멤버version·감사 원자성과 archived 서비스의 폼/게시/공유/공개제출/메일 차단을 12파일257시험으로 확인했다. 계획 상태 완료14/진행41/계획52, 전체 goal active. [증거](../../docs/qa/R03-T02/current/README.md).
+
+## 이전 작업: R03-T01 회사·서비스·초기 설정 모델·규칙 완료
 
 2026-10-11 회사·서비스·구성원·서비스권한·접근요청·사업자파일 6모델66열·29제약·24인덱스를 dev/test PostgreSQL에서 대조했다. 회사 폐쇄와 구성원 회수, 사업자 파일의 회사 소유와 Company.version 경합 제어, 서비스 보관·접근요청 상태를 확인했다. 6파일158시험과 typecheck·lint·production build가 통과했다. 계획 상태 완료13/진행42/계획52, 전체 goal active. [증거](../../docs/qa/R03-T01/current/README.md).
 

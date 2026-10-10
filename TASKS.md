@@ -1,5 +1,7 @@
 # 2026-10-10 활성 구현 계획
 
+R03-T02 회사·서비스 서버 API 완료: 회사·서비스·사업자 파일·컨텍스트·접근요청 OpenAPI 9경로20작업을 현재 handler와 대조했다. 실제 PostgreSQL에서 tenant/role/session/MFA/version/구독한도, 동시 경합, 파일 정리, 요청·권한·멤버 version·감사 원자성과 보관 서비스의 후속 쓰기 차단을 12파일257시험으로 확인했다. 활성 계획은 완료14/진행41/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R03-T02/current/README.md).
+
 R03-T01 회사·서비스 모델·규칙 완료: 6모델66열·29제약·24인덱스를 dev/test PostgreSQL에서 대조하고 tenant FK·unique·상태·보존/삭제·version 규칙을 확인했다. 회사 폐쇄와 구성원 회수를 분리하고 사업자 파일 변경을 Company.version으로 직렬화함을 검증했다. 6파일158시험·타입·린트·production build가 통과했고 신규 migration은 필요하지 않았다. 활성 계획은 완료13/진행42/계획52이며 전체 목표는 진행 중이다. [검증](docs/qa/R03-T01/current/README.md).
 
 R02-T04 내부 수용검증 통과·외부 대기: 현재 소스의 인증 모델·API·UI·권한 15파일249시험과 production 두 차례 기동을 확인했다. 재시작 전후 health, 로그인 HTML, 보존 계정의 인증/MFA/세션/감사 지문이 동일하다. 공식 SMTP·DNS·외부 수신함은 자격증명 미확보로 external_pending이므로 작업은 진행 중이며, 활성 계획은 완료12/진행43/계획52다. [검증](docs/qa/R02-T04/current/README.md).

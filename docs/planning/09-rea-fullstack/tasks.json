@@ -829,29 +829,40 @@
     "legacy_tasks": [
       "P03-T01"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R03-T02/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R03-T02/current/README.md",
+      "docs/qa/R03-T02/current/verification-summary.json",
+      "docs/qa/R03-T02/current/server-api-regression.json",
+      "docs/qa/R03-T02/current/api-contract.json",
+      "docs/qa/R03-T02/current/quality-gates.json",
+      "docs/qa/R03-T02/authority/README.md",
+      "docs/qa/R03-T02/access-authority/README.md"
+    ],
     "dependency_gates": {
       "R03-T01": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "회사/서비스 잠금 대기 중 세션·멤버·MFA 변경과 최종 만료 재검사·회사등록 경합 수정, 관련135개 통과. 접근요청에도 현재 권한/최종 만료·원자성·페이지 보정·승인대상 활성 검사, 관련89개 통과. 전체 조합 수용은 후속.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "회사·서비스·사업자파일·컨텍스트·접근요청 OpenAPI 9경로20작업을 현재 handler와 대조했다. 실제 PostgreSQL에서 tenant/role/session/MFA/version/구독한도, 동시생성·수정, 파일정리, 요청·권한·멤버version·감사 원자성과 archived 서비스의 폼/게시/공유/공개제출/메일 차단을 12파일257시험으로 확인했다.",
     "progress_evidence": [
+      "docs/qa/R03-T02/current/README.md",
+      "docs/qa/R03-T02/current/verification-summary.json",
+      "docs/qa/R03-T02/current/server-api-regression.json",
+      "docs/qa/R03-T02/current/api-contract.json",
+      "docs/qa/R03-T02/current/quality-gates.json",
       "docs/qa/R03-T02/authority/README.md",
-      "docs/qa/R03-T02/authority/regression-final.json",
-      "docs/qa/R03-T02/access-authority/README.md",
-      "docs/qa/R03-T02/access-authority/regression-complete.json"
+      "docs/qa/R03-T02/access-authority/README.md"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
+      "database": "verified",
+      "api": "verified",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {

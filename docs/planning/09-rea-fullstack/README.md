@@ -2,7 +2,7 @@
 
 2026-10-10 · **사용자 승인 후 구현·검증 진행 중**
 
-R03-T01 회사·서비스 모델·규칙은 완료했다. dev/test PostgreSQL의 6모델66열·29제약·24인덱스와 회사 폐쇄/구성원 회수 분리, 사업자 파일 회사 소유·Company.version 경합 제어를 확인했고 6파일158시험과 품질 게이트가 통과했다. 전체107개 작업 상태는 완료13·진행42·계획52다. R02-T04의 공식 SMTP/DNS/외부 수신함은 자격증명 미확보로 external_pending을 유지하며 후속 내부 구현은 계속할 수 있다. [현재 증거](../../qa/R03-T01/current/README.md).
+R03-T02 회사·서비스 서버 API를 완료했다. OpenAPI 9경로20작업과 실제 PostgreSQL의 tenant/role/session/MFA/version/구독한도, 동시 경합, 파일 정리, 접근요청 원자성, 보관 서비스의 후속 쓰기 차단을 12파일257시험으로 확인했다. 전체107개 작업 상태는 완료14·진행41·계획52다. R02-T04의 공식 SMTP/DNS/외부 수신함은 자격증명 미확보로 external_pending을 유지한다. [현재 증거](../../qa/R03-T02/current/README.md).
 
 원본 계획은 outputs에 보존했다. 이 복사본과 tasks.json이 활성 실행 기준선이다. 증거는 저장소 docs/qa/Rxx-Tyy에 기록한다.
 
