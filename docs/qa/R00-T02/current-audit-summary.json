@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-11T04:52:00+09:00",
+  "checkedAt": "2026-10-11T05:00:00+09:00",
   "result": "partial_verified",
   "supportedNode": "v24.18.0",
   "diagnosticNode": "v25.4.0 (outside package engines; not final quality evidence)",
@@ -75,6 +75,19 @@
         "pending": 0,
         "todo": 0
       }
+    },
+    "adminCrudRoutes": {
+      "path": "docs/qa/R00-T02/admin-crud-routes/regression.json",
+      "sha256": "01a8d5fd7c252270999a22eb98c16784d1e2f7f77c2ac48e12c02d2dc627139a",
+      "success": true,
+      "files": 3,
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "pending": 0
+      },
+      "operationsExercised": 15
     }
   },
   "defect": {
@@ -88,17 +101,16 @@
     "handlerFiles": 158,
     "missingHandlers": 0,
     "missingPolicies": 0,
-    "directHandlerTestImport": 416,
-    "missingDirectHandlerTestImport": 50,
-    "missingOwnerTasks": 25
+    "directHandlerTestImport": 431,
+    "missingDirectHandlerTestImport": 35,
+    "missingOwnerTasks": 0
   },
   "taskComplete": false,
   "remaining": [
-    "50 operations lack direct handler test import evidence",
-    "25 operations lack task ownership",
+    "35 operations lack direct handler test import evidence",
     "285 catch-all operations still need branch-level runtime evidence",
     "single Node24 full-suite run is not green"
   ],
-  "baseCommit": "fe9dcd52f6ca0004bd953f8443b9df74c73d2862",
-  "sourceState": "baseCommit plus the OpenAPI generator and audit changes in this checkpoint"
+  "baseCommit": "92a8a29b9b900a21ccb68f6410251863453c531a",
+  "sourceState": "baseCommit plus API ownership completion and the tested admin plan/notice/guide route changes in this checkpoint"
 }

@@ -1557,6 +1557,55 @@
     "current_status": "contract_declared_runtime_unverified"
   },
   {
+    "method": "GET",
+    "path": "/forms/{id}/participation-targets",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "POST",
+    "path": "/forms/{id}/participation-targets",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "DELETE",
+    "path": "/forms/{id}/participation-targets",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "POST",
+    "path": "/public/forms/{token}/participation-challenges",
+    "owner_tasks": [
+      "R11-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "POST",
+    "path": "/public/forms/{token}/participation-challenges-verify",
+    "owner_tasks": [
+      "R11-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/submissions/{id}/pdf",
+    "owner_tasks": [
+      "R11-T02",
+      "R16-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
     "method": "POST",
     "path": "/submissions/{id}/withdraw",
     "owner_tasks": [
@@ -1824,6 +1873,22 @@
   {
     "method": "POST",
     "path": "/templates/{id}/use",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "POST",
+    "path": "/templates/{id}/archive",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "POST",
+    "path": "/templates/{id}/restore",
     "owner_tasks": [
       "R08-T02"
     ],
@@ -3606,6 +3671,30 @@
   },
   {
     "method": "GET",
+    "path": "/security/sso-policy",
+    "owner_tasks": [
+      "R07-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "PUT",
+    "path": "/security/sso-policy",
+    "owner_tasks": [
+      "R07-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "POST",
+    "path": "/security/sso-policy/challenge",
+    "owner_tasks": [
+      "R07-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
     "path": "/security/sso",
     "owner_tasks": [
       "R07-T02"
@@ -3669,6 +3758,14 @@
     "current_status": "contract_declared_runtime_unverified"
   },
   {
+    "method": "PATCH",
+    "path": "/security/sso/{id}/directory/{memberId}",
+    "owner_tasks": [
+      "R07-T02"
+    ],
+    "current_status": "local_runtime_verified_original_policy_external_pending"
+  },
+  {
     "method": "POST",
     "path": "/auth/org/login",
     "owner_tasks": [
@@ -3680,6 +3777,15 @@
   {
     "method": "POST",
     "path": "/auth/org/email-register",
+    "owner_tasks": [
+      "R02-T02",
+      "R07-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "POST",
+    "path": "/auth/org/email-register/challenge",
     "owner_tasks": [
       "R02-T02",
       "R07-T02"
@@ -3714,11 +3820,107 @@
     "current_status": "contract_declared_runtime_unverified"
   },
   {
-    "method": "PATCH",
-    "path": "/security/sso/{id}/directory/{memberId}",
+    "method": "POST",
+    "path": "/author-assets/uploads",
     "owner_tasks": [
-      "R07-T02"
+      "R08-T02"
     ],
-    "current_status": "local_runtime_verified_original_policy_external_pending"
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/author-assets/uploads/{id}",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "DELETE",
+    "path": "/author-assets/uploads/{id}",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "PUT",
+    "path": "/author-assets/uploads/{id}/content",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "POST",
+    "path": "/author-assets/uploads/{id}/complete",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/author-assets/uploads/{id}/download",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/author-assets/usage",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/author-assets",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/author-assets/{id}/download",
+    "owner_tasks": [
+      "R08-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/public/forms/{token}/author-assets",
+    "owner_tasks": [
+      "R11-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/public/forms/{token}/author-assets/{id}/download",
+    "owner_tasks": [
+      "R11-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/viewer/author-assets",
+    "owner_tasks": [
+      "R12-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
+  },
+  {
+    "method": "GET",
+    "path": "/viewer/author-assets/{id}/download",
+    "owner_tasks": [
+      "R12-T02"
+    ],
+    "current_status": "contract_declared_runtime_unverified"
   }
 ]

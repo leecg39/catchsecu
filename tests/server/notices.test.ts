@@ -10,6 +10,12 @@ import type { NoticeListResponse, NoticeRecord } from "@/contracts/notices";
 import { sha256 } from "@/server/file-validation";
 import { requireFileScanner } from "@/server/file-scanner";
 import { cleanupNoticeAttachments } from "@/server/notice-attachments";
+import { GET as listAdminNotices, POST as createAdminNotice } from "@/app/api/v1/admin/notices/route";
+import {
+  DELETE as deleteAdminNotice,
+  GET as readAdminNotice,
+  PATCH as updateAdminNotice,
+} from "@/app/api/v1/admin/notices/[id]/route";
 
 const url = new URL(env.DATABASE_URL);
 if (url.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(url.hostname)) throw new Error("Isolated test DB required");
@@ -158,4 +164,23 @@ describe("notice publication", () => {
     await expect(lstat(join(env.PRIVATE_STORAGE_DIR, "objects", storageKey + ".enc"))).rejects.toMatchObject({ code: "ENOENT" });
     expect((await DELETE(req(`/notices/${created.id}`, "DELETE", "operator", undefined, { "if-match": "2" }))).status).toBe(204);
   });
+});
+
+test("관리자 공지 별칭 경로가 동일한 PostgreSQL CRUD와 운영자 권한을 사용한다", async () => {
+  const input = { category: "일반공지", title: "관리자 별칭 검증", bodyHtml: "<p>관리자 경로</p>", sortOrder: 90 };
+  const createdResponse = await createAdminNotice(req("/admin/notices", "POST", "operator", input,
+    { "idempotency-key": randomUUID() }));
+  const created = await answer<NoticeRecord>(createdResponse, 201);
+  expect(createdResponse.headers.get("location")).toBe(`/api/v1/admin/notices/${created.id}`);
+
+  const listed = await answer<NoticeListResponse>(await listAdminNotices(req("/admin/notices", "GET", "operator")));
+  expect(listed.items.some(item => item.id === created.id)).toBe(true);
+  expect((await answer<NoticeRecord>(await readAdminNotice(req(`/admin/notices/${created.id}`, "GET", "operator")))).id).toBe(created.id);
+
+  const changed = await answer<NoticeRecord>(await updateAdminNotice(req(`/admin/notices/${created.id}`, "PATCH", "operator",
+    { version: 1, title: "관리자 별칭 수정" })));
+  expect(changed).toMatchObject({ title: "관리자 별칭 수정", version: 2 });
+  expect((await deleteAdminNotice(req(`/admin/notices/${created.id}`, "DELETE", "operator", undefined,
+    { "if-match": "2" }))).status).toBe(204);
+  expect((await db.notice.findUniqueOrThrow({ where: { id: created.id } })).status).toBe("archived");
 });

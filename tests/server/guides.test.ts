@@ -9,6 +9,12 @@ import { sha256 } from "@/server/file-validation";
 import { requireFileScanner } from "@/server/file-scanner";
 import { GET, POST, PATCH, PUT, DELETE } from "@/app/api/v1/guides/[[...segments]]/route";
 import type { GuideListResponse, GuideRecord } from "@/contracts/guides";
+import { GET as listAdminGuides, POST as createAdminGuide } from "@/app/api/v1/admin/guides/route";
+import {
+  DELETE as deleteAdminGuide,
+  GET as readAdminGuide,
+  PATCH as updateAdminGuide,
+} from "@/app/api/v1/admin/guides/[id]/route";
 
 const database = new URL(env.DATABASE_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname))
@@ -110,4 +116,23 @@ describe("guide publication and protected PDFs", () => {
     ]);
     await expect(db.guide.update({ where: { id }, data: { status: "unsafe" } })).rejects.toThrow();
   });
+});
+
+test("관리자 가이드 별칭 경로가 동일한 PostgreSQL CRUD와 운영자 권한을 사용한다", async () => {
+  const input = { category: "시험", categoryOrder: 90, title: "관리자 별칭 검증", sortOrder: 90 };
+  const createdResponse = await createAdminGuide(req("/admin/guides", "POST", "operator", input,
+    { "idempotency-key": randomUUID() }));
+  const created = await answer<GuideRecord>(createdResponse, 201);
+  expect(createdResponse.headers.get("location")).toBe(`/api/v1/admin/guides/${created.id}`);
+
+  const listed = await answer<GuideListResponse>(await listAdminGuides(req("/admin/guides", "GET", "operator")));
+  expect(listed.items.some(item => item.id === created.id)).toBe(true);
+  expect((await answer<GuideRecord>(await readAdminGuide(req(`/admin/guides/${created.id}`, "GET", "operator")))).id).toBe(created.id);
+
+  const changed = await answer<GuideRecord>(await updateAdminGuide(req(`/admin/guides/${created.id}`, "PATCH", "operator",
+    { version: 1, title: "관리자 별칭 수정" })));
+  expect(changed).toMatchObject({ title: "관리자 별칭 수정", version: 2 });
+  expect((await deleteAdminGuide(req(`/admin/guides/${created.id}`, "DELETE", "operator", undefined,
+    { "if-match": "2" }))).status).toBe(204);
+  expect((await db.guide.findUniqueOrThrow({ where: { id: created.id } })).status).toBe("archived");
 });

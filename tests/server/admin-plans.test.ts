@@ -7,6 +7,12 @@ import { requireActor } from "@/server/context";
 import { adminPlanCreate } from "@/contracts/admin-plans";
 import { createAdminPlan, readAdminPlan, listAdminPlans, updateAdminPlan, archiveAdminPlan } from "@/server/admin-plans";
 import * as auditModule from "@/server/audit";
+import { GET as listPlansRoute, POST as createPlanRoute } from "@/app/api/v1/admin/plans/route";
+import {
+  DELETE as deletePlanRoute,
+  GET as readPlanRoute,
+  PATCH as updatePlanRoute,
+} from "@/app/api/v1/admin/plans/[id]/route";
 
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (!["/catchsecu_test", "/catchsecu_mock_admin"].includes(database.pathname) || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
@@ -15,14 +21,22 @@ const input = (version = {}) => ({ id: "mock-" + randomUUID(), name: "모의 상
 beforeEach(async () => { await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "Job" CASCADE'); });
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
 afterAll(async () => { await db.$disconnect(); });
-async function actor() {
+async function adminSession() {
   const email = "admin-" + randomUUID() + "@catchsecu.test";
   const request = (path: string, body: unknown) => new Request(origin + "/api/v1/auth/" + path, { method: "POST", headers: { origin, "content-type": "application/json" }, body: JSON.stringify(body) });
   await auth.handler(request("sign-up/email", { email, password, name: "운영자" }));
   await db.user.update({ where: { email }, data: { emailVerified: true, platformAdmin: true } });
   const login = await auth.handler(request("sign-in/email", { email, password }));
   const cookie = login.headers.getSetCookie().map(v => v.split(";")[0]).join("; ");
-  return requireActor(new Headers({ cookie }));
+  return { actor: await requireActor(new Headers({ cookie })), cookie };
+}
+async function actor() { return (await adminSession()).actor; }
+function routeRequest(path: string, method: string, cookie: string, value?: unknown) {
+  return new Request(origin + "/api/v1/admin/plans" + path, {
+    method,
+    headers: { origin, cookie, ...(value === undefined ? {} : { "content-type": "application/json" }) },
+    ...(value === undefined ? {} : { body: JSON.stringify(value) }),
+  });
 }
 
 test.each([{ currency: "USD" }, { priceKrw: 2147483648 }, { orderable: true, priceKrw: null }])("DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: %j", version => {
@@ -86,6 +100,29 @@ test("버전 기간 오류는 이름 변경까지 함께 롤백한다", async ()
   await createAdminPlan(a, parsed, randomUUID());
   await expect(updateAdminPlan(a, parsed.id, { name: "실패해야 함", version: { ...parsed.version, number: 2, effectiveTo: "2000-01-01T00:00:00.000Z" } }, randomUUID())).rejects.toMatchObject({ status: 422 });
   expect((await readAdminPlan(a, parsed.id)).name).toBe(parsed.name);
+});
+test("관리자 상품 HTTP 경로가 동일한 PostgreSQL CRUD와 권한 경계를 사용한다", async () => {
+  const { cookie } = await adminSession(), value = input();
+  const createdResponse = await createPlanRoute(routeRequest("", "POST", cookie, value));
+  expect(createdResponse.status).toBe(201);
+  const created = await createdResponse.json();
+  expect(createdResponse.headers.get("location")).toBe(`/api/v1/admin/plans/${created.id}`);
+
+  const listed = await listPlansRoute(routeRequest("", "GET", cookie));
+  expect(listed.status).toBe(200);
+  expect((await listed.json()).items.some((plan: { id: string }) => plan.id === created.id)).toBe(true);
+
+  const detail = await readPlanRoute(routeRequest("/" + created.id, "GET", cookie));
+  expect(detail.status).toBe(200);
+  expect((await detail.json()).id).toBe(created.id);
+
+  const changed = await updatePlanRoute(routeRequest("/" + created.id, "PATCH", cookie, { name: "HTTP 변경 상품" }));
+  expect(changed.status).toBe(200);
+  expect((await changed.json()).name).toBe("HTTP 변경 상품");
+
+  expect((await deletePlanRoute(routeRequest("/" + created.id, "DELETE", cookie))).status).toBe(204);
+  expect((await readPlanRoute(routeRequest("/" + created.id, "GET", cookie))).status).toBe(404);
+  expect(await db.auditEvent.count({ where: { resourceId: created.id } })).toBe(3);
 });
 test("상품 생성 중 세션이 만료되면 상품·감사가 함께 롤백된다", async () => {
   const a = await actor(), parsed = adminPlanCreate.parse(input());
