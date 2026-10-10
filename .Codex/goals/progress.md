@@ -1,3 +1,7 @@
+## 최신 작업: F7 회사 격리 결함 수정·실측
+
+2026-10-11 Ego Lite에서 A→B 회사 전환 후 같은 `/dashboard` 경로의 자식 resource가 A 집계를 유지하는 결함을 재현했다. `AppShell`의 회사 선택 후 이동을 `window.location.replace('/dashboard')`로 바꾸어 모든 테넌트 resource를 새 문서에서 다시 생성했다. B의 서비스·폼·문서·응답0, A 폼 직접 접근 `NOT_FOUND`, A 복귀를 확인했다. QA 회사는 `closed`, 멤버십은 `revoked`로 정리하고 불변 감사를 보존했다. 집중4파일47개·타입·production82페이지 통과. [검증](../../docs/qa/R08-T04/final-acceptance/README.md). 폼 변경 결합 전체 상태·별도 세션과 외부 공급자 수용은 남아 goal active·공식0/53/54를 유지한다.
+
 ## 최신 작업: F4 저장 실패·회사 전환 보호 완료
 
 2026-10-11 폼 초안 상태를 공통 이탈 보호에 연결했다. 집중24개·관련97개·타입·변경 린트·production82페이지가 통과했다. Ego Lite에서 서버 중단→페이지2 변경→회사 전환 경고→입력 유지→재시작/재시도→다른 회사 전환→복귀/재열기를 확인했고 PostgreSQL에서 폼 버전2·편집 버전1·페이지2·초안 감사1·회사 선택 감사2를 대조했다. [검증](../../docs/qa/R08-T02/page-save-company-switch/README.md). F3/F5/F6/F7 잔여와 외부 의존은 유지하며 공식0/53/54·goal active다.
