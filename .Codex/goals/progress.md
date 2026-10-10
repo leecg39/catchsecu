@@ -1,6 +1,10 @@
-## 최신 작업: R01-T01 실행환경·DB 정합성 완료
+## 최신 작업: R01-T02 API·권한·경합·멱등 공통 경계 완료
 
-2026-10-11 적용 당시 도달 불가 Git blob에서 migration3개의 원본 바이트를 찾아 파일 끝 빈 줄을 복원했다. Node24에서 dev/test migration148/148 checksum 차이0, PostgreSQL·ClamAV 준비, Prisma schema 예상 밖 차이0·SQL전용FK1개를 확인했다. shadow 빈 설치148, 147→148 업그레이드, 의도적 실패 migration rollback/recovery, 반복 seed, 회사 교차 FK23503·중복 이메일23505가 통과했다. 계획 상태 완료5/진행48/계획54, 전체 goal active. [증거](../../docs/qa/R01-T01/current/README.md).
+2026-10-11 실제 PostgreSQL과 현재 Route Handler에서 세션 tenant 결정·본문 tenant 주입 거부·회사 교차 복합 FK, 동일 멱등 키의 동시/순차 재전송 단일 결과, 다른 payload 409, 경쟁 PATCH 200/409와 감사 한 건, viewer 읽기와 create/update/delete 권한 분리를 확인했다. 401/403/404/409/410/413/415/422/429·requestId·1 MiB·안정 목록과 실제 SQLSTATE 변환을 포함해 3파일13시험·타입·린트가 통과했다. 계획 상태 완료6/진행48/계획53, 전체 goal active. [증거](../../docs/qa/R01-T02/current/README.md).
+
+## 이전 작업: R01-T01 실행환경·DB 정합성 완료
+
+2026-10-11 적용 당시 도달 불가 Git blob에서 migration3개의 원본 바이트를 찾아 파일 끝 빈 줄을 복원했다. Node24에서 dev/test migration148/148 checksum 차이0, PostgreSQL·ClamAV 준비, Prisma schema 예상 밖 차이0·SQL전용FK1개를 확인했다. shadow 빈 설치148, 147→148 업그레이드, 의도적 실패 migration rollback/recovery, 반복 seed, 회사 교차 FK23503·중복 이메일23505가 통과했다. 당시 계획 상태 완료5/진행48/계획54, 전체 goal active. [증거](../../docs/qa/R01-T01/current/README.md).
 
 ## 이전 작업: R00-T04 fixture·QA 재현계약 완료
 

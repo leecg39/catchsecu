@@ -1,6 +1,8 @@
 # 상세 TASKS — 캐치시큐 전 페이지 풀스택 완성 계획
 
-R01-T01 실행환경·DB 정합성 완료: 적용 당시 Git blob에서 migration3개의 파일 끝 빈 줄을 복구해 Node24 dev/test 148/148 checksum 차이0을 확인했다. schema 예상 밖 차이0·SQL전용FK1개, shadow 빈 설치·147→148 upgrade·실패 rollback/recovery·seed·FK/unique 거부가 통과했다. 현재 공식 상태는 완료5·진행48·계획54다. [검증](../../qa/R01-T01/current/README.md).
+R01-T02 공통 API 경계 완료: 실제 PostgreSQL과 현재 Route Handler에서 세션 tenant·복합 FK, 동일 멱등 키 동시/순차 재전송 단일 결과, 다른 payload 409, 경쟁 PATCH 200/409, 읽기와 create/update/delete 권한 분리, HTTP 상태·requestId·1 MiB 제한·안정 목록을 확인했다. 3파일13시험·타입·린트가 통과했고 현재 공식 상태는 완료6·진행48·계획53이다. [검증](../../qa/R01-T02/current/README.md).
+
+R01-T01 실행환경·DB 정합성 완료: 적용 당시 Git blob에서 migration3개의 파일 끝 빈 줄을 복구해 Node24 dev/test 148/148 checksum 차이0을 확인했다. schema 예상 밖 차이0·SQL전용FK1개, shadow 빈 설치·147→148 upgrade·실패 rollback/recovery·seed·FK/unique 거부가 통과했다. 당시 공식 상태는 완료5·진행48·계획54였다. [검증](../../qa/R01-T01/current/README.md).
 
 F3 입력 패턴 체크포인트: 원본 확인 ID 1·2·3·4·7·8의 nullable 모델·DB 조합 제약, 폼 CRUD/복제/템플릿/게시/정정과 편집/공개 화면을 구현했다. 임의 정규식은 strict 계약에서 거부하며 고정 길이 검증만 실행한다. 집중6·관련27·frozen fixture20/20, migration140 빈 설치·기존 질문415개 보존, Ego 잘못된 값 거부/정상 제출·production 재시작 hash, 82페이지 build를 통과했다. [검증](../../qa/R08-T02/question-patterns/README.md). R08-T02와 공식 완료0/진행53/계획54는 유지한다.
 
@@ -101,7 +103,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
   - 현재 migration 파일 전수와 실행DB 이력은 별도 검증; checksum 차이 해소 근거 보존
 - 완료 증거: [현재 보고서](../../qa/R01-T01/current/README.md), [shadow 148개 재현](../../qa/R01-T01/current/db-rehearsal.json), [dev 스키마 계약](../../qa/R01-T01/schema-alignment/catchsecu_dev-contract.json), [test 스키마 계약](../../qa/R01-T01/schema-alignment/catchsecu_test-contract.json), [checksum 복구 근거](../../qa/R01-T01/current/checksum-recovery.json). Node24 dev/test 148/148 checksum 일치, 빈 설치·147→148 업그레이드·실패 rollback/recovery·seed·FK/unique 거부를 확인했다.
 
-### [ ] R01-T02 API·권한·경합·멱등 공통 경계
+### [x] R01-T02 API·권한·경합·멱등 공통 경계
 
 HttpError/DTO·requestId·pagination·최대크기·401/403/404/409/410/422/429 정책, optimistic version과 create/action idempotency 범위를 통일한다.
 
@@ -112,6 +114,7 @@ HttpError/DTO·requestId·pagination·최대크기·401/403/404/409/410/422/429 
 - 완료 조건:
   - tenantId는 세션context에서 결정; body/URL 참조 tenant FK까지검증
   - 경쟁PATCH409·동일키재시도1회·다른payload동일키409; create/update/delete 모두읽기와독립권한검증
+- 완료 증거: [현재 보고서](../../qa/R01-T02/current/README.md), [검증 집계](../../qa/R01-T02/current/verification-summary.json), [전용 경계 통합 시험](../../qa/R01-T02/current/r01-api-boundaries.json), [보호 라우트 회사 격리](../../qa/R01-T02/current/tenant-boundary.json), [실제 PostgreSQL 오류 변환](../../qa/R01-T02/current/http-database-errors.json). 실제 PostgreSQL에서 3파일13시험, 타입 검사와 공통 서버·변경 시험 린트가 통과했다.
 
 ### [~] R01-T03 파일·비공개 저장소·다운로드 공통 경계
 

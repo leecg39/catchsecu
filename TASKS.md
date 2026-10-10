@@ -1,6 +1,8 @@
 # 2026-10-10 활성 구현 계획
 
-R01-T01 실행환경·DB 정합성 완료: 적용 당시 Git blob에서 migration 3개의 파일 끝 빈 줄을 복구해 dev/test 148/148 checksum 차이0을 확인했다. Node24·PostgreSQL·ClamAV 준비 상태, 스키마 예상 밖 차이0·SQL 전용 FK1개, shadow 빈 설치·147→148 업그레이드·실패 rollback/recovery·seed·회사교차FK/이메일unique 거부가 통과했다. 활성 계획은 완료5/진행48/계획54이며 전체 목표는 진행 중이다. [검증](docs/qa/R01-T01/current/README.md).
+R01-T02 공통 API 경계 완료: 실제 PostgreSQL과 현재 Route Handler에서 세션 tenant·복합 FK, 동일 멱등 키 동시/순차 재전송 단일 결과, 다른 payload 409, 경쟁 PATCH 200/409, 읽기와 create/update/delete 권한 분리, HTTP 상태·requestId·요청 크기·안정 목록을 확인했다. 3파일13시험·타입·린트가 통과했다. 활성 계획은 완료6/진행48/계획53이며 전체 목표는 진행 중이다. [검증](docs/qa/R01-T02/current/README.md).
+
+R01-T01 실행환경·DB 정합성 완료: 적용 당시 Git blob에서 migration 3개의 파일 끝 빈 줄을 복구해 dev/test 148/148 checksum 차이0을 확인했다. Node24·PostgreSQL·ClamAV 준비 상태, 스키마 예상 밖 차이0·SQL 전용 FK1개, shadow 빈 설치·147→148 업그레이드·실패 rollback/recovery·seed·회사교차FK/이메일unique 거부가 통과했다. 당시 활성 계획은 완료5/진행48/계획54였다. [검증](docs/qa/R01-T01/current/README.md).
 
 R00-T04 fixture·QA 재현계약 완료: 실제 PostgreSQL 시드에서 원본186개와 부가21개 경로를 모두 구체화하고 정상·권한거부·실패 시나리오621개를 고정했다. callback은 실제 state/challenge, wildcard는 알 수 없는 URL, 외부비용 시험은 전용 allowlist/sandbox 계정만 요구한다. 브라우저 선행상태와 외부 공급자 검증은 준비조건이며 CRUD 실행 성공으로 집계하지 않는다. 활성 계획은 완료4/진행49/계획54이며 전체 목표는 진행 중이다. [검증](docs/qa/R00-T04/active-fixtures/README.md).
 

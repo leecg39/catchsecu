@@ -2,7 +2,7 @@
 
 2026-10-10 · **사용자 승인 후 구현·검증 진행 중**
 
-R01-T01 실행환경·DB 정합성이 완료됐다. Node24 dev/test 148/148 checksum, schema diff 예상 밖0, shadow 빈 설치·147→148 업그레이드·실패 복구·seed와 FK/unique 거부를 확인했다. 전체107개 작업 상태는 완료5·진행48·계획54이며 다음 의존 작업은 R01-T02 API·권한·경합·멱등 공통 경계다. [현재 증거](../../qa/R01-T01/current/README.md).
+R01-T02 API·권한·경합·멱등 공통 경계가 완료됐다. 실제 PostgreSQL과 현재 Route Handler에서 tenant 복합 FK, 멱등 생성 단일 결과, payload 충돌409, 경쟁 PATCH409, 읽기/쓰기 권한 분리와 공통 HTTP 계약을 확인했다. 전체107개 작업 상태는 완료6·진행48·계획53이며 다음 의존 작업은 R01-T03 파일·비공개 저장소·다운로드 공통 경계다. [현재 증거](../../qa/R01-T02/current/README.md).
 
 원본 계획은 outputs에 보존했다. 이 복사본과 tasks.json이 활성 실행 기준선이다. 증거는 저장소 docs/qa/Rxx-Tyy에 기록한다.
 

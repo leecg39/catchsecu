@@ -1,0 +1,35 @@
+{
+  "task": "R01-T02",
+  "checkedAt": "2026-10-10T22:04:29Z",
+  "result": "passed",
+  "environment": {
+    "node": "24.18.0",
+    "postgresql": "17.11",
+    "database": "isolated local catchsecu_test",
+    "browser": "not applicable",
+    "externalProvider": "not applicable"
+  },
+  "tests": {
+    "dedicatedBoundary": { "files": 1, "tests": 5, "passed": 5, "failed": 0 },
+    "tenantRouteSweep": { "files": 1, "tests": 2, "passed": 2, "failed": 0 },
+    "postgresqlErrorMapping": { "files": 1, "tests": 6, "passed": 6, "failed": 0 },
+    "total": { "files": 3, "tests": 13, "passed": 13, "failed": 0 }
+  },
+  "acceptance": {
+    "sessionTenantAndCompositeForeignKeys": "passed",
+    "concurrentPatchOneWinnerOne409": "passed",
+    "sameIdempotencyKeyOneResource": "passed",
+    "sameKeyDifferentPayload409": "passed",
+    "independentCreateUpdateDeletePermissions": "passed",
+    "requestIdStatusSizePaginationContract": "passed"
+  },
+  "quality": {
+    "typecheck": "passed",
+    "eslint": "passed"
+  },
+  "limitations": [
+    "This cross-cutting server task has no browser surface.",
+    "No external provider is required for this task.",
+    "The pg 8 deprecation warning emitted during concurrent requests is upstream API noise; all assertions and transactions completed successfully."
+  ]
+}
