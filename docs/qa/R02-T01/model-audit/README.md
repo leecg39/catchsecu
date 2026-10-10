@@ -1,6 +1,6 @@
 # R02 인증 모델 대조
 
-2026-10-10. 실제 로컬 개발/시험 PostgreSQL을 읽기 전용으로 조사했다. 각각 8개 모델, 73개 컬럼, 21개 제약, 24개 인덱스, 7개 사용자 트리거를 대조했다. 신규 migration은 필요하지 않았다.
+2026-10-11. 실제 로컬 개발/시험 PostgreSQL을 읽기 전용으로 조사했다. 각각 8개 모델, 73개 컬럼, 21개 제약, 25개 인덱스, 7개 사용자 트리거와 암호 변경·초기화·유예 DTO를 대조했다. 신규 migration은 필요하지 않았다.
 
 - User: 이메일 유일성, 활성 상태, 이메일 인증, 비밀번호 변경시점, MFA 활성 여부.
 - Account: providerId/accountId 유일성, 사용자 CASCADE, credential 암호 해시, SSO 연결 FK.
@@ -11,7 +11,7 @@
 - PasswordHistory: 사용자 FK, 변경 이력. credential 트리거가 기존 암호 해시를 저장하고 최근 이력 한도를 유지한다.
 - PasswordDeferral: 회사/멤버/사용자 복합 FK, 회사/멤버 유일성, session/date 모드 제약, 암호 정책 revision과 만료. 실제 암호 변경 시 유예를 삭제한다.
 
-credential 변경 트리거는 비밀번호 변경, 과거 세션 삭제, 인증 proof 삭제, `password.changed`와 `session.ended` 감사 기록을 같은 트랜잭션에서 처리한다. 메타데이터 검사와 동작 검증은 별개이며, 동작 증거는 R02-T02/T04에 기록한다.
+credential 변경 트리거는 비밀번호 변경, 과거 세션 삭제, 인증 proof·암호 유예 삭제, `password.changed`와 `session.ended` 감사 기록을 같은 트랜잭션에서 처리한다. 메타데이터와 실제 동작의 현재 완료 증거는 [R02-T01 보고서](../current/README.md)에 기록한다.
 
 실행: `node --env-file=.env.local --import tsx scripts/qa-rea-auth-model.ts` 및 `.env.test.local`.
 

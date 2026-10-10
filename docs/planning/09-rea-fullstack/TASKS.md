@@ -162,7 +162,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
 
 ## R02 계정 인증·세션·복구
 
-### [~] R02-T01 계정 인증·세션·복구 — 모델·규칙 대조 및 보완
+### [x] R02-T01 계정 인증·세션·복구 — 모델·규칙 대조 및 보완
 
 현재 Better Auth 테이블을 재사용한다. 이메일 중복·만료·한 번만 쓰는 인증, 암호 이력, 복구코드 소비, 세션 폐기를 DB 제약과 트랜잭션으로 대조한다.
 
@@ -173,6 +173,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
 - 완료 조건:
   - C 가입·인증 challenge; R 세션/암호정책; U 암호·2FA; D 세션 폐기·2FA 해제. 계정 삭제는 R05.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
+- 완료 증거: [현재 보고서](../../qa/R02-T01/current/README.md), [검증 집계](../../qa/R02-T01/current/verification-summary.json), [dev/test 모델 감사](../../qa/R02-T01/model-audit/README.md), [148개 회귀](../../qa/R02-T01/current/auth-model-regression.json). 신규 migration 없이 8모델·73열·21제약·25인덱스·7트리거와 실제 상태 전이를 검증했다.
 
 ### [~] R02-T02 계정 인증·세션·복구 — 서버 API·업무 처리
 

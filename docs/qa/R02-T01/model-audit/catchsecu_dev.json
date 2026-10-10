@@ -1,8 +1,8 @@
 {
   "result": "passed",
   "database": "catchsecu_dev",
-  "checkedAt": "2026-10-09T19:26:59.770Z",
-  "scope": "Eight existing authentication models; read-only metadata, uniqueness, relation, deferral and credential-trigger assertions. No new migration or claim of full R02 acceptance.",
+  "checkedAt": "2026-10-10T22:19:41.565Z",
+  "scope": "Eight existing authentication models; read-only metadata, DTO, uniqueness, relation, deferral and credential-trigger assertions. Dynamic state transitions are verified separately; no new migration was required.",
   "tables": [
     "User",
     "Account",
@@ -578,6 +578,11 @@
     },
     {
       "table": "Account",
+      "name": "Account_ssoProviderId_id_userId_key",
+      "definition": "CREATE UNIQUE INDEX \"Account_ssoProviderId_id_userId_key\" ON public.\"Account\" USING btree (\"ssoProviderId\", id, \"userId\")"
+    },
+    {
+      "table": "Account",
       "name": "Account_ssoProviderId_idx",
       "definition": "CREATE INDEX \"Account_ssoProviderId_idx\" ON public.\"Account\" USING btree (\"ssoProviderId\")"
     },
@@ -726,13 +731,20 @@
       "function": "CREATE OR REPLACE FUNCTION public.guard_closed_account()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF OLD.status = 'closed' AND NEW.status <> 'closed' THEN\n    RAISE EXCEPTION 'CLOSED_ACCOUNT_IMMUTABLE' USING ERRCODE = '23514';\n  END IF;\n  IF NEW.status = 'closed' AND OLD.status <> 'closed' THEN\n    IF EXISTS (SELECT 1 FROM \"Membership\" m JOIN \"Company\" c ON c.id = m.\"tenantId\"\n      WHERE m.\"userId\" = OLD.id AND m.role = 'owner' AND m.status = 'active' AND c.status <> 'closed') THEN\n      RAISE EXCEPTION 'OWNERSHIP_TRANSFER_REQUIRED' USING ERRCODE = '23514';\n    END IF;\n    IF OLD.\"platformAdmin\" THEN\n      PERFORM pg_advisory_xact_lock(hashtextextended('platform-admin-closure', 0));\n      IF NOT EXISTS (SELECT 1 FROM \"User\" WHERE id <> OLD.id AND status = 'active' AND \"platformAdmin\") THEN\n        RAISE EXCEPTION 'PLATFORM_ADMIN_REQUIRED' USING ERRCODE = '23514';\n      END IF;\n    END IF;\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
     }
   ],
+  "dtoContract": {
+    "passwordDeferral": "strict tenant UUID and positive policy revision",
+    "passwordChange": "strict current/new password and optional revoke flag",
+    "passwordReset": "strict new password and optional bounded token"
+  },
   "sourceFingerprints": {
-    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/schema.prisma": "1a780ed7caf074953ffa7f9139d35b272916f35d0c7892bd24c82a73a375aca3",
     "prisma/migrations/20261005090000_credential_audit/migration.sql": "3aa460d5ec9b177c2cbfb83a664300edff63f44b99fe70d841d3cf62b03cab5d",
-    "src/server/auth.ts": "c286c2ddb74ce4fec6dceaa0473f7f51cf02f08d3e7d45042afaf443b6f8a780",
-    "src/server/auth-adapter.ts": "2c6b62c42d0cfbbef2b0be82f7897f508707dd06f3abdd816e1def835c8c6c2d",
-    "src/server/auth-mutations.ts": "7ec9b624a229b9d721e11b9a07778e99872f4dd0bd504cf95f6444fc666d31ff",
+    "src/contracts/security.ts": "faf7de49c7ffbd071b87350534fafa4a1e4295c9d63a53cf09c3825bef5289d8",
+    "src/server/auth.ts": "2a82ae48df01a9d142ea55a4e545413e3d67f8a3c869238f7c7b592cec759730",
+    "src/server/auth-adapter.ts": "8464ef04a33f8f2d8386a3741d0d0e6974689c6f882efad824510aa2582b2a48",
+    "src/server/auth-mutations.ts": "a1e4a96b521c70372d30a113932c45bef6e3e6bcf7098f9f5c86b45b4eb45169",
     "src/server/credential-lock.ts": "e127c7c753a60ed30e7a84ba3c01461362ab90402977fe40f25e17e404790795",
-    "src/server/password-policy.ts": "33c134d363894a146452710af86cd58c6874e300f065598e2e343391e55e756c"
+    "src/server/password-policy.ts": "33c134d363894a146452710af86cd58c6874e300f065598e2e343391e55e756c",
+    "src/server/password-deferral.ts": "e03d8a71703c301aa3d8e6dc2afd70bf7a2b98fd3d2daf0b06d218d718a6b954"
   }
 }

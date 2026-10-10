@@ -1,4 +1,8 @@
-## 최신 작업: R01-T05 자동 검증·관측·통합환경 완료
+## 최신 작업: R02-T01 계정 인증·세션·복구 모델·규칙 완료
+
+2026-10-11 Better Auth 인증모델8개·73열·21제약·25인덱스·7트리거와 DTO를 dev/test PostgreSQL에서 대조했다. 실제 DB에서 이메일/credential unique, proof 동시1회소비·만료거부, 암호이력 최신9개, credential 변경의 세션·유예·proof·감사 원자성, 직접 계정삭제 거부를 확인했다. 8파일148시험·typecheck·lint·production build 통과. 계획 상태 완료10/진행45/계획52, 전체 goal active. [증거](../../docs/qa/R02-T01/current/README.md).
+
+## 이전 작업: R01-T05 자동 검증·관측·통합환경 완료
 
 2026-10-11 dev/test PostgreSQL·ClamAV·migration148/148 preflight, production 서버 health/ready 200와 보호 API requestId 401, main/export worker 실제 기동, 오류 비밀 마스킹, 운영 로컬 공급자 차단과 CI 실패·scanner blocked 비성공 집계를 확인했다. 3파일36시험·typecheck·lint·production build가 통과했다. 계획 상태 완료9/진행46/계획52, 전체 goal active. [증거](../../docs/qa/R01-T05/current/README.md).
 

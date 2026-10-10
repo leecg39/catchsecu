@@ -2,7 +2,7 @@
 
 2026-10-10 · **사용자 승인 후 구현·검증 진행 중**
 
-R01-T05 자동 검증·관측·통합환경이 완료됐다. dev/test PostgreSQL·ClamAV·migration preflight, production 서버 HTTP readiness와 requestId, main/export worker 기동, 비밀 마스킹, CI 실패 집계 계약을 확인했다. 전체107개 작업 상태는 완료9·진행46·계획52이며 다음 의존 작업은 R02-T01 계정 인증·세션·복구다. [현재 증거](../../qa/R01-T05/current/README.md).
+R02-T01 계정 인증·세션·복구 모델·규칙이 완료됐다. Better Auth 인증모델 8개와 schema·DTO·제약·트리거를 dev/test PostgreSQL에서 대조하고, 인증 proof 1회 소비·암호 이력·세션/유예 정리·계정 삭제 경계를 148시험으로 확인했다. 전체107개 작업 상태는 완료10·진행45·계획52이며 다음 의존 작업은 R02-T02 인증 서버 API다. [현재 증거](../../qa/R02-T01/current/README.md).
 
 원본 계획은 outputs에 보존했다. 이 복사본과 tasks.json이 활성 실행 기준선이다. 증거는 저장소 docs/qa/Rxx-Tyy에 기록한다.
 

@@ -534,25 +534,35 @@
       "P02-T04",
       "P02-T05"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "model",
     "evidence_directory": "catchsecu-clone/docs/qa/R02-T01/",
-    "completion_evidence": [],
-    "dependency_gates": {
-      "R01-T05": "task_complete"
-    },
-    "local_status": "partial_verified",
-    "external_status": "not_applicable",
-    "source_fidelity_status": "partial_observed",
-    "progress_note": "dev/test8개 인증모델73컬럼21제약24인덱스7트리거 실제 대조. 이메일/계정/세션 unique·유예 복합FK·credential 이력/세션폐기/감사 트리거 확인, 신규 migration 없음.",
-    "progress_evidence": [
-      "docs/qa/R02-T01/model-audit/README.md",
+    "completion_evidence": [
+      "docs/qa/R02-T01/current/README.md",
+      "docs/qa/R02-T01/current/verification-summary.json",
+      "docs/qa/R02-T01/current/auth-model-regression.json",
+      "docs/qa/R02-T01/current/quality-gates.json",
       "docs/qa/R02-T01/model-audit/catchsecu_dev.json",
       "docs/qa/R02-T01/model-audit/catchsecu_test.json"
     ],
-    "updatedOn": "2026-10-10",
+    "dependency_gates": {
+      "R01-T05": "task_complete"
+    },
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "Better Auth 인증모델8개·73열·21제약·25인덱스·7트리거와 DTO를 dev/test DB에서 대조했다. 실제 PostgreSQL에서 unique/FK/인증proof 1회소비/암호이력9개/세션·유예·proof 원자정리/직접계정삭제거부를 포함해 8파일148시험을 통과했다. 신규 migration은 필요하지 않았다.",
+    "progress_evidence": [
+      "docs/qa/R02-T01/current/README.md",
+      "docs/qa/R02-T01/current/verification-summary.json",
+      "docs/qa/R02-T01/current/auth-model-regression.json",
+      "docs/qa/R02-T01/current/quality-gates.json",
+      "docs/qa/R02-T01/model-audit/catchsecu_dev.json",
+      "docs/qa/R02-T01/model-audit/catchsecu_test.json"
+    ],
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
+      "database": "verified",
       "api": "not_applicable",
       "ui": "not_applicable",
       "external": "not_applicable"
