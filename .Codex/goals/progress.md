@@ -1,4 +1,8 @@
-## 최신 작업: R04-T01 구성원·초대·권한·전문가 모델 완료
+## 최신 작업: R04-T02 구성원·초대·권한·전문가 서버 API 완료
+
+2026-10-11 OpenAPI15경로23작업을 실제 Route Handler와 대조하고 초대·구성원·접근요청·전문가의 tenant/role/license·현재권한·경합·감사·outbox 원자성을 PostgreSQL12suite239시험으로 확인했다. 동시 소유권 이전은 한 건만 성공하고 활성 owner1명·감사1건을 보존한다. 타입·전체린트 오류0·production82페이지 통과. 계획 상태 완료18/진행37/계획52, 전체 goal active. [증거](../../docs/qa/R04-T02/current/README.md).
+
+## 이전 작업: R04-T01 구성원·초대·권한·전문가 모델 완료
 
 2026-10-11 dev/test PostgreSQL의 6모델55열·26제약·26인덱스·7트리거를 대조하고 구성원·서비스권한·초대·접근요청·전문가 범위와 마지막 owner 동시 보호를 10suite103시험으로 확인했다. migration148개 최신, 타입·린트·production82페이지 통과. 계획 상태 완료17/진행38/계획52, 전체 goal active. [증거](../../docs/qa/R04-T01/current/README.md).
 

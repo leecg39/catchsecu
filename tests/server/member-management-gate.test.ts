@@ -7,7 +7,7 @@ import { auth } from "@/server/auth";
 import { env } from "@/server/env";
 import { decrypt } from "@/server/crypto";
 import { requireActor, requireContext } from "@/server/context";
-import { acceptInvitation, updateMember } from "@/server/members";
+import { acceptInvitation, transferOwnership, updateMember } from "@/server/members";
 import { roleCapabilities } from "@/server/permissions";
 import { POST as invite } from "@/app/api/v1/invitations/route";
 import { POST as invitationAction } from "@/app/api/v1/invitations/[...segments]/route";
@@ -193,6 +193,22 @@ test("동시 소유자 권한 회수에서도 DB는 활성 소유자 한 명을 
   const result = await Promise.allSettled([first.id, second.id].map(id => db.membership.update({ where: { id }, data: { role: "viewer" } })));
   expect(result.filter(item => item.status === "fulfilled")).toHaveLength(1);
   expect(await db.membership.count({ where: { tenantId: tenant.id, role: "owner", status: "active" } })).toBe(1);
+});
+test("같은 소유자의 동시 소유권 이전 요청은 하나만 반영하고 활성 소유자를 보존한다", async () => {
+  const tenant = await company("동시 소유권 이전");
+  const [first, second] = await Promise.all([
+    db.membership.create({ data: { tenantId: tenant.id, userId: member.id, role: "viewer" } }),
+    db.membership.create({ data: { tenantId: tenant.id, userId: expert.id, role: "viewer" } }),
+  ]);
+  const stale = await requireContext(req("/context").headers, "member.manage");
+  const result = await Promise.allSettled([
+    transferOwnership(stale, first.id, first.version, randomUUID()),
+    transferOwnership(stale, second.id, second.version, randomUUID()),
+  ]);
+  expect(result.filter(item => item.status === "fulfilled")).toHaveLength(1);
+  expect(result.filter(item => item.status === "rejected")).toHaveLength(1);
+  expect(await db.membership.count({ where: { tenantId: tenant.id, role: "owner", status: "active" } })).toBe(1);
+  expect(await db.auditEvent.count({ where: { tenantId: tenant.id, action: "company.ownership_transferred" } })).toBe(1);
 });
 test("회사 목록은 실제 소속과 페이지·검색 범위에 한정되고 비밀 필드를 제외한다", async () => {
   const tag = randomUUID(), first = await company("소속 목록 " + tag), second = await company("소속 목록 " + tag);

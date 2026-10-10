@@ -286,7 +286,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 - 완료 증거: [현재 보고서](../../qa/R04-T01/current/README.md), [모델 집계](../../qa/R04-T01/current/verification-summary.json), [103개 회귀](../../qa/R04-T01/current/model-regression.json), [migration 상태](../../qa/R04-T01/current/schema-migration.json). dev/test 6모델55열·26제약·26인덱스·7트리거와 구성원·초대·접근요청·전문가·마지막 owner 규칙을 확인했다.
 
-### [~] R04-T02 구성원·초대·권한·전문가 — 서버 API·업무 처리
+### [x] R04-T02 구성원·초대·권한·전문가 — 서버 API·업무 처리
 
 초대·재전송·수락·취소, 멤버 변경/삭제/owner 이전, 서비스 접근요청 결정과 전문가 배정 API를 역할 허용표에 대조한다. 회수 후 세션과 진행 중 작업에서 권한을 다시 검사한다.
 
@@ -297,6 +297,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
 - 완료 조건:
   - A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 실패; owner2명이 동시탈퇴/이전해도 최소1명 보장; 초대 중복·만료·전문가 기간 만료/재배정409.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
+- 완료 증거: [현재 보고서](../../qa/R04-T02/current/README.md), [23개 API 계약](../../qa/R04-T02/current/api-contract.json), [239개 서버 회귀](../../qa/R04-T02/current/server-api-regression.json), [감사·outbox 원자성](../../qa/R04-T02/current/outbox-atomicity.json). 현재 권한 재검사, 권한 회수 즉시 차단, 동시 소유권 이전의 활성 owner 보존을 실제 PostgreSQL에서 확인했다.
 
 ### [~] R04-T03 구성원·초대·권한·전문가 — 전체 화면·모달 연결
 

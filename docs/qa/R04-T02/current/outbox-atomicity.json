@@ -1,0 +1,16 @@
+{
+  "result": "passed",
+  "database": "catchsecu_test",
+  "checks": [
+    "invitation creation commits invitation, audit and mail job together",
+    "resend cancels the prior queued or retry job and creates only the new invitation version job",
+    "revocation cancels pending delivery",
+    "expired or revoked session and authority deadline roll back mutation, audit and job",
+    "idempotent replay does not create another invitation or mail job",
+    "worker cancels an invitation job that expired before delivery"
+  ],
+  "integrationEvidence": "server-api-regression.json",
+  "localDeliveryEvidence": "../../R04-T04/members-flow/README.md",
+  "externalProviderReceiptRequiredForThisTask": false,
+  "externalProviderClaim": false
+}
