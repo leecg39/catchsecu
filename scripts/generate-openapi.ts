@@ -477,7 +477,7 @@ add("/public/forms/{token}", "get", "current company/service/publication grant +
 add("/public/forms/{token}/participation-challenges", "post", "current active publication + rate limit", "이메일 대상 확인 후 선택적 6자리 인증번호 발송 또는 지정 명단 세션 발급", participationChallengeInput, "implemented", "201");
 add("/public/forms/{token}/participation-challenges-verify", "post", "current active publication + rate limit", "요청 브라우저에 묶인 인증번호를 최대 5회 확인하고 30분 참여 세션 발급", participationChallengeVerifyInput.extend({ challengeId: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict(), "implemented");
 add("/public/forms/{token}/submissions", "post", "current active publication + participation session when enabled + idempotency + rate limit", "한도·참여 대상·중복·필수항목·동의·파일을 잠금 아래 검증하고 원자 저장; 성공 재전송은 기존 응답만 반환", submissionInput, "implemented", "201");
-schemas.PublicSubmissionReceipt = z.toJSONSchema(submissionReceiptSchema);
+schemas.PublicSubmissionReceipt = openApiSchema(submissionReceiptSchema);
 (paths["/public/forms/{token}/submissions"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true,
   schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
 paths["/public/forms/{token}"].parameters = paths["/public/forms/{token}/submissions"].parameters = [{ in: "path", name: "token", required: true,

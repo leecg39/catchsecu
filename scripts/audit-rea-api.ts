@@ -37,7 +37,28 @@ const handlers = files.filter(file => /\/src\/app\/api\/v1\/.+\/route\.ts$/.test
 const contract = JSON.parse(await readFile("docs/planning/contracts/openapi.json", "utf8"));
 const policies = parse(await readFile("docs/planning/contracts/operation-policy-matrix.csv", "utf8"), { columns: true }) as Record<string, string>[];
 const ownership = JSON.parse(await readFile("docs/planning/09-rea-fullstack/api-ownership.json", "utf8")) as Array<{method: string; path: string; owner_tasks: string[]}>;
-const baseline = JSON.parse(await readFile("docs/qa/R00-T02/baseline-tests.json", "utf8")) as {testResults: Array<{name: string; status: string; assertionResults: Array<{status: string}>}>};
+const testEvidenceFile = "docs/qa/R00-T02/full-tests-current.json";
+const retryEvidenceFile = "docs/qa/R00-T02/sso-node24-retry.json";
+type TestEvidence = {
+  success: boolean; numFailedTestSuites: number; numFailedTests: number; numPendingTests: number;
+  testResults: Array<{name: string; status: string; assertionResults: Array<{status: string}>}>;
+};
+const fullEvidence = JSON.parse(await readFile(testEvidenceFile, "utf8")) as TestEvidence;
+const retryEvidence = JSON.parse(await readFile(retryEvidenceFile, "utf8")) as TestEvidence;
+const failedFullFiles = fullEvidence.testResults.filter(test => test.status === "failed");
+const retryTarget = retryEvidence.testResults[0]?.name;
+const fullEvidenceGreen = fullEvidence.success && !fullEvidence.numFailedTestSuites
+  && !fullEvidence.numFailedTests && !fullEvidence.numPendingTests;
+const retryBundleValid = !fullEvidence.numPendingTests && retryEvidence.success
+  && !retryEvidence.numFailedTestSuites && !retryEvidence.numFailedTests && !retryEvidence.numPendingTests
+  && retryEvidence.testResults.length === 1 && failedFullFiles.length === 1
+  && failedFullFiles[0].name === retryTarget && retryTarget.endsWith("/tests/server/sso.test.ts");
+if (!fullEvidenceGreen && !retryBundleValid)
+  throw new Error("Supported-Node full run and targeted retry evidence do not form the expected verified bundle");
+const baseline = fullEvidenceGreen ? fullEvidence : { ...fullEvidence,
+  testResults: fullEvidence.testResults.map(test => test.name === retryTarget ? retryEvidence.testResults[0] : test) };
+const testEvidenceMode = fullEvidenceGreen ? "node24_single_full_run_passed"
+  : "node24_full_run_with_sso_hook_timeout_plus_passing_targeted_retry";
 const sourceHashes = new Map<string, string>();
 const importsByTest = new Map(baseline.testResults.map(test => {
   const source = program.getSourceFile(test.name);
@@ -80,6 +101,19 @@ function graph(entry?: ts.Declaration) {
 }
 const records = [];
 const graphs = new Map<ts.Declaration, ReturnType<typeof graph>>();
+function schemaReferences(value: unknown): string[] {
+  const found = new Set<string>();
+  function visit(node: unknown) {
+    if (Array.isArray(node)) return node.forEach(visit);
+    if (!node || typeof node !== "object") return;
+    for (const [key, child] of Object.entries(node)) {
+      if (key === "$ref" && typeof child === "string") found.add(child);
+      visit(child);
+    }
+  }
+  visit(value);
+  return [...found].sort();
+}
 for (const [path, value] of Object.entries(contract.paths)) for (const [rawMethod, operation] of Object.entries(value as Record<string, unknown>)) {
   const method = rawMethod.toUpperCase(); if (!methods.has(method)) continue;
   const sample = path.replace(/\{[^}]+\}/g, "qa-fixture");
@@ -95,18 +129,39 @@ for (const [path, value] of Object.entries(contract.paths)) for (const [rawMetho
     failed: test.assertionResults.filter(item => item.status === "failed").length,
     pending: test.assertionResults.filter(item => item.status === "pending").length }));
   const policy = policies.find(item => item.method === method && item.path === path);
+  const contractSchemaRefs = schemaReferences(operation);
+  const handlerSchemaImports = reachable.handlerImports.filter(item => /(?:contracts|schemas)/.test(item));
   records.push({ method, path, handler: handlerPath, handlerPattern: handler?.pattern ?? null, methodExported: !!exported,
     catchAll: !!handler?.pattern.includes("..."), branchVerified: false, runtimeOperationVerified: false,
     ownerTasks: ownership.find(item => item.method === method && item.path === path)?.owner_tasks ?? [],
-    policy: policy ?? null, contract: operation, reachable, importingTestFiles: testFiles });
+    policy: policy ?? null, contract: operation,
+    dtoEvidence: { contractSchemaRefs, handlerSchemaImports, policyResponseDto: policy?.response_dto ?? null },
+    reachable, executionEvidence: { mode: testEvidenceMode, fullTestReport: testEvidenceFile,
+      targetedRetryReport: retryEvidenceFile, directHandlerImportTests: testFiles,
+      status: testFiles.length ? "direct_handler_import_present_operation_branch_unverified" : "missing_direct_handler_import" },
+    importingTestFiles: testFiles });
 }
 const missing = records.filter(item => !item.handler || !item.methodExported);
 const missingPolicies = records.filter(item => !item.policy);
+const missingOwners = records.filter(item => !item.ownerTasks.length);
+const missingDirectTestImports = records.filter(item => !item.importingTestFiles.length);
 const report = { checkedAt: new Date().toISOString(), scope: "정적 계약·진입점·호출 함수 대조. 개별 API 실행/분기 통과를 의미하지 않음",
   operations: records.length, handlerFiles: handlers.length, missingHandlers: missing.length, missingPolicies: missingPolicies.length,
-  catchAllOperations: records.filter(item => item.catchAll).length, sourceHashes: Object.fromEntries(sourceHashes), records };
+  catchAllOperations: records.filter(item => item.catchAll).length, testEvidenceFile, retryEvidenceFile, testEvidenceMode,
+  fullRunFailedSuites: fullEvidence.numFailedTestSuites, fullRunFailedTests: fullEvidence.numFailedTests,
+  operationsWithDirectHandlerTestImport: records.length - missingDirectTestImports.length,
+  operationsMissingDirectHandlerTestImport: missingDirectTestImports.length,
+  operationsMissingOwnerTasks: missingOwners.length,
+  sourceHashes: Object.fromEntries(sourceHashes), records };
 await mkdir(directory, { recursive: true });
 await writeFile(directory + "/operations.json", JSON.stringify(report, null, 2) + "\n");
-await writeFile(directory + "/README.md", `# R00-T02 API 진입점 대조\n\n${report.checkedAt}\n\n현재 계약 ${records.length}개 작업, handler 파일 ${handlers.length}개. 진입점/메서드 누락 ${missing.length}개, 정책 누락 ${missingPolicies.length}개.\n\ncatch-all ${report.catchAllOperations}개 작업은 실제 분기와 실행 증거를 추가 확인해야 한다. 테스트 파일의 통과는 해당 파일 전체 결과이며 API별 성공 판정으로 전환하지 않는다.\n\n[기계 판독 결과](operations.json)에 handler→서버 함수·DTO import·권한/이벤트 문자열·정책·원래 계약·현재 테스트 파일과 소스 해시를 기록했다.\n\n${missing.map(item => `- ${item.method} ${item.path}: ${item.handler ?? "handler 없음"}`).join("\n")}\n`);
-console.log(JSON.stringify({ operations: records.length, handlers: handlers.length, missing: missing.map(item => ({method:item.method,path:item.path,handler:item.handler})), missingPolicies: missingPolicies.length }));
+const missingLines = missing.map(item => `- ${item.method} ${item.path}: ${item.handler ?? "handler 없음"}`).join("\n");
+const evidenceDescription = fullEvidenceGreen
+  ? `Node 24 전체 회귀 ${testEvidenceFile}이 단일 실행으로 통과했다.`
+  : `Node 24 전체 회귀 ${testEvidenceFile}은 SSO DB 초기화 hook timeout 2건으로 단일 실행 실패다. 같은 현재 소스의 SSO 파일 재실행 ${retryEvidenceFile}은 131/131 통과했다. 이 둘을 결합한 실행 증거를 사용하며 단일 전체 회귀 성공으로 집계하지 않는다.`;
+await writeFile(directory + "/README.md", `# R00-T02 API 진입점 대조\n\n${report.checkedAt}\n\n현재 계약 ${records.length}개 작업, handler 파일 ${handlers.length}개. 진입점/메서드 누락 ${missing.length}개, 정책 누락 ${missingPolicies.length}개.\n\n${evidenceDescription} handler를 직접 import한 통과 시험이 연결된 operation은 ${report.operationsWithDirectHandlerTestImport}개이고, 직접 연결이 없는 operation은 ${report.operationsMissingDirectHandlerTestImport}개다. 작업 소유자 연결이 없는 operation은 ${report.operationsMissingOwnerTasks}개다.\n\ncatch-all ${report.catchAllOperations}개 작업은 실제 분기와 실행 증거를 추가 확인해야 한다. 테스트 파일의 통과는 해당 파일 전체 결과이며 API별 성공 판정으로 전환하지 않는다.\n\n[기계 판독 결과](operations.json)에 handler→서버 함수·DTO 계약/handler import·권한/이벤트 문자열·정책·원래 계약·현재 테스트 파일과 소스 해시를 기록했다.${missingLines ? `\n\n${missingLines}` : ""}\n`);
+console.log(JSON.stringify({ operations: records.length, handlers: handlers.length, missing: missing.map(item => ({method:item.method,path:item.path,handler:item.handler})), missingPolicies: missingPolicies.length,
+  operationsWithDirectHandlerTestImport: report.operationsWithDirectHandlerTestImport,
+  operationsMissingDirectHandlerTestImport: report.operationsMissingDirectHandlerTestImport,
+  operationsMissingOwnerTasks: report.operationsMissingOwnerTasks }));
 if (missing.length || missingPolicies.length) process.exitCode = 1;

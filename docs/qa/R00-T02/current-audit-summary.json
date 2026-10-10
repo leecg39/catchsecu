@@ -1,0 +1,104 @@
+{
+  "checkedAt": "2026-10-11T04:52:00+09:00",
+  "result": "partial_verified",
+  "supportedNode": "v24.18.0",
+  "diagnosticNode": "v25.4.0 (outside package engines; not final quality evidence)",
+  "reports": {
+    "node25BeforeFix": {
+      "path": "docs/qa/R00-T02/full-tests-before-openapi-fix.json",
+      "sha256": "4d93710c61393985ddbd9fe73aabd2c46723cf31197527100f13123afb1cc2f5",
+      "success": false,
+      "suites": {
+        "total": 261,
+        "passed": 260,
+        "failed": 1,
+        "pending": 0
+      },
+      "tests": {
+        "total": 2867,
+        "passed": 2866,
+        "failed": 1,
+        "pending": 0,
+        "todo": 0
+      }
+    },
+    "node25AfterFix": {
+      "path": "docs/qa/R00-T02/full-tests-node25-current.json",
+      "sha256": "ca1f476633678db31e27ef9ae346e5562698d70e90ab898e06bbba21a038ec29",
+      "success": true,
+      "suites": {
+        "total": 261,
+        "passed": 261,
+        "failed": 0,
+        "pending": 0
+      },
+      "tests": {
+        "total": 2867,
+        "passed": 2867,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      }
+    },
+    "node24Full": {
+      "path": "docs/qa/R00-T02/full-tests-current.json",
+      "sha256": "ade23124ec40fa6df94d08d5e93f9065e6ecef9fa9b393972ca5302b8a759acc",
+      "success": false,
+      "suites": {
+        "total": 261,
+        "passed": 260,
+        "failed": 1,
+        "pending": 0
+      },
+      "tests": {
+        "total": 2867,
+        "passed": 2865,
+        "failed": 2,
+        "pending": 0,
+        "todo": 0
+      }
+    },
+    "node24SsoRetry": {
+      "path": "docs/qa/R00-T02/sso-node24-retry.json",
+      "sha256": "c2ccf351b20af4bcc00964977eb01ff5f79381d62f69e6a65826053d037ee705",
+      "success": true,
+      "suites": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "pending": 0
+      },
+      "tests": {
+        "total": 131,
+        "passed": 131,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0
+      }
+    }
+  },
+  "defect": {
+    "cause": "PublicSubmissionReceipt bypassed openApiSchema, leaving #/$defs references",
+    "fix": "route PublicSubmissionReceipt through openApiSchema",
+    "targetedRegression": "tests/server/form-rich-body-openapi.test.ts 1/1 passed"
+  },
+  "supportedNodeInterpretation": "Node24 full run had two beforeEach hook timeouts in tests/server/sso.test.ts and no product assertion failure; isolated current-source retry passed 131/131. This is combined evidence, not a single green full-suite run.",
+  "apiAudit": {
+    "operations": 466,
+    "handlerFiles": 158,
+    "missingHandlers": 0,
+    "missingPolicies": 0,
+    "directHandlerTestImport": 416,
+    "missingDirectHandlerTestImport": 50,
+    "missingOwnerTasks": 25
+  },
+  "taskComplete": false,
+  "remaining": [
+    "50 operations lack direct handler test import evidence",
+    "25 operations lack task ownership",
+    "285 catch-all operations still need branch-level runtime evidence",
+    "single Node24 full-suite run is not green"
+  ],
+  "baseCommit": "fe9dcd52f6ca0004bd953f8443b9df74c73d2862",
+  "sourceState": "baseCommit plus the OpenAPI generator and audit changes in this checkpoint"
+}
