@@ -1,6 +1,6 @@
 "use client";
-import { useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useApplication } from "../ApplicationContext";
 import { RemoteTable } from "../RemoteTable";
 import { ActionButton, Modal, PageHeading, Panel } from "../shared";
@@ -11,6 +11,7 @@ import type { AccessRequestList, AccessRequestRecord } from "@/contracts/access-
 import { accessStatusLabels } from "@/contracts/access-requests";
 import { useConfirm } from "../ux/confirm";
 import { useUnsavedChanges } from "../ux/navigation-guard";
+import { listHref, oneOf, pageSize as queryPageSize, positivePage } from "@/lib/list-url-state";
 
 function RequestsReview({ onChanged }: { onChanged: () => void }) {
   const [status, setStatus] = useState("pending"), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20);
@@ -126,9 +127,11 @@ function MemberFields({ member, done, onClose, onReload }: { member?: MemberReco
   </form></Modal>;
 }
 export function LiveMembers({ authority = false }: { authority?: boolean }) {
-  const app = useApplication(), router = useRouter(), canManage = !!app.data?.capabilities.includes("member.manage");
-  const [tab, setTab] = useState<"members" | "invitations">("members"), [search, setSearch] = useState(""), [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all"), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20);
+  const app = useApplication(), router = useRouter(), pathname = usePathname(), params = useSearchParams();
+  const canManage = !!app.data?.capabilities.includes("member.manage");
+  const tab = oneOf(params.get("tab"), ["members", "invitations"] as const, "members"), query = (params.get("q") ?? "").slice(0, 100);
+  const status = oneOf(params.get("status"), tab === "members" ? ["all", ...Object.keys(memberStatuses)] : ["all", ...Object.keys(invitationStatuses)], "all");
+  const page = positivePage(params.get("page")), pageSize = queryPageSize(params.get("pageSize"));
   const [editor, setEditor] = useState<MemberRecord | "invite">(), [action, setAction] = useState<{ kind: "remove" | "transfer"; member: MemberRecord }>();
   const [invitationAction, setInvitationAction] = useState<{ kind: "resend" | "revoke"; invitation: InvitationRecord }>();
   const [error, setError] = useState(""), [notice, setNotice] = useState(""), [busy, setBusy] = useState(false);
@@ -137,7 +140,10 @@ export function LiveMembers({ authority = false }: { authority?: boolean }) {
   const suffix = "?page=" + page + "&pageSize=" + pageSize + "&status=" + status + "&search=" + encodeURIComponent(query);
   const members = useResource<Paged<MemberRecord>>(canManage && tab === "members" ? "/members" + suffix : null);
   const invitations = useResource<Paged<InvitationRecord>>(canManage && tab === "invitations" ? "/invitations" + suffix : null);
-  function resetTab(value: "members" | "invitations") { setTab(value); setPage(1); setStatus("all"); setSearch(""); setQuery(""); setError(""); }
+  const resultPage = tab === "members" ? members.data?.page : invitations.data?.page;
+  function updateList(values: Record<string, string | number | null>) { router.replace(listHref(pathname, params.toString(), values), { scroll: false }); }
+  useEffect(() => { if (resultPage && resultPage !== page) router.replace(listHref(pathname, params.toString(), { page: resultPage }), { scroll: false }); }, [page, params, pathname, resultPage, router]);
+  function resetTab(value: "members" | "invitations") { updateList({ tab: value === "members" ? null : value, q: null, status: null, page: null }); setError(""); }
   function refresh() { members.reload(); invitations.reload(); app.reload(); }
   function closeAction() {
     if (lock.current) return;
@@ -155,9 +161,9 @@ export function LiveMembers({ authority = false }: { authority?: boolean }) {
     <Panel><div className="member-tabs"><button aria-pressed={tab === "members"} onClick={() => resetTab("members")}>구성원</button>
       <button aria-pressed={tab === "invitations"} onClick={() => resetTab("invitations")}>초대 이력</button></div>
       <p className="cs-muted">역할과 서비스 범위로 접근 권한을 설정합니다. 자신의 권한 변경과 마지막 소유자 제외는 제한됩니다.</p>
-      <form className="mg-flex mg-search" onSubmit={event => { event.preventDefault(); setQuery(search); setPage(1); }}>
-        <input className="cs-input" aria-label="구성원 검색" placeholder={tab === "members" ? "이름 또는 이메일" : "이메일"} value={search} onChange={event => setSearch(event.target.value)} />
-        <select className="cs-input" aria-label="구성원 상태" value={status} onChange={event => { setStatus(event.target.value); setPage(1); }}>
+      <form className="mg-flex mg-search" onSubmit={event => { event.preventDefault(); updateList({ q: String(new FormData(event.currentTarget).get("search") ?? "").slice(0, 100), page: null }); }}>
+        <input key={tab + ":" + query} name="search" className="cs-input" aria-label="구성원 검색" placeholder={tab === "members" ? "이름 또는 이메일" : "이메일"} defaultValue={query} maxLength={100} />
+        <select className="cs-input" aria-label="구성원 상태" value={status} onChange={event => updateList({ status: event.target.value === "all" ? null : event.target.value, page: null })}>
           <option value="all">전체</option>{Object.entries(tab === "members" ? memberStatuses : invitationStatuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><ActionButton secondary>검색</ActionButton>
       </form>{notice && <p role="status">{notice}</p>}{!action && !invitationAction && error && <p role="alert" className="auth-error">{error}</p>}
       {(tab === "members" ? members.error : invitations.error) && <button className="cs-link" onClick={tab === "members" ? members.reload : invitations.reload}>목록 다시 불러오기</button>}
@@ -168,13 +174,13 @@ export function LiveMembers({ authority = false }: { authority?: boolean }) {
           <div className="mg-flex" key="actions">{manageable && member.status !== "revoked" && <><button className="cs-link" onClick={() => setEditor(member)}>권한 수정</button>
             <button className="cs-link" onClick={() => { setError(""); setAction({ kind: "remove", member }); }}>제외</button></>}
             {!self && member.accessKind !== "expert" && member.role !== "owner" && member.status === "active" && app.data?.company?.role === "owner" && <button className="cs-link" onClick={() => { setError(""); setAction({ kind: "transfer", member }); }}>소유권 이전</button>}</div>] };
-      })} total={members.data?.total ?? 0} page={members.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={members.loading} error={members.error?.message} /> :
+      })} total={members.data?.total ?? 0} page={members.data?.page ?? page} pageSize={pageSize} onPage={value => updateList({ page: value })} onPageSize={size => updateList({ pageSize: size, page: null })} loading={members.loading} error={members.error?.message} /> :
         <RemoteTable columns={["이메일", "역할", "상태", "만료일", "관리"]} rows={(invitations.data?.items ?? []).map(invitation => ({ id: invitation.id, cells: [
           invitation.email, roleLabels[invitation.role], invitationStatuses[invitation.status], new Date(invitation.expiresAt).toLocaleString("ko-KR"),
           <div className="mg-flex" key="actions">{["pending", "expired"].includes(invitation.status) && (app.data?.company?.role === "owner" || invitation.role !== "billing") && <>
             <button className="cs-link" onClick={() => { setError(""); setInvitationAction({ kind: "resend", invitation }); }}>재발송</button>
             <button className="cs-link" onClick={() => { setError(""); setInvitationAction({ kind: "revoke", invitation }); }}>초대 취소</button></>}</div>] }))}
-          total={invitations.data?.total ?? 0} page={invitations.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={invitations.loading} error={invitations.error?.message} />}
+          total={invitations.data?.total ?? 0} page={invitations.data?.page ?? page} pageSize={pageSize} onPage={value => updateList({ page: value })} onPageSize={size => updateList({ pageSize: size, page: null })} loading={invitations.loading} error={invitations.error?.message} />}
     </Panel><RequestsReview onChanged={members.reload}/>{editor && <MemberFields key={editor === "invite" ? "invite" : editor.id + ":" + editor.version} member={editor === "invite" ? undefined : editor} onClose={() => setEditor(undefined)}
         onReload={current => {
           refresh();

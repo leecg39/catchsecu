@@ -299,7 +299,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 - 완료 증거: [현재 보고서](../../qa/R04-T02/current/README.md), [23개 API 계약](../../qa/R04-T02/current/api-contract.json), [239개 서버 회귀](../../qa/R04-T02/current/server-api-regression.json), [감사·outbox 원자성](../../qa/R04-T02/current/outbox-atomicity.json). 현재 권한 재검사, 권한 회수 즉시 차단, 동시 소유권 이전의 활성 owner 보존을 실제 PostgreSQL에서 확인했다.
 
-### [~] R04-T03 구성원·초대·권한·전문가 — 전체 화면·모달 연결
+### [x] R04-T03 구성원·초대·권한·전문가 — 전체 화면·모달 연결
 
 구성원 목록/검색/초대/편집/삭제와 /set/authority 서비스별 범위 편집, 전문가 회사 선택을 연결한다. 관리자용 배정 페이지는 별도 부가 경로로 관리한다.
 
@@ -310,6 +310,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
 - 완료 조건:
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
+- 완료 증거: [현재 보고서](../../qa/R04-T03/current/README.md), [Ego Lite URL·페이지](../../qa/R04-T03/current/browser-url-state.json), [상태 매트릭스](../../qa/R04-T03/current/route-state-matrix.json), [UI/API 계약 13개](../../qa/R04-T03/current/ui-contract-regression.json). 네 원본 경로와 운영자 부가 경로의 전체 상태, 3페이지 이동·새로고침·축소 보정, 3폭·키보드와 API→DB 반영을 확인했다.
 
 ### [~] R04-T04 구성원·초대·권한·전문가 — DB·브라우저·재시작 수용검증
 

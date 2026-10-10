@@ -1,6 +1,7 @@
 "use client";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api, ApiError, errorText, useResource } from "@/lib/api";
 import type { ExpertAssignmentList, ExpertAssignmentRecord, ExpertOptions } from "@/contracts/expert-assignments";
 import { expertStatusLabels } from "@/contracts/expert-assignments";
@@ -8,6 +9,7 @@ import { ActionButton, Modal, PageHeading, Panel } from "./shared";
 import { RemoteTable } from "./RemoteTable";
 import { useConfirm } from "./ux/confirm";
 import { useUnsavedChanges } from "./ux/navigation-guard";
+import { listHref, pageSize as queryPageSize, positivePage } from "@/lib/list-url-state";
 
 function localDate(value: string) {
   const date = new Date(value);
@@ -77,13 +79,16 @@ function AssignmentEditor({ initial, done, onClose, onReload }: { initial?: Expe
   </form></Modal>;
 }
 export function ExpertAssignmentsAdmin() {
-  const [query, setQuery] = useState(""), [search, setSearch] = useState(""), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20);
+  const router = useRouter(), pathname = usePathname(), params = useSearchParams(), search = (params.get("q") ?? "").slice(0, 100);
+  const page = positivePage(params.get("page")), pageSize = queryPageSize(params.get("pageSize"));
   const [editor, setEditor] = useState<ExpertAssignmentRecord | "new">();
   const [revoke, setRevoke] = useState<ExpertAssignmentRecord>();
   const [revokeConflict, setRevokeConflict] = useState(false);
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [notice, setNotice] = useState("");
   const lock = useRef(false);
   const list = useResource<ExpertAssignmentList>("/expert-assignments?scope=admin&page=" + page + "&pageSize=" + pageSize + "&search=" + encodeURIComponent(search));
+  function updateList(values: Record<string, string | number | null>) { router.replace(listHref(pathname, params.toString(), values), { scroll: false }); }
+  useEffect(() => { if (list.data?.page && list.data.page !== page) router.replace(listHref(pathname, params.toString(), { page: list.data.page }), { scroll: false }); }, [list.data?.page, page, params, pathname, router]);
   async function confirmRevoke() {
     if (!revoke || lock.current || revokeConflict) return; lock.current = true;
     setError(""); setBusy(true);
@@ -106,8 +111,8 @@ export function ExpertAssignmentsAdmin() {
   return <main className="expert-admin-page"><PageHeading title="전문가 배정 관리"><Link className="cs-button secondary" href="/dashboard">대시보드</Link>
     <ActionButton onClick={() => { setEditor("new"); setError(""); }}>새 배정</ActionButton></PageHeading>
     <Panel><p className="cs-muted">운영자만 활성·인증된 계정에 회사별 조회 범위를 배정할 수 있습니다.</p>
-      <form className="mg-flex mg-search" onSubmit={event => { event.preventDefault(); setSearch(query.trim()); setPage(1); }}>
-        <input className="cs-input" placeholder="회사명 또는 전문가 이메일" aria-label="배정 검색" value={query} maxLength={100} onChange={event => setQuery(event.target.value)} />
+      <form className="mg-flex mg-search" onSubmit={event => { event.preventDefault(); updateList({ q: String(new FormData(event.currentTarget).get("search") ?? "").trim().slice(0, 100), page: null }); }}>
+        <input key={search} name="search" className="cs-input" placeholder="회사명 또는 전문가 이메일" aria-label="배정 검색" defaultValue={search} maxLength={100} />
         <ActionButton secondary>검색</ActionButton></form>
       {notice && <p role="status">{notice}</p>}{list.error && <p role="alert">{list.error.message} <button className="cs-link" onClick={list.reload}>다시 시도</button></p>}
       <RemoteTable columns={["회사", "전문가", "서비스", "상태", "만료일", "관리"]}
@@ -118,8 +123,8 @@ export function ExpertAssignmentsAdmin() {
           <div className="mg-flex" key="actions"><button className="cs-link" onClick={() => { setEditor(item); setError(""); }}>
             {item.status === "active" ? "수정" : "다시 배정"}</button>
             {item.status === "active" && <button className="cs-link" onClick={() => { setRevoke(item); setRevokeConflict(false); setError(""); }}>회수</button>}</div>,
-        ] }))} total={list.data?.total ?? 0} page={list.data?.page ?? page} pageSize={pageSize} onPage={setPage}
-        onPageSize={size => { setPageSize(size); setPage(1); }} loading={list.loading} error={list.error?.message} />
+        ] }))} total={list.data?.total ?? 0} page={list.data?.page ?? page} pageSize={pageSize} onPage={value => updateList({ page: value })}
+        onPageSize={size => updateList({ pageSize: size, page: null })} loading={list.loading} error={list.error?.message} />
     </Panel>
     {editor && <AssignmentEditor key={editor === "new" ? "new" : editor.id + ":" + editor.version + ":" + editor.status}
         initial={editor === "new" ? undefined : editor} onClose={() => setEditor(undefined)}

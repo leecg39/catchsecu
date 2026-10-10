@@ -1,0 +1,44 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T08:44:24+09:00",
+  "browser": "Ego Lite",
+  "server": "production build on localhost:3100",
+  "cases": [
+    {
+      "path": "/set/member",
+      "input": "tab=invitations, q=example.test, status=revoked, page=999, pageSize=10",
+      "observed": "초대 이력·검색어·취소·10개 보기 복원, 빈 결과, 서버 보정 후 page 제거",
+      "reload": "passed"
+    },
+    {
+      "path": "/set/authority",
+      "input": "q=R03, pageSize=10",
+      "observed": "권한 관리 제목, 구성원 2명, 검색어·10개 보기 복원",
+      "reload": "passed"
+    },
+    {
+      "path": "/expert/select-company",
+      "input": "q=없는회사, page=999",
+      "observed": "검색어 복원, 검색 결과 없음, 1/1 보정",
+      "reload": "passed"
+    },
+    {
+      "path": "/admin/expert-assignments",
+      "actor": "company owner without platform-admin",
+      "observed": "/access-not-allow?reason=admin and operator-only explanation"
+    },
+    {
+      "path": "/oauth2/invite/signup",
+      "input": "synthetic unknown 43-character token",
+      "observed": "초대 없음 오류와 안전한 로그인 returnTo"
+    },
+    {
+      "path": "/set/member",
+      "fixture": "21 temporary users plus 2 preserved members",
+      "observed": "23 total, 10 rows, 3 pages, page 2 persisted after reload; after cleanup 2 total, page 1 and URL clamp",
+      "cleanup": "21 temporary memberships and users removed"
+    }
+  ],
+  "consoleErrors": 0,
+  "externalProviderClaim": false
+}
