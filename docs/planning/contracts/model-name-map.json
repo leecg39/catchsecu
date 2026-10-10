@@ -1,0 +1,32 @@
+{
+  "version": "2026-10-11",
+  "source": "prisma/schema.prisma",
+  "mappings": [
+    {
+      "legacy": "Delivery",
+      "current": [
+        "CampaignDelivery",
+        "SmsReceipt",
+        "NotificationDelivery"
+      ],
+      "rule": "캠페인 수신자 상태, 문자 공급자 영수증, 일반 알림 전달을 문맥별로 분리한다."
+    },
+    {
+      "legacy": "MonthlyClose",
+      "current": [
+        "BillingMonthClose",
+        "ComplianceClose"
+      ],
+      "rule": "결제 원장 마감과 개인정보 준수 스냅샷을 분리한다."
+    },
+    {
+      "legacy": "Purchase",
+      "current": [
+        "PaymentOrder",
+        "PaymentEvent",
+        "PaymentRefund"
+      ],
+      "rule": "주문, 서명된 공급자 이벤트, 환불 상태 전이를 분리한다."
+    }
+  ]
+}

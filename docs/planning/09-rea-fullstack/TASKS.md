@@ -1,5 +1,7 @@
 # 상세 TASKS — 캐치시큐 전 페이지 풀스택 완성 계획
 
+R00-T03 계획·계약 통합 완료: 활성107개 Task와 기존72개 이력을 전부 연결하고 원본186+부가21경로, DB/API/UI/외부 검증 상태를 분리했다. 역할9종·capability32개, Prisma143모델의 구형명3개 매핑, OpenAPI329path·466operation/정책466행을 자동 검사한다. 현재 공식 상태는 완료3·진행50·계획54다. [검증](../../qa/R00-T03/README.md).
+
 F3 입력 패턴 체크포인트: 원본 확인 ID 1·2·3·4·7·8의 nullable 모델·DB 조합 제약, 폼 CRUD/복제/템플릿/게시/정정과 편집/공개 화면을 구현했다. 임의 정규식은 strict 계약에서 거부하며 고정 길이 검증만 실행한다. 집중6·관련27·frozen fixture20/20, migration140 빈 설치·기존 질문415개 보존, Ego 잘못된 값 거부/정상 제출·production 재시작 hash, 82페이지 build를 통과했다. [검증](../../qa/R08-T02/question-patterns/README.md). R08-T02와 공식 완료0/진행53/계획54는 유지한다.
 
 F3 문항 이미지: 단일 questionImageKey·JPEG/PNG 1 MiB·migration124·현재/과거 버전 참조·복제/템플릿/승인/열람 구현. 관련23파일323시험·실제 HTTP 경계12·수명주기71요청·Ego 편집/공개/제출/교체/정정/3폭/선택 공유 확인. 폼3·자산11·참조14·실제blob3과 이전19세트의 재시작 해시 보존. 본문 rich HTML 이미지·NLP/자동동의·다중페이지·전수 수용은 잔여. [검증](../../qa/R08-T02/question-metadata/content-images/README.md). 공식 완료0/진행53/계획54 유지.
@@ -57,7 +59,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
   - 현재 수정중 payment 관련 코드·문서 변경을 보존하고 근거 commit/time 기록; 과거181 검증의 한계 표시
 - 완료 증거: [현재 소스 최종 감사](../../qa/R00-T02/README.md), [API operation 대조](../../qa/R00-T02/api-audit/README.md), [런타임 route 추적](../../qa/R00-T02/runtime-route-trace/README.md), [지원 Node 전체 회귀](../../qa/R00-T02/full-tests-current.json). 466 operation·158 handler의 진입점/메서드/정책/작업소유자 누락0, 직접 handler 시험466/466, 성공 응답466/466, catch-all285/285를 확인했다. 지원 Node24 단일 실행 196파일·261suite·2,877시험이 전부 통과했다.
 
-### [~] R00-T03 TASKS·역할·기능범위·새 경로 계약 통합
+### [x] R00-T03 TASKS·역할·기능범위·새 경로 계약 통합
 
 별도 계획107 task를 기존72 task와 연결하고 새 baseline으로 적용한다. unknown 원본 기능은 독립제품 설계로 라벨한다. 역할 owner/admin/editor/viewer/privacy/sender/billing/security/auditor와 license·service를 함께 명세한다.
 
@@ -68,6 +70,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
 - 완료 조건:
   - root TASKS/tasks.json/goals를 사용자 기존수정과 병합; 181 hardcode 제거·186+부가경로 구분
   - API/DB/UI/외부검증 상태 분리; 존재하지 않는 구형 Delivery/MonthlyClose 등 모델명 정정
+- 완료 증거: [통합 보고서](../../qa/R00-T03/README.md), [기계 검사](../../qa/R00-T03/integration-check.json), [기존 작업 연결표](legacy-task-map.json), [표면별 상태 계약](status-contract.json), [역할 계약](../contracts/roles.json), [모델명 매핑](../contracts/model-name-map.json). 활성107↔기존72 전부 연결, 원본186+부가21 분리, DB/API/UI/외부 상태 분리, 역할9·capability32·Prisma143모델·OpenAPI466정책을 검사했다.
 
 ### [~] R00-T04 fixture·페이지별 행동표·QA 재현계약 확정
 
@@ -930,7 +933,7 @@ RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선�
 
 ### [ ] R17-T01 발신번호·문자 캠페인 — 모델·규칙 대조 및 보완
 
-발신번호 검증·증빙파일 및 Campaign→Delivery→Receipt 고유키, 크레딧예약/정산을 확인한다. 전화번호 정규화·중복 제거·예약 timezone·발신자 변경 버전 고정을 명시한다.
+발신번호 검증·증빙파일 및 Campaign→CampaignDelivery→SmsReceipt 고유키, 크레딧예약/정산을 확인한다. 전화번호 정규화·중복 제거·예약 timezone·발신자 변경 버전 고정을 명시한다.
 
 - 선행: R15-T04, R21-T04
 - 대상: `prisma/schema.prisma`; `prisma/migrations`; `src/contracts`; `src/server/senders.ts`; `src/server/sender-providers.ts`; `src/server/campaigns.ts`; `src/server/campaign-scheduling.ts`; `src/server/campaign-worker.ts`; `src/server/sms-adapter.ts`; `src/server/campaign-ledger.ts`

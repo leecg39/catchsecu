@@ -20,7 +20,7 @@
 | 감사로그 컬럼 일부 미수집 | `AuditLogs.tsx`는 IP·고객번호·사유 등을 `-`로 처리하며 해당 설명 표시 | R22: DTO/감사 수집 항목·마스킹/보존 확정 후 필요한 실제 필드 연결. 존재하지 않는 값을 꾸며 표시하지 않음 |
 | 기관 인증은 mock | `auth/AuthPages.tsx`, `src/server/org-auth.ts`는 VirtualOrgMember 사용 | R07/R25: 실제 기관 계약·환경 확보 후 별도 구현/시험. mock 디렉터리 성공은 실제 GPKI/새올 성공이 아님 |
 | 기존 경로 문서의 상태 설명 낡음 | manifest에 “실제 백엔드 없음” 표시가 남지만 현재 Prisma/API 다수 존재 | R00: sourceObserved·implementation·API·UI·external 검증 상태를 분리해 갱신 |
-| 과거 계획 모델명과 실제 모델명 불일치 | 기존 CSV의 Delivery/MonthlyClose/Purchase 등과 현재 CampaignDelivery/ComplianceClose/PaymentOrder가 다름 | R00: 현128 모델로 매핑. 이 계획은 실제 모델명을 사용 |
+| 과거 계획 모델명과 실제 모델명 불일치 | 기존 CSV의 Delivery/MonthlyClose/Purchase 등은 현재 Prisma 모델이 아님 | R00: Delivery→CampaignDelivery/SmsReceipt/NotificationDelivery, MonthlyClose→BillingMonthClose/ComplianceClose, Purchase→PaymentOrder/PaymentEvent/PaymentRefund로 문맥별 매핑 |
 | 계획 검증기181 hardcode | `scripts/verify-plan.py`가 source/matrix/manifest181을 assert | R00: 186 원본집합+별도 부가경로 집합으로 검증. wildcard 안전성 별도 |
 | 결제 수정 진행 중 | 계획 시작 전 git status에서 payment-events/payments/subscriptions·문서·테스트 수정 확인 | R21: 기존 수정 보존 후 승인/환불/결제중 해지/취소구독 원장 회귀 재검증 |
 

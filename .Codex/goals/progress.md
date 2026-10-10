@@ -1,4 +1,8 @@
-## 최신 작업: F7 목록 장애·별도 세션 수용
+## 최신 작업: R00-T03 계획·계약 통합 완료
+
+2026-10-11 활성107 Task와 기존72 Task를 전부 연결하고 기존 상태를 현재 완료로 자동 승격하지 않는 매핑을 고정했다. 원본186개(구체184/fallback2)와 독립 제품 부가21개 경로를 분리하고 모든 활성 Task에 database/api/ui/external 검증 상태를 추가했다. 실제 permissions 소스와 역할9종·capability32개 일치, Prisma143모델의 구형명3개 매핑, OpenAPI329path·466operation과 정책466행 일치를 자동 검사한다. 계획 상태 완료3/진행50/계획54, 전체 goal active. [증거](../../docs/qa/R00-T03/README.md).
+
+## 이전 작업: F7 목록 장애·별도 세션 수용
 
 2026-10-11 분리 브라우저에서 같은 게시 폼 초안을 재개했고 최근 활성 세션2개와 폼 updatedAt 불변을 PostgreSQL로 대조했다. `/form/manage`에서 정상24개→검색 빈0→production 중단 조회 실패→동일 빌드 재기동 로딩→검색6개 복구를 한 세션에서 확인했다. 쿠키·토큰·비밀번호는 증거에 기록하지 않았다. [검증](../../docs/qa/R08-T04/final-acceptance/README.md). 권한·검증·409·저장 실패·완료를 묶은 폼 변경 흐름과 외부 공급자 수용은 남아 goal active·공식0/53/54를 유지한다.
 
@@ -457,3 +461,5 @@ F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질�
 2026-10-11 R00-T02 재감사 진행: 전체 회귀에서 PublicSubmissionReceipt가 공통 OpenAPI rich 변환기를 우회해 `#/$defs/`를 남기는 결함을 발견·수정하고 집중1/1을 통과했다. 지원 Node24 전체는261파일 중260, 2,867개 중2,865통과·SSO beforeEach DB초기화 hook timeout2이며 제품 assertion 실패0, 같은 현재소스 SSO 독립 재실행131/131통과. 단일 전체 성공으로 집계하지 않는다. operation466·handler158·진입점/정책누락0, 직접handler시험연결416·미연결50, 작업소유자 미연결25, catch-all 분기 미검증285. R00-T02와 전체 goal active. 증거: docs/qa/R00-T02/current-audit-summary.json.
 
 2026-10-11 R00-T02 완료: OpenAPI466 operation·route handler158개의 진입점/메서드/정책/작업소유자 누락0, 직접 handler 시험466/466을 확인했다. route wrapper25,374요청 중24,948건을 계약에 연결해 성공 operation466/466·catch-all285/285를 관측했다. 지원 Node24 단일 전체 회귀196파일·261suite·2,877시험 전부 통과, 실패·대기0. 계획 상태 완료2/진행51/계획54이며 전체 goal은 active다. 외부 공식 공급자 검증은 각 도메인의 external_pending을 유지한다. 증거: ../../docs/qa/R00-T02/current-audit-summary.json.
+
+2026-10-11 R00-T03 완료: 활성107 Task와 기존72 Task를 전부 연결하고 기존 상태를 현재 완료로 자동 승격하지 않는 매핑을 고정했다. 원본186개(구체184/fallback2)와 독립 제품 부가21개 경로를 분리하고 모든 활성 Task에 database/api/ui/external 검증 상태를 추가했다. 실제 permissions 소스와 역할9종·capability32개 일치, Prisma143모델의 구형명3개 매핑, OpenAPI329path·466operation과 정책466행 일치를 자동 검사한다. 계획 상태 완료3/진행50/계획54, 전체 goal active. 증거: ../../docs/qa/R00-T03/README.md.

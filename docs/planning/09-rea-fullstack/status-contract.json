@@ -1,0 +1,27 @@
+{
+  "version": "2026-10-11",
+  "taskStatus": {
+    "planned": "실행을 시작하지 않음",
+    "in_progress": "구현 또는 검증 일부만 충족",
+    "completed": "해당 Task의 모든 수용 조건과 필수 증거 충족"
+  },
+  "surfaceStatus": {
+    "not_assessed": "현재 Task 범위에서 아직 평가하지 않음",
+    "not_applicable": "현재 Task가 소유하지 않는 표면",
+    "partial_verified": "일부 시나리오만 증거로 확인",
+    "verified": "해당 Task 수용 범위의 증거 확인",
+    "external_pending": "내부 구현과 별도로 공식 외부 공급자 증거가 남음"
+  },
+  "fields": {
+    "verification_status.database": "Prisma·migration·실제 PostgreSQL 제약/영속성",
+    "verification_status.api": "Route Handler·서버 업무 규칙·권한·오류 계약",
+    "verification_status.ui": "실제 브라우저 화면·입력·상태·접근성/폭",
+    "verification_status.external": "공식 공급자/기관 sandbox 또는 운영 영수증"
+  },
+  "completionRules": [
+    "completed Task는 completion_evidence가 존재하고 모든 경로가 실제 파일이어야 한다.",
+    "external_pending인 Task는 외부 증거가 완료 조건인 경우 completed로 올리지 않는다.",
+    "partial_verified와 verified는 Task의 소유 표면에만 적용하며 다른 표면으로 전이하지 않는다.",
+    "DB/API/UI/외부 상태를 합산해 추정하지 않는다."
+  ]
+}

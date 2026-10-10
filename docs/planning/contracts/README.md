@@ -1,13 +1,15 @@
-# P00-T03 모델·API·권한 계약 기준선
+# R00-T03 모델·API·권한 통합 기준선
 
-2026-10-03. 이 문서는 **독립 구현의 설계 계약**이다. 원본 서비스의 내부 DB/API를 알아냈다는 뜻이 아니다. 실제 구현 여부는 OpenAPI의 `x-implementation`과 각 Task의 QA 증거를 함께 확인한다. `planned`는 호출 가능한 API가 아니며, `implemented` 표기도 전체 72개 Task의 완료 판정은 아니다.
+2026-10-11. 이 문서는 **독립 구현의 설계 계약**이다. 원본 서비스의 내부 DB/API를 알아냈다는 뜻이 아니다. 실제 구현 여부는 OpenAPI의 `x-implementation`, [표면별 상태 계약](../09-rea-fullstack/status-contract.json), 각 Task의 QA 증거를 함께 확인한다. `planned`는 호출 가능한 API가 아니며, `implemented` 표기도 전체 107개 Task의 완료 판정은 아니다.
+
+활성 기준은 원본 선언 186개(구체 184·fallback 2), 독립 제품 부가 경로 21개, 현재 Task 107개와 이력 Task 72개다. [활성 포인터](../active-plan.json)와 [기존 작업 연결표](../09-rea-fullstack/legacy-task-map.json)가 두 계획을 연결하며 기존 상태를 현재 완료로 자동 승격하지 않는다. 역할은 [기계 판독 계약](roles.json), 구형 모델명은 [현재 모델 매핑](model-name-map.json)을 따른다.
 
 ## 계약의 네 층
 
 1. [Prisma 모델](../../../prisma/schema.prisma)과 [순서 있는 SQL migration](../../../prisma/migrations/)이 구현된 엔티티의 DDL 기준이다. 아직 구현하지 않은 엔티티의 설계 초안은 [데이터 모델 문서](../01-data-models.md)의 표에 있다. 모델과 migration이 다르면 migration의 실제 DB 제약과 해당 Task의 QA로 확인한다.
 2. [OpenAPI 3.1](openapi.json)은 API 경로·method·권한·입력 JSON Schema·HTTP 상태를 기록한다. [API 계약 설명](../02-api-contracts.md)은 도메인 규칙과 UI 상태를 기록한다.
-3. [376개 작업별 정책 표](operation-policy-matrix.csv)는 각 method+경로의 역할/권한, 회사·서비스/토큰 범위, 유효성, 안전 DTO, 삭제 정책, 금지 동작을 [33개 도메인 정책](domain-policies.json)에서 상속해 고정한다. [검사 스크립트](../../../scripts/verify-contracts.py)는 미매핑 경로·권한·입력 스키마를 실패 처리한다. 현재 257개 API 경로의 구현 작업은 324개, 계획 작업은 52개다. P06-T06의 4개 설정 API는 공급자 challenge/callback/서명·제출 흐름의 완료 판정이 아니다.
-4. [181개 화면 표](../03-route-matrix.csv)는 각 화면의 소유 Task, 모델·API, 역할, 정상/오류/권한 상태, 고유 E2E ID를 연결한다. 화면 표의 과거 제안 경로와 실제 Route Handler가 다른 경우에는 구현 Task의 QA와 OpenAPI의 현재 경로를 우선한다.
+3. [466개 작업별 정책 표](operation-policy-matrix.csv)는 329개 API path의 method별 역할/권한, 회사·서비스/토큰 범위, 유효성, 안전 DTO, 삭제 정책, 금지 동작을 [도메인 정책](domain-policies.json)에서 상속해 고정한다. [검사 스크립트](../../../scripts/verify-contracts.py)는 미매핑 경로·권한·입력 스키마를 실패 처리한다. P06-T06의 설정 API 존재만으로 공급자 challenge/callback/서명·제출 흐름을 완료 판정하지 않는다.
+4. [186개 원본 화면 표](../09-rea-fullstack/route-matrix.csv)는 각 화면의 소유 Task, 모델·API, 역할, 정상/오류/권한 상태, 고유 E2E ID를 연결한다. [부가 21개 경로](../09-rea-fullstack/additional-routes.json)는 독립 제품 운영 화면으로 별도 집계한다. 화면 표의 과거 제안 경로와 실제 Route Handler가 다르면 구현 Task의 QA와 OpenAPI의 현재 경로를 우선한다.
 
 ## ERD와 DDL 결정
 
@@ -63,7 +65,7 @@ JSON 오류는 `{error:{code,message,fieldErrors?,requestId}}`이며 400 형식,
 
 ## 역할 × 행위
 
-다음은 [실제 역할 capability 표](../../../src/server/permissions.ts)의 요약이다. 각 OpenAPI 작업의 `x-permission`이 최종 권한 이름이며, 범위는 정책 표에 있다. 플랫폼 운영자는 고객 PII 자동 열람권이 없다.
+다음은 [실제 역할 capability 표](../../../src/server/permissions.ts)의 요약이다. [roles.json](roles.json)이 소스와 정확히 일치하는지 통합 검증기가 검사한다. 각 OpenAPI 작업의 `x-permission`이 최종 권한 이름이며, 범위는 정책 표에 있다. 플랫폼 운영자는 고객 PII 자동 열람권이 없다.
 
 | 역할 | 조직·서비스 관리 | 폼·문서 작성/게시 | 응답·공유·마케팅 | 발신·캠페인 | 알림 연동 | 결제 | 보안 | 감사 |
 |---|---|---|---|---|---|---|---|---|

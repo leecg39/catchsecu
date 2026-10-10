@@ -37,7 +37,13 @@
       "docs/qa/R00-T01/route-contract-check.json",
       "docs/qa/R00-T01/menu-runtime/inventory.json",
       "docs/qa/R00-T01/action-trace.json"
-    ]
+    ],
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "verified",
+      "external": "not_applicable"
+    }
   },
   {
     "id": "R00-T02",
@@ -102,7 +108,13 @@
       "docs/qa/R00-T02/final-handler-routes/sms-retry.json",
       "docs/qa/R00-T02/runtime-route-trace.json",
       "docs/qa/R00-T02/runtime-route-trace/README.md"
-    ]
+    ],
+    "verification_status": {
+      "database": "verified",
+      "api": "verified",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R00-T03",
@@ -124,18 +136,31 @@
     "legacy_tasks": [
       "P00-T03"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "cross-cutting",
     "evidence_directory": "catchsecu-clone/docs/qa/R00-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R00-T03/README.md",
+      "docs/qa/R00-T03/integration-check.json",
+      "docs/planning/09-rea-fullstack/legacy-task-map.json",
+      "docs/planning/09-rea-fullstack/status-contract.json",
+      "docs/planning/contracts/roles.json",
+      "docs/planning/contracts/model-name-map.json"
+    ],
     "dependency_gates": {
       "R00-T02": "task_complete"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "active-plan.json 및 root TASKS/goals 연결. 기존72개 작업과 결제 수정 보존.",
-    "updatedOn": "2026-10-10"
+    "progress_note": "활성107 Task와 기존72 Task를 전부 연결하고 원본186+부가21경로를 분리했다. 모든 Task에 DB/API/UI/외부 상태를 추가했으며 역할9종·capability32개를 소스와 대조한다. Prisma143모델의 구형명3개 매핑, OpenAPI329path·466operation과 정책466행을 자동 검사한다.",
+    "updatedOn": "2026-10-11",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_applicable"
+    }
   },
   {
     "id": "R00-T04",
@@ -172,7 +197,13 @@
     "progress_evidence": [
       "docs/qa/R00-T04/active-fixtures/README.md",
       "docs/qa/R00-T04/active-fixtures/result.json"
-    ]
+    ],
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R01-T01",
@@ -211,7 +242,13 @@
       "docs/qa/R01-T01/schema-alignment/README.md",
       "docs/qa/R01-T01/schema-alignment/regression-final.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R01-T02",
@@ -244,7 +281,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R01-T03",
@@ -282,7 +325,13 @@
       "docs/qa/R01-T03/scanner-runtime/source-build/runtime-final.json",
       "docs/qa/R01-T03/scanner-runtime/files-restored-tests.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R01-T04",
@@ -315,7 +364,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R01-T05",
@@ -353,7 +408,13 @@
     "progress_evidence": [
       "docs/qa/R01-T05/preflight/catchsecu_dev.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R02-T01",
@@ -399,7 +460,13 @@
       "docs/qa/R02-T01/model-audit/catchsecu_dev.json",
       "docs/qa/R02-T01/model-audit/catchsecu_test.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_applicable"
+    }
   },
   {
     "id": "R02-T02",
@@ -444,7 +511,13 @@
       "docs/qa/R02-T02/authentication/verification-replay-after.json",
       "docs/qa/R02-T02/authentication/policy-boundaries.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R02-T03",
@@ -486,7 +559,13 @@
       "docs/qa/R02-T03/authentication/resource-failure-after.json",
       "docs/qa/R02-T03/authentication/signup-final-check.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R02-T04",
@@ -527,7 +606,13 @@
       "docs/qa/R02-T04/authentication/verified-after-restart.json",
       "docs/qa/R02-T04/authentication/revoked-second-session.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R03-T01",
@@ -569,7 +654,13 @@
       "docs/qa/R03-T01/model-audit/catchsecu_dev.json",
       "docs/qa/R03-T01/model-audit/catchsecu_test.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R03-T02",
@@ -611,7 +702,13 @@
       "docs/qa/R03-T02/access-authority/README.md",
       "docs/qa/R03-T02/access-authority/regression-complete.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R03-T03",
@@ -650,7 +747,13 @@
       "docs/qa/R03-T03/service-flow/README.md",
       "docs/qa/R03-T03/access-flow/README.md"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R03-T04",
@@ -689,7 +792,13 @@
       "docs/qa/R03-T04/access-flow/README.md",
       "docs/qa/R03-T04/access-flow/verified-after-restart.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R04-T01",
@@ -732,7 +841,13 @@
       "docs/qa/R04-T01/model-audit/catchsecu_dev.json",
       "docs/qa/R04-T01/model-audit/catchsecu_test.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_applicable"
+    }
   },
   {
     "id": "R04-T02",
@@ -774,7 +889,13 @@
       "docs/qa/R04-T02/members/baseline.json",
       "docs/qa/R04-T04/members-flow/boundaries.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R04-T03",
@@ -816,7 +937,13 @@
       "docs/qa/R04-T03/members-flow/browser-after-restart.json",
       "docs/qa/R04-T03/members-flow/expert-reassigned-revoked.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R04-T04",
@@ -855,7 +982,13 @@
       "docs/qa/R04-T04/members-flow/README.md",
       "docs/qa/R04-T04/members-flow/verified-after-restart.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R05-T01",
@@ -899,7 +1032,13 @@
       "docs/qa/R05-T01/model-audit/catchsecu_dev.json",
       "docs/qa/R05-T01/model-audit/catchsecu_test.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_applicable"
+    }
   },
   {
     "id": "R05-T02",
@@ -943,7 +1082,13 @@
       "docs/qa/R05-T02/profile/sso-integration.json",
       "docs/qa/R05-T04/profile-flow/boundaries.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R05-T03",
@@ -985,7 +1130,13 @@
       "docs/qa/R05-T03/profile-flow/destruction-conflict.json",
       "docs/qa/R05-T03/profile-flow/route-widths.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R05-T04",
@@ -1023,7 +1174,13 @@
       "docs/qa/R05-T04/profile-flow/README.md",
       "docs/qa/R05-T04/profile-flow/verified-after-restart.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R06-T01",
@@ -1070,7 +1227,13 @@
       "docs/qa/R06-T01/model-audit/catchsecu_test.json",
       "docs/qa/R06-T01/security-entitlements/README.md"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_applicable"
+    }
   },
   {
     "id": "R06-T02",
@@ -1118,7 +1281,13 @@
       "docs/qa/R06-T02/security-entitlements/README.md",
       "docs/qa/R06-T02/security-entitlements/worker-and-features-final.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R06-T03",
@@ -1162,7 +1331,13 @@
       "docs/qa/R06-T03/security-flow/browser-after-restart.json",
       "docs/qa/R06-T04/security-entitlements/README.md"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R06-T04",
@@ -1204,7 +1379,13 @@
       "docs/qa/R06-T04/security-flow/mfa-expiry.json",
       "docs/qa/R06-T04/security-entitlements/verified-after-restart.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R07-T01",
@@ -1274,7 +1455,13 @@
       "docs/qa/R07-T04/history-guard/README.md",
       "docs/qa/R07-T04/route-states/README.md"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R07-T02",
@@ -1343,7 +1530,13 @@
       "docs/qa/R07-T04/history-guard/README.md",
       "docs/qa/R07-T04/route-states/README.md"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R07-T03",
@@ -1401,7 +1594,13 @@
       "docs/qa/R07-T04/history-guard/README.md",
       "docs/qa/R07-T04/route-states/README.md"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R07-T04",
@@ -1464,7 +1663,13 @@
       "docs/qa/R07-T04/journey/README.md",
       "docs/qa/R07-T04/journey/after-restart.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R08-T01",
@@ -1553,7 +1758,13 @@
       "docs/qa/R08-T02/special-question-acceptance/README.md",
       "docs/qa/R08-T02/special-question-acceptance/verification-final.json",
       "docs/qa/R08-T02/page-save-company-switch/README.md"
-    ]
+    ],
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R08-T02",
@@ -1654,7 +1865,13 @@
       "docs/qa/R08-T02/special-question-acceptance/verification-final.json",
       "docs/qa/R08-T02/page-save-company-switch/README.md"
     ],
-    "updatedOn": "2026-10-11"
+    "updatedOn": "2026-10-11",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R08-T03",
@@ -1733,7 +1950,13 @@
       "docs/qa/R08-T02/page-save-company-switch/README.md",
       "docs/qa/R08-T03/template-final-internal-acceptance/README.md"
     ],
-    "updatedOn": "2026-10-11"
+    "updatedOn": "2026-10-11",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R08-T04",
@@ -1809,7 +2032,13 @@
       "docs/qa/R08-T04/final-acceptance/browser-selected/cross-tenant-document-rejection.json",
       "docs/qa/R08-T04/final-acceptance/pdf-immutability/verification.json"
     ],
-    "updatedOn": "2026-10-11"
+    "updatedOn": "2026-10-11",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "external_pending"
+    }
   },
   {
     "id": "R09-T01",
@@ -1849,7 +2078,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R09-T02",
@@ -1884,7 +2119,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R09-T03",
@@ -1923,7 +2164,13 @@
     "progress_evidence": [
       "docs/qa/R08-T04/browser-flow/published.png"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R09-T04",
@@ -1955,7 +2202,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R10-T01",
@@ -2006,7 +2259,13 @@
       "docs/qa/R10-T01/source-field-audit/implementation-map.csv",
       "docs/qa/R10-T01/source-field-audit/service-item-source.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R10-T02",
@@ -2053,7 +2312,13 @@
       "docs/qa/R10-T01/structured-policy/form-binding-regression.json",
       "docs/qa/R10-T02/trustee-items/README.md"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R10-T03",
@@ -2102,7 +2367,13 @@
       "docs/qa/R10-T04/structured-policy/README.md",
       "docs/qa/R10-T03/trustee-items/README.md"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R10-T04",
@@ -2147,7 +2418,13 @@
       "docs/qa/R10-T04/structured-policy/verified-after-restart.json",
       "docs/qa/R10-T04/trustee-items/verified-after-restart.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R11-T01",
@@ -2188,7 +2465,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R11-T02",
@@ -2228,7 +2511,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R11-T03",
@@ -2270,7 +2559,13 @@
     "progress_evidence": [
       "docs/qa/R11-T04/browser-flow/conflict-recovered.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R11-T04",
@@ -2310,7 +2605,13 @@
       "docs/qa/R11-T04/browser-flow/README.md",
       "docs/qa/R11-T04/browser-flow/db-after-conflict.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R12-T01",
@@ -2345,7 +2646,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R12-T02",
@@ -2379,7 +2686,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R12-T03",
@@ -2410,7 +2723,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R12-T04",
@@ -2441,7 +2760,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R13-T01",
@@ -2477,7 +2802,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R13-T02",
@@ -2512,7 +2843,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R13-T03",
@@ -2544,7 +2881,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R13-T04",
@@ -2576,7 +2919,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R14-T01",
@@ -2613,7 +2962,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R14-T02",
@@ -2647,7 +3002,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R14-T03",
@@ -2679,7 +3040,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R14-T04",
@@ -2711,7 +3078,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R15-T01",
@@ -2747,7 +3120,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R15-T02",
@@ -2780,7 +3159,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R15-T03",
@@ -2812,7 +3197,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R15-T04",
@@ -2843,7 +3234,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R16-T01",
@@ -2883,7 +3280,13 @@
     "external_status": "not_assessed",
     "source_fidelity_status": "not_assessed",
     "progress_note": "RetentionRule 기존 스키마·관계·적용 우선순위 재사용 확인. 파기 전체 수용은 남음.",
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R16-T02",
@@ -2920,7 +3323,13 @@
     "external_status": "not_assessed",
     "source_fidelity_status": "not_assessed",
     "progress_note": "보유기간 HTTP·독립DB21개 통과. 파기 모듈 전체 수용은 남음.",
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R16-T03",
@@ -2954,7 +3363,13 @@
     "external_status": "not_assessed",
     "source_fidelity_status": "not_assessed",
     "progress_note": "규칙 CRUD UI·경로·메뉴 연결. 생성과 충돌 시 입력 보존을 Ego에서 확인.",
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R16-T04",
@@ -2992,12 +3407,18 @@
     "progress_evidence": [
       "docs/qa/R16-T04/route-connection/README.md",
       "docs/qa/R08-T04/browser-flow/db.json"
-    ]
+    ],
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R17-T01",
     "title": "발신번호·문자 캠페인 — 모델·규칙 대조 및 보완",
-    "scope": "발신번호 검증·증빙파일 및 Campaign→Delivery→Receipt 고유키, 크레딧예약/정산을 확인한다. 전화번호 정규화·중복 제거·예약 timezone·발신자 변경 버전 고정을 명시한다.",
+    "scope": "발신번호 검증·증빙파일 및 Campaign→CampaignDelivery→SmsReceipt 고유키, 크레딧예약/정산을 확인한다. 전화번호 정규화·중복 제거·예약 timezone·발신자 변경 버전 고정을 명시한다.",
     "dependencies": [
       "R15-T04",
       "R21-T04"
@@ -3034,7 +3455,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R17-T02",
@@ -3073,7 +3500,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R17-T03",
@@ -3108,7 +3541,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R17-T04",
@@ -3142,7 +3581,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R18-T01",
@@ -3181,7 +3626,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R18-T02",
@@ -3219,7 +3670,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R18-T03",
@@ -3256,7 +3713,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R18-T04",
@@ -3289,7 +3752,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R19-T01",
@@ -3325,7 +3794,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R19-T02",
@@ -3360,7 +3835,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R19-T03",
@@ -3400,7 +3881,13 @@
     "updatedOn": "2026-10-10",
     "progress_evidence": [
       "docs/qa/R19-T03/route-connection/browser.json"
-    ]
+    ],
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R19-T04",
@@ -3433,7 +3920,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R20-T01",
@@ -3467,7 +3960,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R20-T02",
@@ -3500,7 +3999,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R20-T03",
@@ -3531,7 +4036,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R20-T04",
@@ -3563,7 +4074,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R21-T01",
@@ -3607,7 +4124,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R21-T02",
@@ -3650,7 +4173,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R21-T03",
@@ -3685,7 +4214,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R21-T04",
@@ -3720,7 +4255,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R22-T01",
@@ -3761,7 +4302,13 @@
     "progress_evidence": [
       "docs/qa/R22-T02/audit-resources/README.md"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R22-T02",
@@ -3801,7 +4348,13 @@
     "progress_evidence": [
       "docs/qa/R22-T02/audit-resources/tests-final.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R22-T03",
@@ -3839,7 +4392,13 @@
       "docs/qa/R22-T02/audit-resources/browser.json",
       "docs/qa/R22-T02/audit-resources/responsive.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R22-T04",
@@ -3877,7 +4436,13 @@
       "docs/qa/R22-T02/audit-resources/viewer-denied.json",
       "docs/qa/R11-T04/browser-flow/db-after-conflict.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R23-T01",
@@ -3921,7 +4486,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R23-T02",
@@ -3958,7 +4529,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R23-T03",
@@ -3997,7 +4574,13 @@
     "updatedOn": "2026-10-10",
     "progress_evidence": [
       "docs/qa/R23-T03/route-connection/browser.json"
-    ]
+    ],
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R23-T04",
@@ -4030,7 +4613,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R24-T01",
@@ -4067,7 +4656,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R24-T02",
@@ -4103,7 +4698,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_applicable",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R24-T03",
@@ -4142,7 +4743,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R24-T04",
@@ -4176,7 +4783,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R25-T01",
@@ -4252,7 +4865,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R25-T02",
@@ -4282,7 +4901,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R25-T03",
@@ -4311,7 +4936,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R25-T04",
@@ -4346,7 +4977,13 @@
     "progress_evidence": [
       "docs/qa/R01-T01/db-rehearsal/result.json"
     ],
-    "updatedOn": "2026-10-10"
+    "updatedOn": "2026-10-10",
+    "verification_status": {
+      "database": "partial_verified",
+      "api": "partial_verified",
+      "ui": "partial_verified",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R25-T05",
@@ -4375,7 +5012,13 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   },
   {
     "id": "R25-T06",
@@ -4412,6 +5055,12 @@
     },
     "local_status": "not_run",
     "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed"
+    "source_fidelity_status": "not_assessed",
+    "verification_status": {
+      "database": "not_assessed",
+      "api": "not_assessed",
+      "ui": "not_assessed",
+      "external": "not_assessed"
+    }
   }
 ]
