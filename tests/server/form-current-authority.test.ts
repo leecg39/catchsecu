@@ -6,7 +6,7 @@ import { env } from "@/server/env";
 import { auth } from "@/server/auth";
 import { requireContext, type Context } from "@/server/context";
 import { createForm, updateForm, listForms, readForm, archiveForm, copyForm, designateFormRetention, formDeletionState, publishForm, purgeForm, reviseForm, setFormFavorite, transitionForm } from "@/server/forms";
-import { createTemplate, updateTemplate, listTemplates, getTemplate, deleteTemplate, useTemplate } from "@/server/templates";
+import { changeTemplateStatus, createTemplate, updateTemplate, listTemplates, getTemplate, deleteTemplate, useTemplate } from "@/server/templates";
 import { encrypt } from "@/server/crypto";
 import { formInput } from "@/contracts/domains";
 import { z } from "zod";
@@ -16,6 +16,8 @@ import { createFixedUrl, listFixedUrls } from "@/server/fixed-urls";
 import { createRetentionRule } from "@/server/retention-rules";
 import { POST as formCreate } from "@/app/api/v1/forms/route";
 import { POST as templateCreate } from "@/app/api/v1/templates/route";
+import { POST as formAction } from "@/app/api/v1/forms/[...segments]/route";
+import { POST as templateAction } from "@/app/api/v1/templates/[...segments]/route";
 
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required");
@@ -60,7 +62,26 @@ async function unchanged() {
   expect(await db.formTemplate.findUniqueOrThrow({ where: { id: templateId } })).toMatchObject({ title: "Original", version: 1 });
   expect(await db.auditEvent.count({ where: { action: { in: ["form.draft_updated", "template.updated"] } } })).toBe(0);
 }
-const cases = ["mfa", "ip", "password", "idle", "company"] as const;
+const cases = ["mfa", "ip", "password", "idle", "company", "tenant", "membership", "account", "email", "session"] as const;
+async function ensureBackupOwner() {
+  const user = await db.user.create({ data: { id: randomUUID(), email: "backup-owner-" + randomUUID() + "@example.test",
+    name: "Backup owner", emailVerified: true } });
+  const member = await db.membership.create({ data: { tenantId: ctx.tenantId, userId: user.id, role: "owner" } });
+  return { user, member };
+}
+async function currentEditor() {
+  await ensureBackupOwner();
+  await db.membership.update({ where: { id: ctx.member.id }, data: { role: "editor" } });
+  const grant = await db.serviceGrant.create({ data: { tenantId: ctx.tenantId, memberId: ctx.member.id,
+    serviceId: input.serviceId, capabilities: ["form.read", "form.write", "form.publish"] } });
+  ctx = await requireContext(new Headers({ cookie }), "form.write");
+  ctx = { ...ctx, clientIp: "192.0.2.1" };
+  return grant;
+}
+function post(path: string, value: unknown, key: string) {
+  return new Request(origin + "/api/v1/" + path, { method: "POST", headers: { origin, cookie, "content-type": "application/json",
+    "idempotency-key": key }, body: JSON.stringify(value) });
+}
 async function invalidate(kind: typeof cases[number]) {
   if (kind === "mfa") await db.securityPolicy.update({ where: { tenantId: ctx.tenantId }, data: { requireMfa: true } });
   if (kind === "ip") {
@@ -77,8 +98,18 @@ async function invalidate(kind: typeof cases[number]) {
     await db.membership.create({ data: { tenantId: other.id, userId: ctx.user.id, role: "owner" } });
     await db.session.update({ where: { id: ctx.session.id }, data: { activeCompanyId: other.id } });
   }
+  if (kind === "tenant") await db.company.update({ where: { id: ctx.tenantId }, data: { status: "suspended" } });
+  if (kind === "membership") {
+    await ensureBackupOwner();
+    await db.membership.update({ where: { id: ctx.member.id }, data: { status: "revoked" } });
+  }
+  if (kind === "account") await db.user.update({ where: { id: ctx.user.id }, data: { status: "suspended" } });
+  if (kind === "email") await db.user.update({ where: { id: ctx.user.id }, data: { emailVerified: false } });
+  if (kind === "session") await db.session.delete({ where: { id: ctx.session.id } });
 }
-const codes = { mfa: "MFA_REQUIRED", ip: "IP_NOT_ALLOWED", password: "PASSWORD_CHANGE_REQUIRED", idle: "SESSION_EXPIRED", company: "COMPANY_CHANGED" };
+const codes = { mfa: "MFA_REQUIRED", ip: "IP_NOT_ALLOWED", password: "PASSWORD_CHANGE_REQUIRED", idle: "SESSION_EXPIRED",
+  company: "COMPANY_CHANGED", tenant: "COMPANY_UNAVAILABLE", membership: "FORBIDDEN", account: "ACCOUNT_UNAVAILABLE",
+  email: "ACCOUNT_UNAVAILABLE", session: "SESSION_EXPIRED" };
 test.each(cases)("form and template operations reject current %s after Context resolution", async kind => {
   await invalidate(kind);
   for (const operation of [() => mutate("form"), () => mutate("template"), () => readForm(ctx, formId), () => getTemplate(ctx, templateId),
@@ -96,6 +127,8 @@ test.each(cases)("form and template operations reject current %s after Context r
     () => setFormFavorite(ctx, formId, true),
     () => formDeletionState(ctx, formId),
     () => deleteTemplate(ctx, templateId, 1, randomUUID()),
+    () => changeTemplateStatus(ctx, templateId, 1, "archive", randomUUID()),
+    () => changeTemplateStatus(ctx, templateId, 1, "restore", randomUUID()),
     () => db.$transaction(tx => useTemplate(ctx, templateId, { version: 1, serviceId: input.serviceId }, randomUUID(), tx)),
     () => formDocumentOptions(ctx, input.serviceId, listQuery),
     () => approvalForForm(ctx, formId, 1, 10),
@@ -104,6 +137,62 @@ test.each(cases)("form and template operations reject current %s after Context r
     () => listFixedUrls(ctx, listQuery),
     () => db.$transaction(tx => createFixedUrl(ctx, { formId, name: "Denied URL" }, randomUUID(), tx))])
     await expect(operation()).rejects.toMatchObject({ code: codes[kind] });
+  await unchanged();
+});
+test("revoked service grant blocks existing form and template access after Context resolution", async () => {
+  const grant = await currentEditor();
+  await db.serviceGrant.delete({ where: { id: grant.id } });
+  for (const operation of [() => mutate("form"), () => mutate("template"), () => readForm(ctx, formId), () => getTemplate(ctx, templateId),
+    () => db.$transaction(tx => createForm(ctx, input, randomUUID(), tx)),
+    () => db.$transaction(tx => createTemplate(ctx, { ...input, category: "QA" }, randomUUID(), tx)),
+    () => db.$transaction(tx => copyForm(tx, ctx, formId, "Copy", randomUUID())),
+    () => deleteTemplate(ctx, templateId, 1, randomUUID()),
+    () => changeTemplateStatus(ctx, templateId, 1, "archive", randomUUID()),
+    () => db.$transaction(tx => useTemplate(ctx, templateId, { version: 1, serviceId: input.serviceId }, randomUUID(), tx))])
+    await expect(operation()).rejects.toMatchObject({ code: "SERVICE_FORBIDDEN" });
+  expect((await listForms(ctx, listQuery)).items).toHaveLength(0);
+  expect((await listTemplates(ctx, { ...listQuery, scope: "company" })).items).toHaveLength(0);
+  await unchanged();
+});
+test("published form replay never returns its cached success after the current service grant is revoked", async () => {
+  const grant = await currentEditor(), key = randomUUID(), request = () => post("forms/" + formId + "/publish", { version: 1 }, key);
+  expect((await formAction(request())).status).toBe(201);
+  await db.serviceGrant.delete({ where: { id: grant.id } });
+  const replay = await formAction(request());
+  expect(replay.status).toBe(403); expect((await replay.json()).error.code).toBe("SERVICE_FORBIDDEN");
+  expect(await db.publication.count({ where: { formId } })).toBe(1);
+});
+test("form revision replay never returns its cached success after the current service grant is revoked", async () => {
+  const grant = await currentEditor();
+  expect((await formAction(post("forms/" + formId + "/publish", { version: 1 }, randomUUID()))).status).toBe(201);
+  const key = randomUUID(), request = () => post("forms/" + formId + "/revise", { version: 2 }, key);
+  expect((await formAction(request())).status).toBe(201);
+  await db.serviceGrant.delete({ where: { id: grant.id } });
+  const replay = await formAction(request());
+  expect(replay.status).toBe(403); expect((await replay.json()).error.code).toBe("SERVICE_FORBIDDEN");
+  expect(await db.formVersion.count({ where: { formId } })).toBe(2);
+});
+test("template-use replay never returns its cached form after the current service grant is revoked", async () => {
+  const grant = await currentEditor(), key = randomUUID();
+  const request = () => post("templates/" + templateId + "/use", { version: 1, serviceId: input.serviceId }, key);
+  expect((await templateAction(request())).status).toBe(201);
+  await db.serviceGrant.delete({ where: { id: grant.id } });
+  const replay = await templateAction(request());
+  expect(replay.status).toBe(403); expect((await replay.json()).error.code).toBe("SERVICE_FORBIDDEN");
+  expect(await db.form.count({ where: { tenantId: ctx.tenantId } })).toBe(2);
+});
+test("archived service blocks form and template writes after Context resolution without hiding existing reads", async () => {
+  await db.service.update({ where: { id: input.serviceId }, data: { status: "archived" } });
+  await expect(mutate("form")).rejects.toMatchObject({ code: "FORM_ARCHIVED" });
+  for (const operation of [() => mutate("template"),
+    () => db.$transaction(tx => createForm(ctx, input, randomUUID(), tx)),
+    () => db.$transaction(tx => createTemplate(ctx, { ...input, category: "QA" }, randomUUID(), tx)),
+    () => deleteTemplate(ctx, templateId, 1, randomUUID()),
+    () => changeTemplateStatus(ctx, templateId, 1, "archive", randomUUID()),
+    () => db.$transaction(tx => useTemplate(ctx, templateId, { version: 1, serviceId: input.serviceId }, randomUUID(), tx))])
+    await expect(operation()).rejects.toMatchObject({ code: "SERVICE_ARCHIVED" });
+  expect((await readForm(ctx, formId)).id).toBe(formId);
+  expect((await getTemplate(ctx, templateId)).id).toBe(templateId);
   await unchanged();
 });
 test.each(["form", "template"].flatMap(kind => ["mfa", "ip", "password"].map(policy => ({ kind: kind as "form" | "template", policy }))))("$kind waiting on Company lock observes committed $policy policy", async ({ kind, policy }) => {

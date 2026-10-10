@@ -1,0 +1,66 @@
+{
+  "checkedAt": "2026-10-10T15:34:02Z",
+  "result": "passed",
+  "scope": "R08 F1 current authority and policy",
+  "submoduleComplete": true,
+  "taskComplete": false,
+  "tests": {
+    "file": "tests/server/form-current-authority.test.ts",
+    "filesPassed": 1,
+    "testsPassed": 35,
+    "testsFailed": 0,
+    "typecheck": "passed",
+    "eslint": "passed"
+  },
+  "relatedRegression": {
+    "filesPassed": 7,
+    "testsPassed": 106,
+    "testsFailed": 0
+  },
+  "planValidation": {
+    "result": "passed",
+    "sourcePaths": 186,
+    "additionalPatterns": 21,
+    "activeTasks": 107,
+    "legacyTasksPreserved": 72,
+    "dependencyCycles": 0
+  },
+  "currentInvalidations": {
+    "types": [
+      "mfa_required",
+      "ip_not_allowed",
+      "password_change_required",
+      "idle_session_expired",
+      "selected_company_changed",
+      "company_suspended",
+      "membership_revoked",
+      "account_suspended",
+      "email_verification_revoked",
+      "session_deleted"
+    ],
+    "operationsPerType": 28,
+    "rejectionAssertions": 280
+  },
+  "additionalBoundaries": [
+    "service_grant_revocation",
+    "archived_service_read_write_boundary",
+    "template_archive_and_restore_authority",
+    "audit_failure_rollback",
+    "session_mfa_and_password_natural_expiry",
+    "expert_assignment_expiry_during_allowed_favorite_write"
+  ],
+  "idempotentReplay": {
+    "routes": [
+      "POST /api/v1/forms/{id}/publish",
+      "POST /api/v1/forms/{id}/revise",
+      "POST /api/v1/templates/{id}/use"
+    ],
+    "afterGrantRevocation": "403 SERVICE_FORBIDDEN",
+    "duplicateRows": 0
+  },
+  "remainingScope": [
+    "R08 F2-F7",
+    "external social OAuth acceptance",
+    "external payment-backed public template license acceptance"
+  ]
+}
