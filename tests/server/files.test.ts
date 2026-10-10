@@ -78,6 +78,7 @@ async function init(pub: Publication, bytes = safe, questionId = pub.first, over
 }
 async function ready(pub: Publication, bytes = safe, questionId = pub.first): Promise<Upload> {
   const response = await init(pub, bytes, questionId); expect(response.status).toBe(201); const file = await response.json();
+  expect((await uploadGet(req("/uploads/" + file.id, "GET", "anonymous", undefined, { "x-upload-token": file.uploadToken }))).status).toBe(200);
   expect((await uploadPut(rawReq(file.id, bytes, file.uploadToken))).status).toBe(200);
   const complete = await uploadPost(req("/uploads/" + file.id + "/complete", "POST", "anonymous", undefined, { "x-upload-token": file.uploadToken }));
   expect(complete.status).toBe(200); return { ...file, ...(await complete.json()) };

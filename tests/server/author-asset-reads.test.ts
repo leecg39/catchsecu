@@ -9,7 +9,7 @@ import { createTemplate } from "@/server/templates";
 import { requestApproval } from "@/server/approvals";
 import { submitForm } from "@/server/submissions";
 import { createShare, changeShare } from "@/server/sharing";
-import { startViewerChallenge, verifyViewerChallenge, sharedAuthorAssets, listSharedSubmissions } from "@/server/viewer";
+import { startViewerChallenge, verifyViewerChallenge, sharedAuthorAssets, listSharedSubmissions, VIEWER_COOKIE } from "@/server/viewer";
 import { decrypt } from "@/server/crypto";
 import { memberAuthorAssets, publicAuthorAssets } from "@/server/author-asset-reads";
 import { initAuthorAssetUpload, putAuthorAssetContent, completeAuthorAssetUpload } from "@/server/author-asset-uploads";
@@ -21,6 +21,7 @@ import { formContentSchema, submissionInput } from "@/contracts/domains";
 import type { AuthorAssetManifest } from "@/contracts/author-assets";
 import { GET as memberGet } from "@/app/api/v1/author-assets/[[...segments]]/route";
 import { GET as publicGet } from "@/app/api/v1/public/forms/[...segments]/route";
+import { GET as viewerGet } from "@/app/api/v1/viewer/[...segments]/route";
 
 const url = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (url.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(url.hostname)) throw new Error("Isolated test database required");
@@ -74,6 +75,9 @@ test("member manifest and download require the exact parent revision and reject 
   const f = await fixture(), scope = { kind: "form" as const, id: f.form.id, version: f.form.version };
   expect((await manifest(memberAuthorAssets(ctx, scope, randomUUID()))).items.map(a => a.id).sort()).toEqual([f.first.id, f.second.id].sort());
   const query = new URLSearchParams({ kind: "form", id: f.form.id, version: String(f.form.version) });
+  expect((await memberGet(req("/author-assets?" + query))).status).toBe(200);
+  expect((await memberGet(req("/author-assets/uploads/" + f.first.id))).status).toBe(200);
+  expect((await memberGet(req("/author-assets/usage?serviceId=" + serviceId))).status).toBe(200);
   const response = await memberGet(req("/author-assets/" + f.first.id + "/download?" + query));
   expect(response.status).toBe(200); expect(Buffer.from(await response.arrayBuffer())).toEqual(pdf);
   for (const extra of ["&version=1", "&submissionId=" + randomUUID(), "&id=" + f.form.id])
@@ -84,6 +88,8 @@ test("member manifest and download require the exact parent revision and reject 
 });
 test("active public assets stop at response capacity and while publication is paused", async () => {
   const f = await fixture(), pub = await publish(f.form.id);
+  expect((await publicGet(req("/public/forms/" + pub.token + "/author-assets"))).status).toBe(200);
+  expect((await publicGet(req("/public/forms/" + pub.token + "/author-assets/" + f.first.id + "/download"))).status).toBe(200);
   await expect(publicAuthorAssets(pub.token, randomUUID(), (await ready()).id)).rejects.toMatchObject({ status: 404 });
   await posted(pub.token, f.content.questions[0].id);
   const response = await publicGet(req("/public/forms/" + pub.token + "/author-assets/" + f.first.id + "/download"));
@@ -149,6 +155,9 @@ test("authenticated viewer receives only selected questions' assets and revocati
   const page = await listSharedSubmissions(session.token, 1, 20, randomUUID());
   expect(page.viewer.questions[0].materialList?.[0].fileKey).toBe(f.first.id);
   expect((await manifest(sharedAuthorAssets(session.token, submitted.body.id, randomUUID()))).items.map(a => a.id)).toEqual([f.first.id]);
+  const viewerHeaders = { cookie: `${VIEWER_COOKIE}=${session.token}` };
+  expect((await viewerGet(new Request(origin + "/api/v1/viewer/author-assets?submissionId=" + submitted.body.id, { headers: viewerHeaders }))).status).toBe(200);
+  expect((await viewerGet(new Request(origin + "/api/v1/viewer/author-assets/" + f.first.id + "/download?submissionId=" + submitted.body.id, { headers: viewerHeaders }))).status).toBe(200);
   await expect(sharedAuthorAssets(session.token, submitted.body.id, randomUUID(), f.second.id)).rejects.toMatchObject({ status: 404 });
   await expect(sharedAuthorAssets(session.token, randomUUID(), randomUUID(), f.first.id)).rejects.toMatchObject({ status: 404 });
   expect(Buffer.from(await ((await sharedAuthorAssets(session.token, submitted.body.id, randomUUID(), f.first.id)) as Response).arrayBuffer())).toEqual(pdf);

@@ -99,6 +99,7 @@ describe("guide publication and protected PDFs", () => {
     const published = await answer<GuideRecord>(await PATCH(req(`/guides/${id}`, "PATCH", "operator", {
       version: 2, status: "published", categoryOrder: 2, sortOrder: 3 })));
     expect(published.status).toBe("published"); expect(published.version).toBe(3);
+    expect((await GET(req(`/guides/${id}`))).status).toBe(200);
     const list = await answer<GuideListResponse>(await GET(req("/guides?search=합성")));
     expect(list.total).toBe(1); expect(list.items[0].id).toBe(id);
     const download = await GET(req(`/guides/${id}/download`));

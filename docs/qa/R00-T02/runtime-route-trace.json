@@ -1,535 +1,824 @@
 {
-  "checkedAt": "2026-10-10T20:29:06.904Z",
+  "checkedAt": "2026-10-10T21:38:20.771Z",
   "scope": "실제 route wrapper 요청을 OpenAPI method+path로 정규화한 런타임 증거. 원시 동적 경로와 query는 저장하지 않음",
-  "sourceTraceSha256": "c6b52fb6169faca758c5ea4cd889dc12712d3bb82cf867a51a422d1a2f39a88a",
-  "requests": 807,
-  "matchedRequests": 766,
-  "unmatchedRequests": 41,
-  "operationsObserved": 59,
-  "operationsSuccessful": 57,
+  "sourceTraceSha256": "c8491769e6f86006aa27f9fb5580fbff333149989cc1b1881ac3fbd008d233de",
+  "requests": 25374,
+  "matchedRequests": 24948,
+  "unmatchedRequests": 426,
+  "operationsObserved": 466,
+  "operationsSuccessful": 466,
   "records": [
     {
       "method": "GET",
-      "path": "/admin/guides",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/admin/guides",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "201": 1
-      }
-    },
-    {
-      "method": "DELETE",
-      "path": "/admin/guides/{id}",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "204": 1
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/admin/guides/{id}",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
-      }
-    },
-    {
-      "method": "PATCH",
-      "path": "/admin/guides/{id}",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/admin/notices",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/admin/notices",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "201": 1
-      }
-    },
-    {
-      "method": "DELETE",
-      "path": "/admin/notices/{id}",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "204": 1
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/admin/notices/{id}",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
-      }
-    },
-    {
-      "method": "PATCH",
-      "path": "/admin/notices/{id}",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/change-password",
-      "requests": 70,
-      "successes": 32,
-      "statuses": {
-        "200": 32,
-        "400": 12,
-        "401": 4,
-        "403": 2,
-        "422": 2,
-        "429": 16,
-        "500": 2
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/auth/get-session",
-      "requests": 2,
-      "successes": 0,
-      "statuses": {
-        "401": 1,
-        "500": 1
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/request-password-reset",
-      "requests": 30,
-      "successes": 26,
-      "statuses": {
-        "200": 26,
-        "500": 4
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/reset-password",
+      "path": "/access-requests",
       "requests": 14,
-      "successes": 8,
-      "statuses": {
-        "200": 8,
-        "400": 6
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/sign-in/email",
-      "requests": 193,
-      "successes": 169,
-      "statuses": {
-        "200": 169,
-        "401": 2,
-        "403": 2,
-        "429": 2,
-        "500": 18
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/sign-out",
-      "requests": 10,
       "successes": 6,
       "statuses": {
         "200": 6,
-        "403": 2,
-        "500": 2
+        "401": 3,
+        "403": 5
       }
     },
     {
       "method": "POST",
-      "path": "/auth/sign-up/email",
-      "requests": 167,
-      "successes": 149,
+      "path": "/access-requests",
+      "requests": 14,
+      "successes": 4,
       "statuses": {
-        "200": 149,
-        "403": 2,
-        "429": 2,
-        "500": 14
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/two-factor/disable",
-      "requests": 4,
-      "successes": 2,
-      "statuses": {
-        "200": 2,
-        "500": 2
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/two-factor/enable",
-      "requests": 30,
-      "successes": 26,
-      "statuses": {
-        "200": 26,
+        "200": 1,
+        "201": 3,
         "401": 2,
-        "500": 2
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/two-factor/send-otp",
-      "requests": 4,
-      "successes": 2,
-      "statuses": {
-        "200": 2,
-        "500": 2
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/two-factor/verify-backup-code",
-      "requests": 6,
-      "successes": 2,
-      "statuses": {
-        "200": 2,
-        "401": 2,
-        "500": 2
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/two-factor/verify-otp",
-      "requests": 2,
-      "successes": 2,
-      "statuses": {
-        "200": 2
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/auth/two-factor/verify-totp",
-      "requests": 30,
-      "successes": 20,
-      "statuses": {
-        "200": 20,
-        "401": 6,
-        "500": 4
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/context",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/context",
-      "requests": 2,
-      "successes": 2,
-      "statuses": {
-        "200": 2
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/feedback",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/feedback",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "201": 1
+        "403": 3,
+        "404": 1,
+        "409": 1,
+        "422": 3
       }
     },
     {
       "method": "DELETE",
-      "path": "/feedback/{id}",
-      "requests": 1,
+      "path": "/access-requests/{id}",
+      "requests": 10,
       "successes": 1,
       "statuses": {
-        "204": 1
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/feedback/{id}",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
+        "204": 1,
+        "401": 2,
+        "403": 2,
+        "404": 1,
+        "409": 2,
+        "422": 2
       }
     },
     {
       "method": "PATCH",
-      "path": "/feedback/{id}",
-      "requests": 1,
-      "successes": 1,
+      "path": "/access-requests/{id}",
+      "requests": 24,
+      "successes": 7,
       "statuses": {
-        "200": 1
+        "200": 7,
+        "401": 4,
+        "403": 6,
+        "404": 1,
+        "409": 4,
+        "422": 2
       }
     },
     {
       "method": "GET",
-      "path": "/guides",
+      "path": "/activity-reviews",
       "requests": 5,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "401": 1,
+        "422": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/activity-reviews",
+      "requests": 5,
+      "successes": 1,
+      "statuses": {
+        "201": 1,
+        "400": 1,
+        "422": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/activity-reviews/{id}",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "404": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/activity-reviews/{id}/actions",
+      "requests": 4,
       "successes": 2,
       "statuses": {
         "200": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/activity-reviews/{id}/destruction",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/activity-reviews/{id}/notifications",
+      "requests": 6,
+      "successes": 1,
+      "statuses": {
+        "202": 1,
+        "400": 1,
         "401": 1,
+        "422": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/admin/guides",
+      "requests": 5,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
         "403": 2
       }
     },
     {
       "method": "POST",
-      "path": "/guides",
+      "path": "/admin/guides",
       "requests": 5,
-      "successes": 2,
+      "successes": 3,
       "statuses": {
-        "201": 2,
-        "403": 1,
-        "409": 1,
-        "410": 1
+        "201": 3,
+        "422": 2
       }
     },
     {
       "method": "DELETE",
-      "path": "/guides/{id}",
-      "requests": 2,
-      "successes": 1,
-      "statuses": {
-        "204": 1,
-        "409": 1
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/guides/{id}",
-      "requests": 2,
-      "successes": 0,
-      "statuses": {
-        "403": 1,
-        "404": 1
-      }
-    },
-    {
-      "method": "PATCH",
-      "path": "/guides/{id}",
-      "requests": 3,
-      "successes": 1,
-      "statuses": {
-        "200": 1,
-        "409": 2
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/guides/{id}/download",
-      "requests": 4,
-      "successes": 2,
-      "statuses": {
-        "200": 2,
-        "401": 1,
-        "404": 1
-      }
-    },
-    {
-      "method": "PUT",
-      "path": "/guides/{id}/file",
-      "requests": 4,
-      "successes": 1,
-      "statuses": {
-        "200": 1,
-        "403": 1,
-        "409": 1,
-        "422": 1
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/me/password-policy",
-      "requests": 22,
-      "successes": 22,
-      "statuses": {
-        "200": 22
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/me/password-policy",
-      "requests": 13,
-      "successes": 6,
-      "statuses": {
-        "200": 6,
-        "401": 1,
-        "403": 2,
-        "409": 4
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/notices",
-      "requests": 9,
-      "successes": 7,
-      "statuses": {
-        "200": 7,
-        "401": 1,
-        "403": 1
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/notices",
-      "requests": 7,
-      "successes": 4,
-      "statuses": {
-        "201": 4,
-        "403": 1,
-        "409": 1,
-        "410": 1
-      }
-    },
-    {
-      "method": "DELETE",
-      "path": "/notices/{id}",
+      "path": "/admin/guides/{id}",
       "requests": 5,
       "successes": 3,
       "statuses": {
         "204": 3,
-        "403": 1,
-        "409": 1
+        "422": 2
       }
     },
     {
       "method": "GET",
-      "path": "/notices/{id}",
-      "requests": 9,
-      "successes": 4,
+      "path": "/admin/guides/{id}",
+      "requests": 5,
+      "successes": 3,
       "statuses": {
-        "200": 4,
-        "403": 1,
-        "404": 4
+        "200": 3,
+        "403": 2
       }
     },
     {
       "method": "PATCH",
-      "path": "/notices/{id}",
-      "requests": 6,
-      "successes": 5,
+      "path": "/admin/guides/{id}",
+      "requests": 5,
+      "successes": 3,
       "statuses": {
-        "200": 5,
-        "409": 1
-      }
-    },
-    {
-      "method": "DELETE",
-      "path": "/notices/{id}/attachments/{attachmentId}",
-      "requests": 2,
-      "successes": 1,
-      "statuses": {
-        "204": 1,
-        "409": 1
+        "200": 3,
+        "422": 2
       }
     },
     {
       "method": "GET",
-      "path": "/notices/{id}/attachments/{attachmentId}",
+      "path": "/admin/notices",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/admin/notices",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "201": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/notices/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/admin/notices/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/notices/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/admin/plans",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "403": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/admin/plans",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "201": 1,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/plans/{id}",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "204": 1,
+        "403": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/admin/plans/{id}",
+      "requests": 4,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "403": 2,
+        "404": 1
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/plans/{id}",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/closes",
+      "requests": 9,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "422": 6
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/analytics/closes",
+      "requests": 12,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "404": 1,
+        "422": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/closes/{id}/export",
+      "requests": 7,
+      "successes": 5,
+      "statuses": {
+        "200": 5,
+        "404": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/dashboard",
+      "requests": 23,
+      "successes": 16,
+      "statuses": {
+        "200": 16,
+        "401": 1,
+        "404": 4,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/exports",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "422": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/analytics/exports",
+      "requests": 7,
+      "successes": 1,
+      "statuses": {
+        "202": 1,
+        "401": 4,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/analytics/exports/{id}",
+      "requests": 5,
+      "successes": 3,
+      "statuses": {
+        "204": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/exports/{id}",
+      "requests": 5,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "404": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/analytics/exports/{id}/cancel",
+      "requests": 3,
+      "successes": 3,
+      "statuses": {
+        "200": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/exports/{id}/download",
+      "requests": 7,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "401": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/marketing",
+      "requests": 4,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "401": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/privacy",
+      "requests": 4,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "401": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/approvals",
+      "requests": 6,
+      "successes": 6,
+      "statuses": {
+        "200": 6
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/approvals/{id}",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/approvals/{id}",
       "requests": 6,
       "successes": 2,
       "statuses": {
         "200": 2,
-        "403": 1,
-        "404": 3
+        "404": 4
       }
     },
     {
-      "method": "PUT",
-      "path": "/notices/{id}/attachments/{attachmentId}",
-      "requests": 6,
-      "successes": 4,
+      "method": "POST",
+      "path": "/approvals/{id}/decision",
+      "requests": 57,
+      "successes": 42,
       "statuses": {
-        "200": 4,
-        "403": 1,
-        "422": 1
-      }
-    },
-    {
-      "method": "DELETE",
-      "path": "/security/policy",
-      "requests": 1,
-      "successes": 1,
-      "statuses": {
-        "200": 1
+        "200": 42,
+        "403": 2,
+        "409": 11,
+        "422": 2
       }
     },
     {
       "method": "GET",
-      "path": "/security/policy",
-      "requests": 15,
-      "successes": 15,
+      "path": "/assets",
+      "requests": 20,
+      "successes": 14,
       "statuses": {
-        "200": 15
-      }
-    },
-    {
-      "method": "PATCH",
-      "path": "/security/policy",
-      "requests": 15,
-      "successes": 11,
-      "statuses": {
-        "200": 11,
-        "422": 4
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/services",
-      "requests": 11,
-      "successes": 5,
-      "statuses": {
-        "200": 5,
+        "200": 14,
         "401": 3,
         "403": 3
       }
     },
     {
       "method": "GET",
-      "path": "/support-tickets",
+      "path": "/audit-events",
+      "requests": 67,
+      "successes": 43,
+      "statuses": {
+        "200": 43,
+        "401": 2,
+        "403": 8,
+        "404": 6,
+        "422": 8
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/audit-events/export",
+      "requests": 25,
+      "successes": 16,
+      "statuses": {
+        "200": 16,
+        "401": 2,
+        "403": 2,
+        "404": 2,
+        "413": 2,
+        "422": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/change-password",
+      "requests": 141,
+      "successes": 65,
+      "statuses": {
+        "200": 65,
+        "400": 24,
+        "401": 8,
+        "403": 4,
+        "422": 4,
+        "429": 32,
+        "500": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/auth/get-session",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "401": 2,
+        "500": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/org/email-register",
+      "requests": 51,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "401": 15,
+        "403": 3,
+        "404": 3,
+        "409": 3,
+        "410": 2,
+        "422": 16,
+        "500": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/org/email-register/challenge",
+      "requests": 59,
+      "successes": 39,
+      "statuses": {
+        "200": 39,
+        "401": 14,
+        "403": 1,
+        "429": 4,
+        "500": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/org/login",
+      "requests": 68,
+      "successes": 48,
+      "statuses": {
+        "200": 48,
+        "401": 11,
+        "403": 3,
+        "404": 2,
+        "409": 3,
+        "500": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/request-password-reset",
+      "requests": 96,
+      "successes": 73,
+      "statuses": {
+        "200": 73,
+        "400": 5,
+        "403": 6,
+        "500": 12
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/reset-password",
+      "requests": 43,
+      "successes": 22,
+      "statuses": {
+        "200": 22,
+        "400": 19,
+        "500": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sign-in/email",
+      "requests": 3421,
+      "successes": 3354,
+      "statuses": {
+        "200": 3354,
+        "401": 11,
+        "403": 13,
+        "429": 4,
+        "500": 39
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sign-out",
+      "requests": 46,
+      "successes": 37,
+      "statuses": {
+        "200": 37,
+        "403": 5,
+        "500": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sign-up/email",
+      "requests": 2681,
+      "successes": 2627,
+      "statuses": {
+        "200": 2627,
+        "403": 6,
+        "429": 6,
+        "500": 42
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/auth/sso/{providerId}",
+      "requests": 114,
+      "successes": 109,
+      "statuses": {
+        "302": 109,
+        "401": 1,
+        "404": 1,
+        "422": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/auth/sso/callback",
+      "requests": 98,
+      "successes": 40,
+      "statuses": {
+        "302": 40,
+        "401": 26,
+        "403": 7,
+        "404": 2,
+        "409": 10,
+        "410": 9,
+        "422": 2,
+        "500": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sso/saml",
+      "requests": 47,
+      "successes": 6,
+      "statuses": {
+        "302": 6,
+        "401": 33,
+        "410": 1,
+        "413": 2,
+        "415": 1,
+        "422": 3,
+        "503": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/two-factor/disable",
+      "requests": 13,
+      "successes": 5,
+      "statuses": {
+        "200": 5,
+        "403": 4,
+        "500": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/two-factor/enable",
+      "requests": 122,
+      "successes": 114,
+      "statuses": {
+        "200": 114,
+        "401": 4,
+        "500": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/two-factor/send-otp",
+      "requests": 13,
+      "successes": 7,
+      "statuses": {
+        "200": 7,
+        "500": 6
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/two-factor/verify-backup-code",
+      "requests": 45,
+      "successes": 11,
+      "statuses": {
+        "200": 11,
+        "401": 20,
+        "403": 4,
+        "409": 1,
+        "429": 4,
+        "500": 5
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/two-factor/verify-otp",
+      "requests": 7,
+      "successes": 7,
+      "statuses": {
+        "200": 7
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/auth/two-factor/verify-totp",
+      "requests": 133,
+      "successes": 110,
+      "statuses": {
+        "200": 110,
+        "401": 15,
+        "500": 8
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/author-assets",
+      "requests": 14,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "409": 3,
+        "422": 9
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/author-assets/{id}/download",
+      "requests": 6,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "404": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/author-assets/uploads",
+      "requests": 24,
+      "successes": 4,
+      "statuses": {
+        "201": 4,
+        "422": 20
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/author-assets/uploads/{id}",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "204": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/author-assets/uploads/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "410": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/author-assets/uploads/{id}/complete",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/author-assets/uploads/{id}/content",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/author-assets/uploads/{id}/download",
+      "requests": 7,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "404": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/author-assets/usage",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/billing-history",
+      "requests": 31,
+      "successes": 16,
+      "statuses": {
+        "200": 16,
+        "401": 3,
+        "403": 3,
+        "422": 9
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/billing/methods",
       "requests": 7,
       "successes": 5,
       "statuses": {
@@ -540,80 +829,4354 @@
     },
     {
       "method": "POST",
-      "path": "/support-tickets",
-      "requests": 8,
-      "successes": 2,
+      "path": "/billing/methods",
+      "requests": 13,
+      "successes": 7,
       "statuses": {
-        "201": 2,
-        "400": 1,
-        "403": 1,
-        "404": 1,
+        "201": 7,
         "409": 1,
-        "410": 1,
-        "422": 1
+        "422": 5
       }
     },
     {
       "method": "DELETE",
-      "path": "/support-tickets/{id}",
-      "requests": 3,
+      "path": "/billing/methods/{id}",
+      "requests": 7,
       "successes": 1,
       "statuses": {
-        "204": 1,
-        "404": 1,
-        "409": 1
+        "200": 1,
+        "404": 2,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/billing/methods/{id}",
+      "requests": 5,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "403": 1,
+        "409": 1,
+        "422": 2
       }
     },
     {
       "method": "GET",
-      "path": "/support-tickets/{id}",
+      "path": "/billing/orders",
+      "requests": 9,
+      "successes": 7,
+      "statuses": {
+        "200": 7,
+        "401": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/billing/orders",
+      "requests": 40,
+      "successes": 36,
+      "statuses": {
+        "201": 36,
+        "404": 1,
+        "409": 1,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/billing/orders/{id}",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/billing/orders/{id}/return",
+      "requests": 5,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/billing/orders/{id}/virtual-checkout",
+      "requests": 13,
+      "successes": 5,
+      "statuses": {
+        "200": 5,
+        "401": 2,
+        "404": 1,
+        "409": 2,
+        "422": 2,
+        "500": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/billing/provider-events",
+      "requests": 5,
+      "successes": 2,
+      "statuses": {
+        "202": 2,
+        "500": 1,
+        "503": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/billing/refunds/{id}/virtual-settle",
+      "requests": 7,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "401": 1,
+        "409": 1,
+        "422": 2,
+        "500": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/campaigns",
+      "requests": 6,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "403": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns",
+      "requests": 363,
+      "successes": 339,
+      "statuses": {
+        "201": 339,
+        "404": 6,
+        "409": 3,
+        "422": 15
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/campaigns/{id}",
+      "requests": 11,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "409": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/campaigns/{id}",
+      "requests": 1036,
+      "successes": 1022,
+      "statuses": {
+        "200": 1022,
+        "401": 3,
+        "403": 6,
+        "404": 5
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/campaigns/{id}",
+      "requests": 14,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "409": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/apply-template",
+      "requests": 18,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "404": 6,
+        "409": 9
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/archive",
+      "requests": 3,
+      "successes": 3,
+      "statuses": {
+        "200": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/cancel",
+      "requests": 17,
+      "successes": 17,
+      "statuses": {
+        "200": 17
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/campaigns/{id}/deliveries",
+      "requests": 162,
+      "successes": 162,
+      "statuses": {
+        "200": 162
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/campaigns/{id}/export",
+      "requests": 9,
+      "successes": 9,
+      "statuses": {
+        "200": 9
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/files",
+      "requests": 75,
+      "successes": 63,
+      "statuses": {
+        "201": 63,
+        "409": 6,
+        "422": 3,
+        "503": 3
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/campaigns/{id}/files/{fileId}",
+      "requests": 9,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "409": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/files/{fileId}/attach",
+      "requests": 39,
+      "successes": 33,
+      "statuses": {
+        "200": 33,
+        "404": 3,
+        "409": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/campaigns/{id}/files/{fileId}/download",
+      "requests": 9,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "404": 3,
+        "409": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/preview",
+      "requests": 30,
+      "successes": 27,
+      "statuses": {
+        "200": 27,
+        "403": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/campaigns/{id}/recipients",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/recipients",
+      "requests": 312,
+      "successes": 300,
+      "statuses": {
+        "200": 300,
+        "404": 3,
+        "422": 9
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/reschedule",
+      "requests": 3,
+      "successes": 3,
+      "statuses": {
+        "200": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/retry",
+      "requests": 54,
+      "successes": 51,
+      "statuses": {
+        "202": 51,
+        "409": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/campaigns/{id}/schedule",
+      "requests": 288,
+      "successes": 258,
+      "statuses": {
+        "202": 258,
+        "409": 12,
+        "422": 9,
+        "503": 9
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/campaigns/sources",
+      "requests": 3,
+      "successes": 3,
+      "statuses": {
+        "200": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/clause-templates",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/clause-templates",
+      "requests": 8,
+      "successes": 6,
+      "statuses": {
+        "201": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/clause-templates/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/clause-templates/{id}",
+      "requests": 8,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 6
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/clause-templates/{id}",
+      "requests": 8,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 4,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/clause-templates/{id}/restore",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/companies",
+      "requests": 20,
+      "successes": 17,
+      "statuses": {
+        "200": 17,
+        "401": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/companies",
+      "requests": 16,
+      "successes": 10,
+      "statuses": {
+        "201": 10,
+        "401": 4,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/companies/{id}",
+      "requests": 18,
+      "successes": 6,
+      "statuses": {
+        "204": 6,
+        "401": 2,
+        "403": 4,
+        "404": 2,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/companies/{id}",
+      "requests": 19,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "401": 1,
+        "403": 4,
+        "404": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/companies/{id}",
+      "requests": 26,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "401": 2,
+        "403": 6,
+        "404": 2,
+        "409": 4,
+        "422": 6
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/companies/{id}/business-file",
+      "requests": 9,
+      "successes": 1,
+      "statuses": {
+        "204": 1,
+        "401": 2,
+        "403": 2,
+        "404": 2,
+        "503": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/companies/{id}/business-file",
+      "requests": 20,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "401": 4,
+        "403": 4,
+        "404": 10
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/companies/{id}/business-file",
+      "requests": 33,
+      "successes": 15,
+      "statuses": {
+        "201": 15,
+        "401": 2,
+        "403": 2,
+        "404": 2,
+        "409": 2,
+        "415": 2,
+        "422": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/companies/{id}/closure",
+      "requests": 8,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "401": 2,
+        "403": 2,
+        "404": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/compliance",
+      "requests": 4,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "401": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/context",
+      "requests": 113,
+      "successes": 80,
+      "statuses": {
+        "200": 80,
+        "401": 28,
+        "403": 5
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/context",
+      "requests": 148,
+      "successes": 122,
+      "statuses": {
+        "200": 122,
+        "401": 2,
+        "403": 4,
+        "404": 13,
+        "409": 2,
+        "422": 5
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/destruction-certificates",
+      "requests": 14,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "422": 8
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/destruction-certificates/{id}",
+      "requests": 12,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 2,
+        "404": 4,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/destruction-certificates/{id}/download",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/destruction-requests",
+      "requests": 28,
+      "successes": 14,
+      "statuses": {
+        "200": 14,
+        "401": 2,
+        "403": 2,
+        "422": 10
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/destruction-requests/{id}/approve",
+      "requests": 86,
+      "successes": 70,
+      "statuses": {
+        "200": 70,
+        "403": 4,
+        "404": 2,
+        "409": 8,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/destruction-requests/{id}/cancel",
+      "requests": 22,
+      "successes": 18,
+      "statuses": {
+        "200": 18,
+        "403": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/destruction-requests/{id}/reject",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/destruction-requests/{id}/reschedule",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "422": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/destruction-requests/{id}/retry",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/documents",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 2,
+        "403": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/documents",
+      "requests": 223,
+      "successes": 193,
+      "statuses": {
+        "201": 193,
+        "403": 6,
+        "409": 2,
+        "422": 22
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/documents/{id}",
+      "requests": 10,
+      "successes": 6,
+      "statuses": {
+        "204": 6,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/documents/{id}",
+      "requests": 16,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "403": 2,
+        "404": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/documents/{id}",
+      "requests": 54,
+      "successes": 34,
+      "statuses": {
+        "200": 34,
+        "401": 2,
+        "403": 2,
+        "404": 2,
+        "409": 6,
+        "422": 6,
+        "500": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/documents/{id}/apply-clause",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "409": 2,
+        "422": 6
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/documents/{id}/preview",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/documents/{id}/publish",
+      "requests": 194,
+      "successes": 172,
+      "statuses": {
+        "201": 172,
+        "409": 4,
+        "422": 18
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/documents/{id}/restore",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/documents/{id}/revoke",
+      "requests": 14,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "409": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/documents/{id}/unpublish",
+      "requests": 11,
+      "successes": 9,
+      "statuses": {
+        "200": 9,
+        "409": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/documents/{id}/versions",
+      "requests": 8,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "403": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/documents/{id}/versions/{number}/pdf",
+      "requests": 58,
+      "successes": 32,
+      "statuses": {
+        "200": 32,
+        "401": 2,
+        "403": 6,
+        "404": 6,
+        "422": 10,
+        "429": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/documents/options",
+      "requests": 12,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "401": 2,
+        "403": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/email-feedback",
+      "requests": 113,
+      "successes": 69,
+      "statuses": {
+        "202": 69,
+        "400": 3,
+        "401": 9,
+        "404": 3,
+        "409": 9,
+        "413": 3,
+        "415": 3,
+        "422": 9,
+        "503": 5
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/email-suppressions",
+      "requests": 27,
+      "successes": 12,
+      "statuses": {
+        "200": 12,
+        "401": 2,
+        "403": 6,
+        "404": 3,
+        "422": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/email-unsubscribe/{token}",
+      "requests": 12,
+      "successes": 9,
+      "statuses": {
+        "200": 6,
+        "302": 3,
+        "410": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/email-unsubscribe/{token}",
+      "requests": 39,
+      "successes": 21,
+      "statuses": {
+        "200": 21,
+        "404": 3,
+        "410": 3,
+        "413": 3,
+        "422": 9
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/entitlements",
+      "requests": 8,
+      "successes": 5,
+      "statuses": {
+        "200": 5,
+        "403": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/expert-assignments",
+      "requests": 29,
+      "successes": 23,
+      "statuses": {
+        "200": 23,
+        "401": 3,
+        "403": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/expert-assignments",
+      "requests": 41,
+      "successes": 18,
+      "statuses": {
+        "200": 6,
+        "201": 12,
+        "403": 6,
+        "404": 6,
+        "409": 9,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/expert-assignments/{id}",
+      "requests": 8,
+      "successes": 3,
+      "statuses": {
+        "204": 3,
+        "409": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/expert-assignments/{id}",
+      "requests": 5,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "404": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/expert-assignments/{id}",
+      "requests": 8,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "409": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/expert-assignments/options",
       "requests": 6,
       "successes": 1,
       "statuses": {
         "200": 1,
+        "403": 5
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/exports",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "403": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/exports",
+      "requests": 62,
+      "successes": 44,
+      "statuses": {
+        "201": 44,
+        "400": 2,
+        "403": 6,
+        "409": 4,
+        "410": 2,
+        "422": 4
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/exports/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/exports/{id}",
+      "requests": 8,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 6
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/exports/{id}/cancel",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/exports/{id}/download",
+      "requests": 28,
+      "successes": 12,
+      "statuses": {
+        "200": 12,
+        "401": 2,
+        "403": 4,
+        "409": 2,
+        "410": 8
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/feedback",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/feedback",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "201": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/feedback/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/feedback/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/feedback/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/files",
+      "requests": 20,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "401": 12,
+        "410": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/files/{id}",
+      "requests": 8,
+      "successes": 3,
+      "statuses": {
+        "204": 3,
+        "409": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/files/{id}",
+      "requests": 5,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "404": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/files/{id}",
+      "requests": 5,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/files/{id}/download",
+      "requests": 110,
+      "successes": 46,
+      "statuses": {
+        "200": 46,
+        "401": 5,
+        "403": 9,
+        "404": 26,
+        "409": 6,
+        "410": 9,
+        "422": 9
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/fixed-urls",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/fixed-urls",
+      "requests": 44,
+      "successes": 32,
+      "statuses": {
+        "201": 32,
+        "403": 4,
+        "409": 4,
+        "422": 4
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/fixed-urls/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/fixed-urls/{id}",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/fixed-urls/{id}",
+      "requests": 12,
+      "successes": 5,
+      "statuses": {
+        "200": 5,
+        "409": 3,
+        "422": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms",
+      "requests": 44,
+      "successes": 30,
+      "statuses": {
+        "200": 30,
+        "403": 2,
+        "422": 12
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/forms",
+      "requests": 1129,
+      "successes": 1089,
+      "statuses": {
+        "201": 1089,
+        "401": 4,
+        "404": 2,
+        "410": 2,
+        "422": 32
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/forms/{id}",
+      "requests": 16,
+      "successes": 14,
+      "statuses": {
+        "204": 14,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms/{id}",
+      "requests": 191,
+      "successes": 189,
+      "statuses": {
+        "200": 189,
+        "404": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/forms/{id}",
+      "requests": 85,
+      "successes": 52,
+      "statuses": {
+        "200": 52,
+        "401": 2,
+        "403": 2,
+        "409": 15,
+        "422": 14
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms/{id}/approvals",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/forms/{id}/approvals",
+      "requests": 79,
+      "successes": 67,
+      "statuses": {
+        "201": 67,
+        "403": 6,
+        "404": 2,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms/{id}/audit-events",
+      "requests": 24,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "401": 2,
+        "403": 4,
+        "404": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms/{id}/audit-events/export",
+      "requests": 6,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "413": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/forms/{id}/copy",
+      "requests": 26,
+      "successes": 22,
+      "statuses": {
+        "201": 22,
+        "403": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms/{id}/deletion",
+      "requests": 14,
+      "successes": 12,
+      "statuses": {
+        "200": 12,
+        "404": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/forms/{id}/draft",
+      "requests": 46,
+      "successes": 34,
+      "statuses": {
+        "200": 34,
+        "403": 2,
+        "404": 4,
+        "409": 6
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/forms/{id}/favorite",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "204": 4
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/forms/{id}/favorite",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "404": 4
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/forms/{id}/participation-targets",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms/{id}/participation-targets",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "401": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/forms/{id}/participation-targets",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "201": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/forms/{id}/pause",
+      "requests": 14,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "403": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/forms/{id}/publish",
+      "requests": 1119,
+      "successes": 1071,
+      "statuses": {
+        "201": 1071,
+        "403": 8,
+        "409": 23,
+        "422": 11,
+        "503": 6
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/forms/{id}/purge",
+      "requests": 30,
+      "successes": 14,
+      "statuses": {
+        "204": 14,
+        "403": 4,
+        "404": 2,
+        "409": 8,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/forms/{id}/resume",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "409": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/forms/{id}/retention",
+      "requests": 10,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "403": 2,
+        "409": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/forms/{id}/revise",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "201": 2,
+        "403": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms/{id}/submissions",
+      "requests": 14,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "403": 4,
+        "404": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms/{id}/submissions/export",
+      "requests": 48,
+      "successes": 22,
+      "statuses": {
+        "200": 22,
+        "401": 2,
+        "403": 2,
+        "404": 4,
+        "413": 8,
+        "422": 10
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/forms/document-options",
+      "requests": 8,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "403": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/guides",
+      "requests": 15,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "401": 3,
+        "403": 6
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/guides",
+      "requests": 15,
+      "successes": 6,
+      "statuses": {
+        "201": 6,
+        "403": 3,
+        "409": 3,
+        "410": 3
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/guides/{id}",
+      "requests": 8,
+      "successes": 3,
+      "statuses": {
+        "204": 3,
+        "409": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/guides/{id}",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 3,
+        "404": 5
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/guides/{id}",
+      "requests": 11,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "409": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/guides/{id}/download",
+      "requests": 12,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "401": 3,
+        "404": 3
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/guides/{id}/file",
+      "requests": 12,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "403": 3,
+        "409": 3,
+        "422": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "requests": 3,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "500": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/imports",
+      "requests": 18,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 4,
+        "422": 10
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/imports",
+      "requests": 92,
+      "successes": 84,
+      "statuses": {
+        "201": 84,
+        "401": 2,
+        "409": 2,
+        "410": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/imports/{id}",
+      "requests": 18,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 2,
+        "422": 12
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/imports/{id}",
+      "requests": 56,
+      "successes": 40,
+      "statuses": {
+        "200": 40,
+        "401": 2,
+        "403": 6,
+        "404": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/imports/{id}",
+      "requests": 94,
+      "successes": 74,
+      "statuses": {
+        "200": 74,
+        "401": 2,
+        "409": 2,
+        "422": 16
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/imports/{id}/commit",
+      "requests": 40,
+      "successes": 30,
+      "statuses": {
+        "202": 30,
+        "401": 2,
+        "403": 2,
+        "409": 6
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/imports/{id}/errors.csv",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "401": 2,
+        "403": 2,
+        "404": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/imports/{id}/inspect",
+      "requests": 78,
+      "successes": 78,
+      "statuses": {
+        "200": 78
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/imports/{id}/retry",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "202": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/imports/{id}/rows",
+      "requests": 18,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 2,
+        "403": 2,
+        "404": 2,
+        "410": 4,
+        "422": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/imports/{id}/validate",
+      "requests": 76,
+      "successes": 72,
+      "statuses": {
+        "200": 72,
+        "401": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/imports/options",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/integrations",
+      "requests": 16,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "403": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/integrations",
+      "requests": 88,
+      "successes": 58,
+      "statuses": {
+        "201": 58,
+        "403": 10,
+        "404": 2,
+        "409": 4,
+        "422": 14
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/integrations/{id}",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "404": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/integrations/{id}",
+      "requests": 66,
+      "successes": 58,
+      "statuses": {
+        "200": 58,
+        "401": 2,
+        "404": 4,
+        "410": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/integrations/{id}",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/integrations/{id}/deliveries",
+      "requests": 34,
+      "successes": 34,
+      "statuses": {
+        "200": 34
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/integrations/{id}/deliveries/{deliveryId}/retry",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "202": 4,
+        "409": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/integrations/{id}/enabled",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/integrations/{id}/test",
+      "requests": 38,
+      "successes": 36,
+      "statuses": {
+        "202": 36,
+        "409": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/integrations/delete",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/integrations/options",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/invitations",
+      "requests": 8,
+      "successes": 8,
+      "statuses": {
+        "200": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/invitations",
+      "requests": 60,
+      "successes": 45,
+      "statuses": {
+        "201": 45,
+        "403": 4,
+        "404": 2,
+        "409": 4,
+        "422": 5
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/invitations/{id}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/invitations/{id}/resend",
+      "requests": 18,
+      "successes": 5,
+      "statuses": {
+        "200": 5,
+        "402": 3,
+        "404": 2,
+        "409": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/invitations/accept",
+      "requests": 18,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "404": 2,
+        "409": 2,
+        "410": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/invitations/preview",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "401": 2,
+        "404": 4,
+        "410": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/invitations/sso/options",
+      "requests": 9,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "410": 5,
+        "422": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/invitations/sso/start",
+      "requests": 41,
+      "successes": 30,
+      "statuses": {
+        "200": 30,
+        "403": 3,
+        "410": 5,
+        "422": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/invoices",
+      "requests": 4,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "401": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/kakao/channels",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/kakao/channels",
+      "requests": 156,
+      "successes": 151,
+      "statuses": {
+        "201": 151,
+        "409": 5
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/kakao/channels/{id}",
+      "requests": 20,
+      "successes": 10,
+      "statuses": {
+        "200": 5,
+        "204": 5,
+        "409": 10
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/kakao/channels/{id}",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/kakao/channels/{id}",
+      "requests": 20,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "409": 10
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/kakao/channels/{id}/verify",
+      "requests": 54,
+      "successes": 44,
+      "statuses": {
+        "200": 44,
+        "409": 5,
+        "503": 5
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/kakao/reviews",
+      "requests": 8,
+      "successes": 1,
+      "statuses": {
+        "202": 1,
+        "422": 5,
+        "503": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/kakao/templates",
+      "requests": 5,
+      "successes": 5,
+      "statuses": {
+        "200": 5
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/kakao/templates",
+      "requests": 166,
+      "successes": 161,
+      "statuses": {
+        "201": 161,
+        "404": 5
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/kakao/templates/{id}",
+      "requests": 25,
+      "successes": 15,
+      "statuses": {
+        "200": 5,
+        "204": 10,
+        "409": 10
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/kakao/templates/{id}",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/kakao/templates/{id}",
+      "requests": 43,
+      "successes": 28,
+      "statuses": {
+        "200": 28,
+        "409": 15
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/kakao/templates/{id}/review",
+      "requests": 5,
+      "successes": 5,
+      "statuses": {
+        "200": 5
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/kakao/templates/{id}/send",
+      "requests": 95,
+      "successes": 35,
+      "statuses": {
+        "200": 35,
+        "400": 5,
+        "403": 5,
+        "409": 35,
+        "422": 5,
+        "500": 5,
+        "503": 5
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/kakao/templates/{id}/submit",
+      "requests": 79,
+      "successes": 74,
+      "statuses": {
+        "200": 74,
+        "500": 5
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/kakao/templates/preview",
+      "requests": 4,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "422": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/ledger",
+      "requests": 26,
+      "successes": 14,
+      "statuses": {
+        "200": 14,
+        "401": 3,
+        "403": 3,
+        "404": 3,
+        "422": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/marketing/preferences",
+      "requests": 38,
+      "successes": 14,
+      "statuses": {
+        "200": 14,
+        "401": 2,
+        "403": 4,
+        "404": 2,
+        "422": 16
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/marketing/preferences",
+      "requests": 30,
+      "successes": 8,
+      "statuses": {
+        "201": 8,
+        "401": 4,
+        "403": 2,
+        "409": 4,
+        "410": 4,
+        "422": 8
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/marketing/preferences/{id}",
+      "requests": 28,
+      "successes": 24,
+      "statuses": {
+        "200": 24,
+        "401": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/marketing/preferences/{id}",
+      "requests": 22,
+      "successes": 14,
+      "statuses": {
+        "200": 14,
+        "401": 2,
+        "403": 2,
+        "404": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/marketing/preferences/{id}",
+      "requests": 26,
+      "successes": 20,
+      "statuses": {
+        "200": 20,
+        "401": 2,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/marketing/preferences/export",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/marketing/preferences/withdrawals",
+      "requests": 39,
+      "successes": 25,
+      "statuses": {
+        "200": 25,
+        "401": 2,
+        "403": 6,
+        "404": 2,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/marketing/sources",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 2,
+        "403": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/marketing/summary",
+      "requests": 24,
+      "successes": 16,
+      "statuses": {
+        "200": 16,
+        "401": 2,
+        "404": 4,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "requests": 24,
+      "successes": 12,
+      "statuses": {
+        "200": 12,
+        "401": 12
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/me",
+      "requests": 24,
+      "successes": 5,
+      "statuses": {
+        "200": 5,
+        "401": 4,
+        "403": 2,
+        "409": 3,
+        "422": 10
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/me/audit-events",
+      "requests": 13,
+      "successes": 7,
+      "statuses": {
+        "200": 7,
+        "401": 1,
+        "422": 5
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/me/audit-events/export",
+      "requests": 6,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 1,
+        "422": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/me/closure",
+      "requests": 9,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "401": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/me/closure",
+      "requests": 24,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "401": 2,
+        "403": 2,
+        "409": 8,
+        "422": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/me/password-policy",
+      "requests": 46,
+      "successes": 46,
+      "statuses": {
+        "200": 46
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/me/password-policy",
+      "requests": 28,
+      "successes": 12,
+      "statuses": {
+        "200": 12,
+        "401": 2,
+        "403": 4,
+        "409": 8,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/me/sessions",
+      "requests": 5,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 1
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/me/sessions/{id}",
+      "requests": 9,
+      "successes": 3,
+      "statuses": {
+        "204": 3,
+        "401": 2,
+        "404": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/me/sso-accounts",
+      "requests": 6,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/me/sso-accounts/{id}",
+      "requests": 16,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "401": 2,
+        "403": 2,
+        "404": 2,
+        "409": 3,
+        "422": 3,
+        "500": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/members",
+      "requests": 18,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "403": 8
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/members/{id}",
+      "requests": 9,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "403": 2,
+        "409": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/members/{id}",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/members/{id}",
+      "requests": 53,
+      "successes": 26,
+      "statuses": {
+        "200": 26,
+        "403": 2,
+        "404": 5,
+        "409": 12,
+        "422": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/members/{id}/transfer",
+      "requests": 14,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "401": 2,
+        "403": 4,
+        "404": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/message-content/preview",
+      "requests": 8,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "403": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/message-templates",
+      "requests": 9,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "403": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/message-templates",
+      "requests": 48,
+      "successes": 39,
+      "statuses": {
+        "201": 39,
+        "409": 3,
+        "422": 6
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/message-templates/{id}",
+      "requests": 8,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/message-templates/{id}",
+      "requests": 62,
+      "successes": 48,
+      "statuses": {
+        "200": 48,
+        "401": 3,
+        "403": 6,
+        "404": 5
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/message-templates/{id}",
+      "requests": 17,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "403": 3,
+        "409": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/message-templates/{id}/archive",
+      "requests": 6,
+      "successes": 6,
+      "statuses": {
+        "200": 6
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/message-templates/{id}/restore",
+      "requests": 6,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "410": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/message-templates/{id}/revisions/{version}",
+      "requests": 6,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "410": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/notices",
+      "requests": 18,
+      "successes": 14,
+      "statuses": {
+        "200": 14,
+        "401": 2,
+        "403": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/notices",
+      "requests": 14,
+      "successes": 8,
+      "statuses": {
+        "201": 8,
+        "403": 2,
+        "409": 2,
+        "410": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/notices/{id}",
+      "requests": 12,
+      "successes": 6,
+      "statuses": {
+        "204": 6,
+        "403": 2,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/notices/{id}",
+      "requests": 20,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "403": 2,
+        "404": 10
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/notices/{id}",
+      "requests": 14,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/notices/{id}/attachments/{attachmentId}",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/notices/{id}/attachments/{attachmentId}",
+      "requests": 12,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "403": 2,
+        "404": 6
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/notices/{id}/attachments/{attachmentId}",
+      "requests": 12,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "403": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/plans",
+      "requests": 5,
+      "successes": 5,
+      "statuses": {
+        "200": 5
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/processing-purposes",
+      "requests": 26,
+      "successes": 20,
+      "statuses": {
+        "200": 20,
+        "401": 3,
+        "422": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/processing-purposes",
+      "requests": 364,
+      "successes": 305,
+      "statuses": {
+        "201": 305,
+        "400": 3,
+        "403": 6,
+        "409": 9,
+        "422": 41
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/processing-purposes/{id}",
+      "requests": 18,
+      "successes": 10,
+      "statuses": {
+        "204": 10,
+        "403": 3,
+        "409": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/processing-purposes/{id}",
+      "requests": 14,
+      "successes": 9,
+      "statuses": {
+        "200": 9,
+        "403": 3,
+        "404": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/processing-purposes/{id}",
+      "requests": 57,
+      "successes": 43,
+      "statuses": {
+        "200": 43,
+        "409": 9,
+        "422": 5
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/processing-purposes/{id}/history",
+      "requests": 9,
+      "successes": 9,
+      "statuses": {
+        "200": 9
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/processing-purposes/{id}/restore",
+      "requests": 9,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "409": 3,
+        "422": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/public/documents/{token}",
+      "requests": 54,
+      "successes": 34,
+      "statuses": {
+        "200": 34,
+        "404": 4,
+        "410": 16
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/public/documents/{token}/pdf",
+      "requests": 32,
+      "successes": 20,
+      "statuses": {
+        "200": 20,
+        "404": 2,
+        "410": 10
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/public/forms/{token}",
+      "requests": 145,
+      "successes": 115,
+      "statuses": {
+        "200": 115,
+        "403": 2,
+        "404": 10,
+        "409": 2,
+        "410": 16
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/public/forms/{token}/author-assets",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/public/forms/{token}/author-assets/{id}/download",
+      "requests": 5,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "410": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/public/forms/{token}/participation-challenges",
+      "requests": 14,
+      "successes": 10,
+      "statuses": {
+        "201": 10,
+        "403": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/public/forms/{token}/participation-challenges-verify",
+      "requests": 10,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/public/forms/{token}/submissions",
+      "requests": 1084,
+      "successes": 924,
+      "statuses": {
+        "201": 924,
+        "403": 2,
+        "404": 2,
+        "409": 17,
+        "410": 19,
+        "422": 114,
+        "425": 2,
+        "500": 2,
+        "503": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/public/forms/{token}/uploads",
+      "requests": 226,
+      "successes": 194,
+      "statuses": {
+        "201": 194,
+        "401": 2,
+        "409": 6,
+        "410": 3,
+        "422": 18,
+        "503": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/public/services/{serviceId}/documents",
+      "requests": 38,
+      "successes": 32,
+      "statuses": {
+        "200": 32,
+        "422": 6
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/public/urls/{slug}",
+      "requests": 6,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "410": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/recipients",
+      "requests": 5,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/recipients",
+      "requests": 84,
+      "successes": 64,
+      "statuses": {
+        "201": 64,
+        "403": 6,
+        "422": 14
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/recipients/{id}",
+      "requests": 11,
+      "successes": 6,
+      "statuses": {
+        "204": 6,
+        "409": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/recipients/{id}",
+      "requests": 7,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 5
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/recipients/{id}",
+      "requests": 5,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/recipients/{id}/history",
+      "requests": 5,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/recipients/{id}/restore",
+      "requests": 6,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "409": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/retention-rules",
+      "requests": 3,
+      "successes": 3,
+      "statuses": {
+        "200": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/retention-rules",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "201": 1,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/retention-rules/{id}",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "204": 1,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/retention-rules/{id}",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "404": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/retention-rules/{id}",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/security/ip-rules",
+      "requests": 52,
+      "successes": 40,
+      "statuses": {
+        "200": 40,
+        "403": 3,
+        "422": 9
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/security/ip-rules",
+      "requests": 56,
+      "successes": 38,
+      "statuses": {
+        "201": 38,
+        "403": 9,
+        "409": 3,
+        "410": 3,
+        "422": 3
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/security/ip-rules/{id}",
+      "requests": 20,
+      "successes": 9,
+      "statuses": {
+        "204": 9,
+        "403": 3,
+        "409": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/security/ip-rules/{id}",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 8
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/security/ip-rules/{id}",
+      "requests": 14,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "409": 9,
+        "422": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/security/ip-rules/settings",
+      "requests": 31,
+      "successes": 22,
+      "statuses": {
+        "200": 22,
+        "401": 3,
+        "409": 6
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/security/mfa-policy",
+      "requests": 38,
+      "successes": 30,
+      "statuses": {
+        "200": 30,
+        "422": 8
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/security/mfa-policy",
+      "requests": 32,
+      "successes": 22,
+      "statuses": {
+        "200": 22,
+        "401": 2,
+        "403": 2,
+        "409": 6
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/security/mfa-policy/exceptions",
+      "requests": 40,
+      "successes": 22,
+      "statuses": {
+        "201": 22,
+        "403": 2,
+        "404": 2,
+        "409": 6,
+        "410": 4,
+        "422": 4
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/security/mfa-policy/exceptions/{id}",
+      "requests": 6,
+      "successes": 6,
+      "statuses": {
+        "204": 6
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/security/mfa-policy/exceptions/{id}",
+      "requests": 8,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 2,
+        "404": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/security/mfa-policy/exceptions/{id}",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/security/policy",
+      "requests": 8,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/security/policy",
+      "requests": 112,
+      "successes": 108,
+      "statuses": {
+        "200": 108,
+        "401": 2,
+        "403": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/security/policy",
+      "requests": 88,
+      "successes": 42,
+      "statuses": {
+        "200": 42,
+        "401": 14,
+        "403": 6,
+        "409": 6,
+        "422": 18,
+        "429": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/security/sso",
+      "requests": 8,
+      "successes": 8,
+      "statuses": {
+        "200": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/security/sso",
+      "requests": 127,
+      "successes": 113,
+      "statuses": {
+        "201": 113,
+        "400": 1,
+        "403": 3,
+        "409": 1,
+        "410": 1,
+        "422": 7,
+        "500": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/security/sso-policy",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/security/sso-policy",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/security/sso-policy/challenge",
+      "requests": 7,
+      "successes": 2,
+      "statuses": {
+        "201": 2,
+        "403": 2,
+        "422": 3
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/security/sso/{id}",
+      "requests": 11,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 1,
+        "409": 3,
+        "422": 2,
+        "500": 1
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/security/sso/{id}",
+      "requests": 60,
+      "successes": 51,
+      "statuses": {
+        "200": 51,
+        "403": 1,
+        "409": 6,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/security/sso/{id}/directory",
+      "requests": 7,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "404": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/security/sso/{id}/directory",
+      "requests": 82,
+      "successes": 71,
+      "statuses": {
+        "201": 71,
+        "400": 1,
+        "403": 3,
+        "404": 1,
+        "409": 2,
+        "410": 1,
+        "422": 2,
+        "500": 1
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/security/sso/{id}/directory/{memberId}",
+      "requests": 9,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "403": 2,
+        "409": 1,
+        "422": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/security/sso/{id}/directory/{memberId}",
+      "requests": 21,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "403": 2,
+        "404": 2,
+        "409": 1,
+        "422": 7,
+        "500": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/security/sso/{id}/preflight",
+      "requests": 3,
+      "successes": 1,
+      "statuses": {
+        "200": 1,
+        "404": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/security/status",
+      "requests": 10,
+      "successes": 6,
+      "statuses": {
+        "200": 6,
+        "403": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/senders",
+      "requests": 26,
+      "successes": 12,
+      "statuses": {
+        "200": 12,
+        "401": 2,
+        "422": 12
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders",
+      "requests": 162,
+      "successes": 142,
+      "statuses": {
+        "201": 142,
+        "401": 4,
+        "403": 2,
+        "409": 2,
+        "410": 2,
+        "422": 10
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/senders/{id}",
+      "requests": 16,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "401": 2,
+        "409": 2,
+        "422": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/senders/{id}",
+      "requests": 442,
+      "successes": 420,
+      "statuses": {
+        "200": 420,
+        "401": 8,
+        "403": 8,
+        "404": 4,
+        "422": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/senders/{id}",
+      "requests": 26,
+      "successes": 16,
+      "statuses": {
+        "200": 16,
+        "401": 2,
+        "409": 4,
+        "422": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/check",
+      "requests": 68,
+      "successes": 56,
+      "statuses": {
+        "200": 56,
+        "403": 2,
+        "409": 4,
+        "503": 6
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/cleanup",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "401": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/confirm-email",
+      "requests": 68,
+      "successes": 46,
+      "statuses": {
+        "200": 46,
+        "409": 2,
+        "422": 20
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/default",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "409": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/disable",
+      "requests": 9,
+      "successes": 7,
+      "statuses": {
+        "200": 7,
+        "401": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/dns",
+      "requests": 58,
+      "successes": 56,
+      "statuses": {
+        "201": 56,
+        "401": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/evidence",
+      "requests": 14,
+      "successes": 10,
+      "statuses": {
+        "201": 10,
+        "401": 2,
+        "410": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/senders/{id}/evidence/{fileId}",
+      "requests": 4,
+      "successes": 4,
+      "statuses": {
+        "200": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/evidence/{fileId}/attach",
+      "requests": 10,
+      "successes": 10,
+      "statuses": {
+        "200": 10
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/senders/{id}/evidence/{fileId}/download",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/renew",
+      "requests": 16,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "401": 2,
+        "403": 2,
+        "410": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/senders/{id}/request-email",
+      "requests": 68,
+      "successes": 66,
+      "statuses": {
+        "202": 66,
+        "401": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/services",
+      "requests": 80,
+      "successes": 48,
+      "statuses": {
+        "200": 48,
+        "401": 9,
+        "403": 23
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/services",
+      "requests": 56,
+      "successes": 38,
+      "statuses": {
+        "201": 38,
+        "401": 2,
+        "403": 8,
+        "409": 4,
+        "422": 4
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/services/{id}",
+      "requests": 15,
+      "successes": 7,
+      "statuses": {
+        "204": 7,
+        "401": 2,
+        "403": 2,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/services/{id}",
+      "requests": 39,
+      "successes": 11,
+      "statuses": {
+        "200": 11,
+        "401": 1,
+        "403": 9,
+        "404": 18
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/services/{id}",
+      "requests": 26,
+      "successes": 9,
+      "statuses": {
+        "200": 9,
+        "401": 4,
+        "403": 4,
+        "409": 7,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/services/{id}/consent-display/{kind}",
+      "requests": 40,
+      "successes": 34,
+      "statuses": {
+        "200": 34,
+        "403": 2,
+        "422": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/services/{id}/consent-display/{kind}",
+      "requests": 52,
+      "successes": 30,
+      "statuses": {
+        "200": 30,
+        "403": 2,
+        "409": 2,
+        "422": 18
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/services/{id}/subprocessor-notices",
+      "requests": 17,
+      "successes": 14,
+      "statuses": {
+        "200": 14,
+        "404": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/services/{id}/subprocessor-notices",
+      "requests": 18,
+      "successes": 11,
+      "statuses": {
+        "201": 11,
+        "409": 4,
+        "422": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/services/{id}/subprocessors",
+      "requests": 5,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "404": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/services/{id}/subprocessors",
+      "requests": 16,
+      "successes": 9,
+      "statuses": {
+        "201": 9,
+        "403": 1,
+        "404": 1,
+        "409": 3,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/services/{id}/subprocessors/{subId}",
+      "requests": 7,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
         "403": 1,
         "404": 4
       }
     },
     {
       "method": "PATCH",
-      "path": "/support-tickets/{id}",
+      "path": "/services/{id}/subprocessors/{subId}",
+      "requests": 8,
+      "successes": 5,
+      "statuses": {
+        "200": 5,
+        "409": 1,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/services/{id}/verification",
+      "requests": 24,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "409": 2,
+        "422": 20
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/services/{id}/verification",
+      "requests": 20,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "403": 2,
+        "404": 4,
+        "422": 6
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/services/{id}/verification",
+      "requests": 18,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "409": 2,
+        "422": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/services/{id}/verification",
+      "requests": 92,
+      "successes": 48,
+      "statuses": {
+        "201": 48,
+        "400": 2,
+        "401": 4,
+        "403": 4,
+        "409": 6,
+        "410": 2,
+        "422": 26
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/share-grants",
+      "requests": 30,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "401": 4,
+        "403": 8,
+        "422": 6,
+        "500": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/share-grants",
+      "requests": 155,
+      "successes": 115,
+      "statuses": {
+        "201": 115,
+        "403": 14,
+        "404": 2,
+        "409": 6,
+        "410": 6,
+        "422": 12
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/share-grants/{id}",
+      "requests": 16,
+      "successes": 12,
+      "statuses": {
+        "200": 12,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/share-grants/{id}",
+      "requests": 26,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "401": 2,
+        "403": 8,
+        "404": 4,
+        "422": 2,
+        "500": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/share-grants/{id}",
+      "requests": 12,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "403": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/share-grants/{id}/events",
+      "requests": 6,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/share-grants/{id}/resend",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/share-grants/options",
+      "requests": 54,
+      "successes": 52,
+      "statuses": {
+        "200": 52,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/sms/receipts",
       "requests": 4,
       "successes": 1,
       "statuses": {
-        "200": 1,
-        "404": 1,
+        "202": 1,
+        "401": 1,
+        "503": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subjects/access-requests",
+      "requests": 160,
+      "successes": 154,
+      "statuses": {
+        "202": 154,
+        "403": 2,
+        "422": 2,
+        "429": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subjects/logout",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "204": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/subjects/me",
+      "requests": 8,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "422": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/subjects/me/consents",
+      "requests": 66,
+      "successes": 30,
+      "statuses": {
+        "200": 30,
+        "401": 24,
+        "404": 4,
+        "422": 8
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/subjects/me/events",
+      "requests": 24,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "401": 4,
+        "404": 4,
+        "422": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subjects/me/withdrawals",
+      "requests": 46,
+      "successes": 36,
+      "statuses": {
+        "201": 36,
+        "401": 4,
+        "404": 2,
+        "422": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/subjects/me/withdrawals/{id}",
+      "requests": 6,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "422": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subjects/me/withdrawals/{id}/cancel",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "401": 4,
+        "422": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subjects/me/withdrawals/{id}/confirm",
+      "requests": 22,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "401": 4,
+        "404": 6,
+        "409": 4,
+        "422": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subjects/sessions",
+      "requests": 130,
+      "successes": 120,
+      "statuses": {
+        "201": 120,
+        "422": 10
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/submissions/{id}",
+      "requests": 44,
+      "successes": 38,
+      "statuses": {
+        "200": 38,
+        "403": 2,
+        "404": 4
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/submissions/{id}",
+      "requests": 57,
+      "successes": 37,
+      "statuses": {
+        "200": 37,
+        "409": 7,
+        "410": 2,
+        "422": 11
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/submissions/{id}/destruction-request",
+      "requests": 84,
+      "successes": 80,
+      "statuses": {
+        "200": 80,
+        "409": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/submissions/{id}/hold",
+      "requests": 18,
+      "successes": 14,
+      "statuses": {
+        "200": 14,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/submissions/{id}/notes",
+      "requests": 18,
+      "successes": 10,
+      "statuses": {
+        "201": 10,
+        "403": 4,
+        "410": 4
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/submissions/{id}/notes/{noteId}",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "204": 2
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/submissions/{id}/notes/{noteId}",
+      "requests": 8,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 4,
         "409": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/submissions/{id}/pdf",
+      "requests": 6,
+      "successes": 4,
+      "statuses": {
+        "200": 4,
+        "410": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/submissions/{id}/receipts/{receiptId}/pdf",
+      "requests": 77,
+      "successes": 53,
+      "statuses": {
+        "200": 53,
+        "401": 3,
+        "403": 3,
+        "404": 8,
+        "410": 10
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/submissions/{id}/retention",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 2,
+        "422": 6
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/submissions/{id}/withdraw",
+      "requests": 17,
+      "successes": 15,
+      "statuses": {
+        "200": 15,
+        "409": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/subscriptions",
+      "requests": 24,
+      "successes": 21,
+      "statuses": {
+        "200": 21,
+        "403": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subscriptions",
+      "requests": 18,
+      "successes": 6,
+      "statuses": {
+        "202": 6,
+        "409": 9,
+        "422": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subscriptions/{id}/cancel",
+      "requests": 9,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "404": 3,
+        "409": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subscriptions/{id}/schedule-cancel",
+      "requests": 18,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "404": 3,
+        "409": 2,
+        "422": 5
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/subscriptions/{id}/undo-cancel",
+      "requests": 8,
+      "successes": 5,
+      "statuses": {
+        "200": 5,
+        "409": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/subscriptions/entitlement",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/support-tickets",
+      "requests": 14,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "401": 2,
+        "403": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/support-tickets",
+      "requests": 16,
+      "successes": 4,
+      "statuses": {
+        "201": 4,
+        "400": 2,
+        "403": 2,
+        "404": 2,
+        "409": 2,
+        "410": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/support-tickets/{id}",
+      "requests": 8,
+      "successes": 2,
+      "statuses": {
+        "204": 2,
+        "404": 2,
+        "409": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/support-tickets/{id}",
+      "requests": 14,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 2,
+        "404": 10
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/support-tickets/{id}",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 2,
+        "409": 4,
+        "422": 2
       }
     },
     {
       "method": "POST",
       "path": "/support-tickets/{id}/close",
-      "requests": 1,
-      "successes": 1,
+      "requests": 2,
+      "successes": 2,
       "statuses": {
-        "200": 1
+        "200": 2
       }
     },
     {
       "method": "POST",
       "path": "/support-tickets/{id}/reopen",
-      "requests": 2,
-      "successes": 1,
+      "requests": 4,
+      "successes": 2,
       "statuses": {
-        "200": 1,
-        "403": 1
+        "200": 2,
+        "403": 2
       }
     },
     {
       "method": "POST",
       "path": "/support-tickets/{id}/reply",
-      "requests": 3,
-      "successes": 1,
+      "requests": 6,
+      "successes": 2,
       "statuses": {
-        "200": 1,
-        "403": 1,
-        "409": 1
+        "200": 2,
+        "403": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/templates",
+      "requests": 20,
+      "successes": 18,
+      "statuses": {
+        "200": 18,
+        "422": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/templates",
+      "requests": 54,
+      "successes": 31,
+      "statuses": {
+        "201": 31,
+        "401": 4,
+        "403": 4,
+        "410": 4,
+        "422": 11
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/templates/{id}",
+      "requests": 22,
+      "successes": 8,
+      "statuses": {
+        "204": 8,
+        "403": 4,
+        "409": 8,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/templates/{id}",
+      "requests": 16,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "403": 2,
+        "404": 6
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/templates/{id}",
+      "requests": 28,
+      "successes": 10,
+      "statuses": {
+        "200": 10,
+        "403": 4,
+        "409": 8,
+        "422": 6
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/templates/{id}/archive",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "403": 4,
+        "409": 4
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/templates/{id}/restore",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "409": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/templates/{id}/use",
+      "requests": 33,
+      "successes": 18,
+      "statuses": {
+        "201": 18,
+        "402": 2,
+        "403": 4,
+        "409": 4,
+        "410": 2,
+        "422": 3
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/uploads/{id}",
+      "requests": 14,
+      "successes": 6,
+      "statuses": {
+        "204": 6,
+        "409": 3,
+        "422": 2,
+        "503": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/uploads/{id}",
+      "requests": 33,
+      "successes": 28,
+      "statuses": {
+        "200": 28,
+        "404": 5
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/uploads/{id}/complete",
+      "requests": 325,
+      "successes": 310,
+      "statuses": {
+        "200": 310,
+        "409": 3,
+        "410": 3,
+        "422": 6,
+        "503": 3
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/uploads/{id}/content",
+      "requests": 349,
+      "successes": 316,
+      "statuses": {
+        "200": 316,
+        "403": 3,
+        "404": 9,
+        "410": 3,
+        "413": 3,
+        "415": 3,
+        "422": 12
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/uploads/init",
+      "requests": 24,
+      "successes": 18,
+      "statuses": {
+        "201": 18,
+        "403": 3,
+        "409": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/usage-events",
+      "requests": 4,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "401": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/viewer/author-assets",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/viewer/author-assets/{id}/download",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "200": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/viewer/challenges",
+      "requests": 103,
+      "successes": 99,
+      "statuses": {
+        "202": 99,
+        "422": 2,
+        "429": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/viewer/challenges/{challengeId}/verify",
+      "requests": 99,
+      "successes": 65,
+      "statuses": {
+        "200": 65,
+        "403": 2,
+        "422": 32
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/viewer/files",
+      "requests": 5,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "410": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/viewer/files/{id}",
+      "requests": 6,
+      "successes": 3,
+      "statuses": {
+        "200": 3,
+        "410": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/viewer/files/{id}/download",
+      "requests": 48,
+      "successes": 8,
+      "statuses": {
+        "200": 8,
+        "401": 11,
+        "404": 17,
+        "410": 3,
+        "422": 9
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/viewer/logout",
+      "requests": 2,
+      "successes": 2,
+      "statuses": {
+        "204": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/viewer/session",
+      "requests": 4,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/viewer/submissions",
+      "requests": 48,
+      "successes": 20,
+      "statuses": {
+        "200": 20,
+        "401": 26,
+        "422": 2
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/viewer/submissions/{id}",
+      "requests": 10,
+      "successes": 2,
+      "statuses": {
+        "200": 2,
+        "404": 2,
+        "410": 6
       }
     }
   ]

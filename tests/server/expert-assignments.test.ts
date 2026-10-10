@@ -54,6 +54,7 @@ describe("전문가 배정 PostgreSQL·API·회사 선택", () => {
     expect((await list(req("/expert-assignments"))).status).toBe(401);
     expect((await list(req("/expert-assignments?scope=admin", "GET", expertCookie))).status).toBe(403);
     expect((await options(req("/expert-assignments/options", "GET", ownerCookie))).status).toBe(403);
+    expect((await options(req("/expert-assignments/options", "GET", adminCookie))).status).toBe(200);
     expect((await create(req("/expert-assignments", "POST", ownerCookie,
       { companyId: a, expertEmail: "expert-person@test.local", serviceIds: [a1], expiresAt: expiry() }))).status).toBe(403);
     expect((await create(req("/expert-assignments", "POST", adminCookie,

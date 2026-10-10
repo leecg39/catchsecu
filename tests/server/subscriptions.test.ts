@@ -98,6 +98,7 @@ describe("subscription and catalog boundary", () => {
     expect(overview.subscriptions[0]).toMatchObject({ planId: "trial", status: "trialing", priceKrw: 0 });
     expect(new Date(overview.subscriptions[0].periodEnd!).getTime() - new Date(overview.subscriptions[0].periodStart!).getTime()).toBe(7 * 86400000);
     expect(overview.entitlement).toMatchObject({ active: true, usage: { services: 1, members: 2, subjects: 0, forms: 0 } });
+    expect(await answer<EntitlementRecord>(await getSubscriptions(req("/subscriptions/entitlement")))).toEqual(overview.entitlement);
     const foreign = await answer<BillingOverview>(await getSubscriptions(req("/subscriptions", "GET", "foreign")));
     expect(foreign.subscriptions[0].id).not.toBe(overview.subscriptions[0].id);
     await answer(await getSubscriptions(req("/subscriptions", "GET", "admin")), 403);

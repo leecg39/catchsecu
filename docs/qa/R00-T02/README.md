@@ -1,6 +1,6 @@
-# 2026-10-10 현재 구현 감사
+# R00-T02 현재 구현·계약·증거 감사
 
-## 2026-10-11 현재 소스 재감사
+## 2026-10-11 이전 중간 감사
 
 - 계약 생성에서 `PublicSubmissionReceipt`만 공통 rich 문서 변환기를 우회해 `#/$defs/` 참조가 남는 결함을 전체 회귀에서 발견했다. `openApiSchema`를 사용하도록 수정했고 집중 시험 1/1과 Node 25 진단 실행 2,867/2,867이 통과했다. Node 25는 지원 버전이 아니므로 최종 품질 게이트로 쓰지 않는다.
 - 지원 Node 24.18.0 전체 실행은 261파일 중260파일, 2,867개 중2,865개가 통과했다. 실패2개는 `tests/server/sso.test.ts`의 `beforeEach` DB 초기화 hook timeout이며 제품 assertion 실패는 없었다. 같은 현재 소스의 해당 파일 독립 재실행은 131/131 통과했다. 이 둘은 결합 증거이며 단일 전체 회귀 성공으로 기록하지 않는다.
@@ -11,9 +11,17 @@
 - 현재 API 감사는 466 operation·158 handler, handler/메서드 누락0·정책 누락0·작업 소유자 누락0이다. 모든466개 operation에 handler 직접 import 시험이 연결됐다. 실제 route wrapper 요청807건 중 계약766건을 연결했고 성공 operation57개, catch-all 분기34/285개를 확인했다. 남은 catch-all251개는 분기별 실행 증거가 계속 필요하다. [런타임 route 추적](runtime-route-trace/README.md)
 - [현재 감사 요약](current-audit-summary.json), [API operation 감사](api-audit/README.md), [지원 Node 전체 실행](full-tests-current.json), [SSO 재실행](sso-node24-retry.json)
 
-R00-T02는 위 누락과 단일 지원 Node 전체 실행 실패 때문에 진행 상태를 유지한다.
+이 중간 감사의 누락은 아래 최종 감사에서 모두 해소했다.
 
-## 현재 결과
+## 2026-10-11 최종 감사 — 완료
+
+- 현재 OpenAPI 계약 466 operation과 route handler 158개를 대조했다. handler·method·정책·작업 소유자 누락은 모두 0이며, 모든 operation에 handler 직접 import 테스트가 연결됐다.
+- 실제 route wrapper 요청 25,374건을 수집해 24,948건을 계약에 연결했다. 466/466 operation과 catch-all 285/285 분기에서 성공 응답을 확인했다.
+- 지원 Node 24.18.0에서 전체 196개 파일·261개 suite·2,877개 테스트를 단일 실행으로 통과했다. 실패·대기·todo는 0이다.
+- 외부 공식 공급자 자격증명 의존 흐름은 각 도메인의 `external_pending` 상태를 유지한다. 이번 완료는 현재 내부 API 계약·구현·실행 증거 감사 범위다.
+- [현재 감사 요약](current-audit-summary.json), [API 대조](api-audit/README.md), [런타임 route 추적](runtime-route-trace/README.md), [지원 Node 전체 실행](full-tests-current.json)
+
+## 이전 감사 이력
 
 - 후속 수탁 항목 초기화·재수탁자 필수/선택 항목·처리 근거를 DB/공개 스냅샷/PDF에 연결했다. 관련4파일58개와 네트워크 오류3개, 실제 UI 생성/삭제저장/재게시·실패재시도 입력보존·3개 화면 폭을 확인했다. 게시2본/감사5건/PDF2개·재시작 지문 일치, 기존 처리방침14개 HTTP/2개 PDF 불변도 확인했다. [실행 증거](../R10-T04/trustee-items/README.md). 전체1,834개는 이 변경 전 체크포인트다.
 

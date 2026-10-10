@@ -169,6 +169,7 @@ test.each(["private-session", "shared-session", "shared-grant", "shared-retentio
 
 test("응답·질문·파일의 정확한 조합과 중복 없는 쿼리만 개인·공유 경로에 허용한다", async () => {
   const f = await fixture(), v = await viewer(f);
+  expect((await viewerGet(req("/viewer/files?submissionId=" + f.sub.id, "GET", undefined, v.cookie))).status).toBe(200);
   for (const [handler, base, cookie] of [[fileGet, "/files", f.cookie], [viewerGet, "/viewer/files", v.cookie]] as const) {
     expect((await handler(req(filePath(f, base, ""), "GET", undefined, cookie))).status).toBe(200);
     const response = await handler(req(filePath(f, base), "GET", undefined, cookie)); expect(response.status).toBe(200);

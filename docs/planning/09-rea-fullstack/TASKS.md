@@ -44,7 +44,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
   - 메뉴 action→route/API/모달 trace와 미확인상태 목록; 리디렉션·403을 정상 CRUD 성공으로 집계하지 않음
 - 완료 증거: [경로·메뉴·동작 기준선](../../qa/R00-T01/README.md), `action-trace.json`, `route-contract-check.json`, `menu-runtime/inventory.json`
 
-### [~] R00-T02 현재 구현·계약·증거 유효성 감사
+### [x] R00-T02 현재 구현·계약·증거 유효성 감사
 
 128 Prisma 모델·308 계약path·440 operation·154 handler파일·116 test파일 기준을 다시 수집하고 호출 가능한 API와 미연결 UI를 분류한다. 문서 및 테스트 파일 존재만으로 구현 완료 판정하지 않는다.
 
@@ -55,7 +55,7 @@ F3 길이 제한: 새UI 단문100·장문1000, 버전별 nullable 제한·구100
 - 완료 조건:
   - operation별 handler/서버함수/DTO/정책/실행증거 연결
   - 현재 수정중 payment 관련 코드·문서 변경을 보존하고 근거 commit/time 기록; 과거181 검증의 한계 표시
-- 진행 증거: [현재 소스 재감사](../../qa/R00-T02/README.md), [관리자 CRUD route 수용](../../qa/R00-T02/admin-crud-routes/README.md), [내부 별칭·집계 route 수용](../../qa/R00-T02/internal-alias-routes/README.md), [공통 인증 route 수용](../../qa/R00-T02/auth-route-adapter/README.md), [잔여 API route 수용](../../qa/R00-T02/final-handler-routes/README.md), [런타임 route 추적](../../qa/R00-T02/runtime-route-trace/README.md). 466 operation의 handler·정책·작업소유자 누락0, 직접 시험 연결466·미연결0. 실제807요청 중 계약766건을 연결해 성공 operation57개와 catch-all 분기34/285개를 확인했고 남은251개는 미검증이다. 추적 대상6파일86시험은 통과했다. 지원 Node24 전체 실행의 SSO hook timeout2와 독립 재실행131/131을 분리 기록해 완료 상태는 유지하지 않는다.
+- 완료 증거: [현재 소스 최종 감사](../../qa/R00-T02/README.md), [API operation 대조](../../qa/R00-T02/api-audit/README.md), [런타임 route 추적](../../qa/R00-T02/runtime-route-trace/README.md), [지원 Node 전체 회귀](../../qa/R00-T02/full-tests-current.json). 466 operation·158 handler의 진입점/메서드/정책/작업소유자 누락0, 직접 handler 시험466/466, 성공 응답466/466, catch-all285/285를 확인했다. 지원 Node24 단일 실행 196파일·261suite·2,877시험이 전부 통과했다.
 
 ### [~] R00-T03 TASKS·역할·기능범위·새 경로 계약 통합
 

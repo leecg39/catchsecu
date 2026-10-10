@@ -10,7 +10,7 @@ import { createComplianceExport, getComplianceExport, listComplianceExports, cha
   claimComplianceExport, processComplianceExport, runOneComplianceExport, cleanupComplianceExports } from "@/server/compliance-exports";
 import { sha256 } from "@/server/pdf-renderer";
 import { POST as createRoute } from "@/app/api/v1/analytics/exports/route";
-import { GET as getRoute } from "@/app/api/v1/analytics/exports/[...segments]/route";
+import { GET as getRoute, POST as cancelRoute, DELETE as deleteRoute } from "@/app/api/v1/analytics/exports/[...segments]/route";
 const faults = vi.hoisted(() => ({ action: "", advance: false, render: false, afterRender: null as null | (() => Promise<void>) }));
 vi.mock("@/server/audit", async importOriginal => {
   const actual = await importOriginal<typeof import("@/server/audit")>();
@@ -32,7 +32,7 @@ vi.mock("@/server/pdf-renderer", async importOriginal => {
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
 const email = "close-export@example.test", password = "Close-export!123", month = "2026-09";
-let userId: string, ctx: Context, serviceId: string;
+let userId: string, ctx: Context, serviceId: string, currentCookie: string;
 function request(path: string, input?: unknown, cookie = "") {
   return new Request(origin + "/api/v1" + path, { method: input ? "POST" : "GET", headers: { origin, cookie,
     ...(input ? { "content-type": "application/json" } : {}) }, ...(input ? { body: JSON.stringify(input) } : {}) });
@@ -52,6 +52,7 @@ beforeEach(async () => {
   const signed = await auth.handler(request("/auth/sign-in/email", { email, password }));
   expect(signed.status).toBe(200);
   const cookie = signed.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
+  currentCookie = cookie;
   const session = await db.session.findFirstOrThrow({ where: { userId }, orderBy: { createdAt: "desc" } });
   await db.session.update({ where: { id: session.id }, data: { activeCompanyId: company.id } });
   ctx = await requireContext(request("/context", undefined, cookie).headers, "service.read");
@@ -77,6 +78,23 @@ test("CSV 작업은 고정 마감과 동일한 실제 파일을 반환하고 다
   const stored = await db.complianceExportJob.findUniqueOrThrow({ where: { id: row.id } });
   expect(stored.resultCipher).not.toContain("미판정");
   expect(await db.auditEvent.count({ where: { resourceId: row.id, action: "compliance.export_downloaded" } })).toBe(1);
+});
+test("출력 상세·다운로드·취소·삭제 route가 실제 작업 상태를 처리한다", async () => {
+  const close = await makeClose();
+  const created = await createRoute(new Request(origin + "/api/v1/analytics/exports", { method: "POST", headers: {
+    origin, cookie: currentCookie, "content-type": "application/json", "idempotency-key": randomUUID(),
+  }, body: JSON.stringify({ closeId: close.id, format: "csv" }) }));
+  expect(created.status).toBe(202);
+  const completed = await ready();
+  expect((await getRoute(request("/analytics/exports/" + completed.id, undefined, currentCookie))).status).toBe(200);
+  expect((await getRoute(request("/analytics/exports/" + completed.id + "/download", undefined, currentCookie))).status).toBe(200);
+  const pending = await queued();
+  const cancelledResponse = await cancelRoute(request("/analytics/exports/" + pending.id + "/cancel", { version: pending.version }, currentCookie));
+  expect(cancelledResponse.status).toBe(200);
+  const cancelled = await cancelledResponse.json();
+  const deletion = await deleteRoute(new Request(origin + "/api/v1/analytics/exports/" + pending.id, { method: "DELETE", headers: {
+    origin, cookie: currentCookie, "content-type": "application/json" }, body: JSON.stringify({ version: cancelled.version }) }));
+  expect(deletion.status).toBe(204);
 });
 test("PDF는 한글·미판정·고정 합계와 원천 해시를 포함하며 활성 콘텐츠가 없다", async () => {
   const row = await ready("pdf"); expect(row.status).toBe("ready");

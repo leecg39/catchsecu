@@ -68,6 +68,8 @@ describe("processing catalog through actual PostgreSQL and API handlers", () => 
     expect(await ok(await getPurpose(req("/processing-purposes/" + record.id)))).toMatchObject({ id: record.id, items: input.items });
     const partyNext = await ok<RecipientRecord>(await patchRecipient(req("/recipients/" + party.id, "PATCH", "owner", { ...partyInput, purpose: "변경된 제공 목적", version: 1 })));
     expect(partyNext.version).toBe(2);
+    expect(await ok<RecipientRecord>(await getRecipient(req("/recipients/" + party.id)))).toMatchObject({ id: party.id, version: 2 });
+    expect((await ok<CatalogHistory>(await getRecipient(req("/recipients/" + party.id + "/history")))).total).toBe(2);
     const purposeNext = await ok<PurposeRecord>(await patchPurpose(req("/processing-purposes/" + record.id, "PATCH", "editor", { ...input, retentionDays: 60, version: 1 })));
     expect(purposeNext).toMatchObject({ version: 2, retentionDays: 60 });
     const history = await ok<CatalogHistory>(await getPurpose(req("/processing-purposes/" + record.id + "/history")));

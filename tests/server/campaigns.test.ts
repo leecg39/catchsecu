@@ -164,6 +164,7 @@ describe("persistent campaign CRUD, privacy and delivery", () => {
     const r = await recipient(), c = await create();
     const result = await ok<{ total: number; duplicatesRemoved: number }>(await POST(req("/campaigns/" + c.id + "/recipients", "POST", "owner", { version: c.version, mode: "csv", csv: "email\r\n" + r.contact + "\r\n" + r.contact.toUpperCase() + "\r\ninvalid\r\nunknown@campaigns.local.test" })));
     expect(result).toMatchObject({ total: 3, duplicatesRemoved: 1 }); const row = await read(c.id);
+    expect((await GET(req("/campaigns/" + c.id + "/recipients", "GET", "owner"))).status).toBe(200);
     const preview = await ok<CampaignPreview>(await POST(req("/campaigns/" + c.id + "/preview", "POST", "owner", { version: row.version }))); expect(preview).toMatchObject({ total: 3, eligible: 1, excluded: 2, senderReady: true, transportReady: true });
     expect(preview.items.map(i => i.reason)).toEqual([null, "INVALID_CONTACT", "CONSENT_REQUIRED"]); expect(preview.sample!.subject).toBe("합성 수신자 님 소식");
     const stored = JSON.stringify(await db.campaignDelivery.findMany({ where: { campaignId: c.id } })); expect(stored).not.toContain(r.contact); expect(stored).not.toContain("합성 수신자");

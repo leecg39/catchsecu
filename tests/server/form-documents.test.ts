@@ -28,7 +28,7 @@ import { GET as publicGet, POST as publicSubmit } from "@/app/api/v1/public/form
 import { GET as receiptPdf } from "@/app/api/v1/submissions/[id]/receipts/[receiptId]/pdf/route";
 import { GET as subGet, POST as subAction } from "@/app/api/v1/submissions/[...segments]/route";
 import { POST as destructionAction } from "@/app/api/v1/destruction-requests/[...segments]/route";
-import { POST as decision } from "@/app/api/v1/approvals/[...segments]/route";
+import { GET as approvalGet, POST as decision } from "@/app/api/v1/approvals/[...segments]/route";
 import { POST as templateCreate } from "@/app/api/v1/templates/route";
 import { POST as templateAction } from "@/app/api/v1/templates/[...segments]/route";
 
@@ -202,6 +202,8 @@ describe("versioned form documents and consent receipt PDFs", () => {
     await db.securityPolicy.update({ where: { tenantId: tenant }, data: { requireApproval: true, approvalRoles: ["owner"] } });
     const approval = await ok<{id:string;version:number;snapshot:{consentBundle:FormConsentBundle}}>(await formAction(req(`/forms/${row.id}/approvals`, "POST", "owner", { version: row.version, message: "문서 검토", reference: "QA" }, { "idempotency-key": randomUUID() })), 201);
     expect(approval.snapshot.consentBundle.display?.startText).toBe("승인 당시 안내");
+    expect((await formGet(req(`/forms/${row.id}/approvals`))).status).toBe(200);
+    expect((await approvalGet(req(`/approvals/${approval.id}`))).status).toBe(200);
     await ok(await decision(req(`/approvals/${approval.id}/decision`, "POST", "owner", { version: approval.version, decision: "approved", reason: "문서 확인" })));
     await display("새 안내");
     const current = await readForm(row.id);

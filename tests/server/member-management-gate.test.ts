@@ -11,7 +11,7 @@ import { acceptInvitation, updateMember } from "@/server/members";
 import { roleCapabilities } from "@/server/permissions";
 import { POST as invite } from "@/app/api/v1/invitations/route";
 import { POST as invitationAction } from "@/app/api/v1/invitations/[...segments]/route";
-import { PATCH as memberPatch } from "@/app/api/v1/members/[...segments]/route";
+import { GET as memberGet, PATCH as memberPatch } from "@/app/api/v1/members/[...segments]/route";
 import { GET as context, POST as selectContext } from "@/app/api/v1/context/route";
 import { GET as services } from "@/app/api/v1/services/route";
 import { GET as serviceDetail } from "@/app/api/v1/services/[id]/route";
@@ -126,6 +126,7 @@ test("서비스 범위를 모두 회수하면 기존 세션의 직접 URL과 목
   const tenant = await company("서비스 전체 회수");
   const row = await db.membership.create({ data: { tenantId: tenant.id, userId: member.id, role: "viewer",
     grants: { create: { serviceId: tenant.serviceId, capabilities: [...roleCapabilities("viewer")] } } } });
+  expect((await memberGet(req("/members/" + row.id, "GET", owner))).status).toBe(200);
   expect((await selectContext(req("/context", "POST", member, { companyId: tenant.id }))).status).toBe(200);
   expect((await selectContext(req("/context", "POST", member, { serviceId: tenant.serviceId }))).status).toBe(200);
   expect((await serviceDetail(req("/services/" + tenant.serviceId, "GET", member))).status).toBe(200);

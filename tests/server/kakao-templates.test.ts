@@ -104,6 +104,14 @@ async function detailFixture() {
   const template = await (await create(req("/kakao/templates", cookie, "POST", { serviceId, channelId: channel.id, name: "접수", body: "#{name}님 안내", buttons: [] }, randomUUID()))).json();
   return { cookie, template, companyId: company.id };
 }
+test("채널·템플릿 목록과 상세 및 미리보기를 실제 route에서 조회한다", async () => {
+  const { cookie, template } = await detailFixture();
+  const channel = await db.kakaoChannel.findUniqueOrThrow({ where: { id: template.channelId } });
+  expect((await read(req("/kakao/channels?serviceId=" + channel.serviceId, cookie))).status).toBe(200);
+  expect((await read(req("/kakao/channels/" + channel.id, cookie))).status).toBe(200);
+  expect((await read(req("/kakao/templates/" + template.id, cookie))).status).toBe(200);
+  expect((await create(req("/kakao/templates/preview", cookie, "POST", { body: "#{name}님 안내", values: { name: "테스트" }, buttons: [] }))).status).toBe(200);
+});
 test("같은 버전의 동시 수정은 한 건만 저장하고 충돌 요청은 원문·감사를 바꾸지 않는다", async () => {
   const { cookie, template } = await detailFixture();
   const replies = await Promise.all(["첫 변경", "둘째 변경"].map(body => update(req("/kakao/templates/" + template.id, cookie, "PATCH", { name: template.name, body, buttons: [], version: template.version }))));
@@ -244,6 +252,11 @@ test("버전 없는 서명된 콜백은 HTTP422로 거절하고 심사 상태를
     expect(result.status).toBe(422);
     expect((await db.kakaoTemplate.findUniqueOrThrow({ where: { id: template.id } })).version).toBe(submitted.version);
     expect(await db.auditEvent.count({ where: { resourceId: template.id, action: "kakao.template_approved" } })).toBe(0);
+    const approved = JSON.stringify({ kind: "template", id: template.id, version: submitted.version, outcome: "approved", note: "" });
+    const accepted = await reviewWebhook(new Request(origin + "/api/v1/kakao/reviews", { method: "POST",
+      headers: { "content-type": "application/json", "x-kakao-signature": sign(approved) }, body: approved }));
+    expect(accepted.status).toBe(202);
+    expect(await db.kakaoTemplate.findUniqueOrThrow({ where: { id: template.id } })).toMatchObject({ status: "approved" });
   } finally { env.KAKAO_REVIEW_SECRET = previous; }
 });
 

@@ -168,6 +168,10 @@ test("deletion blocks download before a failed storage erase and the cleanup ret
   expect((await downloadFile(request("/companies/" + a + "/business-file?fileId=" + file.id))).status).toBe(404);
   expect(await cleanupBusinessFiles()).toEqual({ deleted: 1, retry: 0 });
   expect(await db.companyBusinessFile.findUnique({ where: { id: file.id } })).toMatchObject({ status: "deleted", nameCipher: null, size: 0 });
+  const fresh = await upload(pdf, "삭제검증.pdf");
+  expect(fresh.status).toBe(201);
+  expect((await deleteFile(request("/companies/" + a + "/business-file", "DELETE", owner, undefined,
+    { "if-match": String(await version()) }))).status).toBe(204);
 });
 test("service creation, search, editing, selection, archive and restore survive a new session", async () => {
   const created = await createService(request("/services", "POST", owner, { name: "서비스 CRUD", externalName: "공개", type: "app" }));

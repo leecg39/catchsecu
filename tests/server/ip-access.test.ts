@@ -96,6 +96,7 @@ describe("IP network and trusted transport",()=>{
 describe("PostgreSQL IP CRUD and enforcement",()=>{
   test("owner CRUD normalizes ranges, preserves current replay and erases deleted request copies",async()=>{
     const created=await add("192.0.2.7/24");expect(created.row.cidr).toBe("192.0.2.0/24");
+    expect((await GET(request("/security/ip-rules/"+created.row.id))).status).toBe(200);
     const update=await PATCH(request("/security/ip-rules/"+created.row.id,"PATCH",{...created.input,cidr:"192.0.2.8/24",description:"수정",version:1}));expect(update.status).toBe(200);
     const replay=await POST(request("/security/ip-rules","POST",created.input,cookies.owner,peer,{"idempotency-key":created.key}));expect(await replay.json()).toMatchObject({version:2,description:"수정"});
     const removed=await DELETE(request("/security/ip-rules/"+created.row.id,"DELETE",{tenantId:a,version:2}));expect(removed.status).toBe(204);

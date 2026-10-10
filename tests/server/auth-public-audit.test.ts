@@ -65,6 +65,14 @@ test("signup commits the account, encrypted verification job and request-linked 
   expect(events.find(e => e.action === "auth.account_registered")).toMatchObject({ actorId: u.id, tenantId: null, resourceId: u.id, detail: { changedFields: ["name", "email"] } });
   safe(events, [email, password, (await mail("이메일 인증")).url]);
 });
+test("authenticated session is returned through the public auth route", async () => {
+  await user(true);
+  const login = await authRoute(req("/sign-in/email", { email, password }));
+  expect(login.status).toBe(200);
+  const session = await authRoute(req("/get-session", undefined, cookies(login)));
+  expect(session.status).toBe(200);
+  expect(await session.json()).toMatchObject({ user: { email } });
+});
 test.each(["auth.account_registered", "auth.verification_queued"])("%s failure rolls back signup even when the library catches it", async action => {
   const before = await counts(); fault.action = action; const r = await signup(); fault.action = "";
   expect(r.status).toBe(500); expect(r.headers.getSetCookie()).toHaveLength(0); expect(await counts()).toEqual(before); expect(await requestEvents(r)).toHaveLength(0);

@@ -47,7 +47,8 @@ async function fixture(options: { entitlement?: "none" | "excluded" | "expired";
     const start = new Date(Date.now() - (options.entitlement === "expired" ? 8 : 1) * 86400000), end = new Date(start.getTime() + 7 * 86400000);
     await db.billingSubscription.create({ data: { tenantId: company.id, planId: "trial", planVersionId: version.id, status: "trialing", activationSource: "trial", priceKrw: 0, periodStart: start, periodEnd: end } });
   }
-  const request = (method: string, body?: unknown) => new Request(origin + "/api/v1/security/sso-policy", { method, headers: { origin, cookie, "content-type": "application/json" }, ...(body ? { body: JSON.stringify(body) } : {}) });
+  const request = (method: string, body?: unknown) => new Request(origin + "/api/v1/security/sso-policy" + (method === "POST" ? "/challenge" : ""),
+    { method, headers: { origin, cookie, "content-type": "application/json" }, ...(body ? { body: JSON.stringify(body) } : {}) });
   const challenge = async () => {
     const issued = await requestSsoPolicyChallenge(ctx, { ...selection, tenantId: company.id }, randomUUID());
     const job = await db.job.findUniqueOrThrow({ where: { dedupeKey: "mail:sso-policy:" + issued.challengeId } });

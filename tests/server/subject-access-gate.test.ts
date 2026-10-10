@@ -67,7 +67,9 @@ beforeEach(async () => { await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "
 afterAll(async () => { await mkdir("docs/qa/P06-T05", { recursive: true }); await writeFile("docs/qa/P06-T05/lock-barriers.json", JSON.stringify({ checkedAt: new Date().toISOString(), barriers }, null, 2) + "\n"); await db.$disconnect(); });
 
 test.each(["consents", "events"])("%s page clamps to retained data and exposes no submitted answers", async kind => {
-  const f = await fixture(), s = await login(f), result = await ok(await GET(subject(s, "/me/" + kind + "?page=999&pageSize=1")));
+  const f = await fixture(), s = await login(f);
+  expect((await GET(subject(s, "/me"))).status).toBe(200);
+  const result = await ok(await GET(subject(s, "/me/" + kind + "?page=999&pageSize=1")));
   expect(result).toMatchObject({ page: 1, total: 1, pageSize: 1 }); expect(result.items).toHaveLength(1);
   expect(JSON.stringify(result)).not.toContain("PRIVATE-ANSWER");
 });

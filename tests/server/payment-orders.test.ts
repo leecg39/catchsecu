@@ -43,6 +43,7 @@ test("성공 주소와 카드 원문으로는 결제 완료가 되지 않고 서
   const paid = JSON.stringify({ orderId: order.id, eventId: "event-paid-1", outcome: "paid" });
   await expect(applyPaymentEvent(paid, "00", secret)).rejects.toMatchObject({ status: 401 });
   expect((await applyPaymentEvent(paid, sign(paid), secret)).status).toBe("paid");
+  expect((await paymentReturn(req("/billing/orders/" + order.id + "/return", cookie, "POST", { result: "success" }))).status).toBe(200);
   const activated = await db.billingSubscription.findUniqueOrThrow({ where: { id: subscription.id } });
   expect(activated.status).toBe("active");
   expect(activated.activationSource).toBe("payment");
