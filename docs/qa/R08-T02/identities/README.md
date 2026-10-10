@@ -59,3 +59,17 @@ Ego 공간2/p1에서 보기 문구 수정·이동·새 보기 저장 후 삭제,
 Node24 런타임을 사용한다. `node --env-file=.env.test.local node_modules/vitest/vitest.mjs run tests/server/question-identities.test.ts tests/server/question-rules.test.ts tests/server/form-draft-save.test.ts tests/server/form-module-flow.test.ts tests/server/submission-export.test.ts tests/server/sharing.test.ts --reporter=json`으로 마지막 범위를 재현한다. DB 변경 시험은 직렬 실행한다. 동결 자료는 `node --env-file=.env.local --import tsx scripts/qa-rea-option-flow.ts verify` 및 `qa-rea-form-authority.ts verify`만 실행한다.
 
 F2의 ID/label/value 기반은 검증됐으나 직접입력·이동 목적지 계약은 F3/F4와 함께 남아 있다. 질문 특수 유형·길이/설명·이미지/참고 첨부·행렬 EXACT, 여러 페이지, 참여 설정, 템플릿 입력 보호와 전체9경로 상태 수용을 이어간다. 공식107개 작업은 완료0·진행53·계획54를 유지한다.
+
+## 2026-10-11 F2 통합 후속
+
+당시 후속으로 남긴 직접입력과 이동 목적지 계약은 이후 F3 기타 보기와 F4 페이지 분기에서 구현됐다. 현재 소스에서 ID 모듈과 두 후속 모듈을 한 번에 다시 실행했다.
+
+- 기존 `options: string[]`은 값이 정확히 일치하는 기존 보기의 ID를 보존하고 새 값만 ID를 발급한다. 명시적 `optionDefinitions`는 ID·label·불변 value를 사용한다.
+- 기타 직접입력은 `isCustomValue`와 답변의 `custom.optionId`를 사용하며, 질문당 하나·지원 유형·마지막 보기·소유권·길이·숨김 답변을 검사한다.
+- 보기별 이동은 `branchDestination`을 사용하며, 지원 질문 유형·한 페이지 한 분기 질문·직접입력 보기 금지·자기/없는/다른 버전 목적지·전체 그래프 순환을 거절한다.
+- 폼 복제와 템플릿 사용은 질문·보기·페이지·조건·이동 대상 ID를 함께 새로 발급한다. 같은 폼의 개정은 logical ID를 보존한다.
+- 게시된 라벨·암호화 응답·정정·공유·CSV는 제출 버전에 계속 고정된다.
+
+PostgreSQL 통합 6파일 63개와 계약·화면 상태 4파일 19개, 총 10파일 82개가 현재 HEAD에서 통과했다. 기존 Ego의 보기 편집·직접입력·분기·구 응답·3개 화면 폭·키보드 증거와 production 재시작 지문도 유지된다. 구조화된 결과는 [verification-followup.json](verification-followup.json)에 기록했다.
+
+이 후속으로 F2 하위 범위는 완료했다. R08-T01/T02와 전체 목표는 F3~F7 및 외부 공급자 수용이 남아 완료가 아니다.
