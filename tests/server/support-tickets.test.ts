@@ -5,6 +5,12 @@ import { env } from "@/server/env";
 import { auth } from "@/server/auth";
 import { GET, POST, PATCH, DELETE } from "@/app/api/v1/support-tickets/[[...segments]]/route";
 import type { SupportTicketListResponse, SupportTicketRecord } from "@/contracts/support-tickets";
+import { GET as listFeedback, POST as createFeedback } from "@/app/api/v1/feedback/route";
+import {
+  DELETE as deleteFeedback,
+  GET as readFeedback,
+  PATCH as updateFeedback,
+} from "@/app/api/v1/feedback/[id]/route";
 
 const database = new URL(env.DATABASE_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname))
@@ -131,4 +137,24 @@ describe("tenant-scoped support requests", () => {
     await answer(await POST(invalid), 403);
     await answer(await GET(req(`/support-tickets/${id}?scope=admin`, "GET", "author")), 404);
   });
+});
+
+test("피드백 별칭 경로가 작성자 범위와 PostgreSQL CRUD 수명주기를 사용한다", async () => {
+  const input = { kind: "suggestion", subject: "피드백 별칭 검증", body: "피드백 경로의 전체 수명주기를 확인합니다." };
+  const createdResponse = await createFeedback(req("/feedback", "POST", "author", input,
+    { "idempotency-key": randomUUID() }));
+  const created = await answer<SupportTicketRecord>(createdResponse, 201);
+  expect(createdResponse.headers.get("location")).toBe(`/api/v1/feedback/${created.id}`);
+
+  const listed = await answer<SupportTicketListResponse>(await listFeedback(req("/feedback", "GET", "author")));
+  expect(listed.items.some(item => item.id === created.id)).toBe(true);
+  expect((await answer<SupportTicketRecord>(await readFeedback(req(`/feedback/${created.id}`, "GET", "author")))).id)
+    .toBe(created.id);
+
+  const changed = await answer<SupportTicketRecord>(await updateFeedback(req(`/feedback/${created.id}`, "PATCH", "author",
+    { version: 1, subject: "피드백 별칭 수정" })));
+  expect(changed).toMatchObject({ subject: "피드백 별칭 수정", version: 2 });
+  expect((await deleteFeedback(req(`/feedback/${created.id}`, "DELETE", "author", undefined,
+    { "if-match": "2" }))).status).toBe(204);
+  expect((await db.supportTicket.findUniqueOrThrow({ where: { id: created.id } })).status).toBe("archived");
 });

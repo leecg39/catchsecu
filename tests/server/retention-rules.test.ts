@@ -6,11 +6,19 @@ import { env } from "@/server/env";
 import { requireContext } from "@/server/context";
 import { createRetentionRule, readRetentionRule, updateRetentionRule, archiveRetentionRule, listRetentionRules } from "@/server/retention-rules";
 import * as auditModule from "@/server/audit";
+import { GET as listRulesRoute, POST as createRuleRoute } from "@/app/api/v1/retention-rules/route";
+import {
+  DELETE as deleteRuleRoute,
+  GET as readRuleRoute,
+  PATCH as updateRuleRoute,
+} from "@/app/api/v1/retention-rules/[id]/route";
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
 if (!["/catchsecu_test", "/catchsecu_mock_admin"].includes(database.pathname) || !["localhost", "127.0.0.1"].includes(database.hostname)) throw new Error("Isolated test DB required.");
 const password = "Retention-rules!123";
-function req(path: string, cookie = "", method = "GET", input?: unknown) {
-  return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie, ...(input === undefined ? {} : { "content-type": "application/json" }) }, ...(input === undefined ? {} : { body: JSON.stringify(input) }) });
+function req(path: string, cookie = "", method = "GET", input?: unknown, extra: Record<string, string> = {}) {
+  return new Request(origin + "/api/v1" + path, { method, headers: { origin, cookie,
+    ...(input === undefined ? {} : { "content-type": "application/json" }), ...extra },
+    ...(input === undefined ? {} : { body: JSON.stringify(input) }) });
 }
 beforeEach(async () => { await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "Job" CASCADE'); });
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
@@ -71,4 +79,25 @@ test("보관 규칙을 동시 재생성해도 한 요청만 활성화한다", as
   expect(results.filter(r => r.status === "fulfilled")).toHaveLength(1);
   expect(results.find(r => r.status === "rejected")).toMatchObject({ reason: { status: 409, code: "RULE_EXISTS" } });
   expect((await db.retentionRule.findUniqueOrThrow({ where: { id: f.rule.id } })).version).toBe(3);
+});
+test("보유기간 HTTP 경로가 권한과 PostgreSQL CRUD 수명주기를 함께 적용한다", async () => {
+  const f = await owner(), input = { serviceId: f.serviceId, retentionDays: 45, reason: "HTTP 보유기간" };
+  const createdResponse = await createRuleRoute(req("/retention-rules", f.cookie, "POST", input,
+    { "idempotency-key": randomUUID() }));
+  expect(createdResponse.status).toBe(201);
+  const created = await createdResponse.json();
+  expect(createdResponse.headers.get("location")).toBe(`/api/v1/retention-rules/${created.id}`);
+
+  const listed = await listRulesRoute(req("/retention-rules", f.cookie));
+  expect(listed.status).toBe(200);
+  expect((await listed.json()).items.some((rule: { id: string }) => rule.id === created.id)).toBe(true);
+  expect((await readRuleRoute(req(`/retention-rules/${created.id}`, f.cookie))).status).toBe(200);
+
+  const changed = await updateRuleRoute(req(`/retention-rules/${created.id}`, f.cookie, "PATCH",
+    { version: 1, retentionDays: 60 }));
+  expect(changed.status).toBe(200);
+  expect((await changed.json()).retentionDays).toBe(60);
+  expect((await deleteRuleRoute(req(`/retention-rules/${created.id}`, f.cookie, "DELETE", undefined,
+    { "if-match": "2" }))).status).toBe(204);
+  expect((await db.retentionRule.findUniqueOrThrow({ where: { id: created.id } })).status).toBe("archived");
 });

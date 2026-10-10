@@ -5,6 +5,9 @@ import { env } from "@/server/env";
 import { auth } from "@/server/auth";
 import { GET } from "@/app/api/v1/analytics/dashboard/route";
 import type { AnalyticsDashboard } from "@/contracts/analytics";
+import { GET as privacyAnalyticsRoute } from "@/app/api/v1/analytics/privacy/route";
+import { GET as marketingAnalyticsRoute } from "@/app/api/v1/analytics/marketing/route";
+import { GET as complianceRoute } from "@/app/api/v1/compliance/route";
 
 const database = new URL(env.DATABASE_URL);
 if (database.pathname !== "/catchsecu_test" || !["localhost", "127.0.0.1"].includes(database.hostname))
@@ -129,5 +132,22 @@ describe("실제 원천의 회사·서비스 집계", () => {
     const result = await response.json() as AnalyticsDashboard;
     expect(result.period.from).toBe(from);
     expect(result.period.to).toBe(result.asOf);
+  });
+  test("개인정보·마케팅·준수 별칭 경로가 현재 서비스 범위의 실제 집계를 반환한다", async () => {
+    const privacy = await privacyAnalyticsRoute(request("/analytics/privacy?serviceId=" + serviceA1));
+    expect(privacy.status).toBe(200);
+    expect((await privacy.json()).services.map((item: { id: string }) => item.id)).toEqual([serviceA1]);
+
+    const marketing = await marketingAnalyticsRoute(request("/analytics/marketing?serviceId=" + serviceA1));
+    expect(marketing.status).toBe(200);
+    expect((await marketing.json()).items.map((item: { id: string }) => item.id)).toEqual([serviceA1]);
+
+    const compliance = await complianceRoute(request("/compliance?serviceId=" + serviceA1));
+    expect(compliance.status).toBe(200);
+    expect((await compliance.json()).services.map((item: { id: string }) => item.id)).toEqual([serviceA1]);
+
+    expect((await privacyAnalyticsRoute(request("/analytics/privacy", "anonymous"))).status).toBe(401);
+    expect((await marketingAnalyticsRoute(request("/analytics/marketing", "anonymous"))).status).toBe(401);
+    expect((await complianceRoute(request("/compliance", "anonymous"))).status).toBe(401);
   });
 });
