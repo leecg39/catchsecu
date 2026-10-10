@@ -1,0 +1,163 @@
+{
+  "checkedAt": "2026-10-10T15:01:23Z",
+  "status": "partial_verified",
+  "environment": {
+    "browser": "Ego Lite",
+    "applicationUrl": "http://localhost:3120",
+    "serverMode": "production",
+    "database": "PostgreSQL",
+    "serverRestartedDuringRetryScenario": true
+  },
+  "fixtures": {
+    "tenantId": "10000000-0000-4000-8000-000000000001",
+    "serviceId": "20000000-0000-4000-8000-000000000001",
+    "templateId": "3c625a37-a5ac-4e6b-a44c-b6dd7ac42a64",
+    "formId": "a1644c7d-8d4e-457c-9b60-9c39e9e9eacb",
+    "formVersionId": "92e3cdd7-8c08-44a8-b831-f468952509da",
+    "localTrialSubscriptionId": "af4fcea1-d6ee-490b-a4fc-6fb78a20a07f"
+  },
+  "scenarios": [
+    {
+      "id": "company-template-create-edit-reload",
+      "status": "passed",
+      "evidence": [
+        "템플릿 분류·설명·제목·본문·필수 단문 문항·동의 목적을 Ego Lite에서 생성했다.",
+        "저장 뒤 새로고침해 같은 값이 복원되는 것을 확인했다.",
+        "서비스 템플릿 검색에서 일치 1건과 불일치 0건을 확인했다."
+      ]
+    },
+    {
+      "id": "preview-and-dirty-navigation",
+      "status": "passed",
+      "evidence": [
+        "미리보기에서 설명·본문·필수 문항·100자 제한·동의 목적·365일·최대 100건을 확인했다.",
+        "미저장 제목을 둔 채 이동하면 저장하지 않은 변경 확인창이 나타났다.",
+        "계속 편집을 선택한 뒤 입력값이 유지됐다."
+      ]
+    },
+    {
+      "id": "license-deny-and-local-trial-allow",
+      "status": "passed_internal_only",
+      "evidence": [
+        "만료된 체험만 있을 때 템플릿 사용이 ‘이용 가능한 구독이 없습니다’로 거부됐다.",
+        "제품 만료 워커가 기한이 지난 QA 구독 16건을 expired로 전환했다.",
+        "A사에 2026-10-10T14:50:33.581Z부터 7일인 로컬 QA 체험을 만든 뒤 같은 사용 요청이 성공했다.",
+        "실제 외부 결제 또는 운영 라이선스 성공 증거로 사용하지 않는다."
+      ]
+    },
+    {
+      "id": "template-use-and-independent-copy",
+      "status": "passed",
+      "evidence": [
+        "템플릿 사용으로 formId a1644c7d-8d4e-457c-9b60-9c39e9e9eacb가 생성됐다.",
+        "복제된 제목·본문·동의 목적·365일·100건·필수 단문 문항이 화면과 DB에서 일치했다.",
+        "템플릿 문항 ID 5c970bd6-2275-4858-92ab-679bf6b56ebd와 폼 문항 ID f91d9c35-b8ed-4fc0-aa30-dcc5de3ae187가 다르다.",
+        "복제 뒤 템플릿 제목을 서버 최신본 20261010으로 바꿔도 폼 제목은 미저장 제목 보존 20261010으로 유지됐다.",
+        "template.used 감사 이벤트 47847e27-3072-4632-9f10-b50ab82d9c9f를 확인했다."
+      ]
+    },
+    {
+      "id": "two-tab-version-conflict",
+      "status": "passed_without_discard_confirmation",
+      "evidence": [
+        "첫 탭에 충돌 시도 입력 보존 20261010을 저장하지 않은 채 두 번째 탭에서 서버 최신본 20261010을 저장했다.",
+        "첫 탭 저장은 409와 ‘다른 화면에서 템플릿이 변경되었습니다’ 안내를 표시했다.",
+        "첫 탭 입력은 그대로 유지됐고 저장 버튼은 충돌 상태에서 비활성화됐다.",
+        "최신본 적용 확인창에서 현재 입력 유지를 선택하자 입력과 충돌 안내가 유지됐다."
+      ]
+    },
+    {
+      "id": "list-network-error-retry",
+      "status": "passed",
+      "evidence": [
+        "목록이 열린 상태에서 production 서버를 중단하고 검색을 실행했다.",
+        "연결 실패 안내와 템플릿 목록 다시 불러오기 버튼이 표시됐다.",
+        "같은 빌드를 다시 기동하고 재시도해 오류가 사라지고 0건 결과가 표시됐다.",
+        "검색을 지운 뒤 서버 최신본 20261010 1건이 다시 표시됐다."
+      ]
+    },
+    {
+      "id": "responsive-and-keyboard-smoke",
+      "status": "passed",
+      "evidence": [
+        "390px에서 document scrollWidth와 clientWidth가 모두 390px였고 표만 내부 가로 스크롤을 제공했다.",
+        "768px와 1440px에서도 document와 body scrollWidth가 각각 viewport 폭과 같았다.",
+        "템플릿 검색 입력→검색, 공용 탭→서비스 탭→검색 입력, 미리보기→사용하기→편집→삭제 순서로 Tab 포커스가 이동했다.",
+        "미리보기·사용·삭제 대화상자를 Escape로 닫으면 각 실행 버튼으로 포커스가 돌아왔다.",
+        "사용 대화상자는 닫기→서비스 선택→생성→닫기, 삭제 대화상자는 닫기→삭제 확인→닫기로 Tab 포커스가 순환했다."
+      ]
+    },
+    {
+      "id": "viewer-read-only-role",
+      "status": "passed",
+      "environment": "isolated Codex in-app browser",
+      "evidence": [
+        "로컬 QA viewer 계정의 서비스 템플릿 목록에는 미리보기만 표시됐다.",
+        "템플릿 생성 링크와 사용·편집·삭제 동작은 표시되지 않았다.",
+        "templateEdit 직접 URL 접근은 ‘현재 서비스의 캐치폼 또는 템플릿을 편집할 권한이 없습니다’로 차단됐다."
+      ]
+    },
+    {
+      "id": "tenant-a-b-isolation",
+      "status": "passed",
+      "environment": "isolated Codex in-app browser",
+      "evidence": [
+        "B사 owner 계정의 회사·서비스 문맥이 캐치시큐 테스트 회사 B/회사 B 서비스로 표시됐다.",
+        "B사 서비스 템플릿 목록에는 A사 템플릿이 나타나지 않았고 총 0건이었다.",
+        "A사 templateId를 B사 owner가 직접 열면 ‘템플릿을 찾을 수 없습니다’로 차단됐다."
+      ]
+    },
+    {
+      "id": "editor-privacy-role-boundary",
+      "status": "passed",
+      "environment": "isolated Codex in-app browser",
+      "evidence": [
+        "editor 계정에는 템플릿 생성·미리보기·사용·편집·삭제가 각각 1개씩 노출됐다.",
+        "editor는 A사 템플릿 직접 편집 URL에서 서버 최신본 20261010을 읽었다.",
+        "privacy 계정에는 미리보기만 1개 노출되고 생성·사용·편집·삭제는 0개였다.",
+        "privacy의 직접 편집 URL 접근은 편집 권한 오류로 차단됐다."
+      ]
+    },
+    {
+      "id": "remaining-role-boundary",
+      "status": "passed",
+      "environment": "isolated Codex in-app browser",
+      "evidence": [
+        "security 계정은 템플릿 미리보기만 1개 노출되고 생성·사용·편집·삭제는 0개였다.",
+        "auditor·billing·sender 계정은 회사·서비스 문맥 로드 뒤 템플릿 목록 API에서 ‘이 작업을 수행할 권한이 없습니다’와 재시도 버튼을 받았다.",
+        "admin은 Ego Lite 생성·편집·사용·삭제 동작 노출, owner는 B사 목록·직접 URL 격리 시나리오에서 확인했다."
+      ]
+    }
+  ],
+  "databaseSnapshot": {
+    "template": {
+      "id": "3c625a37-a5ac-4e6b-a44c-b6dd7ac42a64",
+      "title": "서버 최신본 20261010",
+      "version": 5,
+      "licenseScope": "SERVICE",
+      "status": "active",
+      "thumbnailAssetId": null
+    },
+    "form": {
+      "id": "a1644c7d-8d4e-457c-9b60-9c39e9e9eacb",
+      "title": "미저장 제목 보존 20261010",
+      "version": 1,
+      "status": "draft"
+    },
+    "subscription": {
+      "id": "af4fcea1-d6ee-490b-a4fc-6fb78a20a07f",
+      "status": "trialing",
+      "activationSource": "trial",
+      "periodStart": "2026-10-10T14:50:33.581Z",
+      "periodEnd": "2026-10-17T14:50:33.581Z"
+    }
+  },
+  "pending": [
+    "최신본 적용 확인창에서 ‘입력 폐기하고 적용’을 누르는 실제 UI 단계는 로컬 미저장 입력 삭제 확인이 필요해 실행하지 않았다.",
+    "템플릿 삭제 확정의 실제 UI 단계는 데이터 삭제 확인이 필요해 실행하지 않았다.",
+    "대표 이미지 업로드·교체·제거의 브라우저 수용",
+    "실제 외부 결제 또는 운영 구독 계정의 라이선스 허용·만료 검증",
+    "템플릿 보관 상태 모델과 보관·복원 화면"
+  ],
+  "taskCompletionClaimed": false
+}
