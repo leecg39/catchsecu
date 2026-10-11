@@ -1,0 +1,18 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T13:45:00+09:00",
+  "restart": {
+    "stopped_pid": 93907,
+    "started_pid": 38804,
+    "command": "APP_PORT=3121 BETTER_AUTH_URL=http://localhost:3121 ALLOW_LOCAL_MAIL=1 ALLOW_LOCAL_PAYMENT=1 ALLOW_LOCAL_KAKAO=1 node --env-file=.env.local --import tsx scripts/server.ts",
+    "mode": "production (NODE_ENV=production, BUILD_ID 6HZLT79_Y8CVYp2sFzCgD)",
+    "health": "GET /api/v1/health → 200 {\"status\":\"ok\",\"database\":\"ready\"}"
+  },
+  "after_restart": {
+    "session": "기존 owner 세션 쿠키 유지 — 재로그인 없이 /form/fixed-url 목록 렌더 (11행)",
+    "renamed_row": "동시수정으로 변경된 이름 \"R09 수용 주소 동시수정\" 목록 반영",
+    "public_fixed_url": "GET /url/r09-accept-qa01 → 공개 폼 \"R09 목록 전용 폼\" 렌더 (hasForm=true)",
+    "db_fingerprint_match": "acceptance-database-before.json fingerprint == acceptance-database-restart.json fingerprint"
+  },
+  "note": "초기 재시작 시도 2건 실패 증거: (1) APP_PORT 미설정으로 3100 포트, (2) ALLOW_LOCAL_* 미설정으로 production provider guard 오류 — env guard가 정상 작동함을 확인한 후 정상 환경으로 재기동. 실패 로그는 /tmp/r09-server-restart.log 순환으로 소실되었으나 오류 내용은 대화 이력에 기록됨."
+}

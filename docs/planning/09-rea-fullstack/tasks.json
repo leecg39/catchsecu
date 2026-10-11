@@ -2427,28 +2427,32 @@
       "P04-T03",
       "P04-T05"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "frontend",
     "evidence_directory": "catchsecu-clone/docs/qa/R09-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R09-T03/current/README.md",
+      "docs/qa/R09-T03/current/browser-acceptance-round2.json",
+      "docs/qa/R09-T03/current/quality-gates.json"
+    ],
     "dependency_gates": {
       "R09-T02": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "직접 생성한 폼의 단계 설정에서 실제 게시 후 공유 URL을 얻고 익명 응답까지 확인. 전체 승인/회수/고정URL 수용은 남음. 고정URL·독립 승인 목록·폼 내부 승인 내역의 URL 상태 연결을 구현했다. 화면15시험·관련회귀8파일14suite96개·타입·린트·production83페이지 통과. 실제API fixture12개·Ego 검색/필터/이력/종료취소/페이지보정·3폭과 production재시작 주소12/감사16 및 폼12/승인12/게시3/감사36 동일해시 검증 완료. 승인·게시 전체 화면 수용은 계속 진행한다.",
+    "progress_note": "공유·게시·승인·고정URL 전체 화면을 실제 브라우저로 수용 완료: 게시 상태/URL 복사/일시중지·재개, 고정URL 생성·이름변경·409·VERSION_CONFLICT 복구·required 차단, 승인 요청·승인(사유)·거절·취소·승인→게시 전체 체인, 승인 로그 전 상태·빈 검색, viewer 읽기 전용(disabled/컨트롤 미표시), 로딩 aria-busy·페이지·새로고침 복원·모달 키보드 포커스·390/768/1440 무가로넘침.",
     "progress_evidence": [
-      "docs/qa/R08-T04/browser-flow/published.png",
       "docs/qa/R09-T03/current/README.md",
+      "docs/qa/R09-T03/current/browser-acceptance-round2.json",
       "docs/qa/R09-T03/current/quality-gates.json"
     ],
     "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "not_applicable",
-      "api": "not_applicable",
-      "ui": "partial_verified",
-      "external": "not_assessed"
+      "database": "verified",
+      "api": "verified",
+      "ui": "verified",
+      "external": "not_applicable"
     }
   },
   {
@@ -2472,21 +2476,29 @@
       "P04-T03",
       "P04-T05"
     ],
-    "status": "planned",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R09-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R09-T04/README.md",
+      "docs/qa/R09-T04/current/acceptance-database-before.json",
+      "docs/qa/R09-T04/current/acceptance-database-restart.json",
+      "docs/qa/R09-T04/current/browser-after-restart.json",
+      "scripts/qa-r09-acceptance.ts"
+    ],
     "dependency_gates": {
       "R09-T03": "task_complete"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "not_assessed",
+    "progress_note": "production server.ts SIGTERM→재기동(PORT/env guard 오류 2건 확인 후 정상 환경 재기동), /api/v1/health ok, R09 fixture 2테넌트의 forms14/approvals13/publications5/fixedUrls13/audits43 SHA256 지문 재시작 전후 동일(02e85f6b…437ad), 세션 유지·공개 고정URL 해석 정상. 외부 제공사 경계 없음.",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "not_assessed",
-      "api": "not_assessed",
-      "ui": "not_assessed",
-      "external": "not_assessed"
+      "database": "verified",
+      "api": "verified",
+      "ui": "verified",
+      "external": "not_applicable"
     }
   },
   {

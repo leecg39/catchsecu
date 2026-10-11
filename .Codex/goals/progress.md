@@ -1,4 +1,8 @@
-## 최신 작업: R09-T02 승인·게시·고정URL 서버 API 완료
+## 최신 작업: R09-T03/T04 승인·게시·고정URL 화면·수용검증 완료
+
+2026-10-11 R09-T03/R09-T04 완료: 실제 브라우저에서 공유(게시 상태·URL 복사 토스트·중단 안내), 공개 폼 익명 접속→일시중지 410→재개 복구, 고정URL 생성/이름변경/QR·복사/동일slug 409/VERSION_CONFLICT 배너+최신 다시 불러오기, 승인 요청·사유 승인→"게시하고 공유하기" 전체 체인·거절·취소, 승인 로그 빈 검색, viewer 읽기 전용(저장/게시 disabled·결정/쓰기 컨트롤 없음), pageSize=10 페이지2·새로고침 복원·Slow 3G 로딩 aria-busy·모달 포커스·3폭 무가로넘침을 확인했다. production server.ts 재기동 후 R09 fixture 2테넌트의 forms14/approvals13/publications5/fixedUrls13/audits43 SHA256 지문이 일치하고 세션·공개 고정URL 해석이 유지된다. 외부 제공사 경계 없음(not_applicable). 공식 완료40/진행25/계획42. R09-T01 모델 대조 잔여만 남았다. [화면](../../docs/qa/R09-T03/current/README.md)·[수용](../../docs/qa/R09-T04/README.md).
+
+## 이전 작업: R09-T02 승인·게시·고정URL 서버 API 완료
 
 2026-10-11 R09-T02 완료: 소유 33작업을 9개 실제 handler와 대조하고 누락된 /forms/{id}/revise 필수 Idempotency-Key를 계약에 추가했다. 자기승인은 구성된 approvalRoles+form.approve만 허용, 만료 라이선스는 신규 청구자원 생성만 402로 막고 기존 폼 워크플로는 유지한다고 계약으로 확정했다. 초안→승인→게시→410→재개·승인본 바꿔치기·slug 경쟁409·복사≠게시·감사실패 원자롤백·현재권한 재검사를 PostgreSQL 시험으로 고정했다. 회귀12파일143시험·계약검증 통과, DB 불변조건 6종 모두0. 공식 완료38/진행26/계획43. R09-T03 전체 화면 수용과 R09-T04 브라우저/재시작 수용은 진행 중이다. [증거](../../docs/qa/R09-T02/README.md).
 
