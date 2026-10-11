@@ -712,7 +712,7 @@ project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이�
 
 ## R12 외부 공유·열람자 인증
 
-### [ ] R12-T01 외부 공유·열람자 인증 — 모델·규칙 대조 및 보완
+### [x] R12-T01 외부 공유·열람자 인증 — 모델·규칙 대조 및 보완
 
 공유권한은 회사·서비스·폼버전·허용필드·대상범위·만료를 가진다. 코드/인증 challenge hash·시도제한·세션 generation으로 권한 수정/회수 뒤 기존세션을 무효화한다.
 
@@ -724,7 +724,7 @@ project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이�
   - C 공유권한/열람 challenge; R 공유목록·허용 응답; U 허용필드·기간·대상; D 권한회수/열람세션 폐기.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R12-T02 외부 공유·열람자 인증 — 서버 API·업무 처리
+### [x] R12-T02 외부 공유·열람자 인증 — 서버 API·업무 처리
 
 공유 CRUD/resend/events와 challenge→verify→session→submissions/files/logout API에서 매번 허용필드/범위를 적용한다. 사용자가 전달한 filter로 범위를 넓힐 수 없게 한다.
 
@@ -736,7 +736,7 @@ project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이�
   - 공유범위2필드/응답1개 지정→별도브라우저코드인증→그 범위만조회; 필드회수·만료·완전회수 즉시적용; 다른공유의 id 주입·재사용OTP·토큰로그노출 차단.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [ ] R12-T03 외부 공유·열람자 인증 — 전체 화면·모달 연결
+### [x] R12-T03 외부 공유·열람자 인증 — 전체 화면·모달 연결
 
 공유생성/편집/회수/초대재전송, /shared-privacy/verify·email-verify·view 각 단계와 만료/권한없음. 이메일·공유코드 입력값과 필수동의 확인을 구분한다.
 
@@ -748,7 +748,7 @@ project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이�
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R12-T04 외부 공유·열람자 인증 — DB·브라우저·재시작 수용검증
+### [x] R12-T04 외부 공유·열람자 인증 — DB·브라우저·재시작 수용검증
 
 공유범위2필드/응답1개 지정→별도브라우저코드인증→그 범위만조회; 필드회수·만료·완전회수 즉시적용; 다른공유의 id 주입·재사용OTP·토큰로그노출 차단.
 
