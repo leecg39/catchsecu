@@ -1,4 +1,8 @@
-## 최신 작업: R19 알림톡 채널·템플릿·발송 — 로컬 완료·외부 카카오 증거 pending
+## 최신 작업: R24 공지·도움말·문의·공통 경로 — 완료 (외부 제공사 없음)
+
+2026-10-14 R24 도메인 완료. T01 모델 대조: Notice(bodyHtml sanitize·sortOrder·version 낙관잠금)→NoticeAttachment(active/deleting·sha256 선언검증·최대10)→Guide(categoryOrder/sortOrder·PDF 필수 FILE_REQUIRED)→SupportTicket(tenantId+authorId·*Cipher 암호화·submitted→answered→closed→reopen). 원본 미관측 관리자 authoring 경로를 독립운영 부가화면으로 개별 등록(/admin/notices·guides·support, /my-page/support). T02 API: platformAdmin vs 회원 published 경계·if-match 버전·멱등키·scope=mine/admin 문의 소유권. T03: /·/IE·/loading→dashboard·access-not-allow 사유별 문구·/security 실시간 점검·와일드카드는 registered-page allowlist에서 명시 제외(/security/bogus·임의경로 404)·새로고침/뒤로앞으로/키보드스킵링크/모바일375 테이블 래퍼 스크롤. T04 수용 5케이스(qa-r24-acceptance): 초안404→게시→구버전409→보관404·첨부해시일치+회원업로드403·회원CRUD/admin-scope 403·가이드 PDF게시+다운로드·문의 답변→종결→회원재개403→운영자재개→테넌트B 404. 재시작 영속(replyCipher·answeredAt). T01~T04 completed·외부 not_applicable. 공식 완료80/진행22/계획5. [수용](../../docs/qa/R24-T04/README.md).
+
+## 이전 작업: R19 알림톡 채널·템플릿·발송 — 로컬 완료·외부 카카오 증거 pending
 
 2026-10-14 R19 알림톡 로컬 완료. 수용 7케이스: 채널 등록→실제 webhook 계약(내부 서명 HMAC·버전 조건부 전이) 통과 검증·중복/재검증 409→템플릿 제출(#반려 표지→rejected+note→수정→재제출→approved·구버전 409)→미리보기 변수검증·모의발송(영수증에 템플릿/채널 버전+contentHash 핀·멱등키 동일영수증·승인템플릿 수정→draft→재심사)→채널 searchId 변경→인증해제+템플릿 심사초기화 감사→kakao+sms 동의 수신자 캠페인→kakao-local 영수증→미치환 변수 실패→SMS 대체발송(sms-local 영수증·fallback 감사·attempt dedupe)→빈채널 삭제204/사용중 보관409/타리소스 404. 브라우저 8경로+플레이그라운드 실데이터. 재시작 영속 PASS. T01~T03 completed·T04 in_progress/external_pending(실제 카카오 채널인증·심사·수신·웹훅 미검증). 공식 완료76/진행22/계획9. [수용](../../docs/qa/R19-T04/README.md).
 

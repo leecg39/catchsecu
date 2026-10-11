@@ -1348,7 +1348,7 @@ dashboard/privacy/marketing/compliance/closes/exports의 분모·시점·동의�
 
 ## R24 공지·도움말·문의·공통 경로
 
-### [ ] R24-T01 공지·도움말·문의·공통 경로 — 모델·규칙 대조 및 보완
+### [x] R24-T01 공지·도움말·문의·공통 경로 — 모델·규칙 대조 및 보완
 
 공지·첨부/가이드 게시상태·정렬·문의소유자/답변관계를 확인한다. 원본에 없는 관리자 authoring 경로는 독립운영 부가화면으로 별도 등록한다.
 
@@ -1360,7 +1360,7 @@ dashboard/privacy/marketing/compliance/closes/exports의 분모·시점·동의�
   - C 관리자 공지/가이드·사용자문의; R 게시콘텐츠/상태; U 초안·답변·게시; D 초안/첨부보관. 로딩/오류/wildcard는 별도 CRUD 없음.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R24-T02 공지·도움말·문의·공통 경로 — 서버 API·업무 처리
+### [x] R24-T02 공지·도움말·문의·공통 경로 — 서버 API·업무 처리
 
 콘텐츠 CRUD/게시·파일, 문의 생성/답변/종결/재개에 systemAdmin·자기문의 접근을 적용한다. 공개/로그인 경계와 안내 페이지의 실제 상태조회 계약을 명시한다.
 
@@ -1372,7 +1372,7 @@ dashboard/privacy/marketing/compliance/closes/exports의 분모·시점·동의�
   - 관리자공지생성/게시→일반조회→수정/보관·첨부검증; 일반계정관리CRUD거부; 문의A/B격리; 잘못된경로404·보안fallback·새로고침·뒤로가기·키보드·모바일까지 검증.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [ ] R24-T03 공지·도움말·문의·공통 경로 — 전체 화면·모달 연결
+### [x] R24-T03 공지·도움말·문의·공통 경로 — 전체 화면·모달 연결
 
 notice/id/help-center·관리자작성/편집·내문의, /·/IE·loading·access-not-allow와 /*·/security/* fallback을 명시적으로 처리한다. wildcards를 임의모든경로 허용 정규식으로 합치지 않는다.
 
@@ -1384,7 +1384,7 @@ notice/id/help-center·관리자작성/편집·내문의, /·/IE·loading·acces
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R24-T04 공지·도움말·문의·공통 경로 — DB·브라우저·재시작 수용검증
+### [x] R24-T04 공지·도움말·문의·공통 경로 — DB·브라우저·재시작 수용검증
 
 관리자공지생성/게시→일반조회→수정/보관·첨부검증; 일반계정관리CRUD거부; 문의A/B격리; 잘못된경로404·보안fallback·새로고침·뒤로가기·키보드·모바일까지 검증.
 
