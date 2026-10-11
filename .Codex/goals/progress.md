@@ -1,4 +1,8 @@
-## 최신 작업: R10 처리방침 도메인 로컬 완료 (T01~T03 완료·T04 외부 대기)
+## 최신 작업: R08 로컬 수용 완료 — NLP 자동분류·문안 자동생성·9경로 스윕 (external_pending)
+
+2026-10-11 R08 잔여 체인 완료. F6 템플릿 삭제 확정(브라우저→DB 0건·template.deleted 감사). F3 NLP 자동분류: local-deterministic-v1 분석/피드백 API·분류 source NLP+feedbackId 페어·DB CHECK 확장(migration 20261025032000)·편집기 700ms 디바운스 제안 카드(로컬 결과 고지)·RESIDENT 필수/유형 전환·복제 시 NLP 항목 제거 재분석. question-nlp 6·consent-display-generate 5·form-page-state 시험 통과. F3 동의 문안 자동생성: consent-display/{kind}/generate 제안 API(저장 분리·generated 감사)+UI 검토→적용→PATCH 저장. 브라우저 검증: 질문 라벨→제안 2건→적용→DB NLP 항목 확인; 문안 생성→제안 카드(목적0·항목2·수탁1)→적용→저장, generated+updated 감사 2건. F7 통합 스윕: 9개 원본 경로(manage/template/create/basic-frame/v3/recipient/agreement/set/setting) formId 보존 렌더·미인증 403 확인. 프로덕션 빌드 재기동 후 테넌트A forms33/versions36/questions59·NLP2/templates2/displays1/감사128 SHA-256 지문 5192c9b7… 재시작 전후 동일. R08-T02/T03/T04는 local_status verified·external_status external_pending 유지 — 외부 NLP 제공사 실연결 증거 없음, R09-T01 게이트는 외부 증거 확보 시 해제. 공식 완료43/진행22/계획42. [수용](../../docs/qa/R08-T03/current/browser-f7-sweep.md).
+
+## 이전 작업: R10 처리방침 도메인 로컬 완료 (T01~T03 완료·T04 외부 대기)
 
 2026-10-11 R10-T01/T02/T03 완료, R10-T04 로컬 수용 통과·external_pending. 원본102필드 중98개를 독립 DTO로 정규화(수탁유형2개 부모 구역·초기화배열2개 연결)하고 migration103→104에서 기존7테이블을 보존했다. 소유54작업이 실제 handler·정책과 일치. 목적/제공자 CRUD→문서 생성/개정→공개토큰·PDF 일치·게시본/영수증 불변, catalog/clause/document/trustee 전체 화면 Ego 수용(409복구·미저장보호·서비스 항목 자동입력·3폭). 재위탁 고지 발송은 notice+mail job+감사 원자 생성, worker drain→done/processed, 재로그인 세션 확인, production 재시작 지문 f4f62052…0081 동일. 도메인 17파일171시험 통과. 실제 SMTP 수신함 증거 없어 T04는 in_progress/external_pending 유지. 공식 완료43/진행22/계획42. [수용](../../docs/qa/R10-T04/final-acceptance/README.md).
 

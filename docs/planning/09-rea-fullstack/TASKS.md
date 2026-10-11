@@ -519,6 +519,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
   - 질문3종+제공자+동의서로 초안 작성→모든 단계 새로고침→다른 브라우저 재개; 2탭409; A 문서를 B 폼에 연결 차단; 게시본 수정 시 원래 응답의 질문·문구 불변.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 - 진행 체크포인트: F5 시작·종료 시각의 버전/게시본 계약과 DB 제약, 시작 전425·시작 후 제출·종료 후410을 구현했다. migration142·기존196버전/154게시본 보존, 전용5·회귀158시험, Ego Lite·production 재시작을 확인했다. [증거](../../qa/R08-T02/collection-window/README.md). 중복 참여·대상 목록·인증 방법 전체와 R08 수용조건은 남아 있다.
+- 진행 체크포인트: F3 NLP 자동분류와 동의 문안 자동생성을 완료했다. local-deterministic-v1 분석/피드백 API·분류 source NLP+feedbackId·migration 20261025032000·편집기 제안 카드(로컬 결과 고지)·RESIDENT 전환·복제 재분석을 구현하고 question-nlp 6·consent-display-generate 5·form-page-state 시험과 브라우저 제안→적용→DB NLP 2건을 통과했다. consent-display/{kind}/generate 제안 API(저장 분리·generated 감사)·UI 검토→적용→PATCH 저장을 검증하고 OpenAPI 336경로477작업·정책행477을 일치시켰다. [증거](../../qa/R08-T02/question-metadata/nlp-analysis/README.md), [증거](../../qa/R08-T02/question-metadata/consent-generation/README.md). 외부 NLP 제공사 실연결 증거는 없어 external_pending을 유지한다.
 
 ### [~] R08-T03 캐치폼·질문·템플릿·단계 편집 — 전체 화면·모달 연결
 
@@ -531,6 +532,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
 - 완료 조건:
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
+- 진행 체크포인트: F7 통합 스윕(2026-10-11)에서 9개 원본 경로의 formId 보존 렌더·알림 없음을 확인하고, NLP 제안→분류 적용→저장과 문안 생성→검토→적용→저장을 라이브로 통과했다. 미인증 draft/analyze/generate는 전부 403이다. [증거](../../qa/R08-T03/current/browser-f7-sweep.md). 로컬 검증 완료, external_pending 유지.
 
 ### [~] R08-T04 캐치폼·질문·템플릿·단계 편집 — DB·브라우저·재시작 수용검증
 
@@ -544,6 +546,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
   - 회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증
   - 브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과
   - 외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지.
+- 진행 체크포인트: F7 라운드 DB 지문(테넌트 A forms33/versions36/questions59·NLP분류2/templates2/displays1/감사128)이 재시작 전후 SHA-256 5192c9b7…로 동일하고 프로덕션 빌드 재기동·health·세션 유지를 확인했다(scripts/qa-r08-acceptance.ts). 로컬 수용 완료 — 외부 NLP 제공사 연결 증거가 없어 external_pending을 유지하며 R09-T01 게이트는 외부 증거 확보 시 해제한다.
 
 
 ## R09 폼 승인·게시·고정 URL
