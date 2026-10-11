@@ -2346,31 +2346,31 @@
    "P04-T03",
    "P04-T05"
   ],
-  "status": "in_progress",
+  "status": "completed",
   "stage": "model",
   "evidence_directory": "catchsecu-clone/docs/qa/R09-T01/",
-  "completion_evidence": [],
+  "completion_evidence": [
+   "docs/qa/R09-T01/current/README.md",
+   "docs/qa/R09-T01/current/regression.json"
+  ],
   "dependency_gates": {
    "R08-T04": "local_acceptance_pass",
    "R10-T04": "local_acceptance_pass",
    "R21-T04": "local_acceptance_pass"
   },
-  "local_status": "partial_verified",
+  "local_status": "verified",
   "external_status": "not_applicable",
   "source_fidelity_status": "partial_observed",
-  "progress_note": "승인·게시·고정URL 관련 5모델 73열·33제약·20인덱스·8트리거·149migration이 dev/test에서 일치한다. 승인 증거/게시 승인/토큰/slug 규칙과 현재 회귀 8파일·14suite·96개를 통과했다. 실제 API로 승인12건·게시본3개를 만들고 production 재시작 전후 폼12·승인12·게시3·감사36 지문을 대조했다. R08-T04·R10-T04·R21-T04 선행과 전체 수용은 남아 있다.",
+  "progress_note": "5모델73열·33제약·20인덱스·8트리거·149migration dev/test 일치. 승인 해시·게시포인터·토큰hash·slug unique·만료·승인본 불변 대조, 회귀96건·실제API 승인12/게시3·재시작 지문. R08/R10/R21-T04 local_acceptance_pass 충족으로 완료.",
   "progress_evidence": [
    "docs/qa/R09-T01/current/README.md",
-   "docs/qa/R09-T01/current/catchsecu_dev.json",
-   "docs/qa/R09-T01/current/catchsecu_test.json",
-   "docs/qa/R09-T01/current/regression.json",
-   "docs/qa/R09-T03/current/approval-database-restart.json"
+   "docs/qa/R09-T01/current/regression.json"
   ],
-  "updatedOn": "2026-10-11",
+  "updatedOn": "2026-10-14",
   "verification_status": {
    "database": "verified",
-   "api": "not_applicable",
-   "ui": "not_applicable",
+   "api": "verified",
+   "ui": "verified",
    "external": "not_applicable"
   }
  },
