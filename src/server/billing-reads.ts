@@ -13,6 +13,7 @@ const pageQuery = z.object({
 export const invoiceQuery = pageQuery;
 export const usageEventQuery = pageQuery.extend({
   kind: z.enum(["funding", "reserve", "capture", "release", "refund"]).optional(),
+  category: z.enum(["message", "identity"]).optional(),
 }).strict();
 const range = (query: z.infer<typeof pageQuery>) => ({
   ...(query.from ? { gte: new Date(query.from) } : {}), ...(query.to ? { lte: new Date(query.to) } : {}) });
@@ -39,6 +40,7 @@ export async function listUsageEvents(ctx: Context, raw: unknown) {
   const query = usageEventQuery.parse(raw);
   return withBillingAccess(ctx, "billing.read", async tx => {
     const where = { tenantId: ctx.tenantId, ...(query.kind ? { kind: query.kind } : {}),
+      ...(query.category ? { sourceKind: query.category === "message" ? "campaign_delivery" : "identity_verification" } : {}),
       ...(query.serviceId ? { serviceId: query.serviceId } : {}), createdAt: range(query) };
     if (query.serviceId && !(await tx.service.count({ where: { tenantId: ctx.tenantId, id: query.serviceId } })))
       fail(404, "NOT_FOUND", "서비스를 찾을 수 없습니다.");
@@ -47,7 +49,7 @@ export async function listUsageEvents(ctx: Context, raw: unknown) {
         skip: (query.page - 1) * query.pageSize, take: query.pageSize,
         include: { entries: { select: { account: true, amount: true } }, service: { select: { name: true } } } }),
       tx.ledgerTransaction.count({ where })]);
-    return { items: rows.map(row => ({ id: row.id, kind: row.kind, sourceKind: row.sourceKind, sourceId: row.sourceId,
+    return { items: rows.map(row => ({ id: row.id, kind: row.kind, sourceKind: row.sourceKind,
       serviceId: row.serviceId, serviceName: row.service?.name ?? null, amount: Number(row.amount), currency: row.currency,
       reservationId: row.reservationId, entries: row.entries.map(entry => ({ account: entry.account, amount: Number(entry.amount) })),
       createdAt: row.createdAt.toISOString() })), total, page: query.page, pageSize: query.pageSize };

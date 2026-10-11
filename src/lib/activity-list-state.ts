@@ -7,9 +7,12 @@ export function listDate(value: string | null) {
   return value && z.iso.date().safeParse(value).success ? value : "";
 }
 export function activityListState(params: Query) {
+  const serviceId = params.get("serviceId");
   return {
     page: Math.min(100000, positivePage(params.get("page"))), pageSize: pageSize(params.get("pageSize"), 10),
     from: listDate(params.get("from")), to: listDate(params.get("to")), search: (params.get("q") ?? "").slice(0, 100),
+    serviceId: serviceId && z.uuid().safeParse(serviceId).success ? serviceId : "",
+    searchField: oneOf(params.get("searchField"), ["action", "resource", "actor"] as const, "action"),
   };
 }
 export function reviewListState(params: Query) {

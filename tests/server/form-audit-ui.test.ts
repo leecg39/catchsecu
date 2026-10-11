@@ -2,7 +2,8 @@ import { beforeEach, expect, test, vi } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 const state = vi.hoisted(() => ({ queried: [] as string[], formService: "10000000-0000-4000-8000-000000000001", empty: false, denied: false }));
-vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams(), useRouter: () => ({ push: vi.fn() }) }));
+vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams(), usePathname: () => "/form/manage/applicant/log/10000000-0000-4000-8000-000000000002",
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
 vi.mock("@/components/ApplicationContext", () => ({ useApplication: () => ({ data: { capabilities: ["audit.read"] } }) }));
 vi.mock("@/lib/api", () => ({ api: vi.fn(), errorText: String, useResource: (path: string | null) => {
  if(path) state.queried.push(path);

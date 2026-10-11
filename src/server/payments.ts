@@ -48,14 +48,14 @@ export async function requestPaymentOrder(ctx: Context, input: { subscriptionId:
     return dto(row);
   }, async () => { assertFileDeadlines(deadlines); });
 }
-export type PaymentOrderListItem = PaymentOrderRecord & { planName: string; refundedTotal: number };
+export type PaymentOrderListItem = PaymentOrderRecord & { planName: string; refundedTotal: number; createdAt: string };
 export async function listPaymentOrders(ctx: Context) {
   return withBillingAccess(ctx, "billing.read", async tx => {
     const rows = await tx.paymentOrder.findMany({ where: { tenantId: ctx.tenantId },
       include: { subscription: { include: { plan: { select: { name: true } } } }, refunds: { where: { status: "refunded" }, select: { amount: true } } },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 100 });
     return { items: rows.map(row => ({ ...dto(row), planName: row.subscription.plan.name,
-      refundedTotal: row.refunds.reduce((sum, r) => sum + r.amount, 0) })),
+      refundedTotal: row.refunds.reduce((sum, r) => sum + r.amount, 0), createdAt: row.createdAt.toISOString() })),
       virtual: virtualPaymentEnabled() };
   });
 }

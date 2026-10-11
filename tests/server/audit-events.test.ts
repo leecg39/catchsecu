@@ -58,6 +58,7 @@ beforeAll(async () => {
   eventMine = (await event(companyA, "service.viewed", serviceA1, viewerId, 1)).id;
   await event(companyB, "service.updated", serviceB, other.id, 0);
   await db.rateLimit.deleteMany();
+  await db.apiRateLimit.deleteMany();
 });
 afterAll(async () => { await db.$disconnect(); });
 
@@ -158,7 +159,23 @@ describe("회사 격리 감사 이벤트 조회", () => {
     const searchedEvent = await db.auditEvent.findFirstOrThrow({ where: { requestId: searched.headers.get("x-request-id")! } });
     expect(searchedEvent.detail).toMatchObject({ hasSearch: true, rowCount: 0 });
     expect(JSON.stringify(searchedEvent.detail)).not.toContain("secret@example.test");
+    await expect(db.auditEvent.update({ where: { id: eventService }, data: { action: "service.tampered" } })).rejects.toThrow();
     await expect(db.auditEvent.delete({ where: { id: eventService } })).rejects.toThrow();
+  });
+  test("같은 시각의 감사 행도 ID 보조 정렬로 페이지 사이에 중복·누락되지 않는다", async () => {
+    const createdAt = new Date("2026-10-11T00:00:00.000Z"), ids: string[] = [];
+    for (let index = 0; index < 3; index++) ids.push((await db.auditEvent.create({ data: {
+      tenantId: companyA, serviceId: serviceA1, actorId: adminId, action: "service.same_time_boundary",
+      resource: "service", resourceId: randomUUID(), requestId: randomUUID(), detail: { index }, createdAt,
+    } })).id);
+    const pages: string[] = [];
+    for (let page = 1; page <= 3; page++) {
+      const response = await list(request(`/audit-events?search=service.same_time_boundary&page=${page}&pageSize=1`, "GET", adminCookie));
+      expect(response.status).toBe(200);
+      pages.push((await response.json()).items[0].id);
+    }
+    expect(pages).toEqual(ids.sort().reverse());
+    expect(new Set(pages).size).toBe(3);
   });
   test("5,000건 초과 내보내기는 일부만 내려주지 않는다", async () => {
     await db.auditEvent.createMany({ data: Array.from({ length: 5001 }, (_, index) => ({
@@ -184,6 +201,22 @@ describe("회사 격리 감사 이벤트 조회", () => {
     const csv = parse(await exported.text(), { bom: true }) as string[][];
     expect(csv.slice(1).map(row => row[0]).sort()).toEqual(ids.sort());
     expect(JSON.stringify(csv)).not.toContain("never-return-this-token");
+  });
+  test.each([
+    ["service", "service.r22_service_matrix"], ["info", "submission.r22_info_matrix"], ["marketing", "marketing.r22_marketing_matrix"],
+    ["customer", "subject.r22_customer_matrix"], ["member", "invitation.r22_member_matrix"], ["authority", "policy.r22_authority_matrix"],
+    ["external", "share.r22_external_matrix"], ["access", "session.r22_access_matrix"], ["mail", "campaign.r22_mail_matrix"],
+  ])("%s 종류는 화면 목록과 CSV에 같은 단일 행을 제공한다", async (kind, action) => {
+    const id = (await event(companyA, action, serviceA1, adminId, 0)).id;
+    const query = `?kind=${kind}&serviceId=${serviceA1}&search=${encodeURIComponent(action)}&pageSize=100`;
+    const response = await list(request("/audit-events" + query, "GET", adminCookie));
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.items.map((row: { id: string }) => row.id)).toEqual([id]);
+    const exported = await exportCsv(request("/audit-events/export" + query, "GET", adminCookie));
+    expect(exported.status).toBe(200);
+    expect((parse(await exported.text(), { bom: true }) as string[][]).slice(1).map(row => row[0])).toEqual([id]);
+    await db.apiRateLimit.deleteMany();
   });
 });
 

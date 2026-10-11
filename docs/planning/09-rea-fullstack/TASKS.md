@@ -1196,7 +1196,7 @@ provider event 검증·order return·승인/실패/환불 상태기계와 멱등
   - 시험주문→승인중복/역순event→1회잔액충전→부분/전액환불→원장합계0검증; 결제중해지409·과거취소구독충전차단 기존회귀 보존; 임의successURL로승인불가; 실제PG시험은 별도.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [ ] R21-T03 라이선스·결제수단·주문·원장·환불 — 전체 화면·모달 연결
+### [x] R21-T03 라이선스·결제수단·주문·원장·환불 — 전체 화면·모달 연결
 
 license-service/membership/detail/method/billing-policy/history/usage/service-asset/bill/creditBill/refund와 성공/실패/type/errorCode 모든 변형을 연결한다. 대기/중복callback/권한없음·영수증·해지철회를 구분한다.
 
@@ -1204,11 +1204,12 @@ license-service/membership/detail/method/billing-policy/history/usage/service-as
 - 대상: `src/components/services/payment.tsx`; `src/components/services/InvoiceDetail.tsx`; `src/data/route-manifest.json`; `src/data/menu.json`
 - 기존 작업 연결: P10-T01, P10-T02, P10-T03, P10-T04, P10-T05
 - 증거: `catchsecu-clone/docs/qa/R21-T03/`
+- 완료 기록(2026-10-11): 결제·사용 이력의 세 탭을 실제 청구 이력·원장 API에 연결하고 탭/기간/페이지/행 수를 URL에 보존했다. `/pay/cancel`을 환불 가능한 주문 선택 화면으로 교체하고 결과 URL 변형을 정확히 제한했다. Ego Lite 17경로×3폭·새로고침·이력 이동·기간오류·키보드 포커스, 결제15파일197시험, 타입·린트·production83페이지·계약검사를 통과했다. [근거](../../qa/R21-T03/README.md).
 - 완료 조건:
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R21-T04 라이선스·결제수단·주문·원장·환불 — DB·브라우저·재시작 수용검증
+### [~] R21-T04 라이선스·결제수단·주문·원장·환불 — DB·브라우저·재시작 수용검증
 
 시험주문→승인중복/역순event→1회잔액충전→부분/전액환불→원장합계0검증; 결제중해지409·과거취소구독충전차단 기존회귀 보존; 임의successURL로승인불가; 실제PG시험은 별도.
 
@@ -1216,6 +1217,7 @@ license-service/membership/detail/method/billing-policy/history/usage/service-as
 - 대상: `tests`; `scripts`; `docs/qa/R21-T04`
 - 기존 작업 연결: P10-T01, P10-T02, P10-T03, P10-T04, P10-T05
 - 증거: `catchsecu-clone/docs/qa/R21-T04/`
+- 진행 기록(2026-10-11): 격리 PostgreSQL·production 서버·worker·Ego Lite에서 임의 성공 URL 비승인, 서명 승인 1회 충전, 중복·역순 이벤트, 부분·전액 환불, 원장합계0, 역할·A/B 격리와 재시작 동일 지문을 확인했다. 저장 세션·fresh 재로그인·2폭, 결제15파일197시험·타입·린트·production83페이지를 통과했다. 실제 PG webhook 영수증이 없어 `external_pending`으로 유지한다. [근거](../../qa/R21-T04/README.md).
 - 완료 조건:
   - 회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증
   - 브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과
@@ -1224,7 +1226,7 @@ license-service/membership/detail/method/billing-policy/history/usage/service-as
 
 ## R22 개인정보·권한·활동 감사로그
 
-### [~] R22-T01 개인정보·권한·활동 감사로그 — 모델·규칙 대조 및 보완
+### [x] R22-T01 개인정보·권한·활동 감사로그 — 모델·규칙 대조 및 보완
 
 tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드를 대조한다. 현재 UI에서 IP·고객번호·사유가 - 처리되는 영역은 합법적 수집근거/보존과 함께 수집·마스킹 계약을 확정한다.
 
@@ -1232,11 +1234,12 @@ tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드�
 - 대상: `prisma/schema.prisma`; `prisma/migrations`; `src/contracts`; `src/server/audit.ts`; `src/server/audit-events.ts`; `src/server/form-audit-events.ts`; `src/server/activity-reviews.ts`; `src/server/exports.ts`
 - 기존 작업 연결: P12-T01, P12-T04
 - 증거: `catchsecu-clone/docs/qa/R22-T01/`
+- 완료 기록(2026-10-10): dev/test PostgreSQL에서 감사·검토 3모델 35열·16제약·13인덱스·3불변 트리거·150 migration의 정의와 이력이 일치했다. 회사·서비스·사건·처리자 복합 FK, 상태·파기 증거, 열린 사건 단일 검토, 동일시각 페이지 인덱스와 고아 참조 0건을 확인했다. [근거](../../qa/R22-T01/README.md).
 - 완료 조건:
   - C 실제업무 처리시 서버가 이벤트 추가; R 필터·상세·CSV; U/D 원장 직접 조작 없음. 검토요청·응답은 별도 resource 상태전이.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [~] R22-T02 개인정보·권한·활동 감사로그 — 서버 API·업무 처리
+### [x] R22-T02 개인정보·권한·활동 감사로그 — 서버 API·업무 처리
 
 각 kind(info/marketing/service/member/authority/external/access/customer/mail)와 mine/form 범위 조회·export가 동일 필터를 사용하게 한다. 업무변경과 audit append 원자성, 개인정보원문 최소화·보존집행을 검증한다.
 
@@ -1244,11 +1247,12 @@ tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드�
 - 대상: `src/server/audit.ts`; `src/server/audit-events.ts`; `src/server/form-audit-events.ts`; `src/server/activity-reviews.ts`; `src/server/exports.ts`; `src/app/api/v1`; `docs/planning/contracts/openapi.json`
 - 기존 작업 연결: P12-T01, P12-T04
 - 증거: `catchsecu-clone/docs/qa/R22-T02/`
+- 완료 기록(2026-10-10): 9종 감사 목록과 CSV의 동일 필터, 역할·A/B 격리·마스킹·원문 비노출·5천 행 상한·동일시각 페이지·원장 불변을 확인했다. 실제 사건 생산자와 검토 상태전이·멱등·경합·보유 파기를 포함한 16파일313시험과 HTTP 35개 검사가 통과했다. [근거](../../qa/R22-T02/README.md).
 - 완료 조건:
   - 각 도메인 실제변경1회→해당kind1건→화면/CSV같음; 읽기전용 권한·타회사·허용필드 마스킹; 로그PATCH/DELETE미노출; 경계날짜/KST·대량export·동일시각페이지 누락없음.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [~] R22-T03 개인정보·권한·활동 감사로그 — 전체 화면·모달 연결
+### [x] R22-T03 개인정보·권한·활동 감사로그 — 전체 화면·모달 연결
 
 9종 로그와 내 활동·폼로그의 기간/서비스/처리자/검색/페이지크기/상세/내보내기, 개인정보활동 검토요청을 실제 컬럼에 연결한다. 403을 건수0으로 표시하지 않는다.
 
@@ -1256,6 +1260,7 @@ tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드�
 - 대상: `src/components/management/AuditLogs.tsx`; `src/components/management/ActivityReviews.tsx`; `src/data/route-manifest.json`; `src/data/menu.json`
 - 기존 작업 연결: P12-T01, P12-T04
 - 증거: `catchsecu-clone/docs/qa/R22-T03/`
+- 완료 기록(2026-10-10): 회사·폼 감사로그의 기간·서비스·검색조건·검색어·페이지·행 수를 URL에 보존했다. Ego Lite에서 9종 로그·나의 활동·검토 상세·동일시각 2/3페이지 새로고침·KST 경계와 1440/390 폭의 오류·가로 넘침 0건을 확인했고 production 83페이지를 빌드했다. [근거](../../qa/R22-T03/README.md).
 - 완료 조건:
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
@@ -1268,6 +1273,7 @@ tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드�
 - 대상: `tests`; `scripts`; `docs/qa/R22-T04`
 - 기존 작업 연결: P12-T01, P12-T04
 - 증거: `catchsecu-clone/docs/qa/R22-T04/`
+- 진행 기록(2026-10-10): 격리 PostgreSQL·production 서버·worker·Ego Lite에서 9종 목록/CSV, KST 경계, 동일시각 페이지, 역할·A/B 격리, 원장 405, 검토·암호화 메시지와 재시작 동일 지문을 확인했다. 재시작 전 14·후 16화면과 각 6개 반응형 조합, 16파일313시험·타입·린트·production83페이지를 통과했다. 실제 SMTP 받은편지함 영수증이 없어 `external_pending`으로 유지한다. [근거](../../qa/R22-T04/README.md).
 - 완료 조건:
   - 회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증
   - 브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과
@@ -1276,7 +1282,7 @@ tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드�
 
 ## R23 대시보드·통계·준수·월마감
 
-### [ ] R23-T01 대시보드·통계·준수·월마감 — 모델·규칙 대조 및 보완
+### [x] R23-T01 대시보드·통계·준수·월마감 — 모델·규칙 대조 및 보완
 
 원천조회→서비스필터→기간버킷→snapshot과 근거hash를 대조한다. ComplianceClose와 BillingMonthClose를 다른 모델로 유지한다. 근거없는 점수/과태료를 실제 계산으로 제시하지 않는다.
 
@@ -1284,11 +1290,12 @@ tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드�
 - 대상: `prisma/schema.prisma`; `prisma/migrations`; `src/contracts`; `src/server/analytics.ts`; `src/server/scoped-analytics.ts`; `src/server/compliance-evidence.ts`; `src/server/compliance-close.ts`; `src/server/compliance-exports.ts`; `src/server/analytics-period.ts`
 - 기존 작업 연결: P12-T02, P12-T03, P12-T04
 - 증거: `catchsecu-clone/docs/qa/R23-T01/`
+- 완료 기록(2026-10-11): dev/test PostgreSQL의 3모델36열·13제약·11인덱스·3트리거·150 migration과 범위 고아0건을 대조했다. 결제·준수 마감을 분리하고 snapshot·근거 hash·출력 작업의 회사/서비스/요청자 결합을 확인했다. [근거](../../qa/R23-T01/README.md).
 - 완료 조건:
   - C 월마감 snapshot/출력job; R 대시보드·개인정보/광고통계·마감자료; U/D 수치 직접변경 없음, 출력취소/파일만 삭제 정책.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R23-T02 대시보드·통계·준수·월마감 — 서버 API·업무 처리
+### [x] R23-T02 대시보드·통계·준수·월마감 — 서버 API·업무 처리
 
 dashboard/privacy/marketing/compliance/closes/exports의 분모·시점·동의철회·파기 반영 기준을 계약화한다. 마감 unique와 정정이력·실패재시도·읽기권한을 검증한다.
 
@@ -1296,11 +1303,12 @@ dashboard/privacy/marketing/compliance/closes/exports의 분모·시점·동의�
 - 대상: `src/server/analytics.ts`; `src/server/scoped-analytics.ts`; `src/server/compliance-evidence.ts`; `src/server/compliance-close.ts`; `src/server/compliance-exports.ts`; `src/server/analytics-period.ts`; `src/app/api/v1`; `docs/planning/contracts/openapi.json`
 - 기존 작업 연결: P12-T02, P12-T03, P12-T04
 - 증거: `catchsecu-clone/docs/qa/R23-T02/`
+- 완료 기록(2026-10-11): 수집3·철회1·파기1에서 전용 개인정보/마케팅 집계, KST 경계, 중복 query 422, 마감 멱등, 역할·A/B 격리와 출력 다운로드를 HTTP 전후 각23개·관련9파일146시험으로 확인했다. [근거](../../qa/R23-T02/README.md).
 - 완료 조건:
   - 수집3→철회1→파기1 fixture로 각통계DB대조; 서비스B제외; KST월말 경계; 마감중복1개; 파기후snapshot의 개인정보비노출; export재시작/취소·다운로드권한.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [~] R23-T03 대시보드·통계·준수·월마감 — 전체 화면·모달 연결
+### [x] R23-T03 대시보드·통계·준수·월마감 — 전체 화면·모달 연결
 
 대시보드7경로의 전체/서비스 선택과 기간/드릴다운, /log/month-monitoring의 고정Enterprise gate를 실제 월목록·상세·출력에 연결한다. 근거부족은 미평가로 표시한다.
 
@@ -1308,11 +1316,12 @@ dashboard/privacy/marketing/compliance/closes/exports의 분모·시점·동의�
 - 대상: `src/components/Dashboard.tsx`; `src/components/StatisticsPages.tsx`; `src/components/forms/Marketing.tsx`; `src/data/route-manifest.json`; `src/data/menu.json`
 - 기존 작업 연결: P12-T02, P12-T03, P12-T04
 - 증거: `catchsecu-clone/docs/qa/R23-T03/`
+- 완료 기록(2026-10-11): 기간·검색·월·범위·출력 페이지를 URL에 보존하고 전용 API에 연결했다. Ego Lite 재시작 전8·후11기능과 각8반응형, 타입·린트 오류0·production83페이지를 확인했다. [근거](../../qa/R23-T03/README.md).
 - 완료 조건:
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R23-T04 대시보드·통계·준수·월마감 — DB·브라우저·재시작 수용검증
+### [x] R23-T04 대시보드·통계·준수·월마감 — DB·브라우저·재시작 수용검증
 
 수집3→철회1→파기1 fixture로 각통계DB대조; 서비스B제외; KST월말 경계; 마감중복1개; 파기후snapshot의 개인정보비노출; export재시작/취소·다운로드권한.
 
@@ -1320,6 +1329,7 @@ dashboard/privacy/marketing/compliance/closes/exports의 분모·시점·동의�
 - 대상: `tests`; `scripts`; `docs/qa/R23-T04`
 - 기존 작업 연결: P12-T02, P12-T03, P12-T04
 - 증거: `catchsecu-clone/docs/qa/R23-T04/`
+- 완료 기록(2026-10-11): production 서버와 실제 출력 worker가 54,762바이트·2페이지 PDF를 만들었고 서버 재시작 전후 HTTP23개와 DB 지문이 일치했다. Ego 저장 세션·새 로그인·새로고침·뒤로가기·1440/390 화면을 확인했다. 별도 외부 공급자가 없는 범위라 `external_status=not_applicable`로 완료했다. 공식 완료37·진행26·계획44. [근거](../../qa/R23-T04/README.md).
 - 완료 조건:
   - 회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증
   - 브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과

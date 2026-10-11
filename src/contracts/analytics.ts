@@ -10,6 +10,16 @@ export const analyticsQuery = z.object({
 
 export type AnalyticsQuery = z.infer<typeof analyticsQuery>;
 
+export type PrivacyAnalytics = {
+  asOf: string;
+  period: { from: string; to: string };
+  serviceId: string | null;
+  services: Array<{
+    id: string; name: string; retainedSubmissions: number; periodSubmissions: number; legalHolds: number;
+    periodConsents: number; periodConsentWithdrawals: number; periodSubjectWithdrawals: number; periodDestructions: number;
+  }>;
+};
+
 export const collectDestructionQuery = z.object({
   serviceId: z.uuid().optional(),
   sourceId: z.uuid().optional(),

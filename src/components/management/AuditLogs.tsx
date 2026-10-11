@@ -6,7 +6,6 @@ import "./management.css";
 import { useEffect, useState, type SetStateAction } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { activityListHref, activityListState } from "@/lib/activity-list-state";
-import { oneOf } from "@/lib/list-url-state";
 import { useResource } from "@/lib/api";
 import type { AuditEventKind, AuditEventList, AuditEventRecord } from "@/contracts/audit-events";
 import type { Application } from "../ApplicationContext";
@@ -58,18 +57,19 @@ export function AuditLogs({ path, formId }: { path: string; formId?: string }) {
   const context = useResource<Application>("/context");
   const query = useSearchParams(), pathname = usePathname(), router = useRouter(), mine = config.scope === "mine";
   const urlState = activityListState(query);
-  const [localApplied, setApplied] = useState(blank);
-  const applied: Filters = mine ? { start: urlState.from, end: urlState.to, search: urlState.search, serviceId: "", searchField: oneOf(query.get("searchField"), ["action", "resource"] as const, "action") } : localApplied;
+  const applied: Filters = { start: urlState.from, end: urlState.to, search: urlState.search,
+    serviceId: mine || formId ? "" : urlState.serviceId,
+    searchField: mine && urlState.searchField === "actor" ? "action" : urlState.searchField };
   const filterKey = JSON.stringify(applied);
   const [draftState, setDraftState] = useState({ key: filterKey, value: applied });
   if (draftState.key !== filterKey) setDraftState({ key: filterKey, value: applied });
   const draft = draftState.key === filterKey ? draftState.value : applied;
   function setDraft(value: SetStateAction<Filters>) { setDraftState({ key: filterKey, value: typeof value === "function" ? value(draft) : value }); }
-  const [localPage, setLocalPage] = useState(1), [localSize, setLocalSize] = useState(10), [error, setError] = useState("");
-  const page = mine ? urlState.page : localPage, pageSize = mine ? urlState.pageSize : localSize;
+  const [error, setError] = useState("");
+  const page = urlState.page, pageSize = urlState.pageSize;
   function update(values: Record<string, string | number | null>) { router.push(activityListHref(pathname, query.toString(), values), { scroll: false }); }
-  function setPage(value: number) { if (mine) update({ page: value }); else setLocalPage(value); }
-  function setPageSize(value: number) { if (mine) update({ pageSize: value, page: 1 }); else { setLocalSize(value); setLocalPage(1); } }
+  function setPage(value: number) { update({ page: value }); }
+  function setPageSize(value: number) { update({ pageSize: value, page: 1 }); }
   const [exporting, setExporting] = useState(false);
   const [reviewEvent, setReviewEvent] = useState<AuditEventRecord | null>(null);
   const canReview = config.kind === "info" && ["security.write", "audit.read"].every(c => context.data?.capabilities.includes(c));
@@ -84,14 +84,13 @@ export function AuditLogs({ path, formId }: { path: string; formId?: string }) {
   const companyWide = ["owner", "admin", "security", "auditor"].includes(context.data?.company?.role ?? "");
   const currentPage = result.data?.page ?? page;
   const pages = Math.max(1, Math.ceil((result.data?.total ?? 0) / pageSize));
-  useEffect(() => { if (mine && result.data && result.data.page !== page) router.replace(activityListHref(pathname, query.toString(), { page: result.data.page }), { scroll: false }); }, [mine, result.data, page, pathname, query, router]);
+  useEffect(() => { if (result.data && result.data.page !== page) router.replace(activityListHref(pathname, query.toString(), { page: result.data.page }), { scroll: false }); }, [result.data, page, pathname, query, router]);
   function search() {
     if (draft.start && draft.end && draft.start > draft.end) { setError("종료일은 시작일 이후로 선택해주세요."); return; }
     setError("");
-    if (mine) update({ from: draft.start, to: draft.end, q: draft.search, searchField: draft.searchField, page: 1 });
-    else { setLocalPage(1); setApplied({ ...draft }); }
+    update({ from: draft.start, to: draft.end, serviceId: draft.serviceId, q: draft.search, searchField: draft.searchField, page: 1 });
   }
-  function reset() { setError(""); setDraft(blank()); if (mine) update({ from: null, to: null, q: null, searchField: null, page: 1 }); else { setApplied(blank()); setLocalPage(1); } result.reload(); }
+  function reset() { setError(""); setDraft(blank()); update({ from: null, to: null, serviceId: null, q: null, searchField: null, page: 1 }); }
   async function download() {
     if (exporting) return;
     setError(""); setExporting(true);

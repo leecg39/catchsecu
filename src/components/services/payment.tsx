@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api, ApiError, errorText, useResource } from "@/lib/api";
 import type { AssetOverview, BillingOverview, PlanRecord, SubscriptionRecord } from "@/contracts/subscriptions";
 import { securityCapabilities, securityCapabilityLabels } from "@/contracts/feature-entitlements";
@@ -10,6 +10,8 @@ import type { LedgerOverview } from "@/contracts/ledger";
 import type { PaymentMethodRecord } from "@/contracts/payment-methods";
 import type { PaymentOrderListItem } from "@/server/payments";
 import type { RefundRecord } from "@/contracts/billing-settlement";
+import { billingHistoryListState } from "@/lib/billing-list-state";
+import { listHref } from "@/lib/list-url-state";
 import { ActionButton, DataTable, PageHeading, Panel } from "../shared";
 import { useConfirm } from "../ux/confirm";
 import { Tabs } from "./ui";
@@ -244,27 +246,78 @@ function PaymentOrdersPanel({ onChanged }: { onChanged: () => void }) {
   </Panel>;
 }
 
+export function PaymentCancel() {
+  const orders = useResource<{ items: PaymentOrderListItem[] }>("/billing/orders");
+  const paid = orders.data?.items.filter(order => order.status === "paid" && order.refundedTotal < order.amount) ?? [];
+  return <div className="svc-payment-cancel"><PageHeading title="환불할 결제 선택"><p>결제 완료 주문의 환불 가능 금액과 처리 내역을 확인한 뒤 요청할 수 있습니다.</p></PageHeading>
+    <Panel title="환불 가능한 결제">
+      {orders.loading && <p role="status">결제 주문을 불러오는 중입니다.</p>}
+      {orders.error && <p role="alert">{orders.error.message}</p>}
+      {orders.data && (paid.length ? <ul className="svc-methods">{paid.map(order => <li key={order.id}>
+        <strong>{order.planName}</strong>
+        <span>{dateTime(order.createdAt)} · 결제 {money(order.amount)} · 환불 완료 {money(order.refundedTotal)}</span>
+        <span className="svc-muted">추가 요청 가능 금액은 처리 대기 환불을 포함해 상세 화면에서 다시 계산합니다.</span>
+        <span><Link className="cs-button" href={`/bill/${order.id}/refund`}>환불 내역 확인 및 요청</Link>{" "}
+          <Link className="cs-button secondary" href={`/bill/${order.id}`}>청구서 상세</Link></span>
+      </li>)}</ul> : <p className="svc-muted">현재 환불을 요청할 수 있는 결제 완료 주문이 없습니다.</p>)}
+      <p><Link href="/pay/history">전체 결제 및 환불 내역 보기</Link></p>
+    </Panel>
+  </div>;
+}
+
+type UsageEventList = {
+  items: Array<{ id: string; kind: "funding" | "reserve" | "capture" | "release" | "refund"; sourceKind: string;
+    serviceId: string | null; serviceName: string | null; amount: number; currency: string;
+    reservationId: string | null; entries: Array<{ account: string; amount: number }>; createdAt: string }>;
+  total: number; page: number; pageSize: number;
+};
+const historyTabs = ["billing", "message", "identity"] as const;
+const usageKind: Record<UsageEventList["items"][number]["kind"], string> = {
+  funding: "충전", reserve: "사용 예약", capture: "사용 확정", release: "예약 반환", refund: "환불",
+};
+const utcStart = (value: string) => value ? `${value}T00:00:00.000Z` : "";
+const utcEnd = (value: string) => value ? `${value}T23:59:59.999Z` : "";
+
 export function PaymentHistory({ usage = false }: { usage?: boolean }) {
-  const [tab, setTab] = useState(usage ? 2 : 0);
-  const [fromMonth, setFromMonth] = useState(""), [toMonth, setToMonth] = useState("");
-  const [filter, setFilter] = useState({ fromMonth: "", toMonth: "" }), [page, setPage] = useState(1), [notice, setNotice] = useState("");
-  const params = new URLSearchParams({ page: String(page), pageSize: "10", ...(filter.fromMonth ? { fromMonth: filter.fromMonth } : {}),
-    ...(filter.toMonth ? { toMonth: filter.toMonth } : {}) });
-  const history = useResource<BillingHistoryList>(tab === 0 ? "/billing-history?" + params : null);
+  const searchParams = useSearchParams(), pathname = usePathname(), router = useRouter();
+  const state = billingHistoryListState(searchParams, usage), tab = historyTabs.indexOf(state.tab);
+  const current = searchParams.toString();
+  const update = (values: Record<string, string | number | null>) => router.push(listHref(pathname, current, values), { scroll: false });
+  const historyParams = new URLSearchParams({ page: String(state.page), pageSize: String(state.pageSize),
+    ...(state.fromMonth ? { fromMonth: state.fromMonth } : {}), ...(state.toMonth ? { toMonth: state.toMonth } : {}) });
+  const usageParams = new URLSearchParams({ category: state.tab === "message" ? "message" : "identity", page: String(state.page), pageSize: String(state.pageSize),
+    ...(state.from ? { from: utcStart(state.from) } : {}), ...(state.to ? { to: utcEnd(state.to) } : {}) });
+  const history = useResource<BillingHistoryList>(tab === 0 ? "/billing-history?" + historyParams : null);
+  const events = useResource<UsageEventList>(tab > 0 ? "/usage-events?" + usageParams : null);
+  const result = tab === 0 ? history.data : events.data;
+  const [notice, setNotice] = useState("");
+  useEffect(() => {
+    if (!result || !result.total) return;
+    const last = Math.max(1, Math.ceil(result.total / result.pageSize));
+    if (state.page > last) router.replace(listHref(pathname, current, { page: last }), { scroll: false });
+  }, [current, pathname, result, router, state.page]);
   function search(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (fromMonth && toMonth && fromMonth > toMonth) { setNotice("조회 시작 월은 종료 월보다 늦을 수 없습니다."); return; }
-    setNotice(""); setPage(1); setFilter({ fromMonth, toMonth });
+    const fields = new FormData(event.currentTarget);
+    if (tab === 0) {
+      const fromMonth = String(fields.get("fromMonth") ?? ""), toMonth = String(fields.get("toMonth") ?? "");
+      if (fromMonth && toMonth && fromMonth > toMonth) { setNotice("조회 시작 월은 종료 월보다 늦을 수 없습니다."); return; }
+      setNotice(""); update({ fromMonth, toMonth, page: 1 });
+    } else {
+      const from = String(fields.get("from") ?? ""), to = String(fields.get("to") ?? "");
+      if (from && to && from > to) { setNotice("조회 시작 일은 종료 일보다 늦을 수 없습니다."); return; }
+      setNotice(""); update({ from, to, page: 1 });
+    }
   }
-  const columns = tab === 1 ? ["결제일시", "발송 제목", "발송건수", "금액"] : ["사용일시", "서비스", "캐치폼", "사용 내역", "사용 금액"];
   return <div className="svc-history"><PageHeading title="자산 및 결제 내역"><p>결제, 부가서비스 이용 내역을 확인할 수 있습니다.</p></PageHeading>
-    <Panel><Tabs items={["결제 및 환불 내역", "문자 결제 내역", "본인인증 사용 내역"]} value={tab} onChange={setTab}/>
+    <Panel><Tabs items={["결제 및 환불 내역", "문자 결제 내역", "본인인증 사용 내역"]} value={tab}
+      onChange={value => { setNotice(""); update({ tab: historyTabs[value], page: 1 }); }}/>
       {tab === 0 ? <><p className="svc-muted">무료 체험, 결제, 환불 이력입니다. 결제·환불 상태는 서명된 공급자 콜백으로만 확정됩니다.</p>
         <form className="svc-history-filter" onSubmit={search}>
-          <label>조회 시작 월<input className="cs-input" type="month" value={fromMonth} onChange={event => setFromMonth(event.target.value)}/></label>
-          <label>조회 종료 월<input className="cs-input" type="month" value={toMonth} onChange={event => setToMonth(event.target.value)}/></label>
+          <label>조회 시작 월<input className="cs-input" type="month" name="fromMonth" defaultValue={state.fromMonth}/></label>
+          <label>조회 종료 월<input className="cs-input" type="month" name="toMonth" defaultValue={state.toMonth}/></label>
           <ActionButton type="submit">검색</ActionButton>
-          <ActionButton type="button" secondary onClick={() => { setFromMonth(""); setToMonth(""); setFilter({ fromMonth: "", toMonth: "" }); setPage(1); setNotice(""); }}>검색 조건 초기화</ActionButton>
+          <ActionButton type="button" secondary onClick={() => { setNotice(""); update({ fromMonth: null, toMonth: null, page: 1 }); }}>검색 조건 초기화</ActionButton>
         </form>
         {notice && <p role="alert">{notice}</p>}
         {history.loading && <p role="status">내역을 불러오는 중입니다.</p>}
@@ -281,12 +334,34 @@ export function PaymentHistory({ usage = false }: { usage?: boolean }) {
           <td>{date(row.periodStart)} ~ {date(row.periodEnd)}</td>
         </tr>) : <tr><td colSpan={7}>조회 조건에 맞는 이력이 없습니다.</td></tr>}</tbody></table></div>
           <div className="svc-history-pages"><span>총 {history.data.total}건</span>
-            <button type="button" disabled={page <= 1} onClick={() => setPage(page - 1)}>이전</button>
-            <span>{page} / {Math.max(1, Math.ceil(history.data.total / history.data.pageSize))}</span>
-            <button type="button" disabled={page * history.data.pageSize >= history.data.total} onClick={() => setPage(page + 1)}>다음</button>
+            <label>페이지당 <select value={state.pageSize} onChange={event => update({ pageSize: Number(event.target.value), page: 1 })}>{[10,20,50,100].map(size => <option key={size}>{size}</option>)}</select></label>
+            <button type="button" disabled={state.page <= 1} onClick={() => update({ page: state.page - 1 })}>이전</button>
+            <span>{state.page} / {Math.max(1, Math.ceil(history.data.total / history.data.pageSize))}</span>
+            <button type="button" disabled={state.page * history.data.pageSize >= history.data.total} onClick={() => update({ page: state.page + 1 })}>다음</button>
           </div></>}
-      </> : <><p className="svc-muted">{tab === 1 ? "문자 결제 기록은 문자 공급자 연동 후 표시됩니다." : "본인인증 사용 기록은 본인인증 연동 후 표시됩니다."}</p>
-        <DataTable columns={columns} rows={[]} empty="확정된 내역이 없습니다"/></>}</Panel></div>;
+      </> : <><p className="svc-muted">{tab === 1 ? "문자 발송의 크레딧 예약·확정·반환 내역입니다." : "본인인증·전자서명 사용이 연결되면 확정 원장 내역으로 표시됩니다."}</p>
+        <form className="svc-history-filter" onSubmit={search}>
+          <label>조회 시작 일<input className="cs-input" type="date" name="from" defaultValue={state.from}/></label>
+          <label>조회 종료 일<input className="cs-input" type="date" name="to" defaultValue={state.to}/></label>
+          <ActionButton type="submit">검색</ActionButton>
+          <ActionButton type="button" secondary onClick={() => { setNotice(""); update({ from: null, to: null, page: 1 }); }}>검색 조건 초기화</ActionButton>
+        </form>
+        {notice && <p role="alert">{notice}</p>}
+        {events.loading && <p role="status">사용 내역을 불러오는 중입니다.</p>}
+        {events.error && <p role="alert">{events.error.message}</p>}
+        {events.data && <><div className="cs-table-wrap"><table className="cs-table"><thead><tr>
+          {["사용일시", "서비스", "처리", "금액", "통화"].map(column => <th key={column}>{column}</th>)}
+        </tr></thead><tbody>{events.data.items.length ? events.data.items.map(row => <tr key={row.id}>
+          <td>{dateTime(row.createdAt)}</td><td>{row.serviceName ?? "회사 공용"}</td><td>{usageKind[row.kind]}</td>
+          <td>{row.amount.toLocaleString("ko-KR")}</td><td>{row.currency}</td>
+        </tr>) : <tr><td colSpan={5}>확정된 내역이 없습니다.</td></tr>}</tbody></table></div>
+          <div className="svc-history-pages"><span>총 {events.data.total}건</span>
+            <label>페이지당 <select value={state.pageSize} onChange={event => update({ pageSize: Number(event.target.value), page: 1 })}>{[10,20,50,100].map(size => <option key={size}>{size}</option>)}</select></label>
+            <button type="button" disabled={state.page <= 1} onClick={() => update({ page: state.page - 1 })}>이전</button>
+            <span>{state.page} / {Math.max(1, Math.ceil(events.data.total / events.data.pageSize))}</span>
+            <button type="button" disabled={state.page * events.data.pageSize >= events.data.total} onClick={() => update({ page: state.page + 1 })}>다음</button>
+          </div></>}
+      </>}</Panel></div>;
 }
 
 export function ServiceAssetPage() {

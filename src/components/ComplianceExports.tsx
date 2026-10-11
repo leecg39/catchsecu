@@ -1,19 +1,32 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ComplianceExportRecord } from "@/contracts/compliance-exports";
 import { exportStatusLabels } from "@/contracts/exports";
 import { api, errorText, useResource } from "@/lib/api";
 import { ActionButton, Panel } from "./shared";
+import { complianceListState } from "@/lib/analytics-list-state";
+import { listHref } from "@/lib/list-url-state";
 
 export function ComplianceExports({ closeId }: { closeId: string }) {
-  const [page, setPage] = useState(1), [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const searchParams = useSearchParams(), pathname = usePathname(), router = useRouter(), currentQuery = searchParams.toString();
+  const { exportPage: page, exportPageSize: pageSize } = complianceListState(searchParams, "2000-01");
+  const [busy, setBusy] = useState(false), [error, setError] = useState("");
   const keys = useRef<Partial<Record<"pdf" | "csv", string>>>({});
-  const result = useResource<{ items: ComplianceExportRecord[]; total: number; page: number; pageSize: number }>(`/analytics/exports?closeId=${closeId}&page=${page}`);
+  const result = useResource<{ items: ComplianceExportRecord[]; total: number; page: number; pageSize: number }>(`/analytics/exports?closeId=${closeId}&page=${page}&pageSize=${pageSize}`);
+  const update = (values: Record<string, string | number | null>, replace = false) => {
+    const href = listHref(pathname, currentQuery, values);
+    if (replace) router.replace(href, { scroll: false }); else router.push(href, { scroll: false });
+  };
+  useEffect(() => {
+    if (result.data && result.data.page !== page)
+      router.replace(listHref(pathname, currentQuery, { exportPage: result.data.page === 1 ? null : result.data.page }), { scroll: false });
+  }, [currentQuery, page, pathname, result.data, router]);
   async function create(format: "pdf" | "csv") {
     if (busy) return; setBusy(true); setError("");
     const key = keys.current[format] ??= crypto.randomUUID();
     try { await api("/analytics/exports", { method: "POST", headers: { "idempotency-key": key }, body: JSON.stringify({ closeId, format }) });
-      delete keys.current[format]; setPage(1); result.reload();
+      delete keys.current[format]; update({ exportPage: null }); result.reload();
     } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); }
   }
   async function change(row: ComplianceExportRecord, remove: boolean) {
@@ -50,8 +63,10 @@ export function ComplianceExports({ closeId }: { closeId: string }) {
           </div></td>
         </tr>) : <tr><td colSpan={6}>출력 작업이 없습니다.</td></tr>}</tbody></table></div>
       <div className="public-stat-filters"><span>{result.data.total}개 · {result.data.page}페이지</span>
-        <ActionButton secondary disabled={busy || result.data.page <= 1} onClick={() => setPage(result.data!.page - 1)}>이전 출력</ActionButton>
-        <ActionButton secondary disabled={busy || result.data.page * result.data.pageSize >= result.data.total} onClick={() => setPage(result.data!.page + 1)}>다음 출력</ActionButton>
+        <label>페이지당 <select className="cs-select" aria-label="출력 페이지당 행 수" value={pageSize}
+          onChange={event => update({ exportPageSize: Number(event.target.value), exportPage: null })}>{[10, 20, 50, 100].map(size => <option key={size}>{size}</option>)}</select></label>
+        <ActionButton secondary disabled={busy || result.data.page <= 1} onClick={() => update({ exportPage: result.data!.page - 1 <= 1 ? null : result.data!.page - 1 })}>이전 출력</ActionButton>
+        <ActionButton secondary disabled={busy || result.data.page * result.data.pageSize >= result.data.total} onClick={() => update({ exportPage: result.data!.page + 1 })}>다음 출력</ActionButton>
       </div>
     </>}
   </Panel>;

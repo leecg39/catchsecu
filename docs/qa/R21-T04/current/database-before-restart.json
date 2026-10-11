@@ -1,0 +1,124 @@
+{
+  "result": "passed",
+  "fingerprint": {
+    "sha256": "2c2969271e3f2b78afbd7907ef8bdc764e3f4804d2bb57029912fa5c3deaaa52",
+    "counts": {
+      "subscriptions": 2,
+      "orders": 2,
+      "refunds": 2,
+      "events": 3,
+      "ledger": 3,
+      "credit": 1,
+      "audits": 10
+    }
+  },
+  "checks": [
+    {
+      "step": "owner 로그인",
+      "status": 200
+    },
+    {
+      "step": "billing 로그인",
+      "status": 200
+    },
+    {
+      "step": "admin 로그인",
+      "status": 200
+    },
+    {
+      "step": "owner 로그인",
+      "status": 200
+    },
+    {
+      "step": "임의 success query는 승인하지 않음",
+      "status": 200
+    },
+    {
+      "step": "success return 단독 승인 거부",
+      "status": 409,
+      "code": "PAYMENT_UNCONFIRMED"
+    },
+    {
+      "step": "결제 중 구독 취소 거부",
+      "status": 409,
+      "code": "PAYMENT_IN_PROGRESS"
+    },
+    {
+      "step": "무권한 admin 주문 조회 거부",
+      "status": 403,
+      "code": "FORBIDDEN"
+    },
+    {
+      "step": "billing 역할 주문 조회 허용",
+      "status": 200
+    },
+    {
+      "step": "다른 회사 주문 직접 조회 거부",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "step": "다른 회사 목록 격리",
+      "status": 200
+    },
+    {
+      "step": "미인증 주문 조회 거부",
+      "status": 401,
+      "code": "UNAUTHENTICATED"
+    },
+    {
+      "step": "서명 승인",
+      "status": 202
+    },
+    {
+      "step": "승인 중복",
+      "status": 202
+    },
+    {
+      "step": "늦은 실패 거부",
+      "status": 409,
+      "code": "OUT_OF_ORDER"
+    },
+    {
+      "step": "환불 요청 1",
+      "status": 201
+    },
+    {
+      "step": "환불 승인 1",
+      "status": 202
+    },
+    {
+      "step": "환불 중복 1",
+      "status": 202
+    },
+    {
+      "step": "환불 요청 2",
+      "status": 201
+    },
+    {
+      "step": "환불 승인 2",
+      "status": 202
+    },
+    {
+      "step": "환불 중복 2",
+      "status": 202
+    },
+    {
+      "step": "환불 누계 조회",
+      "status": 200
+    },
+    {
+      "step": "초과 환불 거부",
+      "status": 409,
+      "code": "REFUND_EXCEEDS_PAID"
+    },
+    {
+      "step": "과거 취소 구독 승인 거부",
+      "status": 409,
+      "code": "SUBSCRIPTION_UNAVAILABLE"
+    }
+  ],
+  "ledgerZero": true,
+  "realExternalProvider": false,
+  "localSignedProvider": true
+}

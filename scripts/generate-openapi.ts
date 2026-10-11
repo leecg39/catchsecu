@@ -34,6 +34,7 @@ import { retentionRuleCreate, retentionRulePatch } from "../src/contracts/retent
 import { guideCreate, guidePatch } from "../src/contracts/guides";
 import { supportTicketCreate, supportTicketPatch, supportTicketReply, supportTicketVersion } from "../src/contracts/support-tickets";
 import { accessRequestInput, accessDecisionInput } from "../src/server/access-requests";
+import { usageEventQuery } from "../src/server/billing-reads";
 import { createExpertInput, updateExpertInput } from "../src/server/expert-assignments";
 import { purchaseRequest, cancelRequest, scheduleTrialCancelRequest } from "../src/contracts/subscriptions";
 import { senderCreate, senderPatch, senderEvidenceInput, senderVersion } from "../src/contracts/senders";
@@ -327,6 +328,12 @@ for (const path of ["/kakao/channels/{id}", "/kakao/templates/{id}"]) {
     { in: "header", name: "If-Match", required: true, schema: { type: "string", pattern: "^[1-9][0-9]*$" } }];
 }
 add("/usage-events", "get", "billing.read + current tenant", "사용량·충전·정산 원장 거래 페이지. 서비스 필터 가능", undefined, "implemented");
+{
+  const json = z.toJSONSchema(usageEventQuery) as { properties: Record<string, unknown>; required?: string[] };
+  (paths["/usage-events"].get as Operation).parameters = Object.entries(json.properties).map(([name, value]) => ({
+    in: "query", name, required: json.required?.includes(name) ?? false, schema: value,
+  }));
+}
 add("/invoices", "get", "billing.read + current tenant", "결제 완료 주문의 청구서 대상 목록", undefined, "implemented");
 add("/forms/{id}/revise", "post", "form.write + current service grant", "게시본을 새 초안으로 복제; 열린 초안·미게시 409", z.object({ version: z.number().int().positive() }).strict(), "implemented", "201");
 add("/retention-rules", "get", "security.read + scoped services", "서비스별 기본 보유 기간 규칙 목록", undefined, "implemented");

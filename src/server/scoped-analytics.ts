@@ -1,6 +1,7 @@
 import { Prisma } from "@/generated/prisma/client";
 import type { z } from "zod";
 import type { analyticsQuery } from "@/contracts/analytics";
+import type { PrivacyAnalytics } from "@/contracts/analytics";
 import type { Context } from "./context";
 import { db, type Transaction } from "./db";
 import { fail } from "./http";
@@ -20,14 +21,14 @@ async function scopedServices(tx: Transaction, ctx: Context, input: z.infer<type
   return { services: (input.serviceId ? services.filter(service => service.id === input.serviceId) : services) as Scoped[], deadlines };
 }
 
-export async function privacyAnalytics(ctx: Context, input: z.infer<typeof analyticsQuery>, requestId: string) {
+export async function privacyAnalytics(ctx: Context, input: z.infer<typeof analyticsQuery>, requestId: string): Promise<PrivacyAnalytics> {
   return db.$transaction(async tx => {
     const [{ asOf }] = await tx.$queryRaw<{ asOf: Date }[]>`SELECT statement_timestamp() AS "asOf"`;
     const { from, to } = analyticsPeriod(input, asOf);
     const { services, deadlines } = await scopedServices(tx, ctx, input, "submission.read");
     const ids = services.map(service => service.id);
     const empty = { asOf: asOf.toISOString(), period: { from: from.toISOString(), to: to.toISOString() },
-      serviceId: input.serviceId ?? null, services: [] as unknown[] };
+      serviceId: input.serviceId ?? null, services: [] as PrivacyAnalytics["services"] };
     if (!ids.length) { await audit(tx, ctx, requestId, "analytics.privacy_viewed", "analytics"); assertFileDeadlines(deadlines); return empty; }
     type Row = { serviceId: string; retained: bigint; period: bigint; holds: bigint };
     const submissions = await tx.$queryRaw<Row[]>(Prisma.sql`

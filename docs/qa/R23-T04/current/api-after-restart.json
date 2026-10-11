@@ -1,0 +1,108 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T03:55:51.776Z",
+  "restart": true,
+  "checks": [
+    {
+      "label": "owner fresh login",
+      "status": 200
+    },
+    {
+      "label": "viewer fresh login",
+      "status": 200
+    },
+    {
+      "label": "foreign fresh login",
+      "status": 200
+    },
+    {
+      "label": "owner GET /analytics/dashboard",
+      "status": 200
+    },
+    {
+      "label": "owner GET /analytics/dashboard?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+      "status": 200
+    },
+    {
+      "label": "owner GET /analytics/privacy?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+      "status": 200
+    },
+    {
+      "label": "owner GET /analytics/marketing?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+      "status": 200
+    },
+    {
+      "label": "owner GET /compliance?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+      "status": 200
+    },
+    {
+      "label": "owner GET /analytics/closes?month=2026-10&serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+      "status": 200
+    },
+    {
+      "label": "owner POST /analytics/closes",
+      "status": 200
+    },
+    {
+      "label": "owner GET /analytics/exports?closeId=c7f90479-d661-425a-b36d-988c1f04fbe8&page=2&pageSize=10",
+      "status": 200
+    },
+    {
+      "label": "owner GET /analytics/exports?closeId=c7f90479-d661-425a-b36d-988c1f04fbe8&page=1&pageSize=10",
+      "status": 200
+    },
+    {
+      "label": "owner GET /analytics/exports/697810ab-cc1c-477b-8f33-bec3a3fdaa94/download",
+      "status": 200
+    },
+    {
+      "label": "viewer GET /analytics/dashboard",
+      "status": 200
+    },
+    {
+      "label": "viewer GET /analytics/privacy?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+      "status": 403
+    },
+    {
+      "label": "viewer GET /analytics/dashboard?serviceId=677cbef5-184c-42bc-9cd7-f723fa3a62fb",
+      "status": 404
+    },
+    {
+      "label": "viewer GET /analytics/closes?month=2026-10",
+      "status": 403
+    },
+    {
+      "label": "foreign GET /analytics/dashboard?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+      "status": 404
+    },
+    {
+      "label": "owner GET /analytics/dashboard?serviceId=471ead64-04b5-490f-b83f-cfed6125788d",
+      "status": 404
+    },
+    {
+      "label": "anonymous GET /analytics/dashboard",
+      "status": 401
+    },
+    {
+      "label": "owner GET /analytics/dashboard?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b&serviceId=677cbef5-184c-42bc-9cd7-f723fa3a62fb",
+      "status": 422
+    },
+    {
+      "label": "owner PATCH /analytics/closes",
+      "status": 405
+    },
+    {
+      "label": "owner DELETE /analytics/closes",
+      "status": 405
+    }
+  ],
+  "fingerprint": {
+    "sha256": "7a5d2494e4e209b9bebd84516051e568241b0d845bb157c55f5ce0dc08c50a07",
+    "counts": {
+      "services": 3,
+      "submissions": 4,
+      "certificates": 1,
+      "exports": 12
+    }
+  }
+}

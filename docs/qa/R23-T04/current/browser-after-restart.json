@@ -1,0 +1,199 @@
+{
+  "checkedAt": "2026-10-11T03:55:58.013Z",
+  "browser": "Ego Lite",
+  "spaceId": 2,
+  "restart": true,
+  "checks": [
+    {
+      "pathname": "/log/month-monitoring?month=2026-10&scope=7af16bfb-8deb-46cd-915a-060dfb34a17b&exportPage=2&exportPageSize=10",
+      "expected": [
+        "마감 데이터 조회",
+        "12개 · 2페이지"
+      ],
+      "endpoint": "/api/v1/analytics/exports?",
+      "passed": true,
+      "url": "/log/month-monitoring?month=2026-10&scope=7af16bfb-8deb-46cd-915a-060dfb34a17b&exportPage=2&exportPageSize=10",
+      "errors": [],
+      "requests": [
+        "/api/v1/analytics/dashboard",
+        "/api/v1/context",
+        "/api/v1/analytics/dashboard?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+        "/api/v1/analytics/closes?month=2026-10&serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+        "/api/v1/analytics/exports?closeId=c7f90479-d661-425a-b36d-988c1f04fbe8&page=2&pageSize=10"
+      ]
+    },
+    {
+      "pathname": "/log/month-monitoring",
+      "persistedSessionAfterRestart": true,
+      "passed": true
+    },
+    {
+      "pathname": "/login",
+      "freshReloginAfterRestart": true,
+      "passed": true
+    },
+    {
+      "pathname": "/dashboard?from=2026-10-01&to=2026-10-11",
+      "expected": [
+        "대시보드",
+        "현재 보유",
+        "3 건",
+        "활성 서비스 2개"
+      ],
+      "endpoint": "/api/v1/analytics/dashboard?",
+      "passed": true,
+      "url": "/dashboard?from=2026-10-01&to=2026-10-11",
+      "errors": [],
+      "requests": [
+        "/api/v1/analytics/dashboard?from=2026-10-01T00%3A00%3A00%2B09%3A00&to=2026-10-12T00%3A00%3A00%2B09%3A00",
+        "/api/v1/context",
+        "/api/v1/marketing/summary?from=2026-10-01T00%3A00%3A00%2B09%3A00&to=2026-10-12T00%3A00%3A00%2B09%3A00",
+        "/api/v1/entitlements"
+      ]
+    },
+    {
+      "pathname": "/dashboard/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11",
+      "expected": [
+        "서비스 대시보드",
+        "현재 보유",
+        "2 건"
+      ],
+      "endpoint": "/api/v1/analytics/dashboard?",
+      "passed": true,
+      "url": "/dashboard/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11",
+      "errors": [],
+      "requests": [
+        "/api/v1/analytics/dashboard?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b&from=2026-10-01T00%3A00%3A00%2B09%3A00&to=2026-10-12T00%3A00%3A00%2B09%3A00",
+        "/api/v1/context",
+        "/api/v1/marketing/summary?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b&from=2026-10-01T00%3A00%3A00%2B09%3A00&to=2026-10-12T00%3A00%3A00%2B09%3A00",
+        "/api/v1/entitlements"
+      ]
+    },
+    {
+      "pathname": "/privacy-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "expected": [
+        "개인정보 응답 보유 현황",
+        "현재 보유 응답 2 건",
+        "선택 기간 접수 3 건",
+        "선택 기간 동의 철회 1 건",
+        "선택 기간 파기 완료 1 건",
+        "R23 서비스 A"
+      ],
+      "endpoint": "/api/v1/analytics/privacy?",
+      "passed": true,
+      "url": "/privacy-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "errors": [],
+      "requests": [
+        "/api/v1/analytics/privacy?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b&from=2026-10-01T00%3A00%3A00%2B09%3A00&to=2026-10-12T00%3A00%3A00%2B09%3A00",
+        "/api/v1/context"
+      ]
+    },
+    {
+      "pathname": "/privacy-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "reloadPreservedUrl": true,
+      "passed": true
+    },
+    {
+      "pathname": "/marketing-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "expected": [
+        "마케팅 동의 현황",
+        "현재 동의 1",
+        "현재 철회 1",
+        "R23 서비스 A 1 1 1",
+        "기간 내 동의 기록 1",
+        "기간 내 철회 기록 1",
+        "기간 내 삭제 기록 1"
+      ],
+      "endpoint": "/api/v1/analytics/marketing?",
+      "passed": true,
+      "url": "/marketing-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "errors": [],
+      "requests": [
+        "/api/v1/context",
+        "/api/v1/analytics/marketing?search=R23&serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b&from=2026-10-01T00%3A00%3A00%2B09%3A00&to=2026-10-12T00%3A00%3A00%2B09%3A00"
+      ]
+    },
+    {
+      "pathname": "/privacy-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "browserBackPreservedUrl": true,
+      "passed": true
+    },
+    {
+      "pathname": "/log/month-monitoring?month=2026-10&scope=7af16bfb-8deb-46cd-915a-060dfb34a17b&exportPage=2&exportPageSize=10",
+      "expected": [
+        "마감 데이터 조회",
+        "법적 준수 여부는 미판정입니다.",
+        "보유 응답 2건",
+        "마감에 저장된 점검 근거",
+        "12개 · 2페이지"
+      ],
+      "endpoint": "/api/v1/analytics/exports?",
+      "passed": true,
+      "url": "/log/month-monitoring?month=2026-10&scope=7af16bfb-8deb-46cd-915a-060dfb34a17b&exportPage=2&exportPageSize=10",
+      "errors": [],
+      "requests": [
+        "/api/v1/analytics/dashboard",
+        "/api/v1/context",
+        "/api/v1/analytics/dashboard?serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+        "/api/v1/analytics/closes?month=2026-10&serviceId=7af16bfb-8deb-46cd-915a-060dfb34a17b",
+        "/api/v1/analytics/exports?closeId=c7f90479-d661-425a-b36d-988c1f04fbe8&page=2&pageSize=10"
+      ]
+    },
+    {
+      "pathname": "/log/month-monitoring?month=2026-10&scope=7af16bfb-8deb-46cd-915a-060dfb34a17b&exportPage=2&exportPageSize=10",
+      "reloadPreservedUrl": true,
+      "passed": true
+    }
+  ],
+  "widths": [
+    {
+      "width": 1440,
+      "pathname": "/dashboard/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11",
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "width": 1440,
+      "pathname": "/privacy-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "width": 1440,
+      "pathname": "/marketing-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "width": 1440,
+      "pathname": "/log/month-monitoring?month=2026-10&scope=7af16bfb-8deb-46cd-915a-060dfb34a17b&exportPage=2&exportPageSize=10",
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "width": 390,
+      "pathname": "/dashboard/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11",
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "width": 390,
+      "pathname": "/privacy-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "width": 390,
+      "pathname": "/marketing-detail/7af16bfb-8deb-46cd-915a-060dfb34a17b?from=2026-10-01&to=2026-10-11&q=R23",
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "width": 390,
+      "pathname": "/log/month-monitoring?month=2026-10&scope=7af16bfb-8deb-46cd-915a-060dfb34a17b&exportPage=2&exportPageSize=10",
+      "overflow": false,
+      "errors": 0
+    }
+  ],
+  "result": "passed"
+}

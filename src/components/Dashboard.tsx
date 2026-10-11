@@ -2,20 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { AnalyticsDashboard } from "@/contracts/analytics";
 import type { MarketingSummary } from "@/contracts/marketing";
 import type { EntitlementRecord } from "@/contracts/subscriptions";
 import { useResource } from "@/lib/api";
+import { analyticsKstBoundary, analyticsListState } from "@/lib/analytics-list-state";
+import { listHref } from "@/lib/list-url-state";
 import { useApplication } from "./ApplicationContext";
 import { ActionButton, DataTable, EmptyState, Modal, Panel } from "./shared";
 import "./dashboard.css";
 
 const asset = "/assets/img/catchsecu/";
-const localBoundary = (date: string, end: boolean) => {
-  const value = new Date(date + "T00:00:00");
-  if (end) value.setDate(value.getDate() + 1);
-  return value.toISOString();
-};
 const date = (value: string | null | undefined) => value ? new Date(value).toLocaleDateString("ko-KR") : "—";
 
 function Welcome({ onCreate }: { onCreate: () => void }) {
@@ -33,14 +31,19 @@ function Welcome({ onCreate }: { onCreate: () => void }) {
 export default function Dashboard({ path = "/dashboard" }: { path?: string }) {
   const app = useApplication();
   const serviceId = /^\/dashboard\/([^/]+)$/.exec(path)?.[1];
+  const searchParams = useSearchParams(), pathname = usePathname(), router = useRouter();
+  const state = analyticsListState(searchParams), currentQuery = searchParams.toString();
+  const applied = { from: state.from, to: state.to }, appliedKey = JSON.stringify(applied);
   const [create, setCreate] = useState(false);
-  const [draft, setDraft] = useState({ from: "", to: "" });
-  const [period, setPeriod] = useState({ from: "", to: "" });
+  const [draftState, setDraftState] = useState({ key: appliedKey, value: applied });
+  if (draftState.key !== appliedKey) setDraftState({ key: appliedKey, value: applied });
+  const draft = draftState.key === appliedKey ? draftState.value : applied;
+  const setDraft = (value: typeof applied) => setDraftState({ key: appliedKey, value });
   const [filterError, setFilterError] = useState("");
   const params = new URLSearchParams();
   if (serviceId) params.set("serviceId", serviceId);
-  if (period.from) params.set("from", localBoundary(period.from, false));
-  if (period.to) params.set("to", localBoundary(period.to, true));
+  if (state.from) params.set("from", analyticsKstBoundary(state.from, false));
+  if (state.to) params.set("to", analyticsKstBoundary(state.to, true));
   const analytics = useResource<AnalyticsDashboard>("/analytics/dashboard" + (params.size ? "?" + params : ""));
   const marketingParams = params.size ? "?" + params : "";
   const marketing = useResource<MarketingSummary>(app.data?.capabilities.includes("marketing.read") ? "/marketing/summary" + marketingParams : null);
@@ -59,7 +62,7 @@ export default function Dashboard({ path = "/dashboard" }: { path?: string }) {
     if (draft.from && draft.to && draft.from > draft.to) {
       setFilterError("종료일은 시작일 이후여야 합니다."); return;
     }
-    setFilterError(""); setPeriod(draft);
+    setFilterError(""); router.push(listHref(pathname, currentQuery, { from: draft.from, to: draft.to }), { scroll: false });
   }
   return <div className="dashboard">
     <Welcome onCreate={() => setCreate(true)} />
@@ -67,11 +70,11 @@ export default function Dashboard({ path = "/dashboard" }: { path?: string }) {
       <p>현재 보유 현황과 선택 기간의 변화를 실제 저장 데이터에서 계산합니다.</p></div>
       <ActionButton secondary onClick={() => { analytics.reload(); marketing.reload(); license.reload(); }}>새로고침</ActionButton></div>
       <div className="cs-row"><label>시작일 <input className="cs-input" type="date" value={draft.from}
-        onChange={event => setDraft(previous => ({ ...previous, from: event.target.value }))} /></label>
+        onChange={event => setDraft({ ...draft, from: event.target.value })} /></label>
         <label>종료일 <input className="cs-input" type="date" value={draft.to}
-          onChange={event => setDraft(previous => ({ ...previous, to: event.target.value }))} /></label>
+          onChange={event => setDraft({ ...draft, to: event.target.value })} /></label>
         <ActionButton onClick={applyPeriod}>기간 적용</ActionButton>
-        <ActionButton secondary onClick={() => { setDraft({ from: "", to: "" }); setPeriod({ from: "", to: "" }); setFilterError(""); }}>기본 기간</ActionButton></div>
+        <ActionButton secondary onClick={() => { setDraft({ from: "", to: "" }); setFilterError(""); router.push(listHref(pathname, currentQuery, { from: null, to: null }), { scroll: false }); }}>기본 기간</ActionButton></div>
       {filterError && <p role="alert">{filterError}</p>}
       {data && <p>조회 기준 {new Date(data.asOf).toLocaleString("ko-KR")} · 기간 {date(data.period.from)}부터 {date(data.period.to)} 전까지</p>}
     </div>

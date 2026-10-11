@@ -1,0 +1,412 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T03:41:31.302Z",
+  "database": "catchsecu_dev",
+  "models": [
+    "BillingMonthClose",
+    "ComplianceClose",
+    "ComplianceExportJob"
+  ],
+  "scope": "R23 analytics, compliance close, compliance export, and distinct billing month-close metadata audit with immutable snapshots, scoped references, transition constraints, deterministic indexes, migration identity, and live orphan checks.",
+  "counts": {
+    "columns": 36,
+    "constraints": 13,
+    "indexes": 11,
+    "triggers": 3,
+    "migrations": 150,
+    "invalidServiceScopes": 0,
+    "invalidExportScopes": 0
+  },
+  "definitionHash": "7959f93ecf116ef17e6f5bfe24b6085a0aea9c651f1a53c10e6d13cd4fecfbf7",
+  "migrationHash": "70ac76b6548de190a2ece069d561d0d585169ea149c47ee45e296fb386deef1a",
+  "sourceHashes": {
+    "prisma/schema.prisma": "15cf5b00155421d781313ba6e10ea4ac630198c3c58c9a6643045403ba486700",
+    "src/contracts/analytics.ts": "c2c4bd59c959eaedc7dda03180256362b51afc2e8ef3f1989a67b5fe6dc5bdd9",
+    "src/contracts/compliance-evidence.ts": "549470cd1f3c22ac3e865819f0e1c9b6f3ed1a69abf415433e3efeb87bf5f4f1",
+    "src/contracts/compliance-exports.ts": "25e53bf0808323a19590110e8ee11164e0e2723c32b99da8d206ffbbd1ffe7bd",
+    "src/server/analytics.ts": "a89c0562a4d1ca7a90ca295d884a5ac2abc5c9577f8b2dee202856061d811b34",
+    "src/server/scoped-analytics.ts": "1c555b738f62dcf7b7037937d9b9df9b127088468a756a99aa7aba29f3b76e50",
+    "src/server/analytics-period.ts": "f2283d5f198bcccaed6213160672a0467910086f3390b1a8700550f578de7da9",
+    "src/server/compliance-evidence.ts": "52f7a459ab5ceaae8cfd1546964d56502ce64c8559bcf77cfda12b830cb9f50c",
+    "src/server/compliance-close.ts": "80f4a6d898e2122f3efc9a6bb7a2ed700ad34970e144bbf0ea3ada61537d3861",
+    "src/server/compliance-exports.ts": "326aba4f40974d0419b99da06182e134ba28a898edb3f6a40a494b8a00eab081",
+    "src/server/payments.ts": "7bc710cc5a0fa3e35b55843f58c2e4084808312fcd7dac36db346a54f75cbe53"
+  },
+  "definitions": {
+    "columns": [
+      {
+        "table": "BillingMonthClose",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "month",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "currency",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "totals",
+        "type": "jsonb",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "closedBy",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "closedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceClose",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceClose",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceClose",
+        "column": "serviceKey",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceClose",
+        "column": "month",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceClose",
+        "column": "snapshot",
+        "type": "jsonb",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceClose",
+        "column": "createdBy",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceClose",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "closeId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "memberId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "requesterId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "format",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "sourceHash",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "requestKeyHash",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "resultCipher",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "resultHash",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "byteLength",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "pageCount",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "leaseOwner",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "leaseUntil",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "attempts",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "lastError",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "expiresAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "completedAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "constraints": [
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_shape",
+        "definition": "CHECK (((month ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'::text) AND (currency ~ '^[A-Z]{3}$'::text) AND ((length(\"closedBy\") >= 1) AND (length(\"closedBy\") <= 128))))",
+        "validated": true
+      },
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_tenantId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ComplianceClose",
+        "name": "ComplianceClose_month",
+        "definition": "CHECK ((month ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'::text))",
+        "validated": true
+      },
+      {
+        "table": "ComplianceClose",
+        "name": "ComplianceClose_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "ComplianceClose",
+        "name": "ComplianceClose_tenant_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_close_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"closeId\") REFERENCES \"ComplianceClose\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_content",
+        "definition": "CHECK ((((status = 'ready'::text) AND (\"resultCipher\" IS NOT NULL) AND (\"resultHash\" IS NOT NULL) AND (\"completedAt\" IS NOT NULL) AND (\"byteLength\" > 0)) OR ((status <> 'ready'::text) AND (\"resultCipher\" IS NULL) AND (\"resultHash\" IS NULL))))",
+        "validated": true
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_expiry",
+        "definition": "CHECK (((\"expiresAt\" > \"createdAt\") AND (\"expiresAt\" <= (\"createdAt\" + '24:00:00'::interval))))",
+        "validated": true
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_lease",
+        "definition": "CHECK ((((status = 'processing'::text) AND (\"leaseOwner\" IS NOT NULL) AND (\"leaseUntil\" IS NOT NULL)) OR ((status <> 'processing'::text) AND (\"leaseOwner\" IS NULL))))",
+        "validated": true
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_requester_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"memberId\", \"requesterId\") REFERENCES \"Membership\"(\"tenantId\", id, \"userId\") ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_state",
+        "definition": "CHECK (((status = ANY (ARRAY['queued'::text, 'processing'::text, 'ready'::text, 'failed'::text, 'cancelled'::text, 'expired'::text, 'deleted'::text])) AND (format = ANY (ARRAY['pdf'::text, 'csv'::text])) AND (version > 0) AND (attempts >= 0) AND ((\"byteLength\" >= 0) AND (\"byteLength\" <= 16777216)) AND ((\"pageCount\" >= 0) AND (\"pageCount\" <= 250))))",
+        "validated": true
+      }
+    ],
+    "indexes": [
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_key",
+        "definition": "CREATE UNIQUE INDEX \"BillingMonthClose_key\" ON public.\"BillingMonthClose\" USING btree (\"tenantId\", month, currency)"
+      },
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_pkey",
+        "definition": "CREATE UNIQUE INDEX \"BillingMonthClose_pkey\" ON public.\"BillingMonthClose\" USING btree (id)"
+      },
+      {
+        "table": "ComplianceClose",
+        "name": "ComplianceClose_pkey",
+        "definition": "CREATE UNIQUE INDEX \"ComplianceClose_pkey\" ON public.\"ComplianceClose\" USING btree (id)"
+      },
+      {
+        "table": "ComplianceClose",
+        "name": "ComplianceClose_tenantId_createdAt_idx",
+        "definition": "CREATE INDEX \"ComplianceClose_tenantId_createdAt_idx\" ON public.\"ComplianceClose\" USING btree (\"tenantId\", \"createdAt\")"
+      },
+      {
+        "table": "ComplianceClose",
+        "name": "ComplianceClose_tenantId_id_key",
+        "definition": "CREATE UNIQUE INDEX \"ComplianceClose_tenantId_id_key\" ON public.\"ComplianceClose\" USING btree (\"tenantId\", id)"
+      },
+      {
+        "table": "ComplianceClose",
+        "name": "ComplianceClose_tenantId_serviceKey_month_key",
+        "definition": "CREATE UNIQUE INDEX \"ComplianceClose_tenantId_serviceKey_month_key\" ON public.\"ComplianceClose\" USING btree (\"tenantId\", \"serviceKey\", month)"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_expiresAt_idx",
+        "definition": "CREATE INDEX \"ComplianceExportJob_expiresAt_idx\" ON public.\"ComplianceExportJob\" USING btree (\"expiresAt\")"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_pkey",
+        "definition": "CREATE UNIQUE INDEX \"ComplianceExportJob_pkey\" ON public.\"ComplianceExportJob\" USING btree (id)"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_status_leaseUntil_createdAt_idx",
+        "definition": "CREATE INDEX \"ComplianceExportJob_status_leaseUntil_createdAt_idx\" ON public.\"ComplianceExportJob\" USING btree (status, \"leaseUntil\", \"createdAt\")"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_tenantId_memberId_closeId_createdAt_id_idx",
+        "definition": "CREATE INDEX \"ComplianceExportJob_tenantId_memberId_closeId_createdAt_id_idx\" ON public.\"ComplianceExportJob\" USING btree (\"tenantId\", \"memberId\", \"closeId\", \"createdAt\", id)"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "ComplianceExportJob_tenantId_memberId_requestKeyHash_key",
+        "definition": "CREATE UNIQUE INDEX \"ComplianceExportJob_tenantId_memberId_requestKeyHash_key\" ON public.\"ComplianceExportJob\" USING btree (\"tenantId\", \"memberId\", \"requestKeyHash\")"
+      }
+    ],
+    "triggers": [
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_guard",
+        "definition": "CREATE TRIGGER \"BillingMonthClose_guard\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"BillingMonthClose\" FOR EACH ROW EXECUTE FUNCTION check_month_close()",
+        "function": "CREATE OR REPLACE FUNCTION public.check_month_close()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP<>'INSERT' THEN RAISE EXCEPTION 'MONTH_CLOSE_IMMUTABLE' USING ERRCODE='23514'; END IF;\n  IF NEW.\"month\" >= to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC','YYYY-MM')\n    THEN RAISE EXCEPTION 'MONTH_CLOSE_NOT_PAST' USING ERRCODE='23514'; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "table": "ComplianceClose",
+        "name": "compliance_close_immutable",
+        "definition": "CREATE TRIGGER compliance_close_immutable BEFORE DELETE OR UPDATE ON public.\"ComplianceClose\" FOR EACH ROW EXECUTE FUNCTION protect_compliance_close()",
+        "function": "CREATE OR REPLACE FUNCTION public.protect_compliance_close()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$ BEGIN RAISE EXCEPTION 'compliance closes are immutable' USING ERRCODE='23514'; END; $function$\n"
+      },
+      {
+        "table": "ComplianceExportJob",
+        "name": "compliance_export_transition",
+        "definition": "CREATE TRIGGER compliance_export_transition BEFORE UPDATE ON public.\"ComplianceExportJob\" FOR EACH ROW EXECUTE FUNCTION protect_compliance_export()",
+        "function": "CREATE OR REPLACE FUNCTION public.protect_compliance_export()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n IF ROW(NEW.\"tenantId\",NEW.\"closeId\",NEW.\"memberId\",NEW.\"requesterId\",NEW.\"format\",NEW.\"sourceHash\",NEW.\"requestKeyHash\",NEW.\"createdAt\",NEW.\"expiresAt\") IS DISTINCT FROM ROW(OLD.\"tenantId\",OLD.\"closeId\",OLD.\"memberId\",OLD.\"requesterId\",OLD.\"format\",OLD.\"sourceHash\",OLD.\"requestKeyHash\",OLD.\"createdAt\",OLD.\"expiresAt\") OR NEW.\"version\"<>OLD.\"version\"+1 THEN RAISE EXCEPTION 'immutable export scope or invalid version' USING ERRCODE='23514'; END IF;\n IF NOT ((OLD.\"status\"='queued' AND NEW.\"status\" IN ('processing','cancelled','expired','deleted')) OR (OLD.\"status\"='processing' AND NEW.\"status\" IN ('processing','ready','failed','cancelled','expired','deleted')) OR (OLD.\"status\"='ready' AND NEW.\"status\" IN ('expired','deleted')) OR (OLD.\"status\" IN ('failed','cancelled','expired') AND NEW.\"status\"='deleted')) THEN RAISE EXCEPTION 'invalid export transition' USING ERRCODE='23514'; END IF;\n RETURN NEW;\nEND; $function$\n"
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "result": "passed",
+  "preserved": true,
+  "fingerprint": {
+    "sha256": "2c2969271e3f2b78afbd7907ef8bdc764e3f4804d2bb57029912fa5c3deaaa52",
+    "counts": {
+      "subscriptions": 2,
+      "orders": 2,
+      "refunds": 2,
+      "events": 3,
+      "ledger": 3,
+      "credit": 1,
+      "audits": 10
+    }
+  },
+  "checks": [
+    {
+      "step": "owner 로그인",
+      "status": 200
+    },
+    {
+      "step": "재시작 후 주문 조회",
+      "status": 200
+    },
+    {
+      "step": "재시작 후 원장 조회",
+      "status": 200
+    },
+    {
+      "step": "재시작 후 승인 중복",
+      "status": 202
+    },
+    {
+      "step": "재시작 후 환불 중복 1",
+      "status": 202
+    },
+    {
+      "step": "재시작 후 환불 중복 2",
+      "status": 202
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-10-11T03:17:05.355Z",
+  "browser": "Ego Lite",
+  "spaceId": 2,
+  "restart": true,
+  "checks": [
+    {
+      "pathname": "/bill/1b07e62b-6669-49cf-9803-d9e00db6616b/refund",
+      "persistedSessionAfterRestart": true,
+      "passed": true
+    },
+    {
+      "pathname": "/login",
+      "freshReloginAfterRestart": true,
+      "passed": true
+    },
+    {
+      "pathname": "/pay/result/success/1b07e62b-6669-49cf-9803-d9e00db6616b?result=forged",
+      "expected": "결제가 확인됐습니다",
+      "absent": null,
+      "passed": true,
+      "url": "/pay/result/success/1b07e62b-6669-49cf-9803-d9e00db6616b?result=forged",
+      "errors": 0
+    },
+    {
+      "pathname": "/pay/history",
+      "expected": "잔액 전액 환불",
+      "absent": null,
+      "passed": true,
+      "url": "/pay/history",
+      "errors": 0
+    },
+    {
+      "pathname": "/bill/1b07e62b-6669-49cf-9803-d9e00db6616b/refund",
+      "expected": "환불 완료",
+      "absent": null,
+      "passed": true,
+      "url": "/bill/1b07e62b-6669-49cf-9803-d9e00db6616b/refund",
+      "errors": 0
+    },
+    {
+      "pathname": "/pay/cancel",
+      "expected": "현재 환불을 요청할 수 있는 결제 완료 주문이 없습니다",
+      "absent": "환불 내역 확인 및 요청",
+      "passed": true,
+      "url": "/pay/cancel",
+      "errors": 0
+    }
+  ],
+  "widths": [
+    {
+      "width": 1440,
+      "overflow": false,
+      "errors": 0
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "errors": 0
+    }
+  ],
+  "result": "passed"
+}

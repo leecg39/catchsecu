@@ -4507,21 +4507,35 @@
       "P10-T04",
       "P10-T05"
     ],
-    "status": "planned",
+    "status": "completed",
     "stage": "frontend",
     "evidence_directory": "catchsecu-clone/docs/qa/R21-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R21-T03/README.md",
+      "docs/qa/R21-T03/current/browser-report.json",
+      "docs/qa/R21-T03/current/regression.log",
+      "docs/qa/R21-T03/current/build.log"
+    ],
     "dependency_gates": {
       "R21-T02": "task_complete"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "updatedOn": "2026-10-11",
+    "progress_note": "결제·문자·본인인증 이력을 실제 청구/원장 API와 연결하고 탭·기간·페이지·행 수를 URL에 보존했다. 환불 주문 선택 화면과 정확한 성공/실패 경로 판정을 추가했다. Ego Lite에서 17경로×3폭·새로고침·뒤로/앞으로·기간오류·키보드 포커스를 통과했고 문서 넘침/브라우저 오류0건, 결제15파일197시험·타입·린트·production83페이지·계약검사를 통과했다.",
+    "progress_evidence": [
+      "docs/qa/R21-T03/README.md",
+      "docs/qa/R21-T03/current/browser-report.json",
+      "docs/qa/R21-T03/current/regression.log",
+      "docs/qa/R21-T03/current/build.log",
+      "docs/qa/R21-T03/current/ui-baseline.log"
+    ],
     "verification_status": {
       "database": "not_applicable",
       "api": "not_applicable",
-      "ui": "not_assessed",
-      "external": "not_assessed"
+      "ui": "verified",
+      "external": "not_applicable"
     }
   },
   {
@@ -4548,21 +4562,31 @@
       "P10-T04",
       "P10-T05"
     ],
-    "status": "planned",
+    "status": "in_progress",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R21-T04/",
     "completion_evidence": [],
     "dependency_gates": {
       "R21-T03": "task_complete"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "progress_note": "격리 PostgreSQL·production 서버·worker·Ego Lite에서 임의 성공 URL 비승인, 서명 승인 1회 충전, 중복·역순 이벤트, 부분·전액 환불, 원장합계0, 역할·A/B 격리와 재시작 동일 지문을 검증했다. 브라우저 저장 세션·fresh 재로그인·2폭, 결제15파일197시험·타입·린트·production83페이지를 통과했다. 실제 PG webhook 영수증은 없어 외부검증을 대기한다.",
+    "progress_evidence": [
+      "docs/qa/R21-T04/README.md",
+      "docs/qa/R21-T04/current/database-before-restart.json",
+      "docs/qa/R21-T04/current/database-after-restart.json",
+      "docs/qa/R21-T04/current/browser-after-restart.json",
+      "docs/qa/R21-T04/current/quality-gates.json",
+      "docs/qa/R21-T04/current/external-pending.json"
+    ],
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "not_assessed",
-      "api": "not_assessed",
-      "ui": "not_assessed",
-      "external": "not_assessed"
+      "database": "verified",
+      "api": "verified",
+      "ui": "verified",
+      "external": "external_pending"
     }
   },
   {
@@ -4590,26 +4614,32 @@
       "P12-T01",
       "P12-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "model",
     "evidence_directory": "catchsecu-clone/docs/qa/R22-T01/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R22-T01/README.md",
+      "docs/qa/R22-T01/current/catchsecu_dev.json",
+      "docs/qa/R22-T01/current/catchsecu_test.json"
+    ],
     "dependency_gates": {
       "R04-T04": "local_acceptance_pass"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "기존 폼/응답/파일/내보내기 관계로 조회필드를 정의. 현재회사/서비스/전체감사권한 경계를 명시하고 원문/IP/외부고객번호를 추정하지 않음.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "progress_note": "dev/test PostgreSQL에서 감사·검토3모델35열·16제약·13인덱스·3불변트리거·150migration이 동일했다. 회사·서비스·사건·처리자 복합FK, 상태·파기증거, 열린사건 단일검토, 동일시각 페이지 인덱스와 고아참조0건을 확인했다. 원문/IP/외부고객번호는 추정하지 않았다.",
     "progress_evidence": [
-      "docs/qa/R22-T02/audit-resources/README.md"
+      "docs/qa/R22-T01/README.md",
+      "docs/qa/R22-T01/current/catchsecu_dev.json",
+      "docs/qa/R22-T01/current/catchsecu_test.json"
     ],
     "updatedOn": "2026-10-10",
     "verification_status": {
-      "database": "partial_verified",
+      "database": "verified",
       "api": "not_applicable",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {
@@ -4636,26 +4666,32 @@
       "P12-T01",
       "P12-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R22-T02/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R22-T02/README.md",
+      "docs/qa/R22-T02/current/regression.log",
+      "docs/qa/R22-T04/current/api-before-restart.json"
+    ],
     "dependency_gates": {
       "R22-T01": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "실제 폼 이름·응답ID를 회사/폼 감사 API·CSV에 연결. 다른회사/서비스/없는참조/제한역할 차단·원문비노출. PostgreSQL/화면48개 통과.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "progress_note": "9종 감사 목록·CSV 동일필터, 역할·A/B격리·마스킹·원문비노출·5천행상한·동일시각페이지·원장불변과 검토 상태전이/멱등/경합/보유파기를 검증했다. 실제 사건 생산자를 포함한16파일313시험과 HTTP35개가 통과했다.",
     "progress_evidence": [
-      "docs/qa/R22-T02/audit-resources/tests-final.json"
+      "docs/qa/R22-T02/README.md",
+      "docs/qa/R22-T02/current/regression.log",
+      "docs/qa/R22-T04/current/api-before-restart.json"
     ],
     "updatedOn": "2026-10-10",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
+      "database": "verified",
+      "api": "verified",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {
@@ -4679,27 +4715,33 @@
       "P12-T01",
       "P12-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "frontend",
     "evidence_directory": "catchsecu-clone/docs/qa/R22-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R22-T03/README.md",
+      "docs/qa/R22-T04/current/browser-before-restart.json",
+      "docs/qa/R22-T03/current/build.log"
+    ],
     "dependency_gates": {
       "R22-T02": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "일반 로그 상세와 실제 폼/응답 필드 연결. 403을0건으로 표시하지 않음. 실제 UI검색/상세/CSV·390/768/1440폭 검증.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "progress_note": "회사·폼 감사로그의 기간·서비스·검색조건·검색어·페이지·행수를 URL에 보존했다. Ego Lite에서9종로그·나의활동·검토상세·동일시각2/3페이지 새로고침·KST경계와 1440/390폭 오류·넘침0건, production83페이지를 확인했다.",
     "progress_evidence": [
-      "docs/qa/R22-T02/audit-resources/browser.json",
-      "docs/qa/R22-T02/audit-resources/responsive.json"
+      "docs/qa/R22-T03/README.md",
+      "docs/qa/R22-T04/current/browser-before-restart.json",
+      "docs/qa/R22-T04/current/browser-after-restart.json",
+      "docs/qa/R22-T03/current/build.log"
     ],
     "updatedOn": "2026-10-10",
     "verification_status": {
       "database": "not_applicable",
       "api": "not_applicable",
-      "ui": "partial_verified",
-      "external": "not_assessed"
+      "ui": "verified",
+      "external": "not_applicable"
     }
   },
   {
@@ -4730,20 +4772,24 @@
     "dependency_gates": {
       "R22-T03": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "실제 정정3건을 화면/CSV/독립DB에서 대조. viewer는 앱 role gate에서차단. 전체종류·검토·보존 수용은 남음.",
+    "local_status": "verified",
+    "external_status": "external_pending",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "progress_note": "격리 PostgreSQL·production 서버·worker·Ego Lite에서9종 목록/CSV, KST경계, 동일시각페이지, 역할·A/B격리, 원장405, 검토·암호화메시지와 재시작 동일지문을 검증했다. 재시작 전14·후16화면과 각6반응형,16파일313시험·타입·린트·production83페이지를 통과했다. 실제 SMTP 받은편지함 영수증은 대기한다.",
     "progress_evidence": [
-      "docs/qa/R22-T02/audit-resources/viewer-denied.json",
-      "docs/qa/R11-T04/browser-flow/db-after-conflict.json"
+      "docs/qa/R22-T04/README.md",
+      "docs/qa/R22-T04/current/api-before-restart.json",
+      "docs/qa/R22-T04/current/api-after-restart.json",
+      "docs/qa/R22-T04/current/browser-after-restart.json",
+      "docs/qa/R22-T04/current/quality-gates.json",
+      "docs/qa/R22-T04/current/external-pending.json"
     ],
     "updatedOn": "2026-10-10",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
-      "ui": "partial_verified",
-      "external": "not_assessed"
+      "database": "verified",
+      "api": "verified",
+      "ui": "verified",
+      "external": "external_pending"
     }
   },
   {
@@ -4776,24 +4822,35 @@
       "P12-T03",
       "P12-T04"
     ],
-    "status": "planned",
+    "status": "completed",
     "stage": "model",
     "evidence_directory": "catchsecu-clone/docs/qa/R23-T01/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R23-T01/README.md",
+      "docs/qa/R23-T01/current/catchsecu_dev.json",
+      "docs/qa/R23-T01/current/catchsecu_test.json"
+    ],
     "dependency_gates": {
       "R15-T04": "local_acceptance_pass",
       "R16-T04": "local_acceptance_pass",
       "R21-T04": "local_acceptance_pass",
       "R22-T04": "local_acceptance_pass"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "progress_note": "dev/test PostgreSQL에서 BillingMonthClose·ComplianceClose·ComplianceExportJob 3모델36열·13제약·11인덱스·3트리거·150 migration과 고아 범위0건을 대조했다. 결제·준수 마감을 분리하고 snapshot·근거 hash·출력 작업의 범위를 확인했다.",
+    "progress_evidence": [
+      "docs/qa/R23-T01/README.md",
+      "docs/qa/R23-T01/current/catchsecu_dev.json",
+      "docs/qa/R23-T01/current/catchsecu_test.json"
+    ],
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "not_assessed",
+      "database": "verified",
       "api": "not_applicable",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {
@@ -4822,21 +4879,33 @@
       "P12-T03",
       "P12-T04"
     ],
-    "status": "planned",
+    "status": "completed",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R23-T02/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R23-T02/README.md",
+      "docs/qa/R23-T02/current/regression-final.log",
+      "docs/qa/R23-T04/current/api-before-restart.json"
+    ],
     "dependency_gates": {
       "R23-T01": "task_complete"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "progress_note": "수집3·철회1·파기1에서 대시보드·개인정보·마케팅·마감·출력 합계를 DB/API로 대조했다. KST경계·중복query422·마감멱등·역할/A-B격리·다운로드를 HTTP23개와 관련9파일146시험으로 확인했다.",
+    "progress_evidence": [
+      "docs/qa/R23-T02/README.md",
+      "docs/qa/R23-T02/current/regression-final.log",
+      "docs/qa/R23-T04/current/api-before-restart.json",
+      "docs/qa/R23-T04/current/api-after-restart.json"
+    ],
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "not_assessed",
-      "api": "not_assessed",
+      "database": "verified",
+      "api": "verified",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {
@@ -4862,26 +4931,33 @@
       "P12-T03",
       "P12-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "frontend",
     "evidence_directory": "catchsecu-clone/docs/qa/R23-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R23-T03/README.md",
+      "docs/qa/R23-T04/current/browser-before-restart.json",
+      "docs/qa/R23-T03/current/build.log"
+    ],
     "dependency_gates": {
       "R23-T02": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "월마감 경로를 실제 집계마감 컴포넌트에 연결. 브라우저 검증 예정.",
-    "updatedOn": "2026-10-10",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "progress_note": "대시보드·개인정보·마케팅의 기간/검색과 월마감 범위·출력페이지를 URL에 보존하고 전용 API에 연결했다. Ego Lite 재시작 전8·후11기능과 각8반응형, 타입·린트오류0·production83페이지를 확인했다.",
+    "updatedOn": "2026-10-11",
     "progress_evidence": [
-      "docs/qa/R23-T03/route-connection/browser.json"
+      "docs/qa/R23-T03/README.md",
+      "docs/qa/R23-T04/current/browser-before-restart.json",
+      "docs/qa/R23-T04/current/browser-after-restart.json",
+      "docs/qa/R23-T03/current/build.log"
     ],
     "verification_status": {
       "database": "not_applicable",
       "api": "not_applicable",
-      "ui": "partial_verified",
-      "external": "not_assessed"
+      "ui": "verified",
+      "external": "not_applicable"
     }
   },
   {
@@ -4906,21 +4982,36 @@
       "P12-T03",
       "P12-T04"
     ],
-    "status": "planned",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R23-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R23-T04/README.md",
+      "docs/qa/R23-T04/current/api-after-restart.json",
+      "docs/qa/R23-T04/current/browser-after-restart.json",
+      "docs/qa/R23-T04/current/worker-verify.log"
+    ],
     "dependency_gates": {
       "R23-T03": "task_complete"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "observed_source_route_mapped",
+    "progress_note": "격리 PostgreSQL·production 서버·실제 출력worker·Ego Lite에서 수집3→철회1→파기1, 역할/A-B격리, 마감·PDF/CSV·다운로드와 재시작 동일지문을 검증했다. HTTP 전후 각23개, 브라우저 전8·후11기능과 각8반응형, 9파일146시험·타입·린트·83페이지 빌드를 통과했다.",
+    "progress_evidence": [
+      "docs/qa/R23-T04/README.md",
+      "docs/qa/R23-T04/current/api-before-restart.json",
+      "docs/qa/R23-T04/current/api-after-restart.json",
+      "docs/qa/R23-T04/current/browser-before-restart.json",
+      "docs/qa/R23-T04/current/browser-after-restart.json",
+      "docs/qa/R23-T04/current/worker-verify.log"
+    ],
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "not_assessed",
-      "api": "not_assessed",
-      "ui": "not_assessed",
-      "external": "not_assessed"
+      "database": "verified",
+      "api": "verified",
+      "ui": "verified",
+      "external": "not_applicable"
     }
   },
   {

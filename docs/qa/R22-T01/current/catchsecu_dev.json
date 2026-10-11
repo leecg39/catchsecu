@@ -1,0 +1,439 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T03:23:43.568Z",
+  "database": "catchsecu_dev",
+  "models": [
+    "AuditEvent",
+    "ActivityReview",
+    "ActivityReviewMessage"
+  ],
+  "scope": "Read-only R22 audit ledger and activity-review metadata audit with immutable records, tenant/service/actor composite references, deterministic paging indexes, lifecycle constraints, retention evidence, migration identity, and live orphan check.",
+  "counts": {
+    "columns": 35,
+    "constraints": 16,
+    "indexes": 13,
+    "triggers": 3,
+    "migrations": 150,
+    "invalidReviewReferences": 0
+  },
+  "definitionHash": "5911cfed9ef8e80bddcdc0d08258dfa5b12bb16c81e639edcb50ec0b4e9c2ec1",
+  "migrationHash": "70ac76b6548de190a2ece069d561d0d585169ea149c47ee45e296fb386deef1a",
+  "sourceHashes": {
+    "prisma/schema.prisma": "15cf5b00155421d781313ba6e10ea4ac630198c3c58c9a6643045403ba486700",
+    "src/contracts/audit-events.ts": "95447e77849cf603ed22c9201496184b4f8a4689bb01411b0e0bcd2a38d5ad6a",
+    "src/contracts/activity-reviews.ts": "b99d2231b5a21d30980df47fd8d41ccae0159707f82409e2740c5edd091df473",
+    "src/server/audit.ts": "23b2dba5e25c61a20e68310c9ea9b9a9109dfab1eb85d199b784b2177faf2f6b",
+    "src/server/audit-events.ts": "a82416f2081de217c6c3495409c5f41aa280d0ba0e3912cc97e8b5934c20f25c",
+    "src/server/audit-resources.ts": "13d90aa37d1591a222e23b4661f1e4a4f225ae00a254eaa9680dfabe58cdb920",
+    "src/server/form-audit-events.ts": "fd2af4524fbf880aa773ca644b8f48d253d08efb432953955b34694c378f8a3b",
+    "src/server/activity-reviews.ts": "dc5f4bdb12834442caabe1176366d0c0a03b0ef13451610bb523e66b64163205",
+    "src/components/management/AuditLogs.tsx": "7d330315081ec9dfd7d30c1f466ef4bb7e8769bb93f4b705d9bf61b4927fd87c",
+    "src/components/management/ActivityReviews.tsx": "b5cfb7ac3b91fae8745a6359b585523543d87fe454d43fa7c9fd3dd584ca0e80"
+  },
+  "definitions": {
+    "columns": [
+      {
+        "table": "ActivityReview",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "serviceId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "auditEventId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "recipientUserId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "requesterId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "recipientId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "respondedAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "closedAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "retentionUntil",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "destructionStatus",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "destroyedAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "ActivityReview",
+        "column": "destroyApproverId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "column": "reviewId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "column": "authorId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "column": "kind",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "column": "bodyCipher",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "actorId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "action",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "resource",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "resourceId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "serviceId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "requestId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "detail",
+        "type": "jsonb",
+        "nullable": "NO"
+      },
+      {
+        "table": "AuditEvent",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "policyColumn": [
+      {
+        "column": "activityReviewRetentionDays",
+        "type": "integer",
+        "nullable": "YES"
+      }
+    ],
+    "constraints": [
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_auditEvent_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"auditEventId\", \"recipientUserId\") REFERENCES \"AuditEvent\"(\"tenantId\", \"serviceId\", id, \"actorId\") ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_dates",
+        "definition": "CHECK ((((status = 'requested'::text) AND (\"respondedAt\" IS NULL) AND (\"closedAt\" IS NULL)) OR ((status = 'responded'::text) AND (\"respondedAt\" IS NOT NULL) AND (\"closedAt\" IS NULL)) OR ((status = 'resolved'::text) AND (\"respondedAt\" IS NOT NULL) AND (\"closedAt\" IS NOT NULL)) OR ((status = 'cancelled'::text) AND (\"closedAt\" IS NOT NULL))))",
+        "validated": true
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_destroyApprover_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"destroyApproverId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_destruction",
+        "definition": "CHECK (((\"destructionStatus\" = ANY (ARRAY['none'::text, 'awaiting'::text, 'kept'::text, 'destroyed'::text])) AND ((\"destructionStatus\" = 'destroyed'::text) = (\"destroyedAt\" IS NOT NULL)) AND ((\"destructionStatus\" = 'destroyed'::text) = (\"destroyApproverId\" IS NOT NULL)) AND ((status = ANY (ARRAY['resolved'::text, 'cancelled'::text])) OR ((\"retentionUntil\" IS NULL) AND (\"destructionStatus\" = 'none'::text)))))",
+        "validated": true
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_recipient_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"recipientId\", \"recipientUserId\") REFERENCES \"Membership\"(\"tenantId\", id, \"userId\") ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_requester_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"requesterId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_service_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_state",
+        "definition": "CHECK (((status = ANY (ARRAY['requested'::text, 'responded'::text, 'resolved'::text, 'cancelled'::text])) AND (version > 0) AND ((char_length(title) >= 1) AND (char_length(title) <= 200))))",
+        "validated": true
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "name": "ActivityReviewMessage_author_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"authorId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "name": "ActivityReviewMessage_kind",
+        "definition": "CHECK ((kind = ANY (ARRAY['request'::text, 'response'::text, 'resolve'::text, 'cancel'::text])))",
+        "validated": true
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "name": "ActivityReviewMessage_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "name": "ActivityReviewMessage_review_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"reviewId\") REFERENCES \"ActivityReview\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "AuditEvent",
+        "name": "AuditEvent_actorId_fkey",
+        "definition": "FOREIGN KEY (\"actorId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE SET NULL",
+        "validated": true
+      },
+      {
+        "table": "AuditEvent",
+        "name": "AuditEvent_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "AuditEvent",
+        "name": "AuditEvent_tenantId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      }
+    ],
+    "indexes": [
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_destructionStatus_retentionUntil_idx",
+        "definition": "CREATE INDEX \"ActivityReview_destructionStatus_retentionUntil_idx\" ON public.\"ActivityReview\" USING btree (\"destructionStatus\", \"retentionUntil\")"
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_open_event_key",
+        "definition": "CREATE UNIQUE INDEX \"ActivityReview_open_event_key\" ON public.\"ActivityReview\" USING btree (\"tenantId\", \"auditEventId\") WHERE (status = ANY (ARRAY['requested'::text, 'responded'::text]))"
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_pkey",
+        "definition": "CREATE UNIQUE INDEX \"ActivityReview_pkey\" ON public.\"ActivityReview\" USING btree (id)"
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_tenantId_id_key",
+        "definition": "CREATE UNIQUE INDEX \"ActivityReview_tenantId_id_key\" ON public.\"ActivityReview\" USING btree (\"tenantId\", id)"
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_tenantId_recipientId_status_createdAt_id_idx",
+        "definition": "CREATE INDEX \"ActivityReview_tenantId_recipientId_status_createdAt_id_idx\" ON public.\"ActivityReview\" USING btree (\"tenantId\", \"recipientId\", status, \"createdAt\", id)"
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_tenantId_requesterId_status_createdAt_id_idx",
+        "definition": "CREATE INDEX \"ActivityReview_tenantId_requesterId_status_createdAt_id_idx\" ON public.\"ActivityReview\" USING btree (\"tenantId\", \"requesterId\", status, \"createdAt\", id)"
+      },
+      {
+        "table": "ActivityReview",
+        "name": "ActivityReview_tenantId_serviceId_status_createdAt_id_idx",
+        "definition": "CREATE INDEX \"ActivityReview_tenantId_serviceId_status_createdAt_id_idx\" ON public.\"ActivityReview\" USING btree (\"tenantId\", \"serviceId\", status, \"createdAt\", id)"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "name": "ActivityReviewMessage_pkey",
+        "definition": "CREATE UNIQUE INDEX \"ActivityReviewMessage_pkey\" ON public.\"ActivityReviewMessage\" USING btree (id)"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "name": "ActivityReviewMessage_tenantId_reviewId_createdAt_id_idx",
+        "definition": "CREATE INDEX \"ActivityReviewMessage_tenantId_reviewId_createdAt_id_idx\" ON public.\"ActivityReviewMessage\" USING btree (\"tenantId\", \"reviewId\", \"createdAt\", id)"
+      },
+      {
+        "table": "AuditEvent",
+        "name": "AuditEvent_actorId_createdAt_idx",
+        "definition": "CREATE INDEX \"AuditEvent_actorId_createdAt_idx\" ON public.\"AuditEvent\" USING btree (\"actorId\", \"createdAt\")"
+      },
+      {
+        "table": "AuditEvent",
+        "name": "AuditEvent_pkey",
+        "definition": "CREATE UNIQUE INDEX \"AuditEvent_pkey\" ON public.\"AuditEvent\" USING btree (id)"
+      },
+      {
+        "table": "AuditEvent",
+        "name": "AuditEvent_tenantId_createdAt_id_idx",
+        "definition": "CREATE INDEX \"AuditEvent_tenantId_createdAt_id_idx\" ON public.\"AuditEvent\" USING btree (\"tenantId\", \"createdAt\", id)"
+      },
+      {
+        "table": "AuditEvent",
+        "name": "AuditEvent_tenantId_serviceId_id_actorId_key",
+        "definition": "CREATE UNIQUE INDEX \"AuditEvent_tenantId_serviceId_id_actorId_key\" ON public.\"AuditEvent\" USING btree (\"tenantId\", \"serviceId\", id, \"actorId\")"
+      }
+    ],
+    "triggers": [
+      {
+        "table": "ActivityReview",
+        "name": "activity_review_transition",
+        "definition": "CREATE TRIGGER activity_review_transition BEFORE UPDATE ON public.\"ActivityReview\" FOR EACH ROW EXECUTE FUNCTION protect_activity_review_transition()",
+        "function": "CREATE OR REPLACE FUNCTION public.protect_activity_review_transition()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n IF ROW(NEW.\"tenantId\",NEW.\"serviceId\",NEW.\"auditEventId\",NEW.\"recipientUserId\",NEW.\"requesterId\",NEW.\"recipientId\",NEW.\"title\",NEW.\"createdAt\") IS DISTINCT FROM ROW(OLD.\"tenantId\",OLD.\"serviceId\",OLD.\"auditEventId\",OLD.\"recipientUserId\",OLD.\"requesterId\",OLD.\"recipientId\",OLD.\"title\",OLD.\"createdAt\") OR NEW.\"version\"<>OLD.\"version\"+1 THEN RAISE EXCEPTION 'immutable review scope or invalid version' USING ERRCODE='23514'; END IF;\n IF OLD.\"destructionStatus\" IN ('destroyed','kept') THEN RAISE EXCEPTION 'terminal review destruction state' USING ERRCODE='23514'; END IF;\n IF NEW.\"status\" IS DISTINCT FROM OLD.\"status\" AND NOT ((OLD.\"status\"='requested' AND NEW.\"status\" IN ('responded','cancelled')) OR (OLD.\"status\"='responded' AND NEW.\"status\" IN ('resolved','cancelled'))) THEN RAISE EXCEPTION 'invalid review transition' USING ERRCODE='23514'; END IF;\n IF NEW.\"destructionStatus\" IS DISTINCT FROM OLD.\"destructionStatus\" AND NOT ((OLD.\"destructionStatus\"='none' AND NEW.\"destructionStatus\"='awaiting') OR (OLD.\"destructionStatus\"='awaiting' AND NEW.\"destructionStatus\" IN ('destroyed','kept','none'))) THEN RAISE EXCEPTION 'invalid review destruction transition' USING ERRCODE='23514'; END IF;\n IF NEW.\"status\" NOT IN ('resolved','cancelled') AND (NEW.\"retentionUntil\" IS NOT NULL OR NEW.\"destructionStatus\"<>'none' OR NEW.\"destroyedAt\" IS NOT NULL OR NEW.\"destroyApproverId\" IS NOT NULL) THEN RAISE EXCEPTION 'destruction requires closed review' USING ERRCODE='23514'; END IF;\n IF NEW.\"destructionStatus\"='destroyed' AND (NEW.\"destroyedAt\" IS NULL OR NEW.\"destroyApproverId\" IS NULL) THEN RAISE EXCEPTION 'destroyed review requires evidence' USING ERRCODE='23514'; END IF;\n RETURN NEW;\nEND; $function$\n"
+      },
+      {
+        "table": "ActivityReviewMessage",
+        "name": "activity_review_message_immutable",
+        "definition": "CREATE TRIGGER activity_review_message_immutable BEFORE DELETE OR UPDATE ON public.\"ActivityReviewMessage\" FOR EACH ROW EXECUTE FUNCTION protect_activity_review_message()",
+        "function": "CREATE OR REPLACE FUNCTION public.protect_activity_review_message()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n IF TG_OP='DELETE' AND current_setting('app.activity_review_destroy', true)='on'\n   AND EXISTS (SELECT 1 FROM \"ActivityReview\" r WHERE r.\"tenantId\"=OLD.\"tenantId\" AND r.id=OLD.\"reviewId\" AND r.\"destructionStatus\"='awaiting')\n THEN RETURN OLD; END IF;\n RAISE EXCEPTION 'activity review messages are immutable' USING ERRCODE='23514';\nEND; $function$\n"
+      },
+      {
+        "table": "AuditEvent",
+        "name": "audit_immutable",
+        "definition": "CREATE TRIGGER audit_immutable BEFORE DELETE OR UPDATE ON public.\"AuditEvent\" FOR EACH ROW EXECUTE FUNCTION prevent_audit_mutation()",
+        "function": "CREATE OR REPLACE FUNCTION public.prevent_audit_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'Audit events are immutable' USING ERRCODE = '23514';\nEND;\n$function$\n"
+      }
+    ]
+  }
+}

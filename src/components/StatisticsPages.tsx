@@ -2,62 +2,71 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import type { AnalyticsDashboard, ComplianceCloseRecord } from "@/contracts/analytics";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { AnalyticsDashboard, ComplianceCloseRecord, PrivacyAnalytics } from "@/contracts/analytics";
 import { api, errorText, useResource } from "@/lib/api";
 import { ActionButton, DataTable, PageHeading, Panel } from "./shared";
 import { ComplianceExports } from "./ComplianceExports";
 import { complianceEvidenceChecks, evidenceStatusLabels } from "@/contracts/compliance-evidence";
 import { useApplication } from "./ApplicationContext";
+import { analyticsKstBoundary, analyticsListState, complianceListState } from "@/lib/analytics-list-state";
+import { listHref } from "@/lib/list-url-state";
 
 const date = (value: string) => new Date(value).toLocaleDateString("ko-KR");
-const boundary = (value: string, end: boolean) => {
-  const day = new Date(value + "T00:00:00");
-  if (end) day.setDate(day.getDate() + 1);
-  return day.toISOString();
-};
 
 export function PrivacyStatistics({ path }: { path: string }) {
   const serviceId = /^\/privacy-detail\/([^/]+)$/.exec(path)?.[1];
-  const [draft, setDraft] = useState({ from: "", to: "" });
-  const [period, setPeriod] = useState({ from: "", to: "" });
-  const [query, setQuery] = useState("");
-  const [search, setSearch] = useState("");
+  const searchParams = useSearchParams(), pathname = usePathname(), router = useRouter();
+  const state = analyticsListState(searchParams), currentQuery = searchParams.toString();
+  const applied = { from: state.from, to: state.to, query: state.search }, appliedKey = JSON.stringify(applied);
+  const [draftState, setDraftState] = useState({ key: appliedKey, value: applied });
+  if (draftState.key !== appliedKey) setDraftState({ key: appliedKey, value: applied });
+  const draft = draftState.key === appliedKey ? draftState.value : applied;
+  const setDraft = (value: typeof applied) => setDraftState({ key: appliedKey, value });
   const [filterError, setFilterError] = useState("");
   const params = new URLSearchParams();
   if (serviceId) params.set("serviceId", serviceId);
-  if (period.from) params.set("from", boundary(period.from, false));
-  if (period.to) params.set("to", boundary(period.to, true));
-  const result = useResource<AnalyticsDashboard>("/analytics/dashboard" + (params.size ? "?" + params : ""));
+  if (state.from) params.set("from", analyticsKstBoundary(state.from, false));
+  if (state.to) params.set("to", analyticsKstBoundary(state.to, true));
+  const result = useResource<PrivacyAnalytics>("/analytics/privacy" + (params.size ? "?" + params : ""));
   const data = result.data;
-  const rows = (data?.services ?? []).filter(row => row.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
+  const rows = (data?.services ?? []).filter(row => row.name.toLocaleLowerCase().includes(state.search.toLocaleLowerCase()));
+  const totals = rows.reduce((sum, row) => ({ retained: sum.retained + row.retainedSubmissions,
+    submitted: sum.submitted + row.periodSubmissions, holds: sum.holds + row.legalHolds,
+    consents: sum.consents + row.periodConsents, consentWithdrawals: sum.consentWithdrawals + row.periodConsentWithdrawals,
+    subjectWithdrawals: sum.subjectWithdrawals + row.periodSubjectWithdrawals, destructions: sum.destructions + row.periodDestructions }),
+  { retained: 0, submitted: 0, holds: 0, consents: 0, consentWithdrawals: 0, subjectWithdrawals: 0, destructions: 0 });
   return <div className="public-statistics">
     <PageHeading title="개인정보 응답 보유 현황"><p>접근 가능한 서비스의 실제 응답과 파기 기록을 집계합니다.</p></PageHeading>
     <Panel title="조회 기간"><div className="public-stat-filters">
       <label>시작일 <input className="cs-input" type="date" value={draft.from}
-        onChange={event => setDraft(previous => ({ ...previous, from: event.target.value }))} /></label>
+        onChange={event => setDraft({ ...draft, from: event.target.value })} /></label>
       <label>종료일 <input className="cs-input" type="date" value={draft.to}
-        onChange={event => setDraft(previous => ({ ...previous, to: event.target.value }))} /></label>
+        onChange={event => setDraft({ ...draft, to: event.target.value })} /></label>
       <ActionButton onClick={() => { if (!!draft.from !== !!draft.to) {
         setFilterError("시작일과 종료일을 모두 선택해주세요."); return;
       } if (draft.from && draft.to && draft.from > draft.to) {
         setFilterError("종료일은 시작일 이후여야 합니다."); return;
-      } setFilterError(""); setPeriod(draft); }}>기간 적용</ActionButton>
-      <ActionButton secondary onClick={() => { setDraft({ from: "", to: "" }); setPeriod({ from: "", to: "" }); setFilterError(""); }}>기본 기간</ActionButton>
+      } setFilterError(""); router.push(listHref(pathname, currentQuery, { from: draft.from, to: draft.to }), { scroll: false }); }}>기간 적용</ActionButton>
+      <ActionButton secondary onClick={() => { setDraft({ ...draft, from: "", to: "" }); setFilterError(""); router.push(listHref(pathname, currentQuery, { from: null, to: null }), { scroll: false }); }}>기본 기간</ActionButton>
     </div>{filterError && <p role="alert">{filterError}</p>}
     {data && <p className="public-stat-note">집계 기준 {new Date(data.asOf).toLocaleString("ko-KR")} · 기간 {date(data.period.from)}부터 {date(data.period.to)} 전까지</p>}</Panel>
     {result.loading ? <Panel><p role="status">개인정보 현황을 집계 중입니다.</p></Panel>
       : result.error ? <Panel><p role="alert">{result.error.message}</p></Panel>
       : data && <><Panel title="응답 현황"><div className="public-stat-overview">
-        <p>현재 보유 응답 <strong>{data.totals.retainedSubmissions}</strong>건</p>
-        <p>선택 기간 접수·현재 보유 <strong>{data.totals.periodSubmissions}</strong>건</p>
-        <p>선택 기간 파기 완료 <strong>{data.totals.periodDestructions}</strong>건</p>
-      </div><p className="public-stat-note">파기 중·파기 완료·보유 기한 경과 응답은 현재 보유 건수에서 제외하고, 보존 조치 중인 응답은 포함합니다.</p></Panel>
-      <Panel title="서비스별 응답 현황"><form className="public-stat-search" onSubmit={event => { event.preventDefault(); setSearch(query.trim()); }}>
-        <input className="cs-input" aria-label="서비스명 검색" placeholder="서비스명" value={query} onChange={event => setQuery(event.target.value)} />
+        <p>현재 보유 응답 <strong>{totals.retained}</strong>건</p>
+        <p>선택 기간 접수 <strong>{totals.submitted}</strong>건</p>
+        <p>보존 조치 <strong>{totals.holds}</strong>건</p>
+        <p>선택 기간 동의 철회 <strong>{totals.consentWithdrawals}</strong>건</p>
+        <p>선택 기간 정보주체 철회 <strong>{totals.subjectWithdrawals}</strong>건</p>
+        <p>선택 기간 파기 완료 <strong>{totals.destructions}</strong>건</p>
+      </div><p className="public-stat-note">현재 보유는 파기 중·파기 완료·보유 기한 경과 응답을 제외하고 보존 조치 중인 응답을 포함합니다. 기간 접수는 이후 철회·파기 여부와 관계없이 접수 시각 기준입니다.</p></Panel>
+      <Panel title="서비스별 응답 현황"><form className="public-stat-search" onSubmit={event => { event.preventDefault(); router.push(listHref(pathname, currentQuery, { q: draft.query.trim() }), { scroll: false }); }}>
+        <input className="cs-input" aria-label="서비스명 검색" placeholder="서비스명" value={draft.query} onChange={event => setDraft({ ...draft, query: event.target.value })} />
         <ActionButton secondary>검색</ActionButton><ActionButton type="button" secondary onClick={result.reload}>새로고침</ActionButton>
-      </form><DataTable columns={["서비스명", "캐치폼", "현재 보유 응답", "선택 기간 접수·현재 보유", "생성일"]}
-        rows={rows.map(row => [<Link key={row.id} href={"/privacy-detail/" + row.id}>{row.name}</Link>, row.forms,
-          row.retainedSubmissions, row.periodSubmissions, date(row.createdAt)])} />
+      </form><DataTable columns={["서비스명", "현재 보유", "기간 접수", "보존 조치", "기간 동의", "기간 동의 철회", "기간 정보주체 철회", "기간 파기"]}
+        rows={rows.map(row => [<Link key={row.id} href={"/privacy-detail/" + row.id}>{row.name}</Link>, row.retainedSubmissions,
+          row.periodSubmissions, row.legalHolds, row.periodConsents, row.periodConsentWithdrawals, row.periodSubjectWithdrawals, row.periodDestructions])} />
         <p className="public-stat-note">원천 데이터에 개인정보·민감정보·고유식별정보 분류가 없으므로 유형별 수치는 표시하지 않습니다.</p>
       </Panel></>}
   </div>;
@@ -67,11 +76,12 @@ export function CompliancePage({ monthly = false }: { monthly?: boolean } = {}) 
   const result = useResource<AnalyticsDashboard>("/analytics/dashboard");
   const data = result.data;
   const app = useApplication();
+  const searchParams = useSearchParams(), pathname = usePathname(), router = useRouter(), currentQuery = searchParams.toString();
+  const defaultMonth = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit" }).format(new Date());
+  const urlState = complianceListState(searchParams, defaultMonth), month = urlState.month;
   const canCloseCompany = !!app.data?.company && ["owner", "admin"].includes(app.data.company.role) &&
     app.data.memberships.some(member => member.tenantId === app.data?.company?.id && member.accessKind === "direct");
-  const [month, setMonth] = useState(() => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit" }).format(new Date()));
-  const [scope, setScope] = useState<string | null>(null);
-  const selected = scope ?? (canCloseCompany ? "" : null);
+  const selected = urlState.scope === "company" ? (canCloseCompany ? "" : null) : urlState.scope || (canCloseCompany ? "" : null);
   const selectedService = data?.services.find(service => service.id === selected);
   const validScope = selected === "" ? canCloseCompany : !!selectedService;
   const selectedDashboard = useResource<AnalyticsDashboard>(validScope && selected ? "/analytics/dashboard?serviceId=" + selected : null);
@@ -89,9 +99,9 @@ export function CompliancePage({ monthly = false }: { monthly?: boolean } = {}) 
       <p className="public-stat-note">월마감에 실제 등록·게시·보유 기한과 회사 인증 설정의 점검 근거를 저장합니다. 조건 확인은 준수 통과를 뜻하지 않으며 점수나 과태료를 산정하지 않습니다.</p>
       <div className="public-stat-filters">
         <label>마감 월 <input className="cs-input" type="month" aria-label="마감 월" value={month} disabled={busy}
-          onChange={event => { setMonth(event.target.value); setMessage(""); setError(""); }} /></label>
+          onChange={event => { router.push(listHref(pathname, currentQuery, { month: event.target.value, exportPage: 1 }), { scroll: false }); setMessage(""); setError(""); }} /></label>
         <label>마감 범위 <select className="cs-select" aria-label="마감 범위" value={selected ?? "select"} disabled={busy || result.loading}
-          onChange={event => { setScope(event.target.value); setMessage(""); setError(""); }}>
+          onChange={event => { router.push(listHref(pathname, currentQuery, { scope: event.target.value ? event.target.value : "company", exportPage: 1 }), { scroll: false }); setMessage(""); setError(""); }}>
           <option value="select" disabled>서비스를 선택해주세요</option>
           {canCloseCompany && <option value="">회사 전체</option>}
           {(data?.services ?? []).map(service => <option key={service.id} value={service.id}>{service.name}</option>)}

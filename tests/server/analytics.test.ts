@@ -136,7 +136,10 @@ describe("실제 원천의 회사·서비스 집계", () => {
   test("개인정보·마케팅·준수 별칭 경로가 현재 서비스 범위의 실제 집계를 반환한다", async () => {
     const privacy = await privacyAnalyticsRoute(request("/analytics/privacy?serviceId=" + serviceA1));
     expect(privacy.status).toBe(200);
-    expect((await privacy.json()).services.map((item: { id: string }) => item.id)).toEqual([serviceA1]);
+    const privacyBody = await privacy.json();
+    expect(privacyBody.services.map((item: { id: string }) => item.id)).toEqual([serviceA1]);
+    expect(privacyBody.services[0]).toMatchObject({ periodSubmissions: 4, legalHolds: 1,
+      periodConsents: 0, periodConsentWithdrawals: 0, periodSubjectWithdrawals: 0, periodDestructions: 0 });
 
     const marketing = await marketingAnalyticsRoute(request("/analytics/marketing?serviceId=" + serviceA1));
     expect(marketing.status).toBe(200);
@@ -149,5 +152,19 @@ describe("실제 원천의 회사·서비스 집계", () => {
     expect((await privacyAnalyticsRoute(request("/analytics/privacy", "anonymous"))).status).toBe(401);
     expect((await marketingAnalyticsRoute(request("/analytics/marketing", "anonymous"))).status).toBe(401);
     expect((await complianceRoute(request("/compliance", "anonymous"))).status).toBe(401);
+  });
+
+  test("집계 별칭 경로는 중복 query를 조용히 덮어쓰지 않는다", async () => {
+    const paths = [
+      () => GET(request(`/analytics/dashboard?serviceId=${serviceA1}&serviceId=${serviceA2}`)),
+      () => privacyAnalyticsRoute(request(`/analytics/privacy?from=2026-10-01T00%3A00%3A00%2B09%3A00&from=2026-10-02T00%3A00%3A00%2B09%3A00`)),
+      () => marketingAnalyticsRoute(request(`/analytics/marketing?search=a&search=b`)),
+      () => complianceRoute(request(`/compliance?to=2026-10-10T00%3A00%3A00%2B09%3A00&to=2026-10-11T00%3A00%3A00%2B09%3A00`)),
+    ];
+    for (const call of paths) {
+      const response = await call();
+      expect(response.status).toBe(422);
+      expect((await response.json()).error.code).toBe("DUPLICATE_QUERY");
+    }
   });
 });

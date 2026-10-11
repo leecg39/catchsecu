@@ -6,7 +6,7 @@ import { env } from "@/server/env";
 import { requireContext, type Context } from "@/server/context";
 import { listInvoices, listUsageEvents } from "@/server/billing-reads";
 import { billingHistory } from "@/server/billing-history";
-import { ledgerOverview } from "@/server/ledger";
+import { ledgerOverview, postTrustedLedgerTransfer } from "@/server/ledger";
 import { closeMonth, invoicePdf, listRefunds, readMonthClose, requestRefund } from "@/server/billing-settlement";
 import { GET as listInvoicesRoute } from "@/app/api/v1/invoices/route";
 import { GET as listUsageEventsRoute } from "@/app/api/v1/usage-events/route";
@@ -63,6 +63,23 @@ test("청구서·사용량 HTTP 조회 경로가 현재 billing 권한과 빈 �
     expect(await response.json()).toMatchObject({ items: [], total: 0, page: 1, pageSize: 20 });
     expect((await handler(new Request(origin + "/api/v1" + path, { headers: { origin } }))).status).toBe(401);
   }
+});
+
+test("사용 내역은 문자·본인인증 범주를 서버에서 나누고 내부 원천 ID를 노출하지 않는다", async () => {
+  const service = await db.service.create({
+    data: {
+      tenantId: ctx.tenantId,
+      name: "사용 내역 서비스",
+      externalName: "usage-history-service",
+    },
+  });
+  await postTrustedLedgerTransfer({ tenantId: ctx.tenantId, currency: "KRW", kind: "funding", amount: BigInt(100), sourceKind: "pg_capture", sourceId: randomUUID() });
+  await postTrustedLedgerTransfer({ tenantId: ctx.tenantId, serviceId: service.id, currency: "KRW", kind: "reserve", amount: BigInt(30), sourceKind: "campaign_delivery", sourceId: randomUUID() });
+  await postTrustedLedgerTransfer({ tenantId: ctx.tenantId, serviceId: service.id, currency: "KRW", kind: "reserve", amount: BigInt(20), sourceKind: "identity_verification", sourceId: randomUUID() });
+  const message = await listUsageEvents(ctx, { category: "message" }), identity = await listUsageEvents(ctx, { category: "identity" });
+  expect(message.items).toHaveLength(1); expect(message.items[0]).toMatchObject({ sourceKind: "campaign_delivery", amount: 30 });
+  expect(identity.items).toHaveLength(1); expect(identity.items[0]).toMatchObject({ sourceKind: "identity_verification", amount: 20 });
+  expect(message.items[0]).not.toHaveProperty("sourceId"); expect(identity.items[0]).not.toHaveProperty("sourceId");
 });
 
 const pastMonth = "2026-09";

@@ -1,7 +1,10 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api, errorText, useResource } from "@/lib/api";
+import { analyticsKstBoundary, analyticsListState } from "@/lib/analytics-list-state";
+import { listHref } from "@/lib/list-url-state";
 import { marketingEventLabel, marketingQuestionTypeAllowed, marketingStatus, type MarketingChannel, type MarketingPage, type MarketingRecord, type MarketingSource, type MarketingSummary } from "@/contracts/marketing";
 import type { Paged } from "@/contracts/forms";
 import { useApplication } from "../ApplicationContext";
@@ -10,11 +13,6 @@ import { RemoteTable } from "../RemoteTable";
 import "./marketing.css";
 const time = (v: string | null) => v ? new Date(v).toLocaleString("ko-KR") : "—";
 const channelLabels: Record<MarketingChannel, string> = { email: "이메일", sms: "문자", kakao: "알림톡" };
-const dateBoundary = (value: string, end: boolean) => {
-  const day = new Date(value + "T00:00:00");
-  if (end) day.setDate(day.getDate() + 1);
-  return day.toISOString();
-};
 export function Marketing() {
   const app = useApplication();
   if (!app.data) return <Panel><p role="status">회사 정보를 불러오는 중입니다.</p></Panel>;
@@ -125,15 +123,19 @@ function MarketingCreate({ serviceId, onClose, onCreated }: { serviceId: string;
   </div></Modal>;
 }
 export function MarketingStatistics({ serviceId }: { serviceId?: string }) {
-  const app = useApplication(), [query, setQuery] = useState(""), [search, setSearch] = useState("");
-  const [draft, setDraft] = useState({ from: "", to: "" });
-  const [period, setPeriod] = useState({ from: "", to: "" });
+  const app = useApplication(), searchParams = useSearchParams(), pathname = usePathname(), router = useRouter();
+  const state = analyticsListState(searchParams), currentQuery = searchParams.toString();
+  const applied = { from: state.from, to: state.to, query: state.search }, appliedKey = JSON.stringify(applied);
+  const [draftState, setDraftState] = useState({ key: appliedKey, value: applied });
+  if (draftState.key !== appliedKey) setDraftState({ key: appliedKey, value: applied });
+  const draft = draftState.key === appliedKey ? draftState.value : applied;
+  const setDraft = (value: typeof applied) => setDraftState({ key: appliedKey, value });
   const [filterError, setFilterError] = useState("");
-  const params = new URLSearchParams({ search });
+  const params = new URLSearchParams({ search: state.search });
   if (serviceId) params.set("serviceId", serviceId);
-  if (period.from) params.set("from", dateBoundary(period.from, false));
-  if (period.to) params.set("to", dateBoundary(period.to, true));
-  const result = useResource<MarketingSummary>(app.data?.capabilities.includes("marketing.read") ? "/marketing/summary?" + params : null);
+  if (state.from) params.set("from", analyticsKstBoundary(state.from, false));
+  if (state.to) params.set("to", analyticsKstBoundary(state.to, true));
+  const result = useResource<MarketingSummary>(app.data?.capabilities.includes("marketing.read") ? "/analytics/marketing?" + params : null);
   if (!app.data) return <Panel><p role="status">회사 정보를 불러오는 중입니다.</p></Panel>;
   if (!app.data.capabilities.includes("marketing.read")) return <Panel><p role="alert">마케팅 통계를 조회할 권한이 없습니다.</p></Panel>;
   const totals = (result.data?.items ?? []).reduce((sum, row) => ({ granted: sum.granted + row.granted,
@@ -145,16 +147,16 @@ export function MarketingStatistics({ serviceId }: { serviceId?: string }) {
   function applyPeriod() {
     if (!!draft.from !== !!draft.to) { setFilterError("시작일과 종료일을 모두 선택해주세요."); return; }
     if (draft.from && draft.to && draft.from > draft.to) { setFilterError("종료일은 시작일 이후여야 합니다."); return; }
-    setFilterError(""); setPeriod(draft);
+    setFilterError(""); router.push(listHref(pathname, currentQuery, { from: draft.from, to: draft.to }), { scroll: false });
   }
   return <div className="marketing-page"><PageHeading title="마케팅 동의 현황 (광고성 정보)"><p>접근 가능한 서비스의 수신동의·발송 차단과 기간별 변경 기록입니다.</p></PageHeading>
     <Panel title="조회 기간"><div className="marketing-summary-filters">
       <label>시작일 <input className="cs-input" type="date" value={draft.from}
-        onChange={event => setDraft(previous => ({ ...previous, from: event.target.value }))} /></label>
+        onChange={event => setDraft({ ...draft, from: event.target.value })} /></label>
       <label>종료일 <input className="cs-input" type="date" value={draft.to}
-        onChange={event => setDraft(previous => ({ ...previous, to: event.target.value }))} /></label>
+        onChange={event => setDraft({ ...draft, to: event.target.value })} /></label>
       <ActionButton onClick={applyPeriod}>기간 적용</ActionButton>
-      <ActionButton secondary onClick={() => { setDraft({ from: "", to: "" }); setPeriod({ from: "", to: "" }); setFilterError(""); }}>기본 기간</ActionButton>
+      <ActionButton secondary onClick={() => { setDraft({ ...draft, from: "", to: "" }); setFilterError(""); router.push(listHref(pathname, currentQuery, { from: null, to: null }), { scroll: false }); }}>기본 기간</ActionButton>
     </div>{filterError && <p role="alert">{filterError}</p>}
       {result.data && <p className="forms-muted">집계 기준 {new Date(result.data.asOf).toLocaleString("ko-KR")} · 기간 {new Date(result.data.period.from).toLocaleString("ko-KR")}부터 {new Date(result.data.period.to).toLocaleString("ko-KR")} 전까지</p>}
     </Panel>
@@ -163,8 +165,8 @@ export function MarketingStatistics({ serviceId }: { serviceId?: string }) {
         <p>현재 수신 차단 <strong>{totals.suppressed}</strong></p><p>현재 발송 가능 <strong>{totals.eligible}</strong></p>
         <p>기간 내 동의 기록 <strong>{totals.periodGrants}</strong></p><p>기간 내 철회 기록 <strong>{totals.periodWithdrawals}</strong></p>
         <p>기간 내 삭제 기록 <strong>{totals.periodErasures}</strong></p></div>}</Panel>
-    <Panel title="서비스별 마케팅 동의 현황"><form className="cs-row" onSubmit={event => { event.preventDefault(); setSearch(query.trim()); }}>
-      <input className="cs-input" aria-label="서비스명 검색" value={query} onChange={event => setQuery(event.target.value)} />
+    <Panel title="서비스별 마케팅 동의 현황"><form className="cs-row" onSubmit={event => { event.preventDefault(); router.push(listHref(pathname, currentQuery, { q: draft.query.trim() }), { scroll: false }); }}>
+      <input className="cs-input" aria-label="서비스명 검색" value={draft.query} onChange={event => setDraft({ ...draft, query: event.target.value })} />
       <ActionButton secondary>검색</ActionButton><ActionButton type="button" secondary onClick={result.reload}>새로고침</ActionButton></form>
       <DataTable columns={["서비스명", "현재 동의", "현재 철회", "현재 삭제", "발송 제외", "수신 차단", "발송 가능", "기간 동의", "기간 철회", "기간 삭제"]}
         rows={(result.data?.items ?? []).map(row => [row.name, row.granted, row.withdrawn, row.erased,

@@ -15,6 +15,19 @@ test("20페이지·20행과 검색 특수문자가 URL 왕복 뒤에도 같은 �
   expect(state).toMatchObject({ scope: "company", page: 20, pageSize: 20, search: "가&나+# /", from: "2026-01-01", status: "resolved" });
 });
 
+test("회사·폼 감사로그의 서비스·검색조건·기간·페이지를 URL에서 안전하게 복원한다", () => {
+  const serviceId = "00000000-0000-4000-8000-000000000009";
+  const href = activityListHref("/log/info-monitoring", "unrelated=keep", {
+    serviceId, searchField: "actor", q: "처리자 & 이름", from: "2026-10-01", to: "2026-10-11", page: 4, pageSize: 50,
+  });
+  const url = new URL(href, "https://example.test");
+  expect(activityListState(url.searchParams)).toMatchObject({ serviceId, searchField: "actor", search: "처리자 & 이름",
+    from: "2026-10-01", to: "2026-10-11", page: 4, pageSize: 50 });
+  expect(url.searchParams.get("unrelated")).toBe("keep");
+  expect(activityListState(new URLSearchParams("serviceId=not-a-uuid&searchField=secret")))
+    .toMatchObject({ serviceId: "", searchField: "action" });
+});
+
 test("상세 선택을 닫아도 기존 목록 조건을 유지하며 새로고침으로 상세가 다시 열리지 않는다", () => {
   const id = "00000000-0000-4000-8000-000000000001";
   const opened = activityListHref("/my-page/info-activity-log", "scope=sent&page=2&q=요청", { reviewId: id });
