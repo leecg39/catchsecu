@@ -1,4 +1,8 @@
-## 최신 작업: R20 알림 받기·웹훅 — T01~T03 완료·T04 로컬 수용 (external_pending)
+## 최신 작업: R17·R15·R18 메시징 도메인 — 로컬 완료·외부 제공사 증거 pending
+
+2026-10-14 R15 마케팅 동의 라이프사이클(26+9+db)·R17 발신번호+SMS(40+18+db·실 DNS 픽스처·6경로 브라우저)·R18 이메일 도메인 로컬 완료. R18 수용 5케이스: 발신자 이메일코드+실제 DNS TXT 이중인증(로컬 픽스처가 senderVerification 레코드 응답)·동의매핑 폼 게시→명시 email동의 2건→selection 캠페인→local_delivered+본문SHA256+List-Unsubscribe 헤더·토큰 수신거부→EmailSuppression·혼합 재캠페인 억제건 excluded/정상건 발송(전원제외는 422)·서명릴레이 수용/위조401/중복멱등. 브라우저 6경로+차단목록+캠페인상세(수신결과·버전이력)·no-mail 게이트. 재시작 영속 PASS. T01~T03 completed·T04 in_progress/external_pending(실제 SMTP·공개DNS·공급자콜백 미검증). 공식 완료73/진행22/계획12. [수용](../../docs/qa/R18-T04/README.md).
+
+## 이전 작업: R20 알림 받기·웹훅 — T01~T03 완료·T04 로컬 수용 (external_pending)
 
 2026-10-14 R20 알림 도메인 로컬 완료. T01 모델 대조: NotificationIntegration(endpointCipher/endpointHost 분리·generation 세대·tombstone)→Subscription((integrationId,kind)유일·targetId null=전체)→Event(eventKey 유일·출처:버전)→Delivery(event+integration 유일·불변 Attempt). 원본 캡처는 목록 화면만 확보됐고 모달 이벤트 목록은 미캡처 — 과업서 "9이벤트"는 기획 추정이며 발생지가 실존하는 submission.created·import.completed+test만 구현함을 증거로 명시. T02 계약=구현=검증(11 op·이벤트는 업무tx 내 생성·SSRF 차단·세대 취소·재시도 상한). T03 브라우저: /integration/message 원본 문구·필터5·모달(이름/webhook/토글/이벤트별 대상)·"로컬 시험 모드" 고지·tombstone 즉시 제외. T04 라이브 수용 9케이스: 응답 이벤트→정확 1배달(페이로드에 응답내용 부재)·타서비스 함정 구독 누출 0·SSRF 3종 거부·disable이 큐잉 배달 즉시 취소·stale version 409·삭제 tombstone+endpointCipher 파기·재시작 영속. tests/server/notifications.test.ts 25건 보강. Slack/Teams 실제 수신 증거 없어 T04 in_progress/external_pending. 공식 완료64/진행19/계획24. [수용](../../docs/qa/R20-T04/README.md).
 

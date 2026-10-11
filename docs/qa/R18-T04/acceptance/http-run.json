@@ -1,0 +1,50 @@
+{
+  "result": "PASS",
+  "checkedAt": "2026-10-11T14:58:43.127Z",
+  "cases": 5,
+  "results": [
+    {
+      "step": "sender-verified",
+      "detail": {
+        "senderId": "7b5e171a-5077-4b14-acf8-f0264c318aad",
+        "domain": "r18-30718672.test",
+        "status": "verified"
+      }
+    },
+    {
+      "step": "campaign-delivered",
+      "detail": {
+        "campaignId": "ea3d0bc1-fde6-4b4f-8f93-d19d4c1ecfd7",
+        "deliveries": [
+          "local_delivered",
+          "local_delivered"
+        ],
+        "mailSha256": "bc4368d11dc75b5bece220c319fa369898722d207e8992724a8807393e603433",
+        "listUnsubscribe": true
+      }
+    },
+    {
+      "step": "unsubscribed",
+      "detail": {
+        "suppressionId": "4570f115-404e-4527-9521-332feed39c1e",
+        "reason": "unsubscribed"
+      }
+    },
+    {
+      "step": "suppression-blocks-resend",
+      "detail": {
+        "campaignId": "c63dbdc6-1118-4929-9589-f38c80028a76",
+        "suppressed": "excluded",
+        "consented": "local_delivered"
+      }
+    },
+    {
+      "step": "relay-feedback",
+      "detail": {
+        "accepted": true,
+        "forged": 401,
+        "duplicate": true
+      }
+    }
+  ]
+}
