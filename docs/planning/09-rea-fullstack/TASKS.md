@@ -1,5 +1,7 @@
 # 상세 TASKS — 캐치시큐 전 페이지 풀스택 완성 계획
 
+R11 공개폼·응답·첨부·정정 로컬 완료: 7개 공개 별칭 명세·file-view 4변형 연결·/jap_intro 일본어 폼 구현. 멱등 재제출(동일키 동일ID·count 1)·동의누락 422·만료 410·철회·첨부 SHA-256 삼중일치·공유범위/타회사 404·내보내기 403/200·재시작 지문 1e93d5f4…52b8 동일. 실 공유초대 메일 등 외부 제공사 증거는 external_pending. 공식 완료46/진행21/계획40. [수용](../../qa/R11-T04/acceptance/README.md).
+
 R10 처리방침 도메인 로컬 완료: 원본102필드 중98개 DTO 정규화·수탁유형2개 부모 구분·초기화배열2개 연결(migration104·기존7테이블 보존). 소유54작업 계약 일치, 목적/제공자→문서→공개토큰/PDF 체인·게시본 불변, catalog/clause/document/trustee 전체 화면 수용. 재위탁 고지는 job+감사 원자 생성·worker drain→processed·재로그인·재시작 지문 f4f62052…0081 동일. 실제 SMTP 수신은 external_pending. 공식 완료43/진행22/계획42. [수용](../../qa/R10-T04/final-acceptance/README.md).
 
 R09 승인·게시·고정URL 수용 완료: 공유·게시·승인·고정URL 전체 화면을 실제 브라우저로 통과(게시·URL 복사·일시중지/재개·409·VERSION_CONFLICT 복구·승인→게시 체인·거절/취소·viewer 읽기 전용·로딩·페이지·새로고침·3폭). production 재시작 후 forms14/approvals13/publications5/fixedUrls13/audits43 SHA256 지문이 일치하고 세션·공개 URL이 유지된다. [모델](../../qa/R09-T01/current/README.md)·[화면](../../qa/R09-T03/current/README.md)·[수용](../../qa/R09-T04/README.md).
@@ -658,7 +660,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
 
 ## R11 공개 폼·응답·첨부·정정
 
-### [ ] R11-T01 공개 폼·응답·첨부·정정 — 모델·규칙 대조 및 보완
+### [x] R11-T01 공개 폼·응답·첨부·정정 — 모델·규칙 대조 및 보완
 
 Submission→FormVersion→Answer/ConsentReceipt와 파일 바인딩, 원본문항·동의문구·timestamp 보존을 검증한다. 정정 payload 암호화, 파일 검사 상태, export source 참조 및 purge 후 불가역 비노출을 설계한다.
 
@@ -670,7 +672,7 @@ Submission→FormVersion→Answer/ConsentReceipt와 파일 바인딩, 원본문�
   - C 제출/동의영수증/첨부/메모; R 응답·파일·내보내기; U 정정/메모/보유기간; D 메모·미참조첨부, 개인정보 삭제는 파기요청.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R11-T02 공개 폼·응답·첨부·정정 — 서버 API·업무 처리
+### [x] R11-T02 공개 폼·응답·첨부·정정 — 서버 API·업무 처리
 
 외부 토큰 조회/제출과 응답 list/read/PATCH/withdraw/hold/retention/note/export API를 점검한다. 응답+영수증+outbox 원자성, 공개 제출 중복과 최대응답 경합, 파일 owner 검증을 수행한다.
 
@@ -682,7 +684,7 @@ Submission→FormVersion→Answer/ConsentReceipt와 파일 바인딩, 원본문�
   - 게시된폼 외부제출→관리자응답조회→정정→영수증/PDF→첨부hash비교→재시작; 2회제출 멱등; 필수동의누락400; 만료게시/타회사파일/공유범위밖파일 거부; 내보내기 재권한검사.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [~] R11-T03 공개 폼·응답·첨부·정정 — 전체 화면·모달 연결
+### [x] R11-T03 공개 폼·응답·첨부·정정 — 전체 화면·모달 연결
 
 project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이를 명세한다. 응답목록·상세·정정·철회·첨부 실제다운로드·로그; file-view 일반/공유 및 파일 지정/목록 네 변형을 각각 연결한다.
 

@@ -1,4 +1,8 @@
-## 최신 작업: R07 라운드2 — 오류 화면·제공사 수명주기·재인증 게이트 (external_pending)
+## 최신 작업: R11 공개폼·응답·첨부·정정 — T01~T03 완료·T04 로컬 수용 (external_pending)
+
+2026-10-14 R11 도메인 완료. T01 모델 대조(Submission→FormVersion 복합FK·원본스냅샷·정정payload암호화·파일검사상태·export참조·파기후 비노출). T02 API 계약 점검(공개 토큰/제출·응답 관리 전수·제출tx 원자성). T03 별칭 명세: /url은 고정URL slug 해석, project/projects/test-projects/customer-use-case는 게시 토큰 해석, /jap_intro는 정적 일본어 상담 폼 신규 구현(JapIntro.tsx), file-view 4변형(목록/단건×일반/공유). T04 잔여 수용을 qa-r11-acceptance.ts로 실측: 동의누락 422·동일 멱등키 동일ID(count 1)·실ClamAV clean·첨부 SHA-256 삼중일치·메모/철회·viewer내보내기403·타회사 404·공유범위밖 파일 404·철회공유410·만료 closedReason expired+410·감사18건. 재시작 지문 1e93d5f4…52b8 동일. R11-T01/T02/T03 completed·R11-T04는 실 공유초대 메일 수신 등 외부 제공사 증거 없어 in_progress/external_pending 유지. 공식 완료46/진행21/계획40. [수용](../../docs/qa/R11-T04/acceptance/README.md).
+
+## 이전 작업: R07 라운드2 — 오류 화면·제공사 수명주기·재인증 게이트 (external_pending)
 
 2026-10-11 R07 잔여 체인 로컬 검증 완료. /login?error= 15개 코드를 3종 action으로 분기 확인 — SSO_BROWSER_MISMATCH(restart·재시작 CTA), SSO_LINK_CONFLICT(contact), SSO_LINK_NEEDED(login·"이메일 로그인 후 연결 관리" CTA) 실측. SSO 제공사 전체 수명주기를 실제 UI로 수행: 가상 GPKI 등록→사전검사 통과→사용→중지 확인 모달→삭제 확인. 오래된 세션의 삭제는 SSO_REAUTH_REQUIRED("다시 로그인한 뒤 5분 안에")로 차단 후 이메일 재로그인으로 통과 — 보안 게이트 실측. 가상 GPKI 로그인 화면은 "외부 GPKI 기관 미연동" 고지와 임의 자격 정직 거절. 제공사 모달 미저장 닫기 확인(in-app 가드). 감사 5건: created→preflight→updated×2→deleted. R07-T02/T03/T04 local_status verified·external_pending 유지(실제 Google/Microsoft/기관 어댑터 증거 없음). [수용](../../docs/qa/R07-T04/provider-lifecycle-round2/README.md).
 

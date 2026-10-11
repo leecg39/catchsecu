@@ -1,0 +1,108 @@
+{
+  "checkedAt": "2026-10-11T12:54:11.363Z",
+  "steps": [
+    {
+      "name": "published",
+      "data": {
+        "formId": "c43ff992-0f44-42cb-b346-e6a98b72166a",
+        "publicationId": "c5aa3af3-8115-4d8c-bfbc-2879e1175297"
+      }
+    },
+    {
+      "name": "consent-required-rejected",
+      "data": {
+        "status": 422,
+        "code": "CONSENT_REQUIRED"
+      }
+    },
+    {
+      "name": "file-uploaded",
+      "data": {
+        "fileId": "424822b9-9d11-4b6a-b781-7e9512583979",
+        "scanStatus": "clean"
+      }
+    },
+    {
+      "name": "idempotent-submit",
+      "data": {
+        "first": "0a139ddb-ea5a-4dc6-a58f-6a2bcce77a97",
+        "replaySameId": true,
+        "responseCount": 1,
+        "secondAccepted": true
+      }
+    },
+    {
+      "name": "attachment-hash-verified",
+      "data": {
+        "fileId": "424822b9-9d11-4b6a-b781-7e9512583979",
+        "size": 66,
+        "sha256": "6826aead2906910d…",
+        "dbMatch": true
+      }
+    },
+    {
+      "name": "withdrawn",
+      "data": {
+        "note": 201,
+        "status": "withdrawn"
+      }
+    },
+    {
+      "name": "export-authority",
+      "data": {
+        "viewer": 403,
+        "owner": 200,
+        "csvRows": "2"
+      }
+    },
+    {
+      "name": "cross-tenant-denied",
+      "data": {
+        "submission": 404,
+        "fileInfo": 404,
+        "download": 404
+      }
+    },
+    {
+      "name": "share-scope-denied",
+      "data": {
+        "sharedDetail": 200,
+        "withdrawnShared": 410,
+        "fileInfo": 404,
+        "download": 404
+      }
+    },
+    {
+      "name": "expired-rejected",
+      "data": {
+        "closedReason": "expired",
+        "submit": 410,
+        "code": "PUBLICATION_CLOSED"
+      }
+    },
+    {
+      "name": "audits",
+      "data": {
+        "count": 18,
+        "actions": [
+          "form.created:form",
+          "form.published:form",
+          "file.upload_initialized:file",
+          "file.uploaded:file",
+          "file.scan_passed:file",
+          "file.attached:file",
+          "submission.created:sub",
+          "submission.created:form",
+          "submission.viewed:sub",
+          "file.list_viewed:sub",
+          "file.viewed:file",
+          "file.downloaded:file",
+          "submission.note_created:form",
+          "submission.viewed:form",
+          "submission.withdraw:form",
+          "submission.exported:form"
+        ]
+      }
+    }
+  ]
+}

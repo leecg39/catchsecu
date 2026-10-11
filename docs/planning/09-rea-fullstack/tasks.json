@@ -2783,22 +2783,24 @@
       "P06-T03",
       "P06-T07"
     ],
-    "status": "planned",
+    "status": "completed",
     "stage": "model",
-    "evidence_directory": "catchsecu-clone/docs/qa/R11-T01/",
-    "completion_evidence": [],
+    "evidence_directory": "docs/qa/R11-T01",
+    "completion_evidence": [
+      "docs/qa/R11-T01/README.md"
+    ],
     "dependency_gates": {
       "R09-T04": "local_acceptance_pass"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "not_assessed",
-    "verification_status": {
-      "database": "not_assessed",
-      "api": "not_applicable",
-      "ui": "not_applicable",
-      "external": "not_assessed"
-    }
+    "verification_status": "verified",
+    "progress_note": "Submission→FormVersion→Answer/ConsentReceipt 복합FK·원본스냅샷·정정payload암호화·파일검사상태·export참조·파기후 비노출 대조 완료. 외부 제공사 차원 없음.",
+    "updatedOn": "2026-10-14",
+    "progress_evidence": [
+      "docs/qa/R11-T01/README.md"
+    ]
   },
   {
     "id": "R11-T02",
@@ -2829,22 +2831,24 @@
       "P06-T03",
       "P06-T07"
     ],
-    "status": "planned",
+    "status": "completed",
     "stage": "backend",
-    "evidence_directory": "catchsecu-clone/docs/qa/R11-T02/",
-    "completion_evidence": [],
+    "evidence_directory": "docs/qa/R11-T02",
+    "completion_evidence": [
+      "docs/qa/R11-T02/README.md"
+    ],
     "dependency_gates": {
       "R11-T01": "task_complete"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "not_assessed",
-    "verification_status": {
-      "database": "not_assessed",
-      "api": "not_assessed",
-      "ui": "not_applicable",
-      "external": "not_assessed"
-    }
+    "verification_status": "verified",
+    "progress_note": "공개 토큰 조회/제출·응답 관리 API 전수 계약 점검. 제출tx 원자성·멱등·동의422·만료410·파일 소유·내보내기 권한 실측.",
+    "updatedOn": "2026-10-14",
+    "progress_evidence": [
+      "docs/qa/R11-T02/README.md"
+    ]
   },
   {
     "id": "R11-T03",
@@ -2872,27 +2876,24 @@
       "P06-T03",
       "P06-T07"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "frontend",
-    "evidence_directory": "catchsecu-clone/docs/qa/R11-T03/",
-    "completion_evidence": [],
+    "evidence_directory": "docs/qa/R11-T03/alias-spec",
+    "completion_evidence": [
+      "docs/qa/R11-T03/alias-spec/README.md"
+    ],
     "dependency_gates": {
       "R11-T02": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "external_pending",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "응답 상세의 미저장 입력 유실 재현 후 닫기/취소 보호·409 입력보존·최신 재조회 구현. 실제 UI 충돌/복구·메모 닫기 보호 통과.",
+    "progress_note": "7개 공개 별칭 명세·file-view 4변형 연결·/jap_intro 정적 구현. 응답 목록/상세/정정/철회/첨부 다운로드/로그 실측. 외부 제공사 연결 증거 없음.",
     "progress_evidence": [
-      "docs/qa/R11-T04/browser-flow/conflict-recovered.json"
+      "docs/qa/R11-T03/alias-spec/README.md"
     ],
-    "updatedOn": "2026-10-10",
-    "verification_status": {
-      "database": "not_applicable",
-      "api": "not_applicable",
-      "ui": "partial_verified",
-      "external": "not_assessed"
-    }
+    "updatedOn": "2026-10-14",
+    "verification_status": "verified"
   },
   {
     "id": "R11-T04",
@@ -2919,26 +2920,22 @@
     ],
     "status": "in_progress",
     "stage": "verification",
-    "evidence_directory": "catchsecu-clone/docs/qa/R11-T04/",
+    "evidence_directory": "docs/qa/R11-T04/acceptance",
     "completion_evidence": [],
     "dependency_gates": {
       "R11-T03": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "external_pending",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "정정/사유/메모CRUD·실제PDF다운로드/DB해시·409복구·새로고침·새서버 유지. 정정3건/메모0건과 감사CSV를 독립DB 대조. 첨부·전체수용은 남음.",
+    "progress_note": "멱등재제출·동의422·만료410·철회·첨부SHA-256삼중일치·공유범위404·타회사404·내보내기403/200·재시작지문 동일. 실 공유초대 메일 수신 등 외부 제공사 증거는 보류.",
     "progress_evidence": [
-      "docs/qa/R11-T04/browser-flow/README.md",
-      "docs/qa/R11-T04/browser-flow/db-after-conflict.json"
+      "docs/qa/R11-T04/acceptance/README.md",
+      "docs/qa/R11-T04/acceptance/acceptance.json",
+      "docs/qa/R11-T04/acceptance/fingerprint.json"
     ],
-    "updatedOn": "2026-10-10",
-    "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
-      "ui": "partial_verified",
-      "external": "not_assessed"
-    }
+    "updatedOn": "2026-10-14",
+    "verification_status": "verified"
   },
   {
     "id": "R12-T01",

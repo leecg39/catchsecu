@@ -6,6 +6,7 @@ import { SubjectPortal } from "./forms/SubjectPortal";
 import { SharedPrivacy } from "./forms/SharedPrivacy";
 import { PublicDocument } from "./forms/Documents";
 import { FileView } from "./forms/FileView";
+import { JapIntro } from "./forms/JapIntro";
 import { PublicForm } from "./forms/PublicForm";
 import { PublicServiceDocuments } from "./forms/PublicServiceDocuments";
 import { parseServiceDocumentPath } from "@/contracts/public-service-documents";
@@ -44,6 +45,7 @@ export function PublicPages({ path }: { path: string }) {
 }
 
 function ExternalForm({ path }: { path: string }) {
+  if (path === "/jap_intro") return <JapIntro />;
   if (path.startsWith("/file-view")) return <FileView path={path} />;
   if (path.startsWith("/document")) return <PublicDocument path={path} />;
   if (parseServiceDocumentPath(path)) return <PublicServiceDocuments path={path} />;
