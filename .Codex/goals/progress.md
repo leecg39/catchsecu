@@ -1,4 +1,8 @@
-## 최신 작업: R17·R15·R18 메시징 도메인 — 로컬 완료·외부 제공사 증거 pending
+## 최신 작업: R19 알림톡 채널·템플릿·발송 — 로컬 완료·외부 카카오 증거 pending
+
+2026-10-14 R19 알림톡 로컬 완료. 수용 7케이스: 채널 등록→실제 webhook 계약(내부 서명 HMAC·버전 조건부 전이) 통과 검증·중복/재검증 409→템플릿 제출(#반려 표지→rejected+note→수정→재제출→approved·구버전 409)→미리보기 변수검증·모의발송(영수증에 템플릿/채널 버전+contentHash 핀·멱등키 동일영수증·승인템플릿 수정→draft→재심사)→채널 searchId 변경→인증해제+템플릿 심사초기화 감사→kakao+sms 동의 수신자 캠페인→kakao-local 영수증→미치환 변수 실패→SMS 대체발송(sms-local 영수증·fallback 감사·attempt dedupe)→빈채널 삭제204/사용중 보관409/타리소스 404. 브라우저 8경로+플레이그라운드 실데이터. 재시작 영속 PASS. T01~T03 completed·T04 in_progress/external_pending(실제 카카오 채널인증·심사·수신·웹훅 미검증). 공식 완료76/진행22/계획9. [수용](../../docs/qa/R19-T04/README.md).
+
+## 이전 작업: R17·R15·R18 메시징 도메인 — 로컬 완료·외부 제공사 증거 pending
 
 2026-10-14 R15 마케팅 동의 라이프사이클(26+9+db)·R17 발신번호+SMS(40+18+db·실 DNS 픽스처·6경로 브라우저)·R18 이메일 도메인 로컬 완료. R18 수용 5케이스: 발신자 이메일코드+실제 DNS TXT 이중인증(로컬 픽스처가 senderVerification 레코드 응답)·동의매핑 폼 게시→명시 email동의 2건→selection 캠페인→local_delivered+본문SHA256+List-Unsubscribe 헤더·토큰 수신거부→EmailSuppression·혼합 재캠페인 억제건 excluded/정상건 발송(전원제외는 422)·서명릴레이 수용/위조401/중복멱등. 브라우저 6경로+차단목록+캠페인상세(수신결과·버전이력)·no-mail 게이트. 재시작 영속 PASS. T01~T03 completed·T04 in_progress/external_pending(실제 SMTP·공개DNS·공급자콜백 미검증). 공식 완료73/진행22/계획12. [수용](../../docs/qa/R18-T04/README.md).
 

@@ -1076,7 +1076,7 @@ mail 폼/직접발송·발신주소/발송내역/주소없음 화면, 편집기�
 
 ## R19 알림톡 채널·템플릿·발송
 
-### [ ] R19-T01 알림톡 채널·템플릿·발송 — 모델·규칙 대조 및 보완
+### [x] R19-T01 알림톡 채널·템플릿·발송 — 모델·규칙 대조 및 보완
 
 채널귀속·템플릿버전/심사상태/변수·버튼·이미지·fallback snapshot을 대조한다. KakaoMockReceipt는 실제카카오 receipt로 집계하지 않는다.
 
@@ -1088,7 +1088,7 @@ mail 폼/직접발송·발신주소/발송내역/주소없음 화면, 편집기�
   - C 채널·템플릿·발송초안; R 목록·상세·심사/발송내역; U 초안·반려수정·활성; D 미사용채널/템플릿보관. 승인본 수정은 재심사.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R19-T02 알림톡 채널·템플릿·발송 — 서버 API·업무 처리
+### [x] R19-T02 알림톡 채널·템플릿·발송 — 서버 API·업무 처리
 
 채널 CRUD/verify, 템플릿 CRUD/preview/submit/review/send 및 심사 callback, 수신결과·SMS 대체발송의 과금 멱등성을 점검한다.
 
@@ -1100,7 +1100,7 @@ mail 폼/직접발송·발신주소/발송내역/주소없음 화면, 편집기�
   - 채널등록→검증→템플릿등록→반려/수정/승인→변수발송→receipt; 승인템플릿수정시 재심사; 비활성채널거부; fallback중복방지; 실제카카오 승인/수신은 제공사시험 증거필수.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [~] R19-T03 알림톡 채널·템플릿·발송 — 전체 화면·모달 연결
+### [x] R19-T03 알림톡 채널·템플릿·발송 — 전체 화면·모달 연결
 
 /alimtalk/channels 현재 dispatcher 누락을 연결하고 /alimtalk·templates/register·id·id/edit·send·history 전부 실제 상태에 맞춘다. Playground는 미리보기 도구로서 저장이 필요한 동작만 템플릿 계약에 연결한다.
 
