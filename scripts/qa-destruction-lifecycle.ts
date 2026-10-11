@@ -9,10 +9,10 @@ import { privateFiles } from "../src/server/file-storage";
 import { runOneDestruction } from "../src/server/destruction-worker";
 import type { DestructionRecord, CertificateRecord } from "../src/contracts/destruction";
 
-const target = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
+const target = new URL(env.DATABASE_URL), origin = new URL(process.env.QA_ORIGIN ?? env.BETTER_AUTH_URL).origin;
 if (target.pathname !== "/catchsecu_dev" || !["localhost", "127.0.0.1"].includes(target.hostname) || !["localhost", "127.0.0.1"].includes(new URL(origin).hostname))
   throw new Error("Independent local development HTTP QA only.");
-const phase = process.argv[2], out = "docs/qa/P07-T03/", checkpoint = ".local/p07-destruction-checkpoint.json";
+const phase = process.argv[2], out = process.env.QA_OUT ?? "docs/qa/P07-T03/", checkpoint = ".local/p07-destruction-checkpoint.json";
 if (!["prepare", "finish", "database"].includes(phase)) throw new Error("prepare, finish or database required.");
 type State = { email: string; password: string; userId: string; companyId: string; serviceId: string; formId: string; submissionId: string;
   questionId: string; fileQuestionId: string; fileId: string; storageKey: string; requestId: string; certificateId: string;

@@ -920,7 +920,7 @@ preferences CRUD/withdrawals/export/sources/summary를 실제 ConsentReceipt와 
 
 ## R16 보유기간·파기 일정·증명서
 
-### [~] R16-T01 보유기간·파기 일정·증명서 — 모델·규칙 대조 및 보완
+### [x] R16-T01 보유기간·파기 일정·증명서 — 모델·규칙 대조 및 보완
 
 RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선순위, legalHold·승인·파기증명서를 대조한다. 파일/내보내기/캠페인 복제본까지 파기 범위를 추적한다.
 
@@ -932,7 +932,7 @@ RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선�
   - C 보유규칙/파기요청; R 기간·예정목록·증명서; U 보유기간·승인·보류·재예약; D 규칙보관·요청취소·승인된 실제파기. 증명서 수정/임의삭제 없음.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [~] R16-T02 보유기간·파기 일정·증명서 — 서버 API·업무 처리
+### [x] R16-T02 보유기간·파기 일정·증명서 — 서버 API·업무 처리
 
 기존 retention-rules CRUD와 /log/retention 신규 화면을 연결할 계약을 명시한다(원본 정상화면 미확인, 독립 제안). 파기 승인/거절/취소/재시도/재예약과 worker의 참조차단·재실행 안전성을 점검한다.
 
@@ -944,7 +944,7 @@ RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선�
   - 짧은보유fixture→보류→만료worker실행(유지)→보류해제/승인→실제DB·파일삭제→증명서; 다운로드/발송/정정과 파기경합; worker중단후재개 중복증명서없음.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [~] R16-T03 보유기간·파기 일정·증명서 — 전체 화면·모달 연결
+### [x] R16-T03 보유기간·파기 일정·증명서 — 전체 화면·모달 연결
 
 /log/retention 기간규칙목록/추가/편집/보관, 수집파기현황, 파기예정·요청상세·승인/보류·재예약, 증명서조회/다운로드. 파기 이후 빈값이 아닌 파기 상태/근거를 표시한다.
 
@@ -956,7 +956,7 @@ RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선�
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [~] R16-T04 보유기간·파기 일정·증명서 — DB·브라우저·재시작 수용검증
+### [x] R16-T04 보유기간·파기 일정·증명서 — DB·브라우저·재시작 수용검증
 
 짧은보유fixture→보류→만료worker실행(유지)→보류해제/승인→실제DB·파일삭제→증명서; 다운로드/발송/정정과 파기경합; worker중단후재개 중복증명서없음.
 

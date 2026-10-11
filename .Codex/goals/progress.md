@@ -1,4 +1,8 @@
-## 최신 작업: R11 공개폼·응답·첨부·정정 — T01~T03 완료·T04 로컬 수용 (external_pending)
+## 최신 작업: R16 보유기간·파기 도메인 완료 — T01~T04 completed
+
+2026-10-14 R16 도메인 완료(외부 제공사 차원 없음, not_applicable). T01 모델 대조: 보유기한 우선순위 formVersion.retentionDays→form.designatedRetentionDays→companyRetentionDays, originalRetentionUntil 보존, legalHold가 워커 수집·요청 409 차단, retentionKey 자동 재생성 방지, 임대·attempts, 증명서 HMAC+불변, 파기 범위(파일객체·영수증·캠페인 복제본·마케팅·정정·메모·동의). T02 계약=구현=검증 일치(retention-rules 5작업·destruction-requests 6작업·certificates 3작업). T03 브라우저 실이동: /log/retention·destruction-schedule(완료요청 행)·destruction_certificate(무결성 확인·증명서 행)·collect-destruction(일별 수집/파기/잔여 24건). T04 라이프사이클 재실행(production 3121): prepare 33케이스(보류차단→요청→취소→재예약승인초기화→승인→워커→증명서→원문{}·파일410·멱등재생410)→서버 재기동→finish 7케이스(재로그인·요청 유지·증명서 유지·401)→database 대조(개인행 0건·암호화객체 ENOENT·캐시3 무효화·사유 암호문 제거·대조군 해시 동일). qa-destruction-lifecycle에 QA_ORIGIN/QA_OUT override 추가(P07 증거 보존). 공식 완료50/진행17/계획40. [수용](../../docs/qa/R16-T04/README.md).
+
+## 이전 작업: R11 공개폼·응답·첨부·정정 — T01~T03 완료·T04 로컬 수용 (external_pending)
 
 2026-10-14 R11 도메인 완료. T01 모델 대조(Submission→FormVersion 복합FK·원본스냅샷·정정payload암호화·파일검사상태·export참조·파기후 비노출). T02 API 계약 점검(공개 토큰/제출·응답 관리 전수·제출tx 원자성). T03 별칭 명세: /url은 고정URL slug 해석, project/projects/test-projects/customer-use-case는 게시 토큰 해석, /jap_intro는 정적 일본어 상담 폼 신규 구현(JapIntro.tsx), file-view 4변형(목록/단건×일반/공유). T04 잔여 수용을 qa-r11-acceptance.ts로 실측: 동의누락 422·동일 멱등키 동일ID(count 1)·실ClamAV clean·첨부 SHA-256 삼중일치·메모/철회·viewer내보내기403·타회사 404·공유범위밖 파일 404·철회공유410·만료 closedReason expired+410·감사18건. 재시작 지문 1e93d5f4…52b8 동일. R11-T01/T02/T03 completed·R11-T04는 실 공유초대 메일 수신 등 외부 제공사 증거 없어 in_progress/external_pending 유지. 공식 완료46/진행21/계획40. [수용](../../docs/qa/R11-T04/acceptance/README.md).
 
