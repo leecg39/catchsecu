@@ -3946,23 +3946,30 @@
    "P08-T03",
    "P08-T04"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "model",
-  "evidence_directory": "catchsecu-clone/docs/qa/R17-T01/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R17-T01",
+  "completion_evidence": [
+   "docs/qa/R17-T01/README.md"
+  ],
   "dependency_gates": {
    "R15-T04": "local_acceptance_pass",
    "R21-T04": "local_acceptance_pass"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_applicable",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "Sender(세대·인증·환경)→Verification(email/dns/evidence·세대 고정)→Event불변·Campaign(내용·발신자 버전 스냅샷·30일)→Delivery(position·동의 근거)·SmsReceipt·크레딧 예약/정산 분리 대조.",
+  "progress_evidence": [
+   "docs/qa/R17-T01/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R17-T02",
@@ -3992,22 +3999,29 @@
    "P08-T03",
    "P08-T04"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "backend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R17-T02/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R17-T02",
+  "completion_evidence": [
+   "docs/qa/R17-T02/README.md"
+  ],
   "dependency_gates": {
    "R17-T01": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "senders 9액션+evidence 체인+campaigns CRUD/sources/recipients/deliveries+sms/receipts 계약=구현=검증. 발송 직전 발신자·동의·잔액 재검사·예약 dueAt 원자 동기.",
+  "progress_evidence": [
+   "docs/qa/R17-T02/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R17-T03",
@@ -4033,22 +4047,31 @@
    "P08-T03",
    "P08-T04"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "frontend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R17-T03/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R17-T03",
+  "completion_evidence": [
+   "docs/qa/R17-T03/README.md",
+   "docs/qa/campaigns/browser-fixture.json"
+  ],
   "dependency_gates": {
    "R17-T02": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_applicable",
-   "api": "not_applicable",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "/sms·catchform·direct·history·nonumber 브라우저: 상태탭·미인증/승인 구분·변수 규칙·정제 미리보기·솔라피 실데이터 내역·정직 고지·번호 게이트.",
+  "progress_evidence": [
+   "docs/qa/R17-T03/README.md",
+   "docs/qa/campaigns/browser-fixture.json"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R17-T04",
@@ -4073,22 +4096,30 @@
    "P08-T03",
    "P08-T04"
   ],
-  "status": "planned",
+  "status": "in_progress",
   "stage": "verification",
-  "evidence_directory": "catchsecu-clone/docs/qa/R17-T04/",
+  "evidence_directory": "docs/qa/R17-T04",
   "completion_evidence": [],
   "dependency_gates": {
    "R17-T03": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "external_pending",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "external_pending"
+  },
+  "progress_note": "라이프사이클+로컬DNS fixture 재실행: 실DNS TXT 검증→verified·증빙 바이트 대조·disable→예약잡 cancelled·재시작 지문·삭제 410 체인.",
+  "progress_evidence": [
+   "docs/qa/R17-T04/README.md",
+   "docs/qa/R17-T04/lifecycle/http-prepare.json",
+   "docs/qa/R17-T04/lifecycle/http-finish.json",
+   "docs/qa/R17-T04/lifecycle/dev-database.json"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R18-T01",

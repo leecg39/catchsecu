@@ -972,7 +972,7 @@ RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선�
 
 ## R17 발신번호·문자 캠페인
 
-### [ ] R17-T01 발신번호·문자 캠페인 — 모델·규칙 대조 및 보완
+### [x] R17-T01 발신번호·문자 캠페인 — 모델·규칙 대조 및 보완
 
 발신번호 검증·증빙파일 및 Campaign→CampaignDelivery→SmsReceipt 고유키, 크레딧예약/정산을 확인한다. 전화번호 정규화·중복 제거·예약 timezone·발신자 변경 버전 고정을 명시한다.
 
@@ -984,7 +984,7 @@ RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선�
   - C 발신자·초안·수신자·템플릿; R 인증/발송내역; U 초안·예약·기본발신자; D 초안·발신자 비활성/예약취소. 발송완료는 receipt 이력 유지.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R17-T02 발신번호·문자 캠페인 — 서버 API·업무 처리
+### [x] R17-T02 발신번호·문자 캠페인 — 서버 API·업무 처리
 
 발신자 CRUD/검증증빙/disable, 폼응답·직접수신자 구성, 캠페인 preview/schedule/reschedule/cancel/retry와 receipt 서명/순서/중복 검증. 발송직전 동의·권한·잔액 재검사.
 
@@ -996,7 +996,7 @@ RetentionRule(service unique)→Form 지정→Submission.retentionUntil 우선�
   - 번호등록→시험검증→수신자2명→예약→취소/발송→receipt→잔액대조; 미승인번호거부; 철회직후발송차단; provider timeout 재시도 중복비용없음. 실제SMS도착증거 별도.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [ ] R17-T03 발신번호·문자 캠페인 — 전체 화면·모달 연결
+### [x] R17-T03 발신번호·문자 캠페인 — 전체 화면·모달 연결
 
 sms 기본/폼선택/직접작성/번호관리/내역/번호없음 모두 실데이터. 번호등록 모달의 번호·설명·증빙4종·파일제한을 최신 캡처와 맞추고 작성내용·주소록·비용·예약확인을 구현한다.
 

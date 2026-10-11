@@ -8,9 +8,9 @@ import { decrypt } from "../src/server/crypto";
 import { enqueueMarketingMail, runOneJob } from "../src/server/jobs";
 import type { SenderRecord, SenderPage } from "../src/contracts/senders";
 
-const url = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
+const url = new URL(env.DATABASE_URL), origin = new URL(process.env.QA_ORIGIN ?? env.BETTER_AUTH_URL).origin;
 if (url.pathname !== "/catchsecu_dev" || !["localhost", "127.0.0.1"].includes(url.hostname) || !["localhost", "127.0.0.1"].includes(new URL(origin).hostname) || env.MAIL_TRANSPORT !== "local") throw new Error("Own local synthetic fixture only.");
-const phase = process.argv[2], checkpoint = ".local/p08-sender-checkpoint.json", out = "docs/qa/P08-T01/";
+const phase = process.argv[2], checkpoint = process.env.QA_CHECKPOINT ?? ".local/p08-sender-checkpoint.json", out = process.env.QA_OUT ?? "docs/qa/P08-T01/";
 if (!["prepare", "finish", "database"].includes(phase)) throw new Error("prepare, finish or database required.");
 type State = { email: string; password: string; userId: string; companyId: string; serviceId: string; cookie: string;
   originalCompanyIds: string[]; originalUserIds: string[]; preservedHash: string; preparedHash: string; finishedHash: string;
