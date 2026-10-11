@@ -466,6 +466,7 @@ OIDC/SAML 검증·계정연결 및 신규 /login/gpki/callback·/login/saeol/cal
 - 완료 조건:
   - 잘못된 issuer/audience/state·만료/재사용 assertion 거부; 별도 시험 IdP로 로그인·연결·해제; 기관2곳 tenant 분리; 가상기관 테스트와 실제기관 수신 증거를 분리.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
+- 진행 체크포인트: 라운드2(2026-10-11)에서 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기를 UI+DB+감사 5건으로 실측하고, 오래된 세션의 삭제가 SSO_REAUTH_REQUIRED로 차단된 뒤 재로그인으로 통과하는 보안 게이트를 확인했다. 가상 GPKI 로그인은 외부 미연동 고지와 임의 자격 정직 거절을 확인했다. [증거](../../qa/R07-T04/provider-lifecycle-round2/README.md). 로컬 검증 완료, external_pending 유지.
 
 ### [~] R07-T03 SSO·OAuth·기관 인증 — 전체 화면·모달 연결
 
@@ -478,6 +479,7 @@ SSO 목록·등록·수정·삭제·연결시험, OAuth/SAML 시작/성공/실�
 - 완료 조건:
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
+- 진행 체크포인트: 라운드2에서 /login?error= 화면을 3종 action(restart/contact/login)별로 실측하고 제공사 등록 모달의 미저장 닫기 확인을 통과했다. [증거](../../qa/R07-T04/provider-lifecycle-round2/README.md). 로컬 검증 완료, external_pending 유지.
 
 ### [~] R07-T04 SSO·OAuth·기관 인증 — DB·브라우저·재시작 수용검증
 
@@ -491,6 +493,7 @@ SSO 목록·등록·수정·삭제·연결시험, OAuth/SAML 시작/성공/실�
   - 회사의 허용·거부역할 및 A/B 격리, 해당 C/R/U/D 전체 행동과 실패·중복·경합 시나리오를 독립 DB조회로 검증
   - 브라우저 상태변경 후 새로고침·서버/worker재시작·다른브라우저/재로그인으로 확인; 관련단위/통합·typecheck·lint·build 통과
   - 외부연동이 있으면 로컬어댑터와 실제 provider 수신증거를 분리. 로컬 수용을 통과하면 후속 내부 구현은 진행 가능하며, 실제 계정 미확보 시 해당 작업의 외부검증은 external_pending으로 유지.
+- 진행 체크포인트: 라운드2에서 제공사 수명주기 감사 5건(created/preflight/updated×2/deleted)·SSO_REAUTH_REQUIRED 차단→재로그인 통과·가상 GPKI 정직 거절을 DB와 함께 실측했다. [증거](../../qa/R07-T04/provider-lifecycle-round2/README.md). 로컬 수용 완료, 외부 제공사 증거 없어 external_pending 유지.
 
 
 ## R08 캐치폼·질문·템플릿·단계 편집

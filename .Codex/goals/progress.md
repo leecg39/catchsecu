@@ -1,4 +1,8 @@
-## 최신 작업: R08 로컬 수용 완료 — NLP 자동분류·문안 자동생성·9경로 스윕 (external_pending)
+## 최신 작업: R07 라운드2 — 오류 화면·제공사 수명주기·재인증 게이트 (external_pending)
+
+2026-10-11 R07 잔여 체인 로컬 검증 완료. /login?error= 15개 코드를 3종 action으로 분기 확인 — SSO_BROWSER_MISMATCH(restart·재시작 CTA), SSO_LINK_CONFLICT(contact), SSO_LINK_NEEDED(login·"이메일 로그인 후 연결 관리" CTA) 실측. SSO 제공사 전체 수명주기를 실제 UI로 수행: 가상 GPKI 등록→사전검사 통과→사용→중지 확인 모달→삭제 확인. 오래된 세션의 삭제는 SSO_REAUTH_REQUIRED("다시 로그인한 뒤 5분 안에")로 차단 후 이메일 재로그인으로 통과 — 보안 게이트 실측. 가상 GPKI 로그인 화면은 "외부 GPKI 기관 미연동" 고지와 임의 자격 정직 거절. 제공사 모달 미저장 닫기 확인(in-app 가드). 감사 5건: created→preflight→updated×2→deleted. R07-T02/T03/T04 local_status verified·external_pending 유지(실제 Google/Microsoft/기관 어댑터 증거 없음). [수용](../../docs/qa/R07-T04/provider-lifecycle-round2/README.md).
+
+## 이전 작업: R08 로컬 수용 완료 — NLP 자동분류·문안 자동생성·9경로 스윕 (external_pending)
 
 2026-10-11 R08 잔여 체인 완료. F6 템플릿 삭제 확정(브라우저→DB 0건·template.deleted 감사). F3 NLP 자동분류: local-deterministic-v1 분석/피드백 API·분류 source NLP+feedbackId 페어·DB CHECK 확장(migration 20261025032000)·편집기 700ms 디바운스 제안 카드(로컬 결과 고지)·RESIDENT 필수/유형 전환·복제 시 NLP 항목 제거 재분석. question-nlp 6·consent-display-generate 5·form-page-state 시험 통과. F3 동의 문안 자동생성: consent-display/{kind}/generate 제안 API(저장 분리·generated 감사)+UI 검토→적용→PATCH 저장. 브라우저 검증: 질문 라벨→제안 2건→적용→DB NLP 항목 확인; 문안 생성→제안 카드(목적0·항목2·수탁1)→적용→저장, generated+updated 감사 2건. F7 통합 스윕: 9개 원본 경로(manage/template/create/basic-frame/v3/recipient/agreement/set/setting) formId 보존 렌더·미인증 403 확인. 프로덕션 빌드 재기동 후 테넌트A forms33/versions36/questions59·NLP2/templates2/displays1/감사128 SHA-256 지문 5192c9b7… 재시작 전후 동일. R08-T02/T03/T04는 local_status verified·external_status external_pending 유지 — 외부 NLP 제공사 실연결 증거 없음, R09-T01 게이트는 외부 증거 확보 시 해제. 공식 완료43/진행22/계획42. [수용](../../docs/qa/R08-T03/current/browser-f7-sweep.md).
 

@@ -1729,14 +1729,16 @@
     "status": "in_progress",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R07-T02/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R07-T04/provider-lifecycle-round2/README.md"
+    ],
     "dependency_gates": {
       "R07-T01": "task_complete"
     },
-    "local_status": "partial_verified",
+    "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여.",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여. | 라운드2(2026-10-11): /login?error= 3종 action 실측(restart/contact/login 문구+CTA 정확), 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기 UI+DB+감사 5건 확인. 오래된 세션 삭제는 SSO_REAUTH_REQUIRED로 차단 후 재로그인으로 통과(보안 게이트 실측). 가상 GPKI 로그인 화면은 외부 미연동 고지+임의자격 정직 거절. 제공사 편집기 미저장 닫기 확인(in-app 가드). 로컬 검증 완료, 실제 제공사 증거 없어 external_pending 유지.",
     "progress_evidence": [
       "docs/qa/R07-T02/core/regression.json",
       "docs/qa/R07-T02/core/crud-final.json",
@@ -1808,14 +1810,16 @@
     "status": "in_progress",
     "stage": "frontend",
     "evidence_directory": "catchsecu-clone/docs/qa/R07-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R07-T04/provider-lifecycle-round2/README.md"
+    ],
     "dependency_gates": {
       "R07-T02": "task_complete"
     },
-    "local_status": "partial_verified",
+    "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여.",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여. | 라운드2(2026-10-11): /login?error= 3종 action 실측(restart/contact/login 문구+CTA 정확), 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기 UI+DB+감사 5건 확인. 오래된 세션 삭제는 SSO_REAUTH_REQUIRED로 차단 후 재로그인으로 통과(보안 게이트 실측). 가상 GPKI 로그인 화면은 외부 미연동 고지+임의자격 정직 거절. 제공사 편집기 미저장 닫기 확인(in-app 가드). 로컬 검증 완료, 실제 제공사 증거 없어 external_pending 유지.",
     "progress_evidence": [
       "docs/qa/R07-T04/management-flow/browser.json",
       "docs/qa/R07-T04/management-flow/responsive.json",
@@ -1877,14 +1881,16 @@
     "status": "in_progress",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R07-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R07-T04/provider-lifecycle-round2/README.md"
+    ],
     "dependency_gates": {
       "R07-T03": "task_complete"
     },
-    "local_status": "partial_verified",
+    "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. E5 가상GPKI 연결·MFA등록/실패/대기차단·로그인·해제·초대불일치/수락/재진입·마지막수단409 확인. 타입/린트·Ego3폭·DB/메일단언·서버재시작 hash2824c95f… 일치. 기존5개 fixture 보존. 전체/외부 조합은 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여.",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. E5 가상GPKI 연결·MFA등록/실패/대기차단·로그인·해제·초대불일치/수락/재진입·마지막수단409 확인. 타입/린트·Ego3폭·DB/메일단언·서버재시작 hash2824c95f… 일치. 기존5개 fixture 보존. 전체/외부 조합은 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여. | 라운드2(2026-10-11): /login?error= 3종 action 실측(restart/contact/login 문구+CTA 정확), 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기 UI+DB+감사 5건 확인. 오래된 세션 삭제는 SSO_REAUTH_REQUIRED로 차단 후 재로그인으로 통과(보안 게이트 실측). 가상 GPKI 로그인 화면은 외부 미연동 고지+임의자격 정직 거절. 제공사 편집기 미저장 닫기 확인(in-app 가드). 로컬 검증 완료, 실제 제공사 증거 없어 external_pending 유지.",
     "progress_evidence": [
       "docs/qa/R07-T04/management-flow/README.md",
       "docs/qa/R07-T04/management-flow/verified-after-restart.json",
