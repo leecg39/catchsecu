@@ -4,6 +4,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { documentTypes, documentType, emptyDisplay, type DocumentInput, type ClauseInput, type DisplayInput, type DisplayKind, type DocumentSnapshot, type PublicPurpose, type PublicRecipient } from "@/contracts/documents";
 import { basisLabels, catalogItem, itemKinds, recipientKinds } from "@/contracts/processing-catalog";
 import { policyItemOptions } from "@/contracts/policy-item-options";
+import { consentItemsSchema } from "@/contracts/consent-items";
 import { db, type Transaction } from "./db";
 import type { Context } from "./context";
 import { roleCan, type Capability } from "./permissions";
@@ -329,6 +330,61 @@ export async function readDisplay(ctx: Context, serviceId: string, kind: Display
     const names = await displayNames(tx, serviceId);
     assertFileDeadlines(deadlines);
     return { ...displayDto(row, serviceId, kind), ...names };
+  });
+}
+/** Join display names into a bounded list ("A, B 외 3건"); reports truncation for the basis flag. */
+function nameList(names: string[], keep: number) {
+  let out = "", used = 0;
+  for (const name of names) {
+    const next = out ? out + ", " + name : name;
+    if (next.length > keep) break;
+    out = next; used++;
+  }
+  const rest = names.length - used;
+  return { text: rest ? (out ? out + ` 외 ${rest}건` : `총 ${rest}건`) : out, truncated: rest > 0 };
+}
+const clip = (value: string) => value.length > 200 ? value.slice(0, 199) + "…" : value;
+/**
+ * Deterministic consent-text proposal assembled from the service's registered
+ * processing purposes, subprocessors, recipients and the version-frozen consent
+ * item projection of its latest form versions. Returns text only — nothing is
+ * persisted until the reviewer saves through the normal display PATCH, which
+ * keeps the version check and audit trail on the actual stored fields.
+ */
+export async function generateDisplayProposal(ctx: Context, serviceId: string, kind: DisplayKind, requestId: string) {
+  return db.$transaction(async tx => {
+    const deadlines = await lockDisplayService(tx, ctx, serviceId, false);
+    const { serviceName: subject } = await displayNames(tx, serviceId);
+    const where = { tenantId: ctx.tenantId, serviceId, status: "active" };
+    const [purposes, subprocessors, recipients] = await Promise.all([
+      tx.processingPurpose.findMany({ where, select: { name: true }, orderBy: [{ name: "asc" }, { id: "asc" }] }),
+      tx.subprocessor.findMany({ where, select: { name: true }, orderBy: [{ name: "asc" }, { id: "asc" }] }),
+      kind === "third_party" ? tx.recipient.findMany({ where: { ...where, kind: { not: "source" } }, select: { name: true }, orderBy: [{ name: "asc" }, { id: "asc" }] }) : Promise.resolve([]),
+    ]);
+    const versions = await tx.formVersion.findMany({ where: { tenantId: ctx.tenantId, consentItemSchemaVersion: 1, form: { serviceId, status: { not: "deleted" } } },
+      select: { formId: true, consentItems: true }, orderBy: [{ formId: "asc" }, { number: "desc" }] });
+    const seen = new Set<string>(), itemNames = new Set<string>();
+    for (const row of versions) {
+      if (seen.has(row.formId)) continue; seen.add(row.formId);
+      for (const item of consentItemsSchema.parse(row.consentItems ?? [])) itemNames.add(item.name);
+    }
+    let truncated = false;
+    const fit = (names: { name: string }[]) => { const result = nameList(names.map(item => item.name), 120); truncated ||= result.truncated; return result.text; };
+    const third = kind === "third_party";
+    const proposals = {
+      startText: clip(third ? `${subject}은(는) 아래와 같이 개인정보를 제3자에게 제공합니다.`
+        : purposes.length ? `${subject}은(는) ${fit(purposes)} 목적으로 개인정보를 수집·이용합니다.` : `${subject}은(는) 아래와 같이 개인정보를 수집·이용합니다.`),
+      processorText: clip(third ? (recipients.length ? `제공받는 자: ${fit(recipients)}` : "")
+        : (subprocessors.length ? `${subject}은(는) ${fit(subprocessors)}에 개인정보 처리 업무를 위탁하고 있습니다.` : "")),
+      policyText: clip(third ? "제3자 제공에 대한 자세한 내용은 개인정보 처리방침에서 확인하실 수 있습니다." : "수집·이용하는 개인정보의 자세한 처리 내역은 개인정보 처리방침에서 확인하실 수 있습니다."),
+      requiredText: clip(third ? "귀하는 개인정보 제3자 제공 동의를 거부할 권리가 있습니다. 다만 동의하지 않으면 해당 서비스 이용이 제한될 수 있습니다."
+        : "귀하는 개인정보 수집·이용 동의를 거부할 권리가 있습니다. 다만 필수 항목에 동의하지 않으면 서비스 이용이 제한될 수 있습니다."),
+      optionalText: clip("선택 항목에 대한 동의는 거부하셔도 서비스 이용에 지장이 없습니다."),
+    };
+    const fields = (Object.keys(proposals) as (keyof typeof proposals)[]).filter(key => proposals[key]);
+    await audit(tx, ctx, requestId, "service.consent_display_generated", "service", serviceId, fields, serviceId, { count: fields.length });
+    assertFileDeadlines(deadlines);
+    return { basis: { purposeCount: purposes.length, itemCount: itemNames.size, subprocessorCount: subprocessors.length, recipientCount: recipients.length, truncated }, proposals };
   });
 }
 export async function updateDisplay(ctx: Context, serviceId: string, kind: DisplayKind, input: DisplayInput, requestId: string) {

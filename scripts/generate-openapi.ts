@@ -46,6 +46,7 @@ import { z } from "zod";
 import { authorAssetPurposeByteLimits, authorAssetUploadInput, authorAssetReadScopeSchema, authorAssetMimeSchema, authorAssetPurposeSchema, authorAssetNameSchema,
   MAX_BODY_IMAGE_BYTES, MAX_MATERIAL_FILE_BYTES, MAX_OPTION_IMAGE_BYTES, MAX_QUESTION_IMAGE_BYTES, MAX_OPTION_IMAGES } from "../src/contracts/author-assets";
 import { questionMaterialsSchema } from "../src/contracts/question-materials";
+import { nlpAnalyzeInput, nlpFeedbackInput } from "../src/contracts/question-nlp";
 import { AUTHOR_ASSET_VALIDATION_LIMITS } from "../src/server/author-asset-validation";
 import { companyInput, serviceInput, servicePatch, profilePatch } from "../src/server/schemas";
 import { retentionDesignationInput } from "../src/contracts/forms";
@@ -717,8 +718,11 @@ for (const path of ["/documents/{id}/versions/{number}/pdf", "/public/documents/
   operation.responses = { ...errors, "200": { description: "PDF 파일. attachment, no-store, nosniff, X-PDF-SHA256, X-Document-SHA256", content: { "application/pdf": { schema: { type: "string", format: "binary" } } } } };
   if (path.startsWith("/public/")) operation.security = [];
 }
+add("/services/{id}/question-personal-information/analyze", "post", "form.write + current service grant", "한국어 문항 로컬 규칙 개인정보 분류 제안; NLP source·feedbackId 반환. 비한국어·행렬형은 빈 제안. 외부 NLP 제공자 미연결로 로컬 결정형 엔진", nlpAnalyzeInput, "implemented");
+add("/services/{id}/question-personal-information/feedback", "post", "form.write + current service grant", "자동분석 제안 대비 수정 분류 피드백 기록; 항목명 대신 수량·유형 enum만 감사 기록", nlpFeedbackInput, "implemented");
 add("/services/{id}/consent-display/{kind}", "get", "service.manage + current service grant", "collection/third_party 표시 설정·회사/서비스 공개명 조회", undefined, "implemented");
 add("/services/{id}/consent-display/{kind}", "patch", "service.manage + current service grant", "표시 문구·HTTPS 외부 주소 또는 동일 서비스 처리방침 게시 버전 저장; 최초 version=0", displayInput, "implemented");
+add("/services/{id}/consent-display/{kind}/generate", "post", "service.manage + current service grant", "처리 목적·수탁자·제공받는 자·수집항목 투영으로 동의 문구 제안 생성. 저장하지 않고 검토 후 PATCH로만 반영; 생성 이벤트는 감사 기록", undefined, "implemented");
 add("/services/{id}/subprocessors", "get", "service.manage + current service grant", "현재 서비스의 재위탁 수신자 목록. 암호문 제외", undefined, "implemented");
 add("/services/{id}/subprocessors", "post", "service.manage + current service grant", "재위탁 수신자 등록. 같은 이메일 중복과 보관 수신자 재등록 거부", subprocessorInput, "implemented", "201");
 add("/services/{id}/subprocessors/{subId}", "get", "service.manage + current service grant", "현재 재위탁 수신자 상세와 version 조회", undefined, "implemented");

@@ -35,11 +35,18 @@ export const displayInput = z.object({ version: z.number().int().nonnegative(), 
   if ((value.policyMode === "document") !== !!value.publicationId)
     ctx.addIssue({ code: "custom", path: ["publicationId"], message: "내부 처리방침의 게시 버전을 선택해주세요." });
 });
+export const displayProposal = z.object({
+  basis: z.object({ purposeCount: z.number().int().nonnegative(), itemCount: z.number().int().nonnegative(),
+    subprocessorCount: z.number().int().nonnegative(), recipientCount: z.number().int().nonnegative(), truncated: z.boolean() }).strict(),
+  proposals: z.object({ startText: text.max(200), processorText: text.max(200), policyText: text.max(200),
+    requiredText: text.max(200), optionalText: text.max(200) }).strict(),
+}).strict();
 export type DocumentInput = z.infer<typeof documentInput>;
 export type ClauseInput = z.infer<typeof clauseInput>;
 export type DisplayInput = z.infer<typeof displayInput>;
 export type DisplayKind = "collection" | "third_party";
 export type DisplayRecord = DisplayInput & { serviceId: string; kind: DisplayKind; policyUrl: string | null; companyName: string; serviceName: string };
+export type DisplayProposal = z.infer<typeof displayProposal>;
 export const emptyDisplay = (): DisplayInput => ({ version: 0, nameMode: "service_company", startText: "", processorText: "", policyText: "", requiredText: "", optionalText: "", policyMode: "none", externalUrl: "", publicationId: null });
 export type DocumentRecord = DocumentInput & { id: string; version: number; draftRevision: number; status: keyof typeof documentStates;
   serviceName: string; createdAt: string; updatedAt: string; latestNumber: number; hasUnpublishedChanges: boolean; hasActivePublication: boolean };

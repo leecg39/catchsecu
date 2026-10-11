@@ -53,6 +53,24 @@ test("페이지 복제는 페이지·질문·보기·행 ID를 새로 만들고 
   expect(formContentSchema.safeParse(copied).success).toBe(true);
 });
 
+test("페이지 복제는 NLP 분류를 비워 재분석하게 하고 USER 분류만 보존한다", () => {
+  const content = addFormPage(enableFormPages(base(), randomUUID), randomUUID);
+  const source = content.sections![1].id;
+  const nlpItem = { nlpFeedbackId: randomUUID(), personalInformationType: "PERSONAL_INFORMATION" as const,
+    detectedPersonalInformation: "이름", personalInformationSource: "NLP" as const };
+  const userItem = { nlpFeedbackId: null, personalInformationType: "PERSONAL_INFORMATION" as const,
+    detectedPersonalInformation: "성명", personalInformationSource: "USER" as const };
+  content.questions[0] = { ...content.questions[0], pageId: source, catchFormPersonalInformationRequests: [nlpItem] };
+  content.questions[1] = { ...content.questions[1], pageId: source, catchFormPersonalInformationRequests: [userItem] };
+  const copied = duplicateFormPage(content, source, randomUUID), clonePage = copied.sections![2];
+  const clones = copied.questions.filter(question => question.pageId === clonePage.id);
+  expect(clones[0].catchFormPersonalInformationRequests).toBeUndefined();
+  expect(clones[1].catchFormPersonalInformationRequests).toEqual([userItem]);
+  expect(copied.questions.filter(question => question.pageId === source).map(question => question.catchFormPersonalInformationRequests))
+    .toEqual([[nlpItem], [userItem]]);
+  expect(formContentSchema.safeParse(copied).success).toBe(true);
+});
+
 test("빈 중간 페이지 삭제는 기본·보기 이동을 다음 목적지로 재연결하고 질문이 있으면 막는다", () => {
   const content = addFormPage(addFormPage(enableFormPages(base(), randomUUID), randomUUID), randomUUID);
   const [first, middle, last] = content.sections!;

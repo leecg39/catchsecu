@@ -2791,7 +2791,16 @@
                                 "type": "object",
                                 "properties": {
                                   "nlpFeedbackId": {
-                                    "type": "null"
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "personalInformationType": {
                                     "type": "string",
@@ -2810,7 +2819,10 @@
                                   },
                                   "personalInformationSource": {
                                     "type": "string",
-                                    "const": "USER"
+                                    "enum": [
+                                      "USER",
+                                      "NLP"
+                                    ]
                                   }
                                 },
                                 "required": [
@@ -2821,7 +2833,7 @@
                                 ],
                                 "additionalProperties": false
                               },
-                              "description": "Ordered manual USER classifications; duplicates and NONE mixed with other types are preserved. NLP and feedback IDs are unsupported."
+                              "description": "Ordered USER/NLP classifications; duplicates and NONE mixed with other types are preserved. NLP items require a feedback identifier."
                             },
                             "infoPatternId": {
                               "anyOf": [
@@ -3929,7 +3941,16 @@
                                 "type": "object",
                                 "properties": {
                                   "nlpFeedbackId": {
-                                    "type": "null"
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "personalInformationType": {
                                     "type": "string",
@@ -3948,7 +3969,10 @@
                                   },
                                   "personalInformationSource": {
                                     "type": "string",
-                                    "const": "USER"
+                                    "enum": [
+                                      "USER",
+                                      "NLP"
+                                    ]
                                   }
                                 },
                                 "required": [
@@ -3959,7 +3983,7 @@
                                 ],
                                 "additionalProperties": false
                               },
-                              "description": "Ordered manual USER classifications; duplicates and NONE mixed with other types are preserved. NLP and feedback IDs are unsupported."
+                              "description": "Ordered USER/NLP classifications; duplicates and NONE mixed with other types are preserved. NLP items require a feedback identifier."
                             },
                             "infoPatternId": {
                               "anyOf": [
@@ -33542,7 +33566,16 @@
                                 "type": "object",
                                 "properties": {
                                   "nlpFeedbackId": {
-                                    "type": "null"
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "personalInformationType": {
                                     "type": "string",
@@ -33561,7 +33594,10 @@
                                   },
                                   "personalInformationSource": {
                                     "type": "string",
-                                    "const": "USER"
+                                    "enum": [
+                                      "USER",
+                                      "NLP"
+                                    ]
                                   }
                                 },
                                 "required": [
@@ -33572,7 +33608,7 @@
                                 ],
                                 "additionalProperties": false
                               },
-                              "description": "Ordered manual USER classifications; duplicates and NONE mixed with other types are preserved. NLP and feedback IDs are unsupported."
+                              "description": "Ordered USER/NLP classifications; duplicates and NONE mixed with other types are preserved. NLP items require a feedback identifier."
                             },
                             "infoPatternId": {
                               "anyOf": [
@@ -41494,7 +41530,16 @@
                                 "type": "object",
                                 "properties": {
                                   "nlpFeedbackId": {
-                                    "type": "null"
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "personalInformationType": {
                                     "type": "string",
@@ -41513,7 +41558,10 @@
                                   },
                                   "personalInformationSource": {
                                     "type": "string",
-                                    "const": "USER"
+                                    "enum": [
+                                      "USER",
+                                      "NLP"
+                                    ]
                                   }
                                 },
                                 "required": [
@@ -41524,7 +41572,7 @@
                                 ],
                                 "additionalProperties": false
                               },
-                              "description": "Ordered manual USER classifications; duplicates and NONE mixed with other types are preserved. NLP and feedback IDs are unsupported."
+                              "description": "Ordered USER/NLP classifications; duplicates and NONE mixed with other types are preserved. NLP items require a feedback identifier."
                             },
                             "infoPatternId": {
                               "anyOf": [
@@ -42649,7 +42697,16 @@
                                 "type": "object",
                                 "properties": {
                                   "nlpFeedbackId": {
-                                    "type": "null"
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "personalInformationType": {
                                     "type": "string",
@@ -42668,7 +42725,10 @@
                                   },
                                   "personalInformationSource": {
                                     "type": "string",
-                                    "const": "USER"
+                                    "enum": [
+                                      "USER",
+                                      "NLP"
+                                    ]
                                   }
                                 },
                                 "required": [
@@ -42679,7 +42739,7 @@
                                 ],
                                 "additionalProperties": false
                               },
-                              "description": "Ordered manual USER classifications; duplicates and NONE mixed with other types are preserved. NLP and feedback IDs are unsupported."
+                              "description": "Ordered USER/NLP classifications; duplicates and NONE mixed with other types are preserved. NLP items require a feedback identifier."
                             },
                             "infoPatternId": {
                               "anyOf": [
@@ -49206,6 +49266,510 @@
         "x-contract-policy": "public-documents"
       }
     },
+    "/services/{id}/question-personal-information/analyze": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "summary": "한국어 문항 로컬 규칙 개인정보 분류 제안; NLP source·feedbackId 반환. 비한국어·행렬형은 빈 제안. 외부 NLP 제공자 미연결로 로컬 결정형 엔진",
+        "x-permission": "form.write + current service grant",
+        "x-implementation": "implemented",
+        "responses": {
+          "200": {
+            "description": "한국어 문항 로컬 규칙 개인정보 분류 제안; NLP source·feedbackId 반환. 비한국어·행렬형은 빈 제안. 외부 NLP 제공자 미연결로 로컬 결정형 엔진"
+          },
+          "400": {
+            "description": "요청 형식 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "로그인 필요",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 또는 Origin 거부",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "현재 회사 범위에 없는 항목",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "버전·중복·상태 전이 충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "회수·만료된 항목",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "요청·파일 크기 초과",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "지원하지 않는 전송 형식",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "필드 검증 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "요청 제한",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 미설정 또는 일시 장애",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "formLanguage": {
+                    "type": "string",
+                    "enum": [
+                      "ko",
+                      "en",
+                      "ja",
+                      "zh-CN",
+                      "zh-TW",
+                      "de",
+                      "fr",
+                      "ru",
+                      "es",
+                      "pt",
+                      "id",
+                      "th",
+                      "vi",
+                      "tr",
+                      "it",
+                      "ar"
+                    ]
+                  },
+                  "questionType": {
+                    "type": "string",
+                    "enum": [
+                      "단문형 답변",
+                      "장문형 답변",
+                      "객관식 답변",
+                      "체크박스",
+                      "드롭다운",
+                      "날짜",
+                      "파일 업로드",
+                      "행렬형 단일 선택",
+                      "행렬형 복수 선택",
+                      "연락처",
+                      "이메일",
+                      "이메일 직접 입력",
+                      "생년월일",
+                      "주소",
+                      "해외 주소",
+                      "직접 그리기"
+                    ]
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 3000
+                  },
+                  "optionLabels": {
+                    "maxItems": 100,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    }
+                  }
+                },
+                "required": [
+                  "formLanguage",
+                  "questionType",
+                  "label"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-origin-check": "exact configured application Origin",
+        "x-contract-policy": "services"
+      }
+    },
+    "/services/{id}/question-personal-information/feedback": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "summary": "자동분석 제안 대비 수정 분류 피드백 기록; 항목명 대신 수량·유형 enum만 감사 기록",
+        "x-permission": "form.write + current service grant",
+        "x-implementation": "implemented",
+        "responses": {
+          "200": {
+            "description": "자동분석 제안 대비 수정 분류 피드백 기록; 항목명 대신 수량·유형 enum만 감사 기록"
+          },
+          "400": {
+            "description": "요청 형식 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "로그인 필요",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 또는 Origin 거부",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "현재 회사 범위에 없는 항목",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "버전·중복·상태 전이 충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "회수·만료된 항목",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "요청·파일 크기 초과",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "지원하지 않는 전송 형식",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "필드 검증 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "요청 제한",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 미설정 또는 일시 장애",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "formLanguage": {
+                    "type": "string",
+                    "enum": [
+                      "ko",
+                      "en",
+                      "ja",
+                      "zh-CN",
+                      "zh-TW",
+                      "de",
+                      "fr",
+                      "ru",
+                      "es",
+                      "pt",
+                      "id",
+                      "th",
+                      "vi",
+                      "tr",
+                      "it",
+                      "ar"
+                    ]
+                  },
+                  "questionType": {
+                    "type": "string",
+                    "enum": [
+                      "단문형 답변",
+                      "장문형 답변",
+                      "객관식 답변",
+                      "체크박스",
+                      "드롭다운",
+                      "날짜",
+                      "파일 업로드",
+                      "행렬형 단일 선택",
+                      "행렬형 복수 선택",
+                      "연락처",
+                      "이메일",
+                      "이메일 직접 입력",
+                      "생년월일",
+                      "주소",
+                      "해외 주소",
+                      "직접 그리기"
+                    ]
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 3000
+                  },
+                  "proposed": {
+                    "minItems": 1,
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "nlpFeedbackId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "personalInformationType": {
+                          "type": "string",
+                          "enum": [
+                            "PERSONAL_INFORMATION",
+                            "SENSITIVE",
+                            "IDENTIFICATION",
+                            "RESIDENT",
+                            "NON_PERSONAL_INFORMATION"
+                          ]
+                        },
+                        "detectedPersonalInformation": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 50
+                        },
+                        "personalInformationSource": {
+                          "type": "string",
+                          "const": "NLP"
+                        }
+                      },
+                      "required": [
+                        "nlpFeedbackId",
+                        "personalInformationType",
+                        "detectedPersonalInformation",
+                        "personalInformationSource"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "corrected": {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "nlpFeedbackId": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "personalInformationType": {
+                          "type": "string",
+                          "enum": [
+                            "PERSONAL_INFORMATION",
+                            "SENSITIVE",
+                            "IDENTIFICATION",
+                            "RESIDENT",
+                            "NON_PERSONAL_INFORMATION"
+                          ]
+                        },
+                        "detectedPersonalInformation": {
+                          "type": "string",
+                          "description": "Literal manual classification name; whitespace is preserved. NONE requires exactly empty text and other types require nonempty text after JavaScript trim.",
+                          "x-max-utf16-length": 50
+                        },
+                        "personalInformationSource": {
+                          "type": "string",
+                          "enum": [
+                            "USER",
+                            "NLP"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "nlpFeedbackId",
+                        "personalInformationType",
+                        "detectedPersonalInformation",
+                        "personalInformationSource"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "formLanguage",
+                  "questionType",
+                  "label",
+                  "proposed",
+                  "corrected"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-origin-check": "exact configured application Origin",
+        "x-contract-policy": "services"
+      }
+    },
     "/services/{id}/consent-display/{kind}": {
       "parameters": [
         {
@@ -49546,6 +50110,149 @@
                   "publicationId"
                 ],
                 "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-origin-check": "exact configured application Origin",
+        "x-contract-policy": "services"
+      }
+    },
+    "/services/{id}/consent-display/{kind}/generate": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "path",
+          "name": "kind",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "summary": "처리 목적·수탁자·제공받는 자·수집항목 투영으로 동의 문구 제안 생성. 저장하지 않고 검토 후 PATCH로만 반영; 생성 이벤트는 감사 기록",
+        "x-permission": "service.manage + current service grant",
+        "x-implementation": "implemented",
+        "responses": {
+          "200": {
+            "description": "처리 목적·수탁자·제공받는 자·수집항목 투영으로 동의 문구 제안 생성. 저장하지 않고 검토 후 PATCH로만 반영; 생성 이벤트는 감사 기록"
+          },
+          "400": {
+            "description": "요청 형식 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "로그인 필요",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 또는 Origin 거부",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "현재 회사 범위에 없는 항목",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "버전·중복·상태 전이 충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "회수·만료된 항목",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "요청·파일 크기 초과",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "지원하지 않는 전송 형식",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "필드 검증 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "요청 제한",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 미설정 또는 일시 장애",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
               }
             }
           }
@@ -86693,7 +87400,16 @@
                         "type": "object",
                         "properties": {
                           "nlpFeedbackId": {
-                            "type": "null"
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "personalInformationType": {
                             "type": "string",
@@ -86712,7 +87428,10 @@
                           },
                           "personalInformationSource": {
                             "type": "string",
-                            "const": "USER"
+                            "enum": [
+                              "USER",
+                              "NLP"
+                            ]
                           }
                         },
                         "required": [
@@ -86723,7 +87442,7 @@
                         ],
                         "additionalProperties": false
                       },
-                      "description": "Ordered manual USER classifications; duplicates and NONE mixed with other types are preserved. NLP and feedback IDs are unsupported."
+                      "description": "Ordered USER/NLP classifications; duplicates and NONE mixed with other types are preserved. NLP items require a feedback identifier."
                     },
                     "infoPatternId": {
                       "anyOf": [
@@ -89036,7 +89755,16 @@
                             "type": "object",
                             "properties": {
                               "nlpFeedbackId": {
-                                "type": "null"
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
                               },
                               "personalInformationType": {
                                 "type": "string",
@@ -89055,7 +89783,10 @@
                               },
                               "personalInformationSource": {
                                 "type": "string",
-                                "const": "USER"
+                                "enum": [
+                                  "USER",
+                                  "NLP"
+                                ]
                               }
                             },
                             "required": [
@@ -89066,7 +89797,7 @@
                             ],
                             "additionalProperties": false
                           },
-                          "description": "Ordered manual USER classifications; duplicates and NONE mixed with other types are preserved. NLP and feedback IDs are unsupported."
+                          "description": "Ordered USER/NLP classifications; duplicates and NONE mixed with other types are preserved. NLP items require a feedback identifier."
                         },
                         "infoPatternId": {
                           "anyOf": [
@@ -90322,7 +91053,16 @@
                         "type": "object",
                         "properties": {
                           "nlpFeedbackId": {
-                            "type": "null"
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "personalInformationType": {
                             "type": "string",
@@ -90341,7 +91081,10 @@
                           },
                           "personalInformationSource": {
                             "type": "string",
-                            "const": "USER"
+                            "enum": [
+                              "USER",
+                              "NLP"
+                            ]
                           }
                         },
                         "required": [
@@ -90352,7 +91095,7 @@
                         ],
                         "additionalProperties": false
                       },
-                      "description": "Ordered manual USER classifications; duplicates and NONE mixed with other types are preserved. NLP and feedback IDs are unsupported."
+                      "description": "Ordered USER/NLP classifications; duplicates and NONE mixed with other types are preserved. NLP items require a feedback identifier."
                     },
                     "infoPatternId": {
                       "anyOf": [

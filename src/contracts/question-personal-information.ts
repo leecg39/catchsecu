@@ -9,18 +9,21 @@ const nameSchema = z.string()
   .refine(value => !value.includes("\u0000") && new TextDecoder("utf-8", { ignoreBOM: true }).decode(new TextEncoder().encode(value)) === value, "개인정보 항목 이름의 문자 인코딩을 확인해주세요.")
   .meta({ description: "Literal manual classification name; whitespace is preserved. NONE requires exactly empty text and other types require nonempty text after JavaScript trim.", "x-max-utf16-length": MAX_PERSONAL_INFORMATION_NAME_LENGTH });
 export const questionPersonalInformationItemSchema = z.object({
-  nlpFeedbackId: z.null(),
+  nlpFeedbackId: z.union([z.uuid(), z.null()]),
   personalInformationType: z.enum(personalInformationTypes),
   detectedPersonalInformation: nameSchema,
-  personalInformationSource: z.literal("USER"),
+  personalInformationSource: z.enum(["USER", "NLP"]),
 }).strict().superRefine((value, ctx) => {
   if (value.personalInformationType === "NON_PERSONAL_INFORMATION" ? value.detectedPersonalInformation !== "" : !value.detectedPersonalInformation.trim())
     ctx.addIssue({ code: "custom", path: ["detectedPersonalInformation"], message: value.personalInformationType === "NON_PERSONAL_INFORMATION"
       ? "개인정보가 아닌 항목의 이름은 빈 문자열이어야 합니다." : "개인정보 항목 이름을 입력해주세요." });
+  if (value.personalInformationSource === "NLP" ? value.nlpFeedbackId === null : value.nlpFeedbackId !== null)
+    ctx.addIssue({ code: "custom", path: ["nlpFeedbackId"], message: value.personalInformationSource === "NLP"
+      ? "자동 분석 항목에는 분석 식별자가 필요합니다." : "직접 입력 항목에는 분석 식별자를 저장할 수 없습니다." });
 });
 export type QuestionPersonalInformation = z.infer<typeof questionPersonalInformationItemSchema>;
 export const questionPersonalInformationSchema = z.array(questionPersonalInformationItemSchema).max(MAX_QUESTION_PERSONAL_INFORMATION)
-  .meta({ description: "Ordered manual USER classifications; duplicates and NONE mixed with other types are preserved. NLP and feedback IDs are unsupported." });
+  .meta({ description: "Ordered USER/NLP classifications; duplicates and NONE mixed with other types are preserved. NLP items require a feedback identifier." });
 export function hasResidentPersonalInformation(items?: readonly QuestionPersonalInformation[] | null): boolean {
   return !!items?.some(item => item.personalInformationType === "RESIDENT");
 }

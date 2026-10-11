@@ -2,7 +2,7 @@
 
 ## 상태
 
-`awaiting_delete_confirmation` — 대표 이미지 추가·교체·제거와 409 입력 폐기 확정은 통과했다. Ego Lite에서 합성 QA 템플릿 삭제 대화상자까지 확인했으며, 브라우저 UI 삭제 최종 클릭은 사용자 확인을 기다린다.
+`completed` — 대표 이미지 추가·교체·제거, 409 입력 폐기 확정, 삭제 확정까지 모두 통과했다. 2026-10-11 후속 실행에서 실제 브라우저(chrome-devtools, production 서버 3121)로 삭제 확정을 완료했다: `서비스 템플릿` 탭 → `삭제` → `템플릿 삭제` 대화상자(“이미 생성한 캐치폼은 유지됩니다”) → `템플릿 삭제 확인` 클릭 → 목록에서 즉시 제거(3→2행) → PostgreSQL 레코드 0개·`template.deleted` 감사 1건([09-db-after-delete.json](09-db-after-delete.json)). 실제 외부 결제 라이선스만 `external_pending`으로 남는다.
 
 ## 대상
 
@@ -48,9 +48,8 @@
 - `06-db-after-remove.json`: 대표 이미지 제거 후 DB
 - `07-delete-confirm-ready.png`: Ego Lite 삭제 확정 직전
 - `08-db-before-delete.json`: 삭제 직전 템플릿·자산 참조·감사 이벤트
+- `09-db-after-delete.json`: 실제 브라우저 삭제 확정 후 레코드 0개·`template.deleted` 1건·남은 템플릿 2개
 
 ## 남은 게이트
 
-- Ego Lite에서 합성 QA 템플릿 삭제를 확정한다.
-- 목록 제거, PostgreSQL 레코드 0개, `template.deleted` 감사 이벤트를 확인한다.
 - 실제 외부 결제 라이선스는 외부 자격증명 의존으로 `external_pending`을 유지한다.

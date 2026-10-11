@@ -313,7 +313,9 @@ function Editor({ initial, initialTemplate, templateMode, path, services }: { in
             <button type="button" aria-label={`Q${index + 1} 삭제`} disabled={content.questions.some(item => item.condition?.questionId === question.id)} onClick={() => update({ questions: content.questions.filter(item => item.id !== question.id) })}>삭제</button></div>
           <h2>Q{index + 1}</h2><textarea className="cs-input" aria-label={`Q${index + 1} 질문`} value={question.label} maxLength={3000} onChange={event => changeQuestion(question.id, { label: event.target.value })} />
           <QuestionImageEditor question={question} index={index} disabled={!!disabled || busy} context={assetContext} onChange={questionImageKey => changeQuestion(question.id, { questionImageKey })} />
-          <QuestionPersonalInformationEditor question={question} index={index} disabled={!!disabled || busy} onChange={(items, required) => changeQuestion(question.id, { catchFormPersonalInformationRequests: items, required })} />
+          <QuestionPersonalInformationEditor question={question} index={index} disabled={!!disabled || busy} formLanguage={content.formLanguage ?? "ko"}
+            conditionLinked={content.questions.some(item => item.condition?.questionId === question.id)}
+            onChange={(items, required, patch) => changeQuestion(question.id, { catchFormPersonalInformationRequests: items, required, ...patch })} />
           {hasResidentPersonalInformation(question.catchFormPersonalInformationRequests) && <p className="cs-muted">주민등록번호 분류가 있는 문항은 필수항목을 해제할 수 없습니다.</p>}
           {question.catchFormPersonalInformationRequests?.some(item => item.personalInformationType !== "NON_PERSONAL_INFORMATION") && <p className="cs-muted">행렬형으로 변경하려면 개인정보 분류를 먼저 제거하거나 개인정보 없음으로 수정해주세요.</p>}
           <QuestionMaterialsEditor question={question} index={index} disabled={!!disabled || busy} context={assetContext} onChange={materialList => changeQuestion(question.id, { materialList })} />

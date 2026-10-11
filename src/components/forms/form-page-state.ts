@@ -41,6 +41,10 @@ function cloneQuestion(question: Question, pageId: string, questionIds: Readonly
   optionIds: ReadonlyMap<string, string>, makeId: IdFactory): Question {
   const next = structuredClone(question);
   next.id = questionIds.get(question.id)!; next.pageId = pageId;
+  // NLP-제안 분류는 feedback id가 원본 제안과 엮여 있으므로 복제본에서는 분류를 비워
+  // 자동 재분석을 다시 받게 한다. 수동(USER) 분류만 있는 문항은 그대로 보존한다.
+  if (next.catchFormPersonalInformationRequests?.some(item => item.personalInformationSource === "NLP"))
+    delete next.catchFormPersonalInformationRequests;
   if (next.rows) next.rows = next.rows.map(row => ({ ...row, id: makeId() }));
   if (next.optionDefinitions) next.optionDefinitions = next.optionDefinitions.map(option => ({ ...option, id: optionIds.get(option.id)! }));
   if (next.condition && questionIds.has(next.condition.questionId)) {
