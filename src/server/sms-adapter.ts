@@ -27,6 +27,16 @@ export async function smsReceiptFile(jobId: string) {
 const solapiSendResponse = z.object({
   groupId: z.string().min(1).optional(), messageId: z.string().optional(), statusCode: z.string().optional(), statusMessage: z.string().optional(),
   errorCode: z.string().optional(), errorMessage: z.string().optional() }).passthrough();
+/** Solapi HMAC 서명 헤더 — SMS/알림톡 어댑터가 공유한다. 자격증명 부재 시 호출 전에 차단한다. */
+export function solapiRequest(path: string, body?: unknown): { url: string; init: RequestInit } {
+  if (!env.SOLAPI_API_KEY || !env.SOLAPI_API_SECRET) fail(503, "SMS_PROVIDER_REQUIRED", "문자 전송·요금 공급자를 연결한 뒤 발송할 수 있습니다.");
+  const date = new Date().toISOString(), salt = randomBytes(16).toString("hex");
+  const signature = createHmac("sha256", env.SOLAPI_API_SECRET).update(date + salt).digest("hex");
+  return { url: env.SOLAPI_API_BASE.replace(/\/$/, "") + path,
+    init: { method: body === undefined ? "GET" : "POST", headers: { Authorization: `HMAC-SHA256 apiKey=${env.SOLAPI_API_KEY}, date=${date}, salt=${salt}, signature=${signature}`, "content-type": "application/json" },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }), signal: AbortSignal.timeout(15000), redirect: "error", cache: "no-store" } };
+}
+export const solapiResponse = solapiSendResponse;
 export async function deliverSms(input: { transport: "unconfigured" | "local" | "solapi"; jobId: string; to: string; from: string; text: string }) {
   const kind = classifySms(input.text);
   if (input.transport === "local") {
@@ -36,14 +46,10 @@ export async function deliverSms(input: { transport: "unconfigured" | "local" | 
     return { status: "local_delivered" as const, receiptId: "local:" + input.jobId, kind };
   }
   if (input.transport !== "solapi" || !env.SOLAPI_API_KEY || !env.SOLAPI_API_SECRET) fail(503, "SMS_PROVIDER_REQUIRED", "문자 전송·요금 공급자를 연결한 뒤 발송할 수 있습니다.");
-  const date = new Date().toISOString(), salt = randomBytes(16).toString("hex");
-  const signature = createHmac("sha256", env.SOLAPI_API_SECRET).update(date + salt).digest("hex");
+  const request = solapiRequest("/messages/v4/send", { message: { to: input.to, from: input.from, text: input.text, type: kind === "sms" ? "SMS" : "LMS" } });
   let response: Response;
   try {
-    response = await fetch("https://api.solapi.com/messages/v4/send", { method: "POST",
-      headers: { Authorization: `HMAC-SHA256 apiKey=${env.SOLAPI_API_KEY}, date=${date}, salt=${salt}, signature=${signature}`, "content-type": "application/json" },
-      body: JSON.stringify({ message: { to: input.to, from: input.from, text: input.text, type: kind === "sms" ? "SMS" : "LMS" } }),
-      signal: AbortSignal.timeout(15000), redirect: "error", cache: "no-store" });
+    response = await fetch(request.url, request.init);
   } catch { fail(503, "SMS_PROVIDER_UNAVAILABLE", "문자 공급자에 연결할 수 없습니다."); }
   let parsed: z.infer<typeof solapiSendResponse>;
   try { parsed = solapiSendResponse.parse(await response.json()); }

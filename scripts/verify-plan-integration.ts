@@ -95,7 +95,7 @@ check(objectives.includes("경로 매핑: 원본 선언 186/186 + 부가 경로 
 const methods = new Set(["get", "post", "put", "patch", "delete", "head", "options"]);
 const operationCount = Object.values(openapi.paths).reduce((count, value) => count + Object.keys(value).filter(method => methods.has(method)).length, 0);
 const policyRows = policyCsv.trimEnd().split(/\r?\n/).length - 1;
-check(operationCount === 477, `OpenAPI operation count ${operationCount} != 477`);
+check(operationCount === 478, `OpenAPI operation count ${operationCount} != 478`);
 check(policyRows === operationCount, `policy rows ${policyRows} != OpenAPI operations ${operationCount}`);
 
 const report = {

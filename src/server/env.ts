@@ -20,10 +20,11 @@ const schema = z.object({
   MESSAGE_UNIT_COST_KRW: z.coerce.number().int().min(0).max(1000000).default(0),
   LOCAL_SMS_DIR: z.string().default(".local/sms"),
   SMS_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),
-  KAKAO_PROVIDER: z.enum(["unconfigured", "local"]).default("unconfigured"),
+  KAKAO_PROVIDER: z.enum(["unconfigured", "local", "solapi"]).default("unconfigured"),
   KAKAO_UNIT_COST_KRW: z.coerce.number().int().min(0).max(1000000).default(0),
   LOCAL_KAKAO_DIR: z.string().default(".local/kakao"),
   KAKAO_REVIEW_SECRET: z.string().min(32).max(128).optional(),
+  KAKAO_WEBHOOK_SECRET: z.string().min(32).max(128).optional(),
   // 가상 PG(local)는 서버가 내부 서명 이벤트를 발행하는 mock — 실제 서명 검증
   // 경로(applyPaymentEvent)를 그대로 탄다. 운영에서는 ALLOW_LOCAL_PAYMENT=1 없이 차단.
   PAYMENT_PROVIDER: z.enum(["unconfigured", "local", "webhook"]).default("unconfigured"),
@@ -42,6 +43,8 @@ const schema = z.object({
   SOLAPI_TENANT_ID: z.uuid().optional(),
   SOLAPI_API_KEY: z.string().regex(/^[A-Za-z0-9_-]+$/).optional(),
   SOLAPI_API_SECRET: z.string().min(16).optional(),
+  // 기본값은 공식 엔드포인트다 — 테스트/스테이징 프록시만 이 값을 바꾼다.
+  SOLAPI_API_BASE: z.url().default("https://api.solapi.com"),
   FILE_STORAGE: z.enum(["local", "s3"]).default("local"),
   S3_ENDPOINT: z.url().optional(),
   S3_REGION: z.string().min(1).max(32).default("us-east-1"),

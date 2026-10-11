@@ -47,7 +47,7 @@ import { POST as destructionAction } from "@/app/api/v1/destruction-requests/[..
 import { runOneDestruction } from "@/server/destruction-worker";
 import { certificateDigest } from "@/server/destruction";
 import { localSenderDns } from "../helpers/sender-dns";
-import { POST as kakaoPost, PATCH as kakaoPatch } from "@/app/api/v1/kakao/[...segments]/route";
+import { GET as kakaoGet, POST as kakaoPost, PATCH as kakaoPatch } from "@/app/api/v1/kakao/[...segments]/route";
 import { senderAddressHash } from "@/server/senders";
 import { postTrustedLedgerTransfer } from "@/server/ledger";
 import * as ledgerModule from "@/server/ledger";
@@ -444,6 +444,50 @@ describe("persistent campaign CRUD, privacy and delivery", () => {
     expect(blockedPreview.transportReady).toBe(false);
     expect((await POST(req("/campaigns/" + blocked.id + "/schedule", "POST", "owner", { version: blockedReady.version, at: null }, { "idempotency-key": randomUUID() }))).status).toBe(503);
     expect(await db.job.count({ where: { campaignDelivery: { campaignId: blocked.id } } })).toBe(0);
+  });
+  test("kakao solapi campaigns verify channel, register template, accept and capture via signed receipts", async () => {
+    env.KAKAO_PROVIDER = "solapi"; env.KAKAO_UNIT_COST_KRW = 25;
+    const savedSolapi = [env.SOLAPI_TENANT_ID, env.SOLAPI_API_KEY, env.SOLAPI_API_SECRET];
+    env.SOLAPI_TENANT_ID = tenant; env.SOLAPI_API_KEY = "test-kakao-key"; env.SOLAPI_API_SECRET = "test-kakao-secret";
+    const calls: { url: string; init: RequestInit }[] = [], originalFetch = globalThis.fetch;
+    try {
+      await postTrustedLedgerTransfer({ tenantId: tenant, currency: "KRW", kind: "funding", amount: BigInt(1000), sourceKind: "pg_capture", sourceId: randomUUID() });
+      const searchId = "@qa" + randomUUID().slice(0, 8);
+      const channel = await ok<{ id: string }>(await kakaoPost(req("/kakao/channels", "POST", "owner", { serviceId: service, name: "QA 채널", searchId }, { "idempotency-key": randomUUID() })), 201);
+      // 채널 목록에 searchId가 있어야 pfId로 고정된다 — 공급자 응답에 없는 채널은 인증할 수 없다.
+      globalThis.fetch = async (url, init) => {
+        calls.push({ url: String(url), init: init as RequestInit });
+        const path = String(url);
+        if (path.includes("/kakao/v2/channels")) return new Response(JSON.stringify({ channelList: [{ pfId: "pf-qa", channelId: searchId }] }), { status: 200 });
+        if (path.match(/\/kakao\/v2\/templates\//)) return new Response(JSON.stringify({ status: "A" }), { status: 200 });
+        if (path.endsWith("/kakao/v2/templates")) return new Response(JSON.stringify({ templateId: "pt-qa-1" }), { status: 200 });
+        if (path.endsWith("/messages/v4/send")) return new Response(JSON.stringify({ groupId: "kg-qa", messageId: "km-qa", statusCode: "2000" }), { status: 200 });
+        return new Response("{}", { status: 404 });
+      };
+      await ok(await kakaoPost(req("/kakao/channels/" + channel.id + "/verify", "POST", "owner", {})));
+      expect(await db.kakaoChannel.findUniqueOrThrow({ where: { id: channel.id } })).toMatchObject({ status: "verified", providerKey: "pf-qa" });
+      const created = await ok<{ id: string; version: number }>(await kakaoPost(req("/kakao/templates", "POST", "owner", { serviceId: service, channelId: channel.id, name: "QA 알림", body: "#{name}님 #{contact} 안내", buttons: [] }, { "idempotency-key": randomUUID() })), 201);
+      const submitted = await ok<{ id: string; version: number; status: string }>(await kakaoPost(req("/kakao/templates/" + created.id + "/submit", "POST", "owner", { version: created.version })));
+      expect(submitted.status).toBe("submitted");
+      expect(await db.kakaoTemplate.findUniqueOrThrow({ where: { id: created.id } })).toMatchObject({ status: "submitted", providerTemplateId: "pt-qa-1" });
+      // 공급자 승인 폴링이 심사 상태를 전이한다.
+      const review = await ok<{ status: string; providerMatched: boolean }>(await kakaoGet(req("/kakao/templates/" + created.id + "/review")));
+      expect(review).toMatchObject({ status: "approved", providerMatched: true });
+      const draft = await ok<{ id: string }>(await POST(req("/campaigns", "POST", "owner", { serviceId: service, channel: "kakao", source: "direct", title: "QA 알림톡 " + randomUUID(), kakaoTemplateId: created.id, content }, { "idempotency-key": randomUUID() })), 201);
+      const target = await recipient("QA 수신자", "kakao");
+      const campaign = await schedule(await targets(await read(draft.id), [target.contact]));
+      const job = await jobFor(campaign.id);
+      expect(decrypt(job.payloadCipher)).toMatchObject({ transport: "kakao-solapi", unitCost: 25 });
+      expect((await drain(job.id)).status).toBe("done");
+      const delivery = (await deliveries(campaign.id)).items[0];
+      expect(delivery).toMatchObject({ status: "accepted" });
+      const sendCall = calls.find(c => c.url.endsWith("/messages/v4/send"))!;
+      expect(JSON.parse(sendCall.init.body as string).message).toMatchObject({ to: target.contact.startsWith("+82") ? target.contact : "+82" + target.contact.slice(1), kakaoOptions: { pfId: "pf-qa", templateId: "pt-qa-1", disableSms: true } });
+      const receiptRow = await db.kakaoReceipt.findUniqueOrThrow({ where: { deliveryId_attempt: { deliveryId: delivery.id, attempt: 1 } } });
+      expect(receiptRow).toMatchObject({ receiptId: "solapi-kakao:kg-qa:km-qa", status: "provider_accepted" });
+      const ledger = await db.ledgerTransaction.findMany({ where: { tenantId: tenant, sourceId: delivery.id }, orderBy: { createdAt: "asc" } });
+      expect(ledger.map(r => [r.kind, Number(r.amount)])).toEqual([["reserve", 25], ["capture", 25]]);
+    } finally { [env.SOLAPI_TENANT_ID, env.SOLAPI_API_KEY, env.SOLAPI_API_SECRET] = savedSolapi; globalThis.fetch = originalFetch; }
   });
   test("kakao failure falls back to a consented SMS sender once, billed at the SMS rate", async () => {
     env.KAKAO_PROVIDER = "local"; env.LOCAL_KAKAO_DIR = ".local/catchsecu_test/kakao-fb-" + randomUUID();

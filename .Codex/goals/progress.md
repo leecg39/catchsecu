@@ -646,3 +646,5 @@ F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질�
 ## 2026-10-11 R09 모델·승인 목록 체크포인트
 
 R09-T01 모델 대조를 시작해 SecurityPolicy·Form·ApprovalRequest·Publication·FixedUrl 5모델의 73열·33제약·20인덱스·8트리거와 dev/test 149 migration 일치를 확인했다. 관련8파일·14suite·96시험을 통과했다. R09-T03에서는 독립 승인 목록과 폼 내부 승인 내역의 검색·상태·페이지·페이지 크기를 URL에 연결하고 새로고침·뒤로가기를 보완했다. 실제 API로 승인12건과 게시3건을 만들고 Ego Lite의 검색/필터/이력/3폭 및 production 재시작을 확인했으며 폼12·승인12·게시3·감사36 지문이 일치했다. 공식 상태는 완료27·진행29·계획51이고 R09-T01/T03은 전체 승인·게시 수용이 남아 진행 중이다. 증거: `docs/qa/R09-T01/current/README.md`, `docs/qa/R09-T03/current/README.md`.
+
+2026-10-29 R26-T01 진행: 유일한 코드 갭이던 카카오 실제 어댑터를 Solapi 기준으로 구현했다. KakaoChannel.providerKey·KakaoTemplate.providerTemplateId·KakaoReceipt 회차별 멱등 영수증(146번째 모델)과 migration152를 추가하고, solapiRequest 공유 HMAC 헬퍼로 채널pfId 해결·템플릿 심사등록·승인폴링·kakaoOptions발송·x-kakao-signature 영수증 webhook을 연결했다. 워커는 kakao-solapi 트랜스포트로 sms-solapi와 동일한 예약→재검증→영수증행→capture/unknown 의미론을 탄다. 어댑터2·e2e1 신규 시험 포함 kakao/sms/campaigns 106+2+82 통과, migrate deploy dev/test·schema↔DB drift0·plan verifier passed(완료107·진행1). 외부 제공사 receipt는 미확보라 external_status=external_pending·goal active를 유지한다. 증거: docs/qa/R26-T01/README.md.

@@ -2515,13 +2515,14 @@ model MarketingEvent {
 }
 
 model KakaoChannel {
-  id        String          @id @default(uuid())
-  tenantId  String
-  serviceId String
-  service   Service         @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: "KakaoChannel_service_fkey")
-  name      String
-  searchId  String
-  status    String          @default("pending")
+  id          String          @id @default(uuid())
+  tenantId    String
+  serviceId   String
+  service     Service         @relation(fields: [tenantId, serviceId], references: [tenantId, id], map: "KakaoChannel_service_fkey")
+  name        String
+  searchId    String
+  providerKey String?
+  status      String          @default("pending")
   version   Int             @default(1)
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
@@ -2539,15 +2540,16 @@ model KakaoTemplate {
   channelId    String
   channel      KakaoChannel       @relation(fields: [tenantId, channelId], references: [tenantId, id], map: "KakaoTemplate_channel_fkey")
   campaigns    Campaign[]
-  mockReceipts KakaoMockReceipt[]
-  name         String
-  body         String
-  buttons      Json
-  status       String             @default("draft")
-  reviewNote   String             @default("")
-  version      Int                @default(1)
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  mockReceipts       KakaoMockReceipt[]
+  name               String
+  body               String
+  buttons            Json
+  providerTemplateId String?
+  status             String             @default("draft")
+  reviewNote         String             @default("")
+  version            Int                @default(1)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   @@unique([tenantId, serviceId, name])
   @@unique([tenantId, id])
@@ -2572,6 +2574,20 @@ model KakaoMockReceipt {
 }
 
 model SmsReceipt {
+  id         String           @id @default(uuid())
+  tenantId   String
+  deliveryId String
+  delivery   CampaignDelivery @relation(fields: [tenantId, deliveryId], references: [tenantId, id], onDelete: Restrict)
+  attempt    Int              @default(1)
+  receiptId  String           @unique
+  status     String
+  createdAt  DateTime         @default(now())
+
+  @@unique([deliveryId, attempt])
+  @@index([tenantId, createdAt])
+}
+
+model KakaoReceipt {
   id         String           @id @default(uuid())
   tenantId   String
   deliveryId String
@@ -2655,6 +2671,7 @@ model CampaignDelivery {
   updatedAt          DateTime             @updatedAt
   jobs               Job[]
   smsReceipts        SmsReceipt[]
+  kakaoReceipts      KakaoReceipt[]
 
   @@unique([tenantId, id])
   @@unique([campaignId, contactHash])

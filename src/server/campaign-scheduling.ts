@@ -22,9 +22,10 @@ function validateTime(row: Campaign, at: string | null) {
 }
 async function requireTransport(tx: Transaction, row: Campaign, sender: Sender | null, at: Date, snapshot = false) {
   if (row.channel === "kakao") {
-    if (env.KAKAO_PROVIDER !== "local") fail(503, "KAKAO_PROVIDER_REQUIRED", "알림톡 발송 공급자를 연결한 뒤 발송할 수 있습니다.");
+    if (env.KAKAO_PROVIDER === "solapi" ? !solapiConfigured(row.tenantId) : env.KAKAO_PROVIDER !== "local") fail(503, "KAKAO_PROVIDER_REQUIRED", "알림톡 발송 공급자를 연결한 뒤 발송할 수 있습니다.");
     const template = await lockKakaoBinding(tx, row.tenantId, row.serviceId, row.kakaoTemplateId);
-    if (!template || template.status !== "approved" || template.channel.status !== "verified" || template.version !== row.kakaoTemplateVersion)
+    if (!template || template.status !== "approved" || template.channel.status !== "verified" || template.version !== row.kakaoTemplateVersion
+      || (env.KAKAO_PROVIDER === "solapi" && (!template.providerTemplateId || !template.channel.providerKey)))
       fail(409, "TEMPLATE_UNAVAILABLE", "승인된 알림톡 템플릿과 확인된 채널이 필요합니다. 템플릿이 수정되면 내용 저장으로 다시 연결해주세요.");
     if (row.fallbackSenderId) {
       const fallback = await tx.sender.findUnique({ where: { id: row.fallbackSenderId } });
@@ -43,7 +44,7 @@ async function enqueue(tx: Transaction, campaign: Campaign, rows: CampaignDelive
   await tx.job.createMany({ data: rows.map(row => ({ type: campaign.mailProtocol, tenantId: row.tenantId, senderId: campaign.senderId,
     campaignDeliveryId: row.id, marketingPreferenceId: row.preferenceId, marketingSubmissionId: row.sourceSubmissionId,
     dedupeKey: "campaign:" + row.id + ":" + row.attempt, dueAt,
-    payloadCipher: encrypt({ campaignId: campaign.id, deliveryId: row.id, attempt: row.attempt, transport: campaign.channel === "sms" ? env.SMS_TRANSPORT === "solapi" ? "sms-solapi" : "sms-local" : campaign.channel === "kakao" ? "kakao-local" : env.MAIL_TRANSPORT, ...(campaign.channel === "sms" ? { unitCost: env.MESSAGE_UNIT_COST_KRW } : {}), ...(campaign.channel === "kakao" ? { unitCost: env.KAKAO_UNIT_COST_KRW } : {}) }) })) });
+    payloadCipher: encrypt({ campaignId: campaign.id, deliveryId: row.id, attempt: row.attempt, transport: campaign.channel === "sms" ? env.SMS_TRANSPORT === "solapi" ? "sms-solapi" : "sms-local" : campaign.channel === "kakao" ? env.KAKAO_PROVIDER === "solapi" ? "kakao-solapi" : "kakao-local" : env.MAIL_TRANSPORT, ...(campaign.channel === "sms" ? { unitCost: env.MESSAGE_UNIT_COST_KRW } : {}), ...(campaign.channel === "kakao" ? { unitCost: env.KAKAO_UNIT_COST_KRW } : {}) }) })) });
 }
 export async function scheduleCampaign(ctx: Context, id: string, input: z.infer<typeof campaignSchedule>, key: string | null, requestId: string) {
   return idempotent("campaign:schedule:" + ctx.member.id + ":" + id, key, input, async tx => {

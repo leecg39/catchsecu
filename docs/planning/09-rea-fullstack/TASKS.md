@@ -1471,16 +1471,17 @@ SMS·SMTP·카카오·PG·IdP·GPKI/새올/그룹웨어·본인인증·Slack/Tea
 - 완료 조건:
   - 미완료필수Task0·테스트실패0·차단미해결0일때만전체완료
   - 코드/DB/API/UI/외부공급사/원본충실도 각각검증범위·제약을보고; 변경기록과재현명령·백업복구자료 완비
-### [ ] R26-T01 외부 제공사 자격증명 연동·수용 (별도 트랙)
+### [ ] R26-T01 외부 제공사 자격증명 연동·수용 (별도 트랙) — 진행 중(로컬 구현 완료)
 
 R25-T03 등록표의 external_blocked 7개 제공사와 Solapi 발송receipt를 실제 자격증명으로 검증한다. 외부 자격증명은 별도 추진으로 결정했으며 로컬 어댑터 통과를 완료로 표시하지 않는다.
 
 - 선행: R25-T03
-- 대상: `src/server/env.ts`; `docs/qa/R25-T03/provider-register.json`
-- 증거: `catchsecu-clone/docs/qa/R26-T01/`
+- 대상: `src/server/env.ts`; `src/server/kakao-adapter.ts`; `docs/qa/R25-T03/provider-register.json`
+- 증거: `catchsecu-clone/docs/qa/R26-T01/README.md`
+- 진행: 카카오 Solapi 어댑터 로컬 구현·테스트 완료(채널pfId·템플릿등록/승인폴링·kakao-solapi발송·서명영수증·원장정산 — 어댑터2건+e2e1건 통과). 실제 제공사 receipt는 자격증명 확보 후 갱신.
 - 완료 조건:
   - 각 제공사의 실제 계정/수신 receipt를 provider-register에 external_verified로 갱신
-  - 미확보 항목은 external_blocked 유지; 카카오는 KAKAO_PROVIDER 실제 어댑터 추가 필요
+  - 미확보 항목은 external_blocked 유지; 카카오 실제 발송·영수증 webhook도 제공사 증거 필요
 
 
 

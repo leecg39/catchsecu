@@ -13,6 +13,7 @@ import { idempotent } from "./idempotency";
 import { markCampaignFilesForDeletion, readCampaignAttachments } from "./campaign-files";
 import { finishFileDeletion } from "./files";
 import { senderDenial } from "./sender-access";
+import { solapiConfigured } from "./sender-providers";
 import { env } from "./env";
 import { campaignScope, locateCampaign, lockCampaign, campaignDraft, campaignLive, campaignEvent, changeCampaign, campaignDto, normalizedTarget, lockCampaignConsents, recipientBinding, evaluateRecipient, deliveryDto, preferenceInclude, type RecipientContact } from "./campaign-common";
 import { normalizeMessageContent } from "./message-content";
@@ -181,7 +182,7 @@ export async function previewCampaign(ctx: Context, id: string, version: number,
         : kakaoTemplate.version !== row.kakaoTemplateVersion ? "템플릿이 수정되었습니다. 내용 저장으로 다시 연결해주세요." : null
       : sender ? senderDenial(sender) : "발신자를 선택해주세요.";
     const transportReason = row.channel === "sms" ? "문자 전송·요금 공급자를 연결한 뒤 발송할 수 있습니다."
-      : row.channel === "kakao" ? (env.KAKAO_PROVIDER !== "local" ? "알림톡 발송 공급자를 연결한 뒤 발송할 수 있습니다." : null)
+      : row.channel === "kakao" ? (env.KAKAO_PROVIDER !== "local" && !(env.KAKAO_PROVIDER === "solapi" && solapiConfigured(row.tenantId)) ? "알림톡 발송 공급자를 연결한 뒤 발송할 수 있습니다." : null)
       : env.MAIL_TRANSPORT !== "local" && !env.SMTP_HOST ? "SMTP 연결 설정이 필요합니다." : null;
     await audit(tx, ctx, requestId, "campaign.previewed", "campaign", id, [], row.serviceId);
     const sample = evaluations.find(e => !e.reason)?.content ?? null, content = decrypt<CampaignContent>(row.contentCipher!);
