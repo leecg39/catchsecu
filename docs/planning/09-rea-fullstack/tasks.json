@@ -3356,23 +3356,30 @@
    "P07-T01",
    "P14-T01"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "model",
-  "evidence_directory": "catchsecu-clone/docs/qa/R14-T01/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R14-T01",
+  "completion_evidence": [
+   "docs/qa/R14-T01/README.md"
+  ],
   "dependency_gates": {
    "R11-T04": "local_acceptance_pass",
    "R10-T04": "local_acceptance_pass"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_applicable",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "ImportJob 상태기계·(tenant,job,rowNo)unique·duplicateOf·증빙 핀·암호화 스테이징·임대·원본 삭제 시점 대조.",
+  "progress_evidence": [
+   "docs/qa/R14-T01/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R14-T02",
@@ -3397,22 +3404,29 @@
    "P07-T01",
    "P14-T01"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "backend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R14-T02/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R14-T02",
+  "completion_evidence": [
+   "docs/qa/R14-T02/README.md"
+  ],
   "dependency_gates": {
    "R14-T01": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "init/upload/inspect/validate/commit/retry/cancel/rows/errors.csv 계약=구현=검증(imports.test 29+라이프사이클37).",
+  "progress_evidence": [
+   "docs/qa/R14-T02/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R14-T03",
@@ -3435,22 +3449,31 @@
    "P07-T01",
    "P14-T01"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "frontend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R14-T03/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R14-T03",
+  "completion_evidence": [
+   "docs/qa/R14-T03/README.md",
+   "docs/qa/imports/browser-committed.png"
+  ],
   "dependency_gates": {
    "R14-T02": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_applicable",
-   "api": "not_applicable",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "/form/info-upload 브라우저: 인코딩·제한·상태필터11종·실제 작업행; 매핑/미리보기/확정/보관 누적 증거.",
+  "progress_evidence": [
+   "docs/qa/R14-T03/README.md",
+   "docs/qa/imports/browser-committed.png"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R14-T04",
@@ -3473,22 +3496,35 @@
    "P07-T01",
    "P14-T01"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "verification",
-  "evidence_directory": "catchsecu-clone/docs/qa/R14-T04/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R14-T04",
+  "completion_evidence": [
+   "docs/qa/R14-T04/README.md",
+   "docs/qa/R14-T04/lifecycle/http-prepare.json",
+   "docs/qa/R14-T04/lifecycle/http-restart.json",
+   "docs/qa/R14-T04/lifecycle/database.json"
+  ],
   "dependency_gates": {
    "R14-T03": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "라이프사이클 3단계 재실행: 수식방어·commit202·worker→partialFailed55·중복commit409·archive 스테이징410·재시작 후 DB대조(55응답·증빙55·원본deleted·109사/172인 지문).",
+  "progress_evidence": [
+   "docs/qa/R14-T04/README.md",
+   "docs/qa/R14-T04/lifecycle/http-prepare.json",
+   "docs/qa/R14-T04/lifecycle/http-restart.json",
+   "docs/qa/R14-T04/lifecycle/database.json"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R15-T01",

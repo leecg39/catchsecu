@@ -816,7 +816,7 @@ find/find-complete, 동의이력·행위이력 토큰, formComplete/form-interru
 
 ## R14 개인정보 업로드·이관
 
-### [ ] R14-T01 개인정보 업로드·이관 — 모델·규칙 대조 및 보완
+### [x] R14-T01 개인정보 업로드·이관 — 모델·규칙 대조 및 보완
 
 파일→헤더매핑→행검증→동의/출처증빙→Submission 변환 관계와 (tenant,job,rowNo)unique를 검사한다. 오류행·부분성공 정책과 원본파일 보존/삭제 시점을 명시한다.
 
@@ -828,7 +828,7 @@ find/find-complete, 동의이력·행위이력 토큰, formComplete/form-interru
   - C 업로드job·행; R 검사결과·오류CSV·진행상태; U 매핑/동의증빙·재검증; D 미실행작업취소·파일정리. commit 이후 증빙은 보존.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R14-T02 개인정보 업로드·이관 — 서버 API·업무 처리
+### [x] R14-T02 개인정보 업로드·이관 — 서버 API·업무 처리
 
 init/upload/inspect/validate/commit/retry/cancel/rows/errors.csv를 상태기계로 연결한다. 인코딩·크기·확장자·수식 주입·동의 근거 없는 데이터·중복행을 검사한다.
 
@@ -840,7 +840,7 @@ init/upload/inspect/validate/commit/retry/cancel/rows/errors.csv를 상태기계
   - 정상CSV3행+오류1행→검증수정→확정; 같은commit2번/worker재시작에도 중복없음; B파일주입차단; UTF8/한글·대용량·잘못된동의 증빙·CSV수식 안전성.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [ ] R14-T03 개인정보 업로드·이관 — 전체 화면·모달 연결
+### [x] R14-T03 개인정보 업로드·이관 — 전체 화면·모달 연결
 
 업로드 기본/동의/제공자 세 페이지에서 파일·매핑·검증오류·미리보기·확정·진행·재시도·취소를 연결한다. 기존 localStorage 이관은 사용자 선택 dry-run과 중복 보고 후 실행한다.
 
@@ -852,7 +852,7 @@ init/upload/inspect/validate/commit/retry/cancel/rows/errors.csv를 상태기계
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R14-T04 개인정보 업로드·이관 — DB·브라우저·재시작 수용검증
+### [x] R14-T04 개인정보 업로드·이관 — DB·브라우저·재시작 수용검증
 
 정상CSV3행+오류1행→검증수정→확정; 같은commit2번/worker재시작에도 중복없음; B파일주입차단; UTF8/한글·대용량·잘못된동의 증빙·CSV수식 안전성.
 

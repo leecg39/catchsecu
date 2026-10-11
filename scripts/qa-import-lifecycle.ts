@@ -9,9 +9,9 @@ import { privateFiles } from "../src/server/file-storage";
 import { runOneImport } from "../src/server/import-worker";
 import type { ImportJobRecord, ImportMapping, ImportPreview } from "../src/contracts/imports";
 
-const target = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
+const target = new URL(env.DATABASE_URL), origin = new URL(process.env.QA_ORIGIN ?? env.BETTER_AUTH_URL).origin;
 if (target.pathname !== "/catchsecu_dev" || !["localhost", "127.0.0.1"].includes(target.hostname) || !["localhost", "127.0.0.1"].includes(new URL(origin).hostname)) throw new Error("Independent local development HTTP QA only.");
-const phase = process.argv[2], out = "docs/qa/P07-T01/", checkpoint = ".local/p07-import-checkpoint.json";
+const phase = process.argv[2], out = process.env.QA_OUT ?? "docs/qa/P07-T01/", checkpoint = ".local/p07-import-checkpoint.json";
 if (!["prepare", "finish", "database"].includes(phase)) throw new Error("prepare, finish or database required.");
 type State = { email: string; password: string; userId: string; companyId: string; serviceId: string; jobId: string; fileId: string; storageKey: string;
   originalCompanyIds: string[]; originalUserIds: string[]; preservedHash: string; preparedHash: string; finishedHash: string; ownerCookie: string; createKey: string; createInput: object };
