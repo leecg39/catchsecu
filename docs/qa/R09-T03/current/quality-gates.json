@@ -1,0 +1,71 @@
+{
+  "at": "2026-10-11T02:38:16Z",
+  "result": "passed",
+  "scope": "Fixed URL, approval log, and form approval panel URL-state restoration; not all R09 routes",
+  "tests": {
+    "files": 2,
+    "passed": 6,
+    "failed": 0,
+    "report": "ui-tests.json"
+  },
+  "approvalTests": {
+    "files": 2,
+    "passed": 9,
+    "failed": 0,
+    "report": "approval-ui-tests.json"
+  },
+  "typecheck": {
+    "exitCode": 0,
+    "config": ".local/r09-extra-tsconfig.json"
+  },
+  "lint": {
+    "exitCode": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "build": {
+    "exitCode": 0,
+    "pages": 83,
+    "directory": ".next-rea-r09-panel",
+    "report": "approval-build.log"
+  },
+  "browser": [
+    "list-after.json",
+    "revoke-browser.json",
+    "responsive.json",
+    "browser-after-restart.json",
+    "approval-list-after.json",
+    "approval-responsive.json",
+    "approval-browser-after-restart.json",
+    "approval-panel-browser.json",
+    "approval-panel-responsive.json"
+  ],
+  "database": [
+    "database-prepare.json",
+    "database-after.json",
+    "database-restart.json",
+    "approval-list-fixture.json",
+    "approval-database-before.json",
+    "approval-database-restart.json"
+  ],
+  "visualReview": {
+    "result": "passed",
+    "files": [
+      "fixed-url-390.png",
+      "approval-log-390.png"
+    ],
+    "note": "Headings one line, readable controls, horizontal table scroll contained"
+  },
+  "sourceHashes": {
+    "src/components/forms/FixedUrls.tsx": "fe5daad40ac6db52c0ac174c98997db0f06ff2af819a51a856e636d382c449e8",
+    "src/components/forms/forms.css": "bd3f4caf4693e754a5761aba8223607149d919ac2a10b55b56f819a905fedae9",
+    "src/lib/list-url-state.ts": "8f135b80973bdf54be8067153331f06aef2ef16ff56879345d20bb9de43735e1",
+    "tests/server/fixed-url-list-ui.test.ts": "26056abaeaba1e319f70d34cdf0e839a91ede31a579f489ee39bcf3aaa37fadd",
+    "scripts/qa-r09-list.ts": "7b61371b5ccedc976244e361825dadac24edf8b611995dfb120a921370a3a0d3",
+    "src/components/forms/Approvals.tsx": "e8f682c88adb430741f9d31bac0dc9cf823cfad89a923fe5e241f8254758ee09",
+    "tests/server/approval-log-ui.test.ts": "0eaa3ff44fd301dbd490646a6379d077caf62fc63d853446deb2ceac4086ae7a",
+    "scripts/qa-r09-model.ts": "f926094fbd9419411bd089e2821398a313ffbf07a5a33cc482c8c16013f708e8",
+    "scripts/qa-r09-approval-list.ts": "fa5fae22a6b5de8b21d60c75ef0f1211b7bb4711b1ca443667ed540209ee861c",
+    "scripts/qa-r09-approval-acceptance.ts": "6422341e637aa540083036d2a30dee275b2a3b1ea88938b5c9c8f2b1b1ebd421"
+  }
+}

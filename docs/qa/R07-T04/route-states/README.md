@@ -47,3 +47,5 @@
 | RR145 | `/saeol/fail/:org` | 로그인에 실패했습니다. 다시 시도해 주세요. ([snapshot](RR145.txt)) |
 | RR151 | `/security/sso` | SSO 로그인 정책 ([snapshot](RR151.txt)) |
 | RR152 | `/security/sso/setting` | SSO 로그인 정책 설정 ([snapshot](RR152.txt)) |
+
+2026-10-11 후속: 위 `/oauth2/signup` 일반 이메일 폼 관측은 당시 이력이다. 현재는 서버 검증 신원·필수 동의 화면으로 교체했고 [후속 검증](../signup/README.md)에 정상·실패·만료·재시작 결과를 기록했다. 회사명은 초대 회사 표시이며 신규 회사 입력이 아니다.

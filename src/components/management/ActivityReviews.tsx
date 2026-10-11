@@ -1,7 +1,9 @@
 "use client";
 import { GuardedLink as Link, useUnsavedChanges } from "../ux/navigation-guard";
+import { usePathname, useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { activityListHref, reviewListState } from "@/lib/activity-list-state";
 import { ApiError, api, errorText, useResource } from "@/lib/api";
 import { reviewAction, reviewCreate, reviewDestruction, reviewStatuses, type ReviewDetail, type ReviewList, type ReviewRecord } from "@/contracts/activity-reviews";
 import type { AuditEventRecord } from "@/contracts/audit-events";
@@ -50,31 +52,42 @@ export function ActivityReviewRequest({ event, onClose }: { event: AuditEventRec
   </Modal>;
 }
 export function ActivityReviews() {
-  const app = useApplication(), params = useSearchParams();
+  const app = useApplication();
   if (!app.data) return <Panel><p role="status">회사 정보를 불러오는 중입니다.</p></Panel>;
-  return <ReviewWorkspace key={app.data.company?.id ?? "none"} app={app.data} initialId={params.get("reviewId") ?? ""} />;
+  return <ReviewWorkspace key={app.data.company?.id ?? "none"} app={app.data} />;
 }
 type Filters = { status: string; search: string; serviceId: string; from: string; to: string };
 const blank = (): Filters => ({ status: "all", search: "", serviceId: "", from: "", to: "" });
 function boundary(value: string, end: boolean) { const date = new Date(value + "T00:00:00"); if (end) date.setDate(date.getDate() + 1); return date.toISOString(); }
-function ReviewWorkspace({ app, initialId }: { app: Application; initialId: string }) {
-  const [scope, setScope] = useState("received"), [draft, setDraft] = useState(blank), [filters, setFilters] = useState(blank), [page, setPage] = useState(1), [size, setSize] = useState(10);
-  const [selected, setSelected] = useState(initialId), [error, setError] = useState("");
+function ReviewWorkspace({ app }: { app: Application }) {
+  const query = useSearchParams(), pathname = usePathname(), router = useRouter();
+  const state = reviewListState(query), { scope, page, pageSize: size, reviewId: selected } = state;
+  const filters: Filters = { status: state.status, search: state.search, serviceId: state.serviceId, from: state.from, to: state.to };
+  const filterKey = JSON.stringify(filters);
+  const [draftState, setDraftState] = useState({ key: filterKey, value: filters });
+  if (draftState.key !== filterKey) setDraftState({ key: filterKey, value: filters });
+  const draft = draftState.key === filterKey ? draftState.value : filters;
+  function setDraft(value: Filters) { setDraftState({ key: filterKey, value }); }
+  const [error, setError] = useState("");
+  function update(values: Record<string, string | number | null>) { router.push(activityListHref(pathname, query.toString(), values), { scroll: false }); }
+  function setSelected(id: string) { update({ reviewId: id }); }
+  function setPage(value: number) { update({ page: value }); }
   const params = new URLSearchParams({ scope, status: filters.status, search: filters.search, page: String(page), pageSize: String(size) });
   if (filters.serviceId) params.set("serviceId", filters.serviceId);
   if (filters.from) params.set("from", boundary(filters.from, false)); if (filters.to) params.set("to", boundary(filters.to, true));
   const result = useResource<ReviewList>("/activity-reviews?" + params), currentPage = result.data?.page ?? page, pages = Math.max(1, Math.ceil((result.data?.total ?? 0) / size));
-  function search(e: FormEvent) { e.preventDefault(); if (draft.from && draft.to && draft.from > draft.to) { setError("종료일은 시작일 이후로 선택해주세요."); return; } setError(""); setFilters({ ...draft }); setPage(1); }
+  useEffect(() => { if (result.data && result.data.page !== page) router.replace(activityListHref(pathname, query.toString(), { page: result.data.page }), { scroll: false }); }, [result.data, page, pathname, query, router]);
+  function search(e: FormEvent) { e.preventDefault(); if (draft.from && draft.to && draft.from > draft.to) { setError("종료일은 시작일 이후로 선택해주세요."); return; } setError(""); update({ status: draft.status, q: draft.search, serviceId: draft.serviceId, from: draft.from, to: draft.to, page: 1 }); }
   return <div className="activity-reviews"><PageHeading title="개인정보 활동 검토 이력"><Link className="cs-button secondary" href="/my-page/info">프로필</Link></PageHeading>
     <p className="mg-description">받은 검토 요청에 처리 사유를 답변하고 진행 상태를 확인합니다. 앱 내 메시지이며 이메일 발송 결과를 뜻하지 않습니다.</p>
-    <div className="mg-tabs" role="tablist" aria-label="검토 이력 범위">{[["received", "받은 요청"], ...(manager(app) ? [["sent", "보낸 요청"], ["company", "회사 전체"]] : [])].map(([value, label]) => <button key={value} role="tab" aria-selected={scope === value} className={scope === value ? "active" : ""} onClick={() => { setScope(value); setPage(1); }}>{label}</button>)}</div>
+    <div className="mg-tabs" role="tablist" aria-label="검토 이력 범위">{[["received", "받은 요청"], ...(manager(app) ? [["sent", "보낸 요청"], ["company", "회사 전체"]] : [])].map(([value, label]) => <button key={value} role="tab" aria-selected={scope === value} className={scope === value ? "active" : ""} onClick={() => update({ scope: value, page: 1 })}>{label}</button>)}</div>
     <Panel><form className="activity-review-filters" onSubmit={search}>
       <label>상태<select className="cs-input" aria-label="검토 상태" value={draft.status} onChange={e => setDraft({ ...draft, status: e.target.value })}><option value="all">전체 상태</option>{reviewStatuses.map(s => <option value={s} key={s}>{statuses[s]}</option>)}</select></label>
       <label>서비스<select className="cs-input" aria-label="검토 서비스" value={draft.serviceId} onChange={e => setDraft({ ...draft, serviceId: e.target.value })}><option value="">전체 서비스</option>{app.services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></label>
       <label>시작일<input className="cs-input" aria-label="검토 시작일" type="date" value={draft.from} onChange={e => setDraft({ ...draft, from: e.target.value })} /></label>
       <label>종료일<input className="cs-input" aria-label="검토 종료일" type="date" value={draft.to} onChange={e => setDraft({ ...draft, to: e.target.value })} /></label>
       <label>제목 검색<input className="cs-input" aria-label="검토 제목 검색" maxLength={100} value={draft.search} onChange={e => setDraft({ ...draft, search: e.target.value })} /></label>
-      <ActionButton>검색</ActionButton><ActionButton secondary type="button" onClick={() => { setDraft(blank()); setFilters(blank()); setPage(1); setError(""); result.reload(); }}>검색 초기화</ActionButton>
+      <ActionButton>검색</ActionButton><ActionButton secondary type="button" onClick={() => { setDraft(blank()); update({ status: null, q: null, serviceId: null, from: null, to: null, page: 1 }); setError(""); result.reload(); }}>검색 초기화</ActionButton>
     </form>{error && <p role="alert">{error}</p>}
       <div className="activity-review-toolbar"><span>전체 {result.data?.total ?? 0}건</span><ActionButton secondary onClick={result.reload}>검토 이력 새로고침</ActionButton></div>
       {result.loading && <p role="status">검토 이력을 불러오는 중입니다.</p>}{result.error && <p role="alert">{problem(result.error)}</p>}
@@ -83,7 +96,7 @@ function ReviewWorkspace({ app, initialId }: { app: Application; initialId: stri
           <td><button className="cs-link" onClick={() => setSelected(row.id)}>{row.title}</button><small className="activity-review-service">{row.serviceName}</small></td><td>{row.action}</td><td>{row.recipientName}</td><td>{statuses[row.status]}</td>
           <td>{row.destructionStatus !== "none" ? <span className="svc-badge">{destructionStatuses[row.destructionStatus]}</span> : row.retentionUntil ? <small>보유 ~{new Date(row.retentionUntil).toLocaleDateString("ko-KR")}</small> : "—"}</td>
           <td><button className="cs-link" aria-label={row.title + " 메시지 확인"} onClick={() => setSelected(row.id)}>메시지 확인</button></td></tr>) : <tr><td colSpan={9}><EmptyState text="조건에 맞는 검토 요청이 없습니다." /></td></tr>}
-      </tbody></table></div><nav className="cs-pagination" aria-label="검토 이력 페이지"><select aria-label="검토 페이지당 행 수" value={size} onChange={e => { setSize(Number(e.target.value)); setPage(1); }}>{[10, 20, 50, 100].map(n => <option key={n}>{n}</option>)}</select>
+      </tbody></table></div><nav className="cs-pagination" aria-label="검토 이력 페이지"><select aria-label="검토 페이지당 행 수" value={size} onChange={e => update({ pageSize: Number(e.target.value), page: 1 })}>{[10, 20, 50, 100].map(n => <option key={n}>{n}</option>)}</select>
         <div><button aria-label="검토 이전 페이지" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>‹</button><span>{currentPage} / {pages}</span><button aria-label="검토 다음 페이지" disabled={currentPage >= pages} onClick={() => setPage(currentPage + 1)}>›</button></div></nav></>}
     </Panel>{selected && <ReviewDialog id={selected} onClose={() => setSelected("")} onChanged={result.reload} />}
   </div>;

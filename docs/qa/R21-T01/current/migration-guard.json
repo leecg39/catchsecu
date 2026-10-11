@@ -1,0 +1,17 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T02:44:45.326Z",
+  "databaseLifecycle": "temporary isolated local schema created and dropped",
+  "dirtyDatabaseBlocked": {
+    "blocked": true,
+    "code": "P0001",
+    "message": "PAYMENT_ORDER_SUBSCRIPTION_TENANT_MISMATCH"
+  },
+  "originalConstraint": "FOREIGN KEY (\"subscriptionId\") REFERENCES \"BillingSubscription\"(id)",
+  "migratedConstraint": "FOREIGN KEY (\"tenantId\", \"subscriptionId\") REFERENCES \"BillingSubscription\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+  "crossTenantInsertAfterMigration": {
+    "rejected": true,
+    "code": "23503"
+  },
+  "sameTenantInsertAfterMigration": "accepted"
+}

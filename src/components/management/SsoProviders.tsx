@@ -1,6 +1,7 @@
 "use client";
-import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { listHref, oneOf, positivePage } from "@/lib/list-url-state";
 import { GuardedLink as Link, useUnsavedChanges } from "../ux/navigation-guard";
 import { OrgDirectory } from "./OrgDirectory";
 import { api, ApiError, errorText, useResource } from "@/lib/api";
@@ -21,7 +22,16 @@ export function SsoProviders({ settings = false }: { settings?: boolean }) {
 }
 
 function SsoContent({ settings, companyId }: { settings: boolean; companyId?: string }) {
-  const router = useRouter();
+  const router = useRouter(), pathname = usePathname(), params = useSearchParams();
+  const search = (params.get("q") ?? "").slice(0, 100);
+  const sort = oneOf(params.get("sort"), ["createdAt", "name"] as const, "createdAt");
+  const page = Math.min(100000, positivePage(params.get("page")));
+  const [draft, setDraft] = useState({ search, value: search });
+  if (draft.search !== search) setDraft({ search, value: search });
+  function update(values: Record<string, string | number | null>) {
+    router.push(listHref(pathname, params.toString(), values), { scroll: false });
+  }
+  function setPage(value: number) { update({ page: value }); }
   const [edit, setEdit] = useState<SsoProviderRecord | null | undefined>();
   const [directory, setDirectory] = useState<SsoProviderRecord | undefined>();
   const [reauth, setReauth] = useState(false);
@@ -32,10 +42,13 @@ function SsoContent({ settings, companyId }: { settings: boolean; companyId?: st
   const items = result.data?.items, canManage = !companyMismatch && result.data?.canManage === true;
   useUnsavedChanges(busy, "SSO 변경 요청을 처리 중입니다. 아직 처리 결과가 확정되지 않았습니다. 이 화면을 나가면 목록에서 결과를 다시 확인해야 합니다.");
   const lock = useRef(false);
-  const [search, setSearch] = useState(""), [sort, setSort] = useState("createdAt"), [page, setPage] = useState(1);
   const rows = (items ?? []).filter(row => `${row.name} ${row.issuer} ${PROTOCOL_LABELS[row.protocol]}`.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => sort === "name" ? a.name.localeCompare(b.name, "ko") || a.id.localeCompare(b.id) : a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
   const pages = Math.max(1, Math.ceil(rows.length / 10)), currentPage = Math.min(page, pages);
+  useEffect(() => {
+    if (items && !companyMismatch && currentPage !== page)
+      router.replace(listHref(pathname, params.toString(), { page: currentPage }), { scroll: false });
+  }, [items, companyMismatch, currentPage, page, router, pathname, params]);
 
   async function run(action: () => Promise<unknown>, done: string) {
     if (lock.current) return; lock.current = true;
@@ -73,8 +86,10 @@ function SsoContent({ settings, companyId }: { settings: boolean; companyId?: st
       : companyMismatch ? <Panel><p role="alert">다른 탭에서 선택한 회사가 변경되었습니다. 회사와 SSO 목록을 함께 다시 불러온 뒤 진행해주세요.</p><ActionButton secondary onClick={() => window.location.reload()}>회사와 목록 다시 불러오기</ActionButton></Panel>
       : !items ? <Panel><p role="status">SSO 설정을 불러오는 중입니다.</p></Panel>
       : <Panel>
-        <div className="mg-flex"><label>SSO 연결 검색<input className="cs-input" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="이름·프로토콜·Issuer" /></label>
-          <label>SSO 연결 정렬<select className="cs-input" value={sort} onChange={e => { setSort(e.target.value); setPage(1); }}><option value="createdAt">등록일순</option><option value="name">이름순</option></select></label></div>
+        <form className="mg-flex" onSubmit={event => { event.preventDefault(); update({ q: draft.search === search ? draft.value : search, page: 1 }); }}>
+          <label>SSO 연결 검색<input className="cs-input" maxLength={100} value={draft.search === search ? draft.value : search} onChange={e => setDraft({ search, value: e.target.value })} placeholder="이름·프로토콜·Issuer" /></label>
+          <ActionButton type="submit">검색</ActionButton>
+          <label>SSO 연결 정렬<select className="cs-input" aria-label="SSO 연결 정렬" value={sort} onChange={e => update({ sort: e.target.value, page: 1 })}><option value="createdAt">등록일순</option><option value="name">이름순</option></select></label></form>
         {!canManage && <p role="status">회사에 직접 소속된 최상위 관리자만 연결을 변경할 수 있습니다.</p>}
         {rows.length
           ? <div className="cs-table-wrap" role="region" aria-label="SSO 연결 목록" tabIndex={0}><table className="cs-table sso-provider-table"><thead><tr>

@@ -1,0 +1,45 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+ ❯ tests/server/payment-orders.test.ts (4 tests | 1 failed | 3 skipped) 991ms
+   × DB는 다른 회사의 구독을 결제 주문에 연결하지 않는다 988ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/payment-orders.test.ts > DB는 다른 회사의 구독을 결제 주문에 연결하지 않는다
+AssertionError: promise resolved "{ …(10) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "amount": 14000,
++   "createdAt": 2026-10-11T02:41:16.977Z,
++   "currency": "KRW",
++   "id": "303668f2-2c29-408c-9f6f-e15b4489756d",
++   "methodId": null,
++   "status": "pending",
++   "subscriptionId": "307724f4-d26b-4f6d-a6b7-f55c9c0dac13",
++   "tenantId": "5db37d53-8e3e-4e22-ad8f-e68b5212948a",
++   "updatedAt": 2026-10-11T02:41:16.977Z,
++   "version": 1,
+  }
+
+ ❯ tests/server/payment-orders.test.ts:30:6
+     28|   await expect(db.paymentOrder.create({
+     29|     data: { tenantId: owner.id, subscriptionId: foreignSubscription.id…
+     30|   })).rejects.toMatchObject({ code: "P2003" });
+       |      ^
+     31|
+     32|   const ownSubscription = await db.billingSubscription.create({ data: …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 skipped (4)
+   Start at  11:41:14
+   Duration  2.03s (tests 51%, import 29%, transform 20%)
+

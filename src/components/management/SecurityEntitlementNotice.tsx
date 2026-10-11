@@ -12,7 +12,7 @@ const messages: Record<FeatureAccess["state"], string> = {
 };
 export function SecurityEntitlementNotice({ access }: { access: FeatureAccess }) {
   const app = useApplication();
-  return <div className="mg-description" role="status" data-entitlement-state={access.state}>
+  return <div className="mg-description security-entitlement-notice" role="status" data-entitlement-state={access.state}>
     <p>{messages[access.state]}{access.available && access.expiresAt && <> 이용 기한: {new Date(access.expiresAt).toLocaleString("ko-KR")}</>}</p>
     {!access.available && <p>현재 설정은 조회할 수 있으며, 적용 중인 보안 보호는 계속 유지됩니다.
       {app.data?.company?.role === "owner" && <> <GuardedLink href="/pay/license-service">구독 확인</GuardedLink></>}</p>}

@@ -18,6 +18,22 @@ function sign(body: string) { return createHmac("sha256", secret).update(body).d
 beforeEach(async () => { await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "Job" CASCADE'); });
 afterAll(async () => { await db.$disconnect(); });
 
+test("DB는 다른 회사의 구독을 결제 주문에 연결하지 않는다", async () => {
+  const owner = await db.company.create({ data: { name: "주문 소유 회사", publicName: "주문 소유", policy: { create: {} } } });
+  const foreign = await db.company.create({ data: { name: "외부 구독 회사", publicName: "외부 구독", policy: { create: {} } } });
+  const plan = await db.billingPlan.create({ data: { id: "pay-scope-" + randomUUID(), name: "회사 범위 상품" } });
+  const version = await db.billingPlanVersion.create({ data: { planId: plan.id, number: 1, cycle: "month", priceKrw: 14000, currency: "KRW", features: {}, orderable: true, effectiveFrom: new Date("2026-01-01") } });
+  const foreignSubscription = await db.billingSubscription.create({ data: { tenantId: foreign.id, planId: plan.id, planVersionId: version.id, status: "pending", priceKrw: 14000, currency: "KRW" } });
+
+  await expect(db.paymentOrder.create({
+    data: { tenantId: owner.id, subscriptionId: foreignSubscription.id, amount: 14000, currency: "KRW" },
+  })).rejects.toMatchObject({ code: "P2003" });
+
+  const ownSubscription = await db.billingSubscription.create({ data: { tenantId: owner.id, planId: plan.id, planVersionId: version.id, status: "pending", priceKrw: 14000, currency: "KRW" } });
+  const valid = await db.paymentOrder.create({ data: { tenantId: owner.id, subscriptionId: ownSubscription.id, amount: 14000, currency: "KRW" } });
+  expect(valid.subscriptionId).toBe(ownSubscription.id);
+});
+
 test("성공 주소와 카드 원문으로는 결제 완료가 되지 않고 서명된 결과만 한 번 반영한다", async () => {
   const email = "pay-" + randomUUID() + "@catchsecu.test";
   expect((await auth.handler(req("/auth/sign-up/email", "", "POST", { name: "결제", email, password }))).status).toBe(200);

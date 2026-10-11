@@ -1,0 +1,72 @@
+{
+  "checkedAt": "2026-10-11T02:54:03.164Z",
+  "result": "passed",
+  "database": "catchsecu_test",
+  "operations": 34,
+  "routeFiles": 21,
+  "contracts": {
+    "openapiPaths": 333,
+    "openapiOperations": 474,
+    "policyRows": 474,
+    "newSettlementOperations": 5,
+    "idempotentMutationContracts": 7,
+    "invoicePdf": true
+  },
+  "regression": {
+    "files": 14,
+    "tests": 169,
+    "log": "docs/qa/R21-T02/current/billing-regression.log"
+  },
+  "liveDatabaseInvariants": {
+    "unbalancedLedgerTransactions": 0,
+    "refundOverflowOrders": 0,
+    "crossTenantOrders": 0,
+    "duplicateProviderEvents": 0
+  },
+  "verifiedBehavior": [
+    "signed event state machine and duplicate/reordered events",
+    "one-time funding and balanced ledger",
+    "partial/full refund and latest-state idempotent replay",
+    "payment/subscription cancellation races",
+    "current role/session/company/policy checks",
+    "audit and idempotency rollback",
+    "server-generated invoice and immutable month close"
+  ],
+  "externalProvider": "not_applicable_to_R21-T02_local_API; separated in R21-T04",
+  "sourceHashes": {
+    "docs/planning/09-rea-fullstack/api-ownership.json": "0872a8065043122d4da1de1a3fc02c2a5060ab7ee2ccc2ba87fbbf7272421d9a",
+    "docs/planning/contracts/openapi.json": "fac1874caac962bbaa3a54fc5e60593ebf7b0891543fefd278eda97853d491e3",
+    "docs/planning/contracts/operation-policy-matrix.csv": "e437de8740b59efe39ec2edefe64f50adc9d3cfdec95977b973b552444db21ca",
+    "src/app/api/v1/admin/plans/[id]/route.ts": "bed86e3dd062206937c8267cb101661ebf31ec52f720ce4ef3ddffc5603b21ee",
+    "src/app/api/v1/admin/plans/route.ts": "2496a3cb6a55367206003a60614cfbb15fb3483579c3481dc6c0293af9c9bbb7",
+    "src/app/api/v1/assets/route.ts": "489e343be05d82d9dcbd91370b1e00783f47b7850c3be5c5e03c2f3e8a6d2719",
+    "src/app/api/v1/billing-history/route.ts": "c159b072f7919cc3e93e7d69ff529d989c2e23531b1b75088b729d9841dc1647",
+    "src/app/api/v1/billing/closing/route.ts": "463d225da7b4c293efa6823df741766eaf42f29aed04a949641dc6fbfe126074",
+    "src/app/api/v1/billing/methods/[id]/route.ts": "004d0fdeef2ab0231e77c3307cdaeb067b7253d359b0549c541ccfcf0593400f",
+    "src/app/api/v1/billing/methods/route.ts": "be37fb993275d2d9925cfaa074e7e5581d7a7d82f3aac847976c6edbc75d9ce3",
+    "src/app/api/v1/billing/orders/[id]/invoice/route.ts": "8ffff2edcddd5d3d94e6c4a9d508ee12f2e12239276d73282f3ebc6451f10d6b",
+    "src/app/api/v1/billing/orders/[id]/refunds/route.ts": "0231b71cc9cbc587ffc405b038f1adb59410414c4708353427370107cb9060bd",
+    "src/app/api/v1/billing/orders/[id]/return/route.ts": "c99f44224f396850e5008601df708556d78afe547d2e700fc4e860ca14d20fbb",
+    "src/app/api/v1/billing/orders/[id]/route.ts": "638ac5fda7e57aed43031316495bd528ef253e1ab42329876f09648dc9a73b56",
+    "src/app/api/v1/billing/orders/[id]/virtual-checkout/route.ts": "acdc6284d5b21f4f9d9b32b4c6553dad9427fd06524b1e4d09d90e6169664777",
+    "src/app/api/v1/billing/orders/route.ts": "6d733af198754b78493a301a29bb674367587a367f56ab5313a7073fcd0ce7a0",
+    "src/app/api/v1/billing/provider-events/route.ts": "4e4b19f8066999a3ff589b243e259b471171d9b2e96ab2bdf0d7b83e22d5ff26",
+    "src/app/api/v1/billing/refunds/[id]/virtual-settle/route.ts": "ebcb79de43f2b0e65e8f449e56876da72a935654fd98a3c702f259d224054b8c",
+    "src/app/api/v1/entitlements/route.ts": "26ccca9d88432f2b33dd45916685565c847cadd7d041e47b0d540ee9d3fba8b1",
+    "src/app/api/v1/invoices/route.ts": "0cd4871944157139d3f3bce7c53205ab23610f2594f8bac0ed998bce412bc9b6",
+    "src/app/api/v1/ledger/route.ts": "aa20941794e59971f3ff49c6e7649598dc8a02c151c5614fffa609b01c4a405c",
+    "src/app/api/v1/plans/route.ts": "88edb92d2284898ae21d1a024991671490680f4b42e8ff328f307c5a99b3a35c",
+    "src/app/api/v1/subscriptions/[[...segments]]/route.ts": "792f3b9aca08720b5afab702c174ed0b5e13a02f5da7e2c0b74b70eb93b4d6fc",
+    "src/app/api/v1/usage-events/route.ts": "b4a1a61655d2352fd166b0dc4fca6d4f937810762692ca8b5764e06c503be301",
+    "src/server/admin-plans.ts": "ac59d56281f2170eab1a12cd240e53794eddd7787ffc07188ca4ebd200632272",
+    "src/server/billing-history.ts": "d4994b5f168cc2a99c45df1a0a15589413a37f455d47549a68633be1a8d92086",
+    "src/server/billing-reads.ts": "e134bd754bb9b903e767b00755b5982f9f231f929e8ad6eff991611cc6bb07db",
+    "src/server/billing-settlement.ts": "a7ac7f2046cf6a261f298fbc1555bba997f267bec2d7e23dce324acbd9610665",
+    "src/server/ledger.ts": "0b9049491dae93c0aa29e37bcbaa2b510768e9806c2de27a0ed3b9b77ac98ff3",
+    "src/server/payment-methods.ts": "8487d073682c4bc28d2428f343df795742ddf66a357f15d4812b686e8ef14063",
+    "src/server/payments.ts": "45664a16cabef7cc0787da26a564884c4797745b7d47f1264f13610dc1628b80",
+    "src/server/subscription-worker.ts": "1b19bd1d028fe6119b092077849cb836ca47a02e3dca641c62fb785ce682ec41",
+    "src/server/subscriptions.ts": "7d34b987ec9e2594c5dfc33a2c8d901751ecb5c23ac1a38c8c3a5e39b77807b7"
+  },
+  "failures": []
+}

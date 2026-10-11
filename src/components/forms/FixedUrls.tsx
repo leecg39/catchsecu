@@ -1,6 +1,8 @@
 "use client";
-import { useReducer, useRef, useState, type FormEvent } from "react";
+import { useEffect, useReducer, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { listHref, oneOf, pageSize as listPageSize, positivePage } from "@/lib/list-url-state";
 import { PageHeading, Panel, ActionButton, Modal } from "../shared";
 import { CopyButton } from "../ux/copy-button";
 import { QrButton } from "../ux/qr-button";
@@ -15,18 +17,28 @@ import type { FormRecord, Paged } from "@/contracts/forms";
 type FixedUrl = { id: string; name: string; slug: string; status: string; version: number; createdAt: string; formId: string; formTitle: string; url: string };
 export function FixedUrls() {
   const app = useApplication(), canWrite = app.data?.capabilities.includes("form.publish");
-  const [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20), [status, setStatus] = useState("active");
-  const [query, setQuery] = useState(""), [search, setSearch] = useState(""), [edit, setEdit] = useState<FixedUrl | "new">();
+  const router = useRouter(), pathname = usePathname(), searchParams = useSearchParams();
+  const page = Math.min(100000, positivePage(searchParams.get("page"))), pageSize = listPageSize(searchParams.get("pageSize"));
+  const status = oneOf(searchParams.get("status"), ["active", "revoked"] as const, "active"), search = (searchParams.get("q") ?? "").slice(0, 100);
+  const [draft, setDraft] = useState({ search, value: search });
+  if (draft.search !== search) setDraft({ search, value: search });
+  const query = draft.search === search ? draft.value : search;
+  function update(values: Record<string, string | number | null>) { router.push(listHref(pathname, searchParams.toString(), values), { scroll: false }); }
+  const [edit, setEdit] = useState<FixedUrl | "new">();
   const [remove, setRemove] = useState<FixedUrl>(), [error, setError] = useState(""), [busy, setBusy] = useState(false);
   const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), search, status });
   if (app.data?.serviceId) params.set("serviceId", app.data.serviceId);
   const result = useResource<Paged<FixedUrl>>(app.data ? "/fixed-urls?" + params : null);
   const shownPage=result.data?.page ?? page;
-  return <><PageHeading title="고정URL 관리"><p>주소를 유지하면서 연결된 캐치폼을 변경할 수 있습니다. 같은 폼을 다시 게시하면 새 게시본으로 자동 연결됩니다.</p>
+  useEffect(() => {
+    if (result.data && result.data.page !== page)
+      router.replace(listHref(pathname, searchParams.toString(), { page: result.data.page }), { scroll: false });
+  }, [result.data, page, pathname, searchParams, router]);
+  return <div className="forms-list-page"><PageHeading title="고정URL 관리"><p>주소를 유지하면서 연결된 캐치폼을 변경할 수 있습니다. 같은 폼을 다시 게시하면 새 게시본으로 자동 연결됩니다.</p>
     {canWrite && <ActionButton onClick={() => setEdit("new")}>고정URL 생성</ActionButton>}</PageHeading>
-    <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); setSearch(query); setPage(1); }}>
-      <input className="cs-input" aria-label="URL명 검색" placeholder="URL명 검색" value={query} onChange={event => setQuery(event.target.value)} />
-      <select aria-label="고정URL 상태" value={status} onChange={event => { setStatus(event.target.value); setPage(1); }}><option value="active">사용 중</option><option value="revoked">사용 종료</option></select><ActionButton secondary>검색</ActionButton></form>
+    <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); update({ q: query, page: 1 }); }}>
+      <input className="cs-input" aria-label="URL명 검색" placeholder="URL명 검색" maxLength={100} value={query} onChange={event => setDraft({ search, value: event.target.value })} />
+      <select aria-label="고정URL 상태" value={status} onChange={event => { update({ status: event.target.value === "active" ? null : event.target.value, page: 1 }); }}><option value="active">사용 중</option><option value="revoked">사용 종료</option></select><ActionButton secondary>검색</ActionButton></form>
       {error && <p role="alert">{error}</p>}
       <RemoteTable columns={["#", "URL 명", "URL", "연결된 캐치폼", "생성일", "관리"]} rows={(result.data?.items ?? []).map((row, index) => ({
         id: row.id, cells: [(shownPage - 1) * pageSize + index + 1, row.name,
@@ -35,7 +47,7 @@ export function FixedUrls() {
             <QrButton url={row.url} name={row.name} filename={row.slug} /></span>,
           row.formTitle, new Date(row.createdAt).toLocaleDateString("ko-KR"), canWrite && row.status === "active" ?
             <div className="forms-row-actions" key="actions"><button onClick={() => setEdit(row)}>수정</button><button onClick={() => setRemove(row)}>사용 종료</button></div> : "종료"],
-      }))} page={shownPage} pageSize={pageSize} total={result.data?.total ?? 0} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={result.loading} error={result.error?.message} />
+      }))} page={shownPage} pageSize={pageSize} total={result.data?.total ?? 0} onPage={page => update({ page })} onPageSize={size => update({ pageSize: size, page: 1 })} loading={result.loading} error={result.error?.message} />
     </Panel>
     {edit && <FixedUrlEditor key={edit === "new" ? "new" : edit.id + ":" + edit.version} initial={edit === "new" ? undefined : edit}
       onClose={() => setEdit(undefined)} onReload={current => {
@@ -47,7 +59,7 @@ export function FixedUrls() {
       <ActionButton disabled={busy} onClick={async () => { setBusy(true); setError(""); try {
         await api("/fixed-urls/" + remove.id, { method: "DELETE", headers: { "If-Match": String(remove.version) } }); setRemove(undefined); result.reload();
       } catch (cause) { setError(errorText(cause)); } finally { setBusy(false); } }}>사용 종료</ActionButton></Modal>}
-  </>;
+  </div>;
 }
 function FixedUrlEditor({ initial, onSaved, onClose, onReload }: {
   initial?: FixedUrl;

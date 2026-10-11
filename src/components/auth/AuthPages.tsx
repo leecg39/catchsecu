@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { SsoSignup } from "./SsoSignup";
 import { SsoAccounts } from "./SsoAccounts";
 import { SsoStartForm } from "./SsoRecovery";
 import { OrgEmailRegister, OrgLoginForm } from "./OrgLogin";
@@ -41,6 +42,7 @@ const ORG_PROTOCOLS: Record<string, { protocol: "gpki" | "saeol" | "groupware"; 
 };
 export function AuthPages({ path }: { path: string }) {
  if(path === "/gpki/email-register")return <Frame><Card><h1>조직 인증 이메일 등록</h1><OrgEmailRegister/></Card></Frame>;
+ if(path === "/oauth2/signup")return <Frame><Card><h1>회사 계정으로 가입하기</h1><SsoSignup/></Card></Frame>;
  if(path === "/oauth2/invite/signup")return <Frame><Card><InvitationAccept/></Card></Frame>;
  if (["/login/oauth2", "/login/saml", "/login/saml/start"].includes(path)) return <Frame><Card><h1>회사 SSO 로그인</h1><AuthCallbackError/><SsoStartForm/></Card></Frame>;
  if (path === "/link/oauth2" || path === "/link/oauth2/verified") return <Frame><Card><h1>내 SSO 연결 계정</h1><SsoAccounts/></Card></Frame>;
@@ -53,7 +55,7 @@ export function AuthPages({ path }: { path: string }) {
  if (path === "/password-change-rule" || path === "/passwordChange") return <ChangePassword />;
  if (path === "/password-change-email/complete") return <Message title="이메일을 확인해주세요." description="가입된 이메일이면 비밀번호 재설정 메일 전송을 요청했습니다." />;
  if (path === "/password-change-email") return <RecoverOrSignup />;
- if (path === "/signup" || path.startsWith("/oauth2/") && path.includes("signup")) return <RecoverOrSignup signup />;
+ if (path === "/signup") return <RecoverOrSignup signup />;
  if (path === "/not-allow-ip") return <Frame><Card><h1>허용되지 않은 IP 접근 제한</h1><p className="auth-description">회사에서 허용한 IP 주소에서 접속해주세요. 다른 소속 회사의 접근 권한이 있다면 회사를 변경할 수 있습니다.</p><IpDeniedCompanies/></Card></Frame>;
  const org = ORG_PROTOCOLS[path];
  if (org) return <Frame><Card><h1>{org.label} 조직 인증</h1><OrgLoginForm protocol={org.protocol} label={org.label}/></Card></Frame>;

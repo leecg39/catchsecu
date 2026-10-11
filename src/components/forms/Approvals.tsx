@@ -5,8 +5,9 @@ import { QuestionChoiceSummary } from "./QuestionChoiceSummary";
 import { QuestionSummary } from "./QuestionSummary";
 import { ConsentDisplay, ConsentDocuments, ConsentItems } from "./ConsentDocuments";
 import type { FormConsentBundle } from "@/contracts/form-documents";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { api, ApiError, errorText, useResource } from "@/lib/api";
 import { approvalInputDirty, createApprovalInputState, updateApprovalInput, type ApprovalInputState, type ApprovalInputValues } from "@/lib/approval-input";
 import type { FormContent, FormRecord, Paged } from "@/contracts/forms";
@@ -16,6 +17,7 @@ import { RemoteTable } from "../RemoteTable";
 import { useApplication } from "../ApplicationContext";
 import { useConfirm } from "../ux/confirm";
 import { useUnsavedChanges } from "../ux/navigation-guard";
+import { listHref, oneOf, pageSize as listPageSize, positivePage } from "@/lib/list-url-state";
 
 type Approval = {
   id: string; formId: string; title: string; serviceName: string; requesterName: string; reviewerName: string | null;
@@ -25,7 +27,16 @@ type Approval = {
 };
 type History = Paged<Approval> & { policy: { requireApproval: boolean; referenceRequired: boolean; requestTemplate: string; approvalRevision: number }; canRequest: boolean; canReview: boolean };
 export function ApprovalPanel({ form, dirty: formDirty, onChanged }: { form: FormRecord; dirty: boolean; onChanged: () => Promise<void> }) {
-  const [page, setPage] = useState(1), [pageSize, setPageSize] = useState(10);
+  const router = useRouter(), pathname = usePathname(), searchParams = useSearchParams();
+  const page = Math.min(100000, positivePage(searchParams.get("approvalPage")));
+  const pageSize = Number(oneOf(searchParams.get("approvalPageSize"), ["10", "20", "50"] as const, "10"));
+  const updatePage = useCallback((nextPage: number, nextPageSize = pageSize, replace = false) => {
+    const href = listHref(pathname, searchParams.toString(), {
+      approvalPage: nextPage === 1 ? null : nextPage,
+      approvalPageSize: nextPageSize === 10 ? null : nextPageSize,
+    });
+    if (replace) router.replace(href, { scroll: false }); else router.push(href, { scroll: false });
+  }, [pageSize, pathname, router, searchParams]);
   const approvalPath = "/forms/" + form.id + "/approvals?page=" + page + "&pageSize=" + pageSize;
   const result = useResource<History>(approvalPath);
   const [error, setError] = useState(""), [notice, setNotice] = useState(""), [busy, setBusy] = useState(false);
@@ -34,6 +45,9 @@ export function ApprovalPanel({ form, dirty: formDirty, onChanged }: { form: For
   const lock = useRef(false), ask = useConfirm();
   const inputDirty = Object.values(drafts).some(approvalInputDirty);
   useUnsavedChanges(inputDirty || busy, "저장하지 않은 승인 요청 또는 검토 의견이 있습니다. 이 화면을 나가면 입력한 내용이 사라집니다.");
+  useEffect(() => {
+    if (result.data && result.data.page !== page) updatePage(result.data.page, pageSize, true);
+  }, [result.data, page, pageSize, updatePage]);
   function currentDraft(key: string, initial?: Partial<ApprovalInputValues>) { return drafts[key] ?? createApprovalInputState(initial); }
   function changeDraft(key: string, initial: Partial<ApprovalInputValues>, field: keyof ApprovalInputValues, value: string) {
     setDrafts(current => ({ ...current, [key]: updateApprovalInput(current[key] ?? createApprovalInputState(initial), field, value) }));
@@ -106,9 +120,9 @@ export function ApprovalPanel({ form, dirty: formDirty, onChanged }: { form: For
       </div>}
     </article>; })}
     {data.total === 0 && <p className="mg-muted">승인 요청 내역이 없습니다.</p>}
-    {data.total > 0 && <div className="cs-pagination"><span>총 {data.total}개</span><select aria-label="승인 내역 페이지당 행 수" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>{[10, 20, 50].map(size => <option key={size}>{size}</option>)}</select>
-      <button aria-label="이전 승인 내역" disabled={data.page <= 1} onClick={() => setPage(data.page - 1)}>이전</button><span>{data.page}</span>
-      <button aria-label="다음 승인 내역" disabled={data.page * pageSize >= data.total} onClick={() => setPage(data.page + 1)}>다음</button></div>}
+    {data.total > 0 && <div className="cs-pagination"><span>총 {data.total}개</span><select aria-label="승인 내역 페이지당 행 수" value={pageSize} onChange={event => updatePage(1, Number(event.target.value))}>{[10, 20, 50].map(size => <option key={size}>{size}</option>)}</select>
+      <button aria-label="이전 승인 내역" disabled={data.page <= 1} onClick={() => updatePage(data.page - 1)}>이전</button><span>{data.page}</span>
+      <button aria-label="다음 승인 내역" disabled={data.page * pageSize >= data.total} onClick={() => updatePage(data.page + 1)}>다음</button></div>}
   </Panel>;
 }
 function ApprovalSnapshot({ id, snapshot }: { id: string; snapshot: Approval["snapshot"] }) {
@@ -126,15 +140,26 @@ function ApprovalSnapshot({ id, snapshot }: { id: string; snapshot: Approval["sn
     <ConsentDisplay display={snapshot.consentBundle?.display} /><ConsentDocuments bundle={snapshot.consentBundle} /></section></AuthorAssetProvider>;
 }
 export function ApprovalLog() {
-  const app = useApplication(), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20), [search, setSearch] = useState(""), [draftSearch, setDraftSearch] = useState(""), [status, setStatus] = useState("all");
+  const app = useApplication(), router = useRouter(), pathname = usePathname(), searchParams = useSearchParams();
+  const page = Math.min(100000, positivePage(searchParams.get("page"))), pageSize = listPageSize(searchParams.get("pageSize"));
+  const search = (searchParams.get("q") ?? "").slice(0, 100);
+  const status = oneOf(searchParams.get("status"), ["all", ...approvalStatuses] as const, "all");
+  const [draft, setDraft] = useState({ search, value: search });
+  if (draft.search !== search) setDraft({ search, value: search });
+  const draftSearch = draft.search === search ? draft.value : search;
+  function update(values: Record<string, string | number | null>) { router.push(listHref(pathname, searchParams.toString(), values), { scroll: false }); }
   const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize), search, status });
   if (app.data?.serviceId) query.set("serviceId", app.data.serviceId);
   const result = useResource<Paged<Approval>>(app.data ? "/approvals?" + query : null);
-  return <><PageHeading title="캐치폼 승인 내역" /><Panel><form className="mg-toolbar" onSubmit={event => { event.preventDefault(); setSearch(draftSearch); setPage(1); }}>
-    <input className="cs-input" aria-label="캐치폼 제목 검색" placeholder="캐치폼 제목" value={draftSearch} onChange={event => setDraftSearch(event.target.value)} />
-    <select className="cs-input" aria-label="승인 상태" value={status} onChange={event => { setStatus(event.target.value); setPage(1); }}>
+  useEffect(() => {
+    if (result.data && result.data.page !== page)
+      router.replace(listHref(pathname, searchParams.toString(), { page: result.data.page }), { scroll: false });
+  }, [result.data, page, pathname, searchParams, router]);
+  return <div className="forms-list-page"><PageHeading title="캐치폼 승인 내역" /><Panel><form className="mg-toolbar" onSubmit={event => { event.preventDefault(); update({ q: draftSearch, page: 1 }); }}>
+    <input className="cs-input" aria-label="캐치폼 제목 검색" placeholder="캐치폼 제목" maxLength={100} value={draftSearch} onChange={event => setDraft({ search, value: event.target.value })} />
+    <select className="cs-input" aria-label="승인 상태" value={status} onChange={event => { update({ status: event.target.value === "all" ? null : event.target.value, page: 1 }); }}>
       <option value="all">모든 상태</option>{approvalStatuses.map(value => <option key={value} value={value}>{approvalStatusLabels[value]}</option>)}</select><ActionButton>검색</ActionButton>
   </form><RemoteTable columns={["캐치폼", "서비스", "요청자", "승인 담당자", "상태", "요청일"]} rows={(result.data?.items ?? []).map(row => ({ id: row.id,
     cells: [<Link key="form" className="cs-link" href={"/form/ai/setting?formId=" + row.formId}>{row.title}</Link>, row.serviceName, row.requesterName, row.reviewerName || "-", approvalStatusLabels[row.status], new Date(row.createdAt).toLocaleString("ko-KR")] }))}
-    total={result.data?.total ?? 0} page={result.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={result.loading} error={result.error?.message} /></Panel></>;
+    total={result.data?.total ?? 0} page={result.data?.page ?? page} pageSize={pageSize} onPage={page => update({ page })} onPageSize={size => update({ pageSize: size, page: 1 })} loading={result.loading} error={result.error?.message} /></Panel></div>;
 }

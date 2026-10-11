@@ -2,10 +2,11 @@ import { beforeEach, expect, test, vi } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-const state = vi.hoisted(() => ({ archived: false, queried: [] as string[] }));
+const state = vi.hoisted(() => ({ archived: false, query: "", queried: [] as string[] }));
 vi.mock("next/navigation", () => ({
-  useSearchParams: () => new URLSearchParams(state.archived ? "scope=company&status=archived" : "scope=company"),
-  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(state.query || (state.archived ? "scope=company&status=archived" : "scope=company")),
+  usePathname: () => "/form/template",
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 vi.mock("@/components/ApplicationContext", () => ({ useApplication: () => ({ data: {
   serviceId: "20000000-0000-4000-8000-000000000001",
@@ -33,7 +34,7 @@ vi.mock("@/lib/api", () => ({
 
 import { TemplateGallery } from "@/components/forms/TemplateGallery";
 
-beforeEach(() => { state.archived = false; state.queried = []; });
+beforeEach(() => { state.archived = false; state.query = ""; state.queried = []; });
 
 test("서비스 템플릿 활성 목록은 상태 필터와 편집·보관 동작을 표시한다", () => {
   const html = renderToStaticMarkup(createElement(TemplateGallery));
@@ -57,4 +58,19 @@ test("보관 목록은 복원·삭제만 제공하고 새 사용·편집을 숨�
   expect(html).toContain(">삭제<");
   expect(html).not.toContain(">사용하기<");
   expect(html).not.toContain(">편집<");
+});
+
+test("직접 진입 URL의 검색·보관·페이지 크기를 API와 입력에 복원한다", () => {
+  state.query = "scope=company&status=archived&q=" + encodeURIComponent("한글 & QA") + "&page=3&pageSize=10";
+  const html = renderToStaticMarkup(createElement(TemplateGallery));
+  const params = new URL(state.queried[0], "https://qa.test").searchParams;
+  expect(Object.fromEntries(params)).toMatchObject({ scope: "company", status: "archived", search: "한글 & QA", page: "3", pageSize: "10" });
+  expect(html).toContain('value="한글 &amp; QA"');
+});
+
+test("잘못된 페이지와 크기는 기본값으로 제한하고 공용 목록은 보관 상태를 적용하지 않는다", () => {
+  state.query = "scope=public&status=archived&page=-3&pageSize=999&q=" + "x".repeat(101);
+  renderToStaticMarkup(createElement(TemplateGallery));
+  const params = new URL(state.queried[0], "https://qa.test").searchParams;
+  expect(Object.fromEntries(params)).toMatchObject({ scope: "public", status: "active", page: "1", pageSize: "20", search: "x".repeat(100) });
 });

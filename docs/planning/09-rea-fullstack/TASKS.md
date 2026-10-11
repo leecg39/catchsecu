@@ -1,6 +1,12 @@
 # 상세 TASKS — 캐치시큐 전 페이지 풀스택 완성 계획
 
-2026-10-11 R05-T01 모델 및 R05-T02 서버 API 완료. 264개 회귀와 실제 HTTP·Ego·재시작으로 본인 검토 파기/보존 권한 결함 수정까지 확인했다. 현재 완료21·진행34·계획52. 사용자 요청으로 이 task 커밋·푸시 후 일시정지하며 다음 작업은 R05-T03이다. [모델](../../qa/R05-T01/current/README.md) · [서버 API](../../qa/R05-T02/current/README.md).
+R09 모델·승인/고정URL 목록 체크포인트: 5모델73열·33제약·20인덱스·8트리거와 dev/test 149 migration을 대조했고 관련8파일·14suite·96시험을 통과했다. 고정URL·독립 승인 목록·폼 내부 승인 내역의 검색·필터·페이지를 URL에 보존하고 Ego 이력·재시작·3폭을 확인했다. 실제 API 승인12건·게시3건과 재시작 전후 폼12·승인12·게시3·감사36 지문이 일치한다. 공식 완료27/진행29/계획51이며 R09 전체 수용은 진행 중이다. [모델](../../qa/R09-T01/current/README.md)·[화면](../../qa/R09-T03/current/README.md).
+
+R08-T01 모델 완료:13모델184열·118제약·55인덱스·45트리거와 PostgreSQL348시험을 대조했다. 폼·템플릿 목록 URL 복원·모바일 제목을 수정하고 화면8시험·Ego 삭제/이력·3폭·production 재시작 데이터 보존을 확인했다. 완료27/진행28/계획52. R08 서버·전체 화면·외부 수용은 진행 중이다. [검증](../../qa/R08-T03/current/README.md).
+
+R07-T01 모델 완료·OAuth 신규 가입 동의 구현/검증 통과. 12모델132열·149migration,16파일471시험·타입·린트오류0·production83페이지,HTTP/Ego/서버·worker 재시작을 확인했다. 완료26/진행29/계획52. R07의 공식 제공사·전체 화면 조합은 잔여로 유지한다. [검증](../../qa/R07-T04/signup/README.md).
+
+2026-10-11 R06-T03 화면 완료. IP/MFA 목록 URL·모바일 간격 보완,8경로24폭·15단위시험·타입·린트·빌드 통과. 완료25·진행30·계획52. R06-T04 내부 재시작 수용 통과, 외부 대기. R07 후속을 진행한다. [화면 증거](../../qa/R06-T03/current/README.md).
 
 R01-T04 outbox·인증메일·감사 기반 완료: 실제 PostgreSQL과 shadow DB에서 worker lease 강제종료·회수·시도이력·중복방지, job/감사 원자성, 인증 proof/job/audit rollback, 로컬·SMTP 인증메일과 마케팅 비의존성을 확인했다. 5파일64시험·shadow 재현·타입·린트가 통과했고 현재 공식 상태는 완료8·진행47·계획52다. [검증](../../qa/R01-T04/current/README.md).
 
@@ -355,7 +361,7 @@ A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 
   - 자기 프로필 수정 재로그인 확인; B 사용자 프로필 노출없음; 최종 로그인 수단 해제 차단; 탈퇴 후 세션 폐기와 보존대상 분리; 검토 만료·중복처리·알림실패 재시도.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [~] R05-T03 MY·프로필·활동 검토·탈퇴 — 전체 화면·모달 연결
+### [x] R05-T03 MY·프로필·활동 검토·탈퇴 — 전체 화면·모달 연결
 
 /my-page 별칭→프로필, 편집/탈퇴 확인, 내 활동로그, 개인정보 활동검토 목록·상세·사유응답·처리결과·재시도를 구현 또는 보완한다.
 
@@ -383,7 +389,7 @@ A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 
 
 ## R06 회사 보안정책·IP·MFA
 
-### [~] R06-T01 회사 보안정책·IP·MFA — 모델·규칙 대조 및 보완
+### [x] R06-T01 회사 보안정책·IP·MFA — 모델·규칙 대조 및 보완
 
 회사 단일 정책, IP/CIDR 정규화·중복, IPv4/IPv6, MFA 예외 만료와 version을 점검한다. 보안 수치의 원본 미확인 기본값을 확정 사실로 기록하지 않는다.
 
@@ -395,7 +401,7 @@ A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 
   - C IP 규칙/MFA 예외; R 정책·보안현황; U 정책·예외기간·활성; D 규칙·예외 삭제/정책 초기화.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [~] R06-T02 회사 보안정책·IP·MFA — 서버 API·업무 처리
+### [x] R06-T02 회사 보안정책·IP·MFA — 서버 API·업무 처리
 
 저장된 정책이 로그인·매 API·파일/내보내기·worker에 실제 집행되게 한다. 프록시 IP 신뢰 경계, 잘못된 정책으로 관리자 전원 잠금 방지와 예외 갱신 경합을 시험한다.
 
@@ -407,7 +413,7 @@ A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 
   - IP 차단 후 기존 로그인에서도 API403; 잘못된 CIDR422(INVALID_CIDR); 신뢰하지 않는 X-Forwarded-For 우회실패; MFA 예외만료 즉시 재인증; 정책초기화 이후 DB와 화면 일치.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [~] R06-T03 회사 보안정책·IP·MFA — 전체 화면·모달 연결
+### [x] R06-T03 회사 보안정책·IP·MFA — 전체 화면·모달 연결
 
 회사 정책 조회/설정, 보안 대시보드, IP 목록·편집·삭제, 2FA 강제·예외 사용자/기간을 API로 연결한다. Enterprise 미가입과 권한 부족을 구분한다.
 
@@ -435,7 +441,7 @@ IP 차단 후 기존 로그인에서도 API403; 잘못된 CIDR422(INVALID_CIDR);
 
 ## R07 SSO·OAuth·기관 인증
 
-### [~] R07-T01 SSO·OAuth·기관 인증 — 모델·규칙 대조 및 보완
+### [x] R07-T01 SSO·OAuth·기관 인증 — 모델·규칙 대조 및 보완
 
 기관별 issuer·client·인증서와 암호화 secret, state/nonce·만료·소비 제약을 대조한다. VirtualOrgMember는 가상시험용임을 유지하며 실제 기관 신원 모델과 혼동하지 않는다.
 
@@ -487,7 +493,7 @@ SSO 목록·등록·수정·삭제·연결시험, OAuth/SAML 시작/성공/실�
 
 ## R08 캐치폼·질문·템플릿·단계 편집
 
-### [~] R08-T01 캐치폼·질문·템플릿·단계 편집 — 모델·규칙 대조 및 보완
+### [x] R08-T01 캐치폼·질문·템플릿·단계 편집 — 모델·규칙 대조 및 보완
 
 Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 순서·필수·조건·옵션 ID 안정성을 확인한다. 원본 번들 question·policy 세부항목과 현재 계약의 누락 필드 표를 만든다.
 
@@ -540,7 +546,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
 
 ## R09 폼 승인·게시·고정 URL
 
-### [ ] R09-T01 폼 승인·게시·고정 URL — 모델·규칙 대조 및 보완
+### [~] R09-T01 폼 승인·게시·고정 URL — 모델·규칙 대조 및 보완
 
 승인대상 버전 해시·게시 포인터·토큰 hash·고정slug unique와 만료를 확인한다. 승인 뒤 내용 변경 시 승인 유효성 및 참조 버전 고정을 명시한다.
 
@@ -1164,7 +1170,7 @@ CRUD/options/test/enabled/bulk-delete/deliveries/retry를 검증하고 실제 �
 
 ## R21 라이선스·결제수단·주문·원장·환불
 
-### [ ] R21-T01 라이선스·결제수단·주문·원장·환불 — 모델·규칙 대조 및 보완
+### [x] R21-T01 라이선스·결제수단·주문·원장·환불 — 모델·규칙 대조 및 보완
 
 가격버전·회사구독·billing method·order/event/refund·복식원장 제약을 확인한다. 금액은 정수, 통화/가격snapshot, eventId unique, 잔액합계·환불누계 불변조건을 정의한다.
 
@@ -1172,11 +1178,12 @@ CRUD/options/test/enabled/bulk-delete/deliveries/retry를 검증하고 실제 �
 - 대상: `prisma/schema.prisma`; `prisma/migrations`; `src/contracts`; `src/server/admin-plans.ts`; `src/server/entitlements.ts`; `src/server/payment-methods.ts`; `src/server/payments.ts`; `src/server/subscriptions.ts`; `src/server/subscription-worker.ts`; `src/server/billing-settlement.ts`; `src/server/ledger.ts`; `src/server/billing-reads.ts`; `src/server/billing-history.ts`
 - 기존 작업 연결: P10-T01, P10-T02, P10-T03, P10-T04, P10-T05
 - 증거: `catchsecu-clone/docs/qa/R21-T01/`
+- 완료 기록(2026-10-11): 12모델 107열·70제약·37인덱스·10트리거·150migration의 dev/test 정의 일치와 교차 회사 주문 0건을 확인했다. 단일 `subscriptionId` FK가 타 회사 구독 연결을 허용하는 실패를 재현해 `(tenantId, subscriptionId)` 복합 FK로 보완했고, 기존 위반 데이터 중단·정상 이행을 임시 격리 스키마에서 검증했다. 결제 관련 14파일 164시험·타입·린트·Prisma 검증 통과. [근거](../../qa/R21-T01/README.md).
 - 완료 조건:
   - C 구독/결제수단/주문/환불요청; R 상품·자산·원장·청구서; U 기본수단·예약해지/취소; D 수단삭제·구독해지. 승인결제/원장은 보정 이벤트만.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R21-T02 라이선스·결제수단·주문·원장·환불 — 서버 API·업무 처리
+### [x] R21-T02 라이선스·결제수단·주문·원장·환불 — 서버 API·업무 처리
 
 provider event 검증·order return·승인/실패/환불 상태기계와 멱등성을 재검증한다. 수정 중인 payment-events/payments/subscriptions를 보존하고 새계획의 검증만 추가한다. success URL은 조회 전용.
 
@@ -1184,6 +1191,7 @@ provider event 검증·order return·승인/실패/환불 상태기계와 멱등
 - 대상: `src/server/admin-plans.ts`; `src/server/entitlements.ts`; `src/server/payment-methods.ts`; `src/server/payments.ts`; `src/server/subscriptions.ts`; `src/server/subscription-worker.ts`; `src/server/billing-settlement.ts`; `src/server/ledger.ts`; `src/server/billing-reads.ts`; `src/server/billing-history.ts`; `src/app/api/v1`; `docs/planning/contracts/openapi.json`
 - 기존 작업 연결: P10-T01, P10-T02, P10-T03, P10-T04, P10-T05
 - 증거: `catchsecu-clone/docs/qa/R21-T02/`
+- 완료 기록(2026-10-11): 소유 API 34작업·21 handler를 대조하고 누락된 환불 목록/요청·PDF 청구서·월마감 조회/생성 5개 계약을 보완했다. 오래된 역할을 신뢰하던 결제 이력·원장·환불·청구서·월마감에 현재 역할/세션/회사/정책 재검사를 적용하고 최신 환불 멱등 응답과 감사 실패 원자 롤백을 확인했다. 결제 14파일 169시험, 타입·린트·계약 검사와 DB 불균형원장/초과환불/교차회사주문/중복event 0건을 통과했다. [근거](../../qa/R21-T02/README.md).
 - 완료 조건:
   - 시험주문→승인중복/역순event→1회잔액충전→부분/전액환불→원장합계0검증; 결제중해지409·과거취소구독충전차단 기존회귀 보존; 임의successURL로승인불가; 실제PG시험은 별도.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.

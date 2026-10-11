@@ -23,6 +23,8 @@ import { assertFreshSsoSession } from "./sso-accounts";
 import { assertSsoBrowser, startSsoBrowser } from "./sso-browser";
 import { requestSsoJson, ssoEndpoint } from "./sso-transport";
 import { issueSsoMfa } from "./sso-mfa";
+import { issueSsoSignup } from "./sso-signup";
+import type { ssoSignupAccept } from "@/contracts/sso-signup";
 import { validateSamlEnvelope, validatedSamlSubject } from "./saml-validation";
 import { idempotent } from "./idempotency";
 import { recordSsoSessionProof } from "./sso-session-proof";
@@ -348,12 +350,12 @@ function sessionCookie(token: string, signature: string) {
   const name = (secure ? "__Secure-" : "") + "better-auth.session_token";
   return `${name}=${token}.${signature}; Path=/; HttpOnly; SameSite=Lax${secure ? "; Secure" : ""}`;
 }
-async function mintSession(tx: Transaction, userId: string, provider: SsoProvider, accountId: string, headers: Headers) {
+async function mintSession(tx: Transaction, userId: string, provider: SsoProvider, accountId: string, headers: Headers, authenticatedAt = new Date()) {
   const tenantId = provider.tenantId;
   const token = randomBytes(32).toString("base64url");
   const session = await tx.session.create({ data: { token, userId, expiresAt: new Date(Date.now() + 7 * 86400 * 1000),
     ipAddress: trustedClientIp(headers), userAgent: headers.get("user-agent") ?? null, activeCompanyId: tenantId } });
-  await recordSsoSessionProof(tx, session.id, userId, provider, accountId);
+  await recordSsoSessionProof(tx, session.id, userId, provider, accountId, authenticatedAt);
   await audit(tx, { tenantId, user: { id: userId } }, "sso-callback", "session.created", "session", session.id);
   return sessionCookie(token, await makeSignature(token, env.BETTER_AUTH_SECRET));
 }
@@ -407,7 +409,7 @@ async function linkActorForState(tx: Transaction, provider: SsoProvider, state: 
   const actor = await lockSsoRecoveryActor(tx, ctx);
   return { user, actor, session };
 }
-async function lockSsoInvitation(tx: Transaction, provider: SsoProvider, state: SsoState, subject: SsoSubject) {
+export async function lockSsoInvitation(tx: Transaction, provider: SsoProvider, state: SsoState, subject: SsoSubject) {
   await tx.$queryRawUnsafe('SELECT id FROM "Invitation" WHERE id=$1 AND "tenantId"=$2 FOR UPDATE', state.invitationId ?? "", provider.tenantId);
   const invitation = await tx.invitation.findUnique({ where: { id: state.invitationId ?? "" } });
   if (!invitation || !state.invitationTokenHash || !state.invitationVersion
@@ -420,8 +422,12 @@ async function lockSsoInvitation(tx: Transaction, provider: SsoProvider, state: 
 }
 export async function completeSso(initialProvider: SsoProvider, state: SsoState, subject: SsoSubject, headers: Headers,
   prepare?: (tx: Transaction) => Promise<void>) {
+  return db.$transaction(tx => completeSsoInTransaction(tx, initialProvider, state, subject, headers, prepare), { timeout: 15000 });
+}
+
+export async function completeSsoInTransaction(tx: Transaction, initialProvider: SsoProvider, state: SsoState, subject: SsoSubject, headers: Headers,
+  prepare?: (tx: Transaction) => Promise<void>, acceptance?: z.infer<typeof ssoSignupAccept> & { authenticatedAt: Date }) {
   const accountKey = subject.iss + "|" + subject.sub;
-  return db.$transaction(async tx => {
     await lockSsoCompany(tx, initialProvider.tenantId, headers);
     const provider = await providerForUpdate(tx, { tenantId: initialProvider.tenantId }, initialProvider.id);
     assertSsoState(provider, state);
@@ -435,14 +441,19 @@ export async function completeSso(initialProvider: SsoProvider, state: SsoState,
     if (linking && account && account.userId !== linking.user.id)
       fail(409, "SSO_ACCOUNT_ALREADY_LINKED", "이미 다른 사용자에게 연결된 외부 계정입니다.");
     let user = account ? await tx.user.findUniqueOrThrow({ where: { id: account.userId } }) : linking?.user ?? null;
+    if (acceptance && user) fail(409, "SSO_SIGNUP_CHANGED", "가입할 계정이 변경되었습니다. 다시 로그인해주세요.");
     if (!user) {
       if (!subject.email || !subject.emailVerified)
         fail(403, "EMAIL_UNVERIFIED", "IdP에서 확인된 이메일이 없어 계정을 연결할 수 없습니다.");
       const existing = await tx.user.findUnique({ where: { email: subject.email.toLowerCase() } });
       if (existing)
         fail(409, "SSO_LINK_REQUIRED", "기존 계정으로 로그인한 뒤 외부 계정을 연결해주세요.");
+      if (provider.protocol === "oidc" && !acceptance) return issueSsoSignup(tx, provider, state, subject);
       user = await tx.user.create({ data: { email: subject.email.toLowerCase(),
         name: subject.name ?? subject.email.split("@")[0], emailVerified: true } });
+      if (acceptance) await tx.ssoSignupAcceptance.create({ data: { userId: user.id, overFourteen: acceptance.overFourteen,
+        termsVersion: acceptance.termsVersion, privacyVersion: acceptance.privacyVersion } });
+      if (acceptance) await audit(tx, { tenantId: provider.tenantId, user: { id: user.id } }, "sso-signup", "sso.signup_accepted", "user", user.id, ["age", "termsVersion", "privacyVersion"]);
     }
     await tx.$queryRawUnsafe('SELECT id FROM "User" WHERE id=$1 FOR SHARE', user.id);
     user = await tx.user.findUniqueOrThrow({ where: { id: user.id } });
@@ -488,15 +499,14 @@ export async function completeSso(initialProvider: SsoProvider, state: SsoState,
       ? await issueSsoMfa(tx, { userId: user.id, tenantId: provider.tenantId, providerId: provider.id,
         providerVersion: provider.version, accountId: linkedAccount.id, memberId: member.id, memberVersion: member.version,
         passwordChangedAt: user.passwordChangedAt?.toISOString() ?? null, originalSessionId: state.mode === "link" ? state.sessionId : null,
-        authenticatedAt: new Date().toISOString() })
-      : { redirect: state.mode === "link" ? "/link/oauth2/verified" : "/dashboard", cookie: await mintSession(tx, user.id, provider, linkedAccount.id, headers), clearSessionCookie: undefined };
+        authenticatedAt: (acceptance?.authenticatedAt ?? new Date()).toISOString() })
+      : { redirect: state.mode === "link" ? "/link/oauth2/verified" : "/dashboard", cookie: await mintSession(tx, user.id, provider, linkedAccount.id, headers, acceptance?.authenticatedAt), clearSessionCookie: undefined };
     if (!user.twoFactorEnabled)
       await audit(tx, { tenantId: provider.tenantId, user: { id: user.id } }, "sso-callback", "sso.login", "user", user.id, []);
     assertSsoState(provider, state);
     if (linking) { assertFileDeadlines(linking.actor.deadlines); assertFreshSsoSession(linking.session); }
     if (invitationDeadline && invitationDeadline <= new Date()) fail(410, "INVITATION_UNAVAILABLE", "초대가 만료되었습니다.");
     return result;
-  }, { timeout: 15000 });
 }
 
 // ---- SAML 2.0 (HTTP-POST 바인딩) ----

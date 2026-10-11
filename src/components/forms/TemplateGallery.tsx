@@ -3,9 +3,10 @@ import { AuthorAssetProvider, useAuthorAsset } from "./AuthorAssetProvider";
 import { hasAuthorAssets } from "@/lib/author-assets";
 import { QuestionChoiceSummary } from "./QuestionChoiceSummary";
 import { QuestionSummary } from "./QuestionSummary";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { listHref, pageSize as listPageSize, positivePage } from "@/lib/list-url-state";
 import { PageHeading, ActionButton, Modal, Panel } from "../shared";
 import { RemoteTable } from "../RemoteTable";
 import { useApplication } from "../ApplicationContext";
@@ -33,26 +34,37 @@ function Preview({ id }: { id: string }) {
     <p>보유 기간 {row.content.retentionDays}일 · 최대 응답 {row.content.maxResponses}건</p></div></AuthorAssetProvider>;
 }
 export function TemplateGallery() {
-  const app = useApplication(), router = useRouter(), searchParams = useSearchParams();
-  const [company, setCompany] = useState(searchParams.get("scope") === "company"), [sourcePreview, setSourcePreview] = useState<number | null>(null);
-  const [archived, setArchived] = useState(searchParams.get("status") === "archived");
+  const app = useApplication(), router = useRouter(), pathname = usePathname(), searchParams = useSearchParams();
+  const company = searchParams.get("scope") === "company", archived = company && searchParams.get("status") === "archived";
+  const page = Math.min(100000, positivePage(searchParams.get("page"))), pageSize = listPageSize(searchParams.get("pageSize"));
+  const search = (searchParams.get("q") ?? "").slice(0, 100);
+  const [draft, setDraft] = useState({ search, value: search });
+  if (draft.search !== search) setDraft({ search, value: search });
+  const query = draft.search === search ? draft.value : search;
+  function update(values: Record<string, string | number | null>) { router.push(listHref(pathname, searchParams.toString(), values), { scroll: false }); }
+  function setPage(value: number) { update({ page: value }); }
+  const [sourcePreview, setSourcePreview] = useState<number | null>(null);
   const [preview, setPreview] = useState<TemplateRecord>(), [use, setUse] = useState<TemplateRecord>(), [remove, setRemove] = useState<TemplateRecord>();
   const [transition, setTransition] = useState<{ row: TemplateRecord; action: "archive" | "restore" }>();
-  const [target, setTarget] = useState(""), [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20);
-  const [query, setQuery] = useState(""), [search, setSearch] = useState(""), [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const [target, setTarget] = useState("");
+  const [busy, setBusy] = useState(false), [error, setError] = useState("");
   const keys = useRef(new Map<string, string>());
   const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), scope: company ? "company" : "public",
     status: company && archived ? "archived" : "active", search });
   if (company && app.data?.serviceId) params.set("serviceId", app.data.serviceId);
   const result = useResource<TemplatePage>(app.data ? "/templates?" + params : null);
+  useEffect(() => {
+    if (result.data && result.data.page !== page)
+      router.replace(listHref(pathname, searchParams.toString(), { page: result.data.page }), { scroll: false });
+  }, [result.data, page, pathname, searchParams, router]);
   const targets = result.data?.permissions.targets ?? [];
-  return <><PageHeading title="캐치폼 템플릿"><p>목적에 맞는 템플릿을 저장하고 질문·동의·응답 설정을 새 캐치폼으로 복제하세요.</p>
+  return <div className="forms-list-page"><PageHeading title="캐치폼 템플릿"><p>목적에 맞는 템플릿을 저장하고 질문·동의·응답 설정을 새 캐치폼으로 복제하세요.</p>
     {result.data?.permissions.canCreate && <Link className="cs-button" href="/form/ai/create?templateEdit=new">템플릿 생성</Link>}</PageHeading>
     <div className="forms-tabs" role="tablist">{["캐치폼 템플릿", "서비스 템플릿"].map((label, index) => <button role="tab" aria-selected={company === (index === 1)}
-      className={company === (index === 1) ? "active" : ""} key={label} onClick={() => { setCompany(index === 1); if (index === 0) setArchived(false); setPage(1); setError(""); }}>{label}</button>)}</div>
-    {(company || !!result.data?.items.length || !!result.error) && <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); setSearch(query); setPage(1); }}>
-      <input className="cs-input" aria-label="템플릿 검색" placeholder="제목·분류·설명" value={query} onChange={event => setQuery(event.target.value)} />
-      {company && <select className="cs-input" aria-label="템플릿 상태" value={archived ? "archived" : "active"} onChange={event => { setArchived(event.target.value === "archived"); setPage(1); setError(""); }}>
+      className={company === (index === 1) ? "active" : ""} key={label} onClick={() => { update({ scope: index === 1 ? "company" : null, status: index === 1 && archived ? "archived" : null, page: 1 }); setError(""); }}>{label}</button>)}</div>
+    {(company || !!search || !!result.data?.items.length || !!result.error) && <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); update({ q: query, page: 1 }); }}>
+      <input className="cs-input" aria-label="템플릿 검색" placeholder="제목·분류·설명" maxLength={100} value={query} onChange={event => setDraft({ search, value: event.target.value })} />
+      {company && <select className="cs-input" aria-label="템플릿 상태" value={archived ? "archived" : "active"} onChange={event => { update({ status: event.target.value === "archived" ? "archived" : null, page: 1 }); setError(""); }}>
         <option value="active">사용 중</option><option value="archived">보관됨</option></select>}
       <ActionButton secondary>검색</ActionButton></form>
       {result.error && <div><p role="alert">{result.error.message}</p><ActionButton secondary disabled={result.loading} onClick={result.reload}>템플릿 목록 다시 불러오기</ActionButton></div>}
@@ -69,7 +81,7 @@ export function TemplateGallery() {
           {row.actions?.archive && <button onClick={() => { setTransition({ row, action: "archive" }); setError(""); }}>보관</button>}
           {row.actions?.restore && <button onClick={() => { setTransition({ row, action: "restore" }); setError(""); }}>복원</button>}
           {row.actions?.remove && <button onClick={() => { setRemove(row); setError(""); }}>삭제</button>}</div>] }))}
-        total={result.data?.total ?? 0} page={result.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} loading={result.loading} error={result.error?.message} empty="등록된 템플릿이 없습니다." />
+        total={result.data?.total ?? 0} page={result.data?.page ?? page} pageSize={pageSize} onPage={setPage} onPageSize={size => update({ pageSize: size, page: 1 })} loading={result.loading} error={result.error?.message} empty="등록된 템플릿이 없습니다." />
     </Panel>}
     {!company && <><p className="cs-muted">아래 양식은 미리보기 전용입니다. 서비스 템플릿에서 직접 양식을 만들어 사용할 수 있습니다.</p>
       <div className="forms-gallery">{sourceTemplates.map((template, index) => <article className="forms-template" key={template.title}>
@@ -105,5 +117,5 @@ export function TemplateGallery() {
         try { await api("/templates/" + remove.id, { method: "DELETE", headers: { "If-Match": String(remove.version) } }); setRemove(undefined); result.reload(); }
         catch (error) { setError(errorText(error)); if (error instanceof ApiError && [403, 404, 409, 410].includes(error.status)) result.reload(); } finally { setBusy(false); }
       }}>{busy ? "삭제 중…" : "템플릿 삭제 확인"}</ActionButton></Modal>}
-  </>;
+  </div>;
 }

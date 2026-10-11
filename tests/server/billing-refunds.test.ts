@@ -1,5 +1,6 @@
 import { createHmac, randomUUID } from "node:crypto";
-import { afterAll, beforeEach, expect, test } from "vitest";
+import { afterAll, afterEach, beforeEach, expect, test, vi } from "vitest";
+import * as auditModule from "@/server/audit";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
 import { env } from "@/server/env";
@@ -18,6 +19,7 @@ function req(path: string, cookie = "", method = "GET", input?: unknown, key?: s
 }
 function sign(body: string) { return createHmac("sha256", secret).update(body).digest("hex"); }
 beforeEach(async () => { await db.$executeRawUnsafe('TRUNCATE TABLE "Company", "User", "Verification", "RateLimit", "IdempotencyRecord", "ApiRateLimit", "Job" CASCADE'); });
+afterEach(() => { vi.restoreAllMocks(); });
 afterAll(async () => { await db.$disconnect(); });
 
 async function paidFixture() {
@@ -63,7 +65,8 @@ test("환불 요청은 결제 주문에만 허용되고 누계 초과는 거부�
 
 test("서명된 환불 이벤트만 정산하고 재시도·무서명·비paid 주문을 거부한다", async () => {
   const { company, order, cookie } = await paidFixture();
-  const refund = await (await requestRefund(req("/billing/orders/" + order.id + "/refunds", cookie, "POST", { amount: 4000, reason: "사유" }, randomUUID()))).json();
+  const refundKey = randomUUID();
+  const refund = await (await requestRefund(req("/billing/orders/" + order.id + "/refunds", cookie, "POST", { amount: 4000, reason: "사유" }, refundKey))).json();
   expect((await account(company.id)).available).toBe(BigInt(12000));
   const bad = JSON.stringify({ orderId: order.id, eventId: "ev-rf-" + randomUUID().slice(0, 8), outcome: "refunded" });
   await expect(applyPaymentEvent(bad, sign(bad), secret)).rejects.toMatchObject({ status: 422 });
@@ -75,6 +78,8 @@ test("서명된 환불 이벤트만 정산하고 재시도·무서명·비paid �
   await expect(applyPaymentEvent(done, "00", secret)).rejects.toMatchObject({ status: 401 });
   await applyPaymentEvent(done, sign(done), secret);
   expect((await db.paymentRefund.findUniqueOrThrow({ where: { id: refund.id } })).status).toBe("refunded");
+  const replay = await requestRefund(req("/billing/orders/" + order.id + "/refunds", cookie, "POST", { amount: 4000, reason: "사유" }, refundKey));
+  expect(await replay.json()).toMatchObject({ id: refund.id, status: "refunded", version: 2 });
   const acc = await account(company.id);
   expect(acc.available).toBe(BigInt(8000));
   const txn = await db.ledgerTransaction.findFirstOrThrow({ where: { tenantId: company.id, kind: "refund", sourceId: refund.id } });
@@ -87,11 +92,50 @@ test("서명된 환불 이벤트만 정산하고 재시도·무서명·비paid �
   await applyPaymentEvent(rejected, sign(rejected), secret);
   expect((await db.paymentRefund.findUniqueOrThrow({ where: { id: second.id } })).status).toBe("rejected");
   expect(await db.ledgerTransaction.count({ where: { tenantId: company.id, kind: "refund" } })).toBe(1);
+  const finalRefund = await (await requestRefund(req("/billing/orders/" + order.id + "/refunds", cookie, "POST", { amount: 8000, reason: "전액 잔여" }, randomUUID()))).json();
+  const finalEvent = JSON.stringify({ orderId: order.id, eventId: "ev-rf-" + randomUUID().slice(0, 8), outcome: "refunded", refundId: finalRefund.id });
+  await applyPaymentEvent(finalEvent, sign(finalEvent), secret);
+  expect((await account(company.id)).available).toBe(BigInt(0));
+  const entries = await db.ledgerEntry.findMany({ where: { transaction: { tenantId: company.id } }, orderBy: [{ transactionId: "asc" }, { account: "asc" }] });
+  expect(entries.reduce((sum, entry) => sum + entry.amount, BigInt(0))).toBe(BigInt(0));
+  const byTransaction = Map.groupBy(entries, entry => entry.transactionId);
+  expect([...byTransaction.values()].every(group => group.reduce((sum, entry) => sum + entry.amount, BigInt(0)) === BigInt(0))).toBe(true);
+  expect((await db.paymentRefund.aggregate({ where: { orderId: order.id, status: "refunded" }, _sum: { amount: true } }))._sum.amount).toBe(12000);
   const late = JSON.stringify({ orderId: order.id, eventId: "ev-rf-" + randomUUID().slice(0, 8), outcome: "refunded", refundId: refund.id });
   await expect(applyPaymentEvent(late, sign(late), secret)).rejects.toMatchObject({ status: 409 });
   await expect(db.paymentRefund.update({ where: { id: refund.id }, data: { status: "requested", version: 2 } })).rejects.toThrow();
   const big = await db.paymentOrder.create({ data: { tenantId: company.id, subscriptionId: order.subscriptionId, amount: 99999999, currency: "KRW", status: "pending" } });
   await expect(db.paymentRefund.create({ data: { tenantId: company.id, orderId: big.id, amount: 1, reason: "미결제", currency: "KRW" } })).rejects.toThrow();
+});
+
+test("환불 요청 감사 실패는 환불·감사·멱등 키를 함께 롤백한다", async () => {
+  const { company, order, cookie } = await paidFixture();
+  const realAudit = auditModule.audit;
+  vi.spyOn(auditModule, "audit").mockImplementation(async (...args) => {
+    if (args[3] === "billing.refund_requested") throw new Error("Injected refund audit failure");
+    return realAudit(...args);
+  });
+  const key = randomUUID();
+  const response = await requestRefund(req("/billing/orders/" + order.id + "/refunds", cookie, "POST", { amount: 1000, reason: "롤백" }, key));
+  expect(response.status).toBe(500);
+  expect(await db.paymentRefund.count({ where: { tenantId: company.id } })).toBe(0);
+  expect(await db.auditEvent.count({ where: { tenantId: company.id, action: "billing.refund_requested" } })).toBe(0);
+  expect(await db.idempotencyRecord.count({ where: { key } })).toBe(0);
+});
+
+test("월마감 감사 실패는 마감·감사·멱등 키를 함께 롤백한다", async () => {
+  const { company, cookie } = await paidFixture();
+  const realAudit = auditModule.audit;
+  vi.spyOn(auditModule, "audit").mockImplementation(async (...args) => {
+    if (args[3] === "billing.month_closed") throw new Error("Injected close audit failure");
+    return realAudit(...args);
+  });
+  const key = randomUUID(), month = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth() - 1, 1)).toISOString().slice(0, 7);
+  const response = await closePost(req("/billing/closing", cookie, "POST", { month, currency: "KRW" }, key));
+  expect(response.status).toBe(500);
+  expect(await db.billingMonthClose.count({ where: { tenantId: company.id } })).toBe(0);
+  expect(await db.auditEvent.count({ where: { tenantId: company.id, action: "billing.month_closed" } })).toBe(0);
+  expect(await db.idempotencyRecord.count({ where: { key } })).toBe(0);
 });
 
 test("청구서는 paid 주문에만 발행되고 권한·격리를 지킨다", async () => {

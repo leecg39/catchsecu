@@ -1,6 +1,9 @@
 "use client";
 import { SecurityEntitlementNotice } from "./SecurityEntitlementNotice";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { listHref } from "@/lib/list-url-state";
+import { ipListState } from "@/lib/security-list-state";
 import { GuardedLink as Link, useUnsavedChanges } from "../ux/navigation-guard";
 import { api, ApiError, errorText, useResource } from "@/lib/api";
 import type { IpRulePage, IpRuleRecord } from "@/contracts/ip-access";
@@ -11,11 +14,18 @@ export function IpAccess({ settings=false }: {settings?:boolean}) {
   const app=useApplication();return <IpAccessContent key={(app.data?.company?.id??"none")+":"+(app.data?.company?.role??"")} settings={settings}/>;
 }
 function IpAccessContent({ settings=false }: {settings?:boolean}) {
-  const [searchInput,setSearchInput]=useState(""),[search,setSearch]=useState(""),[filter,setFilter]=useState("all"),[page,setPage]=useState(1),[sort,setSort]=useState("createdAt:desc");
+  const params=useSearchParams(),pathname=usePathname(),router=useRouter();
+  const {search,status:filter,page,pageSize,sort:field,direction}=ipListState(params),sort=field+":"+direction;
+  const [draft,setDraft]=useState({search,value:search});
+  if(draft.search!==search)setDraft({search,value:search});
+  const searchInput=draft.search===search?draft.value:search;
+  function setSearchInput(value:string){setDraft({search,value});}
+  function update(values:Record<string,string|number|null>){router.push(listHref(pathname,params.toString(),values),{scroll:false});}
+  function setPage(value:number){update({page:value});}
   const [edit,setEdit]=useState<IpRuleRecord|null|undefined>(),[confirm,setConfirm]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(""),[notice,setNotice]=useState("");
-  const [field,direction]=sort.split(":");
-  const query=new URLSearchParams({search,status:filter,page:String(page),sort:field,direction});
+  const query=new URLSearchParams({search,status:filter,page:String(page),pageSize:String(pageSize),sort:field,direction});
   const result=useResource<IpRulePage>("/security/ip-rules?"+query),policy=result.data?.policy;
+  useEffect(()=>{if(result.data&&result.data.page!==page)router.replace(listHref(pathname,params.toString(),{page:result.data.page}),{scroll:false});},[result.data,page,pathname,params,router]);
   const ask=useConfirm(),lock=useRef(false);
   const [conflict,setConflict]=useState(false);
   async function remove(row:IpRuleRecord) {
@@ -29,8 +39,8 @@ function IpAccessContent({ settings=false }: {settings?:boolean}) {
     catch(cause){setError(errorText(cause));setConflict(cause instanceof ApiError&&cause.code==="VERSION_CONFLICT");}finally{lock.current=false;setBusy(false);}
   }
   return <><PageHeading title={settings?"IP 접근 규칙 설정":"IP 접근 관리"}>
-    {!settings&&<Link className="cs-button" href="/security/ip/setting">접근 규칙 설정</Link>}
-    {settings&&<Link className="cs-button" href="/security/ip">목록 보기</Link>}
+    {!settings&&<Link className="cs-button" href={listHref("/security/ip/setting",params.toString(),{})}>접근 규칙 설정</Link>}
+    {settings&&<Link className="cs-button" href={listHref("/security/ip",params.toString(),{})}>목록 보기</Link>}
   </PageHeading><p className="mg-description">허용한 IP 주소와 범위에서만 회사 기능을 사용할 수 있도록 설정합니다. 최상위 관리자만 규칙을 변경할 수 있습니다.</p>
     {!confirm&&error&&<p role="alert">{error}</p>}{!confirm&&conflict&&<ActionButton secondary disabled={busy} onClick={()=>{setConflict(false);setError("");result.reload();}}>최신 규칙 불러오기</ActionButton>}{notice&&<p role="status">{notice}</p>}
     {result.error?<Panel><p role="alert">{result.error.message}</p><ActionButton secondary onClick={result.reload}>다시 불러오기</ActionButton></Panel>:!policy?<Panel><p role="status">IP 접근 설정을 불러오는 중입니다.</p></Panel>:<>
@@ -39,11 +49,11 @@ function IpAccessContent({ settings=false }: {settings?:boolean}) {
       </PageHeading><p>현재 접속 IP: <strong>{policy.currentIp??"확인할 수 없음"}</strong></p>
         <p>제한을 켜기 전에 현재 접속 IP를 허용하는 규칙을 등록해주세요. 현재 관리자의 접속을 차단하는 변경은 저장할 수 없습니다.</p>
       </Panel>
-      <Panel><form className="mg-flex" onSubmit={e=>{e.preventDefault();setSearch(searchInput);setPage(1);}}>
-        <label>검색<input className="cs-input" value={searchInput} onChange={e=>setSearchInput(e.target.value)} placeholder="IP 또는 설명"/></label>
+      <Panel><form className="mg-flex" onSubmit={e=>{e.preventDefault();update({q:searchInput,page:1});}}>
+        <label>검색<input className="cs-input" maxLength={100} value={searchInput} onChange={e=>setSearchInput(e.target.value)} placeholder="IP 또는 설명"/></label>
         <ActionButton type="submit">검색</ActionButton>
-        <label>사용 상태<select className="cs-input" value={filter} onChange={e=>{setFilter(e.target.value);setPage(1);}}><option value="all">전체</option><option value="enabled">사용</option><option value="disabled">사용 안 함</option></select></label>
-        <label>정렬<select className="cs-input" value={sort} onChange={e=>{setSort(e.target.value);setPage(1);}}><option value="createdAt:desc">최근 등록순</option><option value="createdAt:asc">등록순</option><option value="cidr:asc">IP 오름차순</option><option value="cidr:desc">IP 내림차순</option></select></label>
+        <label>사용 상태<select className="cs-input" aria-label="IP 사용 상태" value={filter} onChange={e=>update({status:e.target.value,page:1})}><option value="all">전체</option><option value="enabled">사용</option><option value="disabled">사용 안 함</option></select></label>
+        <label>정렬<select className="cs-input" aria-label="IP 정렬" value={sort} onChange={e=>{const [sort,direction]=e.target.value.split(":");update({sort,direction,page:1});}}><option value="createdAt:desc">최근 등록순</option><option value="createdAt:asc">등록순</option><option value="cidr:asc">IP 오름차순</option><option value="cidr:desc">IP 내림차순</option></select></label>
         {policy.canManage&&<ActionButton type="button" disabled={busy} onClick={()=>setEdit(null)}>IP 규칙 등록</ActionButton>}
       </form><div className="cs-table-wrap"><table className="cs-table"><thead><tr><th>IP·CIDR 범위</th><th>설명</th><th>사용 상태</th><th>등록일</th><th>관리</th></tr></thead><tbody>
         {result.data!.items.map(row=><tr key={row.id}><td>{row.cidr}</td><td>{row.description||"-"}</td><td>{row.enabled?"사용":"사용 안 함"}</td><td>{new Date(row.createdAt).toLocaleDateString("ko-KR")}</td><td>{policy.canManage&&<div className="mg-flex"><ActionButton secondary disabled={busy} onClick={()=>setEdit(row)}>수정</ActionButton><ActionButton secondary disabled={busy} onClick={()=>void remove(row)}>삭제</ActionButton></div>}</td></tr>)}

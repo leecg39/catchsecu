@@ -8,6 +8,8 @@ const database = new URL(env.DATABASE_URL);
 assert.ok(["/catchsecu_dev", "/catchsecu_test"].includes(database.pathname));
 assert.ok(["localhost", "127.0.0.1"].includes(database.hostname));
 const tables = ["SecurityPolicy", "IpRule", "IpAccessPolicy", "MfaException"];
+const directory = process.argv[2] ?? "docs/qa/R06-T01/model-audit";
+assert.ok(["docs/qa/R06-T01/model-audit", "docs/qa/R06-T01/current"].includes(directory));
 try {
   const columns = await db.$queryRaw<{ table: string; column: string; type: string; nullable: string }[]>`
     SELECT table_name AS "table", column_name AS "column", data_type AS type, is_nullable AS nullable
@@ -38,7 +40,7 @@ try {
   const report = { result: "passed", database: database.pathname.slice(1), checkedAt: new Date().toISOString(),
     scope: "Four existing company security policy/IP/MFA models; read-only metadata, unique keys, tenant relations, CIDR normalization, encrypted reasons, bounded lifetime and version guards. No new migration or claim of full R06 acceptance.",
     tables, columns, constraints, indexes, triggers, sourceFingerprints };
-  await mkdir("docs/qa/R06-T01/model-audit", { recursive: true });
-  await writeFile("docs/qa/R06-T01/model-audit/" + database.pathname.slice(1) + ".json", JSON.stringify(report, null, 2) + "\n");
+  await mkdir(directory, { recursive: true });
+  await writeFile(directory + "/" + database.pathname.slice(1) + ".json", JSON.stringify(report, null, 2) + "\n");
   console.log(JSON.stringify({ result: report.result, database: report.database, tables: tables.length, columns: columns.length, constraints: constraints.length, indexes: indexes.length, triggers: triggers.length }));
 } finally { await db.$disconnect(); }

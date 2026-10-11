@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { signupLegalVersions } from "@/contracts/sso-signup";
 import { useRouter } from "next/navigation";
 import { Panel, ActionButton } from "./shared";
 import "./public.css";
@@ -41,7 +42,7 @@ function LegalDocument({ title, updated, sections }: { title: string; updated: s
 }
 
 export function LegalPages({ path }: { path: string }) {
-  if (path === "/legal/terms") return <LegalDocument title="서비스 이용약관" updated="2026-10-07" sections={termsSections} />;
-  if (path === "/legal/privacy") return <LegalDocument title="개인정보 처리방침" updated="2026-10-07" sections={privacySections} />;
+  if (path === "/legal/terms") return <LegalDocument title="서비스 이용약관" updated={signupLegalVersions.terms} sections={termsSections} />;
+  if (path === "/legal/privacy") return <LegalDocument title="개인정보 처리방침" updated={signupLegalVersions.privacy} sections={privacySections} />;
   return null;
 }

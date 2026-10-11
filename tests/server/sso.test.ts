@@ -1,3 +1,4 @@
+import { GET as signupView, POST as signupAccept } from "@/app/api/v1/auth/sso/signup/route";
 import { SsoTestBrowser } from "../helpers/sso-browser";
 import { ssoProviderCheckedRecord } from "@/contracts/sso";
 import { createOTP } from "@better-auth/utils/otp";
@@ -90,6 +91,18 @@ function req(path: string, cookie = "", method = "GET", input?: unknown, key?: s
     ...(input === undefined ? {} : { "content-type": "application/json" }), ...(key ? { "idempotency-key": key } : {}) },
     ...(input === undefined ? {} : { body: JSON.stringify(input) }) });
 }
+// Explicit consent step: never hide it inside the callback wrapper.
+async function signupRequest(response: Response) {
+  expect(response.status).toBe(302); expect(response.headers.get("location")).toBe("/oauth2/signup");
+  expect(response.headers.get("set-cookie")).not.toContain("better-auth.session_token=");
+  const cookie = response.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
+  const display = await signupView(req("/auth/sso/signup", cookie)); expect(display.status).toBe(200);
+  const view = await display.json();
+  return req("/auth/sso/signup", cookie, "POST", { intentId: view.id, overFourteen: true, termsAccepted: true,
+    privacyAccepted: true, termsVersion: view.termsVersion, privacyVersion: view.privacyVersion });
+}
+async function consent(response: Response) { return signupAccept(await signupRequest(response)); }
+
 async function ownerCookie() {
   const email = "sso-" + randomUUID() + "@catchsecu.test";
   await auth.handler(req("/auth/sign-up/email", "", "POST", { name: "소유자", email, password }));
@@ -164,7 +177,7 @@ test("SSO 제공자 CRUD·사전검사·활성화 게이트", async () => {
   expect(insecure.status).toBe(422);
 });
 
-test("실제 OIDC 로그인: state→PKCE→서명검증→세션발급→재전송 차단", async () => {
+test("실제 OIDC 신규 가입: state→PKCE→서명검증→동의→세션발급→재전송 차단", async () => {
   await new Promise<void>(resolve => server.listening ? resolve() : server.once("listening", resolve));
   const port = (server.address() as { port: number }).port;
   idp.issuer = `http://127.0.0.1:${port}`;
@@ -189,8 +202,10 @@ test("실제 OIDC 로그인: state→PKCE→서명검증→세션발급→재전
   const first = await callbackRoute(req(`/auth/sso/callback?${callback.searchParams}`));
   if (first.status !== 302) console.log("CALLBACK BODY:", await first.clone().text());
   expect(first.status).toBe(302);
-  expect(first.headers.get("location")).toBe("/dashboard");
-  const sessionCookie = first.headers.get("set-cookie")!;
+  expect(await db.user.count({ where: { email: "sso-user@catchsecu.test" } })).toBe(0);
+  const accepted = await consent(first); expect(accepted.status).toBe(200);
+  expect(await accepted.clone().json()).toEqual({ redirect: "/dashboard" });
+  const sessionCookie = accepted.headers.get("set-cookie")!;
   expect(sessionCookie).toContain("better-auth.session_token=");
   // 발급된 세션으로 실제 인증 확인
   const { GET: meRoute } = await import("@/app/api/v1/me/route");
@@ -463,7 +478,7 @@ test("P11 콜백: 연결 시작 세션의 회사 선택이 바뀌면 연결을 �
 test("P11 콜백: 이미 연결된 계정도 취소된 초대를 우회할 수 없다", async () => {
   const f = await pendingOidc();
   const first = await f.callbackRoute(req("/auth/sso/callback?" + f.callback.searchParams));
-  expect(first.status).toBe(302);
+  expect((await consent(first)).status).toBe(200);
   const token = opaqueToken();
   const { POST: inviteStart } = await import("@/app/api/v1/invitations/sso/start/route");
   const invitation = await db.invitation.create({ data: { tenantId: f.company.id, invitedBy: f.ctx.member.id,
@@ -495,7 +510,7 @@ test("P11 콜백: 원래 연결 세션의 만료는 새 연결과 감사를 롤�
 });
 test("P11 콜백: 기존 연결 계정의 재초대도 초대 역할과 서비스 권한을 적용한다", async () => {
   const f = await pendingOidc();
-  expect((await f.callbackRoute(req("/auth/sso/callback?" + f.callback.searchParams))).status).toBe(302);
+  expect((await consent(await f.callbackRoute(req("/auth/sso/callback?" + f.callback.searchParams)))).status).toBe(200);
   const user = await db.user.findUniqueOrThrow({ where: { email: "sso-user@catchsecu.test" } });
   const member = await db.membership.findUniqueOrThrow({ where: { tenantId_userId: { tenantId: f.company.id, userId: user.id } } });
   await db.membership.update({ where: { id: member.id }, data: { status: "revoked", version: { increment: 1 } } });
@@ -522,7 +537,7 @@ test("P11 콜백: JIT 가입도 회사 구성원 한도를 초과할 수 없다"
     const user = await db.user.create({ data: { name: "한도 시험", email: "quota-" + i + "@catchsecu.test", emailVerified: true } });
     await db.membership.create({ data: { tenantId: f.company.id, userId: user.id, role: "viewer" } });
   }
-  const response = await f.callbackRoute(req("/auth/sso/callback?" + f.callback.searchParams));
+  const response = await consent(await f.callbackRoute(req("/auth/sso/callback?" + f.callback.searchParams)));
   expect(response.status).toBe(409);
   expect((await response.json()).error.code).toBe("QUOTA_EXCEEDED");
   expect(await db.user.findUnique({ where: { email: "sso-user@catchsecu.test" } })).toBeNull();
@@ -735,9 +750,9 @@ test("SSO 브라우저: 성공 리디렉션과 로그인 쿠키는 유지된다"
   const f = await pendingOidc();
   const request = req("/auth/sso/callback?" + f.callback.searchParams);
   request.headers.set("accept", "text/html");
-  const response = await f.callbackRoute(request);
-  expect(response.status).toBe(302);
-  expect(response.headers.get("location")).toBe("/dashboard");
+  const response = await consent(await f.callbackRoute(request));
+  expect(response.status).toBe(200);
+  expect(await response.clone().json()).toEqual({ redirect: "/dashboard" });
   expect(response.headers.get("set-cookie")).toContain("better-auth.session_token=");
 });
 
@@ -1038,9 +1053,9 @@ test("P11 초대 SSO: 다른 회사 공급자로 시작하거나 외부 출처�
 });
 test("P11 초대 SSO: 새 사용자·지정 역할·서비스 권한·수락·세션을 함께 저장", async () => {
   const f = await invitationSsoFixture(), callback = await f.begin();
-  const response = await f.callbackRoute(req("/auth/sso/callback?" + callback.searchParams));
-  expect(response.status).toBe(302);
-  expect(response.headers.get("location")).toBe("/dashboard");
+  const response = await consent(await f.callbackRoute(req("/auth/sso/callback?" + callback.searchParams)));
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({ redirect: "/dashboard" });
   const user = await db.user.findUniqueOrThrow({ where: { email: f.invitation.email } });
   const member = await db.membership.findUniqueOrThrow({ where: { tenantId_userId: { tenantId: f.company.id, userId: user.id } } });
   expect(member).toMatchObject({ role: "editor", status: "active", accessKind: "direct" });
@@ -1061,7 +1076,8 @@ test.each(["resend", "version", "expired", "legacy", "wrong-email", "unverified-
   if (kind === "inviter") await db.invitation.update({ where: { id: f.invitation.id }, data: { invitedBy: randomUUID() } });
   if (kind === "service") await db.service.update({ where: { id: f.service.id }, data: { status: "archived" } });
   if (kind === "role") await db.invitation.update({ where: { id: f.invitation.id }, data: { role: "owner" } });
-  const response = await f.callbackRoute(req("/auth/sso/callback?" + callback.searchParams));
+  const callbackResponse = await f.callbackRoute(req("/auth/sso/callback?" + callback.searchParams));
+  const response = ["inviter", "service", "role"].includes(kind) ? await consent(callbackResponse) : callbackResponse;
   expect(response.status).toBe(kind === "service" ? 404 : kind === "inviter" ? 409 : kind === "role" ? 403 : 410);
   expect(await db.account.count({ where: { providerId: "sso:" + f.provider.id } })).toBe(0);
   expect(await db.user.findUnique({ where: { email: f.invitation.email } })).toBeNull();
@@ -1084,8 +1100,10 @@ test("P11 초대 SSO: 기존 이메일 계정 자동 연결 거부 후 로그인
 });
 test("P11 초대 SSO: 서로 다른 인증 state로 동시 수락해도 한 번만 가입", async () => {
   const f = await invitationSsoFixture(), first = await f.begin(), second = await f.begin();
-  const responses = await Promise.all([first, second].map(callback => f.callbackRoute(req("/auth/sso/callback?" + callback.searchParams))));
-  expect(responses.map(response => response.status).sort()).toEqual([302, 410]);
+  const callbacks = await Promise.all([first, second].map(callback => f.callbackRoute(req("/auth/sso/callback?" + callback.searchParams))));
+  const requests = await Promise.all(callbacks.map(signupRequest));
+  const responses = await Promise.all(requests.map(request => signupAccept(request)));
+  expect(responses.map(response => response.status).sort()).toEqual([200, 410]);
   expect(await db.auditEvent.count({ where: { action: "invitation.accepted", resourceId: f.invitation.id } })).toBe(1);
   const user = await db.user.findUniqueOrThrow({ where: { email: f.invitation.email } });
   expect(await db.session.count({ where: { userId: user.id } })).toBe(1);
@@ -1116,7 +1134,7 @@ test("P11 초대 SSO: 기존 연결 계정의 2FA 확인 전에는 로그인 세
 test("P11 초대 SSO: 감사 쓰기 실패 시 사용자·계정·권한·수락·세션 원자 롤백", async () => {
   const f = await invitationSsoFixture(), callback = await f.begin();
   ssoFault.audit = true;
-  const response = await f.callbackRoute(req("/auth/sso/callback?" + callback.searchParams));
+  const response = await consent(await f.callbackRoute(req("/auth/sso/callback?" + callback.searchParams)));
   expect(response.status).toBe(500);
   expect(await db.user.count({ where: { email: f.invitation.email } })).toBe(0);
   expect(await db.account.count({ where: { providerId: "sso:" + f.provider.id } })).toBe(0);
@@ -1345,5 +1363,6 @@ test("E1 쿠키 없는 두 OIDC 동시 시작은 양쪽 실제 PKCE 콜백이 �
     expect((await callback(new Request(authorize.headers.get("location")!, { headers: { cookie: browser.cookie() } }))).status).toBe(302);
   }
   expect(await db.ssoState.count()).toBe(0);
-  expect(await db.account.count({ where: { providerId: "sso:" + f.provider.id } })).toBe(1);
+  expect(await db.account.count({ where: { providerId: "sso:" + f.provider.id } })).toBe(0);
+  expect(await db.ssoSignupIntent.count({ where: { providerId: f.provider.id } })).toBe(2);
 });

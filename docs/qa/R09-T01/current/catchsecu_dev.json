@@ -1,0 +1,823 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T02:23:36.791Z",
+  "database": "catchsecu_dev",
+  "models": [
+    "SecurityPolicy",
+    "Form",
+    "ApprovalRequest",
+    "Publication",
+    "FixedUrl"
+  ],
+  "counts": {
+    "columns": 73,
+    "constraints": 33,
+    "indexes": 20,
+    "triggers": 8,
+    "migrations": 149
+  },
+  "definitionHash": "654d088469bbea5d46a3fa19983281f61212173682fab6a51d0614f6ad14c918",
+  "migrationHash": "975d7958685a7630ede7858afe6aa69fdf6684fde3ef5c1b0e82a9928f2ec3b2",
+  "sourceHashes": {
+    "prisma/schema.prisma": "1a3a98727ef838bfaf1ec298f9dc43ddf72a46ba35359c30e49e5a5530f8973c",
+    "src/contracts/security.ts": "faf7de49c7ffbd071b87350534fafa4a1e4295c9d63a53cf09c3825bef5289d8",
+    "src/server/approvals.ts": "194ffe28d5efff71981937ada77e953457a09f0e31b6298528658c06b9cb0036",
+    "src/server/forms.ts": "9ca1f377f517ea9767241a1f705d6e3d6c584251b1baa320f57024f5154f25a4",
+    "src/server/public-publication.ts": "61185bcb40af37128518e43bfdaf237363841287a9eb62e7a3cf574e96782e89",
+    "src/server/fixed-urls.ts": "7b2e151fa2979840dae13272b016b1b77105ad4e6d8174ea178a03e8f194a4a2"
+  },
+  "definitions": {
+    "columns": [
+      {
+        "table": "ApprovalRequest",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "formId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "formVersionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "formRevision",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "policyRevision",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "contentHash",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "snapshot",
+        "type": "jsonb",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "requestCipher",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "requestedBy",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "decidedBy",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "decisionCipher",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "decidedAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "ApprovalRequest",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "FixedUrl",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "FixedUrl",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "FixedUrl",
+        "column": "publicationId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "FixedUrl",
+        "column": "slug",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "FixedUrl",
+        "column": "name",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "FixedUrl",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "FixedUrl",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "FixedUrl",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "FixedUrl",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "serviceId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "ownerId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "title",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "publishedVersionId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "Form",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "sourceType",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Form",
+        "column": "designatedRetentionDays",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "table": "Publication",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "formId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "formVersionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "tokenHash",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "tokenCipher",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "expiresAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "Publication",
+        "column": "maxResponses",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "responseCount",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "Publication",
+        "column": "approvalId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "Publication",
+        "column": "opensAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "minPassword",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "sessionMinutes",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "requireMfa",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "requireApproval",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "retentionDays",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "approvalReferenceRequired",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "approvalRequestTemplate",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "approvalRevision",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "approvalRoles",
+        "type": "ARRAY",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "passwordDeferral",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "passwordMonths",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "passwordReuse",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "passwordRevision",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "allowRetentionAdjustment",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "automaticDestruction",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "allowRetentionDesignation",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "table": "SecurityPolicy",
+        "column": "activityReviewRetentionDays",
+        "type": "integer",
+        "nullable": "YES"
+      }
+    ],
+    "constraints": [
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_author_asset_consistency",
+        "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+        "validated": true
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_decision_check",
+        "definition": "CHECK ((((status = 'pending'::text) AND (\"decidedBy\" IS NULL) AND (\"decidedAt\" IS NULL) AND (\"decisionCipher\" IS NULL)) OR (status = 'superseded'::text) OR ((status = ANY (ARRAY['approved'::text, 'rejected'::text, 'cancelled'::text, 'consumed'::text])) AND (\"decidedBy\" IS NOT NULL) AND (\"decidedAt\" IS NOT NULL) AND (\"decisionCipher\" IS NOT NULL))))",
+        "validated": true
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_status_check",
+        "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'cancelled'::text, 'superseded'::text, 'consumed'::text])))",
+        "validated": true
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_tenantId_decidedBy_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"decidedBy\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_tenantId_formId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"formId\") REFERENCES \"Form\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_tenantId_formId_formVersionId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"formId\", \"formVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", \"formId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_tenantId_requestedBy_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"requestedBy\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_version_check",
+        "definition": "CHECK (((version > 0) AND (\"formRevision\" > 0) AND (\"policyRevision\" > 0)))",
+        "validated": true
+      },
+      {
+        "table": "FixedUrl",
+        "name": "FixedUrl_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "FixedUrl",
+        "name": "FixedUrl_tenantId_publicationId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"publicationId\") REFERENCES \"Publication\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "Form",
+        "name": "Form_author_asset_consistency",
+        "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+        "validated": true
+      },
+      {
+        "table": "Form",
+        "name": "Form_designated_retention",
+        "definition": "CHECK (((\"designatedRetentionDays\" IS NULL) OR ((\"designatedRetentionDays\" >= 1) AND (\"designatedRetentionDays\" <= 36500))))",
+        "validated": true
+      },
+      {
+        "table": "Form",
+        "name": "Form_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "Form",
+        "name": "Form_source_check",
+        "definition": "CHECK (((\"sourceType\" = ANY (ARRAY['form'::text, 'import'::text])) AND ((\"sourceType\" <> 'import'::text) OR ((status = 'archived'::text) AND (\"publishedVersionId\" IS NULL)))))",
+        "validated": true
+      },
+      {
+        "table": "Form",
+        "name": "Form_status_check",
+        "definition": "CHECK ((status = ANY (ARRAY['draft'::text, 'pendingApproval'::text, 'published'::text, 'paused'::text, 'archived'::text])))",
+        "validated": true
+      },
+      {
+        "table": "Form",
+        "name": "Form_tenantId_id_publishedVersionId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", id, \"publishedVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", \"formId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "Form",
+        "name": "Form_tenantId_ownerId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"ownerId\") REFERENCES \"Membership\"(\"tenantId\", \"userId\") ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "Form",
+        "name": "Form_tenantId_serviceId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_collection_window_check",
+        "definition": "CHECK (((\"opensAt\" IS NULL) OR (\"expiresAt\" IS NULL) OR (\"opensAt\" < \"expiresAt\")))",
+        "validated": true
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_limits",
+        "definition": "CHECK (((\"responseCount\" >= 0) AND (\"responseCount\" <= \"maxResponses\")))",
+        "validated": true
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_status_check",
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'revoked'::text, 'expired'::text])))",
+        "validated": true
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_tenantId_formId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"formId\") REFERENCES \"Form\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_tenantId_formId_formVersionId_approvalId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"formId\", \"formVersionId\", \"approvalId\") REFERENCES \"ApprovalRequest\"(\"tenantId\", \"formId\", \"formVersionId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_tenantId_formId_formVersionId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"formId\", \"formVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", \"formId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "SecurityPolicy",
+        "name": "SecurityPolicy_activityReviewRetentionDays",
+        "definition": "CHECK (((\"activityReviewRetentionDays\" IS NULL) OR ((\"activityReviewRetentionDays\" >= 1) AND (\"activityReviewRetentionDays\" <= 36500))))",
+        "validated": true
+      },
+      {
+        "table": "SecurityPolicy",
+        "name": "SecurityPolicy_approval_revision_check",
+        "definition": "CHECK ((\"approvalRevision\" > 0))",
+        "validated": true
+      },
+      {
+        "table": "SecurityPolicy",
+        "name": "SecurityPolicy_approval_roles_check",
+        "definition": "CHECK ((((cardinality(\"approvalRoles\") >= 1) AND (cardinality(\"approvalRoles\") <= 3)) AND ('owner'::\"Role\" = ANY (\"approvalRoles\")) AND (\"approvalRoles\" <@ ARRAY['owner'::\"Role\", 'admin'::\"Role\", 'security'::\"Role\"])))",
+        "validated": true
+      },
+      {
+        "table": "SecurityPolicy",
+        "name": "SecurityPolicy_password_rules",
+        "definition": "CHECK ((((\"minPassword\" >= 12) AND (\"minPassword\" <= 128)) AND ((\"passwordMonths\" >= 0) AND (\"passwordMonths\" <= 12)) AND (\"passwordReuse\" = ANY (ARRAY[0, 1, 10])) AND (\"passwordDeferral\" = ANY (ARRAY['never'::text, 'session'::text, 'period'::text])) AND (\"passwordRevision\" > 0)))",
+        "validated": true
+      },
+      {
+        "table": "SecurityPolicy",
+        "name": "SecurityPolicy_pkey",
+        "definition": "PRIMARY KEY (\"tenantId\")",
+        "validated": true
+      },
+      {
+        "table": "SecurityPolicy",
+        "name": "SecurityPolicy_ranges",
+        "definition": "CHECK ((((\"minPassword\" >= 12) AND (\"minPassword\" <= 128)) AND ((\"sessionMinutes\" >= 5) AND (\"sessionMinutes\" <= 10080)) AND ((\"retentionDays\" >= 1) AND (\"retentionDays\" <= 36500))))",
+        "validated": true
+      },
+      {
+        "table": "SecurityPolicy",
+        "name": "SecurityPolicy_tenantId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      }
+    ],
+    "indexes": [
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_formId_createdAt_idx",
+        "definition": "CREATE INDEX \"ApprovalRequest_formId_createdAt_idx\" ON public.\"ApprovalRequest\" USING btree (\"formId\", \"createdAt\")"
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_one_active_per_form",
+        "definition": "CREATE UNIQUE INDEX \"ApprovalRequest_one_active_per_form\" ON public.\"ApprovalRequest\" USING btree (\"formId\") WHERE (status = ANY (ARRAY['pending'::text, 'approved'::text]))"
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_pkey",
+        "definition": "CREATE UNIQUE INDEX \"ApprovalRequest_pkey\" ON public.\"ApprovalRequest\" USING btree (id)"
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_tenantId_formId_formVersionId_id_key",
+        "definition": "CREATE UNIQUE INDEX \"ApprovalRequest_tenantId_formId_formVersionId_id_key\" ON public.\"ApprovalRequest\" USING btree (\"tenantId\", \"formId\", \"formVersionId\", id)"
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_tenantId_status_createdAt_id_idx",
+        "definition": "CREATE INDEX \"ApprovalRequest_tenantId_status_createdAt_id_idx\" ON public.\"ApprovalRequest\" USING btree (\"tenantId\", status, \"createdAt\", id)"
+      },
+      {
+        "table": "FixedUrl",
+        "name": "FixedUrl_pkey",
+        "definition": "CREATE UNIQUE INDEX \"FixedUrl_pkey\" ON public.\"FixedUrl\" USING btree (id)"
+      },
+      {
+        "table": "FixedUrl",
+        "name": "FixedUrl_slug_key",
+        "definition": "CREATE UNIQUE INDEX \"FixedUrl_slug_key\" ON public.\"FixedUrl\" USING btree (slug)"
+      },
+      {
+        "table": "FixedUrl",
+        "name": "FixedUrl_tenantId_status_idx",
+        "definition": "CREATE INDEX \"FixedUrl_tenantId_status_idx\" ON public.\"FixedUrl\" USING btree (\"tenantId\", status)"
+      },
+      {
+        "table": "Form",
+        "name": "Form_pkey",
+        "definition": "CREATE UNIQUE INDEX \"Form_pkey\" ON public.\"Form\" USING btree (id)"
+      },
+      {
+        "table": "Form",
+        "name": "Form_tenantId_id_key",
+        "definition": "CREATE UNIQUE INDEX \"Form_tenantId_id_key\" ON public.\"Form\" USING btree (\"tenantId\", id)"
+      },
+      {
+        "table": "Form",
+        "name": "Form_tenantId_serviceId_id_key",
+        "definition": "CREATE UNIQUE INDEX \"Form_tenantId_serviceId_id_key\" ON public.\"Form\" USING btree (\"tenantId\", \"serviceId\", id)"
+      },
+      {
+        "table": "Form",
+        "name": "Form_tenantId_serviceId_status_createdAt_id_idx",
+        "definition": "CREATE INDEX \"Form_tenantId_serviceId_status_createdAt_id_idx\" ON public.\"Form\" USING btree (\"tenantId\", \"serviceId\", status, \"createdAt\", id)"
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_approvalId_key",
+        "definition": "CREATE UNIQUE INDEX \"Publication_approvalId_key\" ON public.\"Publication\" USING btree (\"approvalId\")"
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_pkey",
+        "definition": "CREATE UNIQUE INDEX \"Publication_pkey\" ON public.\"Publication\" USING btree (id)"
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_tenantId_formId_formVersionId_approvalId_key",
+        "definition": "CREATE UNIQUE INDEX \"Publication_tenantId_formId_formVersionId_approvalId_key\" ON public.\"Publication\" USING btree (\"tenantId\", \"formId\", \"formVersionId\", \"approvalId\")"
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_tenantId_formId_id_formVersionId_key",
+        "definition": "CREATE UNIQUE INDEX \"Publication_tenantId_formId_id_formVersionId_key\" ON public.\"Publication\" USING btree (\"tenantId\", \"formId\", id, \"formVersionId\")"
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_tenantId_id_formVersionId_key",
+        "definition": "CREATE UNIQUE INDEX \"Publication_tenantId_id_formVersionId_key\" ON public.\"Publication\" USING btree (\"tenantId\", id, \"formVersionId\")"
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_tenantId_id_key",
+        "definition": "CREATE UNIQUE INDEX \"Publication_tenantId_id_key\" ON public.\"Publication\" USING btree (\"tenantId\", id)"
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_tokenHash_key",
+        "definition": "CREATE UNIQUE INDEX \"Publication_tokenHash_key\" ON public.\"Publication\" USING btree (\"tokenHash\")"
+      },
+      {
+        "table": "SecurityPolicy",
+        "name": "SecurityPolicy_pkey",
+        "definition": "CREATE UNIQUE INDEX \"SecurityPolicy_pkey\" ON public.\"SecurityPolicy\" USING btree (\"tenantId\")"
+      }
+    ],
+    "triggers": [
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_author_asset_consistency",
+        "definition": "CREATE CONSTRAINT TRIGGER \"ApprovalRequest_author_asset_consistency\" AFTER INSERT OR UPDATE ON public.\"ApprovalRequest\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_author_asset_graph()",
+        "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_author_asset_lock",
+        "definition": "CREATE TRIGGER \"ApprovalRequest_author_asset_lock\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"ApprovalRequest\" FOR EACH ROW EXECUTE FUNCTION lock_author_asset_content()",
+        "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "table": "ApprovalRequest",
+        "name": "ApprovalRequest_evidence_guard",
+        "definition": "CREATE TRIGGER \"ApprovalRequest_evidence_guard\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"ApprovalRequest\" FOR EACH ROW EXECUTE FUNCTION protect_approval_evidence()",
+        "function": "CREATE OR REPLACE FUNCTION public.protect_approval_evidence()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'DELETE' THEN RAISE EXCEPTION 'Approval evidence cannot be deleted'; END IF;\n  IF TG_OP = 'INSERT' THEN\n    IF NEW.status <> 'pending' OR NEW.version <> 1 THEN RAISE EXCEPTION 'Approval must start pending'; END IF;\n    RETURN NEW;\n  END IF;\n  IF (to_jsonb(NEW) - ARRAY['status','version','updatedAt','decidedBy','decisionCipher','decidedAt'])\n    IS DISTINCT FROM (to_jsonb(OLD) - ARRAY['status','version','updatedAt','decidedBy','decisionCipher','decidedAt'])\n    THEN RAISE EXCEPTION 'Approval snapshot is immutable'; END IF;\n  IF NEW.version <> OLD.version + 1 THEN RAISE EXCEPTION 'Approval version must increment'; END IF;\n  IF NOT ((OLD.status = 'pending' AND NEW.status IN ('approved','rejected','cancelled','superseded'))\n    OR (OLD.status = 'approved' AND NEW.status IN ('superseded','consumed')))\n    THEN RAISE EXCEPTION 'Invalid approval transition'; END IF;\n  IF OLD.status <> 'pending' AND (NEW.\"decidedBy\",NEW.\"decisionCipher\",NEW.\"decidedAt\")\n    IS DISTINCT FROM (OLD.\"decidedBy\",OLD.\"decisionCipher\",OLD.\"decidedAt\")\n    THEN RAISE EXCEPTION 'Approval decision is immutable'; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "table": "Form",
+        "name": "Form_author_asset_consistency",
+        "definition": "CREATE CONSTRAINT TRIGGER \"Form_author_asset_consistency\" AFTER UPDATE ON public.\"Form\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_author_asset_graph()",
+        "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+      },
+      {
+        "table": "Form",
+        "name": "import_form_immutable",
+        "definition": "CREATE TRIGGER import_form_immutable BEFORE UPDATE ON public.\"Form\" FOR EACH ROW EXECUTE FUNCTION protect_import_form()",
+        "function": "CREATE OR REPLACE FUNCTION public.protect_import_form()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$ BEGIN\n IF TG_TABLE_NAME='Publication' THEN\n   IF EXISTS (SELECT 1 FROM \"Form\" WHERE id=NEW.\"formId\" AND \"sourceType\"='import') THEN RAISE EXCEPTION 'import forms cannot publish' USING ERRCODE='23514'; END IF;\n ELSIF NEW.\"sourceType\" IS DISTINCT FROM OLD.\"sourceType\" THEN RAISE EXCEPTION 'immutable form origin' USING ERRCODE='23514'; END IF;\n RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "table": "Publication",
+        "name": "Publication_approval_guard",
+        "definition": "CREATE TRIGGER \"Publication_approval_guard\" BEFORE INSERT OR UPDATE ON public.\"Publication\" FOR EACH ROW EXECUTE FUNCTION enforce_publication_approval()",
+        "function": "CREATE OR REPLACE FUNCTION public.enforce_publication_approval()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE policy_required boolean; policy_revision integer; approval_status text; approval_revision integer;\nBEGIN\n  IF TG_OP = 'UPDATE' THEN\n    IF NEW.\"approvalId\" IS DISTINCT FROM OLD.\"approvalId\" THEN RAISE EXCEPTION 'Publication approval is immutable'; END IF;\n    RETURN NEW;\n  END IF;\n  SELECT \"requireApproval\",\"approvalRevision\" INTO policy_required,policy_revision FROM \"SecurityPolicy\" WHERE \"tenantId\" = NEW.\"tenantId\";\n  IF policy_required AND NEW.\"approvalId\" IS NULL THEN RAISE EXCEPTION 'Publication requires approval'; END IF;\n  IF NEW.\"approvalId\" IS NOT NULL THEN\n    SELECT status,\"policyRevision\" INTO approval_status,approval_revision FROM \"ApprovalRequest\"\n      WHERE id = NEW.\"approvalId\" AND \"tenantId\" = NEW.\"tenantId\" AND \"formId\" = NEW.\"formId\" AND \"formVersionId\" = NEW.\"formVersionId\";\n    IF approval_status IS DISTINCT FROM 'approved' OR approval_revision IS DISTINCT FROM policy_revision\n      THEN RAISE EXCEPTION 'Publication approval is invalid'; END IF;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "table": "Publication",
+        "name": "publication_not_import",
+        "definition": "CREATE TRIGGER publication_not_import BEFORE INSERT OR UPDATE ON public.\"Publication\" FOR EACH ROW EXECUTE FUNCTION protect_import_form()",
+        "function": "CREATE OR REPLACE FUNCTION public.protect_import_form()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$ BEGIN\n IF TG_TABLE_NAME='Publication' THEN\n   IF EXISTS (SELECT 1 FROM \"Form\" WHERE id=NEW.\"formId\" AND \"sourceType\"='import') THEN RAISE EXCEPTION 'import forms cannot publish' USING ERRCODE='23514'; END IF;\n ELSIF NEW.\"sourceType\" IS DISTINCT FROM OLD.\"sourceType\" THEN RAISE EXCEPTION 'immutable form origin' USING ERRCODE='23514'; END IF;\n RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "table": "SecurityPolicy",
+        "name": "export_policy_access",
+        "definition": "CREATE TRIGGER export_policy_access BEFORE DELETE OR UPDATE ON public.\"SecurityPolicy\" FOR EACH ROW EXECUTE FUNCTION invalidate_export_access()",
+        "function": "CREATE OR REPLACE FUNCTION public.invalidate_export_access()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE row_data jsonb; actor_id text; tenant_id text; service_id text;\nBEGIN\n  IF TG_OP='INSERT' THEN row_data:=to_jsonb(NEW); ELSE row_data:=to_jsonb(OLD); END IF;\n  tenant_id:=row_data->>'tenantId';\n  IF TG_TABLE_NAME='User' THEN actor_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Company' THEN tenant_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Service' THEN service_id:=row_data->>'id';\n  ELSIF TG_TABLE_NAME='Membership' THEN actor_id:=row_data->>'userId';\n  ELSIF TG_TABLE_NAME='ExpertAssignment' THEN actor_id:=row_data->>'expertUserId';\n  ELSIF TG_TABLE_NAME='ServiceGrant' THEN\n    SELECT \"userId\" INTO actor_id FROM \"Membership\" WHERE id=row_data->>'memberId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  ELSIF TG_TABLE_NAME='ExpertAssignmentService' THEN\n    SELECT \"expertUserId\" INTO actor_id FROM \"ExpertAssignment\" WHERE id=row_data->>'assignmentId' AND \"tenantId\"=tenant_id;\n    service_id:=row_data->>'serviceId';\n  END IF;\n  PERFORM erase_export_jobs(ARRAY(SELECT id FROM \"ExportJob\" WHERE (tenant_id IS NULL OR \"tenantId\"=tenant_id) AND (actor_id IS NULL OR \"requesterId\"=actor_id) AND (service_id IS NULL OR \"serviceId\"=service_id)),'ACCESS_CHANGED');\n  IF TG_OP='DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;\nEND $function$\n"
+      }
+    ]
+  }
+}

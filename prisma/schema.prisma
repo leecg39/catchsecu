@@ -56,6 +56,7 @@ model User {
   expertAssignments         ExpertAssignment[] @relation("ExpertUser")
   assignedExpertAssignments ExpertAssignment[] @relation("ExpertAssigner")
   closure                   AccountClosure?
+  ssoSignupAcceptance       SsoSignupAcceptance?
 }
 
 model AccountClosure {
@@ -375,7 +376,7 @@ model PaymentOrder {
   id             String              @id @default(uuid())
   tenantId       String
   subscriptionId String
-  subscription   BillingSubscription @relation(fields: [subscriptionId], references: [id], map: "PaymentOrder_subscription_fkey")
+  subscription   BillingSubscription @relation(fields: [tenantId, subscriptionId], references: [tenantId, id], map: "PaymentOrder_subscription_fkey")
   methodId       String?
   method         PaymentMethod?      @relation(fields: [tenantId, methodId], references: [tenantId, id], map: "PaymentOrder_method_fkey")
   amount         Int
@@ -923,9 +924,38 @@ model SsoProvider {
   accounts           Account[]
   orgMembers         VirtualOrgMember[]
   sessionProofs      SsoSessionProof[]
+  signupIntents      SsoSignupIntent[]
 
   @@unique([tenantId, id])
   @@index([tenantId, enabled])
+}
+
+// Short-lived verified OIDC identity awaiting explicit signup consent.
+model SsoSignupIntent {
+  id              String      @id @default(uuid())
+  tenantId        String
+  providerId      String
+  provider        SsoProvider @relation(fields: [tenantId, providerId], references: [tenantId, id], onDelete: Cascade, onUpdate: Restrict)
+  providerVersion Int
+  stateId         String      @unique
+  tokenHash       String      @unique
+  browserHash     String
+  mode            String
+  payloadCipher   String
+  expiresAt       DateTime
+  createdAt       DateTime    @default(now())
+
+  @@index([expiresAt])
+}
+
+// A receipt for server-verified OIDC signup; contains no copied identity/profile data.
+model SsoSignupAcceptance {
+  userId         String   @id
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  overFourteen   Boolean
+  termsVersion   String
+  privacyVersion String
+  acceptedAt     DateTime @default(now())
 }
 
 // Separate from provider CRUD: the original company login policy.

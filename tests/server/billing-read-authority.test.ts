@@ -5,6 +5,9 @@ import { db } from "@/server/db";
 import { env } from "@/server/env";
 import { requireContext, type Context } from "@/server/context";
 import { listInvoices, listUsageEvents } from "@/server/billing-reads";
+import { billingHistory } from "@/server/billing-history";
+import { ledgerOverview } from "@/server/ledger";
+import { closeMonth, invoicePdf, listRefunds, readMonthClose, requestRefund } from "@/server/billing-settlement";
 import { GET as listInvoicesRoute } from "@/app/api/v1/invoices/route";
 import { GET as listUsageEventsRoute } from "@/app/api/v1/usage-events/route";
 const database = new URL(env.DATABASE_URL), origin = new URL(env.BETTER_AUTH_URL).origin;
@@ -60,4 +63,40 @@ test("청구서·사용량 HTTP 조회 경로가 현재 billing 권한과 빈 �
     expect(await response.json()).toMatchObject({ items: [], total: 0, page: 1, pageSize: 20 });
     expect((await handler(new Request(origin + "/api/v1" + path, { headers: { origin } }))).status).toBe(401);
   }
+});
+
+const pastMonth = "2026-09";
+function settlementReads() {
+  return [
+    ["결제 이력", () => billingHistory(ctx, { page: 1, pageSize: 20 })],
+    ["원장", () => ledgerOverview(ctx, { currency: "KRW", page: 1, pageSize: 20 })],
+    ["환불 목록", () => listRefunds(ctx, randomUUID())],
+    ["청구서 PDF", () => invoicePdf(ctx, randomUUID())],
+    ["월마감", () => readMonthClose(ctx, pastMonth, "KRW")],
+  ] as const;
+}
+function settlementWrites() {
+  return [
+    ["환불 요청", () => requestRefund(ctx, randomUUID(), { amount: 1, reason: "현재 권한 검사" }, randomUUID(), randomUUID())],
+    ["월마감 생성", () => closeMonth(ctx, pastMonth, "KRW", randomUUID(), randomUUID())],
+  ] as const;
+}
+
+test("환불·청구서·이력·원장·월마감은 문맥 생성 후 역할 회수를 즉시 거부한다", async () => {
+  await db.membership.update({ where: { id: ctx.member.id }, data: { role: "viewer" } });
+  for (const [name, operation] of [...settlementReads(), ...settlementWrites()])
+    await expect(operation(), name).rejects.toMatchObject({ status: 403, code: "FORBIDDEN" });
+});
+
+test("환불·청구서·이력·원장·월마감은 문맥 생성 후 세션 회수를 즉시 거부한다", async () => {
+  await db.session.delete({ where: { id: ctx.session.id } });
+  for (const [name, operation] of [...settlementReads(), ...settlementWrites()])
+    await expect(operation(), name).rejects.toMatchObject({ status: 401, code: "SESSION_EXPIRED" });
+});
+
+test("환불·청구서·이력·원장·월마감은 문맥 생성 후 회사 전환을 즉시 거부한다", async () => {
+  const other = await db.company.create({ data: { name: "결제 전환 회사", publicName: "결제 전환 회사" } });
+  await db.session.update({ where: { id: ctx.session.id }, data: { activeCompanyId: other.id } });
+  for (const [name, operation] of [...settlementReads(), ...settlementWrites()])
+    await expect(operation(), name).rejects.toMatchObject({ status: 403, code: "COMPANY_CHANGED" });
 });

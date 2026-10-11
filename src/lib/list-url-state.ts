@@ -17,7 +17,7 @@ export function oneOf<T extends string>(value: string | null, allowed: readonly 
 export function listHref(pathname: string, current: string, values: Record<string, string | number | null>) {
   const params = new URLSearchParams(current);
   for (const [key, value] of Object.entries(values)) {
-    if (value === null || value === "" || value === 1 || value === 20) params.delete(key);
+    if (value === null || value === "" || (key === "page" && value === 1) || (key === "pageSize" && value === 20)) params.delete(key);
     else params.set(key, String(value));
   }
   const query = params.toString();

@@ -1,6 +1,9 @@
 "use client";
 import { SecurityEntitlementNotice } from "./SecurityEntitlementNotice";
-import { useRef,useState } from "react";
+import { useEffect,useRef,useState } from "react";
+import { usePathname,useRouter,useSearchParams } from "next/navigation";
+import { listHref } from "@/lib/list-url-state";
+import { mfaListState } from "@/lib/security-list-state";
 import { GuardedLink as Link, useUnsavedChanges } from "../ux/navigation-guard";
 import type { MfaExceptionRecord,MfaPolicyPage } from "@/contracts/mfa-policy";
 import { api,ApiError,errorText,useResource } from "@/lib/api";
@@ -9,8 +12,15 @@ import { useApplication } from "../ApplicationContext";
 import { ActionButton,Modal,PageHeading,Panel } from "../shared";
 export function MfaPolicy({settings=false}:{settings?:boolean}){const app=useApplication();return <MfaContent key={(app.data?.company?.id??"none")+":"+(app.data?.company?.role??"")} settings={settings}/>;}
 function MfaContent({settings}:{settings:boolean}){
- const [searchInput,setSearchInput]=useState(""),[search,setSearch]=useState(""),[filter,setFilter]=useState("all"),[page,setPage]=useState(1),[edit,setEdit]=useState<{memberId:string;name:string;row:MfaExceptionRecord|null}>(),[toggle,setToggle]=useState(false),[remove,setRemove]=useState<MfaExceptionRecord>(),[busy,setBusy]=useState(false),[error,setError]=useState(""),[notice,setNotice]=useState("");
- const result=useResource<MfaPolicyPage>("/security/mfa-policy?"+new URLSearchParams({search,status:filter,page:String(page)})),policy=result.data?.policy;
+ const params=useSearchParams(),pathname=usePathname(),router=useRouter(),{search,status:filter,page,pageSize}=mfaListState(params);
+ const [draft,setDraft]=useState({search,value:search});if(draft.search!==search)setDraft({search,value:search});
+ const searchInput=draft.search===search?draft.value:search;
+ function setSearchInput(value:string){setDraft({search,value});}
+ function update(values:Record<string,string|number|null>){router.push(listHref(pathname,params.toString(),values),{scroll:false});}
+ function setPage(value:number){update({page:value});}
+ const [edit,setEdit]=useState<{memberId:string;name:string;row:MfaExceptionRecord|null}>(),[toggle,setToggle]=useState(false),[remove,setRemove]=useState<MfaExceptionRecord>(),[busy,setBusy]=useState(false),[error,setError]=useState(""),[notice,setNotice]=useState("");
+ const result=useResource<MfaPolicyPage>("/security/mfa-policy?"+new URLSearchParams({search,status:filter,page:String(page),pageSize:String(pageSize)})),policy=result.data?.policy;
+ useEffect(()=>{if(result.data&&result.data.page!==page)router.replace(listHref(pathname,params.toString(),{page:result.data.page}),{scroll:false});},[result.data,page,pathname,params,router]);
  const lock=useRef(false),[conflict,setConflict]=useState(false);
  async function confirm(password:string){
   if(!policy||lock.current||conflict)return;lock.current=true;setBusy(true);setError("");
@@ -19,7 +29,7 @@ function MfaContent({settings}:{settings:boolean}){
    setRemove(undefined);setToggle(false);setNotice("저장했습니다. 다음 회사 요청부터 적용됩니다.");result.reload();
   }catch(cause){setError(errorText(cause));setConflict(cause instanceof ApiError&&cause.code==="VERSION_CONFLICT");}finally{lock.current=false;setBusy(false);}
  }
- return <><PageHeading title={settings?"회사 2단계 인증 설정":"회사 2단계 인증"}><Link className="cs-button secondary" href={settings?"/security/two-factor":"/security/two-factor/setting"}>{settings?"현황 보기":"정책 설정"}</Link></PageHeading>
+ return <><PageHeading title={settings?"회사 2단계 인증 설정":"회사 2단계 인증"}><Link className="cs-button secondary" href={listHref(settings?"/security/two-factor":"/security/two-factor/setting",params.toString(),{})}>{settings?"현황 보기":"정책 설정"}</Link></PageHeading>
  <p>인증 등록이 필요한 구성원과 임시 복구 예외를 관리합니다. 예외는 최초 등록부터 최대 24시간이며 만료 시 접근이 종료됩니다.</p>
  {!toggle&&!remove&&error&&<p role="alert">{error}</p>}{!toggle&&!remove&&conflict&&<ActionButton secondary disabled={busy} onClick={()=>{setConflict(false);setError("");result.reload();}}>최신 현황 불러오기</ActionButton>}{notice&&<p role="status">{notice}</p>}
  {result.error?<Panel><p role="alert">{result.error.message}</p><ActionButton secondary onClick={result.reload}>다시 불러오기</ActionButton></Panel>:!policy?<Panel><p role="status">인증 현황을 불러오는 중입니다.</p></Panel>:<><SecurityEntitlementNotice access={policy.entitlement}/>
@@ -27,7 +37,7 @@ function MfaContent({settings}:{settings:boolean}){
  <p>전체 {result.data!.summary.members}명 · 등록 {result.data!.summary.enrolled}명 · 임시 예외 {result.data!.summary.exceptions}명 · 미등록 {result.data!.summary.missing}명</p>
  {!policy.actorEnrolled&&<p>정책을 변경하려면 관리자 본인의 2단계 인증을 먼저 등록해주세요. <Link href="/two-step-setting?returnTo=%2Fsecurity%2Ftwo-factor">2단계 인증 등록</Link></p>}
  <p>복구코드는 개인 인증 등록 화면에서 발급합니다. 다른 최상위 관리자는 인증 기기를 잃은 구성원에게 기한이 있는 예외를 등록할 수 있습니다.</p></Panel>
- <Panel><form className="mg-flex" onSubmit={e=>{e.preventDefault();setSearch(searchInput);setPage(1);}}><label>이름·이메일 검색<input className="cs-input" aria-label="인증 구성원 검색" value={searchInput} onChange={e=>setSearchInput(e.target.value)}/></label><label>등록 상태<select className="cs-input" value={filter} onChange={e=>{setFilter(e.target.value);setPage(1);}}><option value="all">전체</option><option value="enabled">등록 완료</option><option value="required">미등록·예외 없음</option><option value="exception">임시 예외</option></select></label><ActionButton type="submit">검색</ActionButton></form>
+ <Panel><form className="mg-flex" onSubmit={e=>{e.preventDefault();update({q:searchInput,page:1});}}><label>이름·이메일 검색<input className="cs-input" maxLength={100} aria-label="인증 구성원 검색" value={searchInput} onChange={e=>setSearchInput(e.target.value)}/></label><label>등록 상태<select className="cs-input" aria-label="인증 등록 상태" value={filter} onChange={e=>update({status:e.target.value,page:1})}><option value="all">전체</option><option value="enabled">등록 완료</option><option value="required">미등록·예외 없음</option><option value="exception">임시 예외</option></select></label><ActionButton type="submit">검색</ActionButton></form>
  <div className="cs-table-wrap"><table className="cs-table"><thead><tr><th>구성원</th><th>역할</th><th>인증 상태</th><th>예외 기한·사유</th><th>관리</th></tr></thead><tbody>{result.data!.items.map(m=><tr key={m.id}><td>{m.name}<br/>{m.email}</td><td>{m.role}</td><td>{m.enrolled?"등록 완료":m.exception?.active?"임시 예외":"미등록"}</td><td>{m.exception?<>{new Date(m.exception.expiresAt).toLocaleString("ko-KR")} {!m.exception.active&&"(만료)"}<br/>{m.exception.reason}</>:"-"}</td><td>{policy.canManage&&<div className="mg-flex">{!m.enrolled&&<ActionButton secondary disabled={busy} onClick={()=>setEdit({memberId:m.id,name:m.name,row:m.exception})}>{m.exception?"예외 수정":"예외 등록"}</ActionButton>}{m.exception&&<ActionButton secondary disabled={busy} onClick={()=>{setError("");setRemove(m.exception!);}}>예외 삭제</ActionButton>}</div>}</td></tr>)}{!result.data!.items.length&&<tr><td colSpan={5}>검색 결과가 없습니다.</td></tr>}</tbody></table></div>
  <div className="mg-flex"><span>{result.data!.total}명 · {result.data!.page}페이지</span><ActionButton secondary disabled={busy||result.data!.page<=1} onClick={()=>setPage(result.data!.page-1)}>이전</ActionButton><ActionButton secondary disabled={busy||result.data!.page*result.data!.pageSize>=result.data!.total} onClick={()=>setPage(result.data!.page+1)}>다음</ActionButton></div></Panel>
  {edit&&<ExceptionEditor key={edit.row?.id??edit.memberId} tenantId={policy.tenantId} {...edit} onClose={()=>setEdit(undefined)} onSaved={()=>{setEdit(undefined);setNotice("임시 예외를 저장했습니다.");result.reload();}}/>}

@@ -1,6 +1,8 @@
+import { ssoSignupAccept, ssoSignupCancel, ssoSignupView } from "../src/contracts/sso-signup";
 import { ssoPolicySelection, ssoPolicySave, ssoPolicyView, ssoPolicyChallengeDto } from "../src/contracts/sso-login-policy";
 import { paymentProviderEvent } from "../src/contracts/payment-events";
 import { paymentMethodCreate, paymentMethodUpdate, paymentMethodRemove } from "../src/contracts/payment-methods";
+import { closeMonthRequest, monthQuery, refundRequest } from "../src/contracts/billing-settlement";
 import { ssoAccountUnlink, ssoInvitationToken, ssoInvitationStart, ssoProviderCreate, ssoProviderPatch, ssoProviderRemove, ssoProviderRecord, ssoProviderCheckedRecord, ssoProviderList, ownSsoAccounts, orgMemberCreate, orgMemberPatch, orgMemberRemove, orgMemberRecord, orgMemberList, orgLoginBody, orgEmailRegisterBody, orgEmailChallengeBody, orgEmailChallengeResult, orgLoginResult } from "../src/contracts/sso";
 import { reviewCreate, reviewAction, reviewQuery, reviewNotify, reviewDestruction } from "../src/contracts/activity-reviews";
 import { contextSelectionInput } from "../src/contracts/context";
@@ -1033,7 +1035,25 @@ add("/billing/orders", "get", "billing.read + current tenant", "현재 회사 �
 add("/billing/orders", "post", "billing.write + current tenant", "현재 권한·세션을 검사하여 대기 구독 주문 생성. 서버 가격 적용. 재전송은 최신 상태 반환; 다른 수단의 기존 주문은409", z.object({ subscriptionId: z.uuid(), methodId: z.uuid().optional() }).strict(), "implemented", "201");
 (paths["/billing/orders"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
 add("/billing/orders/{id}", "get", "billing.read", "결제 상태. result=success 쿼리는 무시하고 paid로 바꾸지 않음", undefined, "implemented");
+add("/billing/orders/{id}/refunds", "get", "billing.read + current tenant", "현재 주문의 환불 요청·정산 상태와 확정 환불 합계·잔여 환불 가능액", undefined, "implemented");
+add("/billing/orders/{id}/refunds", "post", "billing.write + current tenant", "결제 완료 주문에 누계 한도 내 환불 요청. 현재 권한·세션·정책 및 최종 기한을 재검사하며 재요청은 최신 환불 상태 반환", refundRequest, "implemented", "201");
+(paths["/billing/orders/{id}/refunds"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
+add("/billing/orders/{id}/invoice", "get", "billing.read + current tenant", "결제 완료 주문의 서버 생성 PDF 청구서. 확정 환불 누계와 현재 결제 잔액 포함", undefined, "implemented");
+(paths["/billing/orders/{id}/invoice"].get as Operation).responses = { ...errors,
+  "200": { description: "해시 헤더가 있는 PDF 청구서 attachment",
+    headers: { "Content-Disposition": { schema: { type: "string" } }, "X-Content-Sha256": { schema: { type: "string", pattern: "^[a-f0-9]{64}$" } } },
+    content: { "application/pdf": { schema: { type: "string", format: "binary" } } } } };
 add("/billing/orders/{id}/return", "post", "billing.write", "성공 복귀 주소는 결제를 확정하지 않음", z.object({ result: z.enum(["success", "fail"]) }).strict(), "implemented");
+add("/billing/closing", "get", "billing.read + current tenant", "해당 월의 원장 합계·서비스 사용량과 저장된 마감 스냅샷·사후 조정 건수", undefined, "implemented");
+{
+  const json = z.toJSONSchema(monthQuery) as { properties: Record<string, unknown>; required?: string[] };
+  (paths["/billing/closing"].get as Operation).parameters = Object.entries(json.properties).map(([name, value]) => ({
+    in: "query", name, required: json.required?.includes(name) ?? false, schema: value,
+  }));
+}
+add("/billing/closing", "post", "billing.write + current tenant", "지난달 원장 합계·서비스 사용량을 불변 마감 스냅샷으로 저장. 현재 권한·세션·정책과 최종 기한 재검사", closeMonthRequest, "implemented", "201");
+(paths["/billing/closing"].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
+((paths["/billing/closing"].post as Operation).responses as Record<string, unknown>)["200"] = { description: "이미 마감된 월의 저장 스냅샷" };
 add("/billing/provider-events", "post", "signed payment webhook", "서명된 결제/환불 결과. 환불 식별자 필수, 승인·실패에는 환불 식별자 금지. 동일 이벤트는 최신 상태, 종료 후 다른 결과와 취소 구독 승인은409", paymentProviderEvent, "implemented", "202");
 (paths["/billing/provider-events"].post as Operation).security = [];
 (paths["/billing/provider-events"].post as Operation)["x-origin-check"] = "not used; rawBody HMAC-SHA256 authentication";
@@ -1162,7 +1182,7 @@ add("/auth/org/email-register/challenge", "post", "PIN-authenticated ticket + ra
 add("/auth/sso/{providerId}", "get", "login: public; link: current direct member + login within 5 minutes", "회사 OIDC/SAML 인증 시작; invite는 토큰 POST API를 사용", undefined, "implemented", "302");
 (paths["/auth/sso/{providerId}"].get as Operation).parameters = [{ in: "query", name: "mode", schema: { type: "string", enum: ["login", "link"], default: "login" } }];
 paths["/auth/sso/{providerId}"].parameters = [{ in: "path", name: "providerId", required: true, schema: { type: "string", format: "uuid" } }];
-add("/auth/sso/callback", "get", "one-time unexpired state + PKCE + verified OIDC issuer/audience/nonce/signature", "OIDC 응답 검증 후 대시보드·연결 완료 또는 개인 2FA로 이동", undefined, "implemented", "302");
+add("/auth/sso/callback", "get", "one-time unexpired state + PKCE + verified OIDC issuer/audience/nonce/signature", "OIDC 응답 검증 후 신규 사용자는 가입 동의 화면으로 이동. 기존 사용자는 대시보드·연결 완료 또는 개인 2FA로 이동", undefined, "implemented", "302");
 (paths["/auth/sso/callback"].get as Operation).parameters = [
   { in: "query", name: "state", required: true, schema: { type: "string" } },
   { in: "query", name: "code", schema: { type: "string" }, description: "code 또는 error 중 하나 필요" },
@@ -1174,11 +1194,24 @@ add("/auth/sso/saml", "post", "one-time RelayState + signed SAML assertion/respo
   additionalProperties: true, description: "본문 최대 1,000,000 bytes. SAMLResponse·RelayState는 각 한 번만 허용한다.",
 } } } };
 (paths["/auth/sso/saml"].post as Operation)["x-origin-check"] = "external signed SAML assertion; Origin exemption only after independent cryptographic validation";
+add("/auth/sso/signup", "get", "verified OIDC signup cookie + original browser binding", "5분 이내 가입 대기 정보 조회. 검증된 이름·이메일과 초대 회사만 표시; 계정·세션 생성 없음", undefined, "implemented");
+add("/auth/sso/signup", "post", "verified OIDC signup cookie + original browser binding + exact Origin", "현재 공급자·회사/IP·정책·초대·정원 재검사 후 필수 동의·계정·소속·세션·감사를 원자 저장하고 가입 대기 정보 1회 소비", ssoSignupAccept, "implemented");
+add("/auth/sso/signup", "delete", "verified OIDC signup cookie + original browser binding + exact Origin", "가입 대기 정보와 쿠키 폐기; 계정 생성 없음", ssoSignupCancel, "implemented");
+for (const method of ["get", "post", "delete"]) {
+  const operation = paths["/auth/sso/signup"][method] as Operation;
+  operation.security = [];
+  operation["x-response-cache"] = "private, no-store";
+  (operation.responses as Record<string, unknown>)["500"] = { description: "저장/감사 실패; 원자 롤백",
+    content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } };
+}
 function ssoJsonResponse(path: string, method: string, schema: z.ZodType, status = "200") {
   const operation = paths[path][method] as Operation;
   const responses = operation.responses as Record<string, { description: string; content?: unknown }>;
   responses[status].content = { "application/json": { schema: z.toJSONSchema(schema) } };
 }
+ssoJsonResponse("/auth/sso/signup", "get", ssoSignupView);
+ssoJsonResponse("/auth/sso/signup", "post", z.object({ redirect: z.string() }).strict());
+ssoJsonResponse("/auth/sso/signup", "delete", z.object({ cancelled: z.literal(true) }).strict());
 ssoJsonResponse("/security/sso-policy", "get", ssoPolicyView);
 ssoJsonResponse("/security/sso-policy", "put", ssoPolicySelection);
 ssoJsonResponse("/security/sso-policy/challenge", "post", ssoPolicyChallengeDto, "201");
@@ -1209,7 +1242,7 @@ for (const [path, method] of [["/auth/sso/{providerId}", "get"], ["/auth/sso/cal
   responses["303"] = { description: "문서 탐색 실패는 고정 오류코드 로그인 화면으로 이동. API 요청은 JSON 오류 상태 유지.",
     headers: { Location: { required: true, schema: { type: "string", pattern: "^/login\\?error=SSO_" } } } };
   if (path.startsWith("/auth/sso/")) responses["302"] = { description: "인증 진행/성공. 개인 2FA가 있으면 아직 로그인 세션 없이 인증 화면으로 이동.",
-    headers: { Location: { required: true, schema: { type: "string" } }, "Set-Cookie": { schema: { type: "string" }, description: "콜백: 세션 또는 개인 2FA 쿠키; HttpOnly/SameSite=Lax. HTTPS에서는 Secure." } } };
+    headers: { Location: { required: true, schema: { type: "string" } }, "Set-Cookie": { schema: { type: "string" }, description: "콜백: 신규 가입 대기·세션 또는 개인 2FA 쿠키; HttpOnly/SameSite=Lax. HTTPS에서는 Secure." } } };
   operation["x-response-cache"] = "private, no-store; Referrer-Policy: no-referrer";
 }
 

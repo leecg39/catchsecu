@@ -1,3 +1,4 @@
+import { cleanupSsoSignup } from "../src/server/sso-signup";
 import { runOneNotification } from "../src/server/notification-worker";
 import { cleanupMarketingJobs } from "../src/server/marketing-jobs";
 import { cleanupSenderVerificationMail } from "../src/server/senders";
@@ -45,6 +46,7 @@ async function main() {
       const businessCleanup = await cleanupBusinessFiles();
       if (businessCleanup.deleted || businessCleanup.retry) console.info("사업자등록증 정리", businessCleanup);
       const expired = await expireIdempotencyResponses();
+      await cleanupSsoSignup();
       const verification = await cleanupVerification();
       if (verification.expired) console.info("인증 요청 정리", verification);
       const expiredSubscriptions = await expireSubscriptions();

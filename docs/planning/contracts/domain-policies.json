@@ -529,6 +529,17 @@
       "response": "안전 메타데이터(id/purpose/name/mime/size/sha256/status/version/expiresAt), upload의 usage, 부모 manifest만 반환한다. storageKey/blobId/암호문/타회사·발급자 정보는 제외한다. 다운로드는 요청마다 부모·현재 권한·기한 및 I/O 후 기한을 확인하며 private, no-store·nosniff·no-referrer를 적용한다. 문서는 attachment, 검사된 이미지는 inline이다.",
       "deletion": "discard는 명시 version·현재 발급자·form.write 검사 후 미참조 자료만 요청한다(참조 중이면 409). pin과 불변 bytes·과거 버전은 보존하며 영속 worker가 최종 무참조 blob만 정리한다. 암묵 개정은 재사용하고 명시 copy/use는 새 asset 소유권과 용량을 적용한다. system ingest는 서버 전용이며 HTTP 경로가 없다.",
       "forbidden": "URL/경로/storageKey/blobId/ownerKind/tenantId 입력으로 자산 권한을 대체하지 않는다. 검사 전·만료·회수된 권한의 다운로드, 다른 문항/부모 자산 추측, 기타/드롭다운/행렬 이미지, 응답 FILE/DRAW 파일 혼용, 과거 pin 파괴를 금지한다."
+    },
+    {
+      "id": "sso-signup-consent",
+      "prefixes": [
+        "/auth/sso/signup"
+      ],
+      "scope": "검증 완료 OIDC 신규 사용자. 현재 회사·공급자 version·IP·로그인 정책·초대 재검사.",
+      "validation": "해시 토큰·브라우저 결합·5분 및 원본 state 기한. 변경은 exact Origin과 intentId 일치, 동의 true와 현재 문서 버전만 허용.",
+      "response": "검증된 이름·이메일·초대 회사·만료시각·문서 버전 또는 내부 이동 경로·취소 여부. 비밀 제외. 가입 완료에만 세션 쿠키 발급.",
+      "deletion": "가입 성공·취소는 intent 삭제. 만료는 worker 삭제. 동의 기록은 User에 결합하며 물리 삭제 시 연쇄 삭제.",
+      "forbidden": "동의 전 계정·소속·세션 생성, 이메일 수정·병합, 재사용, 교차 브라우저·공급자·초대·Origin 우회 금지."
     }
   ]
 }

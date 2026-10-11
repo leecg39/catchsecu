@@ -1,0 +1,1389 @@
+{
+  "result": "passed",
+  "database": "catchsecu_test",
+  "checkedAt": "2026-10-11T01:22:56.441Z",
+  "scope": "Twelve current SSO/directory/account/session/idempotency/policy/challenge/provenance/signup models. Read-only tenant FK, uniqueness, binding and protocol constraints. Expiry/nonce/version consumption also relies on the server transaction checks. orgMemberId is application-checked, not a database FK. Signup consent migration included. No claim of original login-policy/external institution acceptance.",
+  "migrations": 149,
+  "tables": [
+    "SsoProvider",
+    "SsoState",
+    "VirtualOrgMember",
+    "Account",
+    "Session",
+    "IdempotencyRecord",
+    "SsoLoginPolicy",
+    "SsoSessionProof",
+    "SsoPolicyChallenge",
+    "OrgEmailChallenge",
+    "SsoSignupIntent",
+    "SsoSignupAcceptance"
+  ],
+  "columns": [
+    {
+      "table": "Account",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "accountId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "providerId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "accessToken",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "refreshToken",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "idToken",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "accessTokenExpiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "refreshTokenExpiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "scope",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "password",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Account",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Account",
+      "column": "ssoProviderId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "scope",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "key",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "requestHash",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "statusCode",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "responseCipher",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "invalidatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "resourceId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "resourceType",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "stateId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "emailCipher",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "emailHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "codeHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "attempts",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "revokedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "token",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "ipAddress",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Session",
+      "column": "userAgent",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Session",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Session",
+      "column": "activeCompanyId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Session",
+      "column": "activeServiceId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "column": "mode",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "sessionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "policyVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "mode",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "emailHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "codeHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "attempts",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "consumedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "revokedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "name",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "issuer",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "clientId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "clientSecretCipher",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "authorizationUrl",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "tokenUrl",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "jwksUrl",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "scopes",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "enabled",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "preflightOk",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "preflightDetail",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "protocol",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoProvider",
+      "column": "idpCert",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "sessionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "providerId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "accountId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "identityProvider",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSessionProof",
+      "column": "authenticatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupAcceptance",
+      "column": "userId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupAcceptance",
+      "column": "overFourteen",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupAcceptance",
+      "column": "termsVersion",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupAcceptance",
+      "column": "privacyVersion",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupAcceptance",
+      "column": "acceptedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "providerId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "providerVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "stateId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "tokenHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "browserHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "mode",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "payloadCipher",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "providerId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "stateHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "nonceHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "verifierCipher",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "mode",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "userId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoState",
+      "column": "invitationId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoState",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "providerVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "SsoState",
+      "column": "sessionId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoState",
+      "column": "invitationVersion",
+      "type": "integer",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoState",
+      "column": "invitationTokenHash",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoState",
+      "column": "orgMemberId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "SsoState",
+      "column": "browserHash",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "providerId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "orgCode",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "employeeNo",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "nameCipher",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "emailCipher",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "pinHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    }
+  ],
+  "constraints": [
+    {
+      "table": "Account",
+      "name": "Account_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "Account",
+      "name": "Account_ssoProviderId_fkey",
+      "definition": "FOREIGN KEY (\"ssoProviderId\") REFERENCES \"SsoProvider\"(id) ON UPDATE RESTRICT ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "Account",
+      "name": "Account_sso_provider_match",
+      "definition": "CHECK ((((\"left\"(\"providerId\", 4) = 'sso:'::text) AND (\"ssoProviderId\" IS NOT NULL) AND (\"providerId\" = ('sso:'::text || \"ssoProviderId\"))) OR ((\"left\"(\"providerId\", 4) <> 'sso:'::text) AND (\"ssoProviderId\" IS NULL))))",
+      "validated": true
+    },
+    {
+      "table": "Account",
+      "name": "Account_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "IdempotencyRecord",
+      "name": "IdempotencyRecord_invalidation_check",
+      "definition": "CHECK ((((\"invalidatedAt\" IS NULL) AND (\"responseCipher\" IS NOT NULL) AND (\"requestHash\" IS NOT NULL)) OR ((\"invalidatedAt\" IS NOT NULL) AND (\"responseCipher\" IS NULL) AND (\"requestHash\" IS NULL))))",
+      "validated": true
+    },
+    {
+      "table": "IdempotencyRecord",
+      "name": "IdempotencyRecord_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "name": "OrgEmailChallenge_attempts_check",
+      "definition": "CHECK (((attempts >= 0) AND (attempts <= 5)))",
+      "validated": true
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "name": "OrgEmailChallenge_expiry_check",
+      "definition": "CHECK ((\"expiresAt\" > \"createdAt\"))",
+      "validated": true
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "name": "OrgEmailChallenge_hash_check",
+      "definition": "CHECK (((\"emailHash\" ~ '^[a-f0-9]{64}$'::text) AND (\"codeHash\" ~ '^[a-f0-9]{64}$'::text)))",
+      "validated": true
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "name": "OrgEmailChallenge_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "name": "OrgEmailChallenge_tenantId_stateId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"stateId\") REFERENCES \"SsoState\"(\"tenantId\", id) ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "Session",
+      "name": "Session_activeCompanyId_fkey",
+      "definition": "FOREIGN KEY (\"activeCompanyId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE SET NULL",
+      "validated": true
+    },
+    {
+      "table": "Session",
+      "name": "Session_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "Session",
+      "name": "Session_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "name": "SsoLoginPolicy_mode_check",
+      "definition": "CHECK ((mode = ANY (ARRAY['NONE'::text, 'AZURE'::text, 'GOOGLE'::text])))",
+      "validated": true
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "name": "SsoLoginPolicy_pkey",
+      "definition": "PRIMARY KEY (\"tenantId\")",
+      "validated": true
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "name": "SsoLoginPolicy_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE RESTRICT ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "name": "SsoLoginPolicy_version_check",
+      "definition": "CHECK ((version > 0))",
+      "validated": true
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_attempts_check",
+      "definition": "CHECK (((attempts >= 0) AND (attempts <= 5)))",
+      "validated": true
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_expiry_check",
+      "definition": "CHECK ((\"expiresAt\" > \"createdAt\"))",
+      "validated": true
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_hash_check",
+      "definition": "CHECK (((\"emailHash\" ~ '^[a-f0-9]{64}$'::text) AND (\"codeHash\" ~ '^[a-f0-9]{64}$'::text)))",
+      "validated": true
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_mode_check",
+      "definition": "CHECK ((mode = ANY (ARRAY['NONE'::text, 'AZURE'::text, 'GOOGLE'::text])))",
+      "validated": true
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_userId_sessionId_fkey",
+      "definition": "FOREIGN KEY (\"userId\", \"sessionId\") REFERENCES \"Session\"(\"userId\", id) ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_version_check",
+      "definition": "CHECK ((\"policyVersion\" >= 0))",
+      "validated": true
+    },
+    {
+      "table": "SsoProvider",
+      "name": "SsoProvider_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "SsoProvider",
+      "name": "SsoProvider_protocol_check",
+      "definition": "CHECK ((protocol = ANY (ARRAY['oidc'::text, 'saml'::text, 'gpki'::text, 'saeol'::text, 'groupware'::text])))",
+      "validated": true
+    },
+    {
+      "table": "SsoProvider",
+      "name": "SsoProvider_saml_cert_check",
+      "definition": "CHECK (((protocol <> 'saml'::text) OR ((\"idpCert\" IS NOT NULL) AND (\"idpCert\" ~~ '%BEGIN CERTIFICATE%'::text))))",
+      "validated": true
+    },
+    {
+      "table": "SsoProvider",
+      "name": "SsoProvider_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "SsoProvider",
+      "name": "SsoProvider_urls_https",
+      "definition": "CHECK (((protocol = ANY (ARRAY['gpki'::text, 'saeol'::text, 'groupware'::text])) OR (((\"authorizationUrl\" ~~ 'https://%'::text) OR (\"authorizationUrl\" ~ '^http://(127\\.0\\.0\\.1|localhost|\\[::1\\])[:/]'::text)) AND (POSITION(('@'::text) IN (\"authorizationUrl\")) = 0) AND ((protocol = 'saml'::text) OR ((\"tokenUrl\" IS NOT NULL) AND ((\"tokenUrl\" ~~ 'https://%'::text) OR (\"tokenUrl\" ~ '^http://(127\\.0\\.0\\.1|localhost|\\[::1\\])[:/]'::text)) AND (POSITION(('@'::text) IN (\"tokenUrl\")) = 0) AND (\"jwksUrl\" IS NOT NULL) AND ((\"jwksUrl\" ~~ 'https://%'::text) OR (\"jwksUrl\" ~ '^http://(127\\.0\\.0\\.1|localhost|\\[::1\\])[:/]'::text)) AND (POSITION(('@'::text) IN (\"jwksUrl\")) = 0))))))",
+      "validated": true
+    },
+    {
+      "table": "SsoSessionProof",
+      "name": "SsoSessionProof_identityProvider_check",
+      "definition": "CHECK ((\"identityProvider\" = ANY (ARRAY['OTHER'::text, 'GOOGLE'::text, 'AZURE'::text])))",
+      "validated": true
+    },
+    {
+      "table": "SsoSessionProof",
+      "name": "SsoSessionProof_pkey",
+      "definition": "PRIMARY KEY (\"sessionId\")",
+      "validated": true
+    },
+    {
+      "table": "SsoSessionProof",
+      "name": "SsoSessionProof_providerId_accountId_userId_fkey",
+      "definition": "FOREIGN KEY (\"providerId\", \"accountId\", \"userId\") REFERENCES \"Account\"(\"ssoProviderId\", id, \"userId\") ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "SsoSessionProof",
+      "name": "SsoSessionProof_tenantId_providerId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"providerId\") REFERENCES \"SsoProvider\"(\"tenantId\", id) ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "SsoSessionProof",
+      "name": "SsoSessionProof_userId_sessionId_fkey",
+      "definition": "FOREIGN KEY (\"userId\", \"sessionId\") REFERENCES \"Session\"(\"userId\", id) ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupAcceptance",
+      "name": "SsoSignupAcceptance_consent_check",
+      "definition": "CHECK ((\"overFourteen\" AND ((length(\"termsVersion\") >= 1) AND (length(\"termsVersion\") <= 100)) AND ((length(\"privacyVersion\") >= 1) AND (length(\"privacyVersion\") <= 100))))",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupAcceptance",
+      "name": "SsoSignupAcceptance_pkey",
+      "definition": "PRIMARY KEY (\"userId\")",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupAcceptance",
+      "name": "SsoSignupAcceptance_userId_fkey",
+      "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_expiry_check",
+      "definition": "CHECK (((\"expiresAt\" > \"createdAt\") AND (\"expiresAt\" <= (\"createdAt\" + '00:05:00'::interval))))",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_hash_check",
+      "definition": "CHECK (((\"tokenHash\" ~ '^[a-f0-9]{64}$'::text) AND (\"browserHash\" ~ '^[a-f0-9]{64}$'::text)))",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_mode_check",
+      "definition": "CHECK ((mode = ANY (ARRAY['login'::text, 'invite'::text])))",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_payload_check",
+      "definition": "CHECK ((\"payloadCipher\" ~~ 'v1.%'::text))",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_tenantId_providerId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"providerId\") REFERENCES \"SsoProvider\"(\"tenantId\", id) ON UPDATE RESTRICT ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_version_check",
+      "definition": "CHECK ((\"providerVersion\" > 0))",
+      "validated": true
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_binding_check",
+      "definition": "CHECK (((\"providerVersion\" >= 0) AND ((\"providerVersion\" = 0) OR (((mode = 'link'::text) AND (\"userId\" IS NOT NULL) AND (\"sessionId\" IS NOT NULL)) OR ((mode <> 'link'::text) AND (\"userId\" IS NULL) AND (\"sessionId\" IS NULL))))))",
+      "validated": true
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_browserHash_check",
+      "definition": "CHECK (((\"browserHash\" IS NULL) OR (\"browserHash\" ~ '^[a-f0-9]{64}$'::text)))",
+      "validated": true
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_invitation_binding_check",
+      "definition": "CHECK ((((\"invitationVersion\" IS NULL) AND (\"invitationTokenHash\" IS NULL)) OR ((mode = 'invite'::text) AND (\"invitationId\" IS NOT NULL) AND (\"invitationVersion\" IS NOT NULL) AND (\"invitationVersion\" > 0) AND (\"invitationTokenHash\" IS NOT NULL) AND (\"invitationTokenHash\" ~ '^[0-9a-f]{64}$'::text))))",
+      "validated": true
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_mode_check",
+      "definition": "CHECK ((mode = ANY (ARRAY['login'::text, 'link'::text, 'invite'::text])))",
+      "validated": true
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_stateHash_key",
+      "definition": "UNIQUE (\"stateHash\")",
+      "validated": true
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_tenantId_providerId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"providerId\") REFERENCES \"SsoProvider\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_userId_sessionId_fkey",
+      "definition": "FOREIGN KEY (\"userId\", \"sessionId\") REFERENCES \"Session\"(\"userId\", id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "VirtualOrgMember",
+      "name": "VirtualOrgMember_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "VirtualOrgMember",
+      "name": "VirtualOrgMember_tenantId_providerId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"providerId\") REFERENCES \"SsoProvider\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "validated": true
+    }
+  ],
+  "indexes": [
+    {
+      "table": "Account",
+      "name": "Account_one_credential_per_user",
+      "definition": "CREATE UNIQUE INDEX \"Account_one_credential_per_user\" ON public.\"Account\" USING btree (\"userId\") WHERE (\"providerId\" = 'credential'::text)"
+    },
+    {
+      "table": "Account",
+      "name": "Account_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Account_pkey\" ON public.\"Account\" USING btree (id)"
+    },
+    {
+      "table": "Account",
+      "name": "Account_providerId_accountId_key",
+      "definition": "CREATE UNIQUE INDEX \"Account_providerId_accountId_key\" ON public.\"Account\" USING btree (\"providerId\", \"accountId\")"
+    },
+    {
+      "table": "Account",
+      "name": "Account_ssoProviderId_id_userId_key",
+      "definition": "CREATE UNIQUE INDEX \"Account_ssoProviderId_id_userId_key\" ON public.\"Account\" USING btree (\"ssoProviderId\", id, \"userId\")"
+    },
+    {
+      "table": "Account",
+      "name": "Account_ssoProviderId_idx",
+      "definition": "CREATE INDEX \"Account_ssoProviderId_idx\" ON public.\"Account\" USING btree (\"ssoProviderId\")"
+    },
+    {
+      "table": "Account",
+      "name": "Account_userId_idx",
+      "definition": "CREATE INDEX \"Account_userId_idx\" ON public.\"Account\" USING btree (\"userId\")"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "name": "IdempotencyRecord_expiresAt_idx",
+      "definition": "CREATE INDEX \"IdempotencyRecord_expiresAt_idx\" ON public.\"IdempotencyRecord\" USING btree (\"expiresAt\")"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "name": "IdempotencyRecord_pkey",
+      "definition": "CREATE UNIQUE INDEX \"IdempotencyRecord_pkey\" ON public.\"IdempotencyRecord\" USING btree (id)"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "name": "IdempotencyRecord_scope_key_key",
+      "definition": "CREATE UNIQUE INDEX \"IdempotencyRecord_scope_key_key\" ON public.\"IdempotencyRecord\" USING btree (scope, key)"
+    },
+    {
+      "table": "IdempotencyRecord",
+      "name": "IdempotencyRecord_tenantId_resourceType_resourceId_idx",
+      "definition": "CREATE INDEX \"IdempotencyRecord_tenantId_resourceType_resourceId_idx\" ON public.\"IdempotencyRecord\" USING btree (\"tenantId\", \"resourceType\", \"resourceId\")"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "name": "OrgEmailChallenge_pkey",
+      "definition": "CREATE UNIQUE INDEX \"OrgEmailChallenge_pkey\" ON public.\"OrgEmailChallenge\" USING btree (id)"
+    },
+    {
+      "table": "OrgEmailChallenge",
+      "name": "OrgEmailChallenge_tenantId_stateId_createdAt_idx",
+      "definition": "CREATE INDEX \"OrgEmailChallenge_tenantId_stateId_createdAt_idx\" ON public.\"OrgEmailChallenge\" USING btree (\"tenantId\", \"stateId\", \"createdAt\")"
+    },
+    {
+      "table": "Session",
+      "name": "Session_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Session_pkey\" ON public.\"Session\" USING btree (id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_token_key",
+      "definition": "CREATE UNIQUE INDEX \"Session_token_key\" ON public.\"Session\" USING btree (token)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_userId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Session_userId_id_key\" ON public.\"Session\" USING btree (\"userId\", id)"
+    },
+    {
+      "table": "Session",
+      "name": "Session_userId_idx",
+      "definition": "CREATE INDEX \"Session_userId_idx\" ON public.\"Session\" USING btree (\"userId\")"
+    },
+    {
+      "table": "SsoLoginPolicy",
+      "name": "SsoLoginPolicy_pkey",
+      "definition": "CREATE UNIQUE INDEX \"SsoLoginPolicy_pkey\" ON public.\"SsoLoginPolicy\" USING btree (\"tenantId\")"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_pkey",
+      "definition": "CREATE UNIQUE INDEX \"SsoPolicyChallenge_pkey\" ON public.\"SsoPolicyChallenge\" USING btree (id)"
+    },
+    {
+      "table": "SsoPolicyChallenge",
+      "name": "SsoPolicyChallenge_tenantId_userId_createdAt_idx",
+      "definition": "CREATE INDEX \"SsoPolicyChallenge_tenantId_userId_createdAt_idx\" ON public.\"SsoPolicyChallenge\" USING btree (\"tenantId\", \"userId\", \"createdAt\")"
+    },
+    {
+      "table": "SsoProvider",
+      "name": "SsoProvider_pkey",
+      "definition": "CREATE UNIQUE INDEX \"SsoProvider_pkey\" ON public.\"SsoProvider\" USING btree (id)"
+    },
+    {
+      "table": "SsoProvider",
+      "name": "SsoProvider_tenantId_enabled_idx",
+      "definition": "CREATE INDEX \"SsoProvider_tenantId_enabled_idx\" ON public.\"SsoProvider\" USING btree (\"tenantId\", enabled)"
+    },
+    {
+      "table": "SsoProvider",
+      "name": "SsoProvider_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"SsoProvider_tenantId_id_key\" ON public.\"SsoProvider\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "SsoSessionProof",
+      "name": "SsoSessionProof_pkey",
+      "definition": "CREATE UNIQUE INDEX \"SsoSessionProof_pkey\" ON public.\"SsoSessionProof\" USING btree (\"sessionId\")"
+    },
+    {
+      "table": "SsoSessionProof",
+      "name": "SsoSessionProof_tenantId_userId_idx",
+      "definition": "CREATE INDEX \"SsoSessionProof_tenantId_userId_idx\" ON public.\"SsoSessionProof\" USING btree (\"tenantId\", \"userId\")"
+    },
+    {
+      "table": "SsoSessionProof",
+      "name": "SsoSessionProof_userId_sessionId_key",
+      "definition": "CREATE UNIQUE INDEX \"SsoSessionProof_userId_sessionId_key\" ON public.\"SsoSessionProof\" USING btree (\"userId\", \"sessionId\")"
+    },
+    {
+      "table": "SsoSignupAcceptance",
+      "name": "SsoSignupAcceptance_pkey",
+      "definition": "CREATE UNIQUE INDEX \"SsoSignupAcceptance_pkey\" ON public.\"SsoSignupAcceptance\" USING btree (\"userId\")"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_expiresAt_idx",
+      "definition": "CREATE INDEX \"SsoSignupIntent_expiresAt_idx\" ON public.\"SsoSignupIntent\" USING btree (\"expiresAt\")"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_pkey",
+      "definition": "CREATE UNIQUE INDEX \"SsoSignupIntent_pkey\" ON public.\"SsoSignupIntent\" USING btree (id)"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_stateId_key",
+      "definition": "CREATE UNIQUE INDEX \"SsoSignupIntent_stateId_key\" ON public.\"SsoSignupIntent\" USING btree (\"stateId\")"
+    },
+    {
+      "table": "SsoSignupIntent",
+      "name": "SsoSignupIntent_tokenHash_key",
+      "definition": "CREATE UNIQUE INDEX \"SsoSignupIntent_tokenHash_key\" ON public.\"SsoSignupIntent\" USING btree (\"tokenHash\")"
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_expiresAt_idx",
+      "definition": "CREATE INDEX \"SsoState_expiresAt_idx\" ON public.\"SsoState\" USING btree (\"expiresAt\")"
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_pkey",
+      "definition": "CREATE UNIQUE INDEX \"SsoState_pkey\" ON public.\"SsoState\" USING btree (id)"
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_stateHash_key",
+      "definition": "CREATE UNIQUE INDEX \"SsoState_stateHash_key\" ON public.\"SsoState\" USING btree (\"stateHash\")"
+    },
+    {
+      "table": "SsoState",
+      "name": "SsoState_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"SsoState_tenantId_id_key\" ON public.\"SsoState\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "name": "VirtualOrgMember_orgCode_employeeNo_key",
+      "definition": "CREATE UNIQUE INDEX \"VirtualOrgMember_orgCode_employeeNo_key\" ON public.\"VirtualOrgMember\" USING btree (\"orgCode\", \"employeeNo\")"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "name": "VirtualOrgMember_pkey",
+      "definition": "CREATE UNIQUE INDEX \"VirtualOrgMember_pkey\" ON public.\"VirtualOrgMember\" USING btree (id)"
+    },
+    {
+      "table": "VirtualOrgMember",
+      "name": "VirtualOrgMember_providerId_orgCode_employeeNo_key",
+      "definition": "CREATE UNIQUE INDEX \"VirtualOrgMember_providerId_orgCode_employeeNo_key\" ON public.\"VirtualOrgMember\" USING btree (\"providerId\", \"orgCode\", \"employeeNo\")"
+    }
+  ],
+  "triggers": [
+    {
+      "table": "Account",
+      "name": "Account_derive_sso_provider",
+      "definition": "CREATE TRIGGER \"Account_derive_sso_provider\" BEFORE INSERT OR UPDATE OF \"providerId\", \"ssoProviderId\" ON public.\"Account\" FOR EACH ROW EXECUTE FUNCTION derive_account_sso_provider()",
+      "function": "CREATE OR REPLACE FUNCTION public.derive_account_sso_provider()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  NEW.\"ssoProviderId\" := CASE WHEN left(NEW.\"providerId\",4)='sso:' THEN substring(NEW.\"providerId\" from 5) ELSE NULL END;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "Account",
+      "name": "Account_password_history",
+      "definition": "CREATE TRIGGER \"Account_password_history\" AFTER INSERT OR UPDATE OF password ON public.\"Account\" FOR EACH ROW EXECUTE FUNCTION record_credential_change()",
+      "function": "CREATE OR REPLACE FUNCTION public.record_credential_change()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n audit_request_id text;\nBEGIN\n IF NEW.\"providerId\" <> 'credential' OR NEW.password IS NULL THEN RETURN NEW; END IF;\n IF TG_OP = 'UPDATE' AND NEW.password IS NOT DISTINCT FROM OLD.password THEN RETURN NEW; END IF;\n audit_request_id := current_setting('app.auth_request_id', true);\n IF audit_request_id IS NULL OR audit_request_id !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' THEN\n   audit_request_id := gen_random_uuid()::text;\n END IF;\n IF TG_OP = 'UPDATE' AND OLD.password IS NOT NULL THEN\n   INSERT INTO \"PasswordHistory\" (\"userId\",\"passwordHash\",\"changedAt\") VALUES (NEW.\"userId\",OLD.password,(clock_timestamp() AT TIME ZONE 'UTC'));\n   DELETE FROM \"PasswordHistory\" WHERE \"userId\" = NEW.\"userId\" AND id NOT IN\n     (SELECT id FROM \"PasswordHistory\" WHERE \"userId\" = NEW.\"userId\" ORDER BY id DESC LIMIT 9);\n END IF;\n UPDATE \"User\" SET \"passwordChangedAt\" = (clock_timestamp() AT TIME ZONE 'UTC'), \"updatedAt\" = (clock_timestamp() AT TIME ZONE 'UTC') WHERE id = NEW.\"userId\";\n DELETE FROM \"PasswordDeferral\" WHERE \"userId\" = NEW.\"userId\";\n -- Audit the exact rows removed by this trigger, including sessions that the\n -- library's later adapter deletion can no longer see. Any insert failure\n -- aborts the credential update, proofs and every session removal together.\n WITH ended AS (\n   DELETE FROM \"Session\" WHERE \"userId\" = NEW.\"userId\" RETURNING id,\"userId\",\"activeCompanyId\"\n )\n INSERT INTO \"AuditEvent\" (id,\"actorId\",\"tenantId\",action,resource,\"resourceId\",\"requestId\",detail,\"createdAt\")\n SELECT gen_random_uuid()::text,\"userId\",\"activeCompanyId\",'session.ended','session',id,audit_request_id,\n   '{\"changedFields\":[]}'::jsonb,(clock_timestamp() AT TIME ZONE 'UTC') FROM ended;\n DELETE FROM \"Verification\" WHERE value = NEW.\"userId\";\n INSERT INTO \"AuditEvent\" (id,\"actorId\",action,resource,\"resourceId\",\"requestId\",detail,\"createdAt\")\n VALUES (gen_random_uuid()::text,NEW.\"userId\",CASE WHEN TG_OP = 'INSERT' THEN 'password.created' ELSE 'password.changed' END,\n   'user',NEW.\"userId\",audit_request_id,'{\"changedFields\":[\"password\"]}'::jsonb,(clock_timestamp() AT TIME ZONE 'UTC'));\n RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "Session",
+      "name": "session_active_account_guard",
+      "definition": "CREATE TRIGGER session_active_account_guard BEFORE INSERT OR UPDATE ON public.\"Session\" FOR EACH ROW EXECUTE FUNCTION guard_active_account_reference()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_active_account_reference()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE account_status text;\nBEGIN\n  IF TG_TABLE_NAME = 'Membership' THEN\n    IF NEW.status <> 'active' THEN RETURN NEW; END IF;\n  END IF;\n  SELECT status INTO account_status FROM \"User\" WHERE id = NEW.\"userId\" FOR SHARE;\n  IF account_status <> 'active' THEN\n    RAISE EXCEPTION 'ACCOUNT_UNAVAILABLE' USING ERRCODE = '23514';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "SsoSessionProof",
+      "name": "sso_session_proof_immutable",
+      "definition": "CREATE TRIGGER sso_session_proof_immutable BEFORE UPDATE ON public.\"SsoSessionProof\" FOR EACH ROW EXECUTE FUNCTION sso_session_proof_immutable()",
+      "function": "CREATE OR REPLACE FUNCTION public.sso_session_proof_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RAISE EXCEPTION 'SSO session authentication evidence cannot be rewritten' USING ERRCODE='23514';\nEND;\n$function$\n"
+    }
+  ],
+  "sourceFingerprints": {
+    "src/server/sso-signup.ts": "1aa7151655424c95ab3a727308a990a3c9df748d1e51a100194142304984c15a",
+    "src/contracts/sso-signup.ts": "5949c250fa07b811c98c33c9ff738150f76f2727968d6e761c89527a9ba57ea8",
+    "prisma/migrations/20261025030000_sso_signup_consent/migration.sql": "c6a0c6de038dbcb7de455d2dfac3b7ba22f5df62fa5a33d016fce1b015740c30",
+    "prisma/schema.prisma": "1a3a98727ef838bfaf1ec298f9dc43ddf72a46ba35359c30e49e5a5530f8973c",
+    "src/contracts/sso.ts": "ed8ef2edf8dd675330a641a6b935765df423226c9f7404d70b2d5fb8657f2728",
+    "src/server/sso.ts": "56089da82c3ccaff4ccf79948d0eb9265006c13de1c16f980181add197c2c4db",
+    "src/server/org-auth.ts": "0271ad3a87a3cb2b719ec04d2d66af929148f4dc6bdcb64c99f74d42e729f4f0",
+    "src/server/idempotency.ts": "cff00186d5ad761363d9dbf84173f5cd3ef22759494a397fb9970ba316a8be70",
+    "src/server/sso-session-proof.ts": "438817ec18d0aeb6992a2d220d1bb8e8a70151a0b2bca7a9816c020041413c82",
+    "src/server/sso-login-policy.ts": "e84404bde789c04cabfa7bfc401d9c900fad6b3f2161b3066a1489ba7f214f33",
+    "src/server/sso-identity.ts": "b9f14e01d820a13c15ad0d444100330838c40805f6cf66cb5f8d6fe629ebc164",
+    "src/server/org-email-mail.ts": "14239acd718f20b6d9e293fa05eb96ae23fc42ff2db998b975cdeed1cbd9f9bb",
+    "src/contracts/sso-login-policy.ts": "c15b37e50569b9b76bcf4f6bc96feaa66d96c09f75428367011c4808c145d3e1",
+    "src/server/sso-provider-lifecycle.ts": "ed5c0be6e149d42177c75cf8c225135d289e0231a3742bc4967a5ac5b4e1a8e2",
+    "src/server/sso-transport.ts": "4fbad1db007b94c6ceadcdd5260bc7faff9b0fdcd314e0f8ac52170f41ce48c2",
+    "src/server/public-network.ts": "71c7e6f4048a2ec4f02106d5458b04b9c188e2027e5a2682760de77d0c27802b",
+    "prisma/migrations/20261014110000_sso_state_binding/migration.sql": "ed016f3f5d49f1463cf49823f8da3c8331fbbd5c03b6998bcbd96f14f4cce8b2",
+    "prisma/migrations/20261014120000_sso_invitation_binding/migration.sql": "0c3e3fe8f197705eb8151cf90b2838d787b96ef5197014d36834e7fa7e423757",
+    "prisma/migrations/20261014130000_sso_account_provider_reference/migration.sql": "22faa4e20245b44381e67da33e1bf4526c751efe275d3dcf909eb4ac8cf8be82",
+    "prisma/migrations/20261016000000_virtual_org_auth/migration.sql": "a97d927b8c039534f43049f97341598bf485612dfdc6420404c00603ed26784a",
+    "prisma/migrations/20261016100000_virtual_org_protocols/migration.sql": "f8a52719cbff601685787521241f856390aaa51875cf734b9ae4831a076922e5"
+  }
+}

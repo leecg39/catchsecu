@@ -1,0 +1,212 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:24633) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/billing-settlement.test.ts > 문자 발송은 예약·확정으로 정산되고 재실행해도 이중 차감되지 않는다 1436ms
+ ✓ tests/server/billing-settlement.test.ts > 잔액 부족은 INSUFFICIENT_CREDIT 실패로 기록되고 원장을 오염시키지 않는다 1022ms
+ ✓ tests/server/billing-settlement.test.ts > 동의 철회로 취소된 발송은 예약 크레딧을 반환한다 809ms
+ ✓ tests/server/billing-settlement.test.ts > 예약된 문자 캠페인 취소는 미발송분을 취소하고 발송분만 정산한다 1102ms
+ ✓ tests/server/billing-settlement.test.ts > 공급자 수신 결과는 미정산 발송 예약을 접수는 청구·거부와 미확인은 환불로 정산한다 1231ms
+ ✓ tests/server/billing-settlement.test.ts > solapi 영수증 부재 복구는 재전송하지 않고 webhook 대사가 정산한다 1323ms
+ ✓ tests/server/billing-settlement.test.ts > 끊긴 발송 잡의 수리는 영수증으로 정산하고 미전송분은 환불한다 1037ms
+ ✓ tests/server/billing-settlement.test.ts > 월별 사용량은 서비스별로 집계되고 마감 스냅샷에 보존된다 892ms
+ ✓ tests/server/billing-settlement.test.ts > 수동 재요청 문자 webhook accepted는 새 attempt 예약만 정산한다 899ms
+ ✓ tests/server/billing-settlement.test.ts > 수동 재요청 문자 webhook failed는 새 attempt 예약만 정산한다 911ms
+ ✓ tests/server/billing-settlement.test.ts > 수동 재요청 문자 webhook timeout는 새 attempt 예약만 정산한다 903ms
+ ✓ tests/server/billing-settlement.test.ts > 이전 빌드가 예약한 수동 attempt의 기존 원장은 worker에서도 중복 예약 없이 복구한다 909ms
+ ✓ tests/server/billing-settlement.test.ts > 이전 빌드가 예약한 수동 attempt의 기존 원장은 cleanup에서도 중복 예약 없이 복구한다 988ms
+ ✓ tests/server/billing-settlement.test.ts > 문자 공급자 network 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 894ms
+ ✓ tests/server/billing-settlement.test.ts > 문자 공급자 malformed 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 897ms
+ ✓ tests/server/billing-settlement.test.ts > 문자 공급자 server 미확인 응답은 자동 재발송하지 않고 늦은 결과로 정산한다 1197ms
+ ✓ tests/server/billing-settlement.test.ts > 공급자 실패가 기록된 문자의 수동 재요청은 새 영수증으로 청구하고 이전 결과 재전송은 무시한다 1553ms
+(node:25200) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/billing-virtual.test.ts > 가상 checkout 처리 중 세션 만료는 전체 변경을 롤백한다 667ms
+ ✓ tests/server/billing-virtual.test.ts > 가상 refund 처리 중 세션 만료는 전체 변경을 롤백한다 508ms
+stderr | tests/server/billing-virtual.test.ts > 가상 승인 감사 저장 실패는 결제·구독·원장을 함께 롤백한다
+{"requestId":"51716974-bed5-45a1-b669-48ac532cd829","code":"INTERNAL_ERROR","kind":"Error","stack":"    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-virtual.test.ts:77:55 |     at audit (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/vitest/dist/chunks/spy.DgMTfhrK.js:323:40) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/payments.ts:97:11 |     at processTicksAndRejections (node:internal/process/task_queues:104:5) |     at __vite_ssr_import_0__.db.$transaction.timeout (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/billing-access.ts:18:20) |     at Proxy._transactionWithCallback (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:99:4868) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/api/v1/billing/orders/[id]/virtual-checkout/route.ts:9:15"}
+
+ ✓ tests/server/billing-virtual.test.ts > 가상 승인 감사 저장 실패는 결제·구독·원장을 함께 롤백한다 500ms
+stderr | tests/server/billing-virtual.test.ts > 가상 환불 감사 저장 실패는 정산·원장·공급자 이벤트를 함께 롤백한다
+{"requestId":"5e21b828-65b5-419b-b13d-71c2f5707985","code":"INTERNAL_ERROR","kind":"Error","stack":"    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-virtual.test.ts:95:60 |     at audit (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/vitest/dist/chunks/spy.DgMTfhrK.js:323:40) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/payments.ts:108:11 |     at processTicksAndRejections (node:internal/process/task_queues:104:5) |     at __vite_ssr_import_0__.db.$transaction.timeout (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/billing-access.ts:18:20) |     at Proxy._transactionWithCallback (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:99:4868) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/api/v1/billing/refunds/[id]/virtual-settle/route.ts:9:15"}
+
+ ✓ tests/server/billing-virtual.test.ts > 가상 환불 감사 저장 실패는 정산·원장·공급자 이벤트를 함께 롤백한다 512ms
+ ✓ tests/server/billing-virtual.test.ts > 주문 목록이 가상 결제 활성 여부를 보고한다 398ms
+ ✓ tests/server/billing-virtual.test.ts > 가상 승인은 실제 서명 이벤트 경로로 결제·구독활성·원장입금을 완료한다 518ms
+ ✓ tests/server/billing-virtual.test.ts > 가상 실패는 주문만 종료하고 구독·원장을 건드리지 않는다 563ms
+ ✓ tests/server/billing-virtual.test.ts > 가상 환불 정산은 실제 환불 이벤트 경로로 원장 차감을 완료하고 거절도 기록한다 627ms
+ ✓ tests/server/billing-virtual.test.ts > 타 테넌트 주문·환불과 미인증 요청은 가상 경로에서도 거부된다 641ms
+(node:25345) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/billing-refunds.test.ts > 환불 요청은 결제 주문에만 허용되고 누계 초과는 거부된다 791ms
+ ✓ tests/server/billing-refunds.test.ts > 서명된 환불 이벤트만 정산하고 재시도·무서명·비paid 주문을 거부한다 605ms
+stderr | tests/server/billing-refunds.test.ts > 환불 요청 감사 실패는 환불·감사·멱등 키를 함께 롤백한다
+{"requestId":"1fcb1b36-913a-4050-b37f-a58ee0da45de","code":"INTERNAL_ERROR","kind":"Error","stack":"    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-refunds.test.ts:115:55 |     at audit (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/vitest/dist/chunks/spy.DgMTfhrK.js:323:40) |     at tx.paymentRefund.findFirst.where.id (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/billing-settlement.ts:36:11) |     at processTicksAndRejections (node:internal/process/task_queues:104:5) |     at __vite_ssr_import_0__.db.$transaction.timeout (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/idempotency.ts:78:20) |     at Proxy._transactionWithCallback (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:99:4868) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/api/v1/billing/orders/[id]/refunds/route.ts:12:18"}
+
+ ✓ tests/server/billing-refunds.test.ts > 환불 요청 감사 실패는 환불·감사·멱등 키를 함께 롤백한다 577ms
+stderr | tests/server/billing-refunds.test.ts > 월마감 감사 실패는 마감·감사·멱등 키를 함께 롤백한다
+{"requestId":"02364d3e-065d-49f4-8881-bb7a218430cf","code":"INTERNAL_ERROR","kind":"Error","stack":"    at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/tests/server/billing-refunds.test.ts:130:51 |     at audit (file:///Users/user01/Desktop/%E1%84%8F%E1%85%A2%E1%84%8E%E1%85%A7%E1%84%89%E1%85%B5%E1%84%8F%E1%85%B2/catchsecu-clone/node_modules/vitest/dist/chunks/spy.DgMTfhrK.js:323:40) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/billing-settlement.ts:153:11 |     at processTicksAndRejections (node:internal/process/task_queues:104:5) |     at __vite_ssr_import_0__.db.$transaction.timeout (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/server/idempotency.ts:78:20) |     at Proxy._transactionWithCallback (/Users/user01/Desktop/캐쳐시큐/catchsecu-clone/node_modules/@prisma/client/runtime/client.js:99:4868) |     at /Users/user01/Desktop/캐쳐시큐/catchsecu-clone/src/app/api/v1/billing/closing/route.ts:14:18"}
+
+ ✓ tests/server/billing-refunds.test.ts > 월마감 감사 실패는 마감·감사·멱등 키를 함께 롤백한다 482ms
+ ✓ tests/server/billing-refunds.test.ts > 청구서는 paid 주문에만 발행되고 권한·격리를 지킨다 615ms
+ ✓ tests/server/billing-refunds.test.ts > 월마감 스냅샷하고 마감 후 거래는 정정으로 식별한다 539ms
+ ✓ tests/server/billing-refunds.test.ts > 유료 구독은 해지 예약·철회가 되고 effective date가 적용된다 581ms
+(node:25471) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/payment-concurrency.test.ts > 같은 승인 웹훅 8개가 동시에 와도 이벤트·입금은 한 번이고 나머지는 멱등 응답이다 870ms
+ ✓ tests/server/payment-concurrency.test.ts > 승인과 실패 웹훅이 동시 도착하면 하나만 상태를 변경한다 1113ms
+ ✓ tests/server/payment-concurrency.test.ts > 환불 동시 이벤트 duplicate=false에서 정산은 한 번만 적용된다 436ms
+ ✓ tests/server/payment-concurrency.test.ts > 환불 동시 이벤트 duplicate=true에서 정산은 한 번만 적용된다 491ms
+ ✓ tests/server/payment-concurrency.test.ts > 가상 승인과 외부 실패가 동시에 와도 상태와 원장이 일치한다 417ms
+ ✓ tests/server/admin-plans.test.ts > DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: {"currency":"USD"} 276ms
+ ✓ tests/server/admin-plans.test.ts > DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: {"priceKrw":2147483648} 185ms
+ ✓ tests/server/admin-plans.test.ts > DB가 수용하지 않는 상품 계약을 입력 단계에서 거부한다: {"orderable":true,"priceKrw":null} 204ms
+ ✓ tests/server/admin-plans.test.ts > 0개 한도는 유효한 비활성 기능 한도이다 209ms
+ ✓ tests/server/admin-plans.test.ts > 현재 시점보다 과거인 종료일은 422이고 생성 전체가 롤백된다 489ms
+ ✓ tests/server/admin-plans.test.ts > 미판매·미사용 상품 CRUD 및 버전 삭제가 가능하고 감사가 남는다 596ms
+ ✓ tests/server/admin-plans.test.ts > 운영자 권한 회수 후 이전 actor로 상품을 변경하거나 조회할 수 없다 433ms
+ ✓ tests/server/admin-plans.test.ts > 같은 식별자 상품 동시 생성은 하나만 성공하고 나머지는 409이다 393ms
+ ✓ tests/server/admin-plans.test.ts > 감사 실패는 상품과 버전을 함께 롤백하고 서버 오류를 충돌로 숨기지 않는다 424ms
+ ✓ tests/server/admin-plans.test.ts > 주문 가능한 버전의 삭제와 모든 가격 UPDATE는 DB에서도 차단한다 431ms
+ ✓ tests/server/admin-plans.test.ts > 미판매 버전도 과거 취소 구독이 참조하면 삭제를 거부한다 441ms
+ ✓ tests/server/admin-plans.test.ts > 버전 기간 오류는 이름 변경까지 함께 롤백한다 415ms
+ ✓ tests/server/admin-plans.test.ts > 관리자 상품 HTTP 경로가 동일한 PostgreSQL CRUD와 권한 경계를 사용한다 563ms
+ ✓ tests/server/admin-plans.test.ts > 상품 생성 중 세션이 만료되면 상품·감사가 함께 롤백된다 426ms
+(node:25729) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/payment-authority.test.ts > methodList: 이미 읽은 문맥도 현재 권한 회수를 적용한다 176ms
+ ✓ tests/server/payment-authority.test.ts > methodList: 회수된 세션은 차단한다 285ms
+ ✓ tests/server/payment-authority.test.ts > methodCreate: 이미 읽은 문맥도 현재 권한 회수를 적용한다 126ms
+ ✓ tests/server/payment-authority.test.ts > methodCreate: 회수된 세션은 차단한다 108ms
+ ✓ tests/server/payment-authority.test.ts > methodUpdate: 이미 읽은 문맥도 현재 권한 회수를 적용한다 120ms
+ ✓ tests/server/payment-authority.test.ts > methodUpdate: 회수된 세션은 차단한다 106ms
+ ✓ tests/server/payment-authority.test.ts > methodRemove: 이미 읽은 문맥도 현재 권한 회수를 적용한다 107ms
+ ✓ tests/server/payment-authority.test.ts > methodRemove: 회수된 세션은 차단한다 107ms
+ ✓ tests/server/payment-authority.test.ts > orderCreate: 이미 읽은 문맥도 현재 권한 회수를 적용한다 121ms
+ ✓ tests/server/payment-authority.test.ts > orderCreate: 회수된 세션은 차단한다 113ms
+ ✓ tests/server/payment-authority.test.ts > orderList: 이미 읽은 문맥도 현재 권한 회수를 적용한다 102ms
+ ✓ tests/server/payment-authority.test.ts > orderList: 회수된 세션은 차단한다 104ms
+ ✓ tests/server/payment-authority.test.ts > orderRead: 이미 읽은 문맥도 현재 권한 회수를 적용한다 103ms
+ ✓ tests/server/payment-authority.test.ts > orderRead: 회수된 세션은 차단한다 100ms
+ ✓ tests/server/payment-authority.test.ts > orderReturn: 이미 읽은 문맥도 현재 권한 회수를 적용한다 96ms
+ ✓ tests/server/payment-authority.test.ts > orderReturn: 회수된 세션은 차단한다 98ms
+ ✓ tests/server/payment-authority.test.ts > methodCreate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다 101ms
+ ✓ tests/server/payment-authority.test.ts > methodUpdate: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다 99ms
+ ✓ tests/server/payment-authority.test.ts > methodRemove: 감사 저장 중 세션 만료도 업무와 감사를 모두 롤백한다 101ms
+ ✓ tests/server/payment-authority.test.ts > create: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다 104ms
+ ✓ tests/server/payment-authority.test.ts > update: 대표 교체는 기존 수단의 버전도 갱신해 옛 화면 수정이 충돌한다 114ms
+ ✓ tests/server/payment-authority.test.ts > 주문 생성 재전송은 서명 승인 후 최신 paid 상태를 반환한다 145ms
+ ✓ tests/server/payment-authority.test.ts > 주문 재요청: role 회수는 과거 성공 응답도 차단한다 104ms
+ ✓ tests/server/payment-authority.test.ts > 주문 재요청: session 회수는 과거 성공 응답도 차단한다 108ms
+ ✓ tests/server/payment-authority.test.ts > 주문 캐시 저장 도중 세션 만료는 신규 주문·감사·키를 전부 롤백한다 103ms
+ ✓ tests/server/payment-authority.test.ts > 같은 version 동시 수정은 하나만 성공하며 대표는 하나다 121ms
+ ✓ tests/server/payment-authority.test.ts > 다른 결제수단을 요청하면 기존 대기 주문을 성공처럼 반환하지 않는다 122ms
+ ✓ tests/server/payment-authority.test.ts > 서로 다른 키의 동시 주문도 같은 대기 주문 하나만 만든다 109ms
+ ✓ tests/server/payment-authority.test.ts > 수단 해지와 주문 생성 경합에서 해지된 수단의 대기 주문은 생기지 않는다 106ms
+ ✓ tests/server/payment-authority.test.ts > 변경된 MFA 정책과 현재 회사 선택을 적용한다 132ms
+(node:25839) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/subscription-authority.test.ts > plans: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 165ms
+ ✓ tests/server/subscription-authority.test.ts > list: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 110ms
+ ✓ tests/server/subscription-authority.test.ts > entitlement: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 118ms
+ ✓ tests/server/subscription-authority.test.ts > assets: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 102ms
+ ✓ tests/server/subscription-authority.test.ts > purchase: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 99ms
+ ✓ tests/server/subscription-authority.test.ts > cancel: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 103ms
+ ✓ tests/server/subscription-authority.test.ts > schedule: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 110ms
+ ✓ tests/server/subscription-authority.test.ts > undo: 이미 조회한 문맥도 회수된 결제 권한을 다시 검사한다 98ms
+ ✓ tests/server/subscription-authority.test.ts > purchase: 회수된 세션으로 신규 변경을 실행하지 않는다 94ms
+ ✓ tests/server/subscription-authority.test.ts > purchase: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다 108ms
+ ✓ tests/server/subscription-authority.test.ts > cancel: 회수된 세션으로 신규 변경을 실행하지 않는다 94ms
+ ✓ tests/server/subscription-authority.test.ts > cancel: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다 102ms
+ ✓ tests/server/subscription-authority.test.ts > schedule: 회수된 세션으로 신규 변경을 실행하지 않는다 96ms
+ ✓ tests/server/subscription-authority.test.ts > schedule: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다 101ms
+ ✓ tests/server/subscription-authority.test.ts > undo: 회수된 세션으로 신규 변경을 실행하지 않는다 91ms
+ ✓ tests/server/subscription-authority.test.ts > undo: 응답 캐시 저장 중 세션 만료 시 업무·감사·키를 모두 롤백한다 103ms
+ ✓ tests/server/subscription-authority.test.ts > 성공한 구매 요청 재전송도 현재 결제 권한을 확인한다 126ms
+ ✓ tests/server/subscription-authority.test.ts > 같은 해지 예약 키에 다른 취소 사유를 넣으면 충돌한다 107ms
+ ✓ tests/server/subscription-authority.test.ts > 구매 재전송은 취소 후 최신 상태를 반환하고 구독을 다시 만들지 않는다 121ms
+ ✓ tests/server/subscription-authority.test.ts > 예약 재전송은 철회 후 최신 상태를 반환하고 다시 예약하지 않는다 118ms
+ ✓ tests/server/subscription-authority.test.ts > 같은 version 구매 취소 두 건은 하나만 성공하고 다른 건은409로 끝난다 99ms
+ ✓ tests/server/subscription-authority.test.ts > 변경 전 새 MFA 정책과 선택 회사 변경을 적용한다 107ms
+ ✓ tests/server/subscription-authority.test.ts > schedule: 처리 중 해지 기한 도래는 변경·이력·캐시를 롤백한다 101ms
+ ✓ tests/server/subscription-authority.test.ts > undo: 처리 중 해지 기한 도래는 변경·이력·캐시를 롤백한다 98ms
+ ✓ tests/server/subscription-authority.test.ts > 구매 처리 중 상품 판매 기간 종료는 새 구독과 요청 키를 롤백한다 108ms
+ ✓ tests/server/subscription-authority.test.ts > 철회 요청 재전송은 이후 새 해지 예약을 되돌리지 않고 최신 상태를 반환한다 114ms
+ ✓ tests/server/subscription-authority.test.ts > cancel: 성공 요청 재전송도 회수된 세션을 차단한다 105ms
+ ✓ tests/server/subscription-authority.test.ts > schedule: 성공 요청 재전송도 회수된 세션을 차단한다 104ms
+ ✓ tests/server/subscription-authority.test.ts > undo: 성공 요청 재전송도 회수된 세션을 차단한다 107ms
+ ✓ tests/server/subscription-expiration.test.ts > 유료 자연 만료는 DB 상태·이력·감사를 한 번만 저장하고 결제 주문을 보존한다 342ms
+ ✓ tests/server/subscription-expiration.test.ts > 유료 DB 전이는 기한 도래를 허용하고 만료와 함께 해지일을 바꾸는 요청은 거부한다 227ms
+ ✓ tests/server/subscription-expiration.test.ts > 유료 예약 해지는 도래 전 유지하고 도래 후 두 워커가 한 번만 종결한다 1789ms
+ ✓ tests/server/subscription-expiration.test.ts > 유료 미래 구독·철회한 해지 예약은 워커가 만료시키지 않는다 238ms
+ ✓ tests/server/subscription-expiration.test.ts > 유료 만료 감사 저장 실패는 상태·이력을 함께 롤백하고 다음 실행에서 복구한다 223ms
+(node:26021) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/payment-methods.test.ts > 등록·목록·대표수단 전환과 DTO 비밀 미노출 689ms
+ ✓ tests/server/payment-methods.test.ts > 카드 원문·중복 토큰·버전 경합·권한 경계 647ms
+ ✓ tests/server/payment-methods.test.ts > 대표 삭제 승격·삭제 경합·타사 격리·주문 연결 764ms
+(node:26078) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/billing-read-authority.test.ts > invoices: 현재 권한이 있는 빈 회사는 페이지를 반환한다 158ms
+ ✓ tests/server/billing-read-authority.test.ts > invoices: 문맥 생성 후 역할 회수는 조회를 거부한다 113ms
+ ✓ tests/server/billing-read-authority.test.ts > invoices: 문맥 생성 후 세션 회수는 조회를 거부한다 119ms
+ ✓ tests/server/billing-read-authority.test.ts > invoices: 변경된 MFA 정책은 조회에 즉시 적용된다 105ms
+ ✓ tests/server/billing-read-authority.test.ts > invoices: 다른 회사로 전환된 세션은 이전 회사 조회를 거부한다 91ms
+ ✓ tests/server/billing-read-authority.test.ts > usage: 현재 권한이 있는 빈 회사는 페이지를 반환한다 92ms
+ ✓ tests/server/billing-read-authority.test.ts > usage: 문맥 생성 후 역할 회수는 조회를 거부한다 88ms
+ ✓ tests/server/billing-read-authority.test.ts > usage: 문맥 생성 후 세션 회수는 조회를 거부한다 91ms
+ ✓ tests/server/billing-read-authority.test.ts > usage: 변경된 MFA 정책은 조회에 즉시 적용된다 89ms
+ ✓ tests/server/billing-read-authority.test.ts > usage: 다른 회사로 전환된 세션은 이전 회사 조회를 거부한다 89ms
+ ✓ tests/server/billing-read-authority.test.ts > 청구서·사용량 HTTP 조회 경로가 현재 billing 권한과 빈 페이지를 반환한다 115ms
+ ✓ tests/server/billing-read-authority.test.ts > 환불·청구서·이력·원장·월마감은 문맥 생성 후 역할 회수를 즉시 거부한다 116ms
+ ✓ tests/server/billing-read-authority.test.ts > 환불·청구서·이력·원장·월마감은 문맥 생성 후 세션 회수를 즉시 거부한다 119ms
+ ✓ tests/server/billing-read-authority.test.ts > 환불·청구서·이력·원장·월마감은 문맥 생성 후 회사 전환을 즉시 거부한다 120ms
+(node:26153) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > ledger API scopes company, service and currency without exposing source IDs 160ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > billing history shows only real tenant trial events, with Korean month filters 138ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > company registration grants a seven-day trial and tenant-scoped usage 78ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > asset usage comes from company data and rejects other roles 119ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > server owns price, yearly unverified version is unavailable, and paid state cannot be forged 120ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > purchase request is idempotent, pending only, and cancellable with version 176ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > schedules and revokes early trial termination with tenant scope, version and server cutoff 130ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > cuts off access at the scheduled instant and expires once under two workers 13ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > serializes concurrent service creation at the trial limit 164ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > 무제한 한도는 자원 생성을 막지 않고 가격 개정은 기존 청구를 바꾸지 않는다 50ms
+ ✓ tests/server/subscriptions.test.ts > subscription and catalog boundary > expired trial never grants an entitlement 4ms
+ ✓ tests/server/payment-orders.test.ts > DB는 다른 회사의 구독을 결제 주문에 연결하지 않는다 363ms
+(node:26216) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/payment-orders.test.ts > 성공 주소와 카드 원문으로는 결제 완료가 되지 않고 서명된 결과만 한 번 반영한다 628ms
+ ✓ tests/server/payment-orders.test.ts > 연간 주기는 1년 기간으로 활성화되고 결제 없는 활성화는 DB가 거부한다 430ms
+ ✓ tests/server/payment-orders.test.ts > 주문 목록과 결제 이력은 회사별로 격리되고 위조 결과는 노출되지 않는다 721ms
+ ✓ tests/server/payment-event-integrity.test.ts > paid: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다 160ms
+ ✓ tests/server/payment-event-integrity.test.ts > failed: 환불 식별자가 섞인 승인·실패 이벤트를 거절한다 113ms
+ ✓ tests/server/payment-event-integrity.test.ts > refunded: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다 156ms
+ ✓ tests/server/payment-event-integrity.test.ts > refund_rejected: 성공 이벤트 재전송도 환불 식별자 누락을 거절한다 124ms
+ ✓ tests/server/payment-event-integrity.test.ts > 서명은 유효해도 잘못된 JSON은 서버500 대신400으로 거절한다 92ms
+(node:26293) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/server/payment-event-integrity.test.ts > 결제 진행 중 구독 취소는 거절하고 업무·감사·요청 키를 유지한다 130ms
+ ✓ tests/server/payment-event-integrity.test.ts > 이미 취소된 과거 구독의 뒤늦은 승인은 원장만 충전하지 않는다 97ms
+ ✓ tests/server/payment-event-integrity.test.ts > 결제 실패 확인 후에는 같은 취소 요청 키로 정상 취소할 수 있다 129ms
+ ✓ tests/server/payment-event-integrity.test.ts > 승인과 구독 취소 경합은 활성 구독·한 번 충전으로 끝나며 취소는409다 119ms
+ ✓ tests/server/payment-event-integrity.test.ts > 동일 환불 이벤트 ID로 다른 환불 대상을 보내면409이며 두 번째 환불은 대기다 138ms
+ ✓ tests/server/payment-event-integrity.test.ts > refunded: 정확한 환불 이벤트 재전송은 상태·원장·감사를 변경하지 않는다 123ms
+ ✓ tests/server/payment-event-integrity.test.ts > refund_rejected: 정확한 환불 이벤트 재전송은 상태·원장·감사를 변경하지 않는다 115ms
+ ✓ tests/server/invoice-detail-ui.test.ts > invalid invoice path does not query billing data 6ms
+ ✓ tests/server/invoice-detail-ui.test.ts > missing read capability denies detail before requests 0ms
+ ✓ tests/server/invoice-detail-ui.test.ts > paid detail shows actual amount, PDF, and excludes pending refunds from available total 13ms
+ ✓ tests/server/invoice-detail-ui.test.ts > pending payment does not offer invoice PDF or refund action 1ms
+ ✓ tests/server/invoice-detail-ui.test.ts > read-only caller can see invoice but cannot request refund 3ms
+ ✓ tests/server/invoice-detail-ui.test.ts > resource denial hides old amounts and offers retry 0ms
+ ✓ tests/server/invoice-detail-ui.test.ts > 실제 화면 경로 /bill/10000000-0000-4000-8000-000000000001가 청구 데이터를 표시한다 1ms
+ ✓ tests/server/invoice-detail-ui.test.ts > 실제 화면 경로 /creditBill/10000000-0000-4000-8000-000000000001가 청구 데이터를 표시한다 1ms
+ ✓ tests/server/invoice-detail-ui.test.ts > 실제 화면 경로 /bill/10000000-0000-4000-8000-000000000001/refund가 청구 데이터를 표시한다 1ms
+
+ Test Files  14 passed (14)
+      Tests  169 passed (169)
+   Start at  11:52:04
+   Duration  63.74s (tests 90%, import 8%, transform 2%)
+

@@ -7,7 +7,7 @@ const groups = ["security/sso", "auth/sso", "auth/org", "me/sso-accounts", "invi
 function routes(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap(item => item.isDirectory() ? routes(join(dir, item.name)) : item.name === "route.ts" ? [join(dir, item.name)] : []);
 }
-test("SSO 계약: 실제 Route Handler 19개 작업과 선언된 경로/메서드가 일치", () => {
+test("SSO 계약: 실제 Route Handler 22개 작업과 선언된 경로/메서드가 일치", () => {
   const actual: string[] = [];
   for (const group of groups) for (const file of routes("src/app/api/v1/" + group)) {
     const path = "/" + relative("src/app/api/v1", file).replace(/\/route\.ts$/, "").replace(/\[([^\]]+)\]/g, "{$1}");
@@ -24,7 +24,7 @@ test("SSO 계약: 실제 Route Handler 19개 작업과 선언된 경로/메서�
   for (const [path, item] of Object.entries(spec.paths)) if (groups.some(group => path === "/" + group || path.startsWith("/" + group + "/"))) {
     for (const method of ["get", "post", "patch", "delete", "put"]) if ((item as Record<string, unknown>)[method]) declared.push(method.toUpperCase() + " " + path);
   }
-  expect(actual).toHaveLength(19); expect(declared.sort()).toEqual(actual.sort());
+  expect(actual).toHaveLength(22); expect(declared.sort()).toEqual(actual.sort());
   expect(spec.paths["/identity-providers"]).toBeUndefined();
   expect(spec.paths["/identity-providers/{id}"]).toBeUndefined();
 });
@@ -72,4 +72,17 @@ test("SSO 계약: 관리 응답과 계정 목록은 비밀 필드 미포함", ()
   const response = issue.responses["200"].content["application/json"].schema;
   expect(response.required.sort()).toEqual(["challengeId", "expiresAt", "retryAt"]);
   expect(response.properties.code).toBeUndefined();
+});
+
+test("SSO 신규 가입 계약은 동의 cookie·Origin 및 엄격한 입력을 명시한다", () => {
+  const path = spec.paths["/auth/sso/signup"];
+  for (const method of ["get", "post", "delete"]) {
+    expect(path[method].security).toEqual([]); expect(path[method]["x-contract-policy"]).toBe("sso-signup-consent");
+    expect(path[method].responses["200"]).toBeDefined(); expect(path[method].responses["303"]).toBeUndefined();
+  }
+  const schema = path.post.requestBody.content["application/json"].schema;
+  expect(schema.additionalProperties).toBe(false); expect(schema.required).toContain("intentId");
+  expect(schema.properties.email).toBeUndefined(); expect(schema.properties.termsAccepted.const).toBe(true);
+  expect(path.post["x-origin-check"]).toBe("exact configured application Origin");
+  expect(path.delete["x-origin-check"]).toBe("exact configured application Origin");
 });

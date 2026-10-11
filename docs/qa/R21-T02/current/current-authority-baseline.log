@@ -1,0 +1,122 @@
+
+ RUN  v5.0.3 /Users/user01/Desktop/캐쳐시큐/catchsecu-clone
+
+(node:16941) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/billing-refunds.test.ts (5 tests | 1 failed) 3425ms
+   × 서명된 환불 이벤트만 정산하고 재시도·무서명·비paid 주문을 거부한다 562ms
+(node:17065) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ tests/server/billing-read-authority.test.ts (14 tests | 3 failed) 1972ms
+   × 환불·청구서·이력·원장·월마감은 문맥 생성 후 역할 회수를 즉시 거부한다 100ms
+   × 환불·청구서·이력·원장·월마감은 문맥 생성 후 세션 회수를 즉시 거부한다 95ms
+   × 환불·청구서·이력·원장·월마감은 문맥 생성 후 회사 전환을 즉시 거부한다 99ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/server/billing-read-authority.test.ts > 환불·청구서·이력·원장·월마감은 문맥 생성 후 역할 회수를 즉시 거부한다
+AssertionError: promise resolved "{ total: +0, page: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [],
++   "page": 1,
++   "pageSize": 20,
++   "total": 0,
+  }
+
+ ❯ tests/server/billing-read-authority.test.ts:88:36
+     86|   await db.membership.update({ where: { id: ctx.member.id }, data: { r…
+     87|   for (const [name, operation] of [...settlementReads(), ...settlement…
+     88|     await expect(operation(), name).rejects.toMatchObject({ status: 40…
+       |                                    ^
+     89| });
+     90|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/server/billing-read-authority.test.ts > 환불·청구서·이력·원장·월마감은 문맥 생성 후 세션 회수를 즉시 거부한다
+AssertionError: promise resolved "{ total: +0, page: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [],
++   "page": 1,
++   "pageSize": 20,
++   "total": 0,
+  }
+
+ ❯ tests/server/billing-read-authority.test.ts:94:36
+     92|   await db.session.delete({ where: { id: ctx.session.id } });
+     93|   for (const [name, operation] of [...settlementReads(), ...settlement…
+     94|     await expect(operation(), name).rejects.toMatchObject({ status: 40…
+       |                                    ^
+     95| });
+     96|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/server/billing-read-authority.test.ts > 환불·청구서·이력·원장·월마감은 문맥 생성 후 회사 전환을 즉시 거부한다
+AssertionError: promise resolved "{ total: +0, page: 1, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "items": [],
++   "page": 1,
++   "pageSize": 20,
++   "total": 0,
+  }
+
+ ❯ tests/server/billing-read-authority.test.ts:101:36
+     99|   await db.session.update({ where: { id: ctx.session.id }, data: { act…
+    100|   for (const [name, operation] of [...settlementReads(), ...settlement…
+    101|     await expect(operation(), name).rejects.toMatchObject({ status: 40…
+       |                                    ^
+    102| });
+    103|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/server/billing-refunds.test.ts > 서명된 환불 이벤트만 정산하고 재시도·무서명·비paid 주문을 거부한다
+AssertionError: expected { …(8) } to match object { …(3) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "id": "8f359e57-9267-4bf5-9783-846d6d23f041",
+-   "status": "refunded",
+-   "version": 2,
++   "status": "requested",
++   "version": 1,
+  }
+
+ ❯ tests/server/billing-refunds.test.ts:80:31
+     78|   expect((await db.paymentRefund.findUniqueOrThrow({ where: { id: refu…
+     79|   const replay = await requestRefund(req("/billing/orders/" + order.id…
+     80|   expect(await replay.json()).toMatchObject({ id: refund.id, status: "…
+       |                               ^
+     81|   const acc = await account(company.id);
+     82|   expect(acc.available).toBe(BigInt(8000));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 15 passed (19)
+   Start at  11:47:52
+   Duration  6.98s (tests 79%, import 15%, transform 6%)
+

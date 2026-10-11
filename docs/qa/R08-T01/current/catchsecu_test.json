@@ -1,0 +1,2411 @@
+{
+  "checkedAt": "2026-10-11T01:29:27.232Z",
+  "result": "passed",
+  "database": "catchsecu_test",
+  "tables": [
+    "Form",
+    "FormVersion",
+    "Question",
+    "QuestionOption",
+    "FormTemplate",
+    "FormFavorite",
+    "FormDocumentBinding",
+    "FormSection",
+    "AuthorAssetBlob",
+    "AuthorAsset",
+    "AuthorAssetReference",
+    "FormAccessTargetBatch",
+    "FormAccessTarget"
+  ],
+  "migrations": 149,
+  "scope": "Read-only thirteen-model metadata, validated constraints and selected tenant/FK/stable-key/uniqueness/published-child-trigger assertions. Runtime lifecycle and source-field coverage are separate evidence; no external-provider acceptance claim.",
+  "metadataHash": "ac48aa5cc8b3e4cee2ba4a0b296e6ecb3b1735f009ad21d4ebb04644c6b14ec2",
+  "columns": [
+    {
+      "table": "AuthorAsset",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "blobId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "ownerKind",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "createdById",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "purpose",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "nameCipher",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "size",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAsset",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "storageKey",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "mime",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "size",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "sha256",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "validationVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "scanStatus",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "scanEngine",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "scannedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "expiresAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "leaseUntil",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "assetId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "formVersionId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "questionId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "templateId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "approvalId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "questionKey",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "slot",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "orderNumber",
+      "type": "integer",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "optionKey",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "documentKey",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "column": "nodeKey",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Form",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "ownerId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "title",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "publishedVersionId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Form",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "sourceType",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Form",
+      "column": "designatedRetentionDays",
+      "type": "integer",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormAccessTarget",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTarget",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTarget",
+      "column": "formId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTarget",
+      "column": "batchId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTarget",
+      "column": "emailHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTarget",
+      "column": "emailCipher",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTarget",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "formId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "nameCipher",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "sourceHash",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "acceptedCount",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "rejectedCount",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "createdBy",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "formVersionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "documentId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "documentVersionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "required",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "kind",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "order",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "column": "displaySnapshot",
+      "type": "jsonb",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormFavorite",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormFavorite",
+      "column": "memberId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormFavorite",
+      "column": "formId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "formVersionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "pageKey",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "order",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "title",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "body",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "bodyRich",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormSection",
+      "column": "destinationKind",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "destinationSectionId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormSection",
+      "column": "allowBack",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormSection",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "title",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "category",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "content",
+      "type": "jsonb",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "version",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "serviceId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "description",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "thumbnailAssetId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormTemplate",
+      "column": "licenseScope",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "formId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "number",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "title",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "status",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "body",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "verify",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "font",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "bold",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "consentRequired",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "consentPurpose",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "retentionDays",
+      "type": "integer",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "maxResponses",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "showSubmitNotice",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "publishedAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "createdAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "updatedAt",
+      "type": "timestamp without time zone",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "consentDisplay",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "receiptEvidenceVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "marketing",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "optionSchemaVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "formLanguage",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "bodyRich",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "sectionSchemaVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "completionPageMode",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "completionPageBody",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "completionPageBodyRich",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "closedPageMode",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "closedPageBody",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "closedPageBodyRich",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "consentItemSchemaVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "consentItems",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "collectionWindowSchemaVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "collectionOpenAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "collectionCloseAt",
+      "type": "timestamp without time zone",
+      "nullable": "YES"
+    },
+    {
+      "table": "FormVersion",
+      "column": "participationAccessSchemaVersion",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "useParticipationAccess",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "participationAccessMethod",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "participationTargetScope",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "participationUseOtp",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "participationSocialProvider",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "FormVersion",
+      "column": "restrictDuplicateReplies",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "tenantId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "formVersionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "stableKey",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "type",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "label",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "required",
+      "type": "boolean",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "order",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "Question",
+      "column": "subjectRole",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "condition",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "matrixRows",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "selectionLimits",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "textMaxLength",
+      "type": "integer",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "additionalExplanation",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "materialList",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "catchFormPersonalInformationRequests",
+      "type": "jsonb",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "questionImageKey",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "sectionId",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "Question",
+      "column": "infoPatternId",
+      "type": "integer",
+      "nullable": "YES"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "id",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "questionId",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "value",
+      "type": "text",
+      "nullable": "NO"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "order",
+      "type": "integer",
+      "nullable": "NO"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "stableKey",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "label",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "isCustomValue",
+      "type": "boolean",
+      "nullable": "YES"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "optionImageKey",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "branchDestinationKind",
+      "type": "text",
+      "nullable": "YES"
+    },
+    {
+      "table": "QuestionOption",
+      "column": "branchDestinationSectionId",
+      "type": "text",
+      "nullable": "YES"
+    }
+  ],
+  "constraints": [
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_blobId_fkey",
+      "definition": "FOREIGN KEY (\"blobId\") REFERENCES \"AuthorAssetBlob\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_lifetime",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_metadata_check",
+      "definition": "CHECK (((id ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text) AND (purpose = ANY (ARRAY['QUESTION_MATERIAL'::text, 'OPTION_IMAGE'::text, 'QUESTION_IMAGE'::text, 'FORM_CONTENT_IMAGE'::text, 'PAGE_CONTENT_IMAGE'::text, 'END_PAGE_CONTENT_IMAGE'::text, 'PRIVATE_PAGE_CONTENT_IMAGE'::text])) AND ((size >= 1) AND (size <= 14680064)) AND (version > 0) AND ((purpose <> 'QUESTION_MATERIAL'::text) OR (size <= 5242880)) AND ((purpose <> ALL (ARRAY['OPTION_IMAGE'::text, 'QUESTION_IMAGE'::text])) OR (size <= 1048576)) AND ((status = 'deleted'::text) OR ((\"nameCipher\" IS NOT NULL) AND (length(\"nameCipher\") > 0)))))",
+      "validated": true
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_scope_check",
+      "definition": "CHECK ((((\"ownerKind\" = 'company'::text) AND (\"tenantId\" IS NOT NULL) AND (\"serviceId\" IS NOT NULL) AND (\"createdById\" IS NOT NULL)) OR ((\"ownerKind\" = 'system'::text) AND (\"tenantId\" IS NULL) AND (\"serviceId\" IS NULL) AND (\"createdById\" IS NULL))))",
+      "validated": true
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_state_check",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'uploaded'::text, 'ready'::text, 'rejected'::text, 'deleting'::text, 'deleted'::text])))",
+      "validated": true
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_tenantId_createdById_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"createdById\") REFERENCES \"Membership\"(\"tenantId\", id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_tenantId_serviceId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_identity_check",
+      "definition": "CHECK (((id ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text) AND (\"storageKey\" ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text) AND (sha256 ~ '^[a-f0-9]{64}$'::text) AND ((size >= 1) AND (size <= 14680064)) AND (\"validationVersion\" > 0) AND (version > 0)))",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_mime_check",
+      "definition": "CHECK ((mime = ANY (ARRAY['application/pdf'::text, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'::text, 'application/postscript'::text, 'image/jpeg'::text, 'image/png'::text])))",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_state_check",
+      "definition": "CHECK (((status = ANY (ARRAY['pending'::text, 'uploaded'::text, 'ready'::text, 'quarantined'::text, 'deleting'::text, 'deleted'::text])) AND (\"scanStatus\" = ANY (ARRAY['pending'::text, 'clean'::text, 'infected'::text, 'error'::text])) AND ((status <> 'ready'::text) OR ((\"scanStatus\" = 'clean'::text) AND (\"scanEngine\" IS NOT NULL) AND (\"scannedAt\" IS NOT NULL)))))",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_storageKey_key",
+      "definition": "UNIQUE (\"storageKey\")",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_approvalId_fkey",
+      "definition": "FOREIGN KEY (\"approvalId\") REFERENCES \"ApprovalRequest\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_assetId_fkey",
+      "definition": "FOREIGN KEY (\"assetId\") REFERENCES \"AuthorAsset\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_consistency",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_formVersionId_fkey",
+      "definition": "FOREIGN KEY (\"formVersionId\") REFERENCES \"FormVersion\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_key_check",
+      "definition": "CHECK ((((\"questionKey\" IS NULL) OR (\"questionKey\" ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text)) AND ((\"optionKey\" IS NULL) OR (\"optionKey\" ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text)) AND ((\"nodeKey\" IS NULL) OR (\"nodeKey\" ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text)) AND (((slot = 'form_content'::text) AND (\"documentKey\" = 'form'::text)) OR ((slot = 'page_content'::text) AND (\"documentKey\" ~* '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'::text)) OR ((slot = 'end_page_content'::text) AND (\"documentKey\" = 'completion'::text)) OR ((slot = 'private_page_content'::text) AND (\"documentKey\" = 'closed'::text)) OR ((slot = 'template_thumbnail'::text) AND (\"documentKey\" = 'template'::text)) OR ((slot = ANY (ARRAY['material'::text, 'option'::text, 'question'::text])) AND (\"documentKey\" IS NULL)))))",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_parent_check",
+      "definition": "CHECK (((num_nonnulls(\"formVersionId\", \"templateId\", \"approvalId\") = 1) AND (((slot = ANY (ARRAY['material'::text, 'option'::text, 'question'::text])) AND (\"questionKey\" IS NOT NULL) AND (\"documentKey\" IS NULL) AND (\"nodeKey\" IS NULL) AND (((\"formVersionId\" IS NOT NULL) AND (\"questionId\" IS NOT NULL) AND (\"tenantId\" IS NOT NULL) AND (\"serviceId\" IS NOT NULL)) OR ((\"formVersionId\" IS NULL) AND (\"questionId\" IS NULL)))) OR ((slot = ANY (ARRAY['form_content'::text, 'page_content'::text, 'end_page_content'::text, 'private_page_content'::text])) AND (\"questionKey\" IS NULL) AND (\"documentKey\" IS NOT NULL) AND (\"nodeKey\" IS NOT NULL) AND (\"questionId\" IS NULL) AND (((\"formVersionId\" IS NOT NULL) AND (\"tenantId\" IS NOT NULL) AND (\"serviceId\" IS NOT NULL)) OR (\"formVersionId\" IS NULL))) OR ((slot = 'template_thumbnail'::text) AND (\"templateId\" IS NOT NULL) AND (\"questionKey\" IS NULL) AND (\"documentKey\" = 'template'::text) AND (\"nodeKey\" IS NULL) AND (\"questionId\" IS NULL) AND (((\"tenantId\" IS NULL) AND (\"serviceId\" IS NULL)) OR ((\"tenantId\" IS NOT NULL) AND (\"serviceId\" IS NOT NULL)))))))",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_slot_check",
+      "definition": "CHECK ((((slot = 'material'::text) AND (\"orderNumber\" IS NOT NULL) AND ((\"orderNumber\" >= 0) AND (\"orderNumber\" <= 2)) AND (\"optionKey\" IS NULL)) OR ((slot = 'option'::text) AND (\"orderNumber\" IS NULL) AND (\"optionKey\" IS NOT NULL)) OR ((slot = 'question'::text) AND (\"orderNumber\" IS NULL) AND (\"optionKey\" IS NULL)) OR ((slot = ANY (ARRAY['form_content'::text, 'page_content'::text, 'end_page_content'::text, 'private_page_content'::text])) AND (\"orderNumber\" IS NULL) AND (\"optionKey\" IS NULL)) OR ((slot = 'template_thumbnail'::text) AND (\"questionKey\" IS NULL) AND (\"documentKey\" = 'template'::text) AND (\"nodeKey\" IS NULL) AND (\"orderNumber\" IS NULL) AND (\"optionKey\" IS NULL))))",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_templateId_fkey",
+      "definition": "FOREIGN KEY (\"templateId\") REFERENCES \"FormTemplate\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_tenantId_formVersionId_questionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formVersionId\", \"questionId\") REFERENCES \"Question\"(\"tenantId\", \"formVersionId\", id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "Form",
+      "name": "Form_author_asset_consistency",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "Form",
+      "name": "Form_designated_retention",
+      "definition": "CHECK (((\"designatedRetentionDays\" IS NULL) OR ((\"designatedRetentionDays\" >= 1) AND (\"designatedRetentionDays\" <= 36500))))",
+      "validated": true
+    },
+    {
+      "table": "Form",
+      "name": "Form_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "Form",
+      "name": "Form_source_check",
+      "definition": "CHECK (((\"sourceType\" = ANY (ARRAY['form'::text, 'import'::text])) AND ((\"sourceType\" <> 'import'::text) OR ((status = 'archived'::text) AND (\"publishedVersionId\" IS NULL)))))",
+      "validated": true
+    },
+    {
+      "table": "Form",
+      "name": "Form_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['draft'::text, 'pendingApproval'::text, 'published'::text, 'paused'::text, 'archived'::text])))",
+      "validated": true
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_id_publishedVersionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", id, \"publishedVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", \"formId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_ownerId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"ownerId\") REFERENCES \"Membership\"(\"tenantId\", \"userId\") ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_serviceId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormAccessTarget",
+      "name": "FormAccessTarget_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "FormAccessTarget",
+      "name": "FormAccessTarget_tenantId_formId_batchId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formId\", \"batchId\") REFERENCES \"FormAccessTargetBatch\"(\"tenantId\", \"formId\", id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormAccessTarget",
+      "name": "FormAccessTarget_tenantId_formId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formId\") REFERENCES \"Form\"(\"tenantId\", id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "name": "FormAccessTargetBatch_counts_check",
+      "definition": "CHECK (((\"acceptedCount\" >= 0) AND (\"rejectedCount\" >= 0)))",
+      "validated": true
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "name": "FormAccessTargetBatch_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "name": "FormAccessTargetBatch_tenantId_formId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formId\") REFERENCES \"Form\"(\"tenantId\", id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "name": "FormAccessTargetBatch_version_check",
+      "definition": "CHECK ((version > 0))",
+      "validated": true
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_tenantId_formVersionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_tenantId_serviceId_documentId_document_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\", \"documentId\", \"documentVersionId\") REFERENCES \"DocumentVersion\"(\"tenantId\", \"serviceId\", \"documentId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_values",
+      "definition": "CHECK (((kind = ANY (ARRAY['collection'::text, 'third_party'::text])) AND ((\"order\" >= 0) AND (\"order\" <= 9)) AND (jsonb_typeof(\"displaySnapshot\") = 'object'::text)))",
+      "validated": true
+    },
+    {
+      "table": "FormFavorite",
+      "name": "FormFavorite_pkey",
+      "definition": "PRIMARY KEY (\"tenantId\", \"memberId\", \"formId\")",
+      "validated": true
+    },
+    {
+      "table": "FormFavorite",
+      "name": "FormFavorite_tenantId_formId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formId\") REFERENCES \"Form\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormFavorite",
+      "name": "FormFavorite_tenantId_memberId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"memberId\") REFERENCES \"Membership\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_author_asset_consistency",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_bodyRich_shape",
+      "definition": "CHECK (((\"bodyRich\" IS NULL) OR ((jsonb_typeof(\"bodyRich\") = 'object'::text) AND ((\"bodyRich\" ->> 'schemaVersion'::text) = '1'::text) AND (jsonb_typeof((\"bodyRich\" -> 'blocks'::text)) = 'array'::text))))",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_content_limits",
+      "definition": "CHECK (((\"order\" >= 0) AND (\"order\" < 50) AND (char_length(title) <= 200) AND (char_length(body) <= 20000)))",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_destination_state",
+      "definition": "CHECK (((\"destinationKind\" = ANY (ARRAY['page'::text, 'consent'::text, 'submit'::text, 'ineligible'::text])) AND (((\"destinationKind\" = 'page'::text) AND (\"destinationSectionId\" IS NOT NULL)) OR ((\"destinationKind\" <> 'page'::text) AND (\"destinationSectionId\" IS NULL))) AND ((\"destinationSectionId\" IS NULL) OR (\"destinationSectionId\" <> id))))",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_graph",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_pageKey_uuid",
+      "definition": "CHECK ((\"pageKey\" ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'::text))",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_tenantId_formVersionId_destinationSectionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formVersionId\", \"destinationSectionId\") REFERENCES \"FormSection\"(\"tenantId\", \"formVersionId\", id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_tenantId_formVersionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_tenantId_formVersionId_order_key",
+      "definition": "UNIQUE (\"tenantId\", \"formVersionId\", \"order\") DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_author_asset_consistency",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_catalog_scope_check",
+      "definition": "CHECK ((((\"tenantId\" IS NULL) AND (\"serviceId\" IS NULL) AND (\"licenseScope\" = 'ACTIVE_SUBSCRIPTION'::text)) OR ((\"tenantId\" IS NOT NULL) AND (\"serviceId\" IS NOT NULL) AND (\"licenseScope\" = 'SERVICE'::text))))",
+      "validated": true
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_description_length_check",
+      "definition": "CHECK ((char_length(description) <= 2000))",
+      "validated": true
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_scope_check",
+      "definition": "CHECK ((((\"tenantId\" IS NULL) AND (\"serviceId\" IS NULL)) OR ((\"tenantId\" IS NOT NULL) AND (\"serviceId\" IS NOT NULL))))",
+      "validated": true
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'archived'::text])))",
+      "validated": true
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_tenantId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_tenantId_serviceId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_thumbnailAssetId_fkey",
+      "definition": "FOREIGN KEY (\"thumbnailAssetId\") REFERENCES \"AuthorAsset\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_author_asset_consistency",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_bodyRich_shape",
+      "definition": "CHECK (((\"bodyRich\" IS NULL) OR ((jsonb_typeof(\"bodyRich\") = 'object'::text) AND ((\"bodyRich\" ->> 'schemaVersion'::text) = '1'::text) AND (jsonb_typeof((\"bodyRich\" -> 'blocks'::text)) = 'array'::text))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_closedPageRich_shape",
+      "definition": "CHECK (((\"closedPageBodyRich\" IS NULL) OR ((jsonb_typeof(\"closedPageBodyRich\") = 'object'::text) AND ((\"closedPageBodyRich\" ->> 'schemaVersion'::text) = '1'::text) AND (jsonb_typeof((\"closedPageBodyRich\" -> 'blocks'::text)) = 'array'::text))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_closedPage_state",
+      "definition": "CHECK ((((\"closedPageMode\" IS NULL) AND (\"closedPageBody\" IS NULL) AND (\"closedPageBodyRich\" IS NULL)) OR ((\"closedPageMode\" = 'default'::text) AND (\"closedPageBody\" IS NULL) AND (\"closedPageBodyRich\" IS NULL)) OR ((\"closedPageMode\" = 'custom'::text) AND (\"closedPageBody\" IS NOT NULL))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_collection_window_check",
+      "definition": "CHECK ((((\"collectionWindowSchemaVersion\" = 0) AND (\"collectionOpenAt\" IS NULL) AND (\"collectionCloseAt\" IS NULL)) OR ((\"collectionWindowSchemaVersion\" = 1) AND ((\"collectionOpenAt\" IS NULL) OR (\"collectionCloseAt\" IS NULL) OR (\"collectionOpenAt\" < \"collectionCloseAt\")))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_completionPageRich_shape",
+      "definition": "CHECK (((\"completionPageBodyRich\" IS NULL) OR ((jsonb_typeof(\"completionPageBodyRich\") = 'object'::text) AND ((\"completionPageBodyRich\" ->> 'schemaVersion'::text) = '1'::text) AND (jsonb_typeof((\"completionPageBodyRich\" -> 'blocks'::text)) = 'array'::text))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_completionPage_state",
+      "definition": "CHECK ((((\"completionPageMode\" IS NULL) AND (\"completionPageBody\" IS NULL) AND (\"completionPageBodyRich\" IS NULL)) OR ((\"completionPageMode\" = 'default'::text) AND (\"completionPageBody\" IS NULL) AND (\"completionPageBodyRich\" IS NULL)) OR ((\"completionPageMode\" = 'custom'::text) AND (\"completionPageBody\" IS NOT NULL))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_consent_evidence",
+      "definition": "CHECK ((((\"receiptEvidenceVersion\" = 0) AND (\"consentDisplay\" IS NULL)) OR ((\"receiptEvidenceVersion\" = ANY (ARRAY[1, 2])) AND (\"consentDisplay\" IS NOT NULL) AND (jsonb_typeof(\"consentDisplay\") = 'object'::text))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_consent_items_check",
+      "definition": "CHECK ((((\"consentItemSchemaVersion\" = 0) AND (\"consentItems\" IS NULL)) OR ((\"consentItemSchemaVersion\" = 1) AND (\"consentItems\" IS NOT NULL) AND valid_form_consent_items(\"consentItems\"))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_consent_items_projection",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_formLanguage_check",
+      "definition": "CHECK (((\"formLanguage\" IS NULL) OR (\"formLanguage\" = ANY (ARRAY['ko'::text, 'en'::text, 'ja'::text, 'zh-CN'::text, 'zh-TW'::text, 'de'::text, 'fr'::text, 'ru'::text, 'es'::text, 'pt'::text, 'id'::text, 'th'::text, 'vi'::text, 'tr'::text, 'it'::text, 'ar'::text]))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_language_verification_check",
+      "definition": "CHECK (((NOT verify) OR (\"formLanguage\" IS NULL) OR (\"formLanguage\" = 'ko'::text)))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_notice_body_length",
+      "definition": "CHECK ((((\"completionPageBody\" IS NULL) OR (char_length(\"completionPageBody\") <= 20000)) AND ((\"closedPageBody\" IS NULL) OR (char_length(\"closedPageBody\") <= 20000))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_option_schema_check",
+      "definition": "CHECK ((\"optionSchemaVersion\" = ANY (ARRAY[0, 1])))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_participation_access_check",
+      "definition": "CHECK ((((\"participationAccessSchemaVersion\" = 0) AND (\"useParticipationAccess\" = false) AND (\"participationAccessMethod\" = 'EMAIL'::text) AND (\"participationTargetScope\" = 'ALL'::text) AND (\"participationUseOtp\" = false) AND (\"participationSocialProvider\" = 'KAKAO'::text) AND (\"restrictDuplicateReplies\" = false)) OR ((\"participationAccessSchemaVersion\" = 1) AND (((\"useParticipationAccess\" = false) AND (\"participationAccessMethod\" = 'EMAIL'::text) AND (\"participationTargetScope\" = 'ALL'::text) AND (\"participationUseOtp\" = false) AND (\"participationSocialProvider\" = 'KAKAO'::text) AND (\"restrictDuplicateReplies\" = false)) OR ((\"useParticipationAccess\" = true) AND (((\"participationAccessMethod\" = 'EMAIL'::text) AND (\"participationTargetScope\" = ANY (ARRAY['ALL'::text, 'WHITELIST'::text])) AND ((\"participationTargetScope\" = 'WHITELIST'::text) OR (\"participationUseOtp\" = true)) AND (\"participationSocialProvider\" = 'KAKAO'::text)) OR ((\"participationAccessMethod\" = 'SOCIAL'::text) AND (\"participationTargetScope\" = 'ALL'::text) AND (\"participationUseOtp\" = false) AND (\"participationSocialProvider\" = ANY (ARRAY['KAKAO'::text, 'NAVER'::text])))))))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_ranges",
+      "definition": "CHECK (((number > 0) AND ((\"retentionDays\" IS NULL) OR ((\"retentionDays\" >= 1) AND (\"retentionDays\" <= 36500))) AND ((\"maxResponses\" >= 1) AND (\"maxResponses\" <= 1000000))))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_sectionSchemaVersion_check",
+      "definition": "CHECK ((\"sectionSchemaVersion\" = ANY (ARRAY[0, 1])))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_section_graph",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['draft'::text, 'published'::text])))",
+      "validated": true
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_tenantId_formId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formId\") REFERENCES \"Form\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_additional_explanation_check",
+      "definition": "CHECK (((\"additionalExplanation\" IS NULL) OR (question_explanation_utf16_length(\"additionalExplanation\") <= 3000)))",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_author_asset_consistency_delete",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_author_asset_consistency_insert",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_author_asset_consistency_update",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_condition_operator_check",
+      "definition": "CHECK (((condition IS NULL) OR ((jsonb_typeof((condition -> 'operator'::text)) = 'string'::text) AND ((condition ->> 'operator'::text) = ANY (ARRAY['equals'::text, 'includes'::text])) AND ((char_length(btrim((condition ->> 'value'::text))) >= 1) AND (char_length(btrim((condition ->> 'value'::text))) <= 500)))))",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_consent_items_projection",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_info_pattern_check",
+      "definition": "CHECK (((\"infoPatternId\" IS NULL) OR ((\"infoPatternId\" = 1) AND (type = '단문형 답변'::text)) OR ((\"infoPatternId\" = 3) AND (type = '단문형 답변'::text) AND (\"subjectRole\" IS NULL)) OR ((\"infoPatternId\" = 2) AND (type = '장문형 답변'::text)) OR ((\"infoPatternId\" = 4) AND (type = '이메일 직접 입력'::text)) OR ((\"infoPatternId\" = 7) AND (type = '주소'::text)) OR ((\"infoPatternId\" = 8) AND (type = '생년월일'::text))))",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_material_list_check",
+      "definition": "CHECK (((\"materialList\" IS NULL) OR valid_question_material_links(\"materialList\")))",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_personal_information_check",
+      "definition": "CHECK (((\"catchFormPersonalInformationRequests\" IS NULL) OR valid_question_personal_information(\"catchFormPersonalInformationRequests\", type, required)))",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_questionImageKey_fkey",
+      "definition": "FOREIGN KEY (\"questionImageKey\") REFERENCES \"AuthorAsset\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_section_graph",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_settings_check",
+      "definition": "CHECK (valid_question_settings(type, \"subjectRole\", condition, \"matrixRows\", \"selectionLimits\"))",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_subject_role_check",
+      "definition": "CHECK (((\"subjectRole\" IS NULL) OR (required AND (((\"subjectRole\" = 'name'::text) AND (type = '단문형 답변'::text)) OR ((\"subjectRole\" = 'email'::text) AND (type = ANY (ARRAY['단문형 답변'::text, '이메일'::text, '이메일 직접 입력'::text])))))))",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_tenantId_formVersionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formVersionId\") REFERENCES \"FormVersion\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_tenantId_formVersionId_sectionId_fkey",
+      "definition": "FOREIGN KEY (\"tenantId\", \"formVersionId\", \"sectionId\") REFERENCES \"FormSection\"(\"tenantId\", \"formVersionId\", id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_text_max_length_check",
+      "definition": "CHECK (((\"textMaxLength\" IS NULL) OR ((type = '단문형 답변'::text) AND ((\"textMaxLength\" >= 1) AND (\"textMaxLength\" <= 1000))) OR ((type = '장문형 답변'::text) AND ((\"textMaxLength\" >= 1) AND (\"textMaxLength\" <= 20000)))))",
+      "validated": true
+    },
+    {
+      "table": "Question",
+      "name": "Question_type_check",
+      "definition": "CHECK ((type = ANY (ARRAY['단문형 답변'::text, '장문형 답변'::text, '객관식 답변'::text, '체크박스'::text, '드롭다운'::text, '날짜'::text, '파일 업로드'::text, '행렬형 단일 선택'::text, '행렬형 복수 선택'::text, '연락처'::text, '이메일'::text, '이메일 직접 입력'::text, '생년월일'::text, '주소'::text, '해외 주소'::text, '직접 그리기'::text])))",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_author_asset_consistency_delete",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_author_asset_consistency_insert",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_author_asset_consistency_update",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_branchDestinationSectionId_fkey",
+      "definition": "FOREIGN KEY (\"branchDestinationSectionId\") REFERENCES \"FormSection\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_branch_destination_state",
+      "definition": "CHECK ((((\"branchDestinationKind\" IS NULL) AND (\"branchDestinationSectionId\" IS NULL)) OR ((\"branchDestinationKind\" = 'page'::text) AND (\"branchDestinationSectionId\" IS NOT NULL)) OR ((\"branchDestinationKind\" = ANY (ARRAY['consent'::text, 'submit'::text, 'ineligible'::text])) AND (\"branchDestinationSectionId\" IS NULL))))",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_custom_label",
+      "definition": "CHECK (((\"isCustomValue\" IS NULL) OR (((question_explanation_utf16_length(COALESCE(label, value)) >= 1) AND (question_explanation_utf16_length(COALESCE(label, value)) <= 250)) AND (length(btrim(COALESCE(label, value), '\t\n\u000b\f\r                  　﻿'::text)) > 0))))",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_custom_true_only",
+      "definition": "CHECK (((\"isCustomValue\" IS NULL) OR (\"isCustomValue\" = true)))",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_identity_check",
+      "definition": "CHECK ((((\"stableKey\" IS NULL) AND (label IS NULL)) OR ((\"stableKey\" IS NOT NULL) AND (\"stableKey\" ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'::text) AND (label IS NOT NULL) AND ((char_length(btrim(label)) >= 1) AND (char_length(btrim(label)) <= 500)))))",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_optionImageKey_fkey",
+      "definition": "FOREIGN KEY (\"optionImageKey\") REFERENCES \"AuthorAsset\"(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_pkey",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_questionId_fkey",
+      "definition": "FOREIGN KEY (\"questionId\") REFERENCES \"Question\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_section_graph_delete",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_section_graph_insert",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_section_graph_update",
+      "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+      "validated": true
+    }
+  ],
+  "indexes": [
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_blobId_status_idx",
+      "definition": "CREATE INDEX \"AuthorAsset_blobId_status_idx\" ON public.\"AuthorAsset\" USING btree (\"blobId\", status)"
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_pkey",
+      "definition": "CREATE UNIQUE INDEX \"AuthorAsset_pkey\" ON public.\"AuthorAsset\" USING btree (id)"
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_status_expiresAt_idx",
+      "definition": "CREATE INDEX \"AuthorAsset_status_expiresAt_idx\" ON public.\"AuthorAsset\" USING btree (status, \"expiresAt\")"
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_tenantId_serviceId_status_idx",
+      "definition": "CREATE INDEX \"AuthorAsset_tenantId_serviceId_status_idx\" ON public.\"AuthorAsset\" USING btree (\"tenantId\", \"serviceId\", status)"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_pkey",
+      "definition": "CREATE UNIQUE INDEX \"AuthorAssetBlob_pkey\" ON public.\"AuthorAssetBlob\" USING btree (id)"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_status_expiresAt_idx",
+      "definition": "CREATE INDEX \"AuthorAssetBlob_status_expiresAt_idx\" ON public.\"AuthorAssetBlob\" USING btree (status, \"expiresAt\")"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_storageKey_key",
+      "definition": "CREATE UNIQUE INDEX \"AuthorAssetBlob_storageKey_key\" ON public.\"AuthorAssetBlob\" USING btree (\"storageKey\")"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_approvalId_idx",
+      "definition": "CREATE INDEX \"AuthorAssetReference_approvalId_idx\" ON public.\"AuthorAssetReference\" USING btree (\"approvalId\")"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_assetId_idx",
+      "definition": "CREATE INDEX \"AuthorAssetReference_assetId_idx\" ON public.\"AuthorAssetReference\" USING btree (\"assetId\")"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_formVersionId_idx",
+      "definition": "CREATE INDEX \"AuthorAssetReference_formVersionId_idx\" ON public.\"AuthorAssetReference\" USING btree (\"formVersionId\")"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_parent_slot_unique",
+      "definition": "CREATE UNIQUE INDEX \"AuthorAssetReference_parent_slot_unique\" ON public.\"AuthorAssetReference\" USING btree (COALESCE(\"formVersionId\", ''::text), COALESCE(\"templateId\", ''::text), COALESCE(\"approvalId\", ''::text), COALESCE(\"questionKey\", ''::text), COALESCE(\"documentKey\", ''::text), COALESCE(\"nodeKey\", ''::text), slot, COALESCE(\"orderNumber\", '-1'::integer), COALESCE(\"optionKey\", ''::text))"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_pkey",
+      "definition": "CREATE UNIQUE INDEX \"AuthorAssetReference_pkey\" ON public.\"AuthorAssetReference\" USING btree (id)"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_templateId_idx",
+      "definition": "CREATE INDEX \"AuthorAssetReference_templateId_idx\" ON public.\"AuthorAssetReference\" USING btree (\"templateId\")"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_tenantId_formVersionId_questionId_idx",
+      "definition": "CREATE INDEX \"AuthorAssetReference_tenantId_formVersionId_questionId_idx\" ON public.\"AuthorAssetReference\" USING btree (\"tenantId\", \"formVersionId\", \"questionId\")"
+    },
+    {
+      "table": "Form",
+      "name": "Form_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Form_pkey\" ON public.\"Form\" USING btree (id)"
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Form_tenantId_id_key\" ON public.\"Form\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_serviceId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Form_tenantId_serviceId_id_key\" ON public.\"Form\" USING btree (\"tenantId\", \"serviceId\", id)"
+    },
+    {
+      "table": "Form",
+      "name": "Form_tenantId_serviceId_status_createdAt_id_idx",
+      "definition": "CREATE INDEX \"Form_tenantId_serviceId_status_createdAt_id_idx\" ON public.\"Form\" USING btree (\"tenantId\", \"serviceId\", status, \"createdAt\", id)"
+    },
+    {
+      "table": "FormAccessTarget",
+      "name": "FormAccessTarget_batchId_idx",
+      "definition": "CREATE INDEX \"FormAccessTarget_batchId_idx\" ON public.\"FormAccessTarget\" USING btree (\"batchId\")"
+    },
+    {
+      "table": "FormAccessTarget",
+      "name": "FormAccessTarget_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormAccessTarget_pkey\" ON public.\"FormAccessTarget\" USING btree (id)"
+    },
+    {
+      "table": "FormAccessTarget",
+      "name": "FormAccessTarget_tenantId_formId_emailHash_key",
+      "definition": "CREATE UNIQUE INDEX \"FormAccessTarget_tenantId_formId_emailHash_key\" ON public.\"FormAccessTarget\" USING btree (\"tenantId\", \"formId\", \"emailHash\")"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "name": "FormAccessTargetBatch_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormAccessTargetBatch_pkey\" ON public.\"FormAccessTargetBatch\" USING btree (id)"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "name": "FormAccessTargetBatch_tenantId_formId_createdAt_id_idx",
+      "definition": "CREATE INDEX \"FormAccessTargetBatch_tenantId_formId_createdAt_id_idx\" ON public.\"FormAccessTargetBatch\" USING btree (\"tenantId\", \"formId\", \"createdAt\", id)"
+    },
+    {
+      "table": "FormAccessTargetBatch",
+      "name": "FormAccessTargetBatch_tenantId_formId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"FormAccessTargetBatch_tenantId_formId_id_key\" ON public.\"FormAccessTargetBatch\" USING btree (\"tenantId\", \"formId\", id)"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_formVersionId_documentId_key",
+      "definition": "CREATE UNIQUE INDEX \"FormDocumentBinding_formVersionId_documentId_key\" ON public.\"FormDocumentBinding\" USING btree (\"formVersionId\", \"documentId\")"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_formVersionId_order_key",
+      "definition": "CREATE UNIQUE INDEX \"FormDocumentBinding_formVersionId_order_key\" ON public.\"FormDocumentBinding\" USING btree (\"formVersionId\", \"order\")"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormDocumentBinding_pkey\" ON public.\"FormDocumentBinding\" USING btree (id)"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "FormDocumentBinding_tenantId_serviceId_documentVersionId_idx",
+      "definition": "CREATE INDEX \"FormDocumentBinding_tenantId_serviceId_documentVersionId_idx\" ON public.\"FormDocumentBinding\" USING btree (\"tenantId\", \"serviceId\", \"documentVersionId\")"
+    },
+    {
+      "table": "FormFavorite",
+      "name": "FormFavorite_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormFavorite_pkey\" ON public.\"FormFavorite\" USING btree (\"tenantId\", \"memberId\", \"formId\")"
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormSection_pkey\" ON public.\"FormSection\" USING btree (id)"
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_tenantId_formVersionId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"FormSection_tenantId_formVersionId_id_key\" ON public.\"FormSection\" USING btree (\"tenantId\", \"formVersionId\", id)"
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_tenantId_formVersionId_order_key",
+      "definition": "CREATE UNIQUE INDEX \"FormSection_tenantId_formVersionId_order_key\" ON public.\"FormSection\" USING btree (\"tenantId\", \"formVersionId\", \"order\")"
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_tenantId_formVersionId_pageKey_key",
+      "definition": "CREATE UNIQUE INDEX \"FormSection_tenantId_formVersionId_pageKey_key\" ON public.\"FormSection\" USING btree (\"tenantId\", \"formVersionId\", \"pageKey\")"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormTemplate_pkey\" ON public.\"FormTemplate\" USING btree (id)"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_tenantId_serviceId_title_key",
+      "definition": "CREATE UNIQUE INDEX \"FormTemplate_tenantId_serviceId_title_key\" ON public.\"FormTemplate\" USING btree (\"tenantId\", \"serviceId\", title)"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_tenantId_status_idx",
+      "definition": "CREATE INDEX \"FormTemplate_tenantId_status_idx\" ON public.\"FormTemplate\" USING btree (\"tenantId\", status)"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_thumbnailAssetId_idx",
+      "definition": "CREATE INDEX \"FormTemplate_thumbnailAssetId_idx\" ON public.\"FormTemplate\" USING btree (\"thumbnailAssetId\")"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_formId_number_key",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_formId_number_key\" ON public.\"FormVersion\" USING btree (\"formId\", number)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_one_draft",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_one_draft\" ON public.\"FormVersion\" USING btree (\"tenantId\", \"formId\") WHERE (status = 'draft'::text)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_pkey",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_pkey\" ON public.\"FormVersion\" USING btree (id)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_tenantId_formId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_tenantId_formId_id_key\" ON public.\"FormVersion\" USING btree (\"tenantId\", \"formId\", id)"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_tenantId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"FormVersion_tenantId_id_key\" ON public.\"FormVersion\" USING btree (\"tenantId\", id)"
+    },
+    {
+      "table": "Question",
+      "name": "Question_pkey",
+      "definition": "CREATE UNIQUE INDEX \"Question_pkey\" ON public.\"Question\" USING btree (id)"
+    },
+    {
+      "table": "Question",
+      "name": "Question_questionImageKey_idx",
+      "definition": "CREATE INDEX \"Question_questionImageKey_idx\" ON public.\"Question\" USING btree (\"questionImageKey\")"
+    },
+    {
+      "table": "Question",
+      "name": "Question_subject_role_unique",
+      "definition": "CREATE UNIQUE INDEX \"Question_subject_role_unique\" ON public.\"Question\" USING btree (\"formVersionId\", \"subjectRole\") WHERE (\"subjectRole\" IS NOT NULL)"
+    },
+    {
+      "table": "Question",
+      "name": "Question_tenantId_formVersionId_id_key",
+      "definition": "CREATE UNIQUE INDEX \"Question_tenantId_formVersionId_id_key\" ON public.\"Question\" USING btree (\"tenantId\", \"formVersionId\", id)"
+    },
+    {
+      "table": "Question",
+      "name": "Question_tenantId_formVersionId_stableKey_key",
+      "definition": "CREATE UNIQUE INDEX \"Question_tenantId_formVersionId_stableKey_key\" ON public.\"Question\" USING btree (\"tenantId\", \"formVersionId\", \"stableKey\")"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_branchDestinationSectionId_idx",
+      "definition": "CREATE INDEX \"QuestionOption_branchDestinationSectionId_idx\" ON public.\"QuestionOption\" USING btree (\"branchDestinationSectionId\")"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_branch_question_idx",
+      "definition": "CREATE INDEX \"QuestionOption_branch_question_idx\" ON public.\"QuestionOption\" USING btree (\"questionId\") WHERE (\"branchDestinationKind\" IS NOT NULL)"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_one_custom_per_question",
+      "definition": "CREATE UNIQUE INDEX \"QuestionOption_one_custom_per_question\" ON public.\"QuestionOption\" USING btree (\"questionId\") WHERE (\"isCustomValue\" = true)"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_optionImageKey_idx",
+      "definition": "CREATE INDEX \"QuestionOption_optionImageKey_idx\" ON public.\"QuestionOption\" USING btree (\"optionImageKey\")"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_pkey",
+      "definition": "CREATE UNIQUE INDEX \"QuestionOption_pkey\" ON public.\"QuestionOption\" USING btree (id)"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_questionId_stableKey_key",
+      "definition": "CREATE UNIQUE INDEX \"QuestionOption_questionId_stableKey_key\" ON public.\"QuestionOption\" USING btree (\"questionId\", \"stableKey\")"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_questionId_value_key",
+      "definition": "CREATE UNIQUE INDEX \"QuestionOption_questionId_value_key\" ON public.\"QuestionOption\" USING btree (\"questionId\", value)"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_stableKey_idx",
+      "definition": "CREATE INDEX \"QuestionOption_stableKey_idx\" ON public.\"QuestionOption\" USING btree (\"stableKey\")"
+    }
+  ],
+  "triggers": [
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_guard",
+      "definition": "CREATE TRIGGER \"AuthorAsset_guard\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"AuthorAsset\" FOR EACH ROW EXECUTE FUNCTION check_author_asset()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE b \"AuthorAssetBlob\";\nBEGIN\n  PERFORM author_asset_read_committed();\n  IF TG_OP='DELETE' THEN RAISE EXCEPTION 'Keep author asset tombstones' USING ERRCODE='23514'; END IF;\n  IF NEW.\"expiresAt\">((clock_timestamp() AT TIME ZONE 'UTC')::timestamp(3)+interval '1 hour') THEN\n    RAISE EXCEPTION 'Author asset reservation cannot exceed one hour' USING ERRCODE='23514'; END IF;\n  PERFORM id FROM \"AuthorAssetBlob\" WHERE id=NEW.\"blobId\" FOR UPDATE;\n  SELECT * INTO b FROM \"AuthorAssetBlob\" WHERE id=NEW.\"blobId\";\n  IF b.id IS NULL OR NEW.size<>b.size OR\n    (NEW.purpose IN ('OPTION_IMAGE','QUESTION_IMAGE','FORM_CONTENT_IMAGE','PAGE_CONTENT_IMAGE','END_PAGE_CONTENT_IMAGE','PRIVATE_PAGE_CONTENT_IMAGE')\n      AND b.mime NOT IN ('image/jpeg','image/png'))\n    OR (NEW.purpose='QUESTION_MATERIAL' AND b.mime NOT IN ('application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/postscript')) THEN\n    RAISE EXCEPTION 'Author asset byte identity/purpose mismatch' USING ERRCODE='23514'; END IF;\n  IF TG_OP='INSERT' THEN\n    IF NEW.version<>1 OR NEW.status NOT IN ('pending','ready') OR b.status IN ('quarantined','deleting','deleted')\n      OR (NEW.status='pending' AND NEW.\"expiresAt\" IS NULL)\n      OR (NEW.status='ready' AND (b.status<>'ready' OR b.\"scanStatus\"<>'clean')) THEN\n      RAISE EXCEPTION 'Author asset must reserve or copy a clean ready blob' USING ERRCODE='23514'; END IF;\n  ELSE\n    IF OLD.\"expiresAt\"<=(clock_timestamp() AT TIME ZONE 'UTC') AND NEW.status NOT IN ('deleting','deleted') THEN\n      RAISE EXCEPTION 'Expired author asset reservation' USING ERRCODE='23514'; END IF;\n    IF OLD.status='deleted' OR NEW.version<>OLD.version+1 OR\n      (NEW.id,NEW.\"blobId\",NEW.\"ownerKind\",NEW.\"tenantId\",NEW.\"serviceId\",NEW.\"createdById\",NEW.purpose,NEW.size,NEW.\"createdAt\") IS DISTINCT FROM\n      (OLD.id,OLD.\"blobId\",OLD.\"ownerKind\",OLD.\"tenantId\",OLD.\"serviceId\",OLD.\"createdById\",OLD.purpose,OLD.size,OLD.\"createdAt\")\n      OR (NEW.\"nameCipher\" IS DISTINCT FROM OLD.\"nameCipher\" AND NOT (NEW.status='deleted' AND NEW.\"nameCipher\" IS NULL)) THEN\n      RAISE EXCEPTION 'Immutable author asset ownership/metadata/revision' USING ERRCODE='23514'; END IF;\n    IF NEW.status<>OLD.status AND NOT ((OLD.status='pending' AND NEW.status IN ('uploaded','rejected','deleting'))\n      OR (OLD.status='uploaded' AND NEW.status IN ('ready','rejected','deleting')) OR (OLD.status IN ('ready','rejected') AND NEW.status='deleting')\n      OR (OLD.status='deleting' AND NEW.status='deleted')) THEN RAISE EXCEPTION 'Invalid author asset transition' USING ERRCODE='23514'; END IF;\n    IF NEW.status='ready' AND OLD.status<>'ready' AND (b.status<>'ready' OR b.\"scanStatus\"<>'clean') THEN\n      RAISE EXCEPTION 'Author asset requires clean blob' USING ERRCODE='23514'; END IF;\n  END IF;\n  IF NEW.status IN ('deleting','deleted') AND (EXISTS (SELECT 1 FROM \"AuthorAssetReference\" WHERE \"assetId\"=NEW.id)\n    OR EXISTS (SELECT 1 FROM \"QuestionOption\" WHERE \"optionImageKey\"=NEW.id)\n    OR EXISTS (SELECT 1 FROM \"Question\" WHERE \"questionImageKey\"=NEW.id)) THEN\n    RAISE EXCEPTION 'Author asset still referenced' USING ERRCODE='23514'; END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "AuthorAsset",
+      "name": "AuthorAsset_lifetime",
+      "definition": "CREATE CONSTRAINT TRIGGER \"AuthorAsset_lifetime\" AFTER INSERT OR UPDATE ON public.\"AuthorAsset\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "AuthorAssetBlob",
+      "name": "AuthorAssetBlob_guard",
+      "definition": "CREATE TRIGGER \"AuthorAssetBlob_guard\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"AuthorAssetBlob\" FOR EACH ROW EXECUTE FUNCTION check_author_asset_blob()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_blob()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  PERFORM author_asset_read_committed();\n  IF TG_OP='DELETE' THEN RAISE EXCEPTION 'Keep author blob tombstones' USING ERRCODE='23514'; END IF;\n  IF TG_OP='INSERT' THEN\n    IF NEW.status<>'pending' OR NEW.\"scanStatus\"<>'pending' OR NEW.version<>1 OR NEW.\"expiresAt\" IS NULL THEN\n      RAISE EXCEPTION 'Author blob must start as a durable pending reservation' USING ERRCODE='23514'; END IF;\n  ELSE\n    IF OLD.status='deleted' OR NEW.version<>OLD.version+1 OR\n      (NEW.id,NEW.\"storageKey\",NEW.mime,NEW.size,NEW.sha256,NEW.\"validationVersion\",NEW.\"createdAt\") IS DISTINCT FROM\n      (OLD.id,OLD.\"storageKey\",OLD.mime,OLD.size,OLD.sha256,OLD.\"validationVersion\",OLD.\"createdAt\") THEN\n      RAISE EXCEPTION 'Immutable author blob identity/revision' USING ERRCODE='23514'; END IF;\n    IF NEW.status<>OLD.status AND NOT ((OLD.status='pending' AND NEW.status IN ('uploaded','deleting'))\n      OR (OLD.status='uploaded' AND NEW.status IN ('ready','quarantined','deleting'))\n      OR (OLD.status='ready' AND NEW.status IN ('quarantined','deleting')) OR (OLD.status='quarantined' AND NEW.status IN ('ready','deleting'))\n      OR (OLD.status='deleting' AND NEW.status='deleted')) THEN RAISE EXCEPTION 'Invalid author blob transition' USING ERRCODE='23514'; END IF;\n  END IF;\n  -- The row being updated is the serialization fence. Every asset insert locks this blob.\n  IF NEW.status IN ('deleting','deleted') AND EXISTS (SELECT 1 FROM \"AuthorAsset\" WHERE \"blobId\"=NEW.id AND status<>'deleted') THEN\n    RAISE EXCEPTION 'Author blob still owns live assets' USING ERRCODE='23514'; END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_consistency",
+      "definition": "CREATE CONSTRAINT TRIGGER \"AuthorAssetReference_consistency\" AFTER INSERT OR DELETE OR UPDATE ON public.\"AuthorAssetReference\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "AuthorAssetReference",
+      "name": "AuthorAssetReference_guard",
+      "definition": "CREATE TRIGGER \"AuthorAssetReference_guard\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"AuthorAssetReference\" FOR EACH ROW EXECUTE FUNCTION check_author_asset_reference()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_reference()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE r \"AuthorAssetReference\"; a \"AuthorAsset\"; b \"AuthorAssetBlob\"; parent_kind text; parent_id text; parent_status text;\nBEGIN\n  PERFORM author_asset_read_committed();\n  IF TG_OP='UPDATE' THEN RAISE EXCEPTION 'Author asset pins are immutable; replace draft pins' USING ERRCODE='23514'; END IF;\n  IF TG_OP='DELETE' THEN r:=OLD; ELSE r:=NEW; END IF;\n  parent_kind:=CASE WHEN r.\"formVersionId\" IS NOT NULL THEN 'version' WHEN r.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END;\n  parent_id:=coalesce(r.\"formVersionId\",r.\"templateId\",r.\"approvalId\");\n  PERFORM lock_author_asset_parent(parent_kind,parent_id);\n  IF parent_kind='version' THEN\n    SELECT status INTO parent_status FROM \"FormVersion\" WHERE id=parent_id;\n    IF parent_status='published' THEN RAISE EXCEPTION 'Published author asset pins are immutable' USING ERRCODE='23514'; END IF;\n  ELSIF parent_kind='approval' THEN\n    IF TG_OP='DELETE' THEN RAISE EXCEPTION 'Approval author asset pins are immutable' USING ERRCODE='23514'; END IF;\n    IF NOT EXISTS (SELECT 1 FROM \"ApprovalRequest\" WHERE id=parent_id AND xmin::text=((txid_current()%4294967296)::text)) THEN\n      RAISE EXCEPTION 'Approval pins must be written in the approval transaction' USING ERRCODE='23514'; END IF;\n  END IF;\n  PERFORM id FROM \"AuthorAsset\" WHERE id=r.\"assetId\" FOR UPDATE;\n  SELECT * INTO a FROM \"AuthorAsset\" WHERE id=r.\"assetId\";\n  PERFORM id FROM \"AuthorAssetBlob\" WHERE id=a.\"blobId\" FOR SHARE;\n  SELECT * INTO b FROM \"AuthorAssetBlob\" WHERE id=a.\"blobId\";\n  IF TG_OP='INSERT' AND (a.id IS NULL OR a.status<>'ready' OR b.status<>'ready' OR b.\"scanStatus\"<>'clean'\n    OR (a.\"expiresAt\" IS NOT NULL AND a.\"expiresAt\"<=(clock_timestamp() AT TIME ZONE 'UTC'))) THEN\n    RAISE EXCEPTION 'Pin requires a live clean author asset' USING ERRCODE='23514'; END IF;\n  RETURN r;\nEND $function$\n"
+    },
+    {
+      "table": "Form",
+      "name": "Form_author_asset_consistency",
+      "definition": "CREATE CONSTRAINT TRIGGER \"Form_author_asset_consistency\" AFTER UPDATE ON public.\"Form\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "Form",
+      "name": "import_form_immutable",
+      "definition": "CREATE TRIGGER import_form_immutable BEFORE UPDATE ON public.\"Form\" FOR EACH ROW EXECUTE FUNCTION protect_import_form()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_import_form()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$ BEGIN\n IF TG_TABLE_NAME='Publication' THEN\n   IF EXISTS (SELECT 1 FROM \"Form\" WHERE id=NEW.\"formId\" AND \"sourceType\"='import') THEN RAISE EXCEPTION 'import forms cannot publish' USING ERRCODE='23514'; END IF;\n ELSIF NEW.\"sourceType\" IS DISTINCT FROM OLD.\"sourceType\" THEN RAISE EXCEPTION 'immutable form origin' USING ERRCODE='23514'; END IF;\n RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "FormDocumentBinding",
+      "name": "form_document_binding_guard",
+      "definition": "CREATE TRIGGER form_document_binding_guard BEFORE INSERT OR DELETE OR UPDATE ON public.\"FormDocumentBinding\" FOR EACH ROW EXECUTE FUNCTION guard_form_document_binding()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_form_document_binding()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id TEXT; parent_status TEXT; parent_tenant TEXT; parent_service TEXT; evidence_version INTEGER;\nBEGIN\n  IF TG_OP='UPDATE' THEN RAISE EXCEPTION 'replace draft bindings instead of mutating evidence' USING ERRCODE='23514'; END IF;\n  parent_id:=CASE WHEN TG_OP='DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  SELECT v.status, v.\"tenantId\", f.\"serviceId\", v.\"receiptEvidenceVersion\" INTO parent_status,parent_tenant,parent_service,evidence_version\n    FROM \"FormVersion\" v JOIN \"Form\" f ON f.id=v.\"formId\" WHERE v.id=parent_id FOR UPDATE OF v;\n  IF parent_status IS DISTINCT FROM 'draft' THEN RAISE EXCEPTION 'published form document bindings are immutable' USING ERRCODE='23514'; END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  IF NEW.\"tenantId\" IS DISTINCT FROM parent_tenant OR NEW.\"serviceId\" IS DISTINCT FROM parent_service OR evidence_version NOT IN (1,2)\n    THEN RAISE EXCEPTION 'form document binding scope mismatch' USING ERRCODE='23514'; END IF;\n  IF (SELECT count(*) FROM \"FormDocumentBinding\" WHERE \"formVersionId\"=parent_id)>=10\n    THEN RAISE EXCEPTION 'at most ten documents per form' USING ERRCODE='23514'; END IF;\n  IF NOT EXISTS (SELECT 1 FROM \"Document\" d JOIN \"DocumentVersion\" v ON v.\"documentId\"=d.id\n      WHERE v.id=NEW.\"documentVersionId\" AND d.status='published' AND d.type IN ('consent','overseas_transfer'))\n    THEN RAISE EXCEPTION 'only published consent documents can be selected' USING ERRCODE='23514'; END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_author_asset_consistency",
+      "definition": "CREATE CONSTRAINT TRIGGER \"FormSection_author_asset_consistency\" AFTER INSERT OR DELETE OR UPDATE ON public.\"FormSection\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_author_asset_lock",
+      "definition": "CREATE TRIGGER \"FormSection_author_asset_lock\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"FormSection\" FOR EACH ROW EXECUTE FUNCTION lock_author_asset_content()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormSection",
+      "name": "FormSection_graph",
+      "definition": "CREATE CONSTRAINT TRIGGER \"FormSection_graph\" AFTER INSERT OR DELETE OR UPDATE ON public.\"FormSection\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_form_section_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_form_section_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_version TEXT; new_version TEXT;\nBEGIN\n  IF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.id; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.id; END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN SELECT \"formVersionId\" INTO old_version FROM \"Question\" WHERE id=OLD.\"questionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN SELECT \"formVersionId\" INTO new_version FROM \"Question\" WHERE id=NEW.\"questionId\"; END IF;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.\"formVersionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.\"formVersionId\"; END IF;\n  END IF;\n  IF old_version IS NOT NULL THEN PERFORM assert_form_section_graph(old_version); END IF;\n  IF new_version IS NOT NULL AND new_version IS DISTINCT FROM old_version THEN PERFORM assert_form_section_graph(new_version); END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormSection",
+      "name": "published_section_immutable",
+      "definition": "CREATE TRIGGER published_section_immutable BEFORE INSERT OR DELETE OR UPDATE ON public.\"FormSection\" FOR EACH ROW EXECUTE FUNCTION protect_published_section()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_published_section()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP <> 'INSERT' AND EXISTS (\n    SELECT 1 FROM \"FormVersion\" WHERE id = OLD.\"formVersionId\" AND status = 'published'\n  ) THEN RAISE EXCEPTION 'Published form sections are immutable' USING ERRCODE='23514'; END IF;\n  IF TG_OP <> 'DELETE' AND EXISTS (\n    SELECT 1 FROM \"FormVersion\" WHERE id = NEW.\"formVersionId\" AND status = 'published'\n  ) THEN RAISE EXCEPTION 'Published form sections are immutable' USING ERRCODE='23514'; END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_author_asset_consistency",
+      "definition": "CREATE CONSTRAINT TRIGGER \"FormTemplate_author_asset_consistency\" AFTER INSERT OR UPDATE ON public.\"FormTemplate\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_author_asset_lock",
+      "definition": "CREATE TRIGGER \"FormTemplate_author_asset_lock\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"FormTemplate\" FOR EACH ROW EXECUTE FUNCTION lock_author_asset_content()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormTemplate",
+      "name": "FormTemplate_thumbnail_asset_lock",
+      "definition": "CREATE TRIGGER \"FormTemplate_thumbnail_asset_lock\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"FormTemplate\" FOR EACH ROW EXECUTE FUNCTION lock_form_template_thumbnail_asset()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_form_template_thumbnail_asset()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE keys text[];\nBEGIN\n  SELECT array_agg(DISTINCT id ORDER BY id) INTO keys FROM unnest(ARRAY[\n    CASE WHEN TG_OP <> 'INSERT' THEN OLD.\"thumbnailAssetId\" END,\n    CASE WHEN TG_OP <> 'DELETE' THEN NEW.\"thumbnailAssetId\" END\n  ]) id WHERE id IS NOT NULL;\n  IF coalesce(cardinality(keys),0)>0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM id FROM \"AuthorAsset\" WHERE id=ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_author_asset_consistency",
+      "definition": "CREATE CONSTRAINT TRIGGER \"FormVersion_author_asset_consistency\" AFTER INSERT OR UPDATE ON public.\"FormVersion\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_author_asset_lock",
+      "definition": "CREATE TRIGGER \"FormVersion_author_asset_lock\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"FormVersion\" FOR EACH ROW EXECUTE FUNCTION lock_author_asset_content()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_consent_items_projection",
+      "definition": "CREATE CONSTRAINT TRIGGER \"FormVersion_consent_items_projection\" AFTER INSERT OR UPDATE ON public.\"FormVersion\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_form_consent_items_projection()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_form_consent_items_projection()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_TABLE_NAME='FormVersion' THEN\n    PERFORM assert_form_consent_items_projection(CASE WHEN TG_OP='DELETE' THEN OLD.id ELSE NEW.id END);\n  ELSE\n    IF TG_OP='UPDATE' AND OLD.\"formVersionId\" IS DISTINCT FROM NEW.\"formVersionId\" THEN\n      PERFORM assert_form_consent_items_projection(OLD.\"formVersionId\");\n    END IF;\n    PERFORM assert_form_consent_items_projection(CASE WHEN TG_OP='DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END);\n  END IF;\n  RETURN NULL;\nEND $function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "FormVersion_section_graph",
+      "definition": "CREATE CONSTRAINT TRIGGER \"FormVersion_section_graph\" AFTER INSERT OR DELETE OR UPDATE ON public.\"FormVersion\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_form_section_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_form_section_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_version TEXT; new_version TEXT;\nBEGIN\n  IF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.id; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.id; END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN SELECT \"formVersionId\" INTO old_version FROM \"Question\" WHERE id=OLD.\"questionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN SELECT \"formVersionId\" INTO new_version FROM \"Question\" WHERE id=NEW.\"questionId\"; END IF;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.\"formVersionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.\"formVersionId\"; END IF;\n  END IF;\n  IF old_version IS NOT NULL THEN PERFORM assert_form_section_graph(old_version); END IF;\n  IF new_version IS NOT NULL AND new_version IS DISTINCT FROM old_version THEN PERFORM assert_form_section_graph(new_version); END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "form_document_publish_guard",
+      "definition": "CREATE TRIGGER form_document_publish_guard BEFORE UPDATE ON public.\"FormVersion\" FOR EACH ROW EXECUTE FUNCTION guard_form_document_publish()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_form_document_publish()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF OLD.status='draft' AND NEW.status='published' AND EXISTS (\n    SELECT 1 FROM \"FormDocumentBinding\" b JOIN \"Document\" d ON d.id=b.\"documentId\"\n      WHERE b.\"formVersionId\"=NEW.id AND (d.status<>'published' OR NOT EXISTS (\n        SELECT 1 FROM \"DocumentPublication\" p WHERE p.\"documentVersionId\"=b.\"documentVersionId\" AND p.status='active'\n          AND (p.\"expiresAt\" IS NULL OR p.\"expiresAt\">CURRENT_TIMESTAMP))))\n    THEN RAISE EXCEPTION 'selected consent document is no longer public' USING ERRCODE='23514'; END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "published_version_immutable",
+      "definition": "CREATE TRIGGER published_version_immutable BEFORE DELETE OR UPDATE ON public.\"FormVersion\" FOR EACH ROW EXECUTE FUNCTION protect_published_version()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_published_version()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF OLD.status = 'published' THEN\n    RAISE EXCEPTION 'Published form versions are immutable' USING ERRCODE = '23514';\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "question_rules_publish_guard",
+      "definition": "CREATE TRIGGER question_rules_publish_guard BEFORE UPDATE ON public.\"FormVersion\" FOR EACH ROW EXECUTE FUNCTION guard_question_rules_publish()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_question_rules_publish()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE q record; source record; option_count integer;\nBEGIN\n IF NEW.status<>'published' OR OLD.status='published' THEN RETURN NEW; END IF;\n FOR q IN SELECT * FROM \"Question\" WHERE \"formVersionId\"=NEW.id ORDER BY \"order\" LOOP\n  IF NEW.\"optionSchemaVersion\"=1 AND EXISTS (SELECT 1 FROM \"QuestionOption\" WHERE \"questionId\"=q.id AND (\"stableKey\" IS NULL OR label IS NULL)) THEN\n   RAISE EXCEPTION 'Canonical choices require identities and labels' USING ERRCODE='23514';\n  END IF;\n  SELECT count(*) INTO option_count FROM \"QuestionOption\" WHERE \"questionId\"=q.id;\n  IF q.type IN ('객관식 답변','체크박스','드롭다운','행렬형 단일 선택','행렬형 복수 선택') AND option_count=0 THEN\n   RAISE EXCEPTION 'Choice questions need options' USING ERRCODE='23514';\n  END IF;\n  IF q.\"selectionLimits\" IS NOT NULL AND (coalesce((q.\"selectionLimits\"->>'min')::integer,0)>option_count OR coalesce((q.\"selectionLimits\"->>'max')::integer,0)>option_count) THEN\n   RAISE EXCEPTION 'Selection count exceeds available options' USING ERRCODE='23514';\n  END IF;\n  IF q.\"condition\" IS NOT NULL THEN\n   SELECT * INTO source FROM \"Question\" WHERE \"formVersionId\"=NEW.id AND \"stableKey\"=q.\"condition\"->>'questionId' AND \"order\"<q.\"order\";\n   IF NOT FOUND OR (q.\"condition\"->>'operator'='equals' AND source.type NOT IN ('객관식 답변','드롭다운'))\n    OR (q.\"condition\"->>'operator'='includes' AND source.type<>'체크박스')\n    OR NOT EXISTS (SELECT 1 FROM \"QuestionOption\" WHERE \"questionId\"=source.id AND value=q.\"condition\"->>'value' AND (NOT q.\"condition\" ? 'optionId' OR coalesce(\"stableKey\",id)=q.\"condition\"->>'optionId'))\n    OR NEW.marketing->>'nameQuestionId'=q.\"stableKey\" OR NEW.marketing->>'emailQuestionId'=q.\"stableKey\" OR NEW.marketing->>'smsQuestionId'=q.\"stableKey\" THEN\n    RAISE EXCEPTION 'Invalid branch reference' USING ERRCODE='23514';\n   END IF;\n  END IF;\n END LOOP;\n RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "FormVersion",
+      "name": "subject_question_publish_guard",
+      "definition": "CREATE TRIGGER subject_question_publish_guard BEFORE UPDATE ON public.\"FormVersion\" FOR EACH ROW EXECUTE FUNCTION guard_subject_questions()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_subject_questions()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF NEW.status='published' AND (SELECT count(*) FROM \"Question\" WHERE \"formVersionId\"=NEW.id AND \"subjectRole\" IS NOT NULL)=1 THEN\n    RAISE EXCEPTION 'both subject name and email are required' USING ERRCODE='23514';\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "Question_author_asset_consistency_delete",
+      "definition": "CREATE CONSTRAINT TRIGGER \"Question_author_asset_consistency_delete\" AFTER DELETE ON public.\"Question\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "Question_author_asset_consistency_insert",
+      "definition": "CREATE CONSTRAINT TRIGGER \"Question_author_asset_consistency_insert\" AFTER INSERT ON public.\"Question\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW WHEN (((new.\"questionImageKey\" IS NOT NULL) OR (new.\"materialList\" IS NOT NULL))) EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "Question_author_asset_consistency_update",
+      "definition": "CREATE CONSTRAINT TRIGGER \"Question_author_asset_consistency_update\" AFTER UPDATE ON public.\"Question\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW WHEN (((old.\"formVersionId\" IS DISTINCT FROM new.\"formVersionId\") OR (old.\"stableKey\" IS DISTINCT FROM new.\"stableKey\") OR (old.type IS DISTINCT FROM new.type) OR (old.\"questionImageKey\" IS DISTINCT FROM new.\"questionImageKey\") OR (old.\"materialList\" IS DISTINCT FROM new.\"materialList\"))) EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "Question_author_asset_lock_delete",
+      "definition": "CREATE TRIGGER \"Question_author_asset_lock_delete\" BEFORE DELETE ON public.\"Question\" FOR EACH ROW EXECUTE FUNCTION lock_author_asset_content()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "Question_author_asset_lock_insert",
+      "definition": "CREATE TRIGGER \"Question_author_asset_lock_insert\" BEFORE INSERT ON public.\"Question\" FOR EACH ROW WHEN (((new.\"questionImageKey\" IS NOT NULL) OR (new.\"materialList\" IS NOT NULL))) EXECUTE FUNCTION lock_author_asset_content()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "Question_author_asset_lock_update",
+      "definition": "CREATE TRIGGER \"Question_author_asset_lock_update\" BEFORE UPDATE ON public.\"Question\" FOR EACH ROW WHEN (((old.\"formVersionId\" IS DISTINCT FROM new.\"formVersionId\") OR (old.\"stableKey\" IS DISTINCT FROM new.\"stableKey\") OR (old.type IS DISTINCT FROM new.type) OR (old.\"questionImageKey\" IS DISTINCT FROM new.\"questionImageKey\") OR (old.\"materialList\" IS DISTINCT FROM new.\"materialList\"))) EXECUTE FUNCTION lock_author_asset_content()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "Question_consent_items_projection",
+      "definition": "CREATE CONSTRAINT TRIGGER \"Question_consent_items_projection\" AFTER INSERT OR DELETE OR UPDATE ON public.\"Question\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_form_consent_items_projection()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_form_consent_items_projection()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_TABLE_NAME='FormVersion' THEN\n    PERFORM assert_form_consent_items_projection(CASE WHEN TG_OP='DELETE' THEN OLD.id ELSE NEW.id END);\n  ELSE\n    IF TG_OP='UPDATE' AND OLD.\"formVersionId\" IS DISTINCT FROM NEW.\"formVersionId\" THEN\n      PERFORM assert_form_consent_items_projection(OLD.\"formVersionId\");\n    END IF;\n    PERFORM assert_form_consent_items_projection(CASE WHEN TG_OP='DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END);\n  END IF;\n  RETURN NULL;\nEND $function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "Question_section_graph",
+      "definition": "CREATE CONSTRAINT TRIGGER \"Question_section_graph\" AFTER INSERT OR DELETE OR UPDATE ON public.\"Question\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_form_section_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_form_section_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_version TEXT; new_version TEXT;\nBEGIN\n  IF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.id; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.id; END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN SELECT \"formVersionId\" INTO old_version FROM \"Question\" WHERE id=OLD.\"questionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN SELECT \"formVersionId\" INTO new_version FROM \"Question\" WHERE id=NEW.\"questionId\"; END IF;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.\"formVersionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.\"formVersionId\"; END IF;\n  END IF;\n  IF old_version IS NOT NULL THEN PERFORM assert_form_section_graph(old_version); END IF;\n  IF new_version IS NOT NULL AND new_version IS DISTINCT FROM old_version THEN PERFORM assert_form_section_graph(new_version); END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "custom_choice_parent_guard",
+      "definition": "CREATE TRIGGER custom_choice_parent_guard BEFORE UPDATE OF type ON public.\"Question\" FOR EACH ROW EXECUTE FUNCTION guard_custom_choice_parent()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_custom_choice_parent()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE form_id text;\nBEGIN\n  IF NEW.type IS NOT DISTINCT FROM OLD.type THEN RETURN NEW; END IF;\n  IF current_setting('transaction_isolation') NOT IN ('read committed','read uncommitted') THEN\n    RAISE EXCEPTION 'Question type mutations require READ COMMITTED' USING ERRCODE='0A000';\n  END IF;\n  SELECT \"formId\" INTO form_id FROM \"FormVersion\" WHERE id=NEW.\"formVersionId\";\n  PERFORM id FROM \"Form\" WHERE id=form_id FOR UPDATE;\n  IF NEW.type NOT IN ('객관식 답변','체크박스','드롭다운')\n    AND EXISTS (SELECT 1 FROM \"QuestionOption\" WHERE \"questionId\"=NEW.id AND \"isCustomValue\"=true) THEN\n    RAISE EXCEPTION 'Remove custom choices before changing question type' USING ERRCODE='23514';\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "Question",
+      "name": "published_question_immutable",
+      "definition": "CREATE TRIGGER published_question_immutable BEFORE INSERT OR DELETE OR UPDATE ON public.\"Question\" FOR EACH ROW EXECUTE FUNCTION protect_published_question()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_published_question()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP <> 'INSERT' AND EXISTS (SELECT 1 FROM \"FormVersion\" WHERE id = OLD.\"formVersionId\" AND status = 'published') THEN\n    RAISE EXCEPTION 'Published questions are immutable' USING ERRCODE = '23514';\n  END IF;\n  IF TG_OP <> 'DELETE' AND EXISTS (SELECT 1 FROM \"FormVersion\" WHERE id = NEW.\"formVersionId\" AND status = 'published') THEN\n    RAISE EXCEPTION 'Published questions are immutable' USING ERRCODE = '23514';\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_author_asset_consistency_delete",
+      "definition": "CREATE CONSTRAINT TRIGGER \"QuestionOption_author_asset_consistency_delete\" AFTER DELETE ON public.\"QuestionOption\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW WHEN ((old.\"optionImageKey\" IS NOT NULL)) EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_author_asset_consistency_insert",
+      "definition": "CREATE CONSTRAINT TRIGGER \"QuestionOption_author_asset_consistency_insert\" AFTER INSERT ON public.\"QuestionOption\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW WHEN ((new.\"optionImageKey\" IS NOT NULL)) EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_author_asset_consistency_update",
+      "definition": "CREATE CONSTRAINT TRIGGER \"QuestionOption_author_asset_consistency_update\" AFTER UPDATE ON public.\"QuestionOption\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW WHEN (((old.\"optionImageKey\" IS DISTINCT FROM new.\"optionImageKey\") OR (old.\"questionId\" IS DISTINCT FROM new.\"questionId\") OR (((old.\"optionImageKey\" IS NOT NULL) OR (new.\"optionImageKey\" IS NOT NULL)) AND ((old.\"stableKey\" IS DISTINCT FROM new.\"stableKey\") OR (old.\"isCustomValue\" IS DISTINCT FROM new.\"isCustomValue\"))))) EXECUTE FUNCTION check_author_asset_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_author_asset_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE parent_id text; r record;\nBEGIN\n  IF TG_TABLE_NAME = 'AuthorAssetReference' THEN\n    IF TG_OP = 'DELETE' THEN\n      PERFORM validate_author_asset_parent(CASE WHEN OLD.\"formVersionId\" IS NOT NULL THEN 'version' WHEN OLD.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(OLD.\"formVersionId\", OLD.\"templateId\", OLD.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(OLD.\"assetId\");\n    ELSE\n      PERFORM validate_author_asset_parent(CASE WHEN NEW.\"formVersionId\" IS NOT NULL THEN 'version' WHEN NEW.\"templateId\" IS NOT NULL THEN 'template' ELSE 'approval' END,\n        coalesce(NEW.\"formVersionId\", NEW.\"templateId\", NEW.\"approvalId\"));\n      PERFORM validate_author_asset_lifetime(NEW.\"assetId\");\n    END IF;\n  ELSIF TG_TABLE_NAME = 'AuthorAsset' THEN\n    PERFORM validate_author_asset_lifetime(NEW.id);\n  ELSIF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = OLD.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n    IF TG_OP <> 'DELETE' THEN\n      SELECT \"formVersionId\" INTO parent_id FROM \"Question\" WHERE id = NEW.\"questionId\";\n      IF parent_id IS NOT NULL THEN PERFORM validate_author_asset_parent('version', parent_id); END IF;\n    END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN PERFORM validate_author_asset_parent('version', OLD.\"formVersionId\"); END IF;\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('version', NEW.\"formVersionId\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'DELETE' THEN PERFORM validate_author_asset_parent('template', NEW.id); END IF;\n  ELSIF TG_TABLE_NAME = 'ApprovalRequest' THEN\n    PERFORM validate_author_asset_parent('approval', NEW.id);\n  ELSIF TG_TABLE_NAME = 'Form' THEN\n    FOR r IN SELECT id FROM \"FormVersion\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('version', r.id); END LOOP;\n    FOR r IN SELECT id FROM \"ApprovalRequest\" WHERE \"formId\" = NEW.id LOOP PERFORM validate_author_asset_parent('approval', r.id); END LOOP;\n  END IF;\n  RETURN NULL;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_author_asset_lock_delete",
+      "definition": "CREATE TRIGGER \"QuestionOption_author_asset_lock_delete\" BEFORE DELETE ON public.\"QuestionOption\" FOR EACH ROW WHEN ((old.\"optionImageKey\" IS NOT NULL)) EXECUTE FUNCTION lock_author_asset_content()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_author_asset_lock_insert",
+      "definition": "CREATE TRIGGER \"QuestionOption_author_asset_lock_insert\" BEFORE INSERT ON public.\"QuestionOption\" FOR EACH ROW WHEN ((new.\"optionImageKey\" IS NOT NULL)) EXECUTE FUNCTION lock_author_asset_content()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_author_asset_lock_update",
+      "definition": "CREATE TRIGGER \"QuestionOption_author_asset_lock_update\" BEFORE UPDATE ON public.\"QuestionOption\" FOR EACH ROW WHEN (((old.\"optionImageKey\" IS DISTINCT FROM new.\"optionImageKey\") OR (old.\"questionId\" IS DISTINCT FROM new.\"questionId\") OR (((old.\"optionImageKey\" IS NOT NULL) OR (new.\"optionImageKey\" IS NOT NULL)) AND ((old.\"stableKey\" IS DISTINCT FROM new.\"stableKey\") OR (old.\"isCustomValue\" IS DISTINCT FROM new.\"isCustomValue\"))))) EXECUTE FUNCTION lock_author_asset_content()",
+      "function": "CREATE OR REPLACE FUNCTION public.lock_author_asset_content()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_content jsonb; new_content jsonb; version_id text; parent_kind text; parent_id text; keys text[];\nBEGIN\n  IF TG_TABLE_NAME = 'Question' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', OLD.\"stableKey\", 'type', OLD.type, 'questionImageKey', OLD.\"questionImageKey\", 'materialList', OLD.\"materialList\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('questions', jsonb_build_array(jsonb_build_object(\n      'id', NEW.\"stableKey\", 'type', NEW.type, 'questionImageKey', NEW.\"questionImageKey\", 'materialList', NEW.\"materialList\"))); END IF;\n    version_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_set(old_content, '{questions,0,optionDefinitions}', coalesce((\n      SELECT jsonb_agg(jsonb_build_object('id', coalesce(o.\"stableKey\", o.id), 'optionImageKey', o.\"optionImageKey\", 'isCustomValue', o.\"isCustomValue\"))\n      FROM \"QuestionOption\" o WHERE o.\"questionId\" = OLD.id), '[]'::jsonb)); END IF;\n    parent_kind := 'version'; parent_id := version_id;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    SELECT \"formVersionId\" INTO version_id FROM \"Question\" WHERE id = CASE WHEN TG_OP = 'DELETE' THEN OLD.\"questionId\" ELSE NEW.\"questionId\" END;\n    parent_kind := 'version'; parent_id := version_id; keys := ARRAY[]::text[];\n    IF TG_OP <> 'INSERT' AND OLD.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, OLD.\"optionImageKey\"); END IF;\n    IF TG_OP <> 'DELETE' AND NEW.\"optionImageKey\" IS NOT NULL THEN keys := array_append(keys, NEW.\"optionImageKey\"); END IF;\n  ELSIF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('bodyRich', OLD.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', OLD.\"completionPageMode\", 'bodyRich', OLD.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', OLD.\"closedPageMode\", 'bodyRich', OLD.\"closedPageBodyRich\")); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('bodyRich', NEW.\"bodyRich\",\n      'completionPage', jsonb_build_object('mode', NEW.\"completionPageMode\", 'bodyRich', NEW.\"completionPageBodyRich\"),\n      'closedPage', jsonb_build_object('mode', NEW.\"closedPageMode\", 'bodyRich', NEW.\"closedPageBodyRich\")); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSIF TG_TABLE_NAME = 'FormSection' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', OLD.\"pageKey\", 'bodyRich', OLD.\"bodyRich\"))); END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := jsonb_build_object('sections', jsonb_build_array(jsonb_build_object('id', NEW.\"pageKey\", 'bodyRich', NEW.\"bodyRich\"))); END IF;\n    parent_kind := 'version'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.\"formVersionId\" ELSE NEW.\"formVersionId\" END;\n  ELSIF TG_TABLE_NAME = 'FormTemplate' THEN\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.content; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.content; END IF;\n    parent_kind := 'template'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_content := OLD.snapshot->'content'; END IF;\n    IF TG_OP <> 'DELETE' THEN new_content := NEW.snapshot->'content'; END IF;\n    parent_kind := 'approval'; parent_id := CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END;\n  END IF;\n  IF keys IS NULL THEN SELECT array_agg(DISTINCT asset_id) INTO keys FROM (\n    SELECT e.asset_id FROM author_asset_expected(old_content) e\n    UNION ALL SELECT e.asset_id FROM author_asset_expected(new_content) e\n  ) all_keys; END IF;\n  IF coalesce(cardinality(keys), 0) > 0 THEN\n    PERFORM author_asset_read_committed();\n    PERFORM lock_author_asset_parent(parent_kind, parent_id);\n    PERFORM id FROM \"AuthorAsset\" WHERE id = ANY(keys) ORDER BY id FOR UPDATE;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_section_graph_delete",
+      "definition": "CREATE CONSTRAINT TRIGGER \"QuestionOption_section_graph_delete\" AFTER DELETE ON public.\"QuestionOption\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW WHEN ((old.\"branchDestinationKind\" IS NOT NULL)) EXECUTE FUNCTION check_form_section_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_form_section_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_version TEXT; new_version TEXT;\nBEGIN\n  IF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.id; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.id; END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN SELECT \"formVersionId\" INTO old_version FROM \"Question\" WHERE id=OLD.\"questionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN SELECT \"formVersionId\" INTO new_version FROM \"Question\" WHERE id=NEW.\"questionId\"; END IF;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.\"formVersionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.\"formVersionId\"; END IF;\n  END IF;\n  IF old_version IS NOT NULL THEN PERFORM assert_form_section_graph(old_version); END IF;\n  IF new_version IS NOT NULL AND new_version IS DISTINCT FROM old_version THEN PERFORM assert_form_section_graph(new_version); END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_section_graph_insert",
+      "definition": "CREATE CONSTRAINT TRIGGER \"QuestionOption_section_graph_insert\" AFTER INSERT ON public.\"QuestionOption\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW WHEN ((new.\"branchDestinationKind\" IS NOT NULL)) EXECUTE FUNCTION check_form_section_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_form_section_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_version TEXT; new_version TEXT;\nBEGIN\n  IF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.id; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.id; END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN SELECT \"formVersionId\" INTO old_version FROM \"Question\" WHERE id=OLD.\"questionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN SELECT \"formVersionId\" INTO new_version FROM \"Question\" WHERE id=NEW.\"questionId\"; END IF;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.\"formVersionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.\"formVersionId\"; END IF;\n  END IF;\n  IF old_version IS NOT NULL THEN PERFORM assert_form_section_graph(old_version); END IF;\n  IF new_version IS NOT NULL AND new_version IS DISTINCT FROM old_version THEN PERFORM assert_form_section_graph(new_version); END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "QuestionOption_section_graph_update",
+      "definition": "CREATE CONSTRAINT TRIGGER \"QuestionOption_section_graph_update\" AFTER UPDATE ON public.\"QuestionOption\" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW WHEN (((old.\"branchDestinationKind\" IS DISTINCT FROM new.\"branchDestinationKind\") OR (old.\"branchDestinationSectionId\" IS DISTINCT FROM new.\"branchDestinationSectionId\") OR ((old.\"isCustomValue\" IS DISTINCT FROM new.\"isCustomValue\") AND ((old.\"branchDestinationKind\" IS NOT NULL) OR (new.\"branchDestinationKind\" IS NOT NULL))) OR ((old.\"questionId\" IS DISTINCT FROM new.\"questionId\") AND ((old.\"branchDestinationKind\" IS NOT NULL) OR (new.\"branchDestinationKind\" IS NOT NULL))))) EXECUTE FUNCTION check_form_section_graph()",
+      "function": "CREATE OR REPLACE FUNCTION public.check_form_section_graph()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE old_version TEXT; new_version TEXT;\nBEGIN\n  IF TG_TABLE_NAME = 'FormVersion' THEN\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.id; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.id; END IF;\n  ELSIF TG_TABLE_NAME = 'QuestionOption' THEN\n    IF TG_OP <> 'INSERT' THEN SELECT \"formVersionId\" INTO old_version FROM \"Question\" WHERE id=OLD.\"questionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN SELECT \"formVersionId\" INTO new_version FROM \"Question\" WHERE id=NEW.\"questionId\"; END IF;\n  ELSE\n    IF TG_OP <> 'INSERT' THEN old_version:=OLD.\"formVersionId\"; END IF;\n    IF TG_OP <> 'DELETE' THEN new_version:=NEW.\"formVersionId\"; END IF;\n  END IF;\n  IF old_version IS NOT NULL THEN PERFORM assert_form_section_graph(old_version); END IF;\n  IF new_version IS NOT NULL AND new_version IS DISTINCT FROM old_version THEN PERFORM assert_form_section_graph(new_version); END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "custom_choice_option_guard",
+      "definition": "CREATE TRIGGER custom_choice_option_guard BEFORE INSERT OR UPDATE ON public.\"QuestionOption\" FOR EACH ROW EXECUTE FUNCTION guard_custom_choice_option()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_custom_choice_option()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE form_id text; parent_type text;\nBEGIN\n  IF NEW.\"isCustomValue\" IS NOT TRUE THEN RETURN NEW; END IF;\n  IF current_setting('transaction_isolation') NOT IN ('read committed','read uncommitted') THEN\n    RAISE EXCEPTION 'Custom choice mutations require READ COMMITTED' USING ERRCODE='0A000';\n  END IF;\n  SELECT v.\"formId\" INTO form_id FROM \"Question\" q JOIN \"FormVersion\" v ON v.id=q.\"formVersionId\" WHERE q.id=NEW.\"questionId\";\n  PERFORM id FROM \"Form\" WHERE id=form_id FOR UPDATE;\n  SELECT type INTO parent_type FROM \"Question\" WHERE id=NEW.\"questionId\";\n  IF parent_type IS NULL OR parent_type NOT IN ('객관식 답변','체크박스','드롭다운') THEN\n    RAISE EXCEPTION 'Custom choices require a supported choice question' USING ERRCODE='23514';\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "option_identity_guard",
+      "definition": "CREATE TRIGGER option_identity_guard BEFORE INSERT OR UPDATE ON public.\"QuestionOption\" FOR EACH ROW EXECUTE FUNCTION guard_option_identity()",
+      "function": "CREATE OR REPLACE FUNCTION public.guard_option_identity()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE form_id text; question_key text;\nBEGIN\n IF TG_OP='UPDATE' THEN\n  IF OLD.\"stableKey\" IS NOT NULL AND (NEW.\"stableKey\" IS DISTINCT FROM OLD.\"stableKey\" OR NEW.value IS DISTINCT FROM OLD.value OR NEW.\"questionId\"<>OLD.\"questionId\") THEN\n   RAISE EXCEPTION 'Option identity/value is immutable' USING ERRCODE='23514';\n  END IF;\n  IF OLD.\"stableKey\" IS NULL AND NEW.\"stableKey\" IS NOT NULL AND (NEW.\"stableKey\"<>OLD.id OR NEW.value<>OLD.value OR NEW.\"questionId\"<>OLD.\"questionId\") THEN\n   RAISE EXCEPTION 'Legacy identity must retain its row identity and value' USING ERRCODE='23514';\n  END IF;\n END IF;\n IF NEW.\"stableKey\" IS NOT NULL THEN\n  SELECT v.\"formId\",q.\"stableKey\" INTO form_id,question_key FROM \"Question\" q JOIN \"FormVersion\" v ON v.id=q.\"formVersionId\" WHERE q.id=NEW.\"questionId\";\n  -- Serializes same-form identity checks, including direct database writers.\n  PERFORM id FROM \"Form\" WHERE id=form_id FOR UPDATE;\n  IF EXISTS (SELECT 1 FROM \"QuestionOption\" o JOIN \"Question\" q ON q.id=o.\"questionId\" JOIN \"FormVersion\" v ON v.id=q.\"formVersionId\"\n   WHERE v.\"formId\"=form_id AND (o.\"stableKey\"=NEW.\"stableKey\" OR (o.\"stableKey\" IS NULL AND o.id=NEW.\"stableKey\"))\n    AND (q.\"stableKey\"<>question_key OR o.value<>NEW.value)) THEN\n   RAISE EXCEPTION 'Option identity belongs to another question or value' USING ERRCODE='23514';\n  END IF;\n END IF;\n RETURN NEW;\nEND $function$\n"
+    },
+    {
+      "table": "QuestionOption",
+      "name": "published_option_immutable",
+      "definition": "CREATE TRIGGER published_option_immutable BEFORE INSERT OR DELETE OR UPDATE ON public.\"QuestionOption\" FOR EACH ROW EXECUTE FUNCTION protect_published_option()",
+      "function": "CREATE OR REPLACE FUNCTION public.protect_published_option()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE question_id TEXT;\nBEGIN\n  IF TG_OP <> 'INSERT' THEN\n    IF EXISTS (SELECT 1 FROM \"Question\" q JOIN \"FormVersion\" v ON v.id=q.\"formVersionId\" WHERE q.id=OLD.\"questionId\" AND v.status='published') THEN\n      RAISE EXCEPTION 'Published options are immutable' USING ERRCODE = '23514';\n    END IF;\n  END IF;\n  IF TG_OP <> 'DELETE' THEN\n    IF EXISTS (SELECT 1 FROM \"Question\" q JOIN \"FormVersion\" v ON v.id=q.\"formVersionId\" WHERE q.id=NEW.\"questionId\" AND v.status='published') THEN\n      RAISE EXCEPTION 'Published options are immutable' USING ERRCODE = '23514';\n    END IF;\n  END IF;\n  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+    }
+  ],
+  "sourceFingerprints": {
+    "prisma/schema.prisma": "1a3a98727ef838bfaf1ec298f9dc43ddf72a46ba35359c30e49e5a5530f8973c",
+    "src/contracts/domains.ts": "8e5574ac77bd94db6590b4fa4f4ce2a875cc73bf8c4dbcc3945930670e75c67f",
+    "src/contracts/questions.ts": "f1517a94b8e7a9f9b5a65701160c26a529f87eb99110acd412e3e6bb4520fb3a",
+    "src/contracts/forms.ts": "1bb3e028211dcf6862268031db01189e72f1b61fa67e4818183c63d179ee1ef3",
+    "src/contracts/form-copy.ts": "70bc090faec2443d97c18fef0fcf945ee845f54071a9fb51f96cd3b7932a8d4e",
+    "src/server/forms.ts": "9ca1f377f517ea9767241a1f705d6e3d6c584251b1baa320f57024f5154f25a4",
+    "src/server/templates.ts": "cf88724744f0e2cd39042f9b701594505228c908912162cbbb002415c7f14432",
+    "src/server/form-documents.ts": "fd8e53a0d1133b0532d6ba56980c26a74767656f561b8b34b7c580961a61749d",
+    "src/server/form-access.ts": "2a088f47f97e0342e0717bfab47d3e25c9c292d1bc12e926f721998142babf11",
+    "src/server/answer-validation.ts": "12bf3ab1c1e43789766a8e1b9d3cc04193123b017b96f3ffe1d4215c9306373a",
+    "src/server/question-options.ts": "0a83b2d1652a3f058ee9bf50080d863c6319981082725cb34faecb3d35836930",
+    "src/server/author-asset-references.ts": "4bf939d2d54e3dbc02f2ed7e00e712a101701917e3e8e985e5f25f897ac016bc",
+    "src/server/author-asset-uploads.ts": "83bf549e1b62670dad841d253e00f509d41799a231fe76f46babe0336d7d99cb",
+    "src/server/participation-access.ts": "145ef90811c0a2b51bb4791704abdef330a836468cb19d88d5b8b0c174377ab9",
+    "src/server/form-participation-targets.ts": "9a8b9220927943ea727d312201f52d6623c7b3c2b5679f87c49f309353be7305",
+    "src/contracts/form-sections.ts": "0b6f2725eed53fcab7d3654236adaaabbacde5d7ae924047a99644db8a4dd2df",
+    "src/contracts/form-rich-content.ts": "9a7c34a149069c95cf2b631a7c6e046b55fac88c3d55d0b81e12cc37ff676bb5",
+    "src/contracts/form-participation-access.ts": "716e69294e167db523baea5e2b4d13bc2ba238d26c0f8695cf0032fb3cb4ec75",
+    "src/contracts/form-collection-window.ts": "8eb2e63106581ca12894c646af07e5bbd2dd657f3422adf0f9bd4c50d8586fd0",
+    "src/contracts/author-assets.ts": "0228b0dc98a0b9f72a86c95131cab0246d5cf59c55a5b50fb9864956424f58f5",
+    "src/contracts/consent-items.ts": "6abd4232bee41794faeb789f5f80a04a1d2fd0e6a7e1806184f5795201d1721a"
+  }
+}

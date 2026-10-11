@@ -3,7 +3,10 @@ import { AuthorAssetProvider } from "./AuthorAssetProvider";
 import { hasAuthorAssets } from "@/lib/author-assets";
 import { QuestionChoiceSummary } from "./QuestionChoiceSummary";
 import { formLanguageLabel } from "@/contracts/form-language";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { listHref } from "@/lib/list-url-state";
+import { formListState } from "@/lib/form-list-state";
 import Link from "next/link";
 import { PageHeading, Panel, ActionButton, Modal } from "../shared";
 import { RemoteTable } from "../RemoteTable";
@@ -21,11 +24,14 @@ export function FormLists({ kind }: { kind: "manage" | "marketing" | "fixed" }) 
   return <ManageForms />;
 }
 function ManageForms() {
-  const app = useApplication();
-  const [query, setQuery] = useState(""), [search, setSearch] = useState(""), [expanded, setExpanded] = useState(false);
-  const [favorite, setFavorite] = useState(false), [status, setStatus] = useState(""), [start, setStart] = useState(""), [end, setEnd] = useState("");
-  const [page, setPage] = useState(1), [pageSize, setPageSize] = useState(20), [archive, setArchive] = useState<FormRecord>();
-  const [sort, setSort] = useState("createdAt"), [direction, setDirection] = useState("desc");
+  const app = useApplication(), router = useRouter(), pathname = usePathname(), searchParams = useSearchParams();
+  const { search, page, pageSize, favorite, status, start, end, sort, direction, expanded } = formListState(searchParams);
+  const [draft, setDraft] = useState({ search, value: search });
+  if (draft.search !== search) setDraft({ search, value: search });
+  const query = draft.search === search ? draft.value : search;
+  function update(values: Record<string, string | number | null>) { router.push(listHref(pathname, searchParams.toString(), values), { scroll: false }); }
+  function setPage(value: number) { update({ page: value }); }
+  const [archive, setArchive] = useState<FormRecord>();
   const [preview, setPreview] = useState<FormRecord>(), [remove, setRemove] = useState<FormRecord>();
   const [designate, setDesignate] = useState<FormRecord>();
   const [error, setError] = useState(""), [message, setMessage] = useState(""), [busy, setBusy] = useState("");
@@ -37,6 +43,9 @@ function ManageForms() {
   if (app.data?.serviceId) params.set("serviceId", app.data.serviceId);
   const result = useResource<FormPage>(app.data ? "/forms?" + params : null);
   const shownPage = result.data?.page ?? page;
+  useEffect(() => {
+    if (result.data && result.data.page !== page) router.replace(listHref(pathname, searchParams.toString(), { page: result.data.page }), { scroll: false });
+  }, [result.data, page, pathname, searchParams, router]);
   async function perform(id: string, action: () => Promise<unknown>, message: string) {
     if (busy) return;
     setBusy(id); setError(""); setMessage("");
@@ -45,26 +54,26 @@ function ManageForms() {
       if (cause instanceof ApiError && [403, 404, 409, 410].includes(cause.status)) result.reload();
     } finally { setBusy(""); }
   }
-  return <><PageHeading title="캐치폼·업로드 목록"><p>캐치폼과 수집한 응답을 관리할 수 있습니다.</p>
+  return <div className="forms-list-page"><PageHeading title="캐치폼·업로드 목록"><p>캐치폼과 수집한 응답을 관리할 수 있습니다.</p>
     {result.data?.permissions.canViewImports && <Link href="/form/info-upload" className="cs-button secondary">업로드 작업 목록</Link>}
     <div className="forms-actions">{result.data?.permissions.canCreate && <Link href="/form/ai/create?new=1" className="cs-button">캐치폼 생성</Link>}
       {result.data?.permissions.canImport && <Link href="/form/info-upload" className="cs-button secondary">개인정보 업로드</Link>}</div></PageHeading>
-    <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); setSearch(query); setPage(1); }}>
-      <input className="cs-input" aria-label="캐치폼 검색" placeholder="캐치폼명 또는 생성자명을 입력해주세요." value={query} onChange={event => setQuery(event.target.value)} />
-      <ActionButton>검색</ActionButton><ActionButton type="button" secondary onClick={() => setExpanded(!expanded)}>상세 검색 {expanded ? "닫기" : "열기"}</ActionButton></form>
-      {expanded && <div className="forms-expanded"><div className="forms-filter"><label>생성 시작일<input type="date" aria-label="시작일" value={start} onChange={event => { setStart(event.target.value); setPage(1); }} /></label>
-        <label>생성 종료일<input type="date" aria-label="종료일" value={end} onChange={event => { setEnd(event.target.value); setPage(1); }} /></label>
-        <label>공개상태 <select aria-label="공개상태" value={status} onChange={event => { setStatus(event.target.value); setPage(1); }}><option value="">보관 제외</option><option value="all">전체</option>
+    <Panel><form className="forms-filter" onSubmit={event => { event.preventDefault(); update({ q: query, page: 1 }); }}>
+      <input className="cs-input" aria-label="캐치폼 검색" placeholder="캐치폼명 또는 생성자명을 입력해주세요." maxLength={100} value={query} onChange={event => setDraft({ search, value: event.target.value })} />
+      <ActionButton>검색</ActionButton><ActionButton type="button" secondary onClick={() => update({ details: expanded ? "0" : "1" })}>상세 검색 {expanded ? "닫기" : "열기"}</ActionButton></form>
+      {expanded && <div className="forms-expanded"><div className="forms-filter"><label>생성 시작일<input type="date" aria-label="시작일" value={start} onChange={event => { update({ start: event.target.value, page: 1 }); }} /></label>
+        <label>생성 종료일<input type="date" aria-label="종료일" value={end} onChange={event => { update({ end: event.target.value, page: 1 }); }} /></label>
+        <label>공개상태 <select aria-label="공개상태" value={status} onChange={event => { update({ status: event.target.value, page: 1 }); }}><option value="">보관 제외</option><option value="all">전체</option>
           {Object.entries(formStatus).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-        <ActionButton secondary onClick={() => { setQuery(""); setSearch(""); setStart(""); setEnd(""); setStatus(""); setFavorite(false); setPage(1); }}>검색 조건 초기화</ActionButton>
+        <ActionButton secondary onClick={() => { setDraft({ search: "", value: "" }); update({ q: null, start: null, end: null, status: null, favorite: null, page: 1 }); }}>검색 조건 초기화</ActionButton>
       </div></div>}
       <div className="forms-between"><p>{app.data?.services.find(service => service.id === app.data?.serviceId)?.name ?? "접근 가능한 서비스"}</p>
-        <label>정렬 <select aria-label="캐치폼 정렬 기준" value={sort} onChange={event => { setSort(event.target.value); setPage(1); }}><option value="createdAt">생성일</option><option value="name">캐치폼명</option></select></label>
-        <label>순서 <select aria-label="캐치폼 정렬 순서" value={direction} onChange={event => { setDirection(event.target.value); setPage(1); }}><option value="desc">내림차순</option><option value="asc">오름차순</option></select></label>
-        <label><input type="checkbox" checked={favorite} onChange={event => { setFavorite(event.target.checked); setPage(1); }} /> 즐겨찾기만 보기</label></div>
+        <label>정렬 <select aria-label="캐치폼 정렬 기준" value={sort} onChange={event => { update({ sort: event.target.value, page: 1 }); }}><option value="createdAt">생성일</option><option value="name">캐치폼명</option></select></label>
+        <label>순서 <select aria-label="캐치폼 정렬 순서" value={direction} onChange={event => { update({ direction: event.target.value, page: 1 }); }}><option value="desc">내림차순</option><option value="asc">오름차순</option></select></label>
+        <label><input type="checkbox" checked={favorite} onChange={event => { update({ favorite: event.target.checked ? "true" : null, page: 1 }); }} /> 즐겨찾기만 보기</label></div>
       {error && <p role="alert">{error}</p>}<p role="status">{message}</p>
       <RemoteTable columns={["#", "즐겨찾기", "공개상태", "서비스 명", "캐치폼 명", "생성자", "현재 게시 응답", "생성일", "보유 기간", "설정"]}
-        page={shownPage} pageSize={pageSize} onPage={setPage} onPageSize={size => { setPageSize(size); setPage(1); }} total={result.data?.total ?? 0}
+        page={shownPage} pageSize={pageSize} onPage={setPage} onPageSize={size => update({ pageSize: size, page: 1 })} total={result.data?.total ?? 0}
         loading={result.loading} error={result.error?.message} rows={(result.data?.items ?? []).map((form, index) => ({ id: form.id, cells: [
           (shownPage - 1) * pageSize + index + 1,
           <button key="favorite" disabled={!!busy} aria-label={form.title + " 즐겨찾기"} aria-pressed={form.favorite} onClick={() => perform(form.id,
@@ -102,7 +111,7 @@ function ManageForms() {
         await api("/forms/" + archive.id, { method: "DELETE", headers: { "If-Match": String(archive.version) } }); setArchive(undefined);
       }, "캐치폼을 보관했습니다.")}>보관</ActionButton></Modal>}
     {designate && <DesignateRetention key={designate.id} form={designate} busy={!!busy} error={error} onSaved={() => setDesignate(undefined)} />}
-  </>;
+  </div>;
 }
 function DesignateRetention({ form, busy, error, onSaved }: { form: FormRecord; busy: boolean; error: string; onSaved: () => void }) {
   const [days, setDays] = useState(365), [confirmed, setConfirmed] = useState(false);

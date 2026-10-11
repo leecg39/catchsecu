@@ -3,7 +3,10 @@
 import { ActivityReviewRequest } from "./ActivityReviews";
 import Link from "next/link";
 import "./management.css";
-import { useState } from "react";
+import { useEffect, useState, type SetStateAction } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { activityListHref, activityListState } from "@/lib/activity-list-state";
+import { oneOf } from "@/lib/list-url-state";
 import { useResource } from "@/lib/api";
 import type { AuditEventKind, AuditEventList, AuditEventRecord } from "@/contracts/audit-events";
 import type { Application } from "../ApplicationContext";
@@ -53,9 +56,20 @@ export function AuditLogs({ path, formId }: { path: string; formId?: string }) {
   const config: AuditConfig = formId ? { title: "캐치폼 감사 로그", kind: "all", columns: generic,
     description: "선택한 캐치폼과 응답·첨부파일·내보내기의 기록을 조회합니다." } : configs[path];
   const context = useResource<Application>("/context");
-  const [draft, setDraft] = useState(blank);
-  const [applied, setApplied] = useState(blank);
-  const [page, setPage] = useState(1), [pageSize, setPageSize] = useState(10), [error, setError] = useState("");
+  const query = useSearchParams(), pathname = usePathname(), router = useRouter(), mine = config.scope === "mine";
+  const urlState = activityListState(query);
+  const [localApplied, setApplied] = useState(blank);
+  const applied: Filters = mine ? { start: urlState.from, end: urlState.to, search: urlState.search, serviceId: "", searchField: oneOf(query.get("searchField"), ["action", "resource"] as const, "action") } : localApplied;
+  const filterKey = JSON.stringify(applied);
+  const [draftState, setDraftState] = useState({ key: filterKey, value: applied });
+  if (draftState.key !== filterKey) setDraftState({ key: filterKey, value: applied });
+  const draft = draftState.key === filterKey ? draftState.value : applied;
+  function setDraft(value: SetStateAction<Filters>) { setDraftState({ key: filterKey, value: typeof value === "function" ? value(draft) : value }); }
+  const [localPage, setLocalPage] = useState(1), [localSize, setLocalSize] = useState(10), [error, setError] = useState("");
+  const page = mine ? urlState.page : localPage, pageSize = mine ? urlState.pageSize : localSize;
+  function update(values: Record<string, string | number | null>) { router.push(activityListHref(pathname, query.toString(), values), { scroll: false }); }
+  function setPage(value: number) { if (mine) update({ page: value }); else setLocalPage(value); }
+  function setPageSize(value: number) { if (mine) update({ pageSize: value, page: 1 }); else { setLocalSize(value); setLocalPage(1); } }
   const [exporting, setExporting] = useState(false);
   const [reviewEvent, setReviewEvent] = useState<AuditEventRecord | null>(null);
   const canReview = config.kind === "info" && ["security.write", "audit.read"].every(c => context.data?.capabilities.includes(c));
@@ -70,11 +84,14 @@ export function AuditLogs({ path, formId }: { path: string; formId?: string }) {
   const companyWide = ["owner", "admin", "security", "auditor"].includes(context.data?.company?.role ?? "");
   const currentPage = result.data?.page ?? page;
   const pages = Math.max(1, Math.ceil((result.data?.total ?? 0) / pageSize));
+  useEffect(() => { if (mine && result.data && result.data.page !== page) router.replace(activityListHref(pathname, query.toString(), { page: result.data.page }), { scroll: false }); }, [mine, result.data, page, pathname, query, router]);
   function search() {
     if (draft.start && draft.end && draft.start > draft.end) { setError("종료일은 시작일 이후로 선택해주세요."); return; }
-    setError(""); setPage(1); setApplied({ ...draft });
+    setError("");
+    if (mine) update({ from: draft.start, to: draft.end, q: draft.search, searchField: draft.searchField, page: 1 });
+    else { setLocalPage(1); setApplied({ ...draft }); }
   }
-  function reset() { setError(""); setDraft(blank()); setApplied(blank()); setPage(1); result.reload(); }
+  function reset() { setError(""); setDraft(blank()); if (mine) update({ from: null, to: null, q: null, searchField: null, page: 1 }); else { setApplied(blank()); setLocalPage(1); } result.reload(); }
   async function download() {
     if (exporting) return;
     setError(""); setExporting(true);
@@ -141,7 +158,7 @@ export function AuditLogs({ path, formId }: { path: string; formId?: string }) {
         {canReview && <td><button className="cs-link" aria-label={"활동 " + ((currentPage - 1) * pageSize + index + 1) + " 검토 요청"} onClick={() => setReviewEvent(item)}>검토 요청</button></td>}
       </tr>) : null}
     </tbody></table></div><nav className="cs-pagination" aria-label="로그 페이지">
-      <select aria-label="페이지당 행 수" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>
+      <select aria-label="페이지당 행 수" value={pageSize} onChange={event => setPageSize(Number(event.target.value))}>
         {[10, 20, 50, 100].map(size => <option key={size}>{size}</option>)}
       </select><div><button disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)} aria-label="이전 페이지">‹</button>
         <span>{currentPage} / {pages}</span>

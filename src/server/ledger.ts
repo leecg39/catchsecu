@@ -3,8 +3,8 @@ import type { Context } from "./context";
 import type { LedgerOverview, LedgerQuery } from "@/contracts/ledger";
 import { db, type Transaction } from "./db";
 import { fail } from "./http";
-import { roleCan } from "./permissions";
 import { audit } from "./audit";
+import { withBillingAccess } from "./billing-access";
 
 type LedgerKind = "funding" | "reserve" | "capture" | "release" | "refund";
 type Transfer = {
@@ -41,8 +41,7 @@ export async function postTrustedLedgerTransfer(input: Transfer) {
 }
 
 export async function ledgerOverview(ctx: Context, query: LedgerQuery): Promise<LedgerOverview> {
-  if (!roleCan(ctx.member.role, "billing.read")) fail(403, "FORBIDDEN", "원장을 볼 권한이 없습니다.");
-  return db.$transaction(async tx => {
+  return withBillingAccess(ctx, "billing.read", async tx => {
     const clock = await tx.$queryRaw<{ asOf: Date }[]>`SELECT statement_timestamp() AS "asOf"`;
     if (query.serviceId) {
       const service = await tx.service.findFirst({ where: { id: query.serviceId, tenantId: ctx.tenantId }, select: { id: true } });

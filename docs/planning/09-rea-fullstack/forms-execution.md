@@ -108,3 +108,9 @@ F3 질문 부가 필드 통합 완료: 질문 설명·문항/보기 이미지·�
 
 BI 본문/페이지/완료/마감 상세 계획: [계획](../../qa/R08-T02/body-images/PLAN.md), [순수 문서 계약](../../qa/R08-T02/body-images/CONTRACT.md). 원본90개 발췌와 현재47파일 해시를 대조하고 BI-02a~07을 구현·검증했다.
 BI-02a~07 체크포인트: typed 문서·strict HTML/React 표시·구형 평문 호환·nullable FormContent·migration125, 네 본문 이미지 용도의 14 MiB 전송·migration126, 24MiPixels/16,384px 자원 상한, FormSection/질문 배치·완료/마감 버전 설정·migration127/128, 전체 콘텐츠 소유 자산 pin·복제·템플릿·승인·게시 이력·GC fence·migration129, 보기별 분기와 제출/정정 방문 경로·migration130~137, 네 rich 표시 영역·권한·증거 v2/PDF·실제 4슬롯 전체 수용을 완료했다. 3폭·RTL·키보드·장애22·production82페이지·재시작 hash·기존 fixture20/20이 통과했다. [검증](../../qa/R08-T02/body-images/full-acceptance/README.md).
+
+## 현재 모델·목록 점검 — 2026-10-11
+
+R08-T01 모델 완료:13모델184열·118제약·55인덱스·45트리거와 PostgreSQL348시험을 대조했다. 폼·템플릿 목록 URL 복원·모바일 제목을 수정하고 화면8시험·Ego 삭제/이력·3폭·production 재시작 데이터 보존을 확인했다. 완료27/진행28/계획52. R08 서버·전체 화면·외부 수용은 진행 중이다. [모델 대조](../../qa/R08-T01/current/README.md)·[목록 수용](../../qa/R08-T03/current/README.md). F3/F7 전체와 외부 제공사 수용 완료를 뜻하지 않는다.
+
+R09-T01/T03 체크포인트: 승인·게시·고정URL 5모델73열·33제약·20인덱스·8트리거와 dev/test 149 migration을 대조했다. 고정URL·독립 승인 목록·폼 내부 승인 내역의 URL 복원, 이력 이동, 390/768/1440px, production 재시작을 Ego Lite에서 확인했고 관련8파일·14suite·96시험을 통과했다. 실제 API fixture의 폼12·승인12·게시3·감사36 지문이 재시작 전후 일치한다. 공식 완료27/진행29/계획51이며 승인 결정·게시 전 상태 전수 수용은 계속 진행한다. [모델 대조](../../qa/R09-T01/current/README.md)·[화면 수용](../../qa/R09-T03/current/README.md).

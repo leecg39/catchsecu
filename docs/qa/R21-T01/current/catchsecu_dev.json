@@ -1,0 +1,1366 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T02:42:22.763Z",
+  "database": "catchsecu_dev",
+  "models": [
+    "BillingMonthClose",
+    "BillingPlan",
+    "BillingPlanVersion",
+    "BillingSubscription",
+    "BillingSubscriptionEvent",
+    "CreditAccount",
+    "LedgerEntry",
+    "LedgerTransaction",
+    "PaymentEvent",
+    "PaymentMethod",
+    "PaymentOrder",
+    "PaymentRefund"
+  ],
+  "scope": "Read-only R21 billing and double-entry ledger metadata audit with tenant-scoped payment relations, validated constraints, unique indexes, trigger signatures, migration identity, and live cross-tenant data check.",
+  "counts": {
+    "columns": 107,
+    "constraints": 70,
+    "indexes": 37,
+    "triggers": 10,
+    "migrations": 150,
+    "crossTenantOrders": 0
+  },
+  "definitionHash": "2d581ec294fa8191375550f3726a9dadbf755b7b49ff0a930b17cdace7ee1e49",
+  "migrationHash": "70ac76b6548de190a2ece069d561d0d585169ea149c47ee45e296fb386deef1a",
+  "sourceHashes": {
+    "prisma/schema.prisma": "15cf5b00155421d781313ba6e10ea4ac630198c3c58c9a6643045403ba486700",
+    "src/contracts/admin-plans.ts": "5748391b7db74eac8cf18563bc5cfaed38a7fa5758a2a762efda73c1ce941885",
+    "src/contracts/billing-history.ts": "0e968a9b1942129b3660fe80d10c9c8e4e8b89dc3b0b0b11f83c0d858d0096d3",
+    "src/contracts/billing-settlement.ts": "fa6b623f06b218952e13d37378e79e7c972f6b0c50c77c7b9eb8e7671700caf9",
+    "src/contracts/ledger.ts": "16265e24b6931487fc50baba1327abf1bb0ac95f87adba6c9b96655be70815b4",
+    "src/contracts/payment-events.ts": "ddb98ff34d64d41633f037a7837d4f03ef484ea0528e8a7c095f4f2aab9ba847",
+    "src/contracts/payment-methods.ts": "b5f50d6fcdbb811e5e877530bdd6148ee412cb20cd9db65d68654436f8b80ba1",
+    "src/contracts/subscriptions.ts": "8a197aae08a505f3db968aa29c7665e215a3c74311b4076bd44525be210e775b",
+    "src/server/admin-plans.ts": "ac59d56281f2170eab1a12cd240e53794eddd7787ffc07188ca4ebd200632272",
+    "src/server/billing-history.ts": "84a034bc2d3cabb331879e9b43748238e2d389d13b08b097c9dc63385b72c067",
+    "src/server/billing-reads.ts": "e134bd754bb9b903e767b00755b5982f9f231f929e8ad6eff991611cc6bb07db",
+    "src/server/billing-settlement.ts": "62d94eecc480b11aae2861fc030c774a98eac3f7f43b849e93cca7370e347b08",
+    "src/server/ledger.ts": "4680cf35572b1456cd37163acfc0ccd8f623f4b9989fb62558fa0eeda72ede36",
+    "src/server/payment-methods.ts": "8487d073682c4bc28d2428f343df795742ddf66a357f15d4812b686e8ef14063",
+    "src/server/payments.ts": "45664a16cabef7cc0787da26a564884c4797745b7d47f1264f13610dc1628b80",
+    "src/server/subscription-worker.ts": "1b19bd1d028fe6119b092077849cb836ca47a02e3dca641c62fb785ce682ec41",
+    "src/server/subscriptions.ts": "7d34b987ec9e2594c5dfc33a2c8d901751ecb5c23ac1a38c8c3a5e39b77807b7"
+  },
+  "definitions": {
+    "columns": [
+      {
+        "table": "BillingMonthClose",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "month",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "currency",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "totals",
+        "type": "jsonb",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "closedBy",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingMonthClose",
+        "column": "closedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlan",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlan",
+        "column": "name",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlan",
+        "column": "description",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlan",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "planId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "number",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "cycle",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "priceKrw",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "currency",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "serviceLimit",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "memberLimit",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "subjectLimit",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "formLimit",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "features",
+        "type": "jsonb",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "orderable",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "effectiveFrom",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "effectiveTo",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "column": "capabilities",
+        "type": "ARRAY",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "planId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "planVersionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "periodStart",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "periodEnd",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "cancelAt",
+        "type": "timestamp without time zone",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "priceKrw",
+        "type": "integer",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "currency",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "activationSource",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscription",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "column": "subscriptionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "column": "kind",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "column": "detail",
+        "type": "jsonb",
+        "nullable": "NO"
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "CreditAccount",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "CreditAccount",
+        "column": "currency",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "CreditAccount",
+        "column": "available",
+        "type": "bigint",
+        "nullable": "NO"
+      },
+      {
+        "table": "CreditAccount",
+        "column": "held",
+        "type": "bigint",
+        "nullable": "NO"
+      },
+      {
+        "table": "CreditAccount",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "CreditAccount",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerEntry",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerEntry",
+        "column": "transactionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerEntry",
+        "column": "currency",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerEntry",
+        "column": "account",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerEntry",
+        "column": "amount",
+        "type": "bigint",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerEntry",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "serviceId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "currency",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "kind",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "amount",
+        "type": "bigint",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "sourceKind",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "sourceId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "reservationId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "LedgerTransaction",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentEvent",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentEvent",
+        "column": "orderId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentEvent",
+        "column": "providerEventId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentEvent",
+        "column": "outcome",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentEvent",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "tokenHash",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "tokenCipher",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "provider",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "kind",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "label",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "isDefault",
+        "type": "boolean",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentMethod",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "subscriptionId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "amount",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "currency",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentOrder",
+        "column": "methodId",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "id",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "tenantId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "orderId",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "amount",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "currency",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "reason",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "status",
+        "type": "text",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "providerRef",
+        "type": "text",
+        "nullable": "YES"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "version",
+        "type": "integer",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "createdAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      },
+      {
+        "table": "PaymentRefund",
+        "column": "updatedAt",
+        "type": "timestamp without time zone",
+        "nullable": "NO"
+      }
+    ],
+    "constraints": [
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_shape",
+        "definition": "CHECK (((month ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'::text) AND (currency ~ '^[A-Z]{3}$'::text) AND ((length(\"closedBy\") >= 1) AND (length(\"closedBy\") <= 128))))",
+        "validated": true
+      },
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_tenantId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "BillingPlan",
+        "name": "BillingPlan_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_capabilities_check",
+        "definition": "CHECK (((capabilities <@ ARRAY['security.company_policy'::text, 'security.ip_access'::text, 'security.mfa_management'::text, 'security.sso_login_policy'::text]) AND (array_position(capabilities, NULL::text) IS NULL) AND (cardinality(capabilities) = (((\nCASE\n    WHEN ('security.company_policy'::text = ANY (capabilities)) THEN 1\n    ELSE 0\nEND +\nCASE\n    WHEN ('security.ip_access'::text = ANY (capabilities)) THEN 1\n    ELSE 0\nEND) +\nCASE\n    WHEN ('security.mfa_management'::text = ANY (capabilities)) THEN 1\n    ELSE 0\nEND) +\nCASE\n    WHEN ('security.sso_login_policy'::text = ANY (capabilities)) THEN 1\n    ELSE 0\nEND))))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_check",
+        "definition": "CHECK (((\"effectiveTo\" IS NULL) OR (\"effectiveTo\" > \"effectiveFrom\")))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_check1",
+        "definition": "CHECK (((NOT orderable) OR ((cycle <> 'trial'::text) AND (\"priceKrw\" IS NOT NULL))))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_currency_check",
+        "definition": "CHECK ((currency = 'KRW'::text))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_cycle_check",
+        "definition": "CHECK ((cycle = ANY (ARRAY['trial'::text, 'month'::text, 'year'::text])))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_formLimit_check",
+        "definition": "CHECK (((\"formLimit\" IS NULL) OR (\"formLimit\" >= 0)))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_id_planId_key",
+        "definition": "UNIQUE (id, \"planId\")",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_memberLimit_check",
+        "definition": "CHECK (((\"memberLimit\" IS NULL) OR (\"memberLimit\" >= 0)))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_number_check",
+        "definition": "CHECK ((number > 0))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_planId_fkey",
+        "definition": "FOREIGN KEY (\"planId\") REFERENCES \"BillingPlan\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_planId_number_cycle_key",
+        "definition": "UNIQUE (\"planId\", number, cycle)",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_priceKrw_check",
+        "definition": "CHECK (((\"priceKrw\" IS NULL) OR (\"priceKrw\" >= 0)))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_serviceLimit_check",
+        "definition": "CHECK (((\"serviceLimit\" IS NULL) OR (\"serviceLimit\" >= 0)))",
+        "validated": true
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_subjectLimit_check",
+        "definition": "CHECK (((\"subjectLimit\" IS NULL) OR (\"subjectLimit\" >= 0)))",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_activationSource_check",
+        "definition": "CHECK (((\"activationSource\" IS NULL) OR (\"activationSource\" = ANY (ARRAY['trial'::text, 'payment'::text]))))",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_check",
+        "definition": "CHECK ((((status = ANY (ARRAY['trialing'::text, 'expired'::text])) AND (\"planId\" = 'trial'::text) AND (\"priceKrw\" = 0) AND (\"activationSource\" = 'trial'::text) AND (\"periodStart\" IS NOT NULL) AND (\"periodEnd\" IS NOT NULL) AND (\"periodEnd\" > \"periodStart\") AND ((\"cancelAt\" IS NULL) OR ((\"cancelAt\" > \"periodStart\") AND (\"cancelAt\" <= \"periodEnd\")))) OR ((status = ANY (ARRAY['pending'::text, 'cancelled'::text])) AND (\"planId\" <> 'trial'::text) AND (\"priceKrw\" IS NOT NULL) AND (\"activationSource\" IS NULL) AND (\"periodStart\" IS NULL) AND (\"periodEnd\" IS NULL) AND (\"cancelAt\" IS NULL)) OR ((status = 'active'::text) AND (\"planId\" <> 'trial'::text) AND (\"priceKrw\" IS NOT NULL) AND (\"activationSource\" = 'payment'::text) AND (\"periodStart\" IS NOT NULL) AND (\"periodEnd\" IS NOT NULL) AND (\"periodEnd\" > \"periodStart\") AND ((\"cancelAt\" IS NULL) OR ((\"cancelAt\" > \"periodStart\") AND (\"cancelAt\" <= \"periodEnd\")))) OR ((status = 'expired'::text) AND (\"planId\" <> 'trial'::text) AND (\"priceKrw\" IS NOT NULL) AND (\"activationSource\" = 'payment'::text) AND (\"periodStart\" IS NOT NULL) AND (\"periodEnd\" IS NOT NULL) AND (\"periodEnd\" > \"periodStart\") AND ((\"cancelAt\" IS NULL) OR ((\"cancelAt\" > \"periodStart\") AND (\"cancelAt\" <= \"periodEnd\"))))))",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_currency_check",
+        "definition": "CHECK ((currency = 'KRW'::text))",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_planId_fkey",
+        "definition": "FOREIGN KEY (\"planId\") REFERENCES \"BillingPlan\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_planVersionId_planId_fkey",
+        "definition": "FOREIGN KEY (\"planVersionId\", \"planId\") REFERENCES \"BillingPlanVersion\"(id, \"planId\") ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_priceKrw_check",
+        "definition": "CHECK (((\"priceKrw\" IS NULL) OR (\"priceKrw\" >= 0)))",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_status_check",
+        "definition": "CHECK ((status = ANY (ARRAY['trialing'::text, 'pending'::text, 'active'::text, 'cancelled'::text, 'expired'::text])))",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_tenantId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_tenantId_id_key",
+        "definition": "UNIQUE (\"tenantId\", id)",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_version_check",
+        "definition": "CHECK ((version > 0))",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "name": "BillingSubscriptionEvent_kind_check",
+        "definition": "CHECK ((kind = ANY (ARRAY['trial_started'::text, 'trial_imported'::text, 'purchase_requested'::text, 'request_cancelled'::text, 'trial_cancel_scheduled'::text, 'trial_cancel_revoked'::text, 'trial_expired'::text, 'activated'::text, 'expired'::text, 'cancel_scheduled'::text, 'cancel_revoked'::text])))",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "name": "BillingSubscriptionEvent_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "name": "BillingSubscriptionEvent_subscriptionId_fkey",
+        "definition": "FOREIGN KEY (\"subscriptionId\") REFERENCES \"BillingSubscription\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "name": "BillingSubscriptionEvent_subscriptionId_version_key",
+        "definition": "UNIQUE (\"subscriptionId\", version)",
+        "validated": true
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "name": "BillingSubscriptionEvent_version_check",
+        "definition": "CHECK ((version > 0))",
+        "validated": true
+      },
+      {
+        "table": "CreditAccount",
+        "name": "CreditAccount_available_check",
+        "definition": "CHECK ((available >= 0))",
+        "validated": true
+      },
+      {
+        "table": "CreditAccount",
+        "name": "CreditAccount_currency_check",
+        "definition": "CHECK ((currency ~ '^[A-Z]{3}$'::text))",
+        "validated": true
+      },
+      {
+        "table": "CreditAccount",
+        "name": "CreditAccount_held_check",
+        "definition": "CHECK ((held >= 0))",
+        "validated": true
+      },
+      {
+        "table": "CreditAccount",
+        "name": "CreditAccount_pkey",
+        "definition": "PRIMARY KEY (\"tenantId\", currency)",
+        "validated": true
+      },
+      {
+        "table": "CreditAccount",
+        "name": "CreditAccount_tenantId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "LedgerEntry",
+        "name": "LedgerEntry_account_check",
+        "definition": "CHECK ((account = ANY (ARRAY['external'::text, 'available'::text, 'held'::text, 'spent'::text])))",
+        "validated": true
+      },
+      {
+        "table": "LedgerEntry",
+        "name": "LedgerEntry_amount_check",
+        "definition": "CHECK ((amount <> 0))",
+        "validated": true
+      },
+      {
+        "table": "LedgerEntry",
+        "name": "LedgerEntry_currency_check",
+        "definition": "CHECK ((currency ~ '^[A-Z]{3}$'::text))",
+        "validated": true
+      },
+      {
+        "table": "LedgerEntry",
+        "name": "LedgerEntry_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "LedgerEntry",
+        "name": "LedgerEntry_transactionId_account_key",
+        "definition": "UNIQUE (\"transactionId\", account)",
+        "validated": true
+      },
+      {
+        "table": "LedgerEntry",
+        "name": "LedgerEntry_transactionId_fkey",
+        "definition": "FOREIGN KEY (\"transactionId\") REFERENCES \"LedgerTransaction\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_amount_check",
+        "definition": "CHECK (((amount > 0) AND (amount <= '1000000000000'::bigint)))",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_currency_check",
+        "definition": "CHECK ((currency ~ '^[A-Z]{3}$'::text))",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_kind_check",
+        "definition": "CHECK ((kind = ANY (ARRAY['funding'::text, 'reserve'::text, 'capture'::text, 'release'::text, 'refund'::text])))",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_reservationId_fkey",
+        "definition": "FOREIGN KEY (\"reservationId\") REFERENCES \"LedgerTransaction\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_shape_check",
+        "definition": "CHECK ((((kind = 'funding'::text) AND (\"sourceKind\" = 'pg_capture'::text) AND (\"serviceId\" IS NULL) AND (\"reservationId\" IS NULL)) OR ((kind = 'refund'::text) AND (\"sourceKind\" = 'payment_refund'::text) AND (\"serviceId\" IS NULL) AND (\"reservationId\" IS NULL)) OR ((kind = 'reserve'::text) AND (\"serviceId\" IS NOT NULL) AND (\"reservationId\" IS NULL)) OR ((kind = ANY (ARRAY['capture'::text, 'release'::text])) AND (\"serviceId\" IS NOT NULL) AND (\"reservationId\" IS NOT NULL))))",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_sourceId_check",
+        "definition": "CHECK (((length(\"sourceId\") >= 1) AND (length(\"sourceId\") <= 128)))",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_sourceKind_check",
+        "definition": "CHECK ((((length(\"sourceKind\") >= 1) AND (length(\"sourceKind\") <= 64)) AND (\"sourceKind\" ~ '^[a-z][a-z0-9_:-]*$'::text)))",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_tenantId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_tenantId_kind_sourceKind_sourceId_key",
+        "definition": "UNIQUE (\"tenantId\", kind, \"sourceKind\", \"sourceId\")",
+        "validated": true
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_tenantId_serviceId_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"serviceId\") REFERENCES \"Service\"(\"tenantId\", id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "PaymentEvent",
+        "name": "PaymentEvent_order_fkey",
+        "definition": "FOREIGN KEY (\"orderId\") REFERENCES \"PaymentOrder\"(id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "PaymentEvent",
+        "name": "PaymentEvent_outcome",
+        "definition": "CHECK ((outcome = ANY (ARRAY['paid'::text, 'failed'::text, 'refunded'::text, 'refund_rejected'::text])))",
+        "validated": true
+      },
+      {
+        "table": "PaymentEvent",
+        "name": "PaymentEvent_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "PaymentMethod",
+        "name": "PaymentMethod_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "PaymentMethod",
+        "name": "PaymentMethod_shape",
+        "definition": "CHECK (((kind = ANY (ARRAY['card'::text, 'transfer'::text])) AND (status = ANY (ARRAY['active'::text, 'revoked'::text])) AND (provider ~ '^[a-z][a-z0-9-]{0,31}$'::text) AND (\"tokenHash\" ~ '^[0-9a-f]{64}$'::text) AND (\"tokenCipher\" ~~ 'v1.%'::text) AND (length(regexp_replace(label, '[^0-9]'::text, ''::text, 'g'::text)) < 13) AND ((char_length(label) >= 1) AND (char_length(label) <= 40))))",
+        "validated": true
+      },
+      {
+        "table": "PaymentMethod",
+        "name": "PaymentMethod_tenant_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\") REFERENCES \"Company\"(id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "PaymentOrder",
+        "name": "PaymentOrder_method_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"methodId\") REFERENCES \"PaymentMethod\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "PaymentOrder",
+        "name": "PaymentOrder_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "PaymentOrder",
+        "name": "PaymentOrder_status",
+        "definition": "CHECK (((status = ANY (ARRAY['pending'::text, 'paid'::text, 'failed'::text])) AND (amount > 0) AND (currency ~ '^[A-Z]{3}$'::text)))",
+        "validated": true
+      },
+      {
+        "table": "PaymentOrder",
+        "name": "PaymentOrder_subscription_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"subscriptionId\") REFERENCES \"BillingSubscription\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "PaymentRefund",
+        "name": "PaymentRefund_order_fkey",
+        "definition": "FOREIGN KEY (\"tenantId\", \"orderId\") REFERENCES \"PaymentOrder\"(\"tenantId\", id) ON UPDATE CASCADE ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table": "PaymentRefund",
+        "name": "PaymentRefund_pkey",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table": "PaymentRefund",
+        "name": "PaymentRefund_shape",
+        "definition": "CHECK (((status = ANY (ARRAY['requested'::text, 'refunded'::text, 'rejected'::text])) AND (amount > 0) AND (amount <= '1000000000000'::bigint) AND (currency ~ '^[A-Z]{3}$'::text) AND ((length(reason) >= 1) AND (length(reason) <= 500)) AND (version > 0) AND ((status <> 'refunded'::text) OR (\"providerRef\" IS NOT NULL))))",
+        "validated": true
+      }
+    ],
+    "indexes": [
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_key",
+        "definition": "CREATE UNIQUE INDEX \"BillingMonthClose_key\" ON public.\"BillingMonthClose\" USING btree (\"tenantId\", month, currency)"
+      },
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_pkey",
+        "definition": "CREATE UNIQUE INDEX \"BillingMonthClose_pkey\" ON public.\"BillingMonthClose\" USING btree (id)"
+      },
+      {
+        "table": "BillingPlan",
+        "name": "BillingPlan_pkey",
+        "definition": "CREATE UNIQUE INDEX \"BillingPlan_pkey\" ON public.\"BillingPlan\" USING btree (id)"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_id_planId_key",
+        "definition": "CREATE UNIQUE INDEX \"BillingPlanVersion_id_planId_key\" ON public.\"BillingPlanVersion\" USING btree (id, \"planId\")"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_pkey",
+        "definition": "CREATE UNIQUE INDEX \"BillingPlanVersion_pkey\" ON public.\"BillingPlanVersion\" USING btree (id)"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_planId_cycle_orderable_idx",
+        "definition": "CREATE INDEX \"BillingPlanVersion_planId_cycle_orderable_idx\" ON public.\"BillingPlanVersion\" USING btree (\"planId\", cycle, orderable)"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "BillingPlanVersion_planId_number_cycle_key",
+        "definition": "CREATE UNIQUE INDEX \"BillingPlanVersion_planId_number_cycle_key\" ON public.\"BillingPlanVersion\" USING btree (\"planId\", number, cycle)"
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_expiry_due_idx",
+        "definition": "CREATE INDEX \"BillingSubscription_expiry_due_idx\" ON public.\"BillingSubscription\" USING btree (LEAST(COALESCE(\"cancelAt\", \"periodEnd\"), \"periodEnd\"), id) WHERE (status = ANY (ARRAY['trialing'::text, 'active'::text]))"
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_pkey",
+        "definition": "CREATE UNIQUE INDEX \"BillingSubscription_pkey\" ON public.\"BillingSubscription\" USING btree (id)"
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_tenantId_id_key",
+        "definition": "CREATE UNIQUE INDEX \"BillingSubscription_tenantId_id_key\" ON public.\"BillingSubscription\" USING btree (\"tenantId\", id)"
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "BillingSubscription_tenantId_status_periodEnd_idx",
+        "definition": "CREATE INDEX \"BillingSubscription_tenantId_status_periodEnd_idx\" ON public.\"BillingSubscription\" USING btree (\"tenantId\", status, \"periodEnd\")"
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "billing_subscription_live_plan",
+        "definition": "CREATE UNIQUE INDEX billing_subscription_live_plan ON public.\"BillingSubscription\" USING btree (\"tenantId\", \"planId\") WHERE (status = ANY (ARRAY['trialing'::text, 'pending'::text]))"
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "name": "BillingSubscriptionEvent_pkey",
+        "definition": "CREATE UNIQUE INDEX \"BillingSubscriptionEvent_pkey\" ON public.\"BillingSubscriptionEvent\" USING btree (id)"
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "name": "BillingSubscriptionEvent_subscriptionId_version_key",
+        "definition": "CREATE UNIQUE INDEX \"BillingSubscriptionEvent_subscriptionId_version_key\" ON public.\"BillingSubscriptionEvent\" USING btree (\"subscriptionId\", version)"
+      },
+      {
+        "table": "CreditAccount",
+        "name": "CreditAccount_pkey",
+        "definition": "CREATE UNIQUE INDEX \"CreditAccount_pkey\" ON public.\"CreditAccount\" USING btree (\"tenantId\", currency)"
+      },
+      {
+        "table": "LedgerEntry",
+        "name": "LedgerEntry_pkey",
+        "definition": "CREATE UNIQUE INDEX \"LedgerEntry_pkey\" ON public.\"LedgerEntry\" USING btree (id)"
+      },
+      {
+        "table": "LedgerEntry",
+        "name": "LedgerEntry_transactionId_account_key",
+        "definition": "CREATE UNIQUE INDEX \"LedgerEntry_transactionId_account_key\" ON public.\"LedgerEntry\" USING btree (\"transactionId\", account)"
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_pkey",
+        "definition": "CREATE UNIQUE INDEX \"LedgerTransaction_pkey\" ON public.\"LedgerTransaction\" USING btree (id)"
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_reservation_idx",
+        "definition": "CREATE INDEX \"LedgerTransaction_reservation_idx\" ON public.\"LedgerTransaction\" USING btree (\"reservationId\")"
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_tenantId_kind_sourceKind_sourceId_key",
+        "definition": "CREATE UNIQUE INDEX \"LedgerTransaction_tenantId_kind_sourceKind_sourceId_key\" ON public.\"LedgerTransaction\" USING btree (\"tenantId\", kind, \"sourceKind\", \"sourceId\")"
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_tenant_currency_created_idx",
+        "definition": "CREATE INDEX \"LedgerTransaction_tenant_currency_created_idx\" ON public.\"LedgerTransaction\" USING btree (\"tenantId\", currency, \"createdAt\", id)"
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "LedgerTransaction_tenant_service_created_idx",
+        "definition": "CREATE INDEX \"LedgerTransaction_tenant_service_created_idx\" ON public.\"LedgerTransaction\" USING btree (\"tenantId\", \"serviceId\", \"createdAt\", id)"
+      },
+      {
+        "table": "PaymentEvent",
+        "name": "PaymentEvent_orderId_createdAt_idx",
+        "definition": "CREATE INDEX \"PaymentEvent_orderId_createdAt_idx\" ON public.\"PaymentEvent\" USING btree (\"orderId\", \"createdAt\")"
+      },
+      {
+        "table": "PaymentEvent",
+        "name": "PaymentEvent_pkey",
+        "definition": "CREATE UNIQUE INDEX \"PaymentEvent_pkey\" ON public.\"PaymentEvent\" USING btree (id)"
+      },
+      {
+        "table": "PaymentEvent",
+        "name": "PaymentEvent_providerEventId_key",
+        "definition": "CREATE UNIQUE INDEX \"PaymentEvent_providerEventId_key\" ON public.\"PaymentEvent\" USING btree (\"providerEventId\")"
+      },
+      {
+        "table": "PaymentMethod",
+        "name": "PaymentMethod_pkey",
+        "definition": "CREATE UNIQUE INDEX \"PaymentMethod_pkey\" ON public.\"PaymentMethod\" USING btree (id)"
+      },
+      {
+        "table": "PaymentMethod",
+        "name": "PaymentMethod_single_default",
+        "definition": "CREATE UNIQUE INDEX \"PaymentMethod_single_default\" ON public.\"PaymentMethod\" USING btree (\"tenantId\") WHERE (\"isDefault\" AND (status = 'active'::text))"
+      },
+      {
+        "table": "PaymentMethod",
+        "name": "PaymentMethod_tenantId_id_key",
+        "definition": "CREATE UNIQUE INDEX \"PaymentMethod_tenantId_id_key\" ON public.\"PaymentMethod\" USING btree (\"tenantId\", id)"
+      },
+      {
+        "table": "PaymentMethod",
+        "name": "PaymentMethod_tenantId_status_idx",
+        "definition": "CREATE INDEX \"PaymentMethod_tenantId_status_idx\" ON public.\"PaymentMethod\" USING btree (\"tenantId\", status)"
+      },
+      {
+        "table": "PaymentMethod",
+        "name": "PaymentMethod_tokenHash_key",
+        "definition": "CREATE UNIQUE INDEX \"PaymentMethod_tokenHash_key\" ON public.\"PaymentMethod\" USING btree (\"tokenHash\")"
+      },
+      {
+        "table": "PaymentOrder",
+        "name": "PaymentOrder_pkey",
+        "definition": "CREATE UNIQUE INDEX \"PaymentOrder_pkey\" ON public.\"PaymentOrder\" USING btree (id)"
+      },
+      {
+        "table": "PaymentOrder",
+        "name": "PaymentOrder_tenantId_id_key",
+        "definition": "CREATE UNIQUE INDEX \"PaymentOrder_tenantId_id_key\" ON public.\"PaymentOrder\" USING btree (\"tenantId\", id)"
+      },
+      {
+        "table": "PaymentOrder",
+        "name": "PaymentOrder_tenantId_methodId_idx",
+        "definition": "CREATE INDEX \"PaymentOrder_tenantId_methodId_idx\" ON public.\"PaymentOrder\" USING btree (\"tenantId\", \"methodId\")"
+      },
+      {
+        "table": "PaymentOrder",
+        "name": "PaymentOrder_tenantId_status_createdAt_idx",
+        "definition": "CREATE INDEX \"PaymentOrder_tenantId_status_createdAt_idx\" ON public.\"PaymentOrder\" USING btree (\"tenantId\", status, \"createdAt\")"
+      },
+      {
+        "table": "PaymentRefund",
+        "name": "PaymentRefund_order",
+        "definition": "CREATE INDEX \"PaymentRefund_order\" ON public.\"PaymentRefund\" USING btree (\"tenantId\", \"orderId\", status)"
+      },
+      {
+        "table": "PaymentRefund",
+        "name": "PaymentRefund_pkey",
+        "definition": "CREATE UNIQUE INDEX \"PaymentRefund_pkey\" ON public.\"PaymentRefund\" USING btree (id)"
+      },
+      {
+        "table": "PaymentRefund",
+        "name": "PaymentRefund_tenant_id",
+        "definition": "CREATE UNIQUE INDEX \"PaymentRefund_tenant_id\" ON public.\"PaymentRefund\" USING btree (\"tenantId\", id)"
+      }
+    ],
+    "triggers": [
+      {
+        "table": "BillingMonthClose",
+        "name": "BillingMonthClose_guard",
+        "definition": "CREATE TRIGGER \"BillingMonthClose_guard\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"BillingMonthClose\" FOR EACH ROW EXECUTE FUNCTION check_month_close()",
+        "function": "CREATE OR REPLACE FUNCTION public.check_month_close()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP<>'INSERT' THEN RAISE EXCEPTION 'MONTH_CLOSE_IMMUTABLE' USING ERRCODE='23514'; END IF;\n  IF NEW.\"month\" >= to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC','YYYY-MM')\n    THEN RAISE EXCEPTION 'MONTH_CLOSE_NOT_PAST' USING ERRCODE='23514'; END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "table": "BillingPlanVersion",
+        "name": "billing_plan_version_immutable",
+        "definition": "CREATE TRIGGER billing_plan_version_immutable BEFORE DELETE OR UPDATE ON public.\"BillingPlanVersion\" FOR EACH ROW EXECUTE FUNCTION billing_plan_version_immutable()",
+        "function": "CREATE OR REPLACE FUNCTION public.billing_plan_version_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'DELETE' THEN\n    IF NOT OLD.\"orderable\" AND NOT EXISTS (\n      SELECT 1 FROM \"BillingSubscription\" WHERE \"planVersionId\" = OLD.id\n    ) THEN\n      RETURN OLD;\n    END IF;\n  END IF;\n  RAISE EXCEPTION 'BILLING_PLAN_VERSION_IMMUTABLE';\nEND $function$\n"
+      },
+      {
+        "table": "BillingSubscription",
+        "name": "billing_subscription_guard",
+        "definition": "CREATE TRIGGER billing_subscription_guard BEFORE INSERT OR DELETE OR UPDATE ON public.\"BillingSubscription\" FOR EACH ROW EXECUTE FUNCTION billing_subscription_guard()",
+        "function": "CREATE OR REPLACE FUNCTION public.billing_subscription_guard()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE p \"BillingPlanVersion\";\nDECLARE utc_now timestamp := CURRENT_TIMESTAMP AT TIME ZONE 'UTC';\nBEGIN\n  IF TG_OP = 'DELETE' THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_DELETE_DENIED'; END IF;\n  SELECT * INTO p FROM \"BillingPlanVersion\" WHERE id=NEW.\"planVersionId\";\n  IF p.\"planId\"<>NEW.\"planId\" OR NEW.\"priceKrw\" IS DISTINCT FROM p.\"priceKrw\" OR NEW.currency<>p.currency\n    THEN RAISE EXCEPTION 'BILLING_PRICE_MISMATCH'; END IF;\n  IF TG_OP = 'INSERT' THEN\n    IF NEW.version<>1 OR (NEW.status='pending' AND (NOT p.orderable OR p.cycle='trial' OR p.\"effectiveFrom\">utc_now\n      OR (p.\"effectiveTo\" IS NOT NULL AND p.\"effectiveTo\"<=utc_now)))\n      OR (NEW.\"planId\"='trial' AND (p.cycle<>'trial' OR NEW.\"periodEnd\"<>NEW.\"periodStart\"+interval '7 days'))\n      OR (NEW.status='active' AND NOT EXISTS(SELECT 1 FROM \"PaymentOrder\" o WHERE o.\"subscriptionId\"=NEW.id\n        AND o.\"tenantId\"=NEW.\"tenantId\" AND o.status='paid' AND o.amount=NEW.\"priceKrw\" AND o.currency=NEW.currency))\n      THEN RAISE EXCEPTION 'BILLING_INVALID_SUBSCRIPTION'; END IF;\n  ELSE\n    IF NEW.version<>OLD.version+1 THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n    IF OLD.status='pending' AND NEW.status='active' THEN\n      IF (NEW.id,NEW.\"tenantId\",NEW.\"planId\",NEW.\"planVersionId\",NEW.\"priceKrw\",NEW.currency,NEW.\"createdAt\")\n        IS DISTINCT FROM (OLD.id,OLD.\"tenantId\",OLD.\"planId\",OLD.\"planVersionId\",OLD.\"priceKrw\",OLD.currency,OLD.\"createdAt\")\n        OR NEW.\"activationSource\"<>'payment' OR NEW.\"cancelAt\" IS NOT NULL\n        OR NEW.\"periodStart\" IS NULL OR NEW.\"periodEnd\" IS NULL OR NEW.\"periodEnd\"<=NEW.\"periodStart\"\n        OR NEW.\"periodStart\" > utc_now + interval '1 hour'\n        THEN RAISE EXCEPTION 'BILLING_INVALID_ACTIVATION'; END IF;\n      IF NOT EXISTS(SELECT 1 FROM \"PaymentOrder\" o WHERE o.\"subscriptionId\"=NEW.id AND o.\"tenantId\"=NEW.\"tenantId\"\n        AND o.status='paid' AND o.amount=NEW.\"priceKrw\" AND o.currency=NEW.currency)\n        THEN RAISE EXCEPTION 'BILLING_ACTIVATION_WITHOUT_PAYMENT'; END IF;\n    ELSIF OLD.status='active' AND NEW.status='active' THEN\n      -- 유료 해지 예약/철회: cancelAt만 변경 가능하며 예약은 미래·기간 내.\n      IF (NEW.id,NEW.\"tenantId\",NEW.\"planId\",NEW.\"planVersionId\",NEW.\"priceKrw\",NEW.currency,\n          NEW.\"periodStart\",NEW.\"periodEnd\",NEW.\"activationSource\",NEW.\"createdAt\") IS DISTINCT FROM\n         (OLD.id,OLD.\"tenantId\",OLD.\"planId\",OLD.\"planVersionId\",OLD.\"priceKrw\",OLD.currency,\n          OLD.\"periodStart\",OLD.\"periodEnd\",OLD.\"activationSource\",OLD.\"createdAt\")\n        THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n      IF NEW.\"cancelAt\" IS NOT NULL AND (NEW.\"cancelAt\"<=utc_now OR NEW.\"cancelAt\">OLD.\"periodEnd\")\n        THEN RAISE EXCEPTION 'BILLING_INVALID_CANCEL_SCHEDULE'; END IF;\n    ELSE\n      IF (NEW.id,NEW.\"tenantId\",NEW.\"planId\",NEW.\"planVersionId\",NEW.\"priceKrw\",NEW.currency,\n          NEW.\"periodStart\",NEW.\"periodEnd\",NEW.\"activationSource\",NEW.\"createdAt\") IS DISTINCT FROM\n         (OLD.id,OLD.\"tenantId\",OLD.\"planId\",OLD.\"planVersionId\",OLD.\"priceKrw\",OLD.currency,\n          OLD.\"periodStart\",OLD.\"periodEnd\",OLD.\"activationSource\",OLD.\"createdAt\")\n        THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n      IF OLD.status='pending' AND NEW.status='cancelled' THEN\n        IF NEW.\"cancelAt\" IS DISTINCT FROM OLD.\"cancelAt\" THEN RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n      ELSIF OLD.status='trialing' AND NEW.status='trialing' THEN\n        IF NEW.\"cancelAt\" IS NOT DISTINCT FROM OLD.\"cancelAt\"\n          OR (NEW.\"cancelAt\" IS NOT NULL AND (NEW.\"cancelAt\"<=utc_now OR NEW.\"cancelAt\">OLD.\"periodEnd\"))\n          OR LEAST(COALESCE(OLD.\"cancelAt\", OLD.\"periodEnd\"), OLD.\"periodEnd\")<=utc_now\n          THEN RAISE EXCEPTION 'BILLING_INVALID_CANCEL_SCHEDULE'; END IF;\n      ELSIF OLD.status='trialing' AND NEW.status='expired' THEN\n        IF NEW.\"cancelAt\" IS DISTINCT FROM OLD.\"cancelAt\" OR LEAST(COALESCE(OLD.\"cancelAt\", OLD.\"periodEnd\"), OLD.\"periodEnd\")>utc_now\n          THEN RAISE EXCEPTION 'BILLING_EARLY_EXPIRATION'; END IF;\n      ELSIF OLD.status='active' AND NEW.status='expired' THEN\n        IF NEW.\"cancelAt\" IS DISTINCT FROM OLD.\"cancelAt\" OR LEAST(COALESCE(OLD.\"cancelAt\", OLD.\"periodEnd\"), OLD.\"periodEnd\")>utc_now\n          THEN RAISE EXCEPTION 'BILLING_EARLY_EXPIRATION'; END IF;\n      ELSE RAISE EXCEPTION 'BILLING_SUBSCRIPTION_IMMUTABLE'; END IF;\n    END IF;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "table": "BillingSubscriptionEvent",
+        "name": "billing_subscription_event_guard",
+        "definition": "CREATE TRIGGER billing_subscription_event_guard BEFORE DELETE OR UPDATE ON public.\"BillingSubscriptionEvent\" FOR EACH ROW EXECUTE FUNCTION billing_subscription_event_guard()",
+        "function": "CREATE OR REPLACE FUNCTION public.billing_subscription_event_guard()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN IF TG_OP <> 'INSERT' THEN RAISE EXCEPTION 'BILLING_EVENT_IMMUTABLE'; END IF; RETURN NEW; END $function$\n"
+      },
+      {
+        "table": "CreditAccount",
+        "name": "credit_account_guard",
+        "definition": "CREATE TRIGGER credit_account_guard BEFORE INSERT OR DELETE OR UPDATE ON public.\"CreditAccount\" FOR EACH ROW EXECUTE FUNCTION credit_account_guard()",
+        "function": "CREATE OR REPLACE FUNCTION public.credit_account_guard()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'INSERT' THEN\n    IF NEW.available <> 0 OR NEW.held <> 0 THEN RAISE EXCEPTION 'CREDIT_ACCOUNT_INITIAL_BALANCE_DENIED'; END IF;\n    RETURN NEW;\n  END IF;\n  IF TG_OP = 'UPDATE' AND pg_trigger_depth() >= 2 THEN\n    IF (NEW.\"tenantId\",NEW.currency,NEW.\"createdAt\") IS DISTINCT FROM (OLD.\"tenantId\",OLD.currency,OLD.\"createdAt\")\n      THEN RAISE EXCEPTION 'CREDIT_ACCOUNT_IDENTITY_IMMUTABLE'; END IF;\n    RETURN NEW;\n  END IF;\n  RAISE EXCEPTION 'CREDIT_ACCOUNT_DIRECT_CHANGE_DENIED';\nEND $function$\n"
+      },
+      {
+        "table": "LedgerEntry",
+        "name": "ledger_entry_guard",
+        "definition": "CREATE TRIGGER ledger_entry_guard BEFORE INSERT OR DELETE OR UPDATE ON public.\"LedgerEntry\" FOR EACH ROW EXECUTE FUNCTION ledger_entry_guard()",
+        "function": "CREATE OR REPLACE FUNCTION public.ledger_entry_guard()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  IF TG_OP = 'INSERT' AND pg_trigger_depth() >= 2 THEN RETURN NEW; END IF;\n  RAISE EXCEPTION 'LEDGER_ENTRY_DIRECT_CHANGE_DENIED';\nEND $function$\n"
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "ledger_transaction_immutable",
+        "definition": "CREATE TRIGGER ledger_transaction_immutable BEFORE DELETE OR UPDATE ON public.\"LedgerTransaction\" FOR EACH ROW EXECUTE FUNCTION ledger_transaction_immutable()",
+        "function": "CREATE OR REPLACE FUNCTION public.ledger_transaction_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN RAISE EXCEPTION 'LEDGER_TRANSACTION_IMMUTABLE'; END $function$\n"
+      },
+      {
+        "table": "LedgerTransaction",
+        "name": "post_ledger_transaction",
+        "definition": "CREATE TRIGGER post_ledger_transaction AFTER INSERT ON public.\"LedgerTransaction\" FOR EACH ROW EXECUTE FUNCTION post_ledger_transaction()",
+        "function": "CREATE OR REPLACE FUNCTION public.post_ledger_transaction()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE balance \"CreditAccount\"; hold \"LedgerTransaction\"; settled bigint; debit_account text; credit_account text;\nBEGIN\n  INSERT INTO \"CreditAccount\" (\"tenantId\",currency) VALUES (NEW.\"tenantId\",NEW.currency)\n    ON CONFLICT (\"tenantId\",currency) DO NOTHING;\n  SELECT * INTO balance FROM \"CreditAccount\"\n    WHERE \"tenantId\"=NEW.\"tenantId\" AND currency=NEW.currency FOR UPDATE;\n\n  IF NEW.kind = 'funding' THEN\n    debit_account := 'external'; credit_account := 'available';\n    UPDATE \"CreditAccount\" SET available=available+NEW.amount,\"updatedAt\"=CURRENT_TIMESTAMP\n      WHERE \"tenantId\"=NEW.\"tenantId\" AND currency=NEW.currency;\n  ELSIF NEW.kind = 'refund' THEN\n    IF balance.available < NEW.amount THEN RAISE EXCEPTION 'REFUND_EXCEEDS_BALANCE' USING ERRCODE='23514'; END IF;\n    debit_account := 'available'; credit_account := 'external';\n    UPDATE \"CreditAccount\" SET available=available-NEW.amount,\"updatedAt\"=CURRENT_TIMESTAMP\n      WHERE \"tenantId\"=NEW.\"tenantId\" AND currency=NEW.currency;\n  ELSIF NEW.kind = 'reserve' THEN\n    IF balance.available < NEW.amount THEN RAISE EXCEPTION 'CREDIT_INSUFFICIENT'; END IF;\n    debit_account := 'available'; credit_account := 'held';\n    UPDATE \"CreditAccount\" SET available=available-NEW.amount,held=held+NEW.amount,\"updatedAt\"=CURRENT_TIMESTAMP\n      WHERE \"tenantId\"=NEW.\"tenantId\" AND currency=NEW.currency;\n  ELSE\n    SELECT * INTO hold FROM \"LedgerTransaction\" WHERE id=NEW.\"reservationId\" FOR SHARE;\n    IF NOT FOUND OR hold.kind <> 'reserve' OR hold.\"tenantId\" <> NEW.\"tenantId\" OR hold.currency <> NEW.currency\n      OR hold.\"serviceId\" <> NEW.\"serviceId\" THEN RAISE EXCEPTION 'CREDIT_RESERVATION_MISMATCH'; END IF;\n    SELECT COALESCE(SUM(amount),0) INTO settled FROM \"LedgerTransaction\"\n      WHERE \"reservationId\"=NEW.\"reservationId\" AND kind IN ('capture','release');\n    IF settled > hold.amount OR balance.held < NEW.amount THEN RAISE EXCEPTION 'CREDIT_RESERVATION_EXCEEDED'; END IF;\n    debit_account := 'held';\n    IF NEW.kind = 'capture' THEN\n      credit_account := 'spent';\n      UPDATE \"CreditAccount\" SET held=held-NEW.amount,\"updatedAt\"=CURRENT_TIMESTAMP\n        WHERE \"tenantId\"=NEW.\"tenantId\" AND currency=NEW.currency;\n    ELSE\n      credit_account := 'available';\n      UPDATE \"CreditAccount\" SET held=held-NEW.amount,available=available+NEW.amount,\"updatedAt\"=CURRENT_TIMESTAMP\n        WHERE \"tenantId\"=NEW.\"tenantId\" AND currency=NEW.currency;\n    END IF;\n  END IF;\n\n  INSERT INTO \"LedgerEntry\" (\"transactionId\",currency,account,amount) VALUES\n    (NEW.id,NEW.currency,debit_account,-NEW.amount),\n    (NEW.id,NEW.currency,credit_account,NEW.amount);\n  RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "table": "PaymentMethod",
+        "name": "PaymentMethod_guard",
+        "definition": "CREATE TRIGGER \"PaymentMethod_guard\" BEFORE INSERT OR UPDATE ON public.\"PaymentMethod\" FOR EACH ROW EXECUTE FUNCTION check_payment_method()",
+        "function": "CREATE OR REPLACE FUNCTION public.check_payment_method()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n IF TG_OP='UPDATE' AND (NEW.\"tenantId\" IS DISTINCT FROM OLD.\"tenantId\" OR NEW.\"tokenHash\" IS DISTINCT FROM OLD.\"tokenHash\" OR NEW.\"tokenCipher\" IS DISTINCT FROM OLD.\"tokenCipher\" OR NEW.\"provider\" IS DISTINCT FROM OLD.\"provider\")\n THEN RAISE EXCEPTION 'immutable payment method token' USING ERRCODE='23514'; END IF;\n IF NEW.\"isDefault\" AND NEW.\"status\"<>'active' THEN RAISE EXCEPTION 'default must be active' USING ERRCODE='23514'; END IF;\n RETURN NEW;\nEND $function$\n"
+      },
+      {
+        "table": "PaymentRefund",
+        "name": "PaymentRefund_guard",
+        "definition": "CREATE TRIGGER \"PaymentRefund_guard\" BEFORE INSERT OR DELETE OR UPDATE ON public.\"PaymentRefund\" FOR EACH ROW EXECUTE FUNCTION check_payment_refund()",
+        "function": "CREATE OR REPLACE FUNCTION public.check_payment_refund()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE o \"PaymentOrder\"; refunded_total bigint;\nBEGIN\n  IF TG_OP='DELETE' THEN RAISE EXCEPTION 'PAYMENT_REFUND_DELETE_DENIED' USING ERRCODE='23514'; END IF;\n  SELECT * INTO o FROM \"PaymentOrder\" WHERE id=NEW.\"orderId\" AND \"tenantId\"=NEW.\"tenantId\" FOR SHARE;\n  IF NOT FOUND OR o.status<>'paid' OR o.currency<>NEW.currency THEN RAISE EXCEPTION 'PAYMENT_REFUND_ORDER_INVALID' USING ERRCODE='23514'; END IF;\n  IF TG_OP='INSERT' THEN\n    IF NEW.status<>'requested' OR NEW.version<>1 OR NEW.\"providerRef\" IS NOT NULL THEN RAISE EXCEPTION 'PAYMENT_REFUND_STARTS_REQUESTED' USING ERRCODE='23514'; END IF;\n    SELECT COALESCE(SUM(amount),0) INTO refunded_total FROM \"PaymentRefund\"\n      WHERE \"orderId\"=NEW.\"orderId\" AND \"tenantId\"=NEW.\"tenantId\" AND status IN ('requested','refunded');\n    IF refunded_total + NEW.amount > o.amount THEN RAISE EXCEPTION 'REFUND_EXCEEDS_PAID' USING ERRCODE='23514'; END IF;\n  ELSE\n    IF NEW.version<>OLD.version+1 OR\n      (NEW.id,NEW.\"tenantId\",NEW.\"orderId\",NEW.amount,NEW.currency,NEW.\"createdAt\") IS DISTINCT FROM\n      (OLD.id,OLD.\"tenantId\",OLD.\"orderId\",OLD.amount,OLD.currency,OLD.\"createdAt\")\n      THEN RAISE EXCEPTION 'PAYMENT_REFUND_IMMUTABLE' USING ERRCODE='23514'; END IF;\n    IF NOT (OLD.status='requested' AND NEW.status IN ('refunded','rejected'))\n      THEN RAISE EXCEPTION 'PAYMENT_REFUND_TERMINAL' USING ERRCODE='23514'; END IF;\n    IF NEW.reason IS DISTINCT FROM OLD.reason THEN RAISE EXCEPTION 'PAYMENT_REFUND_IMMUTABLE' USING ERRCODE='23514'; END IF;\n    IF OLD.status='requested' AND NEW.status='refunded' THEN\n      IF NEW.\"providerRef\" IS NULL THEN RAISE EXCEPTION 'PAYMENT_REFUND_NEEDS_PROVIDER' USING ERRCODE='23514'; END IF;\n      SELECT COALESCE(SUM(amount),0) INTO refunded_total FROM \"PaymentRefund\"\n        WHERE \"orderId\"=NEW.\"orderId\" AND \"tenantId\"=NEW.\"tenantId\" AND status='refunded' AND id<>NEW.id;\n      IF refunded_total + NEW.amount > o.amount THEN RAISE EXCEPTION 'REFUND_EXCEEDS_PAID' USING ERRCODE='23514'; END IF;\n    END IF;\n    IF NEW.status='rejected' AND NEW.\"providerRef\" IS NULL THEN RAISE EXCEPTION 'PAYMENT_REFUND_NEEDS_PROVIDER' USING ERRCODE='23514'; END IF;\n  END IF;\n  RETURN NEW;\nEND $function$\n"
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T01:24:30.819966+00:00",
+  "runtime": "Node 24.19.0",
+  "typecheck": {
+    "exitCode": 0,
+    "config": ".local/r07-extra-tsconfig.json",
+    "includes": "src, SSO tests and QA scripts"
+  },
+  "lint": {
+    "exitCode": 0,
+    "errors": 0,
+    "warnings": 4,
+    "note": "Existing AuthPages img warnings"
+  },
+  "build": {
+    "exitCode": 0,
+    "staticPages": 83,
+    "directory": ".next-r07-signup",
+    "compiler": "Next 16.3.8 Turbopack"
+  },
+  "regression": "signup-verification-summary.json",
+  "worker": "../../R07-T04/signup/worker-restart.json",
+  "sourceHashes": {
+    "src/server/sso.ts": "56089da82c3ccaff4ccf79948d0eb9265006c13de1c16f980181add197c2c4db",
+    "src/server/sso-signup.ts": "1aa7151655424c95ab3a727308a990a3c9df748d1e51a100194142304984c15a",
+    "src/contracts/sso-signup.ts": "5949c250fa07b811c98c33c9ff738150f76f2727968d6e761c89527a9ba57ea8",
+    "src/components/auth/SsoSignup.tsx": "1ad2c8d17eb04f6daef2677a90b5602daf244317dbadee1d55928d0ad7067faf",
+    "src/components/auth/AuthPages.tsx": "75219bf98ba5dacf42d7431347e453973558fb375f8b7e2cf745699fb9a4472c",
+    "src/components/LegalPages.tsx": "defe3fa11dc19b9e6dc7c0f2329d0284057741564bb049e041e6d0e12bd900d1",
+    "scripts/worker.ts": "927e34f8e9c8c9e8be7d8b0b7d12d01f1aac1750aff297dd8536605b590cd27b",
+    "scripts/qa-r07-signup-worker.ts": "f905ea37e086338a870299456acf7cb1887a8ce557f5ba4cc712f1dfde47b845",
+    "prisma/schema.prisma": "1a3a98727ef838bfaf1ec298f9dc43ddf72a46ba35359c30e49e5a5530f8973c",
+    "prisma/migrations/20261025030000_sso_signup_consent/migration.sql": "c6a0c6de038dbcb7de455d2dfac3b7ba22f5df62fa5a33d016fce1b015740c30"
+  }
+}
