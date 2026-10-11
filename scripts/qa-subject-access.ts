@@ -10,10 +10,10 @@ import { subjectHashes } from "../src/server/subject-identity";
 import { enqueueServiceMail } from "../src/server/jobs";
 import type { SubjectConsent, SubjectEvent, SubjectPage, SubjectSessionInfo, SubjectWithdrawalRecord } from "../src/contracts/subjects";
 
-const origin = new URL(env.BETTER_AUTH_URL).origin, database = new URL(env.DATABASE_URL), phase = process.argv[2];
-assert.equal(origin, "http://localhost:3100"); assert.equal(database.pathname, "/catchsecu_dev"); assert(["localhost", "127.0.0.1"].includes(database.hostname));
+const origin = new URL(process.env.QA_ORIGIN ?? env.BETTER_AUTH_URL).origin, database = new URL(env.DATABASE_URL), phase = process.argv[2];
+assert(["localhost", "127.0.0.1"].includes(new URL(origin).hostname)); assert.equal(database.pathname, "/catchsecu_dev"); assert(["localhost", "127.0.0.1"].includes(database.hostname));
 assert.equal(env.MAIL_TRANSPORT, "local"); assert(["prepare", "finish", "database"].includes(phase));
-const output = "docs/qa/P06-T05/", checkpoint = ".local/p06-subject-access-checkpoint.json", cases: { label: string; status: number }[] = [];
+const output = process.env.QA_OUT ?? "docs/qa/P06-T05/", checkpoint = ".local/p06-subject-access-checkpoint.json", cases: { label: string; status: number }[] = [];
 const hash = (value: string) => createHash("sha256").update(value).digest("hex"), digest = (value: unknown) => hash(JSON.stringify(value));
 type State = { email: string; password: string; userId: string; companyId: string; serviceId: string; otherServiceId: string; formId: string;
   first: string; second: string; secret: string; subjectName: string; subjectEmail: string; otherName: string; otherEmail: string;

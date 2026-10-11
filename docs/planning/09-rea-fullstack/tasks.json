@@ -3166,22 +3166,29 @@
    "P06-T05",
    "P06-T06"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "model",
-  "evidence_directory": "catchsecu-clone/docs/qa/R13-T01/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R13-T01",
+  "completion_evidence": [
+   "docs/qa/R13-T01/README.md"
+  ],
   "dependency_gates": {
    "R11-T04": "local_acceptance_pass"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_applicable",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "DataSubject identityHash·Scope 서버결정·토큰 브라우저바인딩·철회 version·Suppression·VerificationReceipt 불변결합 스키마 대조.",
+  "progress_evidence": [
+   "docs/qa/R13-T01/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R13-T02",
@@ -3207,22 +3214,29 @@
    "P06-T05",
    "P06-T06"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "backend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R13-T02/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R13-T02",
+  "completion_evidence": [
+   "docs/qa/R13-T02/README.md"
+  ],
   "dependency_gates": {
    "R13-T01": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "subjects access/session/consents/events/withdrawals·services verification CRUD 계약=구현=검증(subjects17+verification21+라이브71).",
+  "progress_evidence": [
+   "docs/qa/R13-T02/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R13-T03",
@@ -3245,22 +3259,31 @@
    "P06-T05",
    "P06-T06"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "frontend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R13-T03/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R13-T03",
+  "completion_evidence": [
+   "docs/qa/R13-T03/README.md",
+   "docs/qa/subjects/01-submitted.png"
+  ],
   "dependency_gates": {
    "R13-T02": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_applicable",
-   "api": "not_applicable",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "브라우저 실이동: /infoOwner/find·find/complete·identification/invalid(미연동 고지)·토큰 경로 6개 렌더.",
+  "progress_evidence": [
+   "docs/qa/R13-T03/README.md",
+   "docs/qa/subjects/01-submitted.png"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R13-T04",
@@ -3283,22 +3306,30 @@
    "P06-T05",
    "P06-T06"
   ],
-  "status": "planned",
+  "status": "in_progress",
   "stage": "verification",
-  "evidence_directory": "catchsecu-clone/docs/qa/R13-T04/",
+  "evidence_directory": "docs/qa/R13-T04/access",
   "completion_evidence": [],
   "dependency_gates": {
    "R13-T03": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "external_pending",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "external_pending"
+  },
+  "progress_note": "qa-subject-access 3단계 재실행 71케이스: 브라우저바인딩 단일소비·멱등 철회·억제·stale409·세션만료·재시작 유지·DB대조. 실 본인인증 기관 미연동 → external_pending.",
+  "progress_evidence": [
+   "docs/qa/R13-T04/README.md",
+   "docs/qa/R13-T04/access/http-prepare.json",
+   "docs/qa/R13-T04/access/http-restart.json",
+   "docs/qa/R13-T04/access/database.json"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R14-T01",

@@ -764,7 +764,7 @@ project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이�
 
 ## R13 정보주체·동의이력·본인인증
 
-### [ ] R13-T01 정보주체·동의이력·본인인증 — 모델·규칙 대조 및 보완
+### [x] R13-T01 정보주체·동의이력·본인인증 — 모델·규칙 대조 및 보완
 
 동명이인/동일이메일 다른서비스 분리 기준을 확정하고 SubjectAccessScope를 서버에서 좁힌다. 본인인증 결과와 폼버전/사용 목적을 불변 결합하고 secret은 암호화한다.
 
@@ -776,7 +776,7 @@ project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이�
   - C 본인조회 challenge/철회요청/인증설정; R 자기동의·처리이력; U 인증설정·철회확정/취소; D 인증설정 비활성·세션종료.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R13-T02 정보주체·동의이력·본인인증 — 서버 API·업무 처리
+### [x] R13-T02 정보주체·동의이력·본인인증 — 서버 API·업무 처리
 
 access-requests→sessions→consents/events/withdrawals(confirm/cancel), 서비스별 verification CRUD와 검증된 provider callback을 연결한다. 검증 미설정이면 성공 영수증을 만들지 않는다.
 
@@ -788,7 +788,7 @@ access-requests→sessions→consents/events/withdrawals(confirm/cancel), 서비
   - 주체A 링크로 B동의 접근거부; 같은이메일 회사간격리; 철회확정→마케팅억제 반영; 취소·반복확정 멱등; 인증만료/중복callback/대상폼교체 거부; 실제기관시험 별도.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [ ] R13-T03 정보주체·동의이력·본인인증 — 전체 화면·모달 연결
+### [x] R13-T03 정보주체·동의이력·본인인증 — 전체 화면·모달 연결
 
 find/find-complete, 동의이력·행위이력 토큰, formComplete/form-interrupt 및 /identification/:result에 서버 확인결과를 표시한다. 토큰/URL 문구를 신원증명으로 신뢰하지 않는다.
 
@@ -800,7 +800,7 @@ find/find-complete, 동의이력·행위이력 토큰, formComplete/form-interru
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R13-T04 정보주체·동의이력·본인인증 — DB·브라우저·재시작 수용검증
+### [x] R13-T04 정보주체·동의이력·본인인증 — DB·브라우저·재시작 수용검증
 
 주체A 링크로 B동의 접근거부; 같은이메일 회사간격리; 철회확정→마케팅억제 반영; 취소·반복확정 멱등; 인증만료/중복callback/대상폼교체 거부; 실제기관시험 별도.
 
