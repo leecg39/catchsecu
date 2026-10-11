@@ -1,4 +1,8 @@
-## 최신 작업: R24 공지·도움말·문의·공통 경로 — 완료 (외부 제공사 없음)
+## 최신 작업: R25 전체 통합·최종 수용 — 로컬 수용 완료·외부 제공사 pending
+
+2026-10-14 R25 도메인 완료. T01 전 경로 스윕(`passed_with_skips`): 186경로 중 161 검사 전부 통과(0실패), fixture 불가 25경로 사유기록 — 의도된 리다이렉트·인증게이트(401/410/422)·와일드카드 404는 정상거동 주석, 레이트리밋 일시 5xx는 2패스 쿨다운으로 실제 결함과 구분. T02 교차흐름 7단계 PASS(폼게시→제출동의→공유열람→캠페인발송→과금원장→철회파기→감사통계). T03 제공사 등록 11건: Solapi 읽기전용 계정인증 external_verified 1·external_blocked 7(SMTP·카카오·PG·웹훅·S3·IdP·본인확인)·local_verified 3 — 잔액0으로 발송receipt 없음을 명시. T04 운영런북 4단계 PASS(레거시 dry-run 격리·migration 상태·만료lease 회수 done·백업복원 131테이블 지문). T05 a11y 10p 통과(랜드마크·레이블100%·alert·Tab·390px 무오버플로)·목록API 5종 중앙값21~58ms·원본대조 153건(similar115/close13/diverged25 — 100%일치 미주장). T06 최종 보고 `local_acceptance_complete__external_provider_pending` — 전체완료 미주장, 표면별 제약·재현명령·백업자료 집계. 공식 완료85/진행22(전부 external_pending)·계획0. plan verifier passed. [최종보고](../../docs/qa/R25-T06/README.md).
+
+## 이전 작업: R24 공지·도움말·문의·공통 경로 — 완료 (외부 제공사 없음)
 
 2026-10-14 R24 도메인 완료. T01 모델 대조: Notice(bodyHtml sanitize·sortOrder·version 낙관잠금)→NoticeAttachment(active/deleting·sha256 선언검증·최대10)→Guide(categoryOrder/sortOrder·PDF 필수 FILE_REQUIRED)→SupportTicket(tenantId+authorId·*Cipher 암호화·submitted→answered→closed→reopen). 원본 미관측 관리자 authoring 경로를 독립운영 부가화면으로 개별 등록(/admin/notices·guides·support, /my-page/support). T02 API: platformAdmin vs 회원 published 경계·if-match 버전·멱등키·scope=mine/admin 문의 소유권. T03: /·/IE·/loading→dashboard·access-not-allow 사유별 문구·/security 실시간 점검·와일드카드는 registered-page allowlist에서 명시 제외(/security/bogus·임의경로 404)·새로고침/뒤로앞으로/키보드스킵링크/모바일375 테이블 래퍼 스크롤. T04 수용 5케이스(qa-r24-acceptance): 초안404→게시→구버전409→보관404·첨부해시일치+회원업로드403·회원CRUD/admin-scope 403·가이드 PDF게시+다운로드·문의 답변→종결→회원재개403→운영자재개→테넌트B 404. 재시작 영속(replyCipher·answeredAt). T01~T04 completed·외부 not_applicable. 공식 완료80/진행22/계획5. [수용](../../docs/qa/R24-T04/README.md).
 

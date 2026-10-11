@@ -1,3 +1,18 @@
+# 2026-10-14 R25 최종 수용 — 로컬 수용 완료·외부 제공사 pending
+
+107개 활성 작업 전수 검토 종료: **completed 85 · in_progress 22 · planned 0**. in_progress 22개는 전부 `local verified + external_pending`(내부 구현·로컬 증거 완료, 공식 공급자 증거만 잔여). 레거시 72개 매핑 완료, `scripts/verify-plan-integration.ts` **passed**.
+
+- R25-T01 경로 스윕 `passed_with_skips`: 186경로 중 161 검사 전부 통과(0 실패), fixture 불가 25 스킵 사유 기록. [검증](qa/R25-T01/README.md)
+- R25-T02 전 도메인 교차 흐름 7단계 PASS. [검증](qa/R25-T02/README.md)
+- R25-T03 제공사 11건 등록: external_verified 1(Solapi 계정인증)·external_blocked 7·local_verified 3 — 발송 receipt 미검증 명시. [등록](qa/R25-T03/README.md)
+- R25-T04 이관·마이그레이션·워커 회수·백업복구 4단계 PASS. [런북](qa/R25-T04/README.md)
+- R25-T05 접근성 10p·성능 5API·원본대조 153건(similar115/close13/diverged25, 100%일치 미주장). [검증](qa/R25-T05/README.md)
+- R25-T06 최종 보고 `local_acceptance_complete__external_provider_pending` — 전체 완료 아님. [보고](qa/R25-T06/README.md)
+
+외부 공급사 잔여 7건(SMTP·카카오 알림톡·결제 PG·Slack/Teams 웹훅·S3·외부 IdP·PASS 본인확인)은 staging 자격증명 확보 시 동일 스크립트로 재측정한다.
+
+---
+
 # 2026-10-10 최신 전체 계획 구현 중
 
 R08 F4 저장 실패·회사 전환 보호 하위 범위를 완료했다. 폼 초안의 저장 중·실패·충돌·검증 실패를 공통 이탈 보호에 연결했다. 집중24개·관련97개·타입·변경 린트·production82페이지를 통과했고 Ego Lite에서 서버 중단, 페이지2 수정, 회사 전환 경고, 입력 유지, 재시작·저장 재시도, 회사 전환·복귀·재열기를 확인했다. PostgreSQL은 폼 버전2·편집 버전1·페이지2개·초안 감사1·회사 선택 감사2를 확인했다. [검증](qa/R08-T02/page-save-company-switch/README.md). F3/F5/F6/F7과 외부 공급자 검증이 남아 공식0/53/54를 유지한다.

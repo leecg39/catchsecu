@@ -1,0 +1,99 @@
+{
+  "checkedAt": "2026-10-11T15:47:18.701Z",
+  "summary": {
+    "providers": 11,
+    "externalVerified": 1,
+    "externalBlocked": 7,
+    "localVerified": 3
+  },
+  "rows": [
+    {
+      "provider": "smtp-mail",
+      "mode": "local",
+      "credentials": "n/a",
+      "localEvidence": "R18-T04 local mail dir delivery + suppression/feedback",
+      "verdict": "external_blocked",
+      "note": "로컬 어댑터만 검증됨. 실제 SMTP 계정·수신 사서함 확보 시 relay 수신 증거 필요"
+    },
+    {
+      "provider": "sms-solapi",
+      "mode": "solapi",
+      "credentials": "present",
+      "localEvidence": "R17-T04 local_delivered + sender lifecycle",
+      "verdict": "external_verified",
+      "note": "실계정 인증 성공 accountId=26071757959806 balance=0 point=228 — 잔액0으로 실발송 불가, 발송/수신 receipt는 별도 증거 필요"
+    },
+    {
+      "provider": "kakao-alimtalk",
+      "mode": "unconfigured",
+      "credentials": "n/a",
+      "localEvidence": "R19-T04 local provider + template review + SMS fallback",
+      "verdict": "external_blocked",
+      "note": "실제 카카오 비즈채널/검수 프로바이더 어댑터 없음(KAKAO_PROVIDER enum에 실제 provider 부재). 계정 연동 시 어댑터 추가 필요"
+    },
+    {
+      "provider": "payment-pg",
+      "mode": "local",
+      "credentials": "n/a",
+      "localEvidence": "local virtual-PG signed events through real verify path",
+      "verdict": "external_blocked",
+      "note": "실제 PG 계약·결제/취소환불 receipt 증거 필요. local mock은 ALLOW_LOCAL_PAYMENT 게이트"
+    },
+    {
+      "provider": "notification-webhook",
+      "mode": "local",
+      "credentials": "present",
+      "localEvidence": "R20-T04 local file transport + exact-1 delivery + disable-cancel",
+      "verdict": "external_blocked",
+      "note": "등록 엔드포인트 slack@hooks.slack.com,teams@null,teams@example.invalid,slack@null — 실 workspace webhook 수신 증거 필요"
+    },
+    {
+      "provider": "file-storage-s3",
+      "mode": "local",
+      "credentials": "n/a",
+      "localEvidence": "R11/R14 local PRIVATE_STORAGE_DIR + quota + hash",
+      "verdict": "external_blocked",
+      "note": "FILE_STORAGE=local, 실버킷 미확보"
+    },
+    {
+      "provider": "identity-idp",
+      "mode": "allow_local_sso=1",
+      "credentials": "present",
+      "localEvidence": "R07-T04 local IdP fixture + failure-code matrix + provider lifecycle + re-auth gate",
+      "verdict": "external_blocked",
+      "note": "외부 issuer 5건(https://accounts.google.com) — 실 IdP 인증 왕복 증거 필요"
+    },
+    {
+      "provider": "identity-verification",
+      "mode": "app",
+      "credentials": "absent",
+      "localEvidence": "R13-T04 local identity-provider adapter",
+      "verdict": "external_blocked",
+      "note": "실 본인인증 기관 계약·callback 증거 필요"
+    },
+    {
+      "provider": "sender-dns",
+      "mode": "system",
+      "credentials": "n/a",
+      "localEvidence": "R17/R18 DNS fixture → verified sender",
+      "verdict": "local_verified",
+      "note": "시스템 DNS 사용"
+    },
+    {
+      "provider": "file-scan-clamav",
+      "mode": "daemon",
+      "credentials": "n/a",
+      "localEvidence": "R11-T04 real upload scan",
+      "verdict": "local_verified",
+      "note": "socket=/Users/user01/.cache/catchsecu-clamav/95226d5f/clamd.sock — 실 스캔 데몬(R11 업로드 경로에서 검증)"
+    },
+    {
+      "provider": "prod-local-adapter-guard",
+      "mode": "enforced",
+      "credentials": "n/a",
+      "localEvidence": "env.ts NODE_ENV=production guards + live subprocess boot-block",
+      "verdict": "local_verified",
+      "note": "BLOCKED: Error: 운영 환경은 SMTP 설정이 필요합니다. 로컬 미리보기만 ALLOW_LOCAL_MAIL=1을 사용하세요."
+    }
+  ]
+}

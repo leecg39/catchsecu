@@ -1,0 +1,57 @@
+{
+  "result": "PASS",
+  "checkedAt": "2026-10-11T15:40:46.714Z",
+  "results": [
+    {
+      "step": "legacy-dryrun",
+      "detail": {
+        "dryApplied": false,
+        "secretsRejected": [
+          {
+            "section": "profile",
+            "field": "api_key"
+          },
+          {
+            "section": "profile",
+            "field": "password"
+          }
+        ],
+        "unknown": [
+          "unknownSection"
+        ],
+        "applied": true,
+        "audited": true
+      }
+    },
+    {
+      "step": "migration-state",
+      "detail": {
+        "applied": 151,
+        "rolledBack": [
+          "20261002143000_private_files",
+          "20261003050000_campaign_delivery_lifecycle",
+          "20261004110000_verification_foundation"
+        ],
+        "stuck": 0
+      }
+    },
+    {
+      "step": "worker-crash-recovery",
+      "detail": {
+        "jobType": "mail",
+        "reclaimed": true,
+        "finalStatus": "done",
+        "attempts": 1
+      }
+    },
+    {
+      "step": "backup-recovery-evidence",
+      "detail": {
+        "backup": true,
+        "restore": true,
+        "digestTables": 131,
+        "envKey": true
+      }
+    }
+  ]
+}

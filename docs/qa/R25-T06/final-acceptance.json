@@ -1,0 +1,94 @@
+{
+  "checkedAt": "2026-10-11T16:19:59.016303+00:00",
+  "verdict": "local_acceptance_complete__external_provider_pending",
+  "honestNote": "전체 완료 아님 — 외부 공급사 7건 자격증명 대기로 external_pending 유지. Solapi는 읽기 전용 계정인증만 확인(잔액0으로 발송receipt 없음).",
+  "tasks": {
+    "total": 107,
+    "byStatus": {
+      "completed": 84,
+      "in_progress": 22,
+      "planned": 1
+    },
+    "inProgressAreExternalPendingOnly": true,
+    "inProgressIds": [
+      "R02-T04",
+      "R04-T04",
+      "R05-T04",
+      "R06-T04",
+      "R07-T02",
+      "R07-T03",
+      "R07-T04",
+      "R08-T02",
+      "R08-T03",
+      "R08-T04",
+      "R10-T04",
+      "R11-T04",
+      "R12-T04",
+      "R13-T04",
+      "R15-T04",
+      "R17-T04",
+      "R18-T04",
+      "R19-T04",
+      "R20-T04",
+      "R21-T04",
+      "R22-T04",
+      "R25-T03"
+    ]
+  },
+  "surfaces": {
+    "routeSweep": {
+      "result": "passed_with_skips",
+      "expected": 186,
+      "checked": 161,
+      "fixtureSkipped": 25,
+      "failed": 0
+    },
+    "crossFlow": {
+      "result": "PASS",
+      "steps": 7
+    },
+    "providers": {
+      "providers": 11,
+      "externalVerified": 1,
+      "externalBlocked": 7,
+      "localVerified": 3
+    },
+    "opsRunbook": {
+      "result": "PASS",
+      "steps": 4
+    },
+    "ui": {
+      "a11yPages": 10,
+      "a11yAllPass": true,
+      "perfTargets": 5,
+      "perfAllPass": true,
+      "sourceRefs": 153,
+      "sourceVerdicts": {
+        "similar": 115,
+        "close": 13,
+        "diverged": 25
+      }
+    }
+  },
+  "externalPending": [
+    "smtp-mail",
+    "kakao-alimtalk",
+    "payment-pg",
+    "notification-webhook",
+    "file-storage-s3",
+    "identity-idp",
+    "identity-verification"
+  ],
+  "externalVerified": [
+    "sms-solapi"
+  ],
+  "reproduce": {
+    "sweep": "QA_ORIGIN=http://localhost:3121 node --env-file=.env.local --import tsx scripts/qa-full-page-gate.ts",
+    "crossFlow": "QA_ORIGIN=http://localhost:3121 SMS_TRANSPORT=local node --env-file=.env.local --import tsx scripts/qa-r25-cross-flow.ts",
+    "providers": "QA_ORIGIN=http://localhost:3121 node --env-file=.env.local --import tsx scripts/qa-r25-external-providers.ts",
+    "ops": "QA_ORIGIN=http://localhost:3121 node --env-file=.env.local --import tsx scripts/qa-r25-ops-runbook.ts",
+    "ui": "QA_ORIGIN=http://localhost:3121 node --env-file=.env.local --import tsx scripts/qa-r25-ui-final.ts",
+    "planVerify": "node --env-file=.env.local --import tsx scripts/verify-plan-integration.ts"
+  },
+  "backupRestore": "docs/qa/R01-T01/db-rehearsal/ (09-backup.log·10-restore.log·restored-table-digests.json 131 tables)"
+}
