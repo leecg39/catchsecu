@@ -2531,18 +2531,22 @@
       "P05-T04",
       "P03-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "model",
     "evidence_directory": "catchsecu-clone/docs/qa/R10-T01/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R10-T01/source-field-audit/README.md",
+      "docs/qa/R10-T01/structured-policy/README.md",
+      "docs/qa/R10-T01/public-recipient-snapshots/README.md"
+    ],
     "dependency_gates": {
       "R03-T04": "local_acceptance_pass",
       "R06-T04": "local_acceptance_pass"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
-    "progress_note": "게시 수탁자 출처 보존에 이어 DocumentPolicyDraft·복합FK·유형 guard·DTO 구현. dev103→104에서 기존7테이블 hash 보존. 원본102필드 중98개 정규화·수탁유형2개 부모 구분; 초기화 배열2개 서비스 전체 항목에 연결·재수탁자 항목/근거 추가·과거JSON 모양 보존. 원본 전체 동등성은 계속 검토.",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "partial_observed",
+    "progress_note": "5모델 문서 스키마 대조 + DocumentVersionRecipient/정책초안JSON/복합FK migration(103→104·기존7테이블 hash보존). 원본102필드 중98개 DTO 정규화·수탁유형2개 부모 구역 구분·초기화배열2개(policyItems+수탁/재수탁 자동입력) 연결. piReasonType enum·원본 중복제거 정책은 문서화된 한계.",
     "progress_evidence": [
       "docs/qa/R10-T01/public-recipient-snapshots/README.md",
       "docs/qa/R10-T01/structured-policy/README.md",
@@ -2550,12 +2554,12 @@
       "docs/qa/R10-T01/source-field-audit/implementation-map.csv",
       "docs/qa/R10-T01/source-field-audit/service-item-source.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
+      "database": "verified",
       "api": "not_applicable",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {
@@ -2586,29 +2590,33 @@
       "P05-T04",
       "P03-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R10-T02/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R10-T02/trustee-items/README.md",
+      "docs/qa/R10-T02/public-recipient-snapshots/README.md",
+      "docs/qa/R10-T04/final-acceptance/README.md"
+    ],
     "dependency_gates": {
       "R10-T01": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "목적 수탁자 공개목록·초안변경 영향·100건 전처리 누락 수정. 구조화 초안 저장/제거/과거PATCH 보존·게시 검증·숨은 입력 공개 제외·실패 롤백 추가. 문서/PDF55개와 폼연결23개 회귀 통과. 후속 수탁 항목·재수탁자 저장/게시/PDF·권한58개, 네트워크 오류3개 통과. 전체 문서 API 수용 계속.",
+    "progress_note": "소유54작업이 실제 handler/정책과 일치(계약검사 474작업 0누락). 목적/제공자 CRUD→문서생성·개정·게시/비공개/폐기/복구→공개토큰·PDF 일치, 소프트삭제/복구, 게시본·영수증 불변, 재위탁 고지 outbox 원자성, tenant/role 거부 58시험·도메인 17파일171시험 통과.",
     "progress_evidence": [
       "docs/qa/R10-T02/public-recipient-snapshots/README.md",
       "docs/qa/R10-T01/structured-policy/server-first.json",
       "docs/qa/R10-T01/structured-policy/form-binding-regression.json",
       "docs/qa/R10-T02/trustee-items/README.md"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
+      "database": "verified",
+      "api": "verified",
       "ui": "not_applicable",
-      "external": "not_assessed"
+      "external": "not_applicable"
     }
   },
   {
@@ -2639,17 +2647,22 @@
       "P05-T04",
       "P03-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "frontend",
     "evidence_directory": "catchsecu-clone/docs/qa/R10-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R10-T03/catalog-flow/README.md",
+      "docs/qa/R10-T03/clause-flow/README.md",
+      "docs/qa/R10-T03/document-flow/README.md",
+      "docs/qa/R10-T03/trustee-items/README.md"
+    ],
     "dependency_gates": {
       "R10-T02": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "수집 근거·문서·문구·표시 설정 입력보호/409 복구. P/C/OC 공개경로 연결. UI CRUD·문구적용·게시·연결회수거부·PDF·390/768/1440폭 확인. 국외이전 게시/비공개/보관/복원과 공개7+4경로·390/768/1440폭 확인. 구조화88입력·재위탁 추가/삭제·409복구·미완성 게시거부·게시2본·모바일도 확인. 후속 서비스 항목 초기화·재수탁자 추가/삭제저장/재게시·실패재시도 입력보존·한국어 오류·390/768/1440폭도 확인. 전체 역할/원본 동등성은 남음.",
+    "progress_note": "catalog/clause/document/trustee 전체 화면 Ego 수용: CRUD·문구적용·게시·연결회수거부·409복구·미저장보호·서비스 항목 자동입력·재수탁 추가/삭제·목록차단재시도·390/768/1440 무가로넘침. 재위탁 고지 발송 화면(수신자 목록·발송 이력·처리완료 표시) 실제 브라우저 확인.",
     "progress_evidence": [
       "docs/qa/R10-T03/catalog-flow/README.md",
       "docs/qa/R10-T03/document-flow/README.md",
@@ -2658,12 +2671,12 @@
       "docs/qa/R10-T04/structured-policy/README.md",
       "docs/qa/R10-T03/trustee-items/README.md"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
       "database": "not_applicable",
       "api": "not_applicable",
-      "ui": "partial_verified",
-      "external": "not_assessed"
+      "ui": "verified",
+      "external": "not_applicable"
     }
   },
   {
@@ -2697,24 +2710,29 @@
     "dependency_gates": {
       "R10-T03": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "external_pending",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "기존 수집 근거/문서 검증 유지. 문구·표시 설정 HTTP29개·DB감사18건·문구6/처리방침5/표시5·2 개정 및 재시작 지문 확인. 국외이전 HTTP30개·감사10건·PDF3개·출처6건·재시작 지문도 일치. 구조화 처리방침 HTTP14개·감사6건·PDF2개·재시작 지문도 일치. 후속 재수탁자 문서 v5/초안3/게시2본·감사5건·PDF2개·서버재시작 지문 일치, 과거 구조화 문서 그대로 보존. 전체유형/역할 수용 계속.",
+    "progress_note": "기존 4흐름 수용 + 재위탁 고지 발송 원자성(job+감사 동반)·worker drain→processed·재로그인 확인·서버 재시작 지문 f4f62052…0081 동일·도메인 17파일171시험 통과. 실제 SMTP 수신함 증거는 external_pending으로 유지.",
     "progress_evidence": [
       "docs/qa/R10-T03/catalog-flow/db-after-restart.json",
       "docs/qa/R10-T03/document-flow/db-after-restart.json",
       "docs/qa/R10-T04/display-flow/verified-after-restart.json",
       "docs/qa/R10-T04/overseas-flow/verified-after-restart.json",
       "docs/qa/R10-T04/structured-policy/verified-after-restart.json",
-      "docs/qa/R10-T04/trustee-items/verified-after-restart.json"
+      "docs/qa/R10-T04/trustee-items/verified-after-restart.json",
+      "docs/qa/R10-T04/final-acceptance/README.md",
+      "docs/qa/R10-T04/final-acceptance/prepare.json",
+      "docs/qa/R10-T04/final-acceptance/after-worker.json",
+      "docs/qa/R10-T04/final-acceptance/database-restart.json",
+      "scripts/qa-r10-acceptance.ts"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
-      "ui": "partial_verified",
-      "external": "not_assessed"
+      "database": "verified",
+      "api": "verified",
+      "ui": "verified",
+      "external": "external_pending"
     }
   },
   {

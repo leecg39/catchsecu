@@ -1,6 +1,8 @@
 # 상세 TASKS — 캐치시큐 전 페이지 풀스택 완성 계획
 
-R09 승인·게시·고정URL 수용 완료: 공유·게시·승인·고정URL 전체 화면을 실제 브라우저로 통과(게시·URL 복사·일시중지/재개·409·VERSION_CONFLICT 복구·승인→게시 체인·거절/취소·viewer 읽기 전용·로딩·페이지·새로고침·3폭). production 재시작 후 forms14/approvals13/publications5/fixedUrls13/audits43 SHA256 지문이 일치하고 세션·공개 URL이 유지된다. 공식 완료40/진행25/계획42이며 R09-T01 모델 대조 잔여만 남았다. [모델](../../qa/R09-T01/current/README.md)·[화면](../../qa/R09-T03/current/README.md)·[수용](../../qa/R09-T04/README.md).
+R10 처리방침 도메인 로컬 완료: 원본102필드 중98개 DTO 정규화·수탁유형2개 부모 구분·초기화배열2개 연결(migration104·기존7테이블 보존). 소유54작업 계약 일치, 목적/제공자→문서→공개토큰/PDF 체인·게시본 불변, catalog/clause/document/trustee 전체 화면 수용. 재위탁 고지는 job+감사 원자 생성·worker drain→processed·재로그인·재시작 지문 f4f62052…0081 동일. 실제 SMTP 수신은 external_pending. 공식 완료43/진행22/계획42. [수용](../../qa/R10-T04/final-acceptance/README.md).
+
+R09 승인·게시·고정URL 수용 완료: 공유·게시·승인·고정URL 전체 화면을 실제 브라우저로 통과(게시·URL 복사·일시중지/재개·409·VERSION_CONFLICT 복구·승인→게시 체인·거절/취소·viewer 읽기 전용·로딩·페이지·새로고침·3폭). production 재시작 후 forms14/approvals13/publications5/fixedUrls13/audits43 SHA256 지문이 일치하고 세션·공개 URL이 유지된다. [모델](../../qa/R09-T01/current/README.md)·[화면](../../qa/R09-T03/current/README.md)·[수용](../../qa/R09-T04/README.md).
 
 R08-T01 모델 완료:13모델184열·118제약·55인덱스·45트리거와 PostgreSQL348시험을 대조했다. 폼·템플릿 목록 URL 복원·모바일 제목을 수정하고 화면8시험·Ego 삭제/이력·3폭·production 재시작 데이터 보존을 확인했다. 완료27/진행28/계획52. R08 서버·전체 화면·외부 수용은 진행 중이다. [검증](../../qa/R08-T03/current/README.md).
 
@@ -598,7 +600,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
 
 ## R10 처리 목적·동의서·처리방침·서비스 공개문서
 
-### [~] R10-T01 처리 목적·동의서·처리방침·서비스 공개문서 — 모델·규칙 대조 및 보완
+### [x] R10-T01 처리 목적·동의서·처리방침·서비스 공개문서 — 모델·규칙 대조 및 보완
 
 목적↔항목↔제공자와 DocumentVersion 스냅샷 관계를 대조한다. 국외이전·아동·CCTV·자동화 결정·권리담당자 등 역공학 상태에 있는 필드를 실제 schema/DTO 지원 여부별로 확정한다.
 
@@ -610,7 +612,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
   - C 목적/제공·수탁자/문서/문구; R 목록·버전·공개/PDF; U 초안·표시문구·재위탁; D 보관·복구·게시폐기. 증거 참조 버전은 불변.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [~] R10-T02 처리 목적·동의서·처리방침·서비스 공개문서 — 서버 API·업무 처리
+### [x] R10-T02 처리 목적·동의서·처리방침·서비스 공개문서 — 서버 API·업무 처리
 
 목적/제공자/문구/문서 CRUD·restore/history/publish/unpublish/revoke/PDF와 서비스 동의표시·재위탁고지의 상태 전이를 연결한다. HTML 정제·PDF 폰트·공개 토큰 권한을 확인한다.
 
@@ -622,7 +624,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
   - 목적+제공자 CRUD→문서생성/개정→공개토큰/PDF 내용일치; 소프트삭제/복구; 게시문서와 이전동의영수증 불변; 국내/국외/수신자/agree 변형 DB fixture로 각각검증.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [~] R10-T03 처리 목적·동의서·처리방침·서비스 공개문서 — 전체 화면·모달 연결
+### [x] R10-T03 처리 목적·동의서·처리방침·서비스 공개문서 — 전체 화면·모달 연결
 
 이용목적 wizard, 동의서 생성/목록/편집/문구, 처리방침 목록·미리보기·버전·게시, 서비스 표시동의/수탁자 고지 화면. 모든 /services/... 공개 변형은 경로 파라미터에 맞는 문서 분기.
 

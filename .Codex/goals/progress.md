@@ -1,4 +1,8 @@
-## 최신 작업: R09-T03/T04 승인·게시·고정URL 화면·수용검증 완료
+## 최신 작업: R10 처리방침 도메인 로컬 완료 (T01~T03 완료·T04 외부 대기)
+
+2026-10-11 R10-T01/T02/T03 완료, R10-T04 로컬 수용 통과·external_pending. 원본102필드 중98개를 독립 DTO로 정규화(수탁유형2개 부모 구역·초기화배열2개 연결)하고 migration103→104에서 기존7테이블을 보존했다. 소유54작업이 실제 handler·정책과 일치. 목적/제공자 CRUD→문서 생성/개정→공개토큰·PDF 일치·게시본/영수증 불변, catalog/clause/document/trustee 전체 화면 Ego 수용(409복구·미저장보호·서비스 항목 자동입력·3폭). 재위탁 고지 발송은 notice+mail job+감사 원자 생성, worker drain→done/processed, 재로그인 세션 확인, production 재시작 지문 f4f62052…0081 동일. 도메인 17파일171시험 통과. 실제 SMTP 수신함 증거 없어 T04는 in_progress/external_pending 유지. 공식 완료43/진행22/계획42. [수용](../../docs/qa/R10-T04/final-acceptance/README.md).
+
+## 이전 작업: R09-T03/T04 승인·게시·고정URL 화면·수용검증 완료
 
 2026-10-11 R09-T03/R09-T04 완료: 실제 브라우저에서 공유(게시 상태·URL 복사 토스트·중단 안내), 공개 폼 익명 접속→일시중지 410→재개 복구, 고정URL 생성/이름변경/QR·복사/동일slug 409/VERSION_CONFLICT 배너+최신 다시 불러오기, 승인 요청·사유 승인→"게시하고 공유하기" 전체 체인·거절·취소, 승인 로그 빈 검색, viewer 읽기 전용(저장/게시 disabled·결정/쓰기 컨트롤 없음), pageSize=10 페이지2·새로고침 복원·Slow 3G 로딩 aria-busy·모달 포커스·3폭 무가로넘침을 확인했다. production server.ts 재기동 후 R09 fixture 2테넌트의 forms14/approvals13/publications5/fixedUrls13/audits43 SHA256 지문이 일치하고 세션·공개 고정URL 해석이 유지된다. 외부 제공사 경계 없음(not_applicable). 공식 완료40/진행25/계획42. R09-T01 모델 대조 잔여만 남았다. [화면](../../docs/qa/R09-T03/current/README.md)·[수용](../../docs/qa/R09-T04/README.md).
 
