@@ -1,7 +1,7 @@
 {
   "result": "passed",
   "database": "catchsecu_dev",
-  "checkedAt": "2026-10-09T20:18:36.737Z",
+  "checkedAt": "2026-10-11T00:07:34.092Z",
   "scope": "Six existing profile/session/account/closure/review models; read-only metadata, unique keys, tenant relations, immutable messages, destruction approval and account closure guards. No new migration or claim of full R05 acceptance.",
   "tables": [
     "User",
@@ -593,6 +593,11 @@
     },
     {
       "table": "Account",
+      "name": "Account_ssoProviderId_id_userId_key",
+      "definition": "CREATE UNIQUE INDEX \"Account_ssoProviderId_id_userId_key\" ON public.\"Account\" USING btree (\"ssoProviderId\", id, \"userId\")"
+    },
+    {
+      "table": "Account",
       "name": "Account_ssoProviderId_idx",
       "definition": "CREATE INDEX \"Account_ssoProviderId_idx\" ON public.\"Account\" USING btree (\"ssoProviderId\")"
     },
@@ -750,7 +755,7 @@
     }
   ],
   "sourceFingerprints": {
-    "prisma/schema.prisma": "f58ae1195e8c32cfc6587c1f8e39eda23d8df0c152de6652d415871032fb7afc",
+    "prisma/schema.prisma": "1a780ed7caf074953ffa7f9139d35b272916f35d0c7892bd24c82a73a375aca3",
     "prisma/migrations/20261003190000_account_closure/migration.sql": "19e9cfcec38e3a9e1a3fa1019bbd25873f37914247287bcda927c49902042ff7",
     "prisma/migrations/20261005070000_activity_reviews/migration.sql": "010697dc6f273112352ad2445a4d1e69ca4f50c42cac436fad53d3989b86a5ce",
     "prisma/migrations/20261014000000_activity_review_retention/migration.sql": "3e158703f797ba2b550078709433a11b18c7cef5a54e5a17eb7c1cdf044e2d12",
@@ -758,8 +763,12 @@
     "src/app/api/v1/me/route.ts": "7b2ce923e39cd5670bbff913b5a5b52703fdc9e24cc447d4b4a61b9ebfccaea7",
     "src/server/account-closure.ts": "a90c4501153bd744d079c87f361b182e634a415379096ded593a3b0ee0686f30",
     "src/server/account-actor.ts": "c292c620571d2a6ca07980713c392345724788688dbd907011f2244b6ff4f8d6",
-    "src/server/activity-reviews.ts": "ebeb4ea6536fb2446c474bf9ce688a5018d31eff4e04904054c84a54ebe66fd5",
+    "src/server/activity-reviews.ts": "dc5f4bdb12834442caabe1176366d0c0a03b0ef13451610bb523e66b64163205",
     "src/server/activity-review-mail.ts": "4ed5a1792af3e009d511ec2b14b4573757fca60b5df2feaccf018bf08c96e4cf",
-    "src/server/sso-accounts.ts": "30441e5d93647f6341eff42051819236ed90eef5b03907c73d9aea8aa2a70ea6"
+    "src/server/sso-accounts.ts": "a10db749f11cd34f667340693eba3b99a0a5d1eee93dd529c2542f8a4de42b68",
+    "src/server/auth-mutations.ts": "a1e4a96b521c70372d30a113932c45bef6e3e6bcf7098f9f5c86b45b4eb45169",
+    "src/server/schemas.ts": "0d1b6795f5af6fb90ce09193067cb0ec29254110b50029efa425a7676041e98f",
+    "src/contracts/account-closure.ts": "95297d4b033d404daa6cc21e03f8c0349afa71b35bfa3f20038c0c8270800e53",
+    "src/contracts/activity-reviews.ts": "b99d2231b5a21d30980df47fd8d41ccae0159707f82409e2740c5edd091df473"
   }
 }

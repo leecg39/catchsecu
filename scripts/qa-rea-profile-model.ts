@@ -28,7 +28,7 @@ try {
   for (const name of ["User_email_key", "Session_token_key", "Account_providerId_accountId_key", "AccountClosure_userId_key", "ActivityReview_tenantId_id_key"])
     assert.ok(indexes.some(index => index.name === name && index.definition.includes("UNIQUE")), name);
   assert.ok(indexes.some(index => index.name === "ActivityReview_open_event_key" && index.definition.includes("requested") && index.definition.includes("responded")));
-  for (const name of ["ActivityReview_service_fkey", "ActivityReview_auditEvent_fkey", "ActivityReview_recipient_fkey", "ActivityReviewMessage_review_fkey", "ActivityReviewMessage_author_fkey"])
+  for (const name of ["ActivityReview_service_fkey", "ActivityReview_auditEvent_fkey", "ActivityReview_requester_fkey", "ActivityReview_recipient_fkey", "ActivityReview_destroyApprover_fkey", "ActivityReviewMessage_review_fkey", "ActivityReviewMessage_author_fkey"])
     assert.ok(constraints.some(key => key.name === name && key.definition.includes('"tenantId"')), name);
   for (const name of ["ActivityReview_state", "ActivityReview_dates", "ActivityReview_destruction", "ActivityReviewMessage_kind", "AccountClosure_time_check"])
     assert.ok(constraints.some(key => key.name === name), name);
@@ -39,7 +39,8 @@ try {
   assert.ok(triggers.some(trigger => trigger.table === "ActivityReview" && trigger.function.includes("terminal review destruction state") && trigger.function.includes("invalid version")));
   const files = ["prisma/schema.prisma", "prisma/migrations/20261003190000_account_closure/migration.sql", "prisma/migrations/20261005070000_activity_reviews/migration.sql",
     "prisma/migrations/20261014000000_activity_review_retention/migration.sql", "prisma/migrations/20261014100000_activity_review_destruction_tighten/migration.sql",
-    "src/app/api/v1/me/route.ts", "src/server/account-closure.ts", "src/server/account-actor.ts", "src/server/activity-reviews.ts", "src/server/activity-review-mail.ts", "src/server/sso-accounts.ts"];
+    "src/app/api/v1/me/route.ts", "src/server/account-closure.ts", "src/server/account-actor.ts", "src/server/activity-reviews.ts", "src/server/activity-review-mail.ts", "src/server/sso-accounts.ts",
+    "src/server/auth-mutations.ts", "src/server/schemas.ts", "src/contracts/account-closure.ts", "src/contracts/activity-reviews.ts"];
   const sourceFingerprints = Object.fromEntries(await Promise.all(files.map(async file => [file, createHash("sha256").update(await readFile(file)).digest("hex")])));
   const report = { result: "passed", database: database.pathname.slice(1), checkedAt: new Date().toISOString(),
     scope: "Six existing profile/session/account/closure/review models; read-only metadata, unique keys, tenant relations, immutable messages, destruction approval and account closure guards. No new migration or claim of full R05 acceptance.",

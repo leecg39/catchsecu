@@ -1,0 +1,153 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-11T00:05:21.339479+00:00",
+  "paths": 14,
+  "operations": 18,
+  "scope": "Static contract-to-handler check; runtime behavior is verified separately.",
+  "records": [
+    {
+      "path": "/me",
+      "method": "GET",
+      "permission": "self",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/route.ts",
+      "sha256": "7b2ce923e39cd5670bbff913b5a5b52703fdc9e24cc447d4b4a61b9ebfccaea7"
+    },
+    {
+      "path": "/me",
+      "method": "PATCH",
+      "permission": "self",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/route.ts",
+      "sha256": "7b2ce923e39cd5670bbff913b5a5b52703fdc9e24cc447d4b4a61b9ebfccaea7"
+    },
+    {
+      "path": "/me/sso-accounts",
+      "method": "GET",
+      "permission": "self + current direct company membership",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/sso-accounts/route.ts",
+      "sha256": "dd6ab8d43bf03cf84d8f88a2b9796e081e45d6c747e02f29b7b25e10aff2feef"
+    },
+    {
+      "path": "/me/sso-accounts/{id}",
+      "method": "DELETE",
+      "permission": "self + current direct company membership + login within 5 minutes",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/sso-accounts/[id]/route.ts",
+      "sha256": "132b97c10db19745c19a79d8eebada90d3aaa8c6fb4fcade35e937f6531245a7"
+    },
+    {
+      "path": "/me/sessions",
+      "method": "GET",
+      "permission": "self",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/sessions/route.ts",
+      "sha256": "1d820578a58a65a6a3e54b0e6ca9c8d3fe5abebb4a5a93abd5c740abb623606d"
+    },
+    {
+      "path": "/me/sessions/{id}",
+      "method": "DELETE",
+      "permission": "self",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/sessions/[id]/route.ts",
+      "sha256": "c40172cb4500b3f7a5da6786fca213b9b9c2a6d2c0a2167c47f0934decef56fe"
+    },
+    {
+      "path": "/me/closure",
+      "method": "GET",
+      "permission": "self",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/closure/route.ts",
+      "sha256": "6143f8b62f22172ea7bc2a0d9d44072e016f3c20433a8e135050fbc981975ddb"
+    },
+    {
+      "path": "/me/closure",
+      "method": "POST",
+      "permission": "self + current password + ownership handoff",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/closure/route.ts",
+      "sha256": "6143f8b62f22172ea7bc2a0d9d44072e016f3c20433a8e135050fbc981975ddb"
+    },
+    {
+      "path": "/me/audit-events",
+      "method": "GET",
+      "permission": "self",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/audit-events/route.ts",
+      "sha256": "6e28dcc5642b94b82a4474ab24aae95b44cf65ed93f4aee023e03f06851af662"
+    },
+    {
+      "path": "/me/audit-events/export",
+      "method": "GET",
+      "permission": "self",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/audit-events/export/route.ts",
+      "sha256": "1579d637228503a0dcb98d645b7439cbf522cb22dfa23ee62a567b3dbfb98f51"
+    },
+    {
+      "path": "/me/password-policy",
+      "method": "GET",
+      "permission": "self",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/password-policy/route.ts",
+      "sha256": "4f6736f552e06efa4131d45d712c54d859fceaa435fdedcb26ef341fe67d975e"
+    },
+    {
+      "path": "/me/password-policy",
+      "method": "POST",
+      "permission": "self + matching tenant and password revision",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/me/password-policy/route.ts",
+      "sha256": "4f6736f552e06efa4131d45d712c54d859fceaa435fdedcb26ef341fe67d975e"
+    },
+    {
+      "path": "/activity-reviews",
+      "method": "GET",
+      "permission": "current member recipient; sent/company requires security.write + audit.read + service grants",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/activity-reviews/route.ts",
+      "sha256": "713246e4496820bf28d6e09d0f08f58492cf2182438577f5a98133f92d9cab4f"
+    },
+    {
+      "path": "/activity-reviews",
+      "method": "POST",
+      "permission": "security.write + audit.read + current service grants",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/activity-reviews/route.ts",
+      "sha256": "713246e4496820bf28d6e09d0f08f58492cf2182438577f5a98133f92d9cab4f"
+    },
+    {
+      "path": "/activity-reviews/{id}",
+      "method": "GET",
+      "permission": "current recipient or current service review manager",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/activity-reviews/[id]/route.ts",
+      "sha256": "340c232cab12b829feaffdc5d8931bf99cc9c103758bf924c76d90785a6ddcfc"
+    },
+    {
+      "path": "/activity-reviews/{id}/actions",
+      "method": "POST",
+      "permission": "response: recipient; resolve/cancel: security.write + audit.read + service grants, not recipient",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/activity-reviews/[id]/actions/route.ts",
+      "sha256": "e3bba71ba53218447aa02d71b5734a93884f38447d69dbbd703053b7d614402b"
+    },
+    {
+      "path": "/activity-reviews/{id}/notifications",
+      "method": "POST",
+      "permission": "current service security.write + audit.read; not recipient",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/activity-reviews/[id]/notifications/route.ts",
+      "sha256": "bba2cc2e2ca222868dc6eba23b246989a1087961148feda2f10d409000af84f9"
+    },
+    {
+      "path": "/activity-reviews/{id}/destruction",
+      "method": "POST",
+      "permission": "security.write + audit.read + current service grants, not recipient",
+      "implementation": "implemented",
+      "handler": "src/app/api/v1/activity-reviews/[id]/destruction/route.ts",
+      "sha256": "e4890ab0e05381bb0ca729e642a755b7fd9fd7f3ca7e71dbfad2d4a2f744993b"
+    }
+  ]
+}

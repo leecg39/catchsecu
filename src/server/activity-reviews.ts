@@ -73,7 +73,7 @@ export async function readActivityReview(ctx: Context, id: string): Promise<Revi
       canNotify: row.status === "requested" && row.recipientId !== actor.member.id && manages(actor, row.serviceId) && row.service.status === "active" && !notification,
       notification: notification ? { status: notification.payloadErasedAt ? "expired" : notification.status === "done" ? (decrypt<{ transport: string }>(notification.payloadCipher).transport === "local" ? "local_delivered" : "accepted") : notification.status, createdAt: notification.createdAt.toISOString(), completedAt: notification.completedAt?.toISOString() ?? null } : null, canRespond: row.status === "requested" && row.recipientId === actor.member.id && row.service.status === "active",
       canClose: active(row.status) && row.recipientId !== actor.member.id && manages(actor, row.serviceId) && row.service.status === "active",
-      canDecideDestruction: row.destructionStatus === "awaiting" && manages(actor, row.serviceId) && row.service.status === "active",
+      canDecideDestruction: row.destructionStatus === "awaiting" && row.recipientId !== actor.member.id && manages(actor, row.serviceId) && row.service.status === "active",
       messages: messages.map(m => ({ id: m.id, kind: m.kind, authorName: m.author.user.name, body: decrypt<string>(m.bodyCipher), createdAt: m.createdAt.toISOString() })) };
     assertFileDeadlines(actor.deadlines); return result;
   });
@@ -163,7 +163,7 @@ export async function decideActivityReviewDestruction(ctx: Context, id: string, 
   return idempotent("activity-review:destruction:" + ctx.tenantId + ":" + ctx.member.id + ":" + id, key, input, async tx => {
     actor = await lockServiceActor(tx, ctx, "service.read");
     const row = await locate(tx, ctx, actor, id, true);
-    if (!manages(actor, row.serviceId)) fail(403, "REVIEW_FORBIDDEN", "해당 서비스의 보안 담당자가 처리해야 합니다.");
+    allowAction(actor, row, "cancel");
     requireVersion(input, row);
     if (row.destructionStatus !== "awaiting") fail(409, "INVALID_DESTRUCTION_TRANSITION", "파기 승인 대기 중인 종결 검토만 처리할 수 있습니다.");
     if (input.action === "keep") {
@@ -178,7 +178,7 @@ export async function decideActivityReviewDestruction(ctx: Context, id: string, 
     return { status: 200, body: { id } };
   }, async tx => { actor = await lockServiceActor(tx, ctx, "service.read"); }, async (tx, cached) => {
     const row = await locate(tx, ctx, actor, id, true);
-    if (!manages(actor, row.serviceId)) fail(403, "REVIEW_FORBIDDEN", "해당 서비스의 보안 담당자가 처리해야 합니다.");
+    allowAction(actor, row, "cancel");
     return cached;
   }, async () => { assertFileDeadlines(actor.deadlines); });
 }

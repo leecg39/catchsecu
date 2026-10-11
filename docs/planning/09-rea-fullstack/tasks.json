@@ -1221,25 +1221,28 @@
       "P03-T03",
       "P06-T02"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "model",
     "evidence_directory": "catchsecu-clone/docs/qa/R05-T01/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R05-T01/current/README.md",
+      "docs/qa/R05-T01/current/verification-summary.json",
+      "docs/qa/R05-T01/current/quality-gates.json"
+    ],
     "dependency_gates": {
       "R04-T04": "local_acceptance_pass"
     },
-    "local_status": "partial_verified",
+    "local_status": "verified",
     "external_status": "not_applicable",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "dev/test6모델70컬럼28제약22인덱스10트리거 대조. 본인/회사 복합FK·진행 중 검토 unique·메시지 불변성·파기 승인·계정폐쇄/마지막 owner/admin 제약 확인. 신규 migration 없음.",
+    "progress_note": "dev/test PostgreSQL 6모델70컬럼28제약23인덱스10트리거 일치. 모델 회귀69개, 폐쇄 기록 불변성·FK/시각·재활성화/세션/소속 차단과 롤백을 확인했다. migration148개 체크섬 일치, 타입·린트·production82페이지 통과. 신규 migration 없음.",
     "progress_evidence": [
-      "docs/qa/R05-T01/model-audit/README.md",
-      "docs/qa/R05-T01/model-audit/catchsecu_dev.json",
-      "docs/qa/R05-T01/model-audit/catchsecu_test.json"
+      "docs/qa/R05-T01/current/README.md",
+      "docs/qa/R05-T01/current/verification-summary.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
+      "database": "verified",
       "api": "not_applicable",
       "ui": "not_applicable",
       "external": "not_applicable"
@@ -1270,29 +1273,31 @@
       "P03-T03",
       "P06-T02"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R05-T02/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R05-T02/current/README.md",
+      "docs/qa/R05-T02/current/verification-summary.json",
+      "docs/qa/R05-T02/current/quality-gates.json"
+    ],
     "dependency_gates": {
       "R05-T01": "task_complete"
     },
-    "local_status": "partial_verified",
-    "external_status": "external_pending",
+    "local_status": "verified",
+    "external_status": "not_applicable",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "프로필/계정폐쇄/현재권한/활동검토/SSO 복구104개와 SSO121개, 7파일225개 PostgreSQL 시험 통과. 독립 HTTP13개 본인/회사/역할/버전/중복/소유자 폐쇄 거부와 DB 무변경 확인. 서버 계약 유지.",
+    "progress_note": "14경로18개 API와 실제 PostgreSQL 9파일263개 및 추가 알림 실패/재시도1개 통과. 관리자 대상자의 본인 검토 파기·보존 승인 결함을 수정했다. 실제 HTTP403·Ego 버튼숨김/별도담당자 승인·메시지0/3·감사8·서버 재시작 지문 일치. 타입·린트 오류0·production82페이지 통과. 외부 IdP/SMTP 수신과 전체 UI 수용은 후속 작업.",
     "progress_evidence": [
-      "docs/qa/R05-T02/profile/README.md",
-      "docs/qa/R05-T02/profile/baseline.json",
-      "docs/qa/R05-T02/profile/sso-integration.json",
-      "docs/qa/R05-T04/profile-flow/boundaries.json"
+      "docs/qa/R05-T02/current/README.md",
+      "docs/qa/R05-T02/current/verification-summary.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-11",
     "verification_status": {
-      "database": "partial_verified",
-      "api": "partial_verified",
+      "database": "verified",
+      "api": "verified",
       "ui": "not_applicable",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {

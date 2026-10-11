@@ -125,6 +125,27 @@ test("권한·버전·상태·회사 격리를 검사한다", async () => {
   expect(await db.activityReviewMessage.count({ where: { reviewId: id } })).toBe(3);
 });
 
+test.each(["destroy", "keep"] as const)("관리자로 승격된 검토 대상자도 본인 검토의 %s 승인은 할 수 없다", async action => {
+  const { body: { id } } = await create(); await close(id);
+  const row = await db.activityReview.findUniqueOrThrow({ where: { id } });
+  await sweepActivityReviewRetention(new Date(row.retentionUntil!.getTime() + 1));
+  // 역할은 요청 당시 스냅샷이 아니라 현재 DB 권한으로 다시 검사한다.
+  await db.membership.update({ where: { id: actors.recipient.member.id }, data: { role: "admin", version: { increment: 1 } } });
+  const awaiting = await db.activityReview.findUniqueOrThrow({ where: { id } });
+  const auditCount = await db.auditEvent.count({ where: { tenantId, resourceId: id } });
+  const messageCount = await db.activityReviewMessage.count({ where: { reviewId: id } });
+  const keysBefore = await db.idempotencyRecord.count();
+  const response = await destructionRoute(req(`/activity-reviews/${id}/destruction`, "recipient", { version: awaiting.version, action }));
+  expect(response.status).toBe(403);
+  expect((await readActivityReview(actors.recipient, id)).canDecideDestruction).toBe(false);
+  expect(await db.activityReview.findUniqueOrThrow({ where: { id } })).toEqual(awaiting);
+  expect(await db.activityReviewMessage.count({ where: { reviewId: id } })).toBe(messageCount);
+  expect(await db.auditEvent.count({ where: { tenantId, resourceId: id } })).toBe(auditCount);
+  expect(await db.idempotencyRecord.count()).toBe(keysBefore);
+  expect((await readActivityReview(actors.owner, id)).canDecideDestruction).toBe(true);
+  expect((await destructionRoute(req(`/activity-reviews/${id}/destruction`, "owner", { version: awaiting.version, action }))).status).toBe(200);
+});
+
 test("동시 파기 승인은 한 번만 성공하고 같은 키 재시도는 같은 응답을 돌려준다", async () => {
   const { body: { id } } = await create(); await close(id);
   const row = await db.activityReview.findUniqueOrThrow({ where: { id } });

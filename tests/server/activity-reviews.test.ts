@@ -212,6 +212,26 @@ test("알림은 명시적 요청 한 건만 생성하고 로컬 전달과 외부
  expect(output.to).toBe("activity-recipient@example.test");expect(output.text).toContain("reviewId="+id);expect(output.text).not.toContain(input().message);expect(output.subject).not.toContain(input().title);
  expect(await db.activityReviewMessage.count({where:{reviewId:id}})).toBe(1);expect((await db.activityReview.findUniqueOrThrow({where:{id}})).version).toBe(1);
 });
+test("알림 전달 실패는 원문을 변경하지 않고 같은 job을 재시도해 한 번만 전달한다",async()=>{
+ const {body:{id}}=await create();const {body:{jobId}}=await notify(id);
+ const before=await db.activityReview.findUniqueOrThrow({where:{id}});
+ const spy=vi.spyOn(mailJobs,"deliverMail").mockRejectedValueOnce(new Error("synthetic mail transport failure"));
+ try {expect(await runOneJob("review-retry-test",{tenantId,jobId})).toBe(true);}finally{spy.mockRestore();}
+ expect(await db.job.findUniqueOrThrow({where:{id:jobId}})).toMatchObject({status:"retry",attempts:1,lastError:"DELIVERY_FAILED"});
+ expect((await readActivityReview(actors.owner,id)).notification?.status).toBe("retry");
+ await expect(access(resolve(env.LOCAL_MAIL_DIR,jobId+".json"))).rejects.toBeDefined();
+ await db.job.update({where:{id:jobId},data:{dueAt:new Date(Date.now()-1000)}});
+ expect(await runOneJob("review-retry-test",{tenantId,jobId})).toBe(true);
+ expect(await db.job.findUniqueOrThrow({where:{id:jobId}})).toMatchObject({status:"done",attempts:2,lastError:null});
+ expect((await readActivityReview(actors.owner,id)).notification?.status).toBe("local_delivered");
+ expect(await runOneJob("review-retry-test",{tenantId,jobId})).toBe(false);
+ const attempts=await db.jobAttempt.findMany({where:{jobId},orderBy:{createdAt:"asc"}});
+ expect(attempts.map(row=>row.outcome)).toEqual(["retry","delivered"]);
+ expect(await db.activityReview.findUniqueOrThrow({where:{id}})).toEqual(before);
+ expect(await db.activityReviewMessage.count({where:{reviewId:id}})).toBe(1);
+ const mail=JSON.parse(await readFile(resolve(env.LOCAL_MAIL_DIR,jobId+".json"),"utf8"));
+ expect(mail.text).not.toContain(input().message);expect(mail.subject).not.toContain(input().title);
+});
 test("알림은 대상자·타인·다른 회사·오래된 version·답변 후 요청을 거부한다",async()=>{
  const {body:{id}}=await create();
  await expect(notifyActivityReview(actors.recipient,id,{version:1},randomUUID(),randomUUID())).rejects.toMatchObject({status:403});
