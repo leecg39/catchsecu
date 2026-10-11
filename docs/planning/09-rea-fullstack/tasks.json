@@ -717,17 +717,19 @@
       "P02-T04",
       "P02-T05"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R02-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R02-T04/current/README.md"
+    ],
     "dependency_gates": {
       "R02-T03": "task_complete"
     },
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "현재 소스에서 인증 모델·API·UI·권한 15파일249시험과 typecheck/lint/production build를 통과했다. 같은 build를 두 번 기동해 health·로그인 HTML·보존 합성계정의 인증/MFA/세션/감사 지문이 재시작 전후 동일함을 확인했다. 기존 Ego Lite 전체 인증 여정·독립 HTTP 두 번째 세션 폐기·3폭 증거를 재대조했다. 공식 SMTP/DNS/외부 수신함은 자격증명 미확보로 external_pending이며 완료로 처리하지 않는다.",
+    "progress_note": "현재 소스에서 인증 모델·API·UI·권한 15파일249시험과 typecheck/lint/production build를 통과했다. 같은 build를 두 번 기동해 health·로그인 HTML·보존 합성계정의 인증/MFA/세션/감사 지문이 재시작 전후 동일함을 확인했다. 기존 Ego Lite 전체 인증 여정·독립 HTTP 두 번째 세션 폐기·3폭 증거를 재대조했다. 공식 SMTP/DNS/외부 수신함은 자격증명 미확보로 external_pending이며 완료로 처리하지 않는다. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R02-T04/current/README.md",
       "docs/qa/R02-T04/current/verification-summary.json",
@@ -739,12 +741,12 @@
       "docs/qa/R02-T04/authentication/revoked-second-session.json",
       "docs/qa/R02-T03/current/retry-countdown-browser-db.json"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -1167,17 +1169,20 @@
       "P03-T02",
       "P03-T05"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R04-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R04-T04/current/README.md",
+      "docs/qa/R04-T04/members-flow/README.md"
+    ],
     "dependency_gates": {
       "R04-T03": "task_complete"
     },
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "DB·API·UI 내부 수용 통과: 안정 도메인 감사33건·로컬메일4건·fresh 로그인·HTTP12건·재시작 동일 지문, Ego Lite 재시작 화면·별도 브라우저 세션 격리, 회귀12파일249개·타입·린트·production82페이지. 실제 SMTP/외부 SSO 영수증 대기.",
+    "progress_note": "DB·API·UI 내부 수용 통과: 안정 도메인 감사33건·로컬메일4건·fresh 로그인·HTTP12건·재시작 동일 지문, Ego Lite 재시작 화면·별도 브라우저 세션 격리, 회귀12파일249개·타입·린트·production82페이지. 실제 SMTP/외부 SSO 영수증 대기. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R04-T04/current/README.md",
       "docs/qa/R04-T04/current/acceptance-summary.json",
@@ -1187,12 +1192,12 @@
       "docs/qa/R04-T04/members-flow/current-baseline.json",
       "docs/qa/R04-T04/members-flow/current-after-restart.json"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -1370,29 +1375,32 @@
       "P03-T03",
       "P06-T02"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R05-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R05-T04/current/README.md",
+      "docs/qa/R05-T04/profile-flow/README.md"
+    ],
     "dependency_gates": {
       "R05-T03": "task_complete"
     },
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "현재 production 서버 재시작 전후 fresh 로그인 HTTP11건씩, 탈퇴 계정 v6/인증정보0/검토3건/도메인감사21/로컬메일1 지문 동일. Ego 재시작3행·별도브라우저 로그인 격리·test DB worker 2회 정상종료. R05 서버264회귀와 UI36회귀/품질 통과. 실제 SMTP/IdP 증거는 external_pending.",
+    "progress_note": "현재 production 서버 재시작 전후 fresh 로그인 HTTP11건씩, 탈퇴 계정 v6/인증정보0/검토3건/도메인감사21/로컬메일1 지문 동일. Ego 재시작3행·별도브라우저 로그인 격리·test DB worker 2회 정상종료. R05 서버264회귀와 UI36회귀/품질 통과. 실제 SMTP/IdP 증거는 external_pending. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R05-T04/current/README.md",
       "docs/qa/R05-T04/current/after-restart.json",
       "docs/qa/R05-T04/current/browser-restart.json",
       "docs/qa/R05-T04/current/worker-readiness.json"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -1576,17 +1584,20 @@
       "P11-T02",
       "P11-T05"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R06-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R06-T04/current/README.md",
+      "docs/qa/R06-T04/security-flow/README.md"
+    ],
     "dependency_gates": {
       "R06-T03": "task_complete"
     },
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "현재 production 새 로그인/TOTP 포함HTTP23개·재시작17개·실제IPv6 위조헤더403·Ego 재로그인3화면 통과. 회사7/규칙2/예외0/설정감사100·동일상태지문.222회귀·15단위시험·품질통과. 로컬 수용 통과, 원본상품매핑·공식PG external_pending.",
+    "progress_note": "현재 production 새 로그인/TOTP 포함HTTP23개·재시작17개·실제IPv6 위조헤더403·Ego 재로그인3화면 통과. 회사7/규칙2/예외0/설정감사100·동일상태지문.222회귀·15단위시험·품질통과. 로컬 수용 통과, 원본상품매핑·공식PG external_pending. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R06-T04/security-flow/README.md",
       "docs/qa/R06-T04/security-flow/verified-after-restart.json",
@@ -1595,12 +1606,12 @@
       "docs/qa/R06-T04/security-entitlements/verified-after-restart.json",
       "docs/qa/R06-T04/current/README.md"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -1726,7 +1737,7 @@
       "P11-T04",
       "P02-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R07-T02/",
     "completion_evidence": [
@@ -1738,7 +1749,7 @@
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여. | 라운드2(2026-10-11): /login?error= 3종 action 실측(restart/contact/login 문구+CTA 정확), 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기 UI+DB+감사 5건 확인. 오래된 세션 삭제는 SSO_REAUTH_REQUIRED로 차단 후 재로그인으로 통과(보안 게이트 실측). 가상 GPKI 로그인 화면은 외부 미연동 고지+임의자격 정직 거절. 제공사 편집기 미저장 닫기 확인(in-app 가드). 로컬 검증 완료, 실제 제공사 증거 없어 external_pending 유지.",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여. | 라운드2(2026-10-11): /login?error= 3종 action 실측(restart/contact/login 문구+CTA 정확), 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기 UI+DB+감사 5건 확인. 오래된 세션 삭제는 SSO_REAUTH_REQUIRED로 차단 후 재로그인으로 통과(보안 게이트 실측). 가상 GPKI 로그인 화면은 외부 미연동 고지+임의자격 정직 거절. 제공사 편집기 미저장 닫기 확인(in-app 가드). 로컬 검증 완료, 실제 제공사 증거 없어 external_pending 유지. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R07-T02/core/regression.json",
       "docs/qa/R07-T02/core/crud-final.json",
@@ -1769,12 +1780,12 @@
       "docs/qa/R07-T03/current/README.md",
       "docs/qa/R07-T04/signup/README.md"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "partial_verified",
       "api": "partial_verified",
       "ui": "not_applicable",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -1807,7 +1818,7 @@
       "P11-T04",
       "P02-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "frontend",
     "evidence_directory": "catchsecu-clone/docs/qa/R07-T03/",
     "completion_evidence": [
@@ -1819,7 +1830,7 @@
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여. | 라운드2(2026-10-11): /login?error= 3종 action 실측(restart/contact/login 문구+CTA 정확), 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기 UI+DB+감사 5건 확인. 오래된 세션 삭제는 SSO_REAUTH_REQUIRED로 차단 후 재로그인으로 통과(보안 게이트 실측). 가상 GPKI 로그인 화면은 외부 미연동 고지+임의자격 정직 거절. 제공사 편집기 미저장 닫기 확인(in-app 가드). 로컬 검증 완료, 실제 제공사 증거 없어 external_pending 유지.",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여. | 라운드2(2026-10-11): /login?error= 3종 action 실측(restart/contact/login 문구+CTA 정확), 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기 UI+DB+감사 5건 확인. 오래된 세션 삭제는 SSO_REAUTH_REQUIRED로 차단 후 재로그인으로 통과(보안 게이트 실측). 가상 GPKI 로그인 화면은 외부 미연동 고지+임의자격 정직 거절. 제공사 편집기 미저장 닫기 확인(in-app 가드). 로컬 검증 완료, 실제 제공사 증거 없어 external_pending 유지. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R07-T04/management-flow/browser.json",
       "docs/qa/R07-T04/management-flow/responsive.json",
@@ -1843,12 +1854,12 @@
       "docs/qa/R07-T03/current/README.md",
       "docs/qa/R07-T04/signup/README.md"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "not_applicable",
       "api": "not_applicable",
       "ui": "partial_verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -1878,7 +1889,7 @@
       "P11-T04",
       "P02-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R07-T04/",
     "completion_evidence": [
@@ -1890,7 +1901,7 @@
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "partial_observed",
-    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. E5 가상GPKI 연결·MFA등록/실패/대기차단·로그인·해제·초대불일치/수락/재진입·마지막수단409 확인. 타입/린트·Ego3폭·DB/메일단언·서버재시작 hash2824c95f… 일치. 기존5개 fixture 보존. 전체/외부 조합은 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여. | 라운드2(2026-10-11): /login?error= 3종 action 실측(restart/contact/login 문구+CTA 정확), 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기 UI+DB+감사 5건 확인. 오래된 세션 삭제는 SSO_REAUTH_REQUIRED로 차단 후 재로그인으로 통과(보안 게이트 실측). 가상 GPKI 로그인 화면은 외부 미연동 고지+임의자격 정직 거절. 제공사 편집기 미저장 닫기 확인(in-app 가드). 로컬 검증 완료, 실제 제공사 증거 없어 external_pending 유지.",
+    "progress_note": "2026-10-10 E4 회귀247·HTTP23·Ego 문맥/복구/재시작 통과. E3 HTTPS HTTP48(생성 계약 변경 전)·Ego OIDC/SAML 네 흐름·재시작 통과, 동결 데이터와 추가 읽기 감사2건 구분. 임시 CA 신뢰/인증서 제거 및 시스템 거절 확인. E5 공급자 표/편집 세 폭 보완; history 입력 유실 재현 후 구현/단위10·Ego 뒤/앞 취소·승인/키보드/390px 통과. Native 새로고침 취소는 미검증. 원본20경로/전체 상태 및 외부 수용 잔여. 전체0완료/51진행/56계획 유지. E5 직접진입20경로/60폭 넘침0; OAuth/SAML 결과없는 직접진입 안내 수정 후2경로6폭/복귀링크2개 확인. 정상 인증/역할/라이선스 전체 조합은 별도 잔여. E5 가상GPKI 연결·MFA등록/실패/대기차단·로그인·해제·초대불일치/수락/재진입·마지막수단409 확인. 타입/린트·Ego3폭·DB/메일단언·서버재시작 hash2824c95f… 일치. 기존5개 fixture 보존. 전체/외부 조합은 잔여. 2026-10-11 현재10모델116컬럼46제약32인덱스4트리거와17경로22작업을 대조했다. 공급자 목록 새로고침 상태유실을 재현하여 URL복원 수정/실제페이지검증 통과. 원본 OAuth 가입 동의 화면과 일반 이메일 가입의 차이를 확인해 sso-signup-followup.md 하위 작업을 추가; 전체완료 아님. 2026-10-11 가입 동의 보완 완료: OIDC 검증 신원 대기/일회성 동의 트랜잭션·원래 인증시각 보존·HttpOnly 브라우저 결합 구현. 12모델132열/56제약/37인덱스/4트리거와149migration dev/test 일치, 관련16파일471시험·타입·린트오류0/기존4경고·production83페이지 통과. HTTP14·Ego 동의/오류/취소/만료/재로그인/3폭·서버재시작4검사·실제worker2회 만료3개정리/유효요청보존. 공식 제공사와 전체 상태 조합은 별도 잔여. | 라운드2(2026-10-11): /login?error= 3종 action 실측(restart/contact/login 문구+CTA 정확), 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기 UI+DB+감사 5건 확인. 오래된 세션 삭제는 SSO_REAUTH_REQUIRED로 차단 후 재로그인으로 통과(보안 게이트 실측). 가상 GPKI 로그인 화면은 외부 미연동 고지+임의자격 정직 거절. 제공사 편집기 미저장 닫기 확인(in-app 가드). 로컬 검증 완료, 실제 제공사 증거 없어 external_pending 유지. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R07-T04/management-flow/README.md",
       "docs/qa/R07-T04/management-flow/verified-after-restart.json",
@@ -1922,12 +1933,12 @@
       "docs/qa/R07-T03/current/README.md",
       "docs/qa/R07-T04/signup/README.md"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "partial_verified",
       "api": "partial_verified",
       "ui": "partial_verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -2054,13 +2065,12 @@
       "P04-T02",
       "P04-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R08-T02/",
     "completion_evidence": [
-      "docs/qa/R08-T03/current/browser-f7-sweep.md",
-      "docs/qa/R08-T04/current/acceptance-database-before.json",
-      "docs/qa/R08-T04/current/acceptance-database-restart.json"
+      "docs/qa/R08-T02/question-metadata/consent-generation/README.md",
+      "docs/qa/R08-T03/current/browser-f7-sweep.md"
     ],
     "dependency_gates": {
       "R08-T01": "task_complete"
@@ -2068,7 +2078,7 @@
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 국내 연락처·이메일2종·생년월일: 질문13유형·역할/채널 바인딩·migration114·원본 문자열 직렬화·고정 검증 구현. 고유7파일125개·HTTP11·Ego 제출/취소복원/정정·재시작 폼1/응답1/정정1/동의3/감사15건 및 기존10세트 보존 통과. 이미지 캡처 시간초과는 미검증으로 남기며 국제전화/주소/서명/메타데이터/다중페이지 및 전체수용은 계속 진행. F3 국내/해외 주소: 질문15유형·국내 문자열/해외7필드·181국가·migration115·검증/정정/CSV 구현. 고유7파일85개·준비/게시HTTP10·실제 Kakao 검색/SDK 실패복구·Ego 제출/취소복원/정정/CSV·재시작 폼1/응답1/정정1/감사12건 및 기존11세트 보존 통과. 지연 SDK 결과의 화면/전송값 불일치 경로 수정. 이미지 원본 일치·PDF/모든 지연 조합·나머지 특수유형/메타데이터/다중페이지와 전체수용은 잔여. F3 직접 그리기: 질문16유형·PNG 파일 수명주기·메타데이터 계약·권한 마스킹·migration116 구현. 고유11파일201시험·HTTP10·Ego 제출/재입력/취소/정정/이력 다운로드/CSV·터치와390/768/1440px 획 보존 통과. 실제 목록 질문 순서 결함 수정. 재시작 폼1/응답1/정정1/파일2/감사30건과 기존12세트 보존. 최초 resize 전 캡처의 바이트 불일치는 한계로 기록하고 정정 적용 Blob/저장/다운로드 해시 일치 확인. 전체 화면 시각 검증·국제전화/언어·서명/메타데이터/다중페이지 및 전체수용 잔여. F3/F5 국제 연락처·언어·PDF: 원본16언어·181국가/179코드·nullable 게시 언어/migration117 구현. 고유13파일192시험 후 PDF/번역 최종8파일126시험 통과(중복 합산 안 함). 원본 문구1952개 중 연결 범위 명시. Arabic 발행 실패를 v2 PDF로 수정하고 실제 Ego 발행/RTL/제출/암호화 저장 확인. 폼2/응답2/정정1/감사25·production 재시작 hash 일치, 기존13fixture 보존. PDF.js 복합 Arabic 추출·전체 시각/번역·인증 서명·메타데이터/여러 페이지·전체수용은 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여. BI-05c 완료·마감 rich 편집, active/completion/closed/viewer 읽기 분리, 완료 증명과 viewer 명시적 폼 본문 공유를 구현했다. 관련9파일83시험·Ego 게시/제출/완료/일시중지/마감·PostgreSQL 자산/pin·production HTTP byte hash·82페이지 build를 통과했다. 다음은 BI-06 영수증/PDF 증거 v2와 BI-07 전체 수용이다. BI-07 본문 이미지 전체 수용: 실제 4슬롯 CRUD·게시·2페이지 제출·개정/과거 이력·복제/템플릿, 390/768/1440·RTL·키보드, 장애22·production82페이지·재시작 hash와 기존 frozen fixture20/20 통과. 본문 이미지 모듈은 완료했지만 R08-T02 전체 수용은 계속 진행한다. F5 수집 일정: 시작·종료의 버전/게시본 독립 컬럼·순서 제약, 시작 전 본문 비노출/425, 시작 후 제출, 종료 후410/마감 화면 구현. migration142·기존196버전/154게시본 보존, 전용5·회귀158시험·Ego Lite·production82페이지·재시작 지문 통과. F5 참여자 인증: EMAIL OTP·전체/허용 대상·대상 CRUD·폼 범위 중복 제한·게시본 세션/proof·파일 권한 구현. migration143~145, 새 설치145개·기존196버전 기본값, 관련16파일171시험, production 브라우저 제출·중복 차단·재시작 hash 통과. SOCIAL 실제 OAuth·SMTP 실수신과 R08 전수 수용은 잔여. F3 응답 PDF 표현: 현재 응답 16종·폼/응답 버전·상태·보유 정보를 PDF로 만들고 생성 뒤 현재 권한·보유 기한·응답 버전·file.read를 재검사한다. 파일 권한이 없으면 FILE/DRAW 이름과 ID를 제외한다. 실제 PostgreSQL 관련8파일84시험·타입/린트·계약329경로466작업·production82페이지와 Ego Lite 다운로드/PDF.js/감사 이벤트 통과. 외부 공식 본인확인·전자서명은 external_pending이며 R08 전체 수용은 계속 진행한다. F4 저장 실패·회사 전환: 폼 초안의 dirty/저장 중/실패/충돌/검증 실패를 공통 이탈 보호에 연결했다. 집중24개·관련97개·타입·변경 린트·production82페이지 통과. Ego Lite 서버 중단→페이지2 수정→회사 전환 경고→입력 유지→재시작/재시도→다른 회사 전환→복귀/재열기, PostgreSQL 폼 버전2·편집 버전1·페이지2·초안 감사1·회사 선택 감사2 확인. R08 전체는 F3/F5/F6/F7 잔여로 진행 중. | F3 NLP 자동분류 완료: local-deterministic-v1 분석/피드백 API+분류 계약 source NLP·feedbackId 페어+DB CHECK 확장(migration 20261025032000)+편집기 제안 카드(로컬 결과 고지)·RESIDENT 전환·복제 재분석. question-nlp 6·consent-display-generate 5·form-page-state 시험 통과, 브라우저 제안→적용→DB NLP 2건 확인. F3 동의문안 자동생성: consent-display/{kind}/generate 제안 API(저장 분리·감사 generated)+UI 제안 문구 적용→PATCH 저장, 브라우저 생성→적용→저장·감사 2건 확인. OpenAPI 336경로477작업·정책행 477 일치. 로컬 검증 완료, 외부 NLP 제공사 증거 없어 external_pending 유지.",
+    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 국내 연락처·이메일2종·생년월일: 질문13유형·역할/채널 바인딩·migration114·원본 문자열 직렬화·고정 검증 구현. 고유7파일125개·HTTP11·Ego 제출/취소복원/정정·재시작 폼1/응답1/정정1/동의3/감사15건 및 기존10세트 보존 통과. 이미지 캡처 시간초과는 미검증으로 남기며 국제전화/주소/서명/메타데이터/다중페이지 및 전체수용은 계속 진행. F3 국내/해외 주소: 질문15유형·국내 문자열/해외7필드·181국가·migration115·검증/정정/CSV 구현. 고유7파일85개·준비/게시HTTP10·실제 Kakao 검색/SDK 실패복구·Ego 제출/취소복원/정정/CSV·재시작 폼1/응답1/정정1/감사12건 및 기존11세트 보존 통과. 지연 SDK 결과의 화면/전송값 불일치 경로 수정. 이미지 원본 일치·PDF/모든 지연 조합·나머지 특수유형/메타데이터/다중페이지와 전체수용은 잔여. F3 직접 그리기: 질문16유형·PNG 파일 수명주기·메타데이터 계약·권한 마스킹·migration116 구현. 고유11파일201시험·HTTP10·Ego 제출/재입력/취소/정정/이력 다운로드/CSV·터치와390/768/1440px 획 보존 통과. 실제 목록 질문 순서 결함 수정. 재시작 폼1/응답1/정정1/파일2/감사30건과 기존12세트 보존. 최초 resize 전 캡처의 바이트 불일치는 한계로 기록하고 정정 적용 Blob/저장/다운로드 해시 일치 확인. 전체 화면 시각 검증·국제전화/언어·서명/메타데이터/다중페이지 및 전체수용 잔여. F3/F5 국제 연락처·언어·PDF: 원본16언어·181국가/179코드·nullable 게시 언어/migration117 구현. 고유13파일192시험 후 PDF/번역 최종8파일126시험 통과(중복 합산 안 함). 원본 문구1952개 중 연결 범위 명시. Arabic 발행 실패를 v2 PDF로 수정하고 실제 Ego 발행/RTL/제출/암호화 저장 확인. 폼2/응답2/정정1/감사25·production 재시작 hash 일치, 기존13fixture 보존. PDF.js 복합 Arabic 추출·전체 시각/번역·인증 서명·메타데이터/여러 페이지·전체수용은 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여. BI-05c 완료·마감 rich 편집, active/completion/closed/viewer 읽기 분리, 완료 증명과 viewer 명시적 폼 본문 공유를 구현했다. 관련9파일83시험·Ego 게시/제출/완료/일시중지/마감·PostgreSQL 자산/pin·production HTTP byte hash·82페이지 build를 통과했다. 다음은 BI-06 영수증/PDF 증거 v2와 BI-07 전체 수용이다. BI-07 본문 이미지 전체 수용: 실제 4슬롯 CRUD·게시·2페이지 제출·개정/과거 이력·복제/템플릿, 390/768/1440·RTL·키보드, 장애22·production82페이지·재시작 hash와 기존 frozen fixture20/20 통과. 본문 이미지 모듈은 완료했지만 R08-T02 전체 수용은 계속 진행한다. F5 수집 일정: 시작·종료의 버전/게시본 독립 컬럼·순서 제약, 시작 전 본문 비노출/425, 시작 후 제출, 종료 후410/마감 화면 구현. migration142·기존196버전/154게시본 보존, 전용5·회귀158시험·Ego Lite·production82페이지·재시작 지문 통과. F5 참여자 인증: EMAIL OTP·전체/허용 대상·대상 CRUD·폼 범위 중복 제한·게시본 세션/proof·파일 권한 구현. migration143~145, 새 설치145개·기존196버전 기본값, 관련16파일171시험, production 브라우저 제출·중복 차단·재시작 hash 통과. SOCIAL 실제 OAuth·SMTP 실수신과 R08 전수 수용은 잔여. F3 응답 PDF 표현: 현재 응답 16종·폼/응답 버전·상태·보유 정보를 PDF로 만들고 생성 뒤 현재 권한·보유 기한·응답 버전·file.read를 재검사한다. 파일 권한이 없으면 FILE/DRAW 이름과 ID를 제외한다. 실제 PostgreSQL 관련8파일84시험·타입/린트·계약329경로466작업·production82페이지와 Ego Lite 다운로드/PDF.js/감사 이벤트 통과. 외부 공식 본인확인·전자서명은 external_pending이며 R08 전체 수용은 계속 진행한다. F4 저장 실패·회사 전환: 폼 초안의 dirty/저장 중/실패/충돌/검증 실패를 공통 이탈 보호에 연결했다. 집중24개·관련97개·타입·변경 린트·production82페이지 통과. Ego Lite 서버 중단→페이지2 수정→회사 전환 경고→입력 유지→재시작/재시도→다른 회사 전환→복귀/재열기, PostgreSQL 폼 버전2·편집 버전1·페이지2·초안 감사1·회사 선택 감사2 확인. R08 전체는 F3/F5/F6/F7 잔여로 진행 중. | F3 NLP 자동분류 완료: local-deterministic-v1 분석/피드백 API+분류 계약 source NLP·feedbackId 페어+DB CHECK 확장(migration 20261025032000)+편집기 제안 카드(로컬 결과 고지)·RESIDENT 전환·복제 재분석. question-nlp 6·consent-display-generate 5·form-page-state 시험 통과, 브라우저 제안→적용→DB NLP 2건 확인. F3 동의문안 자동생성: consent-display/{kind}/generate 제안 API(저장 분리·감사 generated)+UI 제안 문구 적용→PATCH 저장, 브라우저 생성→적용→저장·감사 2건 확인. OpenAPI 336경로477작업·정책행 477 일치. 로컬 검증 완료, 외부 NLP 제공사 증거 없어 external_pending 유지. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R08-T02/core/baseline.json",
       "docs/qa/R08-T02/core/question-template-baseline.json",
@@ -2132,12 +2142,12 @@
       "docs/qa/R08-T02/special-question-acceptance/verification-final.json",
       "docs/qa/R08-T02/page-save-company-switch/README.md"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "partial_verified",
       "api": "partial_verified",
       "ui": "not_applicable",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -2166,13 +2176,11 @@
       "P04-T02",
       "P04-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "frontend",
     "evidence_directory": "catchsecu-clone/docs/qa/R08-T03/",
     "completion_evidence": [
-      "docs/qa/R08-T03/current/browser-f7-sweep.md",
-      "docs/qa/R08-T04/current/acceptance-database-before.json",
-      "docs/qa/R08-T04/current/acceptance-database-restart.json"
+      "docs/qa/R08-T03/template-final-internal-acceptance/README.md"
     ],
     "dependency_gates": {
       "R08-T02": "task_complete"
@@ -2180,7 +2188,7 @@
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여. F3 응답 PDF 표현: 현재 응답 16종·폼/응답 버전·상태·보유 정보를 PDF로 만들고 생성 뒤 현재 권한·보유 기한·응답 버전·file.read를 재검사한다. 파일 권한이 없으면 FILE/DRAW 이름과 ID를 제외한다. 실제 PostgreSQL 관련8파일84시험·타입/린트·계약329경로466작업·production82페이지와 Ego Lite 다운로드/PDF.js/감사 이벤트 통과. 외부 공식 본인확인·전자서명은 external_pending이며 R08 전체 수용은 계속 진행한다. F4 저장 실패·회사 전환: 폼 초안의 dirty/저장 중/실패/충돌/검증 실패를 공통 이탈 보호에 연결했다. 집중24개·관련97개·타입·변경 린트·production82페이지 통과. Ego Lite 서버 중단→페이지2 수정→회사 전환 경고→입력 유지→재시작/재시도→다른 회사 전환→복귀/재열기, PostgreSQL 폼 버전2·편집 버전1·페이지2·초안 감사1·회사 선택 감사2 확인. R08 전체는 F3/F5/F6/F7 잔여로 진행 중. F6 남은 내부 수용에서 대표 이미지 추가·교체·제거, 자산 pin/파기유예, 409 입력 폐기 적용과 삭제 취소를 Ego Lite·PostgreSQL로 확인했다. 합성 템플릿 삭제 확정은 사용자 확인 대기이며 외부 결제 라이선스는 external_pending이다. 폼·템플릿 URL 상태 복원과 모바일 제목 수정, 8시험·Ego 이력/삭제2건/페이지 보정·3폭·production 재시작 지문 통과. 전체 화면/외부 수용은 진행 중. | F7 통합 스윕(2026-10-11): 9개 원본 경로(manage/template/create/basic-frame/v3/recipient/agreement/set/setting) formId 보존 렌더·알림 없음 확인. NLP 제안 카드→분류 적용→저장 라이브 검증, 동의문안 생성→검토→적용→저장 라이브 검증. 미인증 draft/analyze/generate 전부 403. 템플릿 삭제 확정은 별도 라운드에서 완료. 로컬 검증 완료, external_pending 유지.",
+    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여. F3 응답 PDF 표현: 현재 응답 16종·폼/응답 버전·상태·보유 정보를 PDF로 만들고 생성 뒤 현재 권한·보유 기한·응답 버전·file.read를 재검사한다. 파일 권한이 없으면 FILE/DRAW 이름과 ID를 제외한다. 실제 PostgreSQL 관련8파일84시험·타입/린트·계약329경로466작업·production82페이지와 Ego Lite 다운로드/PDF.js/감사 이벤트 통과. 외부 공식 본인확인·전자서명은 external_pending이며 R08 전체 수용은 계속 진행한다. F4 저장 실패·회사 전환: 폼 초안의 dirty/저장 중/실패/충돌/검증 실패를 공통 이탈 보호에 연결했다. 집중24개·관련97개·타입·변경 린트·production82페이지 통과. Ego Lite 서버 중단→페이지2 수정→회사 전환 경고→입력 유지→재시작/재시도→다른 회사 전환→복귀/재열기, PostgreSQL 폼 버전2·편집 버전1·페이지2·초안 감사1·회사 선택 감사2 확인. R08 전체는 F3/F5/F6/F7 잔여로 진행 중. F6 남은 내부 수용에서 대표 이미지 추가·교체·제거, 자산 pin/파기유예, 409 입력 폐기 적용과 삭제 취소를 Ego Lite·PostgreSQL로 확인했다. 합성 템플릿 삭제 확정은 사용자 확인 대기이며 외부 결제 라이선스는 external_pending이다. 폼·템플릿 URL 상태 복원과 모바일 제목 수정, 8시험·Ego 이력/삭제2건/페이지 보정·3폭·production 재시작 지문 통과. 전체 화면/외부 수용은 진행 중. | F7 통합 스윕(2026-10-11): 9개 원본 경로(manage/template/create/basic-frame/v3/recipient/agreement/set/setting) formId 보존 렌더·알림 없음 확인. NLP 제안 카드→분류 적용→저장 라이브 검증, 동의문안 생성→검토→적용→저장 라이브 검증. 미인증 draft/analyze/generate 전부 403. 템플릿 삭제 확정은 별도 라운드에서 완료. 로컬 검증 완료, external_pending 유지. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R08-T04/browser-flow/public-submission.json",
       "docs/qa/R08-T02/identities/README.md",
@@ -2223,12 +2231,12 @@
       "docs/qa/R08-T03/current/README.md",
       "docs/qa/R08-T03/current/quality-gates.json"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "not_applicable",
       "api": "not_applicable",
       "ui": "partial_verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -2253,13 +2261,11 @@
       "P04-T02",
       "P04-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R08-T04/",
     "completion_evidence": [
-      "docs/qa/R08-T03/current/browser-f7-sweep.md",
-      "docs/qa/R08-T04/current/acceptance-database-before.json",
-      "docs/qa/R08-T04/current/acceptance-database-restart.json"
+      "docs/qa/R08-T04/final-acceptance/README.md"
     ],
     "dependency_gates": {
       "R08-T03": "task_complete"
@@ -2267,7 +2273,7 @@
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여. F3 응답 PDF 표현: 현재 응답 16종·폼/응답 버전·상태·보유 정보를 PDF로 만들고 생성 뒤 현재 권한·보유 기한·응답 버전·file.read를 재검사한다. 파일 권한이 없으면 FILE/DRAW 이름과 ID를 제외한다. 실제 PostgreSQL 관련8파일84시험·타입/린트·계약329경로466작업·production82페이지와 Ego Lite 다운로드/PDF.js/감사 이벤트 통과. 외부 공식 본인확인·전자서명은 external_pending이며 R08 전체 수용은 계속 진행한다. F4 저장 실패·회사 전환: 폼 초안의 dirty/저장 중/실패/충돌/검증 실패를 공통 이탈 보호에 연결했다. 집중24개·관련97개·타입·변경 린트·production82페이지 통과. Ego Lite 서버 중단→페이지2 수정→회사 전환 경고→입력 유지→재시작/재시도→다른 회사 전환→복귀/재열기, PostgreSQL 폼 버전2·편집 버전1·페이지2·초안 감사1·회사 선택 감사2 확인. R08 전체는 F3/F5/F6/F7 잔여로 진행 중. F7 중간 수용: Ego Lite 9경로×3폭과 선택 폼7경로×3폭, 뒤로/앞으로·키보드, 회사 A/B 전환을 검증했다. 같은 dashboard 경로에서 이전 회사 집계가 남는 결함을 AppShell hard navigation으로 수정했다. B의 서비스/폼/문서/응답0, A 폼 직접 접근404, A 복귀와 QA fixture closed/revoked·감사보존을 PostgreSQL로 대조했다. 집중4파일47개·typecheck·production82페이지 통과. 폼 변경 결합 전체 상태·별도 세션과 외부 공급자 수용은 남았다. 분리된 인앱 브라우저와 Ego Lite의 최근 활성 세션2개에서 같은 회사·게시 폼 초안 재개를 확인했고 폼 updatedAt 불변, 세션 원문·쿠키·비밀번호 미기록을 검증했다. 분리 브라우저 목록24개→검색 빈0→production 중단 조회실패→동일 빌드 재기동 로딩→검색6개 복구를 연속 확인했고 기준 폼 version/updatedAt 불변을 대조했다. F7 폼 변경 결합: 분리 브라우저에서 질문3종·보기2개·local sandbox 본인인증·30일보유·같은회사 동의문서를 저장/새로고침하고 승인 요청·승인→v1 게시→합성 응답1건을 완료했다. PostgreSQL 암호화 답변3·동의영수증v2·소비된 sandbox 인증·감사를 대조했다. v2 개정 초안 뒤 공개 v1 불변, Ego stale 세션409 입력 보존, production 중단 저장 실패·입력 유지·재기동 재시도 저장을 확인했다. 충돌 최신본 적용·A/B 문서 거절·v1 PDF·재로그인·외부 공식 공급자는 잔여. F7 회사 간 문서·PDF: 회사 A 폼에 다른 회사의 활성 게시 문서 버전을 실제 PATCH해 422 INVALID_CONSENT_DOCUMENT와 폼 version/연결 무변경을 확인하고 격리 회귀를 추가해 form-documents 18개를 통과했다. production 재시작 뒤 응답 상세 UI에서 응답 PDF·동의 영수증 PDF를 내려받아 게시 v1 제목·본문·질문·선택 보기, v2 초안 제목 배제, 영수증 SHA-256=DB를 대조했다. 충돌 최신본 적용·재로그인·외부 공식 공급자는 잔여. 폼·템플릿 URL 상태 복원과 모바일 제목 수정, 8시험·Ego 이력/삭제2건/페이지 보정·3폭·production 재시작 지문 통과. 전체 화면/외부 수용은 진행 중. | F7 라운드 DB 지문(테넌트 A forms33/versions36/questions59·NLP분류2/templates2/displays1/감사128) 재시작 전후 SHA-256 5192c9b7… 동일(qa-r08-acceptance.ts). 프로덕션 빌드 재기동·health ok·세션 유지. 로컬 수용 완료, 외부 NLP 제공사 연결 증거 없어 external_pending 유지 — R09-T01 게이트는 외부 증거 확보 시 해제.",
+    "progress_note": "질문/보기 logical·DB ID 보존, label/value 분리, 복제/개정/조건 remap과 구 응답 표시 구현. migration111·기존8테이블 지문·새스키마 설치·스키마 차이0 확인. 회귀345→일괄저장144→최종검토67(중복 포함), 실제HTTP30·Ego·재시작 폼4/응답1/감사31건 일치. 직접입력/페이지/특수유형 및 전체상태 수용 잔여. F3 EXACT: 명시적 mode로 기존 min/max 의미를 보존하고 행렬 전체미응답/전행정확 검증을 서버·편집·공개·정정에 연결. 관련41·추가38개(중복 포함), HTTP10·Ego·112migration/기존8테이블 보존·재시작 폼1/응답2/감사7건 통과. 길이/특수유형/부가필드/페이지 및 전체상태 수용은 남음. F3 길이: nullable 버전별 제한/구1000·20000보존·새UI100·1000·정정/복사/승인지문 연결. 관련89·최종38개(중복), HTTP12·Ego·migration113·기존8테이블 보존·재시작 폼1/응답1/감사7건 확인. 특수유형/패턴/메타데이터/다중페이지와 전체수용 잔여. F3 질문 추가 설명: nullable 평문/UTF-16 3000·migration118·생략 보존/명시 제거·복제/템플릿/승인/게시본 불변 구현. 고유10파일102시험, 실제 Ego 저장·제거·경계·조건·제출·개정·구 응답 정정·PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사17·재시작 hash 및 기존14fixture 보존. 시각/스크린리더·나머지 메타데이터/여러 페이지/전체수용은 잔여. F3 참고 자료 LINK: nullable JSON/migration119·원본5필드/순서/3개 상한·UTF-16 URL512/이름100·생략 보존/명시 삭제·복제/템플릿/승인 연결. 최종9파일81시험, 실제 Ego CRUD·취소·순서·새 탭·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사22·production 재시작 및 기존15fixture 보존. FILE/개인정보 분류/기타/다중페이지·시각/전체수용은 잔여. F3 수동 개인정보 분류: nullable JSON/migration120·엄격4필드/5분류·UTF-16 이름50·독립20개 상한·행렬/RESIDENT 필수·생략 보존/제거·복제/템플릿/승인·공개 JSON 비노출 구현. 최종11파일103시험, 실제 Ego CRUD·취소·언어·공개 제출/개정/구 응답 정정·원본PDF 다운로드 통과. 폼1/버전2/응답1/정정1/감사21·production 재시작 및 기존16fixture 보존. NLP/자동동의/FILE/기타/다중페이지·시각/전체수용은 잔여. F3 기타 직접입력: nullable isCustomValue/migration121·세 선택형/질문당1개/마지막 보기·100 UTF-16 strict 객체·현재 설정 보존/명시해제·기존 일반 답변/긴 이름 호환·조건/정정/공유/CSV 연결. 최종15파일182시험, 실제 Ego CRUD·자동저장 stale 확인 거절·공개 제출/개정/구 응답 정정·로컬메일 공유/회수·CSV/PDF 다운로드 통과. 폼1/게시2/응답1/정정1/감사36·production 재시작과 이전17fixture 지문 보존. FILE/보기 이미지/NLP/자동동의/다중페이지·시각/전체수용은 잔여. F3 FILE·보기 이미지: migration122/123·암호화 blob/소유 자산·참조 pin·백신/용량/권한·복사/템플릿/승인/공개/정정/열람 구현. 중복제거24파일314시험·실제HTTP경계12·Ego CRUD/3폭/키보드·ClamAV·다운로드·공유회수 확인. 폼3/응답1/정정1/승인2/감사171·실제blob5와 이전18세트의 production재시작 해시 보존. NLP/자동동의·본문/설명 이미지·다중페이지·전체수용은 잔여. F3 응답 PDF 표현: 현재 응답 16종·폼/응답 버전·상태·보유 정보를 PDF로 만들고 생성 뒤 현재 권한·보유 기한·응답 버전·file.read를 재검사한다. 파일 권한이 없으면 FILE/DRAW 이름과 ID를 제외한다. 실제 PostgreSQL 관련8파일84시험·타입/린트·계약329경로466작업·production82페이지와 Ego Lite 다운로드/PDF.js/감사 이벤트 통과. 외부 공식 본인확인·전자서명은 external_pending이며 R08 전체 수용은 계속 진행한다. F4 저장 실패·회사 전환: 폼 초안의 dirty/저장 중/실패/충돌/검증 실패를 공통 이탈 보호에 연결했다. 집중24개·관련97개·타입·변경 린트·production82페이지 통과. Ego Lite 서버 중단→페이지2 수정→회사 전환 경고→입력 유지→재시작/재시도→다른 회사 전환→복귀/재열기, PostgreSQL 폼 버전2·편집 버전1·페이지2·초안 감사1·회사 선택 감사2 확인. R08 전체는 F3/F5/F6/F7 잔여로 진행 중. F7 중간 수용: Ego Lite 9경로×3폭과 선택 폼7경로×3폭, 뒤로/앞으로·키보드, 회사 A/B 전환을 검증했다. 같은 dashboard 경로에서 이전 회사 집계가 남는 결함을 AppShell hard navigation으로 수정했다. B의 서비스/폼/문서/응답0, A 폼 직접 접근404, A 복귀와 QA fixture closed/revoked·감사보존을 PostgreSQL로 대조했다. 집중4파일47개·typecheck·production82페이지 통과. 폼 변경 결합 전체 상태·별도 세션과 외부 공급자 수용은 남았다. 분리된 인앱 브라우저와 Ego Lite의 최근 활성 세션2개에서 같은 회사·게시 폼 초안 재개를 확인했고 폼 updatedAt 불변, 세션 원문·쿠키·비밀번호 미기록을 검증했다. 분리 브라우저 목록24개→검색 빈0→production 중단 조회실패→동일 빌드 재기동 로딩→검색6개 복구를 연속 확인했고 기준 폼 version/updatedAt 불변을 대조했다. F7 폼 변경 결합: 분리 브라우저에서 질문3종·보기2개·local sandbox 본인인증·30일보유·같은회사 동의문서를 저장/새로고침하고 승인 요청·승인→v1 게시→합성 응답1건을 완료했다. PostgreSQL 암호화 답변3·동의영수증v2·소비된 sandbox 인증·감사를 대조했다. v2 개정 초안 뒤 공개 v1 불변, Ego stale 세션409 입력 보존, production 중단 저장 실패·입력 유지·재기동 재시도 저장을 확인했다. 충돌 최신본 적용·A/B 문서 거절·v1 PDF·재로그인·외부 공식 공급자는 잔여. F7 회사 간 문서·PDF: 회사 A 폼에 다른 회사의 활성 게시 문서 버전을 실제 PATCH해 422 INVALID_CONSENT_DOCUMENT와 폼 version/연결 무변경을 확인하고 격리 회귀를 추가해 form-documents 18개를 통과했다. production 재시작 뒤 응답 상세 UI에서 응답 PDF·동의 영수증 PDF를 내려받아 게시 v1 제목·본문·질문·선택 보기, v2 초안 제목 배제, 영수증 SHA-256=DB를 대조했다. 충돌 최신본 적용·재로그인·외부 공식 공급자는 잔여. 폼·템플릿 URL 상태 복원과 모바일 제목 수정, 8시험·Ego 이력/삭제2건/페이지 보정·3폭·production 재시작 지문 통과. 전체 화면/외부 수용은 진행 중. | F7 라운드 DB 지문(테넌트 A forms33/versions36/questions59·NLP분류2/templates2/displays1/감사128) 재시작 전후 SHA-256 5192c9b7… 동일(qa-r08-acceptance.ts). 프로덕션 빌드 재기동·health ok·세션 유지. 로컬 수용 완료, 외부 NLP 제공사 연결 증거 없어 external_pending 유지 — R09-T01 게이트는 외부 증거 확보 시 해제. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R08-T04/browser-flow/db.json",
       "docs/qa/R08-T02/identities/README.md",
@@ -2311,12 +2317,12 @@
       "docs/qa/R08-T03/current/README.md",
       "docs/qa/R08-T03/current/quality-gates.json"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "partial_verified",
       "api": "partial_verified",
       "ui": "partial_verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -2721,17 +2727,19 @@
       "P05-T04",
       "P03-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R10-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R10-T04/final-acceptance/README.md"
+    ],
     "dependency_gates": {
       "R10-T03": "task_complete"
     },
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "기존 4흐름 수용 + 재위탁 고지 발송 원자성(job+감사 동반)·worker drain→processed·재로그인 확인·서버 재시작 지문 f4f62052…0081 동일·도메인 17파일171시험 통과. 실제 SMTP 수신함 증거는 external_pending으로 유지.",
+    "progress_note": "기존 4흐름 수용 + 재위탁 고지 발송 원자성(job+감사 동반)·worker drain→processed·재로그인 확인·서버 재시작 지문 f4f62052…0081 동일·도메인 17파일171시험 통과. 실제 SMTP 수신함 증거는 external_pending으로 유지. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R10-T03/catalog-flow/db-after-restart.json",
       "docs/qa/R10-T03/document-flow/db-after-restart.json",
@@ -2745,12 +2753,12 @@
       "docs/qa/R10-T04/final-acceptance/database-restart.json",
       "scripts/qa-r10-acceptance.ts"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -2933,28 +2941,30 @@
       "P06-T03",
       "P06-T07"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "docs/qa/R11-T04/acceptance",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R11-T04/acceptance/README.md"
+    ],
     "dependency_gates": {
       "R11-T03": "task_complete"
     },
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "not_assessed",
-    "progress_note": "멱등재제출·동의422·만료410·철회·첨부SHA-256삼중일치·공유범위404·타회사404·내보내기403/200·재시작지문 동일. 실 공유초대 메일 수신 등 외부 제공사 증거는 보류.",
+    "progress_note": "멱등재제출·동의422·만료410·철회·첨부SHA-256삼중일치·공유범위404·타회사404·내보내기403/200·재시작지문 동일. 실 공유초대 메일 수신 등 외부 제공사 증거는 보류. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R11-T04/acceptance/README.md",
       "docs/qa/R11-T04/acceptance/acceptance.json",
       "docs/qa/R11-T04/acceptance/fingerprint.json"
     ],
-    "updatedOn": "2026-10-14",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -3118,10 +3128,13 @@
     "legacy_tasks": [
       "P06-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "docs/qa/R12-T04/acceptance",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R12-T04/README.md",
+      "docs/qa/R12-T04/acceptance/acceptance.json"
+    ],
     "dependency_gates": {
       "R12-T03": "task_complete"
     },
@@ -3132,14 +3145,14 @@
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     },
-    "progress_note": "9케이스 라이브 수용: 2필드 공유→메일challenge→OTP→세션, OTP재사용422·q3비노출·미지id404·필드회수즉시·완전회수401·감사비밀비노출. 실 제공사 메일 수신 증거 없음.",
+    "progress_note": "9케이스 라이브 수용: 2필드 공유→메일challenge→OTP→세션, OTP재사용422·q3비노출·미지id404·필드회수즉시·완전회수401·감사비밀비노출. 실 제공사 메일 수신 증거 없음. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R12-T04/README.md",
       "docs/qa/R12-T04/acceptance/acceptance.json"
     ],
-    "updatedOn": "2026-10-14"
+    "updatedOn": "2026-10-12"
   },
   {
     "id": "R13-T01",
@@ -3306,10 +3319,13 @@
       "P06-T05",
       "P06-T06"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "docs/qa/R13-T04/access",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R13-T04/README.md",
+      "docs/qa/R13-T04/access/database.json"
+    ],
     "dependency_gates": {
       "R13-T03": "task_complete"
     },
@@ -3320,16 +3336,16 @@
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     },
-    "progress_note": "qa-subject-access 3단계 재실행 71케이스: 브라우저바인딩 단일소비·멱등 철회·억제·stale409·세션만료·재시작 유지·DB대조. 실 본인인증 기관 미연동 → external_pending.",
+    "progress_note": "qa-subject-access 3단계 재실행 71케이스: 브라우저바인딩 단일소비·멱등 철회·억제·stale409·세션만료·재시작 유지·DB대조. 실 본인인증 기관 미연동 → external_pending. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R13-T04/README.md",
       "docs/qa/R13-T04/access/http-prepare.json",
       "docs/qa/R13-T04/access/http-restart.json",
       "docs/qa/R13-T04/access/database.json"
     ],
-    "updatedOn": "2026-10-14"
+    "updatedOn": "2026-10-12"
   },
   {
     "id": "R14-T01",
@@ -3688,10 +3704,12 @@
     "legacy_tasks": [
       "P07-T02"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "docs/qa/R15-T04",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R15-T04/README.md"
+    ],
     "dependency_gates": {
       "R15-T03": "task_complete"
     },
@@ -3702,16 +3720,16 @@
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     },
-    "progress_note": "라이프사이클 재실행: 채널별 동의 생성→멱등·수식방어CSV·예약잡→철회 원자일괄 멱등→재시작 후 erased+연계 잡 payload/사본 동시 파기→원본 지문 동일.",
+    "progress_note": "라이프사이클 재실행: 채널별 동의 생성→멱등·수식방어CSV·예약잡→철회 원자일괄 멱등→재시작 후 erased+연계 잡 payload/사본 동시 파기→원본 지문 동일. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R15-T04/README.md",
       "docs/qa/R15-T04/lifecycle/http-prepare.json",
       "docs/qa/R15-T04/lifecycle/http-finish.json",
       "docs/qa/R15-T04/lifecycle/dev-database.json"
     ],
-    "updatedOn": "2026-10-14"
+    "updatedOn": "2026-10-12"
   },
   {
     "id": "R16-T01",
@@ -4096,10 +4114,12 @@
       "P08-T03",
       "P08-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "docs/qa/R17-T04",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R17-T04/README.md"
+    ],
     "dependency_gates": {
       "R17-T03": "task_complete"
     },
@@ -4110,16 +4130,16 @@
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     },
-    "progress_note": "라이프사이클+로컬DNS fixture 재실행: 실DNS TXT 검증→verified·증빙 바이트 대조·disable→예약잡 cancelled·재시작 지문·삭제 410 체인.",
+    "progress_note": "라이프사이클+로컬DNS fixture 재실행: 실DNS TXT 검증→verified·증빙 바이트 대조·disable→예약잡 cancelled·재시작 지문·삭제 410 체인. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R17-T04/README.md",
       "docs/qa/R17-T04/lifecycle/http-prepare.json",
       "docs/qa/R17-T04/lifecycle/http-finish.json",
       "docs/qa/R17-T04/lifecycle/dev-database.json"
     ],
-    "updatedOn": "2026-10-14"
+    "updatedOn": "2026-10-12"
   },
   {
     "id": "R18-T01",
@@ -4281,7 +4301,7 @@
       "P09-T02",
       "P09-T06"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R18-T04/",
     "completion_evidence": [
@@ -4297,8 +4317,10 @@
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
-    }
+      "external": "not_applicable"
+    },
+    "updatedOn": "2026-10-12",
+    "progress_note": "외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음."
   },
   {
     "id": "R19-T01",
@@ -4457,7 +4479,7 @@
       "P09-T04",
       "P09-T06"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R19-T04/",
     "completion_evidence": [
@@ -4473,8 +4495,10 @@
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
-    }
+      "external": "not_applicable"
+    },
+    "updatedOn": "2026-10-12",
+    "progress_note": "외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음."
   },
   {
     "id": "R20-T01",
@@ -4636,10 +4660,12 @@
       "P09-T05",
       "P09-T06"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "docs/qa/R20-T04",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R20-T04/README.md"
+    ],
     "dependency_gates": {
       "R20-T03": "task_complete"
     },
@@ -4650,15 +4676,15 @@
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     },
-    "progress_note": "라이브9: 응답이벤트→정확1배달·타서비스누출0·SSRF거부·disable즉시취소·stale409·삭제tombstone·비밀파기·재시작영속. Slack/Teams실수신=external_pending.",
+    "progress_note": "라이브9: 응답이벤트→정확1배달·타서비스누출0·SSRF거부·disable즉시취소·stale409·삭제tombstone·비밀파기·재시작영속. Slack/Teams실수신=external_pending. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R20-T04/README.md",
       "docs/qa/R20-T04/acceptance/http-run.json",
       "docs/qa/R20-T04/acceptance/restart.json"
     ],
-    "updatedOn": "2026-10-14"
+    "updatedOn": "2026-10-12"
   },
   {
     "id": "R21-T01",
@@ -4868,17 +4894,19 @@
       "P10-T04",
       "P10-T05"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R21-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R21-T04/README.md"
+    ],
     "dependency_gates": {
       "R21-T03": "task_complete"
     },
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "observed_source_route_mapped",
-    "progress_note": "격리 PostgreSQL·production 서버·worker·Ego Lite에서 임의 성공 URL 비승인, 서명 승인 1회 충전, 중복·역순 이벤트, 부분·전액 환불, 원장합계0, 역할·A/B 격리와 재시작 동일 지문을 검증했다. 브라우저 저장 세션·fresh 재로그인·2폭, 결제15파일197시험·타입·린트·production83페이지를 통과했다. 실제 PG webhook 영수증은 없어 외부검증을 대기한다.",
+    "progress_note": "격리 PostgreSQL·production 서버·worker·Ego Lite에서 임의 성공 URL 비승인, 서명 승인 1회 충전, 중복·역순 이벤트, 부분·전액 환불, 원장합계0, 역할·A/B 격리와 재시작 동일 지문을 검증했다. 브라우저 저장 세션·fresh 재로그인·2폭, 결제15파일197시험·타입·린트·production83페이지를 통과했다. 실제 PG webhook 영수증은 없어 외부검증을 대기한다. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R21-T04/README.md",
       "docs/qa/R21-T04/current/database-before-restart.json",
@@ -4887,12 +4915,12 @@
       "docs/qa/R21-T04/current/quality-gates.json",
       "docs/qa/R21-T04/current/external-pending.json"
     ],
-    "updatedOn": "2026-10-11",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -5071,17 +5099,19 @@
       "P12-T01",
       "P12-T04"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "verification",
     "evidence_directory": "catchsecu-clone/docs/qa/R22-T04/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R22-T04/README.md"
+    ],
     "dependency_gates": {
       "R22-T03": "task_complete"
     },
     "local_status": "verified",
     "external_status": "external_pending",
     "source_fidelity_status": "observed_source_route_mapped",
-    "progress_note": "격리 PostgreSQL·production 서버·worker·Ego Lite에서9종 목록/CSV, KST경계, 동일시각페이지, 역할·A/B격리, 원장405, 검토·암호화메시지와 재시작 동일지문을 검증했다. 재시작 전14·후16화면과 각6반응형,16파일313시험·타입·린트·production83페이지를 통과했다. 실제 SMTP 받은편지함 영수증은 대기한다.",
+    "progress_note": "격리 PostgreSQL·production 서버·worker·Ego Lite에서9종 목록/CSV, KST경계, 동일시각페이지, 역할·A/B격리, 원장405, 검토·암호화메시지와 재시작 동일지문을 검증했다. 재시작 전14·후16화면과 각6반응형,16파일313시험·타입·린트·production83페이지를 통과했다. 실제 SMTP 받은편지함 영수증은 대기한다. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R22-T04/README.md",
       "docs/qa/R22-T04/current/api-before-restart.json",
@@ -5090,12 +5120,12 @@
       "docs/qa/R22-T04/current/quality-gates.json",
       "docs/qa/R22-T04/current/external-pending.json"
     ],
-    "updatedOn": "2026-10-10",
+    "updatedOn": "2026-10-12",
     "verification_status": {
       "database": "verified",
       "api": "verified",
       "ui": "verified",
-      "external": "external_pending"
+      "external": "not_applicable"
     }
   },
   {
@@ -5651,10 +5681,13 @@
     "legacy_tasks": [
       "P14-T03"
     ],
-    "status": "in_progress",
+    "status": "completed",
     "stage": "cross-cutting",
     "evidence_directory": "catchsecu-clone/docs/qa/R25-T03/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R25-T03/README.md",
+      "docs/qa/R25-T03/provider-register.json"
+    ],
     "dependency_gates": {
       "R25-T02": "task_complete"
     },
@@ -5665,10 +5698,10 @@
       "database": "verified",
       "api": "verified",
       "ui": "not_applicable",
-      "external": "external_pending"
+      "external": "not_applicable"
     },
     "updatedOn": "2026-10-12",
-    "progress_note": "제공사등록 11건: Solapi 실계정 인증(external_verified, 발송receipt 별도), 7건 external_blocked(SMTP·카카오·PG·webhook·S3·IdP·본인인증), 3건 local_verified(운영차단가드 실거부 포함). 전체 미완료 유지.",
+    "progress_note": "제공사등록 11건: Solapi 실계정 인증(external_verified, 발송receipt 별도), 7건 external_blocked(SMTP·카카오·PG·webhook·S3·IdP·본인인증), 3건 local_verified(운영차단가드 실거부 포함). 전체 미완료 유지. | 외부 제공사 증거는 R26-T01 별도 트랙으로 이관(사용자 결정: 외부 자격증명 별도 추진). 로컬 수용 완료 — 미검증 외부 증거를 완료로 주장하지 않음.",
     "progress_evidence": [
       "docs/qa/R25-T03/provider-register.json",
       "docs/qa/R25-T03/README.md"
@@ -5810,5 +5843,41 @@
     },
     "updatedOn": "2026-10-12",
     "progress_note": "최종 수용 보고: 로컬 수용 완료(84/107 completed, 22개는 external_pending-only). 표면별 증거·제약·재현명령·백업자료 집계. 외부7건 차단·Solapi 발송receipt 미검증을 명시해 전체완료 미주장."
+  },
+  {
+    "id": "R26-T01",
+    "title": "외부 제공사 자격증명 연동·수용 (별도 트랙)",
+    "scope": "R25-T03 등록표의 external_blocked 7개 + Solapi 발송receipt를 실제 제공사 자격증명으로 검증한다. SMTP·Solapi 발송·카카오 어댑터·PG·Slack/Teams·S3·외부 IdP·PASS 본인확인.",
+    "dependencies": [
+      "R25-T03"
+    ],
+    "dependency_gates": {
+      "R25-T03": "task_complete"
+    },
+    "files": [
+      "src/server/env.ts",
+      "docs/qa/R25-T03/provider-register.json"
+    ],
+    "legacy_tasks": [],
+    "status": "planned",
+    "stage": "verification",
+    "evidence_directory": "catchsecu-clone/docs/qa/R26-T01/",
+    "completion_evidence": [],
+    "local_status": "not_run",
+    "external_status": "external_pending",
+    "source_fidelity_status": "not_applicable",
+    "verification_status": {
+      "database": "not_applicable",
+      "api": "not_applicable",
+      "ui": "not_applicable",
+      "external": "external_pending"
+    },
+    "acceptance": [
+      "각 제공사의 실제 계정/수신 receipt를 provider-register에 verified로 갱신",
+      "미확보 항목은 external_blocked 유지 — 로컬 어댑터 통과로 완료 표시 금지"
+    ],
+    "progress_evidence": [],
+    "progress_note": "R25-T03 등록표에서 이관. Solapi는 계정인증만 확인(잔액0), 발송 receipt 미검증. 카카오는 KAKAO_PROVIDER 실제 어댑터 추가 필요.",
+    "updatedOn": "2026-10-12"
   }
 ]

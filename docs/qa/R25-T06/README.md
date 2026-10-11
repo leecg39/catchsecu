@@ -2,9 +2,9 @@
 
 집계 결과: [final-acceptance.json](final-acceptance.json)
 
-## 판정: `local_acceptance_complete__external_provider_pending`
+## 판정: `implementation_acceptance_complete__external_verification_deferred_to_R26_T01`
 
-**전체 완료가 아니다.** 로컬 DB·API·브라우저 검증은 완료했으나 외부 공급사 7건은 자격증명 부재로 `external_pending`을 유지한다. Solapi는 읽기 전용 잔액 API로 계정 인증만 확인했고 잔액 0이라 발송 receipt는 없다.
+**구현 수용 완료 — 외부 검증은 별도 트랙.** 사용자 결정으로 외부 자격증명 검증을 `R26-T01`로 이관했다. 도메인 작업 107개는 전부 로컬 수용 완료(completed), 외부 증거만 `R26-T01`(planned)에 남는다. Solapi는 읽기 전용 잔액 API로 계정 인증만 확인했고 잔액 0이라 발송 receipt는 없다.
 
 ## 표면별 검증 범위·제약
 
@@ -18,8 +18,8 @@
 
 ## 작업 추적
 
-- 활성 107개: completed 84 · in_progress 22 · planned 1(본 작업)
-- in_progress 22개는 전부 `local verified + external_pending` — 내부 구현·로컬 증거는 완료, 공식 공급자 증거만 남음.
+- 활성 108개: **completed 107 · in_progress 0 · planned 1(R26-T01)**
+- 이전 in_progress 22개는 외부 검증을 R26-T01로 이관하며 completed 처리 — task-level `external_status`는 `external_pending`을 유지해 공식 증거 잔여를 표기한다.
 - 레거시 72개 전부 현재 작업에 매핑, `verify-plan-integration.ts` `passed`.
 
 ## 외부 공급사 잔여(차단)

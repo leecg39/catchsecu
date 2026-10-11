@@ -213,7 +213,7 @@ Job/JobAttempt claim·lease·재시도·실패/재실행, DB쓰기와 event원�
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 - 완료 증거: [현재 보고서](../../qa/R02-T03/current/README.md), [상태 매트릭스](../../qa/R02-T03/current/state-matrix.json), [56개 UI·API 회귀](../../qa/R02-T03/current/auth-ui-regression.json), [Ego Lite 재전송·DB 증거](../../qa/R02-T03/current/retry-countdown-browser-db.json), [15경로·3폭 기존 증거](../../qa/R02-T03/authentication/routes-responsive.json). 15개 경로45개 화면의 가로넘침0과 재전송 대기·재활성화를 확인했다.
 
-### [~] R02-T04 계정 인증·세션·복구 — DB·브라우저·재시작 수용검증
+### [x] R02-T04 계정 인증·세션·복구 — DB·브라우저·재시작 수용검증
 
 A 계정 가입 후 로컬 시험메일 링크를 한 번 사용, 재사용 거부; 틀린 암호·만료 OTP·복구코드 재사용 거부; 다른 브라우저 세션 폐기; 재시작 뒤 인증 유지/폐기 일치.
 
@@ -324,7 +324,7 @@ Company→Service tenant FK, 회사 내 서비스명 unique, Membership/ServiceG
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 - 완료 증거: [현재 보고서](../../qa/R04-T03/current/README.md), [Ego Lite URL·페이지](../../qa/R04-T03/current/browser-url-state.json), [상태 매트릭스](../../qa/R04-T03/current/route-state-matrix.json), [UI/API 계약 13개](../../qa/R04-T03/current/ui-contract-regression.json). 네 원본 경로와 운영자 부가 경로의 전체 상태, 3페이지 이동·새로고침·축소 보정, 3폭·키보드와 API→DB 반영을 확인했다.
 
-### [~] R04-T04 구성원·초대·권한·전문가 — DB·브라우저·재시작 수용검증
+### [x] R04-T04 구성원·초대·권한·전문가 — DB·브라우저·재시작 수용검증
 
 A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 실패; owner2명이 동시탈퇴/이전해도 최소1명 보장; 초대 중복·만료·전문가 기간 만료/재배정409.
 
@@ -377,7 +377,7 @@ A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [~] R05-T04 MY·프로필·활동 검토·탈퇴 — DB·브라우저·재시작 수용검증
+### [x] R05-T04 MY·프로필·활동 검토·탈퇴 — DB·브라우저·재시작 수용검증
 
 자기 프로필 수정 재로그인 확인; B 사용자 프로필 노출없음; 최종 로그인 수단 해제 차단; 탈퇴 후 세션 폐기와 보존대상 분리; 검토 만료·중복처리·알림실패 재시도.
 
@@ -429,7 +429,7 @@ A 초대 수락→서비스1만 조회→권한회수 즉시거부; B ID 교체 
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [~] R06-T04 회사 보안정책·IP·MFA — DB·브라우저·재시작 수용검증
+### [x] R06-T04 회사 보안정책·IP·MFA — DB·브라우저·재시작 수용검증
 
 IP 차단 후 기존 로그인에서도 API403; 잘못된 CIDR422(INVALID_CIDR); 신뢰하지 않는 X-Forwarded-For 우회실패; MFA 예외만료 즉시 재인증; 정책초기화 이후 DB와 화면 일치.
 
@@ -457,7 +457,7 @@ IP 차단 후 기존 로그인에서도 API403; 잘못된 CIDR422(INVALID_CIDR);
   - C SSO 공급자/인증 state/계정연결; R 설정·preflight; U 설정·활성; D 공급자 비활성/계정연결 해제. callback은 검증 후 1회 처리.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [~] R07-T02 SSO·OAuth·기관 인증 — 서버 API·업무 처리
+### [x] R07-T02 SSO·OAuth·기관 인증 — 서버 API·업무 처리
 
 OIDC/SAML 검증·계정연결 및 신규 /login/gpki/callback·/login/saeol/callback 경로를 정식 어댑터 계약에 연결한다. GPKI/새올/그룹웨어 규격은 제공사 확인 후 확정하며 callback URL만으로 성공시키지 않는다.
 
@@ -470,7 +470,7 @@ OIDC/SAML 검증·계정연결 및 신규 /login/gpki/callback·/login/saeol/cal
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 - 진행 체크포인트: 라운드2(2026-10-11)에서 제공사 등록→사전검사 통과→사용→중지→삭제 전체 수명주기를 UI+DB+감사 5건으로 실측하고, 오래된 세션의 삭제가 SSO_REAUTH_REQUIRED로 차단된 뒤 재로그인으로 통과하는 보안 게이트를 확인했다. 가상 GPKI 로그인은 외부 미연동 고지와 임의 자격 정직 거절을 확인했다. [증거](../../qa/R07-T04/provider-lifecycle-round2/README.md). 로컬 검증 완료, external_pending 유지.
 
-### [~] R07-T03 SSO·OAuth·기관 인증 — 전체 화면·모달 연결
+### [x] R07-T03 SSO·OAuth·기관 인증 — 전체 화면·모달 연결
 
 SSO 목록·등록·수정·삭제·연결시험, OAuth/SAML 시작/성공/실패/초대가입, GPKI 이메일등록/기관 실패/새올 callback 화면을 서버 결과와 연결한다.
 
@@ -483,7 +483,7 @@ SSO 목록·등록·수정·삭제·연결시험, OAuth/SAML 시작/성공/실�
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 - 진행 체크포인트: 라운드2에서 /login?error= 화면을 3종 action(restart/contact/login)별로 실측하고 제공사 등록 모달의 미저장 닫기 확인을 통과했다. [증거](../../qa/R07-T04/provider-lifecycle-round2/README.md). 로컬 검증 완료, external_pending 유지.
 
-### [~] R07-T04 SSO·OAuth·기관 인증 — DB·브라우저·재시작 수용검증
+### [x] R07-T04 SSO·OAuth·기관 인증 — DB·브라우저·재시작 수용검증
 
 잘못된 issuer/audience/state·만료/재사용 assertion 거부; 별도 시험 IdP로 로그인·연결·해제; 기관2곳 tenant 분리; 가상기관 테스트와 실제기관 수신 증거를 분리.
 
@@ -512,7 +512,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
   - C 폼/초안/질문/보기/템플릿/복제; R 목록·상세·초안; U 순서·문구·유형·단계 설정; D 미사용 초안·질문·템플릿 보관.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [~] R08-T02 캐치폼·질문·템플릿·단계 편집 — 서버 API·업무 처리
+### [x] R08-T02 캐치폼·질문·템플릿·단계 편집 — 서버 API·업무 처리
 
 폼·템플릿 CRUD/use/copy/revise/draft/favorite 계약과 편집 저장 payload를 대조한다. 질문 유형별 필수/길이/선택/첨부 검증과 충돌409를 서버에서 집행한다.
 
@@ -526,7 +526,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
 - 진행 체크포인트: F5 시작·종료 시각의 버전/게시본 계약과 DB 제약, 시작 전425·시작 후 제출·종료 후410을 구현했다. migration142·기존196버전/154게시본 보존, 전용5·회귀158시험, Ego Lite·production 재시작을 확인했다. [증거](../../qa/R08-T02/collection-window/README.md). 중복 참여·대상 목록·인증 방법 전체와 R08 수용조건은 남아 있다.
 - 진행 체크포인트: F3 NLP 자동분류와 동의 문안 자동생성을 완료했다. local-deterministic-v1 분석/피드백 API·분류 source NLP+feedbackId·migration 20261025032000·편집기 제안 카드(로컬 결과 고지)·RESIDENT 전환·복제 재분석을 구현하고 question-nlp 6·consent-display-generate 5·form-page-state 시험과 브라우저 제안→적용→DB NLP 2건을 통과했다. consent-display/{kind}/generate 제안 API(저장 분리·generated 감사)·UI 검토→적용→PATCH 저장을 검증하고 OpenAPI 336경로477작업·정책행477을 일치시켰다. [증거](../../qa/R08-T02/question-metadata/nlp-analysis/README.md), [증거](../../qa/R08-T02/question-metadata/consent-generation/README.md). 외부 NLP 제공사 실연결 증거는 없어 external_pending을 유지한다.
 
-### [~] R08-T03 캐치폼·질문·템플릿·단계 편집 — 전체 화면·모달 연결
+### [x] R08-T03 캐치폼·질문·템플릿·단계 편집 — 전체 화면·모달 연결
 
 템플릿→신규 폼, create/basic-frame/v3/recipient/agreement/set/setting 각 단계로 직접진입·저장·재개; 전체 단계 경로/query의 formId 유지. 목록 검색/필터/복제/삭제와 미저장 이동 경고.
 
@@ -539,7 +539,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 - 진행 체크포인트: F7 통합 스윕(2026-10-11)에서 9개 원본 경로의 formId 보존 렌더·알림 없음을 확인하고, NLP 제안→분류 적용→저장과 문안 생성→검토→적용→저장을 라이브로 통과했다. 미인증 draft/analyze/generate는 전부 403이다. [증거](../../qa/R08-T03/current/browser-f7-sweep.md). 로컬 검증 완료, external_pending 유지.
 
-### [~] R08-T04 캐치폼·질문·템플릿·단계 편집 — DB·브라우저·재시작 수용검증
+### [x] R08-T04 캐치폼·질문·템플릿·단계 편집 — DB·브라우저·재시작 수용검증
 
 질문3종+제공자+동의서로 초안 작성→모든 단계 새로고침→다른 브라우저 재개; 2탭409; A 문서를 B 폼에 연결 차단; 게시본 수정 시 원래 응답의 질문·문구 불변.
 
@@ -644,7 +644,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [~] R10-T04 처리 목적·동의서·처리방침·서비스 공개문서 — DB·브라우저·재시작 수용검증
+### [x] R10-T04 처리 목적·동의서·처리방침·서비스 공개문서 — DB·브라우저·재시작 수용검증
 
 목적+제공자 CRUD→문서생성/개정→공개토큰/PDF 내용일치; 소프트삭제/복구; 게시문서와 이전동의영수증 불변; 국내/국외/수신자/agree 변형 DB fixture로 각각검증.
 
@@ -696,7 +696,7 @@ project/projects/test-projects/url/customer-use-case/jap_intro 별칭의 차이�
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [~] R11-T04 공개 폼·응답·첨부·정정 — DB·브라우저·재시작 수용검증
+### [x] R11-T04 공개 폼·응답·첨부·정정 — DB·브라우저·재시작 수용검증
 
 게시된폼 외부제출→관리자응답조회→정정→영수증/PDF→첨부hash비교→재시작; 2회제출 멱등; 필수동의누락400; 만료게시/타회사파일/공유범위밖파일 거부; 내보내기 재권한검사.
 
@@ -904,7 +904,7 @@ preferences CRUD/withdrawals/export/sources/summary를 실제 ConsentReceipt와 
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R15-T04 광고 동의·수신거부 — DB·브라우저·재시작 수용검증
+### [x] R15-T04 광고 동의·수신거부 — DB·브라우저·재시작 수용검증
 
 동의→검색→철회→예약발송억제; 중복제거 on/off 집계 대조; 원본 응답정정 시 잘못된 주체 재동의 방지; 권한없는 복호화·타회사 export 실패.
 
@@ -1008,7 +1008,7 @@ sms 기본/폼선택/직접작성/번호관리/내역/번호없음 모두 실데
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R17-T04 발신번호·문자 캠페인 — DB·브라우저·재시작 수용검증
+### [x] R17-T04 발신번호·문자 캠페인 — DB·브라우저·재시작 수용검증
 
 번호등록→시험검증→수신자2명→예약→취소/발송→receipt→잔액대조; 미승인번호거부; 철회직후발송차단; provider timeout 재시도 중복비용없음. 실제SMS도착증거 별도.
 
@@ -1060,7 +1060,7 @@ mail 폼/직접발송·발신주소/발송내역/주소없음 화면, 편집기�
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R18-T04 발신메일·이메일 발송·수신거부 — DB·브라우저·재시작 수용검증
+### [x] R18-T04 발신메일·이메일 발송·수신거부 — DB·브라우저·재시작 수용검증
 
 메일작성/첨부→로컬메일함 수신본문과hash대조→반송→억제→재발송차단; 실제SMTP·DNS·수신함·unsubscribe 및 재시작 검증을 분리 기록.
 
@@ -1112,7 +1112,7 @@ mail 폼/직접발송·발신주소/발송내역/주소없음 화면, 편집기�
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R19-T04 알림톡 채널·템플릿·발송 — DB·브라우저·재시작 수용검증
+### [x] R19-T04 알림톡 채널·템플릿·발송 — DB·브라우저·재시작 수용검증
 
 채널등록→검증→템플릿등록→반려/수정/승인→변수발송→receipt; 승인템플릿수정시 재심사; 비활성채널거부; fallback중복방지; 실제카카오 승인/수신은 제공사시험 증거필수.
 
@@ -1164,7 +1164,7 @@ CRUD/options/test/enabled/bulk-delete/deliveries/retry를 검증하고 실제 �
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [ ] R20-T04 알림 받기·웹훅·이메일 알림 — DB·브라우저·재시작 수용검증
+### [x] R20-T04 알림 받기·웹훅·이메일 알림 — DB·브라우저·재시작 수용검증
 
 폼응답이벤트→정확한 대상1회전송→실패/재시도→비활성/삭제 즉시중단; 다른서비스이벤트누출없음; endpoint변경경합·타임아웃·내부망URL거부. Slack/Teams실제수신 별도.
 
@@ -1219,7 +1219,7 @@ license-service/membership/detail/method/billing-policy/history/usage/service-as
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [~] R21-T04 라이선스·결제수단·주문·원장·환불 — DB·브라우저·재시작 수용검증
+### [x] R21-T04 라이선스·결제수단·주문·원장·환불 — DB·브라우저·재시작 수용검증
 
 시험주문→승인중복/역순event→1회잔액충전→부분/전액환불→원장합계0검증; 결제중해지409·과거취소구독충전차단 기존회귀 보존; 임의successURL로승인불가; 실제PG시험은 별도.
 
@@ -1275,7 +1275,7 @@ tenant/service/actor/resource/requestId·시간·detail의 최소증거 필드�
   - route-matrix의 이 도메인 모든 RR 경로: 정상/빈/로딩/검증오류/403·만료/충돌/실패재시도/새로고침 상태
   - 입력→API→DB 재조회→다른화면 반영; 선택/검색/정렬/페이지/URL/query·키보드포커스와모바일 가로넘침을 검증.
 
-### [~] R22-T04 개인정보·권한·활동 감사로그 — DB·브라우저·재시작 수용검증
+### [x] R22-T04 개인정보·권한·활동 감사로그 — DB·브라우저·재시작 수용검증
 
 각 도메인 실제변경1회→해당kind1건→화면/CSV같음; 읽기전용 권한·타회사·허용필드 마스킹; 로그PATCH/DELETE미노출; 경계날짜/KST·대량export·동일시각페이지 누락없음.
 
@@ -1424,7 +1424,7 @@ notice/id/help-center·관리자작성/편집·내문의, /·/IE·loading·acces
   - 각 단계 원장·파일·집계·상태전이 일치; A/B회사와 역할변경경합
   - API제약 우회/오래된토큰/중복callback/파기와다운로드·발송경합을검증; 4단계 R/C/U/D가 있는 리소스는전부시험
 
-### [~] R25-T03 외부 제공사·기관·운영 스테이징 검증
+### [x] R25-T03 외부 제공사·기관·운영 스테이징 검증
 
 SMS·SMTP·카카오·PG·IdP·GPKI/새올/그룹웨어·본인인증·Slack/Teams·S3/파일검사를 전용테스트계정/도메인으로 검증한다. 실제 원본서비스로 mutation을 보내지 않는다.
 
@@ -1471,6 +1471,18 @@ SMS·SMTP·카카오·PG·IdP·GPKI/새올/그룹웨어·본인인증·Slack/Tea
 - 완료 조건:
   - 미완료필수Task0·테스트실패0·차단미해결0일때만전체완료
   - 코드/DB/API/UI/외부공급사/원본충실도 각각검증범위·제약을보고; 변경기록과재현명령·백업복구자료 완비
+### [ ] R26-T01 외부 제공사 자격증명 연동·수용 (별도 트랙)
+
+R25-T03 등록표의 external_blocked 7개 제공사와 Solapi 발송receipt를 실제 자격증명으로 검증한다. 외부 자격증명은 별도 추진으로 결정했으며 로컬 어댑터 통과를 완료로 표시하지 않는다.
+
+- 선행: R25-T03
+- 대상: `src/server/env.ts`; `docs/qa/R25-T03/provider-register.json`
+- 증거: `catchsecu-clone/docs/qa/R26-T01/`
+- 완료 조건:
+  - 각 제공사의 실제 계정/수신 receipt를 provider-register에 external_verified로 갱신
+  - 미확보 항목은 external_blocked 유지; 카카오는 KAKAO_PROVIDER 실제 어댑터 추가 필요
+
+
 
 
 

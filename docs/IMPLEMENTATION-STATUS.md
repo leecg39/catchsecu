@@ -1,6 +1,6 @@
-# 2026-10-14 R25 최종 수용 — 로컬 수용 완료·외부 제공사 pending
+# 2026-10-14 최종 수용 — 구현 완료·외부 검증은 R26-T01 별도 트랙
 
-107개 활성 작업 전수 검토 종료: **completed 85 · in_progress 22 · planned 0**. in_progress 22개는 전부 `local verified + external_pending`(내부 구현·로컬 증거 완료, 공식 공급자 증거만 잔여). 레거시 72개 매핑 완료, `scripts/verify-plan-integration.ts` **passed**.
+108개 활성 작업: **completed 107 · in_progress 0 · planned 1(R26-T01)**. 사용자 결정으로 외부 자격증명 검증을 전담 트랙 `R26-T01`로 이관했고, 도메인 작업은 전부 로컬 수용 완료다. 레거시 72개 매핑 완료, `scripts/verify-plan-integration.ts` **passed**. 이관된 22개 작업은 task-level `external_status=external_pending`을 유지해 외부 증거 잔여를 표기한다.
 
 - R25-T01 경로 스윕 `passed_with_skips`: 186경로 중 161 검사 전부 통과(0 실패), fixture 불가 25 스킵 사유 기록. [검증](qa/R25-T01/README.md)
 - R25-T02 전 도메인 교차 흐름 7단계 PASS. [검증](qa/R25-T02/README.md)

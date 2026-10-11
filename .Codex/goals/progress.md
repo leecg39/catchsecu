@@ -1,4 +1,8 @@
-## 최신 작업: R25 전체 통합·최종 수용 — 로컬 수용 완료·외부 제공사 pending
+## 최신 작업: 계획 마감 — 107/108 completed, 외부 검증은 R26-T01 별도 트랙
+
+2026-10-14 사용자 결정으로 외부 자격증명 검증을 별도 추진으로 확정. in_progress 22개(전부 local verified + external_pending)의 외부 표면을 신규 트랙 `R26-T01`(planned: 제공사 자격증명 연동·수용)로 이관하고 전부 completed 처리 — 각 태스크의 task-level `external_status`는 `external_pending` 유지로 공식 증거 잔여를 표기한다. verifier 계약 107→108 갱신 후 **passed**(completed 107·in_progress 0·planned 1). 최종 보고 판정 `implementation_acceptance_complete__external_verification_deferred_to_R26_T01`. 카카오는 KAKAO_PROVIDER 실제 어댑터 추가가 필요한 유일한 코드 작업. [최종보고](../../docs/qa/R25-T06/README.md).
+
+## 이전 작업: R25 전체 통합·최종 수용 — 로컬 수용 완료·외부 제공사 pending
 
 2026-10-14 R25 도메인 완료. T01 전 경로 스윕(`passed_with_skips`): 186경로 중 161 검사 전부 통과(0실패), fixture 불가 25경로 사유기록 — 의도된 리다이렉트·인증게이트(401/410/422)·와일드카드 404는 정상거동 주석, 레이트리밋 일시 5xx는 2패스 쿨다운으로 실제 결함과 구분. T02 교차흐름 7단계 PASS(폼게시→제출동의→공유열람→캠페인발송→과금원장→철회파기→감사통계). T03 제공사 등록 11건: Solapi 읽기전용 계정인증 external_verified 1·external_blocked 7(SMTP·카카오·PG·웹훅·S3·IdP·본인확인)·local_verified 3 — 잔액0으로 발송receipt 없음을 명시. T04 운영런북 4단계 PASS(레거시 dry-run 격리·migration 상태·만료lease 회수 done·백업복원 131테이블 지문). T05 a11y 10p 통과(랜드마크·레이블100%·alert·Tab·390px 무오버플로)·목록API 5종 중앙값21~58ms·원본대조 153건(similar115/close13/diverged25 — 100%일치 미주장). T06 최종 보고 `local_acceptance_complete__external_provider_pending` — 전체완료 미주장, 표면별 제약·재현명령·백업자료 집계. 공식 완료85/진행22(전부 external_pending)·계획0. plan verifier passed. [최종보고](../../docs/qa/R25-T06/README.md).
 

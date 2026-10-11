@@ -36,7 +36,7 @@ const check = (condition: unknown, message: string) => { if (!condition) failure
 
 const taskById = new Map(tasks.map(task => [task.id, task]));
 const legacyById = new Map(legacy.map(task => [task.id, task]));
-check(tasks.length === 107, `active task count ${tasks.length} != 107`);
+check(tasks.length === 108, `active task count ${tasks.length} != 108`);
 check(legacy.length === 72, `legacy task count ${legacy.length} != 72`);
 check(sourceRoutes.length === 186, `source route count ${sourceRoutes.length} != 186`);
 check(additionalRoutes.length === 21, `additional route count ${additionalRoutes.length} != 21`);
