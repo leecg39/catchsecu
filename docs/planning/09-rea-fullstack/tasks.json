@@ -3550,23 +3550,30 @@
   "legacy_tasks": [
    "P07-T02"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "model",
-  "evidence_directory": "catchsecu-clone/docs/qa/R15-T01/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R15-T01",
+  "completion_evidence": [
+   "docs/qa/R15-T01/README.md"
+  ],
   "dependency_gates": {
    "R11-T04": "local_acceptance_pass",
    "R13-T04": "local_acceptance_pass"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_applicable",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "MarketingPreference((tenant,service,channel,contactHash)유일 중복통합)·Event불변·Suppression억제·erased 파기·sourceKind·증빙 핀 대조.",
+  "progress_evidence": [
+   "docs/qa/R15-T01/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R15-T02",
@@ -3590,22 +3597,29 @@
   "legacy_tasks": [
    "P07-T02"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "backend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R15-T02/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R15-T02",
+  "completion_evidence": [
+   "docs/qa/R15-T02/README.md"
+  ],
   "dependency_gates": {
    "R15-T01": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "preferences CRUD/withdrawals/export/sources/summary+억제 연계 계약=구현=검증. 철회 재검사·재동의 새 근거·연계 잡 사본 파기.",
+  "progress_evidence": [
+   "docs/qa/R15-T02/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R15-T03",
@@ -3628,22 +3642,31 @@
   "legacy_tasks": [
    "P07-T02"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "frontend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R15-T03/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R15-T03",
+  "completion_evidence": [
+   "docs/qa/R15-T03/README.md",
+   "docs/qa/marketing/browser-default-consent.json"
+  ],
   "dependency_gates": {
    "R15-T02": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_applicable",
-   "api": "not_applicable",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "/form/ad-manage 브라우저: 검색5조건·채널통합 고지·선택철회·근거등록·marketing-detail 링크·실데이터 행.",
+  "progress_evidence": [
+   "docs/qa/R15-T03/README.md",
+   "docs/qa/marketing/browser-default-consent.json"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R15-T04",
@@ -3665,22 +3688,30 @@
   "legacy_tasks": [
    "P07-T02"
   ],
-  "status": "planned",
+  "status": "in_progress",
   "stage": "verification",
-  "evidence_directory": "catchsecu-clone/docs/qa/R15-T04/",
+  "evidence_directory": "docs/qa/R15-T04",
   "completion_evidence": [],
   "dependency_gates": {
    "R15-T03": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "external_pending",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "external_pending"
+  },
+  "progress_note": "라이프사이클 재실행: 채널별 동의 생성→멱등·수식방어CSV·예약잡→철회 원자일괄 멱등→재시작 후 erased+연계 잡 payload/사본 동시 파기→원본 지문 동일.",
+  "progress_evidence": [
+   "docs/qa/R15-T04/README.md",
+   "docs/qa/R15-T04/lifecycle/http-prepare.json",
+   "docs/qa/R15-T04/lifecycle/http-finish.json",
+   "docs/qa/R15-T04/lifecycle/dev-database.json"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R16-T01",

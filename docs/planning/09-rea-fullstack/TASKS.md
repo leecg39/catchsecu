@@ -868,7 +868,7 @@ init/upload/inspect/validate/commit/retry/cancel/rows/errors.csv를 상태기계
 
 ## R15 광고 동의·수신거부
 
-### [ ] R15-T01 광고 동의·수신거부 — 모델·규칙 대조 및 보완
+### [x] R15-T01 광고 동의·수신거부 — 모델·규칙 대조 및 보완
 
 주체·서비스·채널별 동의, 취득출처/일시/문구버전, 철회이벤트와 억제목록의 연결을 확인한다. 중복수신자 통합 기준과 목적별 동의범위를 명시한다.
 
@@ -880,7 +880,7 @@ init/upload/inspect/validate/commit/retry/cancel/rows/errors.csv를 상태기계
   - C 근거 있는 동의등록; R 동의목록·집계·내보내기; U 채널별 동의/철회; D 근거 삭제가 아닌 동의회수·보존정책 적용.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R15-T02 광고 동의·수신거부 — 서버 API·업무 처리
+### [x] R15-T02 광고 동의·수신거부 — 서버 API·업무 처리
 
 preferences CRUD/withdrawals/export/sources/summary를 실제 ConsentReceipt와 연결한다. 철회는 예약발송이 claim되는 시점에도 재검사되며 재동의는 새로운 근거를 요구한다.
 
@@ -892,7 +892,7 @@ preferences CRUD/withdrawals/export/sources/summary를 실제 ConsentReceipt와 
   - 동의→검색→철회→예약발송억제; 중복제거 on/off 집계 대조; 원본 응답정정 시 잘못된 주체 재동의 방지; 권한없는 복호화·타회사 export 실패.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [ ] R15-T03 광고 동의·수신거부 — 전체 화면·모달 연결
+### [x] R15-T03 광고 동의·수신거부 — 전체 화면·모달 연결
 
 /form/ad-manage 검색조건(동의일·이메일/전화 존재·중복제거), 채널/서비스/폼 필터, 선택철회·수정·내보내기와 marketing-detail 집계를 연결한다.
 
