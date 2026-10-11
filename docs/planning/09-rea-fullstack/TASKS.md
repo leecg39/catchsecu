@@ -1128,7 +1128,7 @@ mail 폼/직접발송·발신주소/발송내역/주소없음 화면, 편집기�
 
 ## R20 알림 받기·웹훅·이메일 알림
 
-### [ ] R20-T01 알림 받기·웹훅·이메일 알림 — 모델·규칙 대조 및 보완
+### [x] R20-T01 알림 받기·웹훅·이메일 알림 — 모델·규칙 대조 및 보완
 
 integration→subscription(service/form/event)과 delivery/attempt, 암호화endpoint 및 generation을 검사한다. 화면에서 본 9이벤트를 서버 발생지와 일대일 대응시킨다.
 
@@ -1140,7 +1140,7 @@ integration→subscription(service/form/event)과 delivery/attempt, 암호화end
   - C 알림설정/이벤트구독; R 설정·전송이력; U 대상·채널·활성; D 설정해제·일괄삭제. 전달결과는 append-only.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R20-T02 알림 받기·웹훅·이메일 알림 — 서버 API·업무 처리
+### [x] R20-T02 알림 받기·웹훅·이메일 알림 — 서버 API·업무 처리
 
 CRUD/options/test/enabled/bulk-delete/deliveries/retry를 검증하고 실제 업무 트랜잭션에서 outbox를 만든다. HTTPS목적지·내부주소차단·secret마스킹·재시도 상한을 점검한다.
 
@@ -1152,7 +1152,7 @@ CRUD/options/test/enabled/bulk-delete/deliveries/retry를 검증하고 실제 �
   - 폼응답이벤트→정확한 대상1회전송→실패/재시도→비활성/삭제 즉시중단; 다른서비스이벤트누출없음; endpoint변경경합·타임아웃·내부망URL거부. Slack/Teams실제수신 별도.
   - 각 허용 C/R/U/D/action의 DB변화·감사/outbox 원자성·불허 U/D와 tenant/role/license 거부를 PostgreSQL 통합테스트로 확인.
 
-### [ ] R20-T03 알림 받기·웹훅·이메일 알림 — 전체 화면·모달 연결
+### [x] R20-T03 알림 받기·웹훅·이메일 알림 — 전체 화면·모달 연결
 
 목록·추가/편집 모달의 이름, webhook/email, 전체/선택 서비스·폼, 9이벤트, 활성토글·테스트·삭제·전송결과/재시도까지 연결한다.
 

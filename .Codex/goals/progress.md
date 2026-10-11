@@ -1,4 +1,20 @@
-## 최신 작업: R16 보유기간·파기 도메인 완료 — T01~T04 completed
+## 최신 작업: R20 알림 받기·웹훅 — T01~T03 완료·T04 로컬 수용 (external_pending)
+
+2026-10-14 R20 알림 도메인 로컬 완료. T01 모델 대조: NotificationIntegration(endpointCipher/endpointHost 분리·generation 세대·tombstone)→Subscription((integrationId,kind)유일·targetId null=전체)→Event(eventKey 유일·출처:버전)→Delivery(event+integration 유일·불변 Attempt). 원본 캡처는 목록 화면만 확보됐고 모달 이벤트 목록은 미캡처 — 과업서 "9이벤트"는 기획 추정이며 발생지가 실존하는 submission.created·import.completed+test만 구현함을 증거로 명시. T02 계약=구현=검증(11 op·이벤트는 업무tx 내 생성·SSRF 차단·세대 취소·재시도 상한). T03 브라우저: /integration/message 원본 문구·필터5·모달(이름/webhook/토글/이벤트별 대상)·"로컬 시험 모드" 고지·tombstone 즉시 제외. T04 라이브 수용 9케이스: 응답 이벤트→정확 1배달(페이로드에 응답내용 부재)·타서비스 함정 구독 누출 0·SSRF 3종 거부·disable이 큐잉 배달 즉시 취소·stale version 409·삭제 tombstone+endpointCipher 파기·재시작 영속. tests/server/notifications.test.ts 25건 보강. Slack/Teams 실제 수신 증거 없어 T04 in_progress/external_pending. 공식 완료64/진행19/계획24. [수용](../../docs/qa/R20-T04/README.md).
+
+## 이전 작업: R14 개인정보 업로드·이관 — T01~T04 완료 (외부 차원 없음)
+
+2026-10-14 R14 도메인 완료. ImportJob 상태기계(init→inspect→validate→commit→partialFailed→archive)·(tenant,job,rowNo)unique·duplicateOf·증빙 핀·암호화 스테이징·임대/재시도·원본파일 24h 후 삭제 대조. qa-import-lifecycle 3단계 재실행(QA_ORIGIN=3121): prepare 28(수식주입 방어·errors.csv 이스케이프·commit 202→worker 50행·원본 deleted·멱등 410)→finish 9(partialFailed 55/57·중복commit 409·archive 후 rows/errors 410)→database(55응답·55증빙·leaseGen2·109사/172인 지문 동일). imports.test 29건(UTF-8/EUC-KR·한글·대용량·잘못된 증빙·타사 파일). T01~T04 completed·외부 not_applicable. 공식 완료61/진행18/계획28. [수용](../../docs/qa/R14-T04/README.md).
+
+## 이전 작업: R13 정보주체 접근·동의 이력·본인인증 — T01~T03 완료·T04 로컬 수용 (external_pending)
+
+2026-10-14 R13 도메인 로컬 완료. qa-subject-access(QA_ORIGIN=3121): prepare 60케이스(접근 요청→브라우저 바운드 메일 토큰→1회 소비→주체 세션→동의/이벤트 접근→철회 요청/확정/취소→멱등 반복→마케팅 억제→회사/서비스/주체 경계)→서버 재기동→finish 11→database 대조. /infoOwner/find·find/complete·/identification/invalid 브라우저 실이동. 로컬 메일·본인확인 어댑터로 검증했으나 실제 외부 본인인증기관 증거 없어 T04 in_progress/external_pending. 공식 완료57/진행. [수용](../../docs/qa/R13-T04/README.md).
+
+## 이전 작업: R12 외부 공유·열람자 인증 — T01~T03 완료·T04 로컬 수용 (external_pending)
+
+2026-10-14 R12 도메인 로컬 완료. qa-r12-acceptance 9케이스: 3필드 폼 게시→공유(필드 선택 q1,q2·만료)→열람자 OTP 인증→공유범위 필드만 노출·비공유 응답 404·다른 공유 id 주입 차단·OTP 재사용 거부·필드 회수 즉시성(q3→q1 좁히기 후 q3 비노출)·토큰 비노출. /shared-privacy 열람 게이트+공유 관리 UI(초대/재발송/회수/로그) 브라우저 실이동. 공유 초대 메일 실수신 증거 없어 T04 external_pending. 공식 완료54/진행. [수용](../../docs/qa/R12-T04/acceptance/).
+
+## 이전 작업: R16 보유기간·파기 도메인 완료 — T01~T04 completed
 
 2026-10-14 R16 도메인 완료(외부 제공사 차원 없음, not_applicable). T01 모델 대조: 보유기한 우선순위 formVersion.retentionDays→form.designatedRetentionDays→companyRetentionDays, originalRetentionUntil 보존, legalHold가 워커 수집·요청 409 차단, retentionKey 자동 재생성 방지, 임대·attempts, 증명서 HMAC+불변, 파기 범위(파일객체·영수증·캠페인 복제본·마케팅·정정·메모·동의). T02 계약=구현=검증 일치(retention-rules 5작업·destruction-requests 6작업·certificates 3작업). T03 브라우저 실이동: /log/retention·destruction-schedule(완료요청 행)·destruction_certificate(무결성 확인·증명서 행)·collect-destruction(일별 수집/파기/잔여 24건). T04 라이프사이클 재실행(production 3121): prepare 33케이스(보류차단→요청→취소→재예약승인초기화→승인→워커→증명서→원문{}·파일410·멱등재생410)→서버 재기동→finish 7케이스(재로그인·요청 유지·증명서 유지·401)→database 대조(개인행 0건·암호화객체 ENOENT·캐시3 무효화·사유 암호문 제거·대조군 해시 동일). qa-destruction-lifecycle에 QA_ORIGIN/QA_OUT override 추가(P07 증거 보존). 공식 완료50/진행17/계획40. [수용](../../docs/qa/R16-T04/README.md).
 

@@ -4421,22 +4421,29 @@
    "P09-T05",
    "P09-T06"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "model",
-  "evidence_directory": "catchsecu-clone/docs/qa/R20-T01/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R20-T01",
+  "completion_evidence": [
+   "docs/qa/R20-T01/README.md"
+  ],
   "dependency_gates": {
    "R11-T04": "local_acceptance_pass"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_applicable",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "통합→구독→이벤트→배달→시도 모델·endpointCipher/endpointHost 분리·generation 세대·발생지 일대일 대조. 원본은 목록만 캡처(9이벤트=기획추정) → 발생지 있는 2종+test만 구현함을 명시.",
+  "progress_evidence": [
+   "docs/qa/R20-T01/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R20-T02",
@@ -4460,22 +4467,29 @@
    "P09-T05",
    "P09-T06"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "backend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R20-T02/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R20-T02",
+  "completion_evidence": [
+   "docs/qa/R20-T02/README.md"
+  ],
   "dependency_gates": {
    "R20-T01": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_applicable",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "CRUD/options/test/enabled/bulk-delete/deliveries/retry 계약=구현=검증. 이벤트는 업무 tx 내 생성·HTTPS+SSRF차단·비밀값 마스킹·재시도 상한·세대 취소.",
+  "progress_evidence": [
+   "docs/qa/R20-T02/README.md"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R20-T03",
@@ -4497,22 +4511,31 @@
    "P09-T05",
    "P09-T06"
   ],
-  "status": "planned",
+  "status": "completed",
   "stage": "frontend",
-  "evidence_directory": "catchsecu-clone/docs/qa/R20-T03/",
-  "completion_evidence": [],
+  "evidence_directory": "docs/qa/R20-T03",
+  "completion_evidence": [
+   "docs/qa/R20-T03/README.md",
+   "docs/qa/notifications/browser-fixture.json"
+  ],
   "dependency_gates": {
    "R20-T02": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "not_applicable",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_applicable",
-   "api": "not_applicable",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "not_applicable"
+  },
+  "progress_note": "/integration/message 브라우저: 원본 문구·필터5·컬럼·모달(이름/webhook/토글/이벤트별 대상)·로컬모드 고지·tombstone 즉시 제외.",
+  "progress_evidence": [
+   "docs/qa/R20-T03/README.md",
+   "docs/qa/notifications/browser-fixture.json"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R20-T04",
@@ -4535,22 +4558,29 @@
    "P09-T05",
    "P09-T06"
   ],
-  "status": "planned",
+  "status": "in_progress",
   "stage": "verification",
-  "evidence_directory": "catchsecu-clone/docs/qa/R20-T04/",
+  "evidence_directory": "docs/qa/R20-T04",
   "completion_evidence": [],
   "dependency_gates": {
    "R20-T03": "task_complete"
   },
-  "local_status": "not_run",
-  "external_status": "not_assessed",
+  "local_status": "verified",
+  "external_status": "external_pending",
   "source_fidelity_status": "not_assessed",
   "verification_status": {
-   "database": "not_assessed",
-   "api": "not_assessed",
-   "ui": "not_assessed",
-   "external": "not_assessed"
-  }
+   "database": "verified",
+   "api": "verified",
+   "ui": "verified",
+   "external": "external_pending"
+  },
+  "progress_note": "라이브9: 응답이벤트→정확1배달·타서비스누출0·SSRF거부·disable즉시취소·stale409·삭제tombstone·비밀파기·재시작영속. Slack/Teams실수신=external_pending.",
+  "progress_evidence": [
+   "docs/qa/R20-T04/README.md",
+   "docs/qa/R20-T04/acceptance/http-run.json",
+   "docs/qa/R20-T04/acceptance/restart.json"
+  ],
+  "updatedOn": "2026-10-14"
  },
  {
   "id": "R21-T01",
