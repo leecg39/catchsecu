@@ -1,0 +1,61 @@
+{
+  "checkedAt": "2026-10-11T04:19:51.006Z",
+  "result": "passed",
+  "database": "catchsecu_test",
+  "operations": 33,
+  "routeFiles": 9,
+  "contracts": {
+    "openapiPaths": 333,
+    "openapiOperations": 474,
+    "policyRows": 474,
+    "requiredIdempotentMutations": 6
+  },
+  "regression": {
+    "files": 12,
+    "tests": 143,
+    "log": "docs/qa/R09-T02/current/regression.log"
+  },
+  "liveDatabaseInvariants": {
+    "duplicateActiveApprovals": 0,
+    "consumedApprovalsWithoutPublication": 0,
+    "multipleActivePublications": 0,
+    "archivedFormsWithActivePublication": 0,
+    "crossTenantFixedUrls": 0,
+    "publicationVersionMismatch": 0
+  },
+  "verifiedBehavior": [
+    "approval request/decide/cancel transitions with transactional form status changes",
+    "draft→approval→publish→pause→resume flow binding approval to draft/policy/content hash",
+    "self-approval allowed only for configured approval roles; unconfigured role decisions rejected",
+    "expired subscription blocks new billable resources (402) while existing approval/publish/fixed-url workflow continues",
+    "same-slug concurrent create conflict (201 + 409) and immediate revoke to 410",
+    "read/copy-link operations never create publications, responses or audit rows",
+    "audit persistence failure atomically rolls back approval/publish/fixed-url writes",
+    "current membership/role/service-grant rechecked at request and replay time"
+  ],
+  "externalProvider": "not_applicable_to_R09-T02_local_API; separated in R09-T04",
+  "sourceHashes": {
+    "docs/planning/09-rea-fullstack/api-ownership.json": "0872a8065043122d4da1de1a3fc02c2a5060ab7ee2ccc2ba87fbbf7272421d9a",
+    "docs/planning/contracts/openapi.json": "a5b86ae5e1a545981fd6bc16cca18229704238cc822a2752a084509ef8fac26b",
+    "docs/planning/contracts/operation-policy-matrix.csv": "e437de8740b59efe39ec2edefe64f50adc9d3cfdec95977b973b552444db21ca",
+    "src/app/api/v1/approvals/[...segments]/route.ts": "41b5e9a6c811296e84f2f7ac78422589da0538d1736518710de92bdffb27cf27",
+    "src/app/api/v1/approvals/route.ts": "84e2a19403aa4f0e7dff3b99be37c74e8a6af07c3e2de7cee68a3b922a15a4d4",
+    "src/app/api/v1/fixed-urls/[id]/route.ts": "fc828e0c7e098db82368a5f29f88e2bb36911960dd2e3c6abbc747706aca890f",
+    "src/app/api/v1/fixed-urls/route.ts": "e7b4025cf6eb43fdc733f9dbeeb4c5bca0cc7d39250dc2ba56933e3a962ac29a",
+    "src/app/api/v1/forms/[...segments]/route.ts": "f03ad39628569bf9d1dedc17735cd6f5a17ae4a90d19ba7525f95a646350395b",
+    "src/app/api/v1/forms/[id]/submissions/export/route.ts": "21403779aaf81647fe20cc3c59df598b36e8f66bea8226824662141251c23f75",
+    "src/app/api/v1/forms/document-options/route.ts": "f0425339edec3577fd2c1b8d40e884d20b1d6f54ed711fc27c7b77f8ebdfe564",
+    "src/app/api/v1/forms/route.ts": "a5bbed6c1ba221eec0c89839d920f82a6afe65dcfb83195f0952eb0267f84522",
+    "src/app/api/v1/public/urls/[slug]/route.ts": "40a3d3b3ed83a7c536e607f1e2193242c65376d2170e19b866b13e6c788063d1",
+    "src/server/approvals.ts": "194ffe28d5efff71981937ada77e953457a09f0e31b6298528658c06b9cb0036",
+    "src/server/entitlements.ts": "2ff1a2a5bb0d88acf02e63fc7043248a371da4f0e63faf94e007b281b4a256da",
+    "src/server/fixed-urls.ts": "7b2e151fa2979840dae13272b016b1b77105ad4e6d8174ea178a03e8f194a4a2",
+    "src/server/form-access.ts": "2a088f47f97e0342e0717bfab47d3e25c9c292d1bc12e926f721998142babf11",
+    "src/server/forms.ts": "9ca1f377f517ea9767241a1f705d6e3d6c584251b1baa320f57024f5154f25a4",
+    "src/server/http.ts": "2495c5cb84bb541d8aab08e1684d8bfdc85b55a4be16f2d0f4145b0bf61c389c",
+    "src/server/idempotency.ts": "cff00186d5ad761363d9dbf84173f5cd3ef22759494a397fb9970ba316a8be70",
+    "src/server/public-publication.ts": "61185bcb40af37128518e43bfdaf237363841287a9eb62e7a3cf574e96782e89",
+    "tests/server/r09-publish-contract.test.ts": "ea1c794a7f2872d13ae9c91628bb1c7a4d3ca82c5c8ba39116cdfd0eef280d8f"
+  },
+  "failures": []
+}

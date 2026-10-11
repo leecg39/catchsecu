@@ -14072,6 +14072,17 @@
           }
         },
         "x-origin-check": "exact configured application Origin",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            }
+          }
+        ],
         "x-contract-policy": "forms"
       }
     },

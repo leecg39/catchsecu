@@ -2380,22 +2380,29 @@
       "P04-T03",
       "P04-T05"
     ],
-    "status": "planned",
+    "status": "completed",
     "stage": "backend",
     "evidence_directory": "catchsecu-clone/docs/qa/R09-T02/",
-    "completion_evidence": [],
+    "completion_evidence": [
+      "docs/qa/R09-T02/README.md",
+      "docs/qa/R09-T02/current/api-audit.json",
+      "docs/qa/R09-T02/current/regression.log",
+      "tests/server/r09-publish-contract.test.ts"
+    ],
     "dependency_gates": {
       "R09-T01": "task_complete"
     },
-    "local_status": "not_run",
-    "external_status": "not_assessed",
-    "source_fidelity_status": "not_assessed",
+    "local_status": "verified",
+    "external_status": "not_applicable",
+    "source_fidelity_status": "observed_api_contract_mapped",
     "verification_status": {
-      "database": "not_assessed",
-      "api": "not_assessed",
+      "database": "verified",
+      "api": "verified",
       "ui": "not_applicable",
-      "external": "not_assessed"
-    }
+      "external": "not_applicable"
+    },
+    "progress_note": "R09 소유 33개 API 작업을 9개 실제 handler와 대조하고 누락된 /forms/{id}/revise 필수 Idempotency-Key를 계약에 추가했다. 자기승인(구성된 approvalRoles+form.approve만 허용)과 만료 라이선스 write gate(신규 청구자원 생성만 402·기존 폼 워크플로 계속)를 계약으로 확정했다. 초안→승인→게시→410→재개·승인본 바꿔치기·이전 링크 정책·slug 경쟁409·복사≠게시·감사실패 원자롤백·현재권한 재검사를 PostgreSQL 시험으로 고정했다. 회귀12파일143시험 통과, DB 불변조건 6종 모두0.",
+    "updatedOn": "2026-10-11"
   },
   {
     "id": "R09-T03",

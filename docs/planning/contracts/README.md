@@ -110,6 +110,15 @@ owner/admin 외 역할의 서비스 자산 접근은 별도 `ServiceGrant`가 �
 이 결정이 모든 원본 경로의 UX를 관찰했다는 뜻은 아니다. [원본 관찰 상태](../../research/COVERAGE.md)의 제한 경로는 해당 구현 Task에서 다시 확인한다.
 
 
+## R09-T02 승인·게시·고정 URL 계약 결정
+
+2026-10-11. 요청→결정→게시→고정 URL의 두 계약 분기를 확정했다.
+
+- **자기승인**: 회사 `SecurityPolicy.approvalRoles`에 구성된 역할(`owner|admin|security`; `owner`는 계약상 항상 포함)이면 요청자 본인이 결정할 수 있다. 구성되지 않은 역할은 본인 요청도 `REVIEWER_FORBIDDEN`으로 거부되고, `form.approve` capability가 없으면 결정 API 자체가 거부된다. 게시 시점에는 검토자의 현재 활성 멤버십·역할·서비스 grant를 다시 검사해 권한 상실 승인을 `REVIEWER_UNAVAILABLE`로 막는다. 요청 취소는 요청자 또는 `owner`만 가능하다.
+- **만료 라이선스 write gate**: 구독 한도(`assertQuota`)는 신규 청구 자원(`services|members|subjects|forms`) 생성만 402·409로 막는다. 기존 폼의 승인 요청·결정·게시·중단·재개·고정 URL 생성은 구독 만료와 무관하게 현재 capability/서비스 grant로 계속 처리한다. 증거·수집 워크플로 보존을 위해 만료가 기존 자산의 상태 전이를 잠그지 않는다.
+- `POST /forms/{id}/revise`는 실행 계약상 `Idempotency-Key`가 필수다(2026-10-11 계약 표 갱신).
+
+
 ## P07-T03 파기 계약 보완
 
 현재 항목별 작업 권한·실제 기한·검색/정렬/페이지·엄격한 쿼리·증명서 무결성 검사를 연결했다. 계약 257경로·376작업·33정책, 매핑/권한/입력 누락 0이며 공식 완료는 15/72다. [검증](../../qa/P07-T03/README.md).

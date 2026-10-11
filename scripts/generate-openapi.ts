@@ -599,7 +599,7 @@ add("/templates/{id}/restore", "post", "form.write + service grant; public read-
 for (const path of ["/services/{id}", "/forms/{id}", "/fixed-urls/{id}", "/members/{id}", "/invitations/{id}", "/templates/{id}", "/submissions/{id}/notes/{noteId}"]) {
   (paths[path].delete as Operation).parameters = [{ in: "header", name: "If-Match", required: true, schema: { type: "string", pattern: "^[1-9][0-9]*$" } }];
 }
-for (const path of ["/forms", "/forms/{id}/copy", "/forms/{id}/publish", "/public/forms/{token}/submissions", "/submissions/{id}/notes", "/fixed-urls", "/invitations", "/invitations/accept", "/templates", "/templates/{id}/use"]) {
+for (const path of ["/forms", "/forms/{id}/copy", "/forms/{id}/publish", "/forms/{id}/revise", "/public/forms/{token}/submissions", "/submissions/{id}/notes", "/fixed-urls", "/invitations", "/invitations/accept", "/templates", "/templates/{id}/use"]) {
   (paths[path].post as Operation).parameters = [{ in: "header", name: "Idempotency-Key", required: true, schema: { type: "string", pattern: "^[A-Za-z0-9_-]{16,128}$" } }];
 }
 for (const [path, item] of Object.entries(paths)) if (path.startsWith("/public/") || path === "/health")

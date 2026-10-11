@@ -558,7 +558,7 @@ Form와 버전/질문/보기 관계, 게시본 불변·draft revision, 질문 �
   - C 승인요청/게시/고정URL; R 승인상세·게시상태; U 승인결정·URL 대상·재개; D 승인취소·URL 폐기·게시중단.
   - 사용 필드·관계·FK/unique/index·상태전이·보존/삭제 및 scope를 schema/DTO로 대조. 수정 필요 항목만 새migration; 기존DB 재사용.
 
-### [ ] R09-T02 폼 승인·게시·고정 URL — 서버 API·업무 처리
+### [x] R09-T02 폼 승인·게시·고정 URL — 서버 API·업무 처리
 
 요청/승인/거절/취소와 publish/pause/resume/고정URL CRUD를 트랜잭션으로 연결한다. 자기승인 허용 여부를 계약으로 확정하고 만료 라이선스에서 write gate를 검증한다.
 
